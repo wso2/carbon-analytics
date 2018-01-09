@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.idp.client.core.exception.AuthenticationExcepti
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.internal.DataHolder;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
+import org.wso2.carbon.stream.processor.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.Response;
 import org.wso2.msf4j.interceptor.RequestInterceptor;
@@ -61,19 +62,19 @@ public class AuthenticationInterceptor implements RequestInterceptor {
             }
             IdPClient idPClient = DataHolder.getInstance().getIdPClient();
             HttpHeaders headers = request.getHeaders();
-            String authorizationHeader = request.getHeader(IdPClientConstants.AUTHORIZATION_HEADER);
+            String authorizationHeader = request.getHeader(SPConstants.AUTHORIZATION_HEADER);
             if (authorizationHeader != null && authorizationHeader.contains(" ")) {
                 String headerPrefix = authorizationHeader.split(" ")[0];
                 String headerPostfix = authorizationHeader.split(" ")[1];
                 if (headerPostfix != null) {
-                    if (headerPrefix.equalsIgnoreCase(IdPClientConstants.BEARER_PREFIX)) {
-                        String cookieHeader = headers.getHeaderString(IdPClientConstants.COOKIE_HEADER);
+                    if (headerPrefix.equalsIgnoreCase(InterceptorConstants.BEARER_PREFIX)) {
+                        String cookieHeader = headers.getHeaderString(SPConstants.COOKIE_HEADER);
                         String partialTokenFromCookie = null;
                         if (cookieHeader != null) {
                             cookieHeader = cookieHeader.trim();
                             String[] cookies = cookieHeader.split(";");
                             String token2 = Arrays.stream(cookies)
-                                    .filter(name -> name.contains(IdPClientConstants.WSO2_SP_TOKEN_2))
+                                    .filter(name -> name.contains(SPConstants.WSO2_SP_TOKEN_2))
                                     .findFirst().orElse("");
                             String tokensArr[] = token2.split("=");
                             if (tokensArr.length == 2) {
@@ -89,7 +90,7 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                             return true;
                         }
                         return false;
-                    } else if (headerPrefix.equalsIgnoreCase(IdPClientConstants.BASIC_PREFIX)) {
+                    } else if (headerPrefix.equalsIgnoreCase(InterceptorConstants.BASIC_PREFIX)) {
                         byte[] decodedAuthHeader = Base64.getDecoder().decode(headerPostfix);
                         String authHeader = new String(decodedAuthHeader, Charset.forName("UTF-8"));
                         if (authHeader.contains(":")) {

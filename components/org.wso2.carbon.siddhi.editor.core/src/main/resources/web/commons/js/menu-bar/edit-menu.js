@@ -61,7 +61,17 @@ define(([],function (){
                 id: "find",
                 label: "Find",
                 command: {
-                    id: "find"
+                    id: "find",
+                    labels: {
+                        mac: {
+                            //key: "command+f",
+                            label: "\u2318F"
+                        },
+                        other: {
+                            //key: "ctrl+f",
+                            label: "Ctrl+F"
+                        }
+                    }
                 },
                 disabled: true
             },
@@ -69,7 +79,17 @@ define(([],function (){
                 id: "findAndReplace",
                 label: "Find and Replace",
                 command: {
-                    id: "findAndReplace"
+                    id: "findAndReplace",
+                    labels:{
+                        mac: {
+                            //key: "command+option+f",
+                            label: "\u2318\u2325f"
+                        },
+                        other: {
+                            //key: "ctrl+h",
+                            label: "Ctrl+H"
+                        }
+                    }
                 },
                 disabled: true
             }

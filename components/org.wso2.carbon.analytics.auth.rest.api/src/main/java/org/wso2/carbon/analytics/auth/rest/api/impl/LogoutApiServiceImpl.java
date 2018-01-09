@@ -23,9 +23,11 @@ import org.wso2.carbon.analytics.auth.rest.api.LogoutApiService;
 import org.wso2.carbon.analytics.auth.rest.api.NotFoundException;
 import org.wso2.carbon.analytics.auth.rest.api.dto.ErrorDTO;
 import org.wso2.carbon.analytics.auth.rest.api.internal.DataHolder;
+import org.wso2.carbon.analytics.auth.rest.api.util.AuthRESTAPIConstants;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthUtil;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.stream.processor.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 
 import java.util.HashMap;
@@ -48,7 +50,7 @@ public class LogoutApiServiceImpl extends LogoutApiService {
         String appContext = "/" + trimmedAppName;
 
         String accessToken = AuthUtil
-                .extractTokenFromHeaders(request.getHeaders(), IdPClientConstants.WSO2_SP_TOKEN);
+                .extractTokenFromHeaders(request.getHeaders(), AuthRESTAPIConstants.WSO2_SP_TOKEN);
         if (accessToken != null) {
             try {
                 Map<String, String> logoutProperties = new HashMap<>();
@@ -59,25 +61,21 @@ public class LogoutApiServiceImpl extends LogoutApiService {
 
                 // Lets invalidate all the cookies saved.
                 NewCookie appContextCookie = AuthUtil
-                        .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_2, "", appContext, true, true,
+                        .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, "", appContext, true, true,
                                 0);
                 NewCookie logoutContextAccessToken = AuthUtil
-                        .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN, "",
-                                IdPClientConstants.LOGOUT_CONTEXT + appContext, true, true, 0);
-
-                NewCookie refreshTokenHttpOnlyCookie = AuthUtil
-                        .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_2, "", appContext, true, true,
-                                0);
+                        .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, "",
+                                AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, 0);
                 NewCookie loginContextRefreshToken = AuthUtil
-                        .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN, "",
-                                IdPClientConstants.LOGIN_CONTEXT + appContext, true, true, 0);
+                        .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, "",
+                                AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true, 0);
 
                 return Response.ok()
                         .cookie(appContextCookie, logoutContextAccessToken,
-                                refreshTokenHttpOnlyCookie, loginContextRefreshToken)
+                                loginContextRefreshToken)
                         .build();
             } catch (IdPClientException e) {
-                LOG.error("Error in logout for uri '" + appName + "', with token, '" + accessToken + "'.", e);
+                LOG.debug("Error in logout for uri '{}', with token, '{}'.", appName, accessToken, e);
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                 errorDTO.setDescription("Error in logout for uri '" + appName + "', with token, '" + accessToken +
@@ -85,10 +83,10 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                 return Response.serverError().entity(errorDTO).build();
             }
         }
-        LOG.error("Unable to extract the access token from the request uri '" + appName + "'.");
+        LOG.debug("Unable to extract the access token from the request uri '{}'.", appName);
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
         errorDTO.setDescription("Invalid Authorization header. Please provide the Authorization header to proceed.");
-        return Response.status(Response.Status.UNAUTHORIZED).entity(errorDTO).build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
     }
 }

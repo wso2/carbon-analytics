@@ -32,7 +32,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 container.empty();
                 // check whether container element exists in dom
                 if (!container.length > 0) {
-                    errMsg = 'unable to find container for welcome screen with selector: ' + _.get(options, 'container');
+                    errMsg = 'unable to find container for welcome screen with selector: ' +
+                        _.get(options, 'container');
                     log.error(errMsg);
                     throw errMsg;
                 }
@@ -85,7 +86,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(newButton);
                 buttonWrap.append(openButton);
 
-                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg"><h1>Stream Processor Studio</h1></h2>');
+                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg">' +
+                    '<h1>Stream Processor Studio</h1></h2>');
                 productNameWrap.append(productNameWrapHeader);
 
 
@@ -98,10 +100,18 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 recentFilesPane.append(recentFilesHeader);
 
                 var samplesHeader = $('<h4 class="margin-top-60">Try out samples</h4>');
-                samplesPane.append(samplesHeader);
+                samplesPane.append(samplesHeader)
                 var bodyUlSampleContent = $('<ul class="recent-files clearfix"></ul>');
+                var moreSampleLink = $('<a class="more-samples">' +
+                    '<i class="fw fw-application"></i>More Samples</a>');
                 bodyUlSampleContent.attr('id', "sampleContent");
                 samplesPane.append(bodyUlSampleContent);
+                samplesPane.append(moreSampleLink);
+
+                // Show the import file dialog when "More Samples" is clicked.
+                $(moreSampleLink).click(function(){
+                    command.dispatch("open-sample-file-open-dialog");
+                });
 
                 var quickLinkHeader = $('<h4 class="margin-top-60">Quick links</h4>');
                 quickLinksPane.append(quickLinkHeader);
@@ -115,8 +125,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
                     '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Tutorials"' +
                     'target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Samples"' +
-                    'target="_blank"><i class="fw fw-application"></i>Sample Docs</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Stream+Processor+Documentation"' +
+                    'target="_blank"><i class="fw fw-google-docs"></i>Documentation</a></li>' +
                     '<li class="col-md-4"><a href="http://wso2.com/support/"' +
                     'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
 
@@ -153,10 +163,10 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                         data: payload,
                         async: false,
                         success: function(data, textStatus, xhr) {
-                            var content = {"content": data.content};
                             var config =
                                 {
                                     "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
+                                    "content":data.content,
                                     "parentContainer": "#sampleContent",
                                     "firstItem": i === 0,
                                     "clickEventCallback": function (event) {
@@ -174,7 +184,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                             samplePreview.render();
                         },
                         error: function() {
-                            alerts.error("Unable to read a sample file.");
+                            alertError("Unable to read a sample file.");
                             throw "Unable to read a sample file.";
                         }
                     });
@@ -202,6 +212,23 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 this._tab.on('removed', function(){
                     browserStorage.put("pref:passedFirstLaunch", true);
                 });
+
+                function alertError(errorMessage) {
+                    var errorNotification = getErrorNotification(errorMessage);
+                    $("#notification-container").append(errorNotification);
+                    errorNotification.fadeTo(2000, 200).slideUp(1000, function () {
+                        errorNotification.slideUp(1000);
+                    });
+                }
+
+                function getErrorNotification(errorMessage) {
+                    return $(
+                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' id='error-alert'>" +
+                        "<span class='notification'>" +
+                        errorMessage +
+                        "</span>" +
+                        "</div>");
+                };
             }
         });
 

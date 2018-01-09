@@ -1,0 +1,9 @@
+@App:name('ReceiveAndCount')
+@source(type='inMemory', topic='symbol', @map(type='passThrough'))
+Define stream CustomerInformationStream(name string, age int, country string);
+@sink(type='log')
+define stream CountStream(name string, age int, country string, count long);
+@info(name='query1')
+from CustomerInformationStream
+select name, age, country, count() as count
+insert into CountStream;

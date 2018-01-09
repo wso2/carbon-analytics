@@ -274,7 +274,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                 = getAggregationsFromAggregationDefinitions(response.aggregationDefinitions);
                             for (var aggregationDefinition in aggregationDefinitions) {
                                 if (aggregationDefinitions.hasOwnProperty(aggregationDefinition)) {
-                                    self.completionEngine.streamsList[aggregationDefinition]
+                                    self.completionEngine.aggregationsList[aggregationDefinition]
                                         = aggregationDefinitions[aggregationDefinition];
                                 }
                             }
@@ -928,6 +928,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     case constants.TRIGGERS:
                         updateTriggerTooltip(tooltipData, row, column);
                         break;
+                    case constants.AGGREGATIONS:
+                        updateAggregationTooltip(tooltipData, row, column);
+                        break;
                     case constants.IO:
                         updateIOToolTip(tooltipData, row, column);
                         break;
@@ -1130,6 +1133,23 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 var trigger = editor.completionEngine.eventTriggersList[triggerName];
                 if (trigger && trigger.description) {
                     updateTokenTooltip(row, column, trigger.description);
+                }
+            }
+
+            /**
+             * Update the tooltip for an aggregation
+             *
+             * @param {object} tooltipData Tool tip data to be added. Should contain the aggregation name
+             * @param {int} row The row at which the target token is at
+             * @param {int} column The column at which the target token is at
+             */
+            function updateAggregationTooltip(tooltipData, row, column) {
+                var aggregationName = tooltipData.aggregationName;
+
+                var aggregation = editor.completionEngine.aggregationsList[aggregationName];
+                //var details = editor.incompleteData.aggregationsList;
+                if (aggregation && aggregation.description) {
+                    updateTokenTooltip(row, column, aggregation.description);
                 }
             }
 

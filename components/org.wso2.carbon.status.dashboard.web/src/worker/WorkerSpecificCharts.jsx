@@ -22,14 +22,14 @@ import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import DashboardUtils from "../utils/DashboardUtils";
-import VizG from "../gadgets/VizG";
+import VizG from 'react-vizgrammar';
 //Material UI
 import {CardMedia, CardTitle, Checkbox, GridList, GridTile, IconButton} from "material-ui";
 
 const loadMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
 const loadLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Load Average'}], width: 800, height: 350,
+    charts: [{type: 'line', y: 'Load Average',style: {markRadius: 2}}],
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -39,9 +39,9 @@ const loadLineChartConfig = {
         tickLabelColor:'#f2f2f2',
     }
 };
-const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
+const tpMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
 const tpLineChartConfig = {
-    x: 'Time', charts: [{type: 'line', y: 'Throughput'}], width: 800, height: 350,
+    x: 'Time', charts: [{type: 'line', y: 'Throughput(events/second)',style: {markRadius: 2}}],
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -54,9 +54,8 @@ const tpLineChartConfig = {
 const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const cpuLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'System CPU', fill: '#f17b31'}, {type: 'line', y: 'Process CPU'}],
-    width: 800,
-    height: 330,
+    charts: [{type: 'line', y: 'System CPU', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', fill: '#3366cc', y: 'Process CPU',style: {markRadius: 2}}],
+    width: 100, height: 50,
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -69,7 +68,8 @@ const cpuLineChartConfig = {
 const memoryMetadata = {names: ['Time', 'Used Memory', 'Total Memory'], types: ['time', 'linear', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Used Memory', fill: '#f17b31'}, {type: 'line', y: 'Total Memory'}],
+    charts: [{type: 'line', y: 'Used Memory', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'Total' +
+    ' Memory',fill: '#3366cc',style: {markRadius: 2}}],
     width: 800,
     height: 330,
     gridColor: '#f2f2f2',
@@ -136,7 +136,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.sysCpuChecked) {
             data = this.state.systemCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'System CPU'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', fill: '#f17b31', y: 'System CPU',style: {markRadius: 2}}],  width: 100, height: 50,
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -150,7 +150,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.processCpuChecked) {
             data = this.state.processCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Process CPU'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line',fill: '#3366cc', y: 'Process CPU',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -164,7 +164,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else {
             data = [];
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -193,7 +193,8 @@ export default class WorkerSpecificCharts extends React.Component {
             );
         } 
         else {
-            yLimit = DashboardUtils.getYDomain(DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu));
+            yLimit = DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
+            console.log(yLimit)
         }
         return (
             <GridTile className="container" title="CPU Usage" titlePosition="top" titleBackground='#303030'>
@@ -213,7 +214,7 @@ export default class WorkerSpecificCharts extends React.Component {
                             onCheck={(e, checked) => this.setState({sysCpuChecked: checked})}
                             checked={this.state.sysCpuChecked}
                             iconStyle={{fill: '#f17b31'}}
-                            style={{width: 150, fontSize: 12}}
+                            style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
                     <div>
@@ -221,19 +222,22 @@ export default class WorkerSpecificCharts extends React.Component {
                             label="Process CPU"
                             onCheck={(e, checked) => this.setState({processCpuChecked: checked})}
                             checked={this.state.processCpuChecked}
-                            iconStyle={{fill: '#f17b31'}}
-                            style={{width: 150, fontSize: 12}}
+                            iconStyle={{fill: '#3366cc'}}
+                            style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
                 </div>
                 <Link key="cpu" to={window.contextPath + '/worker/history/' + this.state.workerId }>
-                    <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
+                    <div style={{backgroundColor: '#131313', paddingTop: 18, height: 370}}>
+                        <div style={{backgroundColor: '#131313', height: 200, width: 500}}>
                         <VizG
                             data={data}
                             metadata={metadata} config={config}
                             yDomain={[yLimit[0],yLimit[1]]}
-                            xAxisTickCount ={20}
+                            width={590}
+                            height={230}
                         />
+                        </div>
                     </div>
                 </Link>
             </GridTile>
@@ -249,7 +253,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.totalMemoryChecked) {
             data = this.state.totalMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Total Memory'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line',fill: '#3366cc', y: 'Total Memory',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -265,7 +269,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.usedMemoryChecked) {
             data = this.state.usedMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Used Memory'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', fill: '#f17b31', y: 'Used Memory',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -280,7 +284,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else {
             data = [];
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -309,11 +313,11 @@ export default class WorkerSpecificCharts extends React.Component {
             );
         } 
         else {
-            yLimit = DashboardUtils.getYDomain(DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.totalMem));
+            yLimit = DashboardUtils.initCombinedYDomain(this.state.usedMem, this.state.totalMem);
         }
 
         return (
-            <GridTile className="container" title="Memory Used" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title="Memory Used(bytes)" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay" style={{color: '#303030', paddingTop: 40, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
@@ -330,7 +334,7 @@ export default class WorkerSpecificCharts extends React.Component {
                             onCheck={(e, checked) => this.setState({usedMemoryChecked: checked})}
                             checked={this.state.usedMemoryChecked}
                             iconStyle={{fill: '#f17b31'}}
-                            style={{width: 150, fontSize: 12}}
+                            style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
                     <div>
@@ -338,19 +342,22 @@ export default class WorkerSpecificCharts extends React.Component {
                             label="Total Memory"
                             onCheck={(e, checked) => this.setState({totalMemoryChecked: checked})}
                             checked={this.state.totalMemoryChecked}
-                            iconStyle={{fill: '#f17b31'}}
-                            style={{width: 150, fontSize: 12}}
+                            iconStyle={{fill: '#3366cc'}}
+                            style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
                 </div>
                 <Link key="memory" to={window.contextPath + '/worker/history/' + this.state.workerId }>
-                    <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
+                    <div style={{backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
+                        <div style={{backgroundColor: '#131313', height: 200, width: 500}}>
                         <VizG
                             data={data}
                             metadata={metadata} config={config}
-                             yDomain={[yLimit[0],yLimit[1]]}
-                             xAxisTickCount ={20}
+                            yDomain={[yLimit[0],yLimit[1]]}
+                            width={590}
+                            height={230}
                         />
+                        </div>
                     </div>
                 </Link>
             </GridTile>
@@ -383,13 +390,14 @@ export default class WorkerSpecificCharts extends React.Component {
                 </div>
                 <Link key="loadAverage"
                       to={window.contextPath +'/worker/history/' + this.state.workerId}>
-                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 10, height: '370px'}}>
-                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: '100%'}}>
+                    <div style={{backgroundColor: '#131313', paddingTop: 10, height: '370px'}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: 550}}>
                         <VizG data={this.state.loadAvg}
                               metadata={loadMetadata}
                               config={loadLineChartConfig}
                               yDomain={[yLimit[0],yLimit[1]]}
-                               xAxisTickCount ={20}
+                                width={550}
+                                height={255}
                         />
                         </div>
                     </div>
@@ -402,7 +410,7 @@ export default class WorkerSpecificCharts extends React.Component {
         let yLimit;
         if (this.state.throughputAll.length === 0) {
             return (
-                <GridTile className="container" title="Overall Throughput" titlePosition="top"
+                <GridTile className="container" title="Overall Throughput(events/second)" titlePosition="top"
                           titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
@@ -420,18 +428,19 @@ export default class WorkerSpecificCharts extends React.Component {
         }
         return (
 
-            <GridTile className="container" title="Overall Throughput" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title="Overall Throughput(events/second)" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay" style={{color: '#303030', paddingTop: 20, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
                 <Link key="throughput" to={window.contextPath + '/worker/history/' + this.state.workerId }>
-                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 10, height: '370px'}}>
-                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: '100%'}}>
+                    <div style={{backgroundColor: '#131313', paddingTop: 10, height: '370px'}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: 550}}>
                         <VizG data={this.state.throughputAll}
                               metadata={tpMetadata}
                               config={tpLineChartConfig}
                               yDomain={[yLimit[0],yLimit[1]]}
-                               xAxisTickCount ={20}
+                              width={550}
+                              height={255}
                         />
                         </div>
                     </div>

@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.207-SNAPSHOT</version>
+    <version>2.0.264-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -174,7 +174,6 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven.failsafe.plugin.version}</version>
                 </plugin>
-
             </plugins>
         </pluginManagement>
 
@@ -1138,6 +1137,12 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>${ojdbc6.version}</version>
+                <scope>test</scope>
+            </dependency>
             <!--Dependencies for  database feed simulation ends here-->
 
             <!--Event simulator as a feature-->
@@ -1320,8 +1325,8 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_2.10</artifactId>
-                <version>${kafka-2.10.version}</version>
+                <artifactId>kafka_2.11</artifactId>
+                <version>${kafka-2.11.version}</version>
             </dependency>
 
             <!-- Siddhi Metrics related -->
@@ -1431,9 +1436,9 @@
             </dependency>
             <!--Carbon UI Server-->
             <dependency>
-                <groupId>org.wso2.carbon.uis</groupId>
-                <artifactId>org.wso2.carbon.uis.feature</artifactId>
-                <version>${carbon.uis.version}</version>
+                <groupId>org.wso2.carbon.uiserver</groupId>
+                <artifactId>org.wso2.carbon.uiserver.feature</artifactId>
+                <version>${carbon.uiserver.version}</version>
                 <type>zip</type>
             </dependency>
 
@@ -1489,15 +1494,23 @@
                 <artifactId>org.wso2.carbon.data.provider</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
+            <!--UI Server-->
+            <dependency>
+                <groupId>org.wso2.carbon.uiserver</groupId>
+                <artifactId>org.wso2.carbon.uiserver</artifactId>
+                <version>${carbon.uiserver.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.207-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-beta18</siddhi.version>
-        <siddhi.bundle.version>4.0.0-beta18</siddhi.bundle.version>
-        <carbon.analytics-common.version>6.0.38</carbon.analytics-common.version>
-        <carbon.analytics-common.version.range>[6.0.38, 6.1.0)</carbon.analytics-common.version.range>
+        <carbon.analytics.version>2.0.264-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.1.0</siddhi.version>
+        <siddhi.bundle.version>4.1.0</siddhi.bundle.version>
+        <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
+        <carbon.analytics-common.version>6.0.52</carbon.analytics-common.version>
+        <carbon.analytics-common.version.range>[6.0.52, 6.1.0)</carbon.analytics-common.version.range>
+        <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
@@ -1548,7 +1561,8 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
         <!--Dashboard-->
-        <carbon.uis.version>0.16.0</carbon.uis.version>
+        <carbon.uiserver.version>0.19.2</carbon.uiserver.version>
+        <carbon.uiserver.version.range>[0.19.2, 1.0.0]</carbon.uiserver.version.range>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->
@@ -1579,18 +1593,18 @@
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
 
         <!-- Dependencies -->
-        <carbon.kernel.version>5.2.5</carbon.kernel.version>
-        <carbon.kernel.package.import.version.range>[5.2.0, 6.0.0)</carbon.kernel.package.import.version.range>
-        <carbon.kernel.pax.version>5.2.2</carbon.kernel.pax.version>
+        <carbon.kernel.version>5.2.6</carbon.kernel.version>
+        <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
+        <carbon.kernel.pax.version>5.2.6</carbon.kernel.pax.version>
 
-        <org.wso2.transport.http.netty.version>6.0.56</org.wso2.transport.http.netty.version>
+        <org.wso2.transport.http.netty.version>6.0.64</org.wso2.transport.http.netty.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
 
         <carbon.messaging.version>3.0.1</carbon.messaging.version>
         <carbon.messaging.package.import.version.range>[0.0.0, 4.0.0)</carbon.messaging.package.import.version.range>
 
-        <carbon.deployment.version>5.1.5</carbon.deployment.version>
-        <carbon.deployment.export.version>5.1.4</carbon.deployment.export.version>
+        <carbon.deployment.version>5.2.0</carbon.deployment.version>
+        <carbon.deployment.export.version>5.2.0</carbon.deployment.export.version>
 
         <carbon.datasources.version>1.1.4</carbon.datasources.version>
         <carbon.metrics.version>2.3.7</carbon.metrics.version>
@@ -1650,12 +1664,12 @@
         <quartz.version>2.1.1.wso2v1</quartz.version>
         <metrics.version>3.2.5</metrics.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
-        <kafka-2.10.version>0.9.0.1</kafka-2.10.version>
+        <kafka-2.11.version>0.10.0.0</kafka-2.11.version>
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.5.0-beta</msf4j.version>
-        <msf4j.import.version.range>[2.0.0, 3.0.0)</msf4j.import.version.range>
+        <msf4j.version>2.5.2</msf4j.version>
+        <msf4j.import.version.range>[2.5.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.7.4</com.fasterxml.jackson.core.version>
         <io.swagger.version>1.5.10</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
@@ -1672,7 +1686,6 @@
         <fabricator.wso2v1.version>2.1.4.wso2v1</fabricator.wso2v1.version>
         <generex.wso2v1.version>1.0.0.wso2v1</generex.wso2v1.version>
         <mysql.connector.version>5.1.38</mysql.connector.version>
-        <kafka.version>0.9.0.0</kafka.version>
         <google.collections.version>1.0</google.collections.version>
         <project.scm.id>my-scm-server</project.scm.id>
         <libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
@@ -1697,7 +1710,7 @@
 
         <siddhi.io.tcp.version>2.0.7</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.0.0-M6</siddhi.io.email.version>
-        <siddhi.io.kafka.version>4.0.13</siddhi.io.kafka.version>
+        <siddhi.io.kafka.version>4.1.2</siddhi.io.kafka.version>
         <siddhi.io.http.version>1.0.4</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.0.6</siddhi.map.json.version>
@@ -1707,7 +1720,7 @@
         <siddhi.store.rdbms.version>4.0.0-M7</siddhi.store.rdbms.version>
         <siddhi.store.solr.version>1.0.6</siddhi.store.solr.version>
 
-        <zkclient.version>0.7</zkclient.version>
+        <zkclient.version>0.10</zkclient.version>
 
         <curator-test.version>2.7.1</curator-test.version>
         <zookeeper.version>3.4.0</zookeeper.version>
@@ -1718,5 +1731,6 @@
         <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
         <slf4j.version.range>[1.7,2)</slf4j.version.range>
         <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
+        <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
     </properties>
 </project>

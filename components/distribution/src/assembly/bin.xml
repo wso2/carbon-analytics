@@ -213,6 +213,14 @@
             <outputDirectory>lib</outputDirectory>
             <fileMode>644</fileMode>
         </fileSet>
+        <fileSet>
+            <directory>carbon-home/samples/artifacts/1001</directory>
+            <outputDirectory>samples/artifacts/1001</outputDirectory>
+            <fileMode>644</fileMode>
+            <excludes>
+                <exclude>empty.txt</exclude>
+            </excludes>
+        </fileSet>
     </fileSets>
     <files>
         <file>

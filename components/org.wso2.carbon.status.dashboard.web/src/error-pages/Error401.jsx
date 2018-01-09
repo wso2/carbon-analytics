@@ -22,8 +22,11 @@ import Header from "../common/Header";
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-const muiTheme = getMuiTheme(darkBaseTheme);
+import {RaisedButton} from "material-ui";
+import {Link} from "react-router-dom";
 
+const muiTheme = getMuiTheme(darkBaseTheme);
+const buttonStyle = {marginLeft: 60, width: 100, fontSize: '12px',backgroundColor:'#f17b31'};
 const errorTitleStyles = {
     color: "white",
     fontSize: 45
@@ -42,13 +45,16 @@ const errorContainerStyles = {
  *  This component provide a basic 401 error page.
  */
 class Error401 extends Component {
-    //TODO We need to remove this after finalizing the WSO2 theme. Because we need to get Error pages from it
     render() {
         return <MuiThemeProvider muiTheme={muiTheme}>
             <Header/>
             <div style={errorContainerStyles}>
-                <h1 style={errorTitleStyles}>401 : Unauthorized</h1>
-                <h1 style={errorMessageStyles}>You are not authorized to access this page</h1>
+                <i class="fw fw-security fw-inverse fw-5x"></i>
+                <h1 style={errorTitleStyles}>Unauthorized!</h1>
+                <h1 style={errorMessageStyles}>You are not authorized to access this page.<br/> Please retry with login.</h1>
+                <Link to={`${window.contextPath}/logout`} >
+                    <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Back"/>
+                </Link>
             </div>
         </MuiThemeProvider>;
     }

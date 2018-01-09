@@ -257,7 +257,7 @@ public class EventSimulator implements Runnable {
         EventGenerator generator;
         int eventsRemaining = simulationProperties.getNoOfEventsRequired();
         try {
-            while (!status.equals(Status.STOP)) {
+            while (!status.equals(Status.STOP) && !status.equals(Status.PENDING_STOP)) {
 //                if the simulator is paused, wait till it is resumed
                 if (status.equals(Status.PAUSE)) {
                     lock.acquire();
@@ -318,6 +318,10 @@ public class EventSimulator implements Runnable {
                 } else {
                     break;
                 }
+            }
+
+            if(status.equals(Status.PENDING_STOP)){
+                status = Status.STOP;
             }
             stop();
         } catch (InterruptedException e) {
@@ -451,15 +455,15 @@ public class EventSimulator implements Runnable {
      */
     public void stop() {
         if (!status.equals(Status.STOP)) {
-            lockStop.lock();
-            try {
+            if(!lockStop.tryLock()){
+                status = Status.PENDING_STOP;
+            } else{
                 status = Status.STOP;
-                generators.forEach(EventGenerator::stop);
-                if (log.isDebugEnabled()) {
-                    log.debug("Stop simulation '" + simulationName + "'");
-                }
-            } finally {
                 lockStop.unlock();
+            }
+            generators.forEach(EventGenerator::stop);
+            if (log.isDebugEnabled()) {
+                log.debug("Stop simulation '" + simulationName + "'");
             }
         }
     }
@@ -529,6 +533,7 @@ public class EventSimulator implements Runnable {
         RUN,
         PAUSE,
         STOP,
-        ERROR
+        ERROR,
+        PENDING_STOP
     }
 }

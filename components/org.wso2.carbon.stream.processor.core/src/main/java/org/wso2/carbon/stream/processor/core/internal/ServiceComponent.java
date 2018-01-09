@@ -34,7 +34,7 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
-import org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent;
+import org.wso2.carbon.siddhi.metrics.core.internal.service.MetricsServiceComponent;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
@@ -90,7 +90,7 @@ public class ServiceComponent {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Service Component is activated");
+        log.debug("Service Component is activated");
 
         String runningFileName = System.getProperty(SiddhiAppProcessorConstants.SYSTEM_PROP_RUN_FILE);
         ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
@@ -184,10 +184,6 @@ public class ServiceComponent {
             log.debug("Runtime mode is set to : " + StreamProcessorDataHolder.getInstance().getRuntimeMode());
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("WSO2 Data Analytics Server runtime started...!");
-        }
-
         streamServiceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new CarbonEventStreamService(), null);
         siddhiAppRuntimeServiceRegistration = bundleContext.registerService(SiddhiAppRuntimeService.class
@@ -214,7 +210,7 @@ public class ServiceComponent {
      */
     @Deactivate
     protected void stop() throws Exception {
-        log.info("Service Component is deactivated");
+        log.debug("Service Component is deactivated");
 
         Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.
                 getStreamProcessorService().getSiddhiAppMap();
@@ -392,7 +388,7 @@ public class ServiceComponent {
     }
 
     @Reference(
-            name = "org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent",
+            name = "org.wso2.carbon.siddhi.metrics.core.internal.service.MetricsServiceComponent",
             service = MetricsServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,

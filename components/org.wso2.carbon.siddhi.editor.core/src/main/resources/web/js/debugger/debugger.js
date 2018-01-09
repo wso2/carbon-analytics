@@ -38,18 +38,35 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                     } else {
                         if (self._debugStarted) {
                             self._debugger.release(row, function (d) {
-                                delete self._breakpoints[row];
+                                self._breakpoints[row] = undefined;
                                 e.editor.session.clearBreakpoint(row);
                             });
                         } else {
-                            delete self._breakpoints[row];
+                            self._breakpoints[row] = undefined;
                             e.editor.session.clearBreakpoint(row);
                         }
                         console.info("Release Breakpoint " +
                             JSON.stringify(self._validBreakpoints[row]));
                     }
+                } else if (breakpoints[row] === "ace_breakpoint") {
+                        if (self._debugStarted) {
+                            self._debugger.release(row, function (d) {
+                                self._breakpoints[row] = undefined;
+                                e.editor.session.clearBreakpoint(row);
+                            });
+                        } else {
+                            self._breakpoints[row] = undefined;
+                            e.editor.session.clearBreakpoint(row);
+                        }
                 } else {
-                    console.warn("Trying to acquire an invalid breakpoint");
+                    var warningMessage = "Break points can only be applied for <i><b>from</b></i> or " +
+                        "<i><b>query output(insert, delete, update, update or insert into)</b></i>" + " statements";
+                    var warningNotification = self.getWarningNotification(warningMessage);
+                    $("#notification-container").append(warningNotification);
+                    warningNotification.fadeTo(2000, 200).slideUp(1000, function () {
+                        warningNotification.slideUp(1000);
+                    });
+
                 }
                 e.stop();
             });
@@ -58,8 +75,11 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                 var len, firstRow;
 
                 if (e.end.row == e.start.row) {
-                    // editing in same line
-                    return;
+                    //editing in same line
+                    if (self._breakpoints[e.end.row]) {
+                        self._breakpoints[e.end.row] = undefined;
+                        self._editor.session.clearBreakpoint(e.end.row);
+                    }
                 } else {
                     // new line or remove line
                     if (e.action == "insert") {
@@ -80,7 +100,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                             for (var oldBP in rem) {
                                 if (rem[oldBP]) {
                                     self._breakpoints[firstRow] = rem[oldBP];
-                                    break
+                                    break;
                                 }
                             }
                         }
@@ -114,6 +134,22 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
 
                     }
                 }
+
+                // Redraw the breakpoints
+                var currentBreakpoints = self._editor.session.getBreakpoints();
+                for (var i = 0; i < currentBreakpoints.length; i++) {
+                    if (currentBreakpoints[i] === "ace_breakpoint") {
+                        // checking whether the current applied breakpoint is valid
+                        if (i in self._validBreakpoints) {
+                            self._breakpoints[i] = true;
+                            self._editor.session.setBreakpoint(i);
+                        } else {
+                            // if the breakpoint is invalid, then remove it
+                            self._breakpoints[i] = undefined;
+                            self._editor.session.clearBreakpoint(i);
+                        }
+                    }
+                }
             });
         },
 
@@ -144,6 +180,16 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             this._consoleObj = _.get(containerOpts, 'consoleObj')
 
         },
+
+        getWarningNotification: function(warningMessage) {
+            return $(
+                "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-warning' id='error-alert'>" +
+                "<span class='notification'>" +
+                warningMessage +
+                "</span>" +
+                "</div>")
+        },
+
 
         isActive: function () {
             return this._activateBtn.parent('li').hasClass('active');
@@ -200,40 +246,27 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             );
         },
 
-        render: function () {
+        acquireDebugPoints: function () {
             var self = this;
-            var debuggerModel = this._console;
-            //var appName = this._appName;
-            var debuggerModalName = debuggerModel.find(".appName");
-            self._debugStarted = true;
-            // debuggerModalName.text(appName);
-
             for (var i = 0; i < self._breakpoints.length; i++) {
                 if (self._breakpoints[i] && i in self._validBreakpoints) {
                     self._debugger.acquire(i);
                     console.info("Acquire Breakpoint " + JSON.stringify(self._validBreakpoints[i]));
                 }
             }
+        },
+
+        render: function () {
+            var self = this;
+            var debuggerModel = this._console;
+            //var appName = this._appName;
+            var debuggerModalName = debuggerModel.find(".appName");
+            self._debugStarted = true;
 
             debuggerModel.find(".fw-resume").click(function(e) {
                 e.preventDefault();
                 self._debugger.play();
-                //console.log("debugger resume click");
             });
-            // this._resumeBtn.on('click', function (e) {
-            //     // e.preventDefault();
-            //     // self._debugger.play();
-            //
-            //     console.log("inside click")
-            //
-            // });
-            // resumeBtn.attr("data-placement", "bottom").attr("data-container", "body");
-
-            // if (this.application.isRunningOnMacOS()) {
-            //     resumeBtn.attr("title", "Debugger resume (" + _.get(self._debuggerOption, 'commandResume.shortcuts.other.label') + ") ").tooltip();
-            // } else {
-            //     resumeBtn.attr("title", "Debugger resume () ").tooltip();
-            // }
 
             self._debugger.setOnUpdateCallback(function (data) {
                 var line = self.getLineNumber(data['eventState']['queryIndex'], data['eventState']['queryTerminal']);
@@ -254,17 +287,20 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                 self._debugger.next();
             });
 
-            debuggerModel.find(".fw-stop").click(function (e) {
-                e.preventDefault();
-                self.stop();
-            });
         },
 
         stop: function () {
+            var self = this;
+            self._debugStarted = false;
             var console = this.application.outputController.getGlobalConsole();
             var activeTab = this.application.tabController.getActiveTab();
             var workspace = this.application.workspaceManager;
-            var siddhiAppName = activeTab.getTitle().split('.')[0];
+            var siddhiAppName = "";
+            if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
+                siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
+            } else{
+                siddhiAppName = activeTab.getTitle();
+            }
             this.unHighlightDebugLine();
             this._debugger.stop(
                 function (data) {

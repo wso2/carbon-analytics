@@ -20,12 +20,14 @@ package org.wso2.carbon.sp.jobmanager.core.impl;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
+import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.sp.jobmanager.core.api.ApiResponseMessage;
 import org.wso2.carbon.sp.jobmanager.core.api.NotFoundException;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApiService;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.HeartbeatResponse;
 import org.wso2.carbon.sp.jobmanager.core.model.InterfaceConfig;
+import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerNodeConfig;
 import org.wso2.carbon.sp.jobmanager.core.model.NodeConfig;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
@@ -49,19 +51,58 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
 
     @Override
     public Response updateHeartbeat(NodeConfig nodeConfig) throws NotFoundException {
+        if (ServiceDataHolder.getCoordinator() == null) { // When clustering is disabled
+            ManagerNode leaderNode = ServiceDataHolder.getLeaderNode();
+            if (leaderNode == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("No leader node is set because clustering is disabled. Setting current node as leader");
+                }
+                ServiceDataHolder.isLeader(true);
+                ServiceDataHolder.setLeaderNode(ServiceDataHolder.getCurrentNode());
+                // Get last known state of the resource pool from database and restore it.
+                String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
+                ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourcePool(groupId);
+                ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
+                        : new ResourcePool(groupId));
+                ServiceDataHolder.getResourcePool().init();
+                LOG.info(ServiceDataHolder.getCurrentNode() + " is the leader of the resource pool.");
+            }
+        } else if (ServiceDataHolder.getLeaderNode() == null) { // Cluster has not already notified who the leader is
+            return Response
+                    .status(Response.Status.NO_CONTENT)
+                    .entity(new HeartbeatResponse()
+                            .connectedManagers(null)
+                            .joinedState(null)
+                            .leader(null))
+                    .build();
+        }
         if (ServiceDataHolder.isLeader()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Leader node received heartbeat from " + nodeConfig.getId());
+            }
             ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
             List<InterfaceConfig> connectedManagers = new ArrayList<>();
-            for (NodeDetail nodeDetail : ServiceDataHolder.getCoordinator().getAllNodeDetails()) {
-                if (nodeDetail.getPropertiesMap() != null) {
-                    Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
-                    String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
-                    int httpInterfacePort = (int) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
-                    InterfaceConfig interfaceConfig = new InterfaceConfig();
-                    interfaceConfig.setHost(httpInterfaceHost);
-                    interfaceConfig.setPort(httpInterfacePort);
-                    connectedManagers.add(interfaceConfig);
+            ClusterCoordinator clusterCoordinator = ServiceDataHolder.getCoordinator();
+            if (clusterCoordinator != null) {
+                for (NodeDetail nodeDetail : clusterCoordinator.getAllNodeDetails()) {
+                    if (nodeDetail.getPropertiesMap() != null) {
+                        Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
+                        String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
+                        int httpInterfacePort = (int) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+                        String httpInterfaceUsername = (String) propertiesMap.get(
+                                ResourceManagerConstants.KEY_NODE_USERNAME);
+                        String httpInterfacePassword = (String) propertiesMap.get(
+                                ResourceManagerConstants.KEY_NODE_PASSWORD);
+                        InterfaceConfig interfaceConfig = new InterfaceConfig();
+                        interfaceConfig.setHost(httpInterfaceHost);
+                        interfaceConfig.setPort(httpInterfacePort);
+                        interfaceConfig.setUsername(httpInterfaceUsername);
+                        interfaceConfig.setPassword(httpInterfacePassword);
+                        connectedManagers.add(interfaceConfig);
+                    }
                 }
+            } else {
+                connectedManagers.add(TypeConverter.convert(ServiceDataHolder.getCurrentNode().getHttpInterface()));
             }
             ResourceNode existingResourceNode = resourcePool.getResourceNodeMap().get(nodeConfig.getId());
             HeartbeatResponse.JoinedStateEnum joinedState = (existingResourceNode == null)

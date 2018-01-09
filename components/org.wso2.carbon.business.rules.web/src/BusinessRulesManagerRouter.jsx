@@ -17,11 +17,11 @@
  */
 
 import React from 'react';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 // Auth Components
-import SecuredRouter from "./components/auth/SecuredRouter";
-import Login from "./components/auth/Login";
-import Logout from "./components/auth/Logout";
+import SecuredRouter from './components/auth/SecuredRouter';
+import Login from './components/auth/Login';
+import Logout from './components/auth/Logout';
 // App Components
 import Header from "./components/common/Header";
 // Custom Theme
@@ -46,8 +46,6 @@ export default class BusinessRulesManagerRouter extends React.Component {
                 <Switch>
                     <MuiThemeProvider theme={theme}>
                         <div>
-                            <Header/>
-                            <br/>
                             {/* Authentication */}
                             <Route path={`${appContext}/login`} component={Login}/>
                             <Route path={`${appContext}/logout`} component={Logout}/>

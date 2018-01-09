@@ -63,7 +63,7 @@ div[class*="col-sm-12"] {
 }
 
 .left-container{
-  height: calc(100% - 41px);
+  height: calc(100% - 60px);
   padding: 0;
   /*Adjust when implementing file explorer*/
   min-width: 40px;
@@ -71,7 +71,7 @@ div[class*="col-sm-12"] {
   z-index: 2;
 }
 .left-tool-bar{
-  height: calc(100% - 41px);
+  height: calc(100% - 40px);
   padding: 0;
   width: 40px;
   position: fixed;
@@ -81,14 +81,13 @@ div[class*="col-sm-12"] {
   background: #16191d;
 }
 .sidebar-left{
-  height: 100%;
   width: 100%;
   padding: 0 0 0 40px;
   overflow: hidden;
 }
 
 #right-container{
-  height: calc(100% - 41px);
+  height: calc(100% - 60px);
   position: fixed;
   padding-left: 40px;
   width: 100%;
@@ -230,7 +229,12 @@ div[class*="col-sm-12"] {
 /*//////////////////////////////////////////////////*/
 /** Resource level tabs related styles | Start -> **/
 
-#service-tabs-wrapper,
+.container,
+.page-content-first-row,
+#tabs-container,
+.grid-background .tab-content,
+.grid-background .tab-pane,
+.initial-welcome-container,
 #service-tabs-wrapper > .row,
 #service-tabs-wrapper > .row > #tabs-container,
 #service-tabs-wrapper > .row > #tabs-container > #tab-content-wrapper > .tab-content.tab-content-default,
@@ -343,9 +347,10 @@ div[class*="col-sm-12"] {
   right: 0;
 }
 
-#tab-content-wrapper {
+.grid-background {
   position: relative;
   background-color: #282828;
+  height: calc(100% - 20px);
 }
 
 .about-dialog-close {
@@ -415,4 +420,12 @@ header .tool-bar a.disabled {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.page-content-wrapper {
+  height: calc(100% - 40px);
+}
+
+.nano.console-wrap {
+  height: calc(100% - 26px);
 }

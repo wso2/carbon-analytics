@@ -1,6 +1,7 @@
 queries:
   -
    mappings:
+      CHECK_FOR_BUSINESS_RULES_TABLE:
       CREATE_BUSINESS_RULES_TABLE:
       ADD_BUSINESS_RULE:
       UPDATE_BUSINESS_RULE:
@@ -11,6 +12,8 @@ queries:
       RETRIEVE_ARTIFACT_COUNT:
       RETRIEVE_DEPLOYMENT_STATUS:
       DELETE_BUSINESS_RULE:
+
+      CHECK_FOR_RULE_TEMPLATES_TABLE:
       CREATE_RULE_TEMPLATES_TABLE:
       ADD_RULE_TEMPLATE:
       RETRIEVE_ALL_RULE_TEMPLATES:
@@ -18,8 +21,10 @@ queries:
 
    type: default
    version: default
+
   -
    mappings:
+      CHECK_FOR_BUSINESS_RULES_TABLE: SELECT 1 FROM business_rules LIMIT 1
       CREATE_BUSINESS_RULES_TABLE: CREATE TABLE IF NOT EXISTS business_rules ( uuid varchar(50) PRIMARY KEY, business_rule blob, deployment_status tinyInt(1), artifact_count int )
       ADD_BUSINESS_RULE: INSERT INTO business_rules VALUES (?, ?, ?, ?)
       UPDATE_BUSINESS_RULE: UPDATE business_rules SET business_rule = ?, deployment_status = ? WHERE business_rules.uuid = ?
@@ -30,10 +35,58 @@ queries:
       RETRIEVE_ARTIFACT_COUNT: SELECT artifact_count FROM business_rules WHERE business_rules.uuid = ?
       RETRIEVE_DEPLOYMENT_STATUS: SELECT deployment_status FROM business_rules WHERE business_rules.uuid = ?
       DELETE_BUSINESS_RULE: DELETE FROM business_rules WHERE business_rules.uuid = ?
+
+      CHECK_FOR_RULE_TEMPLATES_TABLE: SELECT 1 FROM rule_templates LIMIT 1
       CREATE_RULE_TEMPLATES_TABLE: CREATE TABLE IF NOT EXISTS rule_templates ( uuid varchar(50))
       ADD_RULE_TEMPLATE: INSERT INTO rule_templates VALUES (?)
       RETRIEVE_ALL_RULE_TEMPLATES: SELECT * FROM rule_templates
       DELETE_RULE_TEMPLATE: DELETE FROM rule_templates WHERE rule_templates.uuid = ?
 
    type: H2
+   version: default
+
+  -
+   mappings:
+      CHECK_FOR_BUSINESS_RULES_TABLE: SELECT 1 FROM business_rules LIMIT 1
+      CREATE_BUSINESS_RULES_TABLE: CREATE TABLE IF NOT EXISTS business_rules ( uuid varchar(50) PRIMARY KEY, business_rule blob, deployment_status tinyInt(1), artifact_count int )
+      ADD_BUSINESS_RULE: INSERT INTO business_rules VALUES (?, ?, ?, ?)
+      UPDATE_BUSINESS_RULE: UPDATE business_rules SET business_rule = ?, deployment_status = ? WHERE business_rules.uuid = ?
+      UPDATE_DEPLOYMENT_STATUS: UPDATE business_rules SET deployment_status = ? WHERE business_rules.uuid = ?
+      UPDATE_ARTIFACT_COUNT: UPDATE business_rules SET artifact_count = ? WHERE business_rules.uuid = ?
+      RETRIEVE_BUSINESS_RULE: SELECT uuid, business_rule, deployment_status FROM business_rules WHERE business_rules.uuid = ?
+      RETRIEVE_ALL: SELECT * FROM business_rules
+      RETRIEVE_ARTIFACT_COUNT: SELECT artifact_count FROM business_rules WHERE business_rules.uuid = ?
+      RETRIEVE_DEPLOYMENT_STATUS: SELECT deployment_status FROM business_rules WHERE business_rules.uuid = ?
+      DELETE_BUSINESS_RULE: DELETE FROM business_rules WHERE business_rules.uuid = ?
+
+      CHECK_FOR_RULE_TEMPLATES_TABLE: SELECT 1 FROM rule_templates LIMIT 1
+      CREATE_RULE_TEMPLATES_TABLE: CREATE TABLE IF NOT EXISTS rule_templates ( uuid varchar(50))
+      ADD_RULE_TEMPLATE: INSERT INTO rule_templates VALUES (?)
+      RETRIEVE_ALL_RULE_TEMPLATES: SELECT * FROM rule_templates
+      DELETE_RULE_TEMPLATE: DELETE FROM rule_templates WHERE rule_templates.uuid = ?
+
+   type: mysql
+   version: default
+
+  -
+   mappings:
+      CHECK_FOR_BUSINESS_RULES_TABLE: SELECT 1 FROM business_rules
+      CREATE_BUSINESS_RULES_TABLE: CREATE TABLE business_rules ( uuid varchar(50) PRIMARY KEY, business_rule blob, deployment_status int, artifact_count int )
+      ADD_BUSINESS_RULE: INSERT INTO business_rules VALUES (?, ?, ?, ?)
+      UPDATE_BUSINESS_RULE: UPDATE business_rules SET business_rule = ?, deployment_status = ? WHERE business_rules.uuid = ?
+      UPDATE_DEPLOYMENT_STATUS: UPDATE business_rules SET deployment_status = ? WHERE business_rules.uuid = ?
+      UPDATE_ARTIFACT_COUNT: UPDATE business_rules SET artifact_count = ? WHERE business_rules.uuid = ?
+      RETRIEVE_BUSINESS_RULE: SELECT uuid, business_rule, deployment_status FROM business_rules WHERE business_rules.uuid = ?
+      RETRIEVE_ALL: SELECT * FROM business_rules
+      RETRIEVE_ARTIFACT_COUNT: SELECT artifact_count FROM business_rules WHERE business_rules.uuid = ?
+      RETRIEVE_DEPLOYMENT_STATUS: SELECT deployment_status FROM business_rules WHERE business_rules.uuid = ?
+      DELETE_BUSINESS_RULE: DELETE FROM business_rules WHERE business_rules.uuid = ?
+
+      CHECK_FOR_RULE_TEMPLATES_TABLE: SELECT 1 FROM rule_templates
+      CREATE_RULE_TEMPLATES_TABLE: CREATE TABLE rule_templates ( uuid varchar(50))
+      ADD_RULE_TEMPLATE: INSERT INTO rule_templates VALUES (?)
+      RETRIEVE_ALL_RULE_TEMPLATES: SELECT * FROM rule_templates
+      DELETE_RULE_TEMPLATE: DELETE FROM rule_templates WHERE rule_templates.uuid = ?
+
+   type: oracle
    version: default

@@ -58,7 +58,10 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                 this.changeSiddhiAppStatusInSingleSimulation, this);
             this.application.commandManager.registerHandler("stop-running-simulation-on-app-stop",
                 this.stopRunningSimulationOnSiddhiAppStop, this);
-            
+            this.application.commandManager.registerHandler("remove-unwanted-streams-single-simulation",
+                this.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave, this);
+            this.application.commandManager.registerHandler("remove-siddhi-apps-on-delete",
+                this.removeSiddhiAppsOnDelete, this);
 
         },
         isActive: function(){
@@ -78,22 +81,11 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                 this._$parent_el.parent().width(width);
                 this._containerToAdjust.css('padding-left', width);
                 this._verticalSeparator.css('left',  width - _.get(this._options, 'separatorOffset'));
-                Simulator.retrieveSiddhiAppNames(
-                    function (data) {
-                        var numOfFeedSimulations = data.length;
-                        if(numOfFeedSimulations == 0){
-                            $('#createFeedSimulationNotification').show();
-                            feedSimulator.disableCreateButtons(true);
-                        } else{
-                            $('#createFeedSimulationNotification').hide();
-                            feedSimulator.enableCreateButtons(true);
-                        }
-                    },
-                    function (data) {
-                        log.error("Error in retrieving back end data " + data);
-                    }
-                );
+                feedSimulator.updateFeedCreationButtonAndNotification();
             }
+        },
+        getFeedSimulator: function () {
+            return feedSimulator;
         },
 
         render: function() {
@@ -125,7 +117,7 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                 }
             });
 
-            activateBtn.attr("data-placement", "bottom").attr("data-container", "body");
+            activateBtn.attr("data-placement", "right").attr("data-container", "body");
 
             if (this.application.isRunningOnMacOS()) {
                 activateBtn.attr("title", "Event Simulator (" + _.get(self._options, 
@@ -182,6 +174,14 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
 
         stopRunningSimulationOnSiddhiAppStop: function (siddhiAppName) {
             feedSimulator.stopRunningSimulationOnSiddhiAppStop(siddhiAppName);
+        },
+
+        changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave: function (siddhiAppName) {
+            singleEventSimulator.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave(siddhiAppName, 12);
+        },
+
+        removeSiddhiAppsOnDelete: function (siddhiAppName) {
+            singleEventSimulator.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnDelete(siddhiAppName, 12);
         }
 
     });

@@ -41,7 +41,7 @@ export default class NonHeapMemory extends React.Component {
             jvmMemoryNonHeapCommitted: this.props.data[2],
             jvmMemoryNonHeapMax: this.props.data[3],
             jvmMemoryNonHeapUsage:this.props.data[4],
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -52,7 +52,7 @@ export default class NonHeapMemory extends React.Component {
             jvmMemoryNonHeapCommitted: nextprops.data[2],
             jvmMemoryNonHeapMax: nextprops.data[3],
             jvmMemoryNonHeapUsage: nextprops.data[4],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -71,7 +71,9 @@ export default class NonHeapMemory extends React.Component {
                 tickLabelColor:'#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
-                axisLabelColor: '#9c9898'
+                axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             },
             legend:true,
             tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
@@ -85,7 +87,7 @@ export default class NonHeapMemory extends React.Component {
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
-                            title="JVM Non-Heap Memory (MB)"
+                            title="JVM Non-Heap Memory (bytes)"
                         />
                         <Divider/>
                         <CardMedia>
@@ -108,7 +110,7 @@ export default class NonHeapMemory extends React.Component {
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={data} yDomain={y}
-                           metadata={metadata} config={chartConfig} title="JVM Non-Heap Memory (MB)"/>
+                           metadata={metadata} config={chartConfig} title="JVM Non-Heap Memory (bytes)"/>
             </div>
         );
     }

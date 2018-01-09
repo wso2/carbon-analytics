@@ -83,4 +83,32 @@ public class RDBMSDataProviderConfBean {
     public String[] getTimeTypes() {
         return timeTypes;
     }
+
+    public void setSqlSelectQuerySanitizingRegex(String sqlSelectQuerySanitizingRegex) {
+        this.sqlSelectQuerySanitizingRegex = sqlSelectQuerySanitizingRegex;
+    }
+
+    public void setSqlWhereQuerySanitizingRegex(String sqlWhereQuerySanitizingRegex) {
+        this.sqlWhereQuerySanitizingRegex = sqlWhereQuerySanitizingRegex;
+    }
+
+    public void setSqlTableNameSanitizingRegex(String sqlTableNameSanitizingRegex) {
+        this.sqlTableNameSanitizingRegex = sqlTableNameSanitizingRegex;
+    }
+
+    public void setQueries(ArrayList<Queries> queries) {
+        this.queries = queries;
+    }
+
+    public void setLinearTypes(String[] linearTypes) {
+        this.linearTypes = linearTypes;
+    }
+
+    public void setOrdinalTypes(String[] ordinalTypes) {
+        this.ordinalTypes = ordinalTypes;
+    }
+
+    public void setTimeTypes(String[] timeTypes) {
+        this.timeTypes = timeTypes;
+    }
 }

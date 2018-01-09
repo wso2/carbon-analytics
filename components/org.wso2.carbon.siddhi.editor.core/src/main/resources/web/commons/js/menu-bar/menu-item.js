@@ -43,11 +43,15 @@ define(['lodash', 'event_channel'],
         this._listItemElement = item;
 
         var shortcuts = _.get(this, 'definition.command.shortcuts'),
-            commandId = _.get(this, 'definition.command.id');
+            commandId = _.get(this, 'definition.command.id'),
+            commandLabels = _.get(this, 'definition.command.labels');
         if (!_.isNil(shortcuts)) {
             this._application.commandManager.registerCommand(commandId, {shortcuts: shortcuts});
             this.renderShortcutLabel();
         } else {
+            if (!_.isNil(commandLabels)) {
+                this.renderCommandLabel();
+            }
             this._application.commandManager.registerCommand(commandId, {});
         }
 
@@ -70,6 +74,15 @@ define(['lodash', 'event_channel'],
         shortcutLabel.addClass(_.get(this, 'options.cssClass.shortcut'));
         shortcutLabel.text(shortcut);
         this._linkElement.append(shortcutLabel);
+    };
+
+    MenuItem.prototype.renderCommandLabel = function(){
+       var labels = _.get(this, 'definition.command.labels'),
+           shortcutLabel = $('<span></span>'),
+           shortcut = this._application.isRunningOnMacOS() ? labels.mac.label : labels.other.label;
+       shortcutLabel.addClass(_.get(this, 'options.cssClass.shortcut'));
+       shortcutLabel.text(shortcut);
+       this._linkElement.append(shortcutLabel);
     };
 
     MenuItem.prototype.disable = function(){

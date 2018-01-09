@@ -51,7 +51,7 @@ public class RDBMSServiceImpl {
     private DataSource datasource;
 
     public RDBMSServiceImpl() {
-        String datasourceName = ServiceDataHolder.getClusterConfig().getStrategyConfig().getDatasource();
+        String datasourceName = ServiceDataHolder.getDeploymentConfig().getDatasource();
         if (datasourceName == null) {
             throw new ResourceManagerException("No datasource specified to be used with RDBMS based resource pool " +
                     "management. Please check configurations under " + ResourceManagerConstants.DEPLOYMENT_CONFIG_NS);

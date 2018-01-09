@@ -9,17 +9,41 @@ queries:
     version: default
   -
     mappings:
-      record_delete: "DELETE FROM {{TABLE_NAME}} ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}"
+      record_delete: "DELETE TOP {{LIMIT_VALUE}} FROM {{TABLE_NAME}}"
       total_record_count: "SELECT COUNT(*) FROM {{TABLE_NAME}}"
-      record_limit: " ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}"
-      record_greater_than: " WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"
+      record_limit: "{{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC LIMIT {{LIMIT_VALUE}}"
+      record_greater_than: "SELECT * FROM ({{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC ) WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"
     type: H2
     version: default
   -
     mappings:
       record_delete: "DELETE FROM {{TABLE_NAME}} ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}"
       total_record_count: "SELECT COUNT(*) FROM {{TABLE_NAME}}"
-      record_limit: " ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}"
-      record_greater_than: " WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"
+      record_limit: "{{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC LIMIT {{LIMIT_VALUE}}"
+      record_greater_than: "SELECT * FROM ({{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC ) AS A_TABLE WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"
     type: MySQL
+    version: default
+  -
+    mappings:
+      record_delete: "DELETE FROM {{TABLE_NAME}} WHERE {{INCREMENTAL_COLUMN}} = any (array(SELECT {{INCREMENTAL_COLUMN}} FROM {{TABLE_NAME}} ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}))"
+      total_record_count: "SELECT COUNT(*) FROM {{TABLE_NAME}}"
+      record_limit: "{{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC LIMIT {{LIMIT_VALUE}}"
+      record_greater_than: "SELECT * FROM ({{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC ) AS A_TABLE WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"
+    type: PostgreSQL
+    version: default
+  -
+    mappings:
+      record_delete: "DELETE FROM {{TABLE_NAME}} WHERE ROWNUM <= {{LIMIT_VALUE}}"
+      total_record_count: "SELECT COUNT(*) FROM {{TABLE_NAME}}"
+      record_limit: "SELECT * FROM ({{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC ) WHERE ROWNUM <= {{LIMIT_VALUE}}"
+      record_greater_than: "SELECT * FROM ({{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC ) WHERE (ROWNUM <= {{LIMIT_VALUE}}) AND ({{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}})"
+    type: Oracle
+    version: default
+  -
+    mappings:
+      record_delete: "DELETE FROM {{TABLE_NAME}} WHERE {{INCREMENTAL_COLUMN}} in (SELECT TOP {{LIMIT_VALUE}} {{INCREMENTAL_COLUMN}} FROM {{TABLE_NAME}} ORDER BY {{INCREMENTAL_COLUMN}} ASC)"
+      total_record_count: "SELECT COUNT(*) FROM {{TABLE_NAME}}"
+      record_limit: "SELECT TOP {{LIMIT_VALUE}} * FROM ({{CUSTOM_QUERY}}) A_TABLE ORDER BY {{INCREMENTAL_COLUMN}} DESC"
+      record_greater_than: "SELECT * FROM ({{CUSTOM_QUERY}}) A_TABLE WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}} ORDER BY {{INCREMENTAL_COLUMN}} DESC"
+    type: Microsoft SQL Server
     version: default

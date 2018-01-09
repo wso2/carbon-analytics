@@ -28,15 +28,19 @@ import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from "material-ui";
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import RaisedButton from "material-ui/RaisedButton";
+import { Redirect } from 'react-router-dom';
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
+import Error403 from "../error-pages/Error403";
 
 const styles = {
-    button: {margin: 12, backgroundColor: '#f17b31'}
+    button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}
 };
-const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
+const memoryMetadata = {names: ['Time', 'Memory(bytes)'], types: ['time', 'linear']};
 
-const latencyMetadata = {names: ['Time', 'Latency'], types: ['time', 'linear']};
+const latencyMetadata = {names: ['Time', 'Latency(milliseconds)'], types: ['time', 'linear']};
 
-const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
+const tpMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
 
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
@@ -55,7 +59,9 @@ export default class AppSpecific extends React.Component {
             appName: this.props.match.params.appName,
             period: '5min',
             isApiWaiting: true,
-            statsEnable: this.props.match.params.isStatsEnabled
+            statsEnable: this.props.match.params.isStatsEnabled,
+            sessionInvalid: false,
+            hasViewerPermission: true,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleApi = this.handleApi.bind(this);
@@ -96,10 +102,50 @@ export default class AppSpecific extends React.Component {
                     tickCountLt: (response.data[0].latency.data.length>20)?10:response.data[0].latency.data.length,
                     tickCountMem: (response.data[0].memory.data.length>20)?10:response.data[0].memory.data.length,
                 });
-            });
+            }).catch((error) => {
+            let message;
+            if(error.response != null) {
+                if (error.response.status === 401) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if (error.response.status === 403) {
+                    message = "User Have No Viewer Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+            }
+        });
     }
 
     componentWillMount() {
+        AuthenticationAPI.isUserAuthorized('viewer', AuthManager.getUser().SDID)
+            .then((response) => {
+                that.setState({
+                    hasViewerPermission: response.data
+                });
+            }).catch((error) => {
+            let message;
+            if(error.response != null) {
+                if (error.response.status === 401) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if (error.response.status === 403) {
+                    message = "User Have No Viewer Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+            }
+        });
         this.handleApi(this.state.period);
     }
 
@@ -107,7 +153,7 @@ export default class AppSpecific extends React.Component {
 
         const latencyLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Latency', fill: '#f17b31', markRadius: 2}],
+            charts: [{type: 'area', y: 'Latency(milliseconds)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -120,6 +166,8 @@ export default class AppSpecific extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if(this.state.latency.length === 0) {
@@ -141,7 +189,7 @@ export default class AppSpecific extends React.Component {
     renderMemoryChart(){
         const memoryLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Memory', fill: '#f17b31', markRadius: 2}],
+            charts: [{type: 'area', y: 'Memory(bytes)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -154,6 +202,8 @@ export default class AppSpecific extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if(this.state.memory.length === 0) {
@@ -176,7 +226,7 @@ export default class AppSpecific extends React.Component {
 
         const tpLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', markRadius: 2}],
+            charts: [{type: 'area', y: 'Throughput(events/second)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -189,6 +239,8 @@ export default class AppSpecific extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if(this.state.throughputAll.length === 0) {
@@ -245,43 +297,55 @@ export default class AppSpecific extends React.Component {
     }
 
     render() {
-        return (
-            <div style={{backgroundColor: '#222222'}}>
-                <Header/>
-                <div className="navigation-bar">
-                    <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                              icon={<HomeButton color="black"/>}/></Link>
-                    <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
-                        <FlatButton label={this.state.workerID + " >"}/></Link>
-                    <Link
-                        to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
-                        this.props.match.params.appName + '/' + this.state.statsEnable}>
-                        <FlatButton label={this.props.match.params.appName + " >"}/></Link>
-                    <RaisedButton label= "Metrics" disabled disabledLabelColor='white'
-                                  disabledBackgroundColor='#f17b31'/>
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
+        if(this.state.hasViewerPermission) {
+            return (
+                <div style={{backgroundColor: '#222222'}}>
+                    <Header/>
+                    <div className="navigation-bar">
+                        <Link to={window.contextPath}><FlatButton label="Overview >"
+                                                                  icon={<HomeButton color="black"/>}/></Link>
+                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
+                            <FlatButton label={this.state.workerID + " >"}/></Link>
+                        <Link
+                            to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
+                            this.props.match.params.appName + '/' + this.state.statsEnable}>
+                            <FlatButton label={this.props.match.params.appName + " >"}/></Link>
+                        <RaisedButton label="Metrics" disabled disabledLabelColor='white'
+                                      disabledBackgroundColor='#f17b31'/>
+                    </div>
+                    <div className="worker-h1">
+                        <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
+                    </div>
+                    <Toolbar style={toolBar}>
+                        <ToolbarGroup firstChild={true}>
+                            <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
+                                          onClick={() => this.handleChange("5min")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last 1 Hour" backgroundColor={this.setColor('1hr')}
+                                          onClick={() => this.handleChange("1hr")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last 6 Hours" backgroundColor={this.setColor('6hr')}
+                                          onClick={() => this.handleChange("6hr")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last day" backgroundColor={this.setColor('24hr')}
+                                          onClick={() => this.handleChange("24hr")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last Week" backgroundColor={this.setColor('1wk')}
+                                          onClick={() => this.handleChange("1wk")}
+                                          style={styles.button}/>
+                        </ToolbarGroup>
+                    </Toolbar>
+                    {this.renderCharts()}
                 </div>
-                <div className="worker-h1">
-                    <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
-                </div>
-                <Toolbar style={toolBar}>
-                    <ToolbarGroup firstChild={true}>
-                        <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
-                                      onClick={() => this.handleChange("5min")}
-                                      style={styles.button}/>
-                        <RaisedButton label="Last 1 Hour" backgroundColor={this.setColor('1hr')}
-                                      onClick={() => this.handleChange("1hr")}
-                                      style={styles.button}/>
-                        <RaisedButton label="Last 6 Hours" backgroundColor={this.setColor('6hr')}
-                                      onClick={() => this.handleChange("6hr")}
-                                      style={styles.button}/>
-                        <RaisedButton label="Last day" backgroundColor={this.setColor('24hr')}
-                                      onClick={() => this.handleChange("24hr")}
-                                      style={styles.button}/>
-                    </ToolbarGroup>
-                </Toolbar>
-                {this.renderCharts()}
-            </div>
-        );
+            );
+        } else {
+            return <Error403/>;
+        }
     }
 }
 

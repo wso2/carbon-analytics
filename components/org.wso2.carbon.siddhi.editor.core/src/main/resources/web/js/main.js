@@ -100,10 +100,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     this.menuBar.render();
                     log.debug("end: rendering menu_bar control");
 
-                    // log.debug("start: rendering menu_bar control");
-                    // this.toolBar.render();
-                    // log.debug("end: rendering menu_bar control");
-
                     log.debug("start: rendering workspace explorer control");
                     this.workspaceExplorer.render();
                     log.debug("end: rendering workspace explorer control");

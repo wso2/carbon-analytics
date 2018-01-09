@@ -1,18 +1,18 @@
 /*
-*  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  Licensed under the Apache License, Version 2.0 (the "License");
-*  you may not use this file except in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*  http://www.apache.org/licenses/LICENSE-2.0
-*
-*  Unless required by applicable law or agreed to in writing, software
-*  distributed under the License is distributed on an "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*  See the License for the specific language governing permissions and
-*  limitations under the License.
-*/
+ *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.wso2.carbon.data.provider.rdbms;
 
 import org.osgi.service.component.annotations.Component;
@@ -44,7 +44,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
 
     @Override
     public void publish(String topic, String sessionId) {
-        String customQuery = getCustomQuery();
+        String customQuery = getRecordLimitQuery();
         DataSetMetadata metadata = getMetadata();
         int columnCount = getColumnCount();
         if (customQuery != null) {
@@ -55,17 +55,14 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                 ResultSet resultSet = null;
                 try {
                     if (lastRecordValue > 0) {
-                        String query = getRdbmsProviderConfig().getQuery();
                         String greaterThanWhereQuery = getGreaterThanWhereSQLQuery().replace
                                 (LAST_RECORD_VALUE_PLACEHOLDER,
                                         Double.toString(lastRecordValue));
-                        query = query.concat(greaterThanWhereQuery).concat(getRecordLimitQuery());
-                        statement = connection.prepareStatement(query);
+                        statement = connection.prepareStatement(greaterThanWhereQuery);
                     } else {
                         statement = connection.prepareStatement(customQuery);
                     }
                     resultSet = statement.executeQuery();
-                    connection.commit();
                     ArrayList<Object[]> data = new ArrayList<>();
                     while (resultSet.next()) {
                         Object[] rowData = new Object[columnCount];
@@ -75,7 +72,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                             } else if (metadata.getTypes()[i].equals(DataSetMetadata.Types.ORDINAL)) {
                                 rowData[i] = resultSet.getString(i + 1);
                             } else if (metadata.getTypes()[i].equals(DataSetMetadata.Types.TIME)) {
-                                rowData[i] = resultSet.getDate(i + 1);
+                                rowData[i] = resultSet.getDouble(i + 1);
                             } else {
                                 if (LOGGER.isDebugEnabled()) {
                                     LOGGER.debug("Meta Data type not defined, added value of the given column as a " +
@@ -83,13 +80,18 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                                 }
                                 rowData[i] = resultSet.getObject(i + 1);
                             }
-                            if (metadata.getNames()[i].equals(getRdbmsProviderConfig().getIncrementalColumn())) {
-                                lastRecordValue = (double) rowData[i];
+                            if (metadata.getNames()[i].equalsIgnoreCase(getRdbmsProviderConfig()
+                                    .getIncrementalColumn())) {
+                                if (lastRecordValue < (double) rowData[i]) {
+                                    lastRecordValue = (double) rowData[i];
+                                }
                             }
                         }
                         data.add(rowData);
                     }
-                    publishToEndPoint(data, sessionId, topic);
+                    if (!data.isEmpty()) {
+                        publishToEndPoint(data, sessionId, topic);
+                    }
                 } catch (SQLException e) {
                     LOGGER.error("SQL exception occurred " + e.getMessage(), e);
                 } finally {

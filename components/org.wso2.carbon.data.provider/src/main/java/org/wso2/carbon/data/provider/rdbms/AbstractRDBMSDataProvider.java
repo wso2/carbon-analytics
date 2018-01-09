@@ -42,8 +42,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import javax.sql.DataSource;
 
+import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.CUSTOM_QUERY_PLACEHOLDER;
 import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.INCREMENTAL_COLUMN_PLACEHOLDER;
 import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.LIMIT_VALUE_PLACEHOLDER;
 import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.RECORD_DELETE_QUERY;
@@ -61,7 +64,6 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     private String recordLimitQuery;
     private String purgingQuery;
     private String totalRecordCountQuery;
-    private String customQuery;
     private String greaterThanWhereSQLQuery;
     private DataSetMetadata metadata;
     private int columnCount;
@@ -100,23 +102,41 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
             greaterThanWhereSQLQuery = rdbmsQueryManager.getQuery(RECORD_GREATER_THAN_QUERY);
             if (greaterThanWhereSQLQuery != null) {
                 greaterThanWhereSQLQuery = greaterThanWhereSQLQuery.replace
-                        (INCREMENTAL_COLUMN_PLACEHOLDER, getRdbmsProviderConfig().getIncrementalColumn());
+                        (INCREMENTAL_COLUMN_PLACEHOLDER, getRdbmsProviderConfig().getIncrementalColumn())
+                        .replace(LIMIT_VALUE_PLACEHOLDER, Long.toString(rdbmsProviderConfig
+                                .getPublishingLimit())).replace(CUSTOM_QUERY_PLACEHOLDER, rdbmsProviderConfig
+                                .getQuery());
             }
             recordLimitQuery = rdbmsQueryManager.getQuery(RECORD_LIMIT_QUERY);
             if (recordLimitQuery != null) {
                 recordLimitQuery = recordLimitQuery.replace(INCREMENTAL_COLUMN_PLACEHOLDER, rdbmsProviderConfig
                         .getIncrementalColumn()).replace(LIMIT_VALUE_PLACEHOLDER, Long.toString(rdbmsProviderConfig
-                        .getPublishingLimit()));
-                customQuery = rdbmsProviderConfig.getQuery().concat(recordLimitQuery);
+                        .getPublishingLimit())).replace(CUSTOM_QUERY_PLACEHOLDER, rdbmsProviderConfig.getQuery());
                 try {
-                    statement = connection.prepareStatement(customQuery);
+                    statement = connection.prepareStatement(recordLimitQuery);
                     resultSet = statement.executeQuery();
                     ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
                     metadata = new DataSetMetadata(resultSetMetaData.getColumnCount());
                     columnCount = metadata.getColumnCount();
+                    List<String> timeColumns = null;
+                    if (rdbmsProviderConfig.getTimeColumns() != null && !rdbmsProviderConfig.getTimeColumns()
+                            .isEmpty()) {
+                        timeColumns = Arrays.asList(rdbmsProviderConfig.getTimeColumns().split(","));
+                    }
                     for (int i = 0; i < columnCount; i++) {
-                        metadata.put(i, resultSetMetaData.getColumnName(i + 1),
-                                getMetadataTypes(resultSetMetaData.getColumnTypeName(i + 1)));
+                        boolean isTimeColumnFound = false;
+                        if (timeColumns != null) {
+                            for (String timeColumn : timeColumns) {
+                                if (timeColumn.equalsIgnoreCase(resultSetMetaData.getColumnName(i + 1))) {
+                                    metadata.put(i, resultSetMetaData.getColumnName(i + 1), DataSetMetadata.Types.TIME);
+                                    isTimeColumnFound = true;
+                                }
+                            }
+                        }
+                        if (!isTimeColumnFound) {
+                            metadata.put(i, resultSetMetaData.getColumnName(i + 1),
+                                    getMetadataTypes(resultSetMetaData.getColumnTypeName(i + 1)));
+                        }
                     }
                 } catch (SQLException e) {
                     throw new DataProviderException("SQL exception occurred " + e.getMessage(), e);
@@ -174,11 +194,13 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
      * @return String metadata type
      */
     public DataSetMetadata.Types getMetadataTypes(String dataType) {
-        if (Arrays.asList(rdbmsDataProviderConfBean.getLinearTypes()).contains(dataType)) {
+        if (Arrays.asList(rdbmsDataProviderConfBean.getLinearTypes()).contains(dataType.toUpperCase(Locale.ENGLISH))) {
             return DataSetMetadata.Types.LINEAR;
-        } else if (Arrays.asList(rdbmsDataProviderConfBean.getOrdinalTypes()).contains(dataType)) {
+        } else if (Arrays.asList(rdbmsDataProviderConfBean.getOrdinalTypes()).contains(dataType.toUpperCase(Locale
+                .ENGLISH))) {
             return DataSetMetadata.Types.ORDINAL;
-        } else if (Arrays.asList(rdbmsDataProviderConfBean.getTimeTypes()).contains(dataType)) {
+        } else if (Arrays.asList(rdbmsDataProviderConfBean.getTimeTypes()).contains(dataType.toUpperCase(Locale
+                .ENGLISH))) {
             return DataSetMetadata.Types.TIME;
         } else {
             return DataSetMetadata.Types.OBJECT;
@@ -213,10 +235,6 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
 
     public String getTotalRecordCountQuery() {
         return totalRecordCountQuery;
-    }
-
-    public String getCustomQuery() {
-        return customQuery;
     }
 
     public int getColumnCount() {
@@ -283,7 +301,6 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                     int totalRecordCount = 0;
                     statement = connection.prepareStatement(totalRecordCountQuery);
                     resultSet = statement.executeQuery();
-                    connection.commit();
                     while (resultSet.next()) {
                         totalRecordCount = resultSet.getInt(1);
                     }
@@ -292,7 +309,6 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                                 Long.toString(totalRecordCount - rdbmsProviderConfig.getPurgingLimit()));
                         statement = connection.prepareStatement(query);
                         statement.executeUpdate();
-                        connection.commit();
                     }
                 } catch (SQLException e) {
                     LOGGER.error("SQL exception occurred " + e.getMessage(), e);

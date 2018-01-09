@@ -32,7 +32,7 @@ import OverviewChart from "./OverviewChart";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 
-const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20}};
+const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex:1}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
@@ -58,7 +58,7 @@ export default class WorkerThumbnail extends React.Component {
     }
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasPermission: response.data
@@ -111,7 +111,7 @@ export default class WorkerThumbnail extends React.Component {
     renderDeleteWorker() {
         if (this.state.hasPermission) {
             return (
-                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker"
+                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker" style={{zIndex:1}}
                             tooltipPosition="bottom-center" onClick={() => {
                     this.setState({open: true})
                 }}><Delete color="grey"/></IconButton>
@@ -128,13 +128,28 @@ export default class WorkerThumbnail extends React.Component {
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
         if (this.props.worker.serverDetails.clusterID == null) {
-            gridTiles = <div>
-                <GridList cols={1} cellHeight={180} style={styles.gridList}>
-                    <h2 style={{textAlign: 'center', color: 'white', padding: 50}}>Worker is not reachable!</h2>
-                </GridList>
-            </div>;
-            lastUpdated = "N/A";
-            color = 'red';
+            if(this.props.worker.statusMessage == null) {
+                gridTiles = <div>
+                    <GridList cols={1} cellHeight={180} style={styles.gridList}>
+                        <h2 style={{textAlign: 'center', color: 'white', padding: 50}}>Worker is not reachable!</h2>
+                    </GridList>
+                </div>;
+                lastUpdated = "N/A";
+                color = 'red';
+            } else {
+                gridTiles = <div>
+                    <GridList cols={1} cellHeight={180} style={styles.gridList}>
+                        <h2 style={{textAlign: 'center', color: 'white', padding: 15}}>Worker is not reachable!
+                            <br/>
+                            <text style={{textAlign: 'center',fontSize:12, color: 'white'}}>
+                                {this.props.worker.statusMessage}
+                                </text>
+                        </h2>
+                    </GridList>
+                </div>;
+                lastUpdated = "N/A";
+                color = 'red';
+            }
             //statistics disabled workers
         } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>

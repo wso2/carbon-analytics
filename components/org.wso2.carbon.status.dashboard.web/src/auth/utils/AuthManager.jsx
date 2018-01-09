@@ -22,7 +22,11 @@ import AuthenticationAPI from '../../utils/apis/AuthenticationAPI';
 /**
  * Name of the session cookie.
  */
-const sessionUser = 'wso2dashboard_user';
+const sessionUser = 'DASHBOARD_USER';
+/**
+ * Name of the refresh token cookie.
+ */
+const REFRESH_TOKEN_COOKIE_NAME = 'REFRESH_TOKEN';
 const TIMESTAMP_SKEW =  100;
 const REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
 
@@ -36,7 +40,7 @@ export default class AuthManager {
      * @returns {{}|null} User object
      */
     static getUser() {
-        const buffer = AuthManager.getSessionCookie(sessionUser);
+        const buffer = AuthManager.getCookie(sessionUser);
         return buffer ? JSON.parse(buffer) : null;
     }
 
@@ -46,14 +50,16 @@ export default class AuthManager {
      * @param {{}} user  User object
      */
     static setUser(user) {
-        AuthManager.setSessionCookie(sessionUser, JSON.stringify(user), (user.validity - TIMESTAMP_SKEW) * 1000);
+        AuthManager.setCookie(sessionUser, JSON.stringify(user), null, window.contextPath);
     }
 
     /**
-     * Delete user from the session cookie.
+     * Discards user session.
      */
-    static clearUser() {
-        AuthManager.deleteSessionCookie(sessionUser);
+    static discardSession() {
+        AuthManager.deleteCookie(sessionUser);
+        AuthManager.deleteCookie(REFRESH_TOKEN_COOKIE_NAME);
+        window.localStorage.clear();
     }
 
     /**
@@ -70,13 +76,18 @@ export default class AuthManager {
             AuthenticationAPI
                 .getAccessTokenWithRefreshToken()
                 .then((response) => {
+                    const { pID, lID, validityPeriod } = response.data;
+                    const username = AuthManager.isRememberMeSet() ?
+                        window.localStorage.getItem('username') : AuthManager.getUser().username;
                     AuthManager.setUser({
-                        username:  window.localStorage.getItem("username"),
-                        token: response.data.partialAccessToken,
-                        validity: response.data.validityPeriod
+                        username: username,
+                        SDID: pID,
+                        validity: validityPeriod,
+                        expires: AuthManager.calculateExpiryTime(validityPeriod),
                     });
-                    AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
-                        REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
+                    // If rememberMe, set refresh token into a persistent cookie else session cookie.
+                    const refreshTokenValidityPeriod = AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
+                    AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -89,7 +100,7 @@ export default class AuthManager {
      * @returns {boolean} Status
      */
     static isRememberMeSet() {
-        return !!(window.localStorage.getItem("rememberMe"));
+        return (window.localStorage.getItem('rememberMe') === 'true');
     }
 
 
@@ -106,16 +117,21 @@ export default class AuthManager {
             AuthenticationAPI
                 .login(username, password, rememberMe)
                 .then((response) => {
-                    // TODO: Get user roles from the SCIM API.
-                    const roles = [];
-                    AuthManager.setUser({ username, rememberMe, roles, token: response.data.partialAccessToken,
-                        validity: response.data.validityPeriod });
+                    const { authUser, pID, lID, validityPeriod } = response.data;
+                    window.localStorage.setItem('rememberMe', rememberMe);
                     if (rememberMe) {
-                        window.localStorage.setItem("rememberMe", rememberMe);
-                        window.localStorage.setItem("username", username);
-                        AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
-                            REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
+                        window.localStorage.setItem('username', authUser);
                     }
+                    // Set user in a cookie
+                    AuthManager.setUser({
+                        username: authUser,
+                        SDID: pID,
+                        validity: validityPeriod,
+                        expires: AuthManager.calculateExpiryTime(validityPeriod),
+                    });
+                    // If rememberMe, set refresh token into a persistent cookie else session cookie.
+                    const refreshTokenValidityPeriod = rememberMe ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
+                    AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -130,11 +146,9 @@ export default class AuthManager {
     static logout() {
         return new Promise((resolve, reject) => {
             AuthenticationAPI
-                .logout(AuthManager.getUser().token)
+                .logout(AuthManager.getUser().SDID)
                 .then(() => {
-                    AuthManager.clearUser();
-                    window.localStorage.clear();
-                    AuthManager.delete_cookie("REFRESH_TOKEN");
+                    AuthManager.discardSession();
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -142,29 +156,11 @@ export default class AuthManager {
     }
 
     /**
-     * Set session cookie.
-     *
-     * @param {string} name Name of the cookie
-     * @param {string} value Value of the cookie
-     * @param {number} expiresIn Number of milliseconds to expire the cookie
+     * Get JavaScript accessible cookies saved in browser, by giving the cooke name.
+     * @param {String} name : Name of the cookie which need to be retrived
+     * @returns {String|null} : If found a cookie with given name , return its value,Else null value is returned
      */
-    static setSessionCookie(name, value, expiresIn) {
-        let expires = '';
-        if (expiresIn) {
-            const d = new Date();
-            d.setTime(d.getTime() + expiresIn);
-            expires = `expires=${d.toUTCString()};`;
-        }
-        document.cookie = `${name}=${value};${expires}path=${window.contextPath};Secure`;
-    }
-
-    /**
-     * Get session cookie by name.
-     *
-     * @param {string} name Name of the cookie
-     * @returns {string} Content
-     */
-    static getSessionCookie(name) {
+    static getCookie(name) {
         name = `${name}=`;
         const arr = document.cookie.split(';');
         for (let i = 0; i < arr.length; i++) {
@@ -177,15 +173,6 @@ export default class AuthManager {
             }
         }
         return '';
-    }
-
-    /**
-     * Delete session cookie by name.
-     *
-     * @param {string} name Name of the cookie
-     */
-    static deleteSessionCookie(name) {
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/monitoring';
     }
 
     /**
@@ -208,30 +195,22 @@ export default class AuthManager {
     }
 
     /**
-     * Get JavaScript accessible cookies saved in browser, by giving the cooke name.
-     * @param {String} name : Name of the cookie which need to be retrived
-     * @returns {String|null} : If found a cookie with given name , return its value,Else null value is returned
-     */
-    static getCookie(name) {
-        let pairs = document.cookie.split(";");
-        let cookie = null;
-        for (let pair of pairs) {
-            pair = pair.split("=");
-            let cookie_name = pair[0].trim();
-            let value = encodeURIComponent(pair[1]);
-            if (cookie_name === name) {
-                cookie = value;
-                break;
-            }
-        }
-        return cookie;
-    }
-
-    /**
      * Delete a browser cookie given its name
      * @param {String} name : Name of the cookie which need to be deleted
      */
-    static delete_cookie(name) {
-        document.cookie = name + '=; Path=' + "/" + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    static deleteCookie(name) {
+        document.cookie = name + '=; path=' + window.contextPath + '; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+
+    /**
+     +     * Calculate expiry time.
+     +     *
+     +     * @param validityPeriod
+     +     * @returns {Date}
+     +     */
+    static calculateExpiryTime(validityPeriod) {
+        let expires = new Date();
+        expires.setSeconds(expires.getSeconds() + validityPeriod);
+        return expires;
     }
 }

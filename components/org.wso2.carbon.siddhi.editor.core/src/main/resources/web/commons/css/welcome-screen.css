@@ -16,31 +16,31 @@
 */
 
 .initial-background-container {
-	background:#282828;
-  	background-size: cover;
-	height: 100%;
-	width: 100%;
-	color: #f6f6f6;
+    background: #282828;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+    color: #f6f6f6;
 }
 
 .left-pane {
-	background: #1c1c1c;
-	width: 300px;
-	height: 100%;
-	padding: 100px 20px 20px;
-	float: left;
+    background: #1c1c1c;
+    width: 300px;
+    height: 100%;
+    padding: 100px 20px 20px;
+    float: left;
 }
 
 .content-pane {
-	width: calc(100% - 300px);
-	float: left;
-	padding:30px;
-	height: 100%;
-	overflow-y:auto;
+    width: calc(100% - 300px);
+    float: left;
+    padding: 30px;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .new-welcome-button, .open-welcome-button {
-	color: #f1f6fa;
+    color: #f1f6fa;
     font-size: 1.286em;
     width: 200px;
     margin: 0 auto;
@@ -50,8 +50,8 @@
 .new-welcome-button {
     background-color: #f17b31;
     margin-bottom: 25px;
-	z-index: 1;
-	position: relative;
+    z-index: 1;
+    position: relative;
 }
 
 .new-welcome-button:hover, .new-welcome-button:active {
@@ -61,8 +61,8 @@
 
 .open-welcome-button {
     background-color: #505050;
-	z-index: 1;
-	position: relative;
+    z-index: 1;
+    position: relative;
 }
 
 .open-welcome-button:hover, .open-welcome-button:active {
@@ -71,75 +71,98 @@
 }
 
 .productname-wrap {
-	position: absolute;
-	bottom: 0;
-	padding:30px 0;
-	width: 260px;
+    position: absolute;
+    bottom: 0;
+    padding: 30px 0;
+    width: 260px;
 }
 
 .productname-wrap img {
-	height: 30px;
+    height: 30px;
 }
 
 .productname-wrap h1 {
-	margin-top: 5px;
-	font-size: 1.714em;
-	color: #b1b1b1;
+    margin-top: 5px;
+    font-size: 1.714em;
+    color: #b1b1b1;
 }
 
 ul.recent-files li a {
-	background: #373737;
-	padding: 10px;
-	margin: 5px 0;
-	cursor: pointer;
-	-webkit-transition: all 0.3s ease;
-    -moz-transition: all 0.3s ease;
-    -o-transition: all 0.3s ease;
-    -ms-transition: all 0.3s ease;
+    background: #373737;
+    padding: 10px;
+    margin: 5px 0;
+    cursor: pointer;
     transition: all 0.3s ease;
     line-height: 21px;
     display: block;
     color: #f6f6f6;
-    font-size:1.45em;
+    font-size: 1.45em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: .25rem;
 }
 
 ul.recent-files li button {
-	display: none;
+    display: none;
 }
 
 ul.recent-files li:hover button {
-	display: block;
+    display: block;
 }
 
 ul.recent-files li a:hover {
-	font-size:1.58em;
-  	background: #424242;
+    font-size: 1.58em;
+    background: #424242;
 }
 
 .margin-top-60 {
-	margin-top: 60px;
+    margin-top: 60px;
 }
 
 ul.recent-files li span.description {
-	display: block;
-	font-weight: 300;
-	font-size: 14px;
-	color: #c8c7c7;
+    font-weight: 200;
+    font-size: 14px;
+    color: #c8c7c7;
+    display: -webkit-box;
+    height: 65px;
+    margin: 0 auto;
+    line-height: 20px;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 2%;
 }
 
 ul.quick-links {
-	margin-left: -15px;
+    margin-left: -15px;
+    width: 100%;
+    max-width: 600px;
 }
 
-ul.quick-links li i {
-	padding-right: 10px;
+ul.quick-links li {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-ul.quick-links li a {
-	color: #f6f6f6;
-	transition: all 0.3s ease,
+ul.quick-links li i,
+.more-samples i{
+    padding-right: 10px;
 }
 
-ul.quick-links li a:hover {
-	color: #a2a2a2;
+ul.quick-links li a,
+a.more-samples {
+    color: #f6f6f6;
+    transition: all 0.3s ease,
+}
+
+ul.quick-links li a:hover,
+a.more-samples:hover{
+    color: #a2a2a2;
+}
+
+.more-samples {
+    display: block;
+    padding: 10px 0 0 15px;
 }

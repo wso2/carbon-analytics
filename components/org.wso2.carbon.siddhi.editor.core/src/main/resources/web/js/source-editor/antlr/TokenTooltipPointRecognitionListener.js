@@ -91,6 +91,17 @@ TokenTooltipPointRecognitionListener.prototype.exitTrigger_name = function (ctx)
     }
 };
 
+TokenTooltipPointRecognitionListener.prototype.exitAggregation_name = function (ctx) {
+    // Identifying aggregations for tooltips
+    var aggregationName = this.walker.utils.getTextFromANTLRCtx(ctx);
+
+    if (aggregationName) {
+        updateTokenDescription(this.walker, SiddhiEditor.constants.AGGREGATIONS, {
+            aggregationName: aggregationName
+        }, ctx);
+    }
+};
+
 TokenTooltipPointRecognitionListener.prototype.exitPartition = function () {
     // Incrementing the partition count so that the correct index in used in the next partition
     this.partitionCount++;

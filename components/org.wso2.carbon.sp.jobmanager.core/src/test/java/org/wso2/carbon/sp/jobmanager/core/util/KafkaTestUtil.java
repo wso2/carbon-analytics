@@ -19,6 +19,7 @@
 package org.wso2.carbon.sp.jobmanager.core.util;
 
 import kafka.admin.AdminUtils;
+import kafka.admin.RackAwareMode;
 import kafka.common.TopicExistsException;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServerStartable;
@@ -170,7 +171,8 @@ public class KafkaTestUtil {
         ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
         for (String topic : topics) {
             try {
-                AdminUtils.createTopic(zkUtils, topic, numOfPartitions, 1, new Properties());
+                AdminUtils.createTopic(zkUtils, topic, numOfPartitions, 1, new Properties(),
+                        RackAwareMode.Enforced$.MODULE$);
             } catch (TopicExistsException e) {
                 log.warn("topic exists for: " + topic);
             }

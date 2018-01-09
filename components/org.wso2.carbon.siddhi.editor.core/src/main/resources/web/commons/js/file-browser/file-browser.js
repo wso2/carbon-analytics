@@ -47,6 +47,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             this._fetchFiles = _.get(config, 'fetchFiles', false);
             this._root = _.get(config, 'root');
             this._showWorkspace = _.get(config, 'showWorkspace');
+            this._showSamples = _.get(config, 'showSamples');
 
             this._treeConfig = {
                 'core': {
@@ -78,10 +79,13 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                     'file': {
                         'icon': 'fw-document'
                     }
+                },
+                'sort': function (a, b) {
+                    return this.get_text(a).toLowerCase() > this.get_text(b).toLowerCase() ? 1 : -1;
                 }
             };
 
-            this._plugins = ['types', 'wholerow'];
+            this._plugins = ['types', 'wholerow', 'sort'];
             this._contextMenuProvider = _.get(config, 'contextMenuProvider');
             if(!_.isNil(this._contextMenuProvider)){
                 this._plugins.push('contextmenu');
@@ -95,18 +99,18 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             var self = this;
             return function (node) {
                 if(self._showWorkspace && node.id === '#'){
-                    console.log("defaultDir=true");
                     return self._workspaceServiceURL + "/listFilesInPath?path=" + btoa("");
-                }
-                else if (node.id === '#') {
+                } else if(self._showSamples && node.id === '#'){
+                    var samplesRelativeUrl = "";
+                    return self._workspaceServiceURL + "/listFiles/samples?path=" + btoa(samplesRelativeUrl);
+                } else if (node.id === '#') {
                     if(!_.isNil(self._root)){
                         if (self._fetchFiles) {
                             return self._workspaceServiceURL + "/listFiles/workspace?path=" + btoa(self._root);
                         }
                     }
                     return self._workspaceServiceURL + "/root";
-                }
-                else {
+                } else {
                     if (self._fetchFiles) {
                         return self._workspaceServiceURL + "/listFiles?path=" + btoa(node.id);
                     } else {
@@ -146,25 +150,32 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             var self = this;
             this._$parent_el
                 .jstree(self._treeConfig).on('changed.jstree', function (e, data) {
-                    if (data && data.selected && data.selected.length) {
-                        self.selected = data.selected[0];
-                        self.trigger("selected", data.selected[0]);
-                    }
-                    else {
-                        self.selected = false;
-                        self.trigger("selected", null);
-                    }
-                }).on('open_node.jstree', function (e, data) {
-                    data.instance.set_icon(data.node, "fw fw-folder");
-                }).on('close_node.jstree', function (e, data) {
-                    data.instance.set_icon(data.node, "fw fw-folder");
-                }).on('ready', function(){
-                    self.trigger("ready");
-                }).on("dblclick.jstree", function (event) {
-                    var item = $(event.target).closest("li");
-                    var node = self._$parent_el.jstree(true).get_node(item[0].id);
-                    self.trigger("double-click-node", node);
-                });
+                if (data && data.selected && data.selected.length) {
+                    self.selected = data.selected[0];
+                    self.trigger("selected", data.selected[0]);
+                }
+                else {
+                    self.selected = false;
+                    self.trigger("selected", null);
+                }
+            }).on('open_node.jstree', function (e, data) {
+                data.instance.set_icon(data.node, "fw fw-folder");
+            }).on('close_node.jstree', function (e, data) {
+                data.instance.set_icon(data.node, "fw fw-folder");
+            }).on('ready', function(){
+                self.trigger("ready");
+            }).on('hover_node.jstree', function (e, data) {
+                var linkId = data.node.a_attr.id;
+                var fileName = data.node.text;
+                $("a[id='"+linkId+"']").attr('title', fileName);
+            }).on("dblclick.jstree", function (event) {
+                var item = $(event.target).closest("li");
+                var node = self._$parent_el.jstree(true).get_node(item[0].id);
+                var path = node.id;
+                var fileName = _.last(path.split(self.application.getPathSeperator()));
+                node.id = "workspace" + self.application.getPathSeperator() + fileName;
+                self.trigger("double-click-node", node);
+            });
             return this;
         }
     });

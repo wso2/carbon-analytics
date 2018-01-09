@@ -101,8 +101,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 });
             };
 
-            this.handleSave = function() {
-                var activeTab = app.tabController.getActiveTab();
+            this.handleSave = function(option) {
+
+                var saveFileTab;
+                if ( option !== undefined && option.tabInstance !== undefined){
+                    saveFileTab = option.tabInstance;
+                } else {
+                    saveFileTab = app.tabController.getActiveTab();
+                }
                 var file = undefined;
                 var siddhiFileEditor;
                 var config = "";
@@ -110,31 +116,40 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var fileName = "";
                 var options = {};
 
-                if(activeTab.getTitle() != "welcome-page"){
-                    file = activeTab.getFile();
+                if(saveFileTab.getTitle() != "welcome-page"){
+                    file = saveFileTab.getFile();
                 }
 
                 if(file !== undefined){
                     if(file.isPersisted()){
                         if(file.isDirty()){
-                            var activeTab = app.tabController.activeTab;
-                            var siddhiFileEditor= activeTab.getSiddhiFileEditor();
+                            //var activeTab = app.tabController.activeTab;
+                            var activeTab = saveFileTab;
+                            siddhiFileEditor= activeTab.getSiddhiFileEditor();
                             config = siddhiFileEditor.getContent();
                             var response = self._serviceClient.writeFile(file,config);
                             if(response.error){
                                 alerts.error(response.message);
                                 self.updateRunMenuItem();
                                 return;
+                            } else {
+                                var trimmedSiddhiAppName = file.attributes.name;
+                                if (checkEndsWithSiddhi(trimmedSiddhiAppName)) {
+                                    trimmedSiddhiAppName = trimmedSiddhiAppName.slice(0, -7);
+                                }
+                                app.commandManager.dispatch('remove-unwanted-streams-single-simulation',
+                                    trimmedSiddhiAppName);
                             }
                             if(file.getRunStatus() || file.getDebugStatus()){
                                 var launcher = activeTab.getSiddhiFileEditor().getLauncher();
-                                launcher.stopApplication(self, false);
+                                launcher.stopApplication(app.workspaceManager, false);
                             }
                         }
                         if(!_.isNil(options) && _.isFunction(options.callback)){
                             options.callback(true);
                         }
                     } else {
+                        options.tabInstance = saveFileTab;
                         app.commandManager.dispatch('open-file-save-dialog', options);
                     }
                 }
@@ -212,8 +227,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateSaveMenuItem();
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
-                this.updateSettingsMenuItem();
-                //this.updateCodeFormatMenu();
+                this.updateDeleteMenuItem();
             };
 
             this.manageConsoles = function(evt){
@@ -276,7 +290,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         if (undoManager.hasRedo() && undoManager.redoStackTop().canRedo()) {
                             redoMenuItem.enable();
                             redoMenuItem.addLabelSuffix(
-                            undoManager.redoStackTop().getTitle());
+                                undoManager.redoStackTop().getTitle());
                         } else {
                             redoMenuItem.disable();
                             redoMenuItem.clearLabelSuffix();
@@ -296,7 +310,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var activeTab = app.tabController.getActiveTab(),
                     saveMenuItem = app.menuBar.getMenuItemByID('file.save'),
                     saveAsMenuItem = app.menuBar.getMenuItemByID('file.saveAs'),
-                    deletesMenuItem = app.menuBar.getMenuItemByID('file.delete'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -312,17 +325,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         saveMenuItem.disable();
                         saveAsMenuItem.enable();
                     }
-                    deletesMenuItem.enable();
                 } else {
                     saveMenuItem.disable();
                     saveAsMenuItem.disable();
-                    deletesMenuItem.disable();
                 }
             };
 
-            this.updateSettingsMenuItem = function(){
+            this.updateDeleteMenuItem = function(){
                 var activeTab = app.tabController.getActiveTab(),
-                    settingMenuItem = app.menuBar.getMenuItemByID('file.settings'),
+                    deleteMenuItem = app.menuBar.getMenuItemByID('file.delete'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -330,9 +341,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
 
                 if(file !== undefined){
-                    settingMenuItem.enable();
+                    file = activeTab.getFile();
+                    if(file.isPersisted()){
+                        deleteMenuItem.enable();
+                    } else {
+                        deleteMenuItem.disable();
+                    }
                 } else {
-                    settingMenuItem.disable();
+                    deleteMenuItem.disable();
                 }
             };
 
@@ -359,15 +375,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         toolBar.disableDebugButton();
                         toolBar.disableStopButton();
                     } else {
-                        if(activeTab.getFile().getRunStatus() || activeTab.getFile().getDebugStatus()){
+                        if(file.getRunStatus() || file.getDebugStatus()){
                             runMenuItem.disable();
                             debugMenuItem.disable();
                             stopMenuItem.enable();
                             toolBar.disableRunButton();
                             toolBar.disableDebugButton();
                             toolBar.enableStopButton();
-                        } else if(!activeTab.getFile().getRunStatus()){
-                            if(!activeTab.getFile().getDebugStatus()){
+                        } else if(!file.getRunStatus()){
+                            if(!file.getDebugStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
@@ -378,8 +394,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                                 stopMenuItem.enable();
                                 toolBar.enableStopButton();
                             }
-                        } else if(!activeTab.getFile().getDebugStatus()){
-                            if(!activeTab.getFile().getRunStatus()){
+                        } else if(!file.getDebugStatus()){
+                            if(!file.getRunStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
@@ -406,8 +422,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if(_.isNil(this._saveFileDialog)){
                     this._saveFileDialog = new Dialogs.save_to_file_dialog(app);
                 }
-                this._saveFileDialog.render();
-
+                if (options !== undefined && options.tabInstance !== undefined){
+                    this._saveFileDialog.render(options.tabInstance);
+                } else {
+                    this._saveFileDialog.render();
+                }
                 if(!_.isNil(options) && _.isFunction(options.callback)){
                     var isSaved = false;
                     this._saveFileDialog.once('save-completed', function(success){
@@ -500,6 +519,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._openFileDialog.show();
             };
 
+            this.openSampleFileOpenDialog = function openSampleFileOpenDialog() {
+                if(_.isNil(this._openSampleFileDialog)){
+                    this._openSampleFileDialog = new Dialogs.open_sample_file_dialog(app);
+                }
+                this._openSampleFileDialog.render();
+                this._openSampleFileDialog.show();
+            };
+
             this.openCloseFileConfirmDialog = function(options) {
                 if(_.isNil(this._closeFileConfirmDialog)){
                     this._closeFileConfirmDialog = new Dialogs.CloseConfirmDialog();
@@ -519,7 +546,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.openSettingsDialog = function openSettingsDialog(options){
-                if(_.isNil(this._openFileDialog)){
+                if(_.isNil(this._openSettingsDialog)){
                     var opts = _.cloneDeep(_.get(app.config, 'settings_dialog'));
                     _.set(opts, "application", app);
                     this._openSettingsDialog = new Dialogs.settings_dialog(opts);
@@ -560,10 +587,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 app.tabController.removeTab(tab)
             };
 
+            function checkEndsWithSiddhi(string) {
+                return string.endsWith(".siddhi");
+            }
+
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
 
-            app.commandManager.registerHandler('save', this.handleSave);
+            app.commandManager.registerHandler('save', this.handleSave, this);
 
             app.commandManager.registerHandler('export', this.handleExport, this);
 
@@ -603,7 +634,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             // Delete file delete dialog
             app.commandManager.registerHandler('delete-file-delete-dialog', this.openDeleteFileConfirmDialog, this);
-            
+
             // close all tabs
             app.commandManager.registerHandler('close-all', this.closeAllTabs, this);
 
@@ -612,6 +643,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             app.commandManager.registerHandler('open-close-all-file-confirm-dialog', this
                 .openCloseAllFileConfirmDialog, this);
+
+            // Open Sample file open dialog
+            app.commandManager.registerHandler('open-sample-file-open-dialog', this.openSampleFileOpenDialog, this);
         }
     });
 

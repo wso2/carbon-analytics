@@ -24,14 +24,13 @@ import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
-import Menu, { MenuItem } from 'material-ui/Menu';
 import Button from 'material-ui/Button';
-import MoreVertIcon from 'material-ui-icons/MoreVert';
 import AccountCircle from 'material-ui-icons/AccountCircle';
-
+import HomeIcon from 'material-ui-icons/Home';
+import Menu, { MenuItem } from 'material-ui/Menu';
 import Logo from '../../images/wso2-logo.svg';
 // App Utilities
-import AuthManager from "../../utils/AuthManager";
+import AuthManager from '../../utils/AuthManager';
 // CSS
 import '../../index.css';
 
@@ -64,6 +63,17 @@ class Header extends React.Component {
      * @returns {XML} HTML content
      */
     renderRightLinks() {
+        const homeButton = (
+            <Link
+                style={{textDecoration: 'none'}}
+                to={`${appContext}/businessRulesManager`}
+            >
+                <IconButton color="contrast">
+                    <HomeIcon />
+                </IconButton>
+            </Link>
+        );
+
         if (this.props.hideUserSettings) {
             return (<div />);
         }
@@ -85,6 +95,11 @@ class Header extends React.Component {
 
         return (
             <div>
+                <Toolbar>
+                    {!this.props.hideHomeButton ? (homeButton) : (null)}
+                    <Typography type="body1" style={{ color: 'inherit' }}>
+                        {user.username}
+                    </Typography>
                     <IconButton
                         aria-owns={open ? 'menu-appbar' : null}
                         aria-haspopup="true"
@@ -95,7 +110,7 @@ class Header extends React.Component {
                     >
                         <AccountCircle />
                     </IconButton>
-
+                </Toolbar>
                 <Menu
                     id="menu-appbar"
                     anchorEl={this.state.anchorEl}

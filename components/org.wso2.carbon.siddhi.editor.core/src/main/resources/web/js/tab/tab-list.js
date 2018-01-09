@@ -124,7 +124,11 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                 tabHeaderLink.text(tab.getTitle());
 
                 tabHeader.setText = function(text){
-                    tabHeaderLink.text(text.split(".")[0]);
+                    if(text.lastIndexOf(".siddhi") != -1){
+                        tabHeaderLink.text(text.substring(0, text.lastIndexOf(".siddhi")));
+                    } else{
+                        tabHeaderLink.text(text);
+                    }
                 };
 
                 var self = this;

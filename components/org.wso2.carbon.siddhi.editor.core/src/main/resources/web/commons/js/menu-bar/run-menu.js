@@ -64,12 +64,12 @@ define(([],function (){
                    id: "stop",
                    shortcuts: {
                        mac: {
-                           key: "command+shift+p",
-                           label: "\u2318\u21E7P"
+                           key: "command+p",
+                           label: "\u2318P"
                        },
                        other: {
-                           key: "ctrl+shift+p",
-                           label: "Ctrl+Shift+P"
+                           key: "ctrl+p",
+                           label: "Ctrl+P"
                        }
                    }
                },

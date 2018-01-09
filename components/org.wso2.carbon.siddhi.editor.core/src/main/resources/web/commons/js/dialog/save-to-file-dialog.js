@@ -50,13 +50,19 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 }
             },
 
-            render: function () {
+            render: function (tabInstance) {
                 var self = this;
                 var fileBrowser;
                 var app = this.app;
                 var notification_container = this.notification_container;
                 var workspaceServiceURL = app.config.services.workspace.endpoint;
-                var activeTab = app.tabController.activeTab;
+                var activeTab;
+                if(tabInstance !== undefined) {
+                    activeTab = tabInstance;
+                } else {
+                    activeTab = app.tabController.activeTab;
+                }
+
                 var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                 var content = siddhiFileEditor.getContent();
                 var plan_regex = /@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"](.*?)['|"]\)/g;
@@ -177,7 +183,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             var replaceConfirmCb = function(confirmed) {
                                 if(confirmed) {
                                     saveConfiguration({location: _location, configName: _configName,
-                                    replaceContent: replaceContent, oldAppName: providedFileName}, callback);
+                                        replaceContent: replaceContent, oldAppName: providedFileName},
+                                        callback, tabInstance);
                                 } else {
                                     callback(false);
                                 }
@@ -191,12 +198,12 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
                         } else {
                             saveConfiguration({location: _location, configName: _configName, replaceContent:
-                            replaceContent, oldAppName: providedFileName}, callback);
+                                replaceContent, oldAppName: providedFileName}, callback, tabInstance);
                         }
                     }else {
-                         saveWizardError.text("Error in reading the file location "+_location);
-                         saveWizardError.show();
-                     }
+                        saveWizardError.text("Error in reading the file location "+_location);
+                        saveWizardError.show();
+                    }
 
                 });
 
@@ -234,7 +241,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var saveServiceURL = workspaceServiceURL + "/exists/workspace";
                     var payload = "configName=" + btoa("workspace" + self.app
-                                 .getPathSeperator() + options.configName);
+                        .getPathSeperator() + options.configName);
 
                     $.ajax({
                         type: "POST",
@@ -253,10 +260,15 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     return data;
                 }
 
-                function saveConfiguration(options, callback) {
+                function saveConfiguration(options, callback, tabInstance) {
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var saveServiceURL = workspaceServiceURL + "/write";
-                    var activeTab = app.tabController.activeTab;
+                    var activeTab;
+                    if(tabInstance !== undefined) {
+                        activeTab = tabInstance;
+                    } else {
+                        activeTab = app.tabController.activeTab;
+                    }
                     var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                     var config = siddhiFileEditor.getContent();
                     var regexToExtractAppNameAnnotation = /@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"]/g;
@@ -270,8 +282,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         wrappingCodeTobeUsed = "\"";
                     }
 
-                    var appNameToAdd = appNameAnnotation + options.configName.split(".")[0] + wrappingCodeTobeUsed +
-                        ")";
+                    var appNameToAdd = appNameAnnotation + options.configName.substring
+                    (0, options.configName.lastIndexOf(".siddhi")) + wrappingCodeTobeUsed + ")";
                     var appNameToRemove = appNameAnnotation + options.oldAppName + wrappingCodeTobeUsed + ")";
                     if(options.replaceContent){
                         config = config.replace(appNameToRemove,'');
@@ -279,7 +291,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     }
 
                     var payload = "configName=" + btoa("workspace" + self.app
-                                  .getPathSeperator() + options.configName) + "&config=" + (btoa(config));
+                        .getPathSeperator() + options.configName) + "&config=" + (btoa(config));
 
                     $.ajax({
                         url: saveServiceURL,
@@ -291,13 +303,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             if (xhr.status == 200) {
                                 activeTab.setTitle(options.configName);
                                 activeTab.getFile()
-                                            .setPath(options.location)
-                                            .setName(options.configName)
-                                            .setContent(config)
-                                            .setPersisted(true)
-                                            .setLastPersisted(_.now())
-                                            .setDirty(false)
-                                            .save();
+                                    .setPath(options.location)
+                                    .setName(options.configName)
+                                    .setContent(config)
+                                    .setPersisted(true)
+                                    .setLastPersisted(_.now())
+                                    .setDirty(false)
+                                    .save();
                                 app.commandManager.dispatch("open-folder", data.path);
                                 if(!app.workspaceExplorer.isActive()){
                                     app.commandManager.dispatch("toggle-file-explorer");
@@ -305,6 +317,12 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                 //app.breadcrumbController.setPath(options.location, options.configName);
                                 saveConfigModal.modal('hide');
                                 app.workspaceManager.updateMenuItems();
+                                var trimmedSiddhiAppName = options.configName;
+                                if (checkEndsWithSiddhi(trimmedSiddhiAppName)) {
+                                    trimmedSiddhiAppName = trimmedSiddhiAppName.slice(0, -7);
+                                }
+                                app.commandManager.dispatch('remove-unwanted-streams-single-simulation',
+                                    trimmedSiddhiAppName);
                                 log.debug('file saved successfully');
                                 siddhiFileEditor.setContent(config);
                                 callback(true);
@@ -327,6 +345,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             callback(false);
                         }
                     });
+                }
+
+                function checkEndsWithSiddhi(string) {
+                    return string.endsWith(".siddhi");
                 }
             }
         });

@@ -34,8 +34,6 @@ public class HTTPClientUtil {
      * Media type to send with the requests.
      */
     private static final MediaType MEDIA_TYPE_PLAINTEXT = MediaType.parse("text/plain; charset=utf-8");
-    private static final String DEFAULT_USERNAME = "admin";
-    private static final String DEFAULT_PASSWORD = "admin";
 
     /**
      * Send a GET request.
@@ -44,11 +42,11 @@ public class HTTPClientUtil {
      * @return {@link Response} for the request.
      * @throws IOException when failed to connect.
      */
-    public static Response doGetRequest(String url) throws IOException {
+    public static Response doGetRequest(String url, String username, String password) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        return getAuthenticatedClient(DEFAULT_USERNAME, DEFAULT_PASSWORD).newCall(request).execute();
+        return getAuthenticatedClient(username, password).newCall(request).execute();
     }
 
     /**
@@ -59,13 +57,14 @@ public class HTTPClientUtil {
      * @return {@link Response} for the request.
      * @throws IOException when failed to connect.
      */
-    public static Response doPostRequest(String url, String payload) throws IOException {
+    public static Response doPostRequest(String url, String payload, String username, String password)
+            throws IOException {
         RequestBody body = RequestBody.create(MEDIA_TYPE_PLAINTEXT, payload);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
                 .build();
-        return getAuthenticatedClient(DEFAULT_USERNAME, DEFAULT_PASSWORD).newCall(request).execute();
+        return getAuthenticatedClient(username, password).newCall(request).execute();
     }
 
     /**
@@ -76,13 +75,14 @@ public class HTTPClientUtil {
      * @return {@link Response} for the request.
      * @throws IOException when failed to connect.
      */
-    public static Response doPutRequest(String url, String payload) throws IOException {
+    public static Response doPutRequest(String url, String payload, String username, String password)
+            throws IOException {
         RequestBody body = RequestBody.create(MEDIA_TYPE_PLAINTEXT, payload);
         Request request = new Request.Builder()
                 .url(url)
                 .put(body)
                 .build();
-        return getAuthenticatedClient(DEFAULT_USERNAME, DEFAULT_PASSWORD).newCall(request).execute();
+        return getAuthenticatedClient(username, password).newCall(request).execute();
     }
 
     /**
@@ -92,12 +92,12 @@ public class HTTPClientUtil {
      * @return {@link Response} for the request.
      * @throws IOException when failed to connect.
      */
-    public static Response doDeleteRequest(String url) throws IOException {
+    public static Response doDeleteRequest(String url, String username, String password) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .delete()
                 .build();
-        return getAuthenticatedClient(DEFAULT_USERNAME, DEFAULT_PASSWORD).newCall(request).execute();
+        return getAuthenticatedClient(username, password).newCall(request).execute();
     }
 
     /**

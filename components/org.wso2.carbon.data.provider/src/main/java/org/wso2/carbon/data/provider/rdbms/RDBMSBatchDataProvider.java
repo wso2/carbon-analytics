@@ -41,7 +41,7 @@ public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
 
     @Override
     public void publish(String topic, String sessionId) {
-        String customQuery = getCustomQuery();
+        String customQuery = getRecordLimitQuery();
         DataSetMetadata metadata = getMetadata();
         int columnCount = getColumnCount();
         if (customQuery != null) {
@@ -53,7 +53,6 @@ public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
                 try {
                     statement = connection.prepareStatement(customQuery);
                     resultSet = statement.executeQuery();
-                    connection.commit();
                     ArrayList<Object[]> data = new ArrayList<>();
                     while (resultSet.next()) {
                         Object[] rowData = new Object[columnCount];
@@ -63,7 +62,7 @@ public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
                             } else if (metadata.getTypes()[i].equals(DataSetMetadata.Types.ORDINAL)) {
                                 rowData[i] = resultSet.getString(i + 1);
                             } else if (metadata.getTypes()[i].equals(DataSetMetadata.Types.TIME)) {
-                                rowData[i] = resultSet.getDate(i + 1);
+                                rowData[i] = resultSet.getDouble(i + 1);
                             } else {
                                 if (LOGGER.isDebugEnabled()) {
                                     LOGGER.debug("Meta Data type not defined, added value of the given column as a " +

@@ -20,11 +20,11 @@
 import React from "react";
 import {Link} from "react-router-dom";
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import DashboardUtils from "../utils/DashboardUtils";
-import VizG from "../gadgets/VizG";
+import VizG from 'react-vizgrammar';
 //Material UI
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 
 const styles = {
     header: {color: '#dedede'},
@@ -36,12 +36,12 @@ const styles = {
         borderLeft: '1px solid rgb(120, 120, 120)'
     }
 };
-const metadata = {names: ['Timestamp', 'value'], types: ['time', 'linear']};
+const metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
 const sparkLineConfig = {
-    x: 'Timestamp',
+    x: 'Time',
     charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:'0.1'}],
-    width: 100,
-    height: 30
+    strokeWidth:1,
+    fillOpacity:0.1
 };
 
 /**
@@ -59,7 +59,7 @@ export default class ComponentTable extends React.Component {
     }
 
     componentWillMount() {
-        StatusDashboardAPIS.getComponents(this.state.workerID, this.state.appName)
+        StatusDashboardOverViewAPI.getComponents(this.state.workerID, this.state.appName)
             .then((response) => {
                 this.setState({
                     componentData: response.data
@@ -172,12 +172,16 @@ export default class ComponentTable extends React.Component {
                                                                                                                             width: '50%',
                                                                                                                             float: 'right'
                                                                                                                         }}>
+                                                                                                                        <div style={{width: '100px', height: '48px'}}>
                                                                                                                         <VizG
                                                                                                                             data={metric.attribute.recentValues}
                                                                                                                             metadata={metadata}
                                                                                                                             config={sparkLineConfig}
                                                                                                                             yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                            width={100}
+                                                                                                                            height={50}
                                                                                                                         />
+                                                                                                                        </div>
                                                                                                                     </div>
                                                                                                                 </Link>
                                                                                                             </div>
@@ -228,12 +232,16 @@ export default class ComponentTable extends React.Component {
                                                                                                             width: '50%',
                                                                                                             float: 'right'
                                                                                                         }}>
+                                                                                                            <div style={{width: '100px', height: '48px'}}>
                                                                                                             <VizG
                                                                                                                 data={metric.attribute.recentValues}
                                                                                                                 metadata={metadata}
                                                                                                                 config={sparkLineConfig}
                                                                                                                 yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                width={100}
+                                                                                                                height={50}
                                                                                                             />
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </Link>
                                                                                                 </div>
@@ -302,12 +310,16 @@ export default class ComponentTable extends React.Component {
                                                                                                             width: '50%',
                                                                                                             float: 'right'
                                                                                                         }}>
+                                                                                                            <div style={{width: '100px', height: '48px'}}>
                                                                                                             <VizG
                                                                                                                 data={metric.attribute.recentValues}
                                                                                                                 metadata={metadata}
                                                                                                                 config={sparkLineConfig}
                                                                                                                 yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                width={100}
+                                                                                                                height={50}
                                                                                                             />
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </Link>
                                                                                                 </div>
@@ -356,12 +368,16 @@ export default class ComponentTable extends React.Component {
                                                                                                     width: '50%',
                                                                                                     float: 'right'
                                                                                                 }}>
+                                                                                                    <div style={{width: '100px', height: '48px'}}>
                                                                                                     <VizG
                                                                                                         data={metric.attribute.recentValues}
                                                                                                         metadata={metadata}
                                                                                                         config={sparkLineConfig}
                                                                                                         yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                        width={100}
+                                                                                                        height={50}
                                                                                                     />
+                                                                                                    </div>
                                                                                                 </div>
                                                                                             </Link>
                                                                                         </div>

@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.analytics.test.osgi.util;
 
+import io.netty.handler.codec.http.HttpMethod;
 import org.awaitility.Duration;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
@@ -23,9 +24,13 @@ import org.wso2.msf4j.MicroservicesRegistry;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -33,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import io.netty.handler.codec.http.HttpMethod;
-
+import static java.lang.System.currentTimeMillis;
+import static java.net.URLConnection.guessContentTypeFromName;
 import static org.awaitility.Awaitility.await;
 
 
@@ -42,53 +47,128 @@ import static org.awaitility.Awaitility.await;
  * Util class for test cases.
  */
 public class TestUtil {
+    private static final String LINE_FEED = "\r\n";
+    private static final String CHARSET = "UTF-8";
+    private HttpURLConnection connection = null;
+    private OutputStream outputStream = null;
+    private PrintWriter writer = null;
+    private String boundary = null;
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TestUtil.class);
 
-    public static HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
-                                                   String methodType, Boolean auth, String userName, String password) {
+    public TestUtil(URI baseURI, String path, Boolean auth, Boolean keepAlive, String methodType,
+                    String contentType, String userName, String password) {
         try {
-            HttpURLConnection urlConn = null;
-            try {
-                urlConn = TestUtil.generateRequest(baseURI, path, methodType, false);
-            } catch (IOException e) {
-                TestUtil.handleException("IOException occurred while running the HttpsSourceTestCaseForSSL", e);
+            URL url = baseURI.resolve(path).toURL();
+            boundary = "---------------------------" + currentTimeMillis();
+
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Accept-Charset", CHARSET);
+            connection.setRequestMethod(methodType);
+            setHeader("HTTP_METHOD", methodType);
+            if (keepAlive) {
+                connection.setRequestProperty("Connection", "Keep-Alive");
             }
+            if (contentType != null) {
+                if (contentType.equals("multipart/form-data")) {
+                    setHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+                } else {
+                    setHeader("Content-Type", contentType);
+                }
+            }
+            connection.setUseCaches(false);
+            connection.setDoInput(true);
             if (auth) {
-                TestUtil.setHeader(urlConn, "Authorization",
+                connection.setRequestProperty("Authorization",
                         "Basic " + java.util.Base64.getEncoder().
                                 encodeToString((userName + ":" + password).getBytes()));
             }
-            if (contentType != null) {
-                TestUtil.setHeader(urlConn, "Content-Type", contentType);
+            if (methodType.equals(HttpMethod.POST.name()) || methodType.equals(HttpMethod.PUT.name())
+                    || methodType.equals(HttpMethod.DELETE.name())) {
+                connection.setDoOutput(true);
+                outputStream = connection.getOutputStream();
+                writer = new PrintWriter(new OutputStreamWriter(outputStream, CHARSET),
+                        true);
             }
-            TestUtil.setHeader(urlConn, "HTTP_METHOD", methodType);
-            if (methodType.equals(HttpMethod.POST.name()) || methodType.equals(HttpMethod.PUT.name())) {
-                TestUtil.writeContent(urlConn, body);
-            }
-            assert urlConn != null;
-            String successContent = null;
-            String errorContent = null;
-            if (urlConn.getResponseCode() >= 400) {
-                errorContent = readErrorContent(urlConn);
-            }
-            if (urlConn.getResponseCode() < 400) {
-                successContent = readSuccessContent(urlConn);
-            }
-            HTTPResponseMessage httpResponseMessage = new HTTPResponseMessage(urlConn.getResponseCode(),
-                    urlConn.getContentType(), urlConn.getResponseMessage(), successContent, errorContent);
-            urlConn.disconnect();
-            return httpResponseMessage;
         } catch (IOException e) {
-            TestUtil.handleException("IOException occurred while running the HttpsSourceTestCaseForSSL", e);
+            handleException("IOException occurred while running the HttpsSourceTestCaseForSSL", e);
+        }
+    }
+
+    public HttpURLConnection getConnection() {
+        return this.connection;
+    }
+
+    public void addBodyContent(String body) {
+        if (body != null && !body.isEmpty()) {
+            writer.write(body);
+            writer.close();
+        }
+    }
+
+    public void addFormField(final String name, final String value) {
+        writer.append("--").append(boundary).append(LINE_FEED)
+                .append("Content-Disposition: form-data; name=\"").append(name)
+                .append("\"").append(LINE_FEED)
+                .append("Content-Type: text/plain; charset=").append(CHARSET)
+                .append(LINE_FEED).append(LINE_FEED).append(value).append(LINE_FEED);
+    }
+
+    public void addFilePart(final String fieldName, final File uploadFile)
+            throws IOException {
+        final String fileName = uploadFile.getName();
+        writer.append("--").append(boundary).append(LINE_FEED)
+                .append("Content-Disposition: form-data; name=\"")
+                .append(fieldName).append("\"; filename=\"").append(fileName)
+                .append("\"").append(LINE_FEED).append("Content-Type: ")
+                .append(guessContentTypeFromName(fileName)).append(LINE_FEED)
+                .append("Content-Transfer-Encoding: binary").append(LINE_FEED)
+                .append(LINE_FEED);
+
+        writer.flush();
+        outputStream.flush();
+        try (final FileInputStream inputStream = new FileInputStream(uploadFile)) {
+            final byte[] buffer = new byte[4096];
+            int bytesRead = -1;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            outputStream.flush();
+            inputStream.close();
+        }
+        writer.append(LINE_FEED);
+        writer.flush();
+    }
+
+    public HTTPResponseMessage getResponse() {
+        assert connection != null;
+        String successContent = null;
+        String errorContent = null;
+        if (writer != null) {
+            writer.append(LINE_FEED).flush();
+            writer.append("--" + boundary + "--").append(LINE_FEED);
+            writer.close();
+        }
+        try {
+            if (connection.getResponseCode() >= 400) {
+                errorContent = readErrorContent();
+            } else {
+                successContent = readSuccessContent();
+            }
+            return new HTTPResponseMessage(connection.getResponseCode(),
+                    connection.getContentType(), connection.getResponseMessage(), successContent, errorContent);
+        } catch (IOException e) {
+            handleException("IOException occurred while running the HttpsSourceTestCaseForSSL", e);
+        } finally {
+            connection.disconnect();
         }
         return new HTTPResponseMessage();
     }
 
-    private static String readSuccessContent(HttpURLConnection urlConn) throws IOException {
+    private String readSuccessContent() throws IOException {
         StringBuilder sb = new StringBuilder("");
         String line;
         try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                urlConn.getInputStream()))) {
+                connection.getInputStream()))) {
             while ((line = in.readLine()) != null) {
                 sb.append(line + "\n");
             }
@@ -96,11 +176,11 @@ public class TestUtil {
         return sb.toString();
     }
 
-    private static String readErrorContent(HttpURLConnection urlConn) throws IOException {
+    private String readErrorContent() throws IOException {
         StringBuilder sb = new StringBuilder("");
         String line;
         try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                urlConn.getErrorStream()))) {
+                connection.getErrorStream()))) {
             while ((line = in.readLine()) != null) {
                 sb.append(line + "\n");
             }
@@ -108,32 +188,13 @@ public class TestUtil {
         return sb.toString();
     }
 
-    private static void writeContent(HttpURLConnection urlConn, String content) throws IOException {
-        OutputStreamWriter out = new OutputStreamWriter(
-                urlConn.getOutputStream());
-        out.write(content);
-        out.close();
-    }
-
-    private static HttpURLConnection generateRequest(URI baseURI, String path, String method, boolean keepAlive)
-            throws IOException {
-        URL url = baseURI.resolve(path).toURL();
-        HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
-        urlConn.setRequestMethod(method);
-        if (method.equals(HttpMethod.POST.name()) || method.equals(HttpMethod.PUT.name())) {
-            urlConn.setDoOutput(true);
+    private void setHeader(String key, String value) {
+        if (key != null && value != null) {
+            connection.setRequestProperty(key, value);
         }
-        if (keepAlive) {
-            urlConn.setRequestProperty("Connection", "Keep-Alive");
-        }
-        return urlConn;
     }
 
-    private static void setHeader(HttpURLConnection urlConnection, String key, String value) {
-        urlConnection.setRequestProperty(key, value);
-    }
-
-    private static void handleException(String msg, Exception ex) {
+    private void handleException(String msg, Exception ex) {
         logger.error(msg, ex);
     }
 

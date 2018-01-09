@@ -137,7 +137,7 @@ public class HAActiveNodeTestcase {
                 "insert into OutputTable;";
 
         log.info("Deploying Siddhi app to Active Node");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "TestApp",
                 Duration.TEN_SECONDS);
@@ -153,7 +153,7 @@ public class HAActiveNodeTestcase {
         String method = "GET";
 
         log.info("Calling active node outputSyncTimestamp");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
 
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
@@ -170,7 +170,7 @@ public class HAActiveNodeTestcase {
         String method = "GET";
 
         log.info("Calling active node to get state of SiddhiApp");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
 
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
@@ -187,12 +187,20 @@ public class HAActiveNodeTestcase {
         String method = "GET";
 
         log.info("Calling active node to get state of all SiddhiApps");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
 
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         HAStateSyncObject haStateSyncObject = new Gson().fromJson((String) httpResponseMessage.getSuccessContent(),
                 HAStateSyncObject.class);
         Assert.assertTrue(haStateSyncObject != null);
+    }
+
+    private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
+                                             String methodType, Boolean auth, String userName, String password) {
+        TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,
+                contentType, userName, password);
+        testUtil.addBodyContent(body);
+        return testUtil.getResponse();
     }
 }

@@ -23,7 +23,11 @@ import {Link} from "react-router-dom";
 import {GridList} from "material-ui/GridList";
 import Info from "material-ui/svg-icons/action/info";
 import HomeButton from "material-ui/svg-icons/action/home";
-import {Divider, FlatButton, FloatingActionButton, Toggle} from "material-ui";
+import {
+    Card, CardText, CardTitle, Divider, FlatButton, FloatingActionButton, RaisedButton, Table, TableBody, TableRow,
+    TableRowColumn,
+    Toggle
+} from "material-ui";
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -32,6 +36,10 @@ import Header from "../common/Header";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import {FormattedMessage} from "react-intl";
+import { Redirect } from 'react-router-dom';
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
+import FormPanel from "../common/FormPanel";
+import Error500 from "../error-pages/Error500";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
@@ -41,7 +49,20 @@ const styles = {
     paper: {height: 50, width: 500, textAlign: 'center'},
     background: {backgroundColor: '#222222'}
 };
+const errorTitleStyles = {
+    color: "#c7cad1",
+    fontSize: 45
+};
 
+const errorMessageStyles = {
+    color: "#abaeb4",
+    fontSize: 22
+};
+const errorContainerStyles = {
+    textAlign: "center",
+    marginTop:30
+};
+const buttonStyle = {marginLeft: 50, width: '35%', fontSize: '12px',backgroundColor:'#f17b31'};
 /**
  * class which manages overview page.
  */
@@ -50,17 +71,22 @@ export default class WorkerOverview extends React.Component {
     constructor() {
         super();
         this.state = {
+            sessionInvalid:false,
             clustersList: {},
-            pInterval: 0,
+            pInterval: window.localStorage.getItem("pInterval")!= null ? parseInt(window.localStorage.getItem("pInterval")): 5,
             currentTime: '',
             interval: '',
-            enableAutoSync: false,
+            enableAutoSync: window.localStorage.getItem("enableAutoSync")!= null ? ((window.localStorage.getItem("enableAutoSync"))==='true'): false,
             isApiCalled: false,
             counter: 0,
             hasManagerPermission: false,
-            statusMessage: "Currently there are no workers to display"
+            hasViewPermission: true,
+            statusMessage: "Currently there are no workers to display",
+            isError: false
+
         };
         this.autoSync = this.autoSync.bind(this);
+        this.initAutoSync = this.initAutoSync.bind(this);
         this.renderWorkers = this.renderWorkers.bind(this);
     }
 
@@ -68,32 +94,63 @@ export default class WorkerOverview extends React.Component {
         StatusDashboardAPIS.getDashboardConfig()
             .then((response) => {
                 this.setState({
-                    pInterval: response.data,
+                    pInterval: response.data.pollingInterval,
                     counter: this.state.counter
                 });
             }).catch((error) => {
-            let message = error.response && error.response.status === 401 ? "User Have No Permission to view the" +
-                " Dashboard." : "Unknown error occurred!";
-            this.setState({
-                isApiCalled: true,
-                statusMessage: message
-            });
-            //TODO Need to use proper notification library to show the error
+            if(error.response != null){
+                if(error.response.status === 401){
+                    this.setState({
+                        sessionInvalid: true,
+                        statusMessage:"Authentication fail. Please login again.",
+                        isApiCalled: true
+                    })
+                } else if(error.response.status === 403){
+                    this.setState({
+                        hasViewPermission: false,
+                        statusMessage:"User Have No Permission to view this page.",
+                        isApiCalled: true
+                    })
+                } else {
+                    this.setState({
+                        isError:true,
+                        statusMessage:"Unknown error occurred! : " + JSON.stringify(error.response.data),
+                        isApiCalled: true
+                    })
+                }
+            }
         });
 
         this.setState({currentTime: new Date().getTime()});
-        StatusDashboardAPIS.getWorkersList()
+        StatusDashboardOverViewAPI.getWorkersList()
             .then((response) => {
                 this.setState({
                     clustersList: response.data,
-                    isApiCalled: true
+                    isApiCalled: true,
+                    statusMessage:!WorkerOverview.hasWorkers(this.state.clustersList) ? "Currently there are no" +
+                        " workers to display" : ''
                 });
             }).catch((error) => {
-            this.setState({
-                isApiCalled: true,
-                statusMessage: "User Have No Permission to view the Dashboard."
-            });
-            //TODO Need to use proper notification library to show the error
+            if(error.response != null){
+                if(error.response.status === 401){
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
+                    })
+                } else if(error.response.status === 403){
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "User Have No Permission to view this page."
+                    });
+                } else {
+                    this.setState({
+                        isError:true,
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                    });
+                }
+            }
         });
     }
 
@@ -104,15 +161,27 @@ export default class WorkerOverview extends React.Component {
 
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+        this.initAutoSync();
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasManagerPermission: response.data
                 });
             })
             .catch((error) => {
-                //TODO Need to use proper notification library to show the error
-
+                if(error.response.status === 401){
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
+                    })
+                }else {
+                    this.setState({
+                        isError:true,
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                    });
+                }
             });
     }
 
@@ -175,23 +244,44 @@ export default class WorkerOverview extends React.Component {
     /**
      * Method which handles auto sync button submit
      */
+    initAutoSync() {
+        let interval ='';
+        let that = this;
+        if (this.state.enableAutoSync) {
+            interval = setInterval(() => {
+                // that.setState({currentTime: new Date().getTime()});
+                StatusDashboardOverViewAPI.getWorkersList()
+                    .then((response) => {
+                        that.setState({clustersList: response.data});
+                    }).catch((error) => {
+                });
+            }, parseInt(this.state.pInterval * 1000));
+            this.setState({interval: interval});
+        }
+    }
+    /**
+     * Method which handles auto sync button submit
+     */
     autoSync() {
         let interval;
         let that = this;
         if (!this.state.enableAutoSync) {
             interval = setInterval(() => {
-                that.setState({currentTime: new Date().getTime()});
-                StatusDashboardAPIS.getWorkersList()
+                // that.setState({currentTime: new Date().getTime()});
+                StatusDashboardOverViewAPI.getWorkersList()
                     .then((response) => {
                         that.setState({clustersList: response.data});
                     }).catch((error) => {
                     //TODO Need to use proper notification library to show the error
                 });
-            }, parseInt(this.state.pInterval.pollingInterval * 1000));
+            }, parseInt(this.state.pInterval * 1000));
             this.setState({interval: interval, enableAutoSync: true});
+            window.localStorage.setItem("enableAutoSync", true);
+            window.localStorage.setItem("pInterval", this.state.pInterval)
         } else {
             clearInterval(this.state.interval);
             this.setState({enableAutoSync: false});
+            window.localStorage.setItem("enableAutoSync", false)
         }
     }
 
@@ -202,18 +292,42 @@ export default class WorkerOverview extends React.Component {
      */
     renderWorkers(workersList) {
         if (this.state.isApiCalled && !WorkerOverview.hasWorkers(this.state.clustersList)) {
-            return (
-                <div style={styles.background}>
-                    <div className="info-card" style={{backgroundColor: '#f17b31'}}>
-                        <FlatButton
-                            label={this.state.statusMessage}
-                            icon={<Info />}
-                            style={{marginTop: 10, backgroundColor: '#f17b31'}}
-                        />
+            if(this.state.hasViewPermission) {
+                return (
+                    <div style={styles.background}>
+                        <div className="info-card" style={{backgroundColor: '#f17b31'}}>
+                            <FlatButton
+                                label={this.state.statusMessage}
+                                icon={<Info />}
+                                style={{marginTop: 10, backgroundColor: '#f17b31'}}
+                            />
+                        </div>
+                        {this.renderAddWorker()}
                     </div>
-                    {this.renderAddWorker()}
-                </div>
-            );
+                );
+            }else {
+                return (
+                    <div style={styles.background}>
+                        <Card style={{width:700,high:'100%',marginTop:'10%',marginLeft: '33%',backgroundColor:'#1a1a1a',
+                            borderColor:'#f17b31',borderRadius:2,borderBottomColor:'#f17b31'}}>
+                            <CardText  style={{borderBottom:'1px solid #AE5923',borderTop:'1px solid #AE5923'}}>
+                                <FormPanel title={""} width={650}>
+                                    <div style={errorContainerStyles}>
+                                        <i class="fw fw-security fw-inverse fw-5x"></i>
+                                        <h1 style={errorTitleStyles}>Page Forbidden!</h1>
+                                        <text style={errorMessageStyles}>You have no permission to access this page.</text>
+                                        <br/>
+                                        <br/>
+                                        <Link to={`${window.contextPath}/logout`} >
+                                            <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
+                                        </Link>
+                                    </div>
+                                </FormPanel>
+                            </CardText>
+                        </Card>
+                    </div>
+                );
+            }
         } else if (this.state.isApiCalled && WorkerOverview.hasWorkers(this.state.clustersList)) {
             return (
                 <div style={styles.background}>
@@ -223,6 +337,7 @@ export default class WorkerOverview extends React.Component {
                             <Toggle labelPosition="left"
                                     label={<b>Auto Sync</b>}
                                     labelStyle={{color: 'white', fontSize: 18}}
+                                    toggled={this.state.enableAutoSync}
                                     onToggle={this.autoSync}
                                     thumbStyle={{backgroundColor: 'grey'}}
                                     thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
@@ -241,7 +356,7 @@ export default class WorkerOverview extends React.Component {
                                         {workersList[id].map((worker) => {
                                             return (
                                                 <WorkerThumbnail worker={worker}
-                                                                 currentTime={this.state.currentTime}/>
+                                                                 currentTime={new Date().getTime()}/>
                                             )
                                         })}
                                     </GridList>
@@ -266,8 +381,11 @@ export default class WorkerOverview extends React.Component {
             );
         }
     }
-
     render() {
+        if(this.state.isError){
+            return <Error500 message={this.state.statusMessage}/>;
+        }
+        if (!this.state.sessionInvalid) {
         return (
             <div style={styles.background}>
                 <Header/>
@@ -277,7 +395,12 @@ export default class WorkerOverview extends React.Component {
                 {this.renderWorkers(this.state.clustersList)}
             </div>
         );
-    }
+    } else {
+            return (
+                <Redirect to={{ pathname: `${window.contextPath}/logout` }} />
+            );
+            }
+     }
 
     static hasWorkers(clusters) {
         for (let prop in clusters) {

@@ -21,16 +21,20 @@ package org.wso2.carbon.status.dashboard.core.dbhandler;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerConfigurationDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
-import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
-import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidationException;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.DBTableUtils;
-import org.wso2.carbon.status.dashboard.core.dbhandler.utils.QueryManager;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardRuntimeException;
+import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidationException;
+import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,58 +43,65 @@ import java.util.List;
 import java.util.Map;
 
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS_PRIMARYKEY;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SQL_WHERE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.String_TEMPLATE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.TUPLES_SEPARATOR;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.WHITESPACE;
 
-// TODO: 11/1/17 Constants
 
 /**
  * This class represents key database operations related to worker data.
  */
 public class StatusDashboardWorkerDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardWorkerDBHandler.class);
-    private static final String DATASOURCE_ID = DashboardDataHolder.getInstance().getStatusDashboardConfiguration()
+    private static final String DATASOURCE_ID = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
             .getDashboardDatasourceName();
+    private String createTableQuery;
+    private String tableCheckQuery;
     private String selectQuery;
     private String deleteQuery;
     private String insertQuery;
     private HikariDataSource dataSource;
-    private Connection conn;
     private Map<String, Map<String, String>> workerAttributeTypeMap;
     private static final String WORKERID_PLACEHOLDER = "{{WORKER_ID}}";
     private static final String WORKERID_EXPRESSION = "WORKERID={{WORKER_ID}}";
     private static final String WORKER_DETAILS_TABLE = "WORKERS_DETAILS";
     private static final String WORKER_CONFIG_TABLE = "WORKERS_CONFIGURATION";
-    private String tableCreateQuery;
-    private String tableCheckQuery;
     private static boolean isConfigTableCreated = false;
     private static boolean isGeneralTableCreated = false;
+    private QueryManager statusDashboardQueryManager;
 
     public StatusDashboardWorkerDBHandler() {
-        dataSource = DashboardDataHolder.getInstance().getDashboardDataSource();
+        dataSource = MonitoringDataHolder.getInstance().getDashboardDataSource();
+        Connection conn = null;
         if (dataSource != null) {
-            this.conn = DBHandler.getInstance().getConnection(dataSource);
-            String dbType = DBTableUtils.getInstance().getDBType(this.conn);
-            QueryManager.getInstance().readConfigs(dbType);
-            workerAttributeTypeMap = DBTableUtils.getInstance().loadWorkerAttributeTypeMap();
-            selectQuery = QueryManager.getInstance().getQuery(SQLConstants.SELECT_QUERY);
-            selectQuery = loadQuery(selectQuery, SQLConstants.SELECT_QUERY, dbType);
-
-            deleteQuery = QueryManager.getInstance().getQuery(SQLConstants.DELETE_QUERY);
-            deleteQuery = loadQuery(deleteQuery, SQLConstants.DELETE_QUERY, dbType);
-
-            insertQuery = QueryManager.getInstance().getQuery(SQLConstants.INSERT_QUERY);
-            insertQuery = loadQuery(insertQuery, SQLConstants.INSERT_QUERY, dbType);
-
-            tableCheckQuery = QueryManager.getInstance().getQuery(SQLConstants.ISTABLE_EXISTS_QUERY);
-            tableCheckQuery = loadQuery(tableCheckQuery, SQLConstants.ISTABLE_EXISTS_QUERY, dbType);
-
-            tableCreateQuery = QueryManager.getInstance().getQuery(SQLConstants.CREATE_TABLE);
-            tableCreateQuery = loadQuery(tableCreateQuery, SQLConstants.CREATE_TABLE, dbType);
-
+            conn = DBHandler.getInstance().getConnection(dataSource);
+            try {
+                conn = MonitoringDataHolder.getInstance().getDashboardDataSource().getConnection();
+                DatabaseMetaData databaseMetaData = conn.getMetaData();
+                statusDashboardQueryManager = new QueryManager(databaseMetaData.getDatabaseProductName(),
+                        databaseMetaData.getDatabaseProductVersion());
+                workerAttributeTypeMap = DBTableUtils.getInstance().loadWorkerAttributeTypeMap(statusDashboardQueryManager);
+                selectQuery = statusDashboardQueryManager.getQuery(SQLConstants.SELECT_QUERY);
+                deleteQuery = statusDashboardQueryManager.getQuery(SQLConstants.DELETE_QUERY);
+                insertQuery = statusDashboardQueryManager.getQuery(SQLConstants.INSERT_QUERY);
+                tableCheckQuery = statusDashboardQueryManager.getQuery(SQLConstants.ISTABLE_EXISTS_QUERY);
+                createTableQuery = statusDashboardQueryManager.getQuery(SQLConstants.CREATE_TABLE);
+            } catch (SQLException | ConfigurationException | IOException | QueryMappingNotAvailableException e) {
+                throw new StatusDashboardRuntimeException("Error initializing connection. ", e);
+            } finally {
+                if (conn != null) {
+                    try {
+                        conn.close();
+                    } catch (SQLException e) {
+                        logger.warn("Database error. Could not close database connection", e);
+                    }
+                }
+            }
             creteConfigurationDB();
             creteDetailsDB();
         } else {
@@ -99,18 +110,22 @@ public class StatusDashboardWorkerDBHandler {
         }
     }
 
-    // TODO: 11/2/17 improve for all databases
     private void creteConfigurationDB() {
         Connection conn = this.getConnection();
-        PreparedStatement stmt= null;
+        PreparedStatement stmt = null;
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE);
+        String resolvedTableCreateQuery = createTableQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE);
         if (!DBHandler.getInstance().isTableExist(conn, resolved)) {
             if (!isConfigTableCreated) {
-                String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
-                        "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
-                        "HOST VARCHAR(500),\n" +
-                        "PORT INT\n" +
-                        ");";
+                Map<String, String> attributesList = DBTableUtils.getInstance().loadWorkerConfigTableTuples
+                        (statusDashboardQueryManager);
+                String resolvedTuples = String.format(
+                        "WORKERID " + String_TEMPLATE + " PRIMARY KEY" + TUPLES_SEPARATOR +
+                                "HOST " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                "PORT " + String_TEMPLATE, attributesList.get("WORKERID"), attributesList.get("HOST"),
+                        attributesList.get("PORT"));
+                resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
+                        resolvedTuples);
                 try {
                     stmt = conn.prepareStatement(resolvedTableCreateQuery);
                     stmt.execute();
@@ -119,12 +134,13 @@ public class StatusDashboardWorkerDBHandler {
                     logger.error("Error creating table please create manually ." + WORKER_CONFIG_TABLE, e);
                 } finally {
                     try {
-                        if(stmt!=null) {
+                        if (stmt != null) {
                             stmt.close();
                         }
                     } catch (SQLException e) {
                         //ignore
                     }
+                    cleanupConnection(conn);
                 }
             }
         }
@@ -133,32 +149,43 @@ public class StatusDashboardWorkerDBHandler {
     private void creteDetailsDB() {
         Connection conn = this.getConnection();
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_DETAILS_TABLE);
-
+        String resolvedCreatedTable = createTableQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_DETAILS_TABLE);
         if (!DBHandler.getInstance().isTableExist(conn, resolved)) {
             if (!isGeneralTableCreated) {
-                String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_DETAILS (\n" +
-                        " CARBONID VARCHAR(255) PRIMARY KEY ,\n" +
-                        " WORKERID VARCHAR(255),\n" +
-                        " JAVARUNTIMENAME VARCHAR(255),\n" +
-                        " JAVAVMVERSION VARCHAR(255),\n" +
-                        " JAVAVMVENDOR VARCHAR(255),\n" +
-                        " JAVAHOME VARCHAR(255),\n" +
-                        " JAVAVERSION VARCHAR(255),\n" +
-                        " OSNAME VARCHAR(255),\n" +
-                        " OSVERSION VARCHAR(255),\n" +
-                        " USERHOME VARCHAR(255),\n" +
-                        " USERTIMEZONE VARCHAR(255),\n" +
-                        " USERNAME VARCHAR(255),\n" +
-                        " USERCOUNTRY VARCHAR(255),\n" +
-                        " REPOLOCATION VARCHAR(255),\n" +
-                        " SERVERSTARTTIME VARCHAR(255),\n" +
-                        " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
-                        ");";
+                Map<String, String> attributesList = DBTableUtils.getInstance().loadWorkerGeneralTableTuples
+                        (statusDashboardQueryManager);
+                String resolvedTuples = String.format(
+                        " CARBONID " + String_TEMPLATE + " PRIMARY KEY " + TUPLES_SEPARATOR +
+                                " WORKERID " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVARUNTIMENAME " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVAVMVERSION " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVAVMVENDOR " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVAHOME " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVAVERSION " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " OSNAME " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " OSVERSION " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " USERHOME " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " USERTIMEZONE " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " USERNAME " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " USERCOUNTRY " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " REPOLOCATION " + String_TEMPLATE + TUPLES_SEPARATOR +
+                                " SERVERSTARTTIME " + String_TEMPLATE + TUPLES_SEPARATOR + " " + String_TEMPLATE
+                        , attributesList.get("CARBONID"), attributesList.get("WORKERID"),
+                        attributesList.get("JAVARUNTIMENAME"), attributesList.get("JAVAVMVERSION"),
+                        attributesList.get("JAVAVMVENDOR"), attributesList.get("JAVAHOME"),
+                        attributesList.get("JAVAVERSION"), attributesList.get("OSNAME"),
+                        attributesList.get("OSVERSION"), attributesList.get("USERHOME"),
+                        attributesList.get("USERTIMEZONE"), attributesList.get("USERNAME"),
+                        attributesList.get("USERCOUNTRY"), attributesList.get("REPOLOCATION"),
+                        attributesList.get("SERVERSTARTTIME"),
+                        statusDashboardQueryManager.getQuery("foreignKeyQuery"));
+                resolvedCreatedTable = resolvedCreatedTable.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY, resolvedTuples);
                 PreparedStatement stmt = null;
                 try {
-                    stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                    stmt = conn.prepareStatement(resolvedCreatedTable);
                     stmt.execute();
                     isGeneralTableCreated = true;
+                    stmt.close();
                 } catch (SQLException e) {
                     throw new RDBMSTableException("Error creating table there may have already existing database ." +
                             WORKER_DETAILS_TABLE);
@@ -167,32 +194,14 @@ public class StatusDashboardWorkerDBHandler {
                         try {
                             stmt.close();
                         } catch (SQLException e) {
-                            logger.error("Error while closing DB Statement: " + e.getMessage(), e);
+                            logger.error("Error while closing DB Statement.", e);
                         }
                     }
+                    cleanupConnection(conn);
                 }
             }
         }
     }
-
-    /**
-     * This will load the database general queries which is in deployment YAML or default queries.
-     *
-     * @param query  DB query from YAML.
-     * @param key    requested query name.
-     * @param dbType Database type
-     * @return
-     */
-    private String loadQuery(String query, String key, String dbType) {
-        if (query != null) {
-            return query;
-        } else {
-            return DashboardDataHolder.getInstance()
-                    .getStatusDashboardConfiguration().getQueries().get(dbType).get(key);
-        }
-
-    }
-
 
     /**
      * Resolve the table names in the queries.
@@ -210,15 +219,26 @@ public class StatusDashboardWorkerDBHandler {
      * @return a new {@link Connection} instance from the datasource.
      */
     private Connection getConnection() {
-        try {
-            if (conn != null && !conn.isClosed()) {
-                return conn;
-            } else {
-                return DBHandler.getInstance().getConnection(dataSource);
+        return DBHandler.getInstance().getConnection(dataSource);
+    }
+
+    /**
+     * Method which can be used to clear up and ephemeral SQL connectivity artifacts.
+     *
+     * @param conn {@link Connection} instance (can be null)
+     */
+    public static void cleanupConnection(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Closed Connection in Worker DB");
+                }
+            } catch (SQLException e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Error closing Connection in worker DB.", e);
+                }
             }
-        } catch (SQLException e) {
-            throw new RDBMSTableException("Error occurred in while checking the connection in closed.  " +
-                    DATASOURCE_ID + e.getMessage(), e);
         }
     }
 
@@ -251,7 +271,7 @@ public class StatusDashboardWorkerDBHandler {
         try {
             return this.insert(columnNames, records, WORKER_DETAILS_TABLE);
         } catch (RDBMSTableException e) {
-            throw new RDBMSTableException(e.getMessage(), e);
+            throw new RDBMSTableException("Error inserting worker general details.", e);
         }
     }
 
@@ -271,21 +291,22 @@ public class StatusDashboardWorkerDBHandler {
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(query);
-            stmt = DBTableUtils.getInstance().populateInsertStatement(records, stmt, attributesTypes);
+            stmt = DBTableUtils.getInstance().populateInsertStatement(records, stmt, attributesTypes,
+                    statusDashboardQueryManager);
             DBHandler.getInstance().insert(stmt);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Attempted execution of query [" + query + "] produced an exceptions" +
-                    " in " + DATASOURCE_ID, e);
+            throw new RDBMSTableException(e.getMessage(), e);
         } finally {
-            if(stmt != null){
+            if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
                     //ignore
-                    logger.error("Error closing statement at inser.",e);
+                    logger.error("Error closing statement at insert query.", e);
                 }
             }
+            cleanupConnection(conn);
         }
     }
 
@@ -331,13 +352,14 @@ public class StatusDashboardWorkerDBHandler {
                     tableName + DATASOURCE_ID, e);
         } finally {
             try {
-                if(stmt!=null) {
+                if (stmt != null) {
                     stmt.close();
                 }
             } catch (SQLException e) {
                 logger.error("Fail closing statement.");
                 //ignore
             }
+            cleanupConnection(conn);
         }
     }
 
@@ -352,13 +374,13 @@ public class StatusDashboardWorkerDBHandler {
     public WorkerGeneralDetails selectWorkerGeneralDetails(String workerId) {
         String columnNames = WorkerGeneralDetails.getColumnLabeles();
         List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_DETAILS_TABLE,
-                new String[] {workerId});
+                new String[]{workerId});
         if (!row.isEmpty()) {
             WorkerGeneralDetails details = new WorkerGeneralDetails();
             try {
                 details.setArrayList(row);
             } catch (StatusDashboardValidationException e) {
-                logger.error("Error mapping the data in row : " + row.toString());
+                logger.error("Error mapping the data in row in worker general details.");
             }
             return details;
         } else {
@@ -392,7 +414,7 @@ public class StatusDashboardWorkerDBHandler {
     public WorkerConfigurationDetails selectWorkerConfigurationDetails(String workerId) {
         String columnNames = WorkerConfigurationDetails.getColumnLabeles();
         List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_CONFIG_TABLE,
-                new String[] {workerId});
+                new String[]{workerId});
         if (!row.isEmpty()) {
             WorkerConfigurationDetails details = new WorkerConfigurationDetails();
             try {
@@ -425,20 +447,19 @@ public class StatusDashboardWorkerDBHandler {
             stmt = conn.prepareStatement(DBTableUtils.getInstance().formatQueryWithCondition
                     (resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, String.format(" %s ", columns)), condition));
             for (int i = 1; i <= parameters.length; i++) {
-                stmt.setString(i, parameters[i-1]);
+                stmt.setString(i, parameters[i - 1]);
             }
             rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
                 for (String columnLabel : columnLabels) {
                     row.add(DBTableUtils.getInstance().fetchData(rs, columnLabel, attributesTypes.get
-                            (columnLabel.trim())));
+                            (columnLabel.trim()), statusDashboardQueryManager));
                 }
             }
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table '" + "': "
-                    + e.getMessage(), e);
+            throw new RDBMSTableException("Error retrieving records from table.", e);
         } finally {
             try {
                 if (rs != null) {
@@ -454,6 +475,7 @@ public class StatusDashboardWorkerDBHandler {
             } catch (SQLException e) {
                 //ignore
             }
+            cleanupConnection(conn);
         }
         return row;
     }
@@ -471,45 +493,37 @@ public class StatusDashboardWorkerDBHandler {
         List<WorkerConfigurationDetails> workerConfigurationDetails = new ArrayList<>();
         PreparedStatement stmt = null;
         try {
-            stmt = conn.prepareStatement(DBTableUtils.getInstance().formatQueryWithCondition
-                    (resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, WHITESPACE +
-                            WorkerConfigurationDetails.getColumnLabeles()), "true"));
+            stmt = conn.prepareStatement(resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, WHITESPACE +
+                    WorkerConfigurationDetails.getColumnLabeles()).replace(PLACEHOLDER_CONDITION, ""));
             ResultSet rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
                 row = new WorkerConfigurationDetails();
                 row.setPort((Integer) DBTableUtils.getInstance().fetchData(rs, "PORT", attributesTypes.get
-                        ("PORT")));
+                        ("PORT"), statusDashboardQueryManager));
                 row.setHost((String) DBTableUtils.getInstance().fetchData(rs, "HOST", attributesTypes.get
-                        ("HOST")));
+                        ("HOST"), statusDashboardQueryManager));
                 row.setWorkerId((String) DBTableUtils.getInstance().fetchData(rs, "WORKERID",
-                        attributesTypes.get("WORKERID")));
+                        attributesTypes.get("WORKERID"), statusDashboardQueryManager));
                 workerConfigurationDetails.add(row);
 
             }
             stmt.close();
             rs.close();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table '" + "WORKER CONFIGURATION" + "': "
-                    + e.getMessage(), e);
+            throw new RDBMSTableException("Error retrieving records from table '" + "WORKER CONFIGURATION", e);
         } finally {
-            if(stmt!= null){
+            if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
                     //ignore
                 }
             }
+            cleanupConnection(conn);
         }
         return workerConfigurationDetails;
     }
 
-    /**
-     * Closed db connection.
-     */
-    public void cleanupConnection() {
-        Connection conn = this.getConnection();
-        DBHandler.getInstance().cleanupConnection(conn);
-    }
 
     /**
      * Generated thw worker ID condition.

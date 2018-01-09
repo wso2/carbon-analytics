@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.*;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.stream.processor.statistics.factories.SystemDetailsApiServiceFactory;
-import org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent;
+import org.wso2.carbon.stream.processor.statistics.internal.service.ConfigServiceComponent;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
@@ -53,7 +53,7 @@ public class SystemDetailsApi implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
-        log.info("SystemDetailsApi has been activated.");
+        log.debug("SystemDetailsApi has been activated.");
     }
 
     /**
@@ -64,7 +64,7 @@ public class SystemDetailsApi implements Microservice {
      */
     @Deactivate
     protected void stop() throws Exception {
-        log.info("SystemDetailsApi has been stop.");
+        log.debug("SystemDetailsApi has been stop.");
     }
 
     @GET

@@ -168,6 +168,8 @@ ul {
 
 .footer {
   background: #282b2f;
+  min-height: 20px;
+  height: 20px;
 }
 
 /* single simulator fixes */
@@ -178,8 +180,8 @@ ul {
   font-size: 21px;
 }
 
-.single_configs .error {
-  color: #a94442;
+.error {
+  color: #d9534f;
 }
 
 header.header-default {
@@ -514,4 +516,18 @@ margin-bottom: 5px;
 
 .modalSettings .modal-dialog hr {
   margin-bottom: 15px;
+}
+
+body.sticky-footer {
+  padding-bottom: 20px;
+}
+
+.jstree-default .jstree-wholerow-clicked,
+.jstree-default .jstree-wholerow-hovered {
+  background: #161616;
+}
+
+.alert {
+  border-radius: .25rem;
+  margin-right: 20px;
 }

@@ -19,10 +19,7 @@
 package org.wso2.carbon.sp.jobmanager.core.appCreator;
 
 import kafka.admin.AdminUtils;
-import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
-import org.I0Itec.zkclient.ZkClient;
-import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 import org.apache.log4j.Logger;
@@ -113,25 +110,23 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     private void createTopicPartitions(Map<String, Integer> topicParallelismMap) {
         int timeout = 120;
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
-        String[] bootstrapServerURLs = bootstrapServerURL.split(",");
+        String[] bootstrapServerURLs = bootstrapServerURL.replaceAll("\\s+","").split(",");
         String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
-        ZkClient zkClient = new ZkClient(
-                zooKeeperServerURL,
-                10000,
-                8000,
-                ZKStringSerializer$.MODULE$);
+        String[] zooKeeperServerURLs = zooKeeperServerURL.replaceAll("\\s+","").split(",");
 
         boolean isSecureKafkaCluster = false;
-        ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(zooKeeperServerURL), isSecureKafkaCluster);
+        SafeZkClient safeZkClient = new SafeZkClient();
+        ZkUtils zkUtils = safeZkClient.createZkClient(zooKeeperServerURLs, isSecureKafkaCluster);
+
         Properties topicConfig = new Properties();
         for (Map.Entry<String, Integer> entry : topicParallelismMap.entrySet()) {
             String topic = entry.getKey();
             Integer partitions = entry.getValue();
             if (AdminUtils.topicExists(zkUtils, topic)) {
-                int existingPartitions = AdminUtils.fetchTopicMetadataFromZk(topic, zkUtils).partitionsMetadata()
+                int existingPartitions = AdminUtils.fetchTopicMetadataFromZk(topic, zkUtils).partitionMetadata()
                         .size();
                 if (existingPartitions < partitions) {
-                    AdminUtils.addPartitions(zkUtils, topic, partitions, "", true);
+                    (new SafeKafkaInvoker()).addKafkaPartition(zkUtils, topic, partitions);
                     log.info("Added " + partitions + " partitions to topic " + topic);
                 } else if (existingPartitions > partitions) {
                     log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
@@ -149,8 +144,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         }
                     }
                     if (!AdminUtils.topicExists(zkUtils, topic)) {
-                        AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
-                                               topicConfig);
+                        (new SafeKafkaInvoker()).createKafkaTopic(bootstrapServerURLs, zkUtils, topicConfig, topic,
+                                partitions);
                         log.info("Created topic " + topic + "with " + partitions + " partitions.");
                     } else {
                         throw new SiddhiAppCreationException("Topic " + topic + " deletion failed. Hence Could not "
@@ -159,14 +154,11 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     }
                 }
             } else {
-                AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
-                                       topicConfig);
+                (new SafeKafkaInvoker()).createKafkaTopic(bootstrapServerURLs, zkUtils, topicConfig, topic, partitions);
                 log.info("Created topic " + topic + "with " + partitions + " partitions.");
             }
         }
-        zkClient.close();
-
-
+        safeZkClient.closeClient();
     }
 
     private void processInputStreams(String siddhiAppName, String groupName, List<SiddhiQuery> queryList,

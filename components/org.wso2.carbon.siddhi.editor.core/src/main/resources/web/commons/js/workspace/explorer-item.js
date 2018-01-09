@@ -93,7 +93,7 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
                     fileAlreadyOpened = true;
                     openedTab = tab;
                 }
-            })
+            });
 
             if(fileAlreadyOpened){
                 self.app.tabController.setActiveTab(openedTab);
@@ -133,7 +133,7 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
                         self.application.commandManager.dispatch("create-new-item-at-path",
                             {
                                 path: path,
-                                type: 'ballerina-file',
+                                type: 'siddhi-file',
                                 onSuccess: function(){
                                     self._fileBrowser.refresh(node);
                                 }

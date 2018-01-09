@@ -34,7 +34,9 @@ import Header from "../common/Header";
 import JVMSwap from "./JVMSwap";
 import JVMGarbageCOllector from "./JVMGarbageCOllector";
 import JVMOsLoad from "./JVMOsLoad";
-
+import { Redirect } from 'react-router-dom';
+import JVMLoad from "./JVMLoad";
+import JVMOTotalMemory from "./JVMTotalMemory";
 const cardStyle = {padding: 30, width: '90%'};
 /**
  * class to manage worker history details.
@@ -85,8 +87,8 @@ export default class WorkerHistoryMore extends React.Component {
             jvmThreadsWaitingCount:[],
             jvmOsFileDescriptorOpenCount: [],
             jvmOsFileDescriptorMaxCount:[],
-
-            isApiWaiting: true
+            sessionInvalid: false,
+            isApiWaiting: true,
         };
     }
 
@@ -141,10 +143,17 @@ export default class WorkerHistoryMore extends React.Component {
                     jvmMemoryTotalMax:response.data.jvmMemoryTotalMax.data,
                     jvmMemoryTotalUsed:response.data.jvmMemoryTotalUsed.data,
                     jvmMemoryPoolsSize:response.data.jvmMemoryPoolsSize.data,
-
                     isApiWaiting: false
                 });
-            })
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    sessionInvalid: true
+                })
+            }
+        });
     }
 
     renderCharts() {
@@ -174,21 +183,28 @@ export default class WorkerHistoryMore extends React.Component {
                     <div style={cardStyle}>
                         <JVMOsLoad data={[
                             this.state.jvmOsCpuLoadProcess,
-                            this.state.jvmOsCpuLoadSystem,
+                            this.state.jvmOsCpuLoadSystem
+                        ]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <JVMLoad data={[
                             this.state.jvmOsSystemLoadAverage
                         ]}/>
                     </div>
                     <div style={cardStyle}>
                         <JVMOsPhysicalMemory
                             data={[
-                                this.state.jvmMemoryTotalCommitted,
-                                this.state.jvmMemoryTotalInit,
-                                this.state.jvmMemoryTotalMax,
-                                this.state.jvmMemoryTotalUsed,
-                                this.state.jvmMemoryPoolsSize,
                                 this.state.jvmOsPhysicalMemoryFreeSize,
                                 this.state.jvmOsPhysicalMemoryTotalSize,
                                 this.state.jvmOsVirtualMemoryCommittedSize]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <JVMOTotalMemory
+                            data={[
+                                this.state.jvmMemoryTotalCommitted,
+                                this.state.jvmMemoryTotalInit,
+                                this.state.jvmMemoryTotalMax,
+                                this.state.jvmMemoryTotalUsed]}/>
                     </div>
                     <div style={cardStyle}>
                         <JVMSwap
@@ -197,7 +213,7 @@ export default class WorkerHistoryMore extends React.Component {
                                 this.state.jvmOsSwapSpaceTotalSize]}/>
                     </div>
                     <div style={cardStyle}>
-                        <JVMThread data={[
+                        <JVMThread  data={[
                             this.state.jvmThreadsCount,
                             this.state.jvmThreadsDaemonCount,
                             this.state.jvmThreadsBlockedCount,
@@ -211,7 +227,7 @@ export default class WorkerHistoryMore extends React.Component {
                         />
                     </div>
                     <div style={cardStyle}>
-                        <HeapMemory data={[
+                        <HeapMemory   data={[
                             this.state.jvmMemoryHeapInit,
                             this.state.jvmMemoryHeapUsed,
                             this.state.jvmMemoryHeapCommitted,
@@ -248,6 +264,11 @@ export default class WorkerHistoryMore extends React.Component {
         }
     }
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
         return (
             <div>
                 <div className="navigation-bar">

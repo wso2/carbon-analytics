@@ -35,6 +35,7 @@ import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlreadyExistException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.msf4j.MicroservicesServer;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -153,7 +154,7 @@ public class StreamProcessorDeployer implements Deployer {
     public void init() {
         try {
             directoryLocation = new URL("file:" + SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY);
-            log.info("Stream Processor Deployer Initiated");
+            log.debug("Stream Processor Deployer initiated.");
         } catch (MalformedURLException e) {
             log.error("Error while initializing directoryLocation" + SiddhiAppProcessorConstants.
                     SIDDHI_APP_FILES_DIRECTORY, e);
@@ -280,4 +281,18 @@ public class StreamProcessorDeployer implements Deployer {
     }
 
 
+    @Reference(service = MicroservicesServer.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetMicroservicesServer")
+    protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
+        if(log.isDebugEnabled()) {
+            log.info("@(bind) MicroservicesServer ");
+        }
+    }
+    protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
+        if(log.isDebugEnabled()) {
+            log.info(" @(unbind) MicroservicesServer ");
+        }
+    }
 }

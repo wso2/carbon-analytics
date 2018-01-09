@@ -20,22 +20,24 @@
 import React from "react";
 import {Link} from "react-router-dom";
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import DashboardUtils from "../utils/DashboardUtils";
-import VizG from "../gadgets/VizG";
+import VizG from "react-vizgrammar";
 //Material UI
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui/Table";
 import Pagination from "material-ui-pagination";
 import Circle from "material-ui/svg-icons/av/fiber-manual-record";
 import {TableFooter} from "material-ui/Table/index";
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 
 const dataConstants = {PAGE_LENGTH: 5};
 const metadata = {names: ['Time', 'value'], types: ['linear', 'linear']};
 const sparkLineConfig = {
     x: 'Time',
-    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:'0.1'}],
+    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:0.1}],
     width: 100,
-    height: 40
+    height: 40,
+    strokeWidth:1,
+    fillOpacity:0.1
 };
 
 let currentPage = 1;
@@ -57,7 +59,7 @@ export default class AppTable extends React.Component {
 
     componentWillMount() {
         let that = this;
-        StatusDashboardAPIS.getSiddhiApps(this.state.workerId)
+        StatusDashboardOverViewAPI.getSiddhiApps(this.state.workerId)
         .then(function (response) {
             that.loadData(currentPage, response.data.siddhiAppMetricsHistoryList)
         });
@@ -113,7 +115,7 @@ export default class AppTable extends React.Component {
         }
 
         return (
-            <TableRow >
+            <TableRow  >
                 <TableRowColumn style={{width: '400px'}}>
                     {isInactive ? (
                         <div style={{height: 24, color: 'white'}}>
@@ -145,11 +147,13 @@ export default class AppTable extends React.Component {
                                       to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/"
                                       + row.appName
                                       + "/" + row.isStatEnabled}>
-                                    <div style={{width: '50%', float: 'right', height: '100%'}}>
+                                    <div style={{width: '100px', float: 'right', height: '40px'}}>
                                         <VizG data={row.appMetricsHistory.latency.data} metadata={metadata}
                                               config={sparkLineConfig}
                                               yDomain={[latencyLimit[0],latencyLimit[1]]}
                                               append={false}
+                                              width={100}
+                                              height={50}
                                         />
                                     </div>
                                 </Link>
@@ -169,12 +173,13 @@ export default class AppTable extends React.Component {
                                   to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/"
                                   + row.appName
                                   + "/" + row.isStatEnabled}>
-                                <div style={{width: '50%', float: 'right', height: '100%'}}>
+                                <div style={{width: '100px', float: 'right', height: '40px'}}>
                                     <VizG data={row.appMetricsHistory.throughput.data} metadata={metadata}
                                           config={sparkLineConfig}
                                           yDomain={[throughputLimit[0],throughputLimit[1]]}
                                           append={false}
-
+                                          width={100}
+                                          height={50}
                                     />
                                 </div>
                             </Link>
@@ -186,19 +191,21 @@ export default class AppTable extends React.Component {
                 {row.isStatEnabled ?
                     row.appMetricsHistory.memory.data.length !== 0 ?
                         (<TableRowColumn>
-                            <div style={{width: '50%', float: 'left', height: '100%', lineHeight: 4}}>
+                            <div style={{width: '100px', height: '40px', float: 'left', lineHeight: 4}}>
                                 {row.appMetricsHistory.memoryRecent}
                             </div>
                             <Link style={{textDecoration: 'none'}}
                                   to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/"
                                   + row.appName
                                   + "/" + row.isStatEnabled}>
-                                <div style={{width: '50%', float: 'right', height: '100%'}}>
+
+                                <div style={{width: '100px', float: 'right', height: '40px'}}>
                                     <VizG data={row.appMetricsHistory.memory.data} metadata={metadata}
                                           config={sparkLineConfig}
                                           yDomain={[memoryLimit[0],memoryLimit[1]]}
                                           append={false}
-
+                                          width={100}
+                                            height={50}
                                     />
                                 </div>
                             </Link>
@@ -223,7 +230,7 @@ export default class AppTable extends React.Component {
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Age</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Latency(ms)</h3></TableHeaderColumn>
+                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Latency(milliseconds)</h3></TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Throughput(events/second)</h3>
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Memory</h3></TableHeaderColumn>
@@ -234,9 +241,9 @@ export default class AppTable extends React.Component {
                             this.renderRow(row)
                         ))}
                     </TableBody >
-                    <TableFooter adjustForCheckbox={false}>
-                        <TableRow>
-                            <TableRowColumn colSpan="1" style={{textAlign: 'center'}}>
+                    <TableFooter adjustForCheckbox={false} style={{height: 10}}>
+                        <TableRow style={{height: 10}}>
+                            <TableRowColumn colSpan="1" style={{textAlign: 'center',height:10}}>
                             </TableRowColumn>
                         </TableRow>
                     </TableFooter>

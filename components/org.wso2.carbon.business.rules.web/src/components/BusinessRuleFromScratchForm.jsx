@@ -31,6 +31,7 @@ import Property from './Property';
 import InputComponent from "./InputComponent";
 import OutputComponent from "./OutputComponent";
 import FilterComponent from "./FilterComponent";
+import Header from "./common/Header";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 // App Constants
@@ -592,11 +593,26 @@ class BusinessRuleFromScratchForm extends React.Component {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
-                    that.setSnackbar('Failed to create the Business Rule');
-                    setTimeout(function () {
-                        window.location.href = appContext + '/businessRulesManager';
-                    }, 3000);
-                });
+                    // Check for script execution error
+                    if (error.response) {
+                        if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                            that.setState({
+                                isFormFillable: true
+                            });
+                            that.setSnackbar(error.response.data[1]);
+                        } else {
+                            that.setSnackbar('Failed to create the Business Rule');
+                            setTimeout(function () {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }, 3000);
+                        }
+                    } else {
+                        that.setSnackbar('Failed to create the Business Rule');
+                        setTimeout(function () {
+                            window.location.href = appContext + '/businessRulesManager';
+                        }, 3000);
+                    }
+                })
             } else {
                 // Display error
                 this.setState({
@@ -653,11 +669,26 @@ class BusinessRuleFromScratchForm extends React.Component {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
-                    that.setSnackbar('Failed to create the Business Rule');
-                    setTimeout(function () {
-                        window.location.href = appContext + '/businessRulesManager';
-                    }, 3000);
-                });
+                    // Check for script execution error
+                    if (error.response) {
+                        if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                            that.setState({
+                                isFormFillable: true
+                            });
+                            that.setSnackbar(error.response.data[1]);
+                        } else {
+                            that.setSnackbar('Failed to create the Business Rule');
+                            setTimeout(function () {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }, 3000);
+                        }
+                    } else {
+                        that.setSnackbar('Failed to create the Business Rule');
+                        setTimeout(function () {
+                            window.location.href = appContext + '/businessRulesManager';
+                        }, 3000);
+                    }
+                })
             } else {
                 // Display error
                 this.setState({
@@ -838,6 +869,14 @@ class BusinessRuleFromScratchForm extends React.Component {
                                 onClick={(e) => this.createBusinessRule(true)}>
                             Save & Deploy
                         </Button>
+                        <Button
+                            color="default" style={{marginRight: 10}}
+                            onClick={() => {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }}
+                        >
+                            Cancel
+                        </Button>
                     </div>
             } else if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT) {
                 submitButtons =
@@ -850,12 +889,22 @@ class BusinessRuleFromScratchForm extends React.Component {
                                 onClick={(e) => this.updateBusinessRule(true)}>
                             Save & Deploy
                         </Button>
+                        <Button
+                            color="default" style={{marginRight: 10}}
+                            onClick={() => {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }}
+                        >
+                            Cancel
+                        </Button>
                     </div>
             }
         }
 
         return (
             <div>
+                <Header />
+                <br />
                 {this.showDialog()}
                 {this.showSnackbar()}
                 <Grid container spacing={24} style={styles.formRoot} justify='center'>

@@ -18,7 +18,7 @@
  */
 
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 // App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import {HttpStatus} from "../utils/Constants";
@@ -30,15 +30,16 @@ import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from "material-ui
 import "../../public/css/dashboard.css";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
-import Error401 from "../error-pages/Error401";
 import FormPanel from "../common/FormPanel";
-import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
+import Error403 from "../error-pages/Error403";
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
-const buttonStyle = {marginLeft: 60, width: '35%',fontSize:'11px'};
-const textField = {width: 450};
+const buttonStyle = {marginLeft: 10, width: '30%', fontSize: '8px'};
+const textField = {width: 650};
 
 /**
  * class which manages add worker functionality.
@@ -48,12 +49,16 @@ export default class AddWorker extends React.Component {
     constructor() {
         super();
         this.state = {
+            sessionInvalid: false,
+            host:'',
+            port:'',
             messageStyle: '',
             showMsg: false,
             message: '',
             open: false,
             hasPermission: false,
-            isApiCalled: false
+            isApiCalled: false,
+            isError: false
         };
         this._handleSubmit = this._handleSubmit.bind(this);
         this._showMessage = this._showMessage.bind(this);
@@ -63,13 +68,36 @@ export default class AddWorker extends React.Component {
 
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasPermission: response.data,
                     isApiCalled: true
                 });
-            });
+            }).catch((error) => {
+            if(error.response != null){
+                if(error.response.status === 401){
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage:"Authentication fail. Please login again."
+                    })
+                } else if(error.response.status === 403){
+                    this.setState({
+                        isApiCalled: true,
+                        hasPermission: false,
+                        statusMessage:"User Have No Permission to view this page."
+                    })
+                } else {
+                    this.setState({
+                        isError:true,
+                        hasPermission: false,
+                        statusMessage:"Error while adding worker!. Worker may exists or unexpected error has occurred."
+                    })
+                }
+                that._showError(that.state.statusMessage);
+            }
+        });
     }
 
     /**
@@ -83,20 +111,41 @@ export default class AddWorker extends React.Component {
         });
         let that = this;
         let workerID = this.refs.host.input.value + ":" + this.refs.port.input.value;
-        StatusDashboardAPIS.createWorker(worker)
+        StatusDashboardOverViewAPI.createWorker(worker)
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
                     that._showMessage("Worker '" + workerID + "' is added successfully !");
                     setTimeout(function () {
                         window.location.href = window.contextPath;
                     }, 1000)
-                }
-                else {
+                } else {
                     that._showError("Error while adding worker '" + workerID + "' . Try Again !");
                 }
             }).catch((error) => {
-            that._showError("Error in adding worker !!");
+            if(error.response != null){
+                if(error.response.status === 401){
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
+                    })
+                } else if(error.response.status === 403){
+                    this.setState({
+                        isApiCalled: true,
+                        hasPermission: false,
+                        statusMessage: "User Have No Permission to view this"
+                    })
+                } else {
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred!"
+                    })
+                }
+            }
+            that._showError(that.state.statusMessage);
         });
+
+
     }
 
     /**
@@ -107,20 +156,13 @@ export default class AddWorker extends React.Component {
         let that = this;
         StatusDashboardAPIS.testConnection(workerID)
             .then((response) => {
-                if (response.status === HttpStatus.OK) {
-                    that.setState({
-                        open: true,
-                        message: "Connection Success!"
-                    });
-                }
-                else {
-                    that.setState({
-                        open: true,
-                        message: "Connection Fail!"
-                    });
+                if (response.data.code === 200) {
+                    that._showMessage(response.data.message)
+                } else {
+                    that._showError(response.data.message)
                 }
             }).catch((error) => {
-            that._showError("Error while testing the connection !!");
+            that._showError("Error while testing the connection!! ");
         });
     }
 
@@ -141,9 +183,17 @@ export default class AddWorker extends React.Component {
     }
 
     render() {
+        if(this.state.isError){
+            return <Error500 message={this.state.statusMessage}/>;
+        }
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
         if (this.state.isApiCalled) {
             if (!this.state.hasPermission) {
-                return <Error401/>;
+                return <Error403/>;
             }
             let actionsButtons = [
                 <FlatButton
@@ -176,27 +226,50 @@ export default class AddWorker extends React.Component {
                     </div>
                     <MuiThemeProvider muiTheme={muiTheme}>
                         <div>
-                            <FormPanel title={"Let's add a new worker"} onSubmit={this._handleSubmit}>
+                            <FormPanel title={"Let's add a new worker"} onSubmit={this._handleSubmit} width={650}>
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="host"
-                                           hintText="Eg. 100.10.5.41"
-                                           floatingLabelText="Host" type="text"/><br />
+                                           hintText="Eg. localhost"
+                                           floatingLabelText="HOST"
+                                           type="text"
+                                           value={this.state.host}
+                                           onChange={(e) => {
+                                               this.setState({
+                                                   host: e.target.value,
+                                               });
+                                           }}
+
+
+                                /><br />
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
-                                           style={textField} className="form-group" ref="port" hintText="Eg. 9080"
-                                           floatingLabelText="Port" type="text"/><br />
+                                           style={textField} className="form-group" ref="port"
+                                           hintText="Eg. 9443"
+                                           floatingLabelText="HTTPS PORT"
+                                           type="text"
+                                           value={this.state.port}
+                                           onChange={(e) => {
+                                               this.setState({
+                                                   port: e.target.value,
+                                               });
+                                           }}
+
+                                /><br />
                                 <br />
                                 <RaisedButton
+                                    disabled={this.state.host === '' || this.state.port === ''}
                                     backgroundColor='#f17b31'
                                     style={buttonStyle}
                                     label="Add Worker"
                                     type="submit"/>
-                                {/*TODO: next version*/}
-                                {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
+                                <RaisedButton style={buttonStyle}
+                                              disabled={this.state.host === '' || this.state.port === ''}
+                                              label="Test Connection"
+                                              onClick={this._testConnection}/>
                                 <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
                             </FormPanel>
-                    </div>
+                        </div>
                     </MuiThemeProvider>
                     <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
                               open={this.state.showMsg}

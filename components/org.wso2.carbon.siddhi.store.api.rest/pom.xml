@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.207-SNAPSHOT</version>
+        <version>2.0.264-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -181,7 +181,7 @@
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            org.wso2.siddhi.*;version="0.0.0",
+            org.wso2.siddhi.*;version="${siddhi.version.range}",
             *;resolution:=optional
         </import.package>
         <carbon.component>

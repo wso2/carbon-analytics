@@ -64,6 +64,12 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                     this._file.setDirty(true);
                     this._file.save();
                     this.app.workspaceManager.updateMenuItems();
+                    var activeTab = this.app.tabController.getActiveTab();
+                    var file = activeTab.getFile();
+                    if(file.getRunStatus() || file.getDebugStatus()){
+                        var launcher = activeTab.getSiddhiFileEditor().getLauncher();
+                        launcher.stopApplication(this.app.workspaceManager, false);
+                    }
                     this.trigger("tab-content-modified");
                 }, this);
 
@@ -78,6 +84,7 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                 }, this);
 
                 toolEditor.render();
+                this.app.workspaceManager.updateUndoRedoMenus();
 
                 // bind app commands to source editor commands
                 this.app.commandManager.getCommands().forEach(function(command){

@@ -28,8 +28,8 @@ define(([],function (){
                     id: "create-new-tab",
                     shortcuts: {
                         mac: {
-                            key: "command+alt+n",
-                            label: "\u2318\u2303N"
+                            key: "command+option+n",
+                            label: "\u2318\u2325N"
                         },
                         other: {
                             key: "ctrl+alt+n",
@@ -52,6 +52,24 @@ define(([],function (){
                         other: {
                             key: "ctrl+o",
                             label: "Ctrl+O"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: "openSample",
+                label: "Import Sample",
+                command: {
+                    id: "open-sample-file-open-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+o",
+                            label: "\u2318\u21E7O"
+                        },
+                        other: {
+                            key: "ctrl+shift+o",
+                            label: "Ctrl+Shift+O"
                         }
                     }
                 },
@@ -136,12 +154,12 @@ define(([],function (){
                     id: "close",
                     shortcuts: {
                         mac: {
-                            key: "command+w",
-                            label: "\u2318W"
+                            key: "command+shift+c",
+                            label: "\u2318\u21E7C"
                         },
                         other: {
-                            key: "ctrl+w",
-                            label: "Ctrl+W"
+                            key: "ctrl+shift+c",
+                            label: "Ctrl+Shift+C"
                         }
                     }
                 },
@@ -154,12 +172,12 @@ define(([],function (){
                     id: "close-all",
                     shortcuts: {
                         mac: {
-                            key: "command+alt+w",
-                            label: "\u2318\u2303W"
+                            key: "command+alt+x",
+                            label: "\u2318\u2303X"
                         },
                         other: {
-                            key: "ctrl+alt+w",
-                            label: "Ctrl+Alt+W"
+                            key: "ctrl+alt+x",
+                            label: "Ctrl+Alt+X"
                         }
                     }
                 },
@@ -190,12 +208,12 @@ define(([],function (){
                     id: "open-settings-dialog",
                     shortcuts: {
                         mac: {
-                            key: "command+alt+s",
-                            label: "\u2318\u2303S"
+                            key: "command+option+e",
+                            label: "\u2318\u2325E"
                         },
                         other: {
-                            key: "ctrl+alt+s",
-                            label: "Ctrl+Alt+S"
+                            key: "ctrl+alt+e",
+                            label: "Ctrl+Alt+E"
                         }
                     }
                 },

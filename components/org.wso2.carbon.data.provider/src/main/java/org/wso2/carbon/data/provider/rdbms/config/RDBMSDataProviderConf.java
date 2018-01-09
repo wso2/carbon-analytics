@@ -21,10 +21,11 @@ import org.wso2.carbon.data.provider.ProviderConfig;
  * Model class for the RDBMS provider configurations.
  */
 public class RDBMSDataProviderConf implements ProviderConfig {
-    private String datasourceName = null;
-    private String query = null;
-    private String tableName = null;
-    private String incrementalColumn = null;
+    private String datasourceName;
+    private String query;
+    private String tableName;
+    private String incrementalColumn;
+    private String timeColumns;
     private long publishingInterval;
     private long purgingInterval;
     private long publishingLimit;
@@ -32,15 +33,16 @@ public class RDBMSDataProviderConf implements ProviderConfig {
     private boolean isPurgingEnable;
 
     public RDBMSDataProviderConf() {
-        this.publishingInterval = 6000;
-        this.purgingInterval = 6000;
+        this.publishingInterval = 1;
+        this.purgingInterval = 60;
         this.isPurgingEnable = false;
-        this.publishingLimit = 1000;
-        this.purgingLimit = 1000;
+        this.publishingLimit = 30;
+        this.purgingLimit = 30;
         this.datasourceName = "";
         this.query = "";
         this.tableName = "";
         this.incrementalColumn = "";
+        this.timeColumns = "";
     }
 
     public String getDatasourceName() {
@@ -65,6 +67,10 @@ public class RDBMSDataProviderConf implements ProviderConfig {
 
     public long getPurgingLimit() {
         return purgingLimit;
+    }
+
+    public String getTimeColumns() {
+        return timeColumns;
     }
 
     @Override

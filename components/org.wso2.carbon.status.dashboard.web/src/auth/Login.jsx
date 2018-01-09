@@ -62,12 +62,10 @@ export default class Login extends Component {
         this.authenticate = this.authenticate.bind(this);
     }
 
-    componentWillMount() {
-        if (AuthManager.isRememberMeSet()) {
+    componentWillMount(){
+        if (AuthManager.isRememberMeSet() && !AuthManager.isLoggedIn()) {
             AuthManager.authenticateWithRefreshToken()
-                .then((response) => {
-                    this.setState({authenticated: true})
-                });
+                .then(() => this.setState({authenticated: true}));
         }
     }
 
@@ -81,7 +79,6 @@ export default class Login extends Component {
         if (params.referrer) {
             this.state.referrer = params.referrer;
         }
-
         // If the user already logged in set the state to redirect user to the referrer page.
         if (AuthManager.isLoggedIn()) {
             this.state.authenticated = true;
@@ -99,15 +96,8 @@ export default class Login extends Component {
             .authenticate(this.state.username, this.state.password, this.state.rememberMe)
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
-                const errorMessage = error.response && error.response.status === 401 ?
-                    {
-                        id: "login.error.message",
-                        defaultMessage: "Invalid username/password!"
-                    } :
-                    {
-                        id: "login.unknown.error",
-                        defaultMessage: "Unknown error occurred!"
-                    };
+                const errorMessage = error.response && error.response.status === 401 ? "Invalid username/password!":
+                    "Unknown error occurred!";
                 this.setState({
                     username: '',
                     password: '',
@@ -133,7 +123,7 @@ export default class Login extends Component {
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
                 <div>
-                    <Header title={"monitoring"} hideUserSettings/>
+                    <Header title={window.contextPath.substr(1)} hideUserSettings/>
                     <FormPanel title={"Login"}
                                onSubmit={this.authenticate}>
                         <TextField
@@ -194,6 +184,7 @@ export default class Login extends Component {
                         autoHideDuration="4000"
                         contentStyle={styles.messageBox}
                         bodyStyle={styles.errorMessage}
+                        onRequestClose={() => this.setState({error: '', showError: false})}
                     />
                 </div>
             </MuiThemeProvider>

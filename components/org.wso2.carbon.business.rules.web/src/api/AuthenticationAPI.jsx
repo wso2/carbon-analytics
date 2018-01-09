@@ -20,6 +20,8 @@
 import Axios from 'axios';
 import Qs from 'qs';
 import {MediaType} from "../constants/AuthConstants";
+import AuthManager from "../utils/AuthManager";
+import BusinessRulesUtilityFunctions from '../utils/BusinessRulesUtilityFunctions';
 
 /**
  * Authentication API base path.
@@ -55,6 +57,26 @@ export default class AuthenticationAPI {
     }
 
     /**
+     * Get new token using refresh token
+     *
+     * @return {AxiosPromise} Axios promise
+     */
+    static getAccessTokenWithRefreshToken() {
+        return AuthenticationAPI
+            .getHttpClient()
+            .post(`/login/${appContext}`, Qs.stringify({
+                grantType: "refresh_token",
+                rememberMe: true
+            }), {
+                headers: {
+                    'Content-Type': MediaType.APPLICATION_WWW_FORM_URLENCODED,
+                    'Authorization': "Bearer " + AuthManager.getCookie('RTK'),
+                    'Accept': MediaType.APPLICATION_JSON,
+                },
+            });
+    }
+
+    /**
      * Login user.
      *
      * @param {string} username Username
@@ -70,6 +92,7 @@ export default class AuthenticationAPI {
                 password,
                 grantType: passwordGrantType,
                 rememberMe,
+                appId: "br_" + BusinessRulesUtilityFunctions.generateguid()
             }), {
                 headers: {
                     'Content-Type': MediaType.APPLICATION_WWW_FORM_URLENCODED,
@@ -91,28 +114,5 @@ export default class AuthenticationAPI {
                     Authorization: `Bearer ${token}`,
                 },
             });
-    }
-
-    /**
-     * Get all roles.
-     *
-     * @returns {Promise} Promise
-     */
-    static getRoles() {
-        return AuthenticationAPI
-            .getHttpClient()
-            .get('/apis/dashboards/roles');
-    }
-
-    /**
-     * Get roles by username.
-     *
-     * @param {string} username Username
-     * @returns {Promise} Promise
-     */
-    static getUserRoles(username) {
-        return AuthenticationAPI
-            .getHttpClient()
-            .get(`/apis/dashboards/roles/${username}`);
     }
 }

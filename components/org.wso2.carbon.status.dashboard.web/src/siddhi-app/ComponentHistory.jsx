@@ -29,31 +29,34 @@ import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, Divider, FlatButton, RaisedButton} from "material-ui";
 import DashboardUtils from "../utils/DashboardUtils";
-
-const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
+import { Redirect } from 'react-router-dom';
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
+import Error403 from "../error-pages/Error403";
+const styles = {button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 const latencyMetadata = {
-    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', 'P75', 'P95', 'P99', 'P999',
+    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', '75th Percentile', '95th Percentile', '99th Percentile', '99.9th Percentile',
         'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
     types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
         'linear', 'linear', 'linear']
 };
 const latencyLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Count', fill: '#058DC7',  style: {markRadius: 2}},
-        {type: 'line', y: 'Max', fill: '#50B432',  style: {markRadius: 2}},
-        {type: 'line', y: 'Mean', fill: '#f17b31',  style: {markRadius: 2}},
-        {type: 'line', y: 'Min', fill: '#8c51a5',  style: {markRadius: 2}},
-        {type: 'line', y: 'Standard Deviation', fill: '#FFEB3B',  style: {markRadius: 2}},
-        {type: 'line', y: 'P75', fill: '#70dbed',  style: {markRadius: 2}},
-        {type: 'line', y: 'P95', fill: '#ffb873',  style: {markRadius: 2}},
-        {type: 'line', y: 'P99', fill: '#95dd87', style: {markRadius: 2}},
-        {type: 'line', y: 'P999',fill: '#890f02', style: {markRadius: 2}},
-        {type: 'line', y: 'Mean Rate', fill: '#ff918f',style: {markRadius: 2}},
-        {type: 'line', y: 'M1 Rate', fill: '#b76969', style: {markRadius: 2}},
-        {type: 'line', y: 'M5 Rate', fill: '#aea2e0', style: {markRadius: 2}},
-        {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', style: {markRadius: 2}}
+    charts: [{type: 'area', y: 'Count', fill: '#058DC7',  style: {markRadius: 2}},
+        {type: 'area', y: 'Max', fill: '#50B432',  style: {markRadius: 2}},
+        {type: 'area', y: 'Mean', fill: '#f17b31',  style: {markRadius: 2}},
+        {type: 'area', y: 'Min', fill: '#8c51a5',  style: {markRadius: 2}},
+        {type: 'area', y: 'Standard Deviation', fill: '#FFEB3B',  style: {markRadius: 2}},
+        {type: 'area', y: '75th Percentile', fill: '#70dbed',  style: {markRadius: 2}},
+        {type: 'area', y: '95th Percentile', fill: '#ffb873',  style: {markRadius: 2}},
+        {type: 'area', y: '99th Percentile', fill: '#95dd87', style: {markRadius: 2}},
+        {type: 'area', y: '99.9th Percentile',fill: '#890f02', style: {markRadius: 2}},
+        {type: 'area', y: 'Mean Rate', fill: '#ff918f',style: {markRadius: 2}},
+        {type: 'area', y: 'M1 Rate', fill: '#b76969', style: {markRadius: 2}},
+        {type: 'area', y: 'M5 Rate', fill: '#aea2e0', style: {markRadius: 2}},
+        {type: 'area', y: 'M15 Rate',fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
     height: 250,
@@ -61,31 +64,35 @@ const latencyLineChartConfig = {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
-        axisLabelColor: '#9c9898'
+        axisLabelColor: '#9c9898',
+        legendTextSize:8,
+        legendTitleSize:8
     },
     tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:20
+    xAxisTickCount:10
 };
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Memory', fill: '#f17b31',  style: {markRadius: 2}}],
+    charts: [{type: 'area', y: 'Memory', fill: '#f17b31',  style: {markRadius: 2}}],
     width: 800,
     height: 250,
     style: {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
-        axisLabelColor: '#9c9898'
+        axisLabelColor: '#9c9898',
+        legendTextSize:12,
+        legendTitleSize:12
     },
     tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:20
+    xAxisTickCount:10
 };
 const tpMetadata = {
     names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
@@ -94,11 +101,11 @@ const tpMetadata = {
 
 const tpLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
-        {type: 'line', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
-        {type: 'line', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},
-        {type: 'line', y: 'M5 Rate', fill: '#8c51a5', style: {markRadius: 2}},
-        {type: 'line', y: 'M15 Rate', fill: '#FFEB3B', style: {markRadius: 2}}
+    charts: [{type: 'area', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
+        {type: 'area', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
+        {type: 'area', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},
+        {type: 'area', y: 'M5 Rate', fill: '#8c51a5', style: {markRadius: 2}},
+        {type: 'area', y: 'M15 Rate', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
     height: 250,
@@ -106,13 +113,15 @@ const tpLineChartConfig = {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
-        axisLabelColor: '#9c9898'
+        axisLabelColor: '#9c9898',
+        legendTextSize:12,
+        legendTitleSize:12
     },
     tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:20
+    xAxisTickCount:10
 };
 /**
  * class which manages Siddhi App component history.
@@ -130,7 +139,9 @@ export default class ComponentHistory extends React.Component {
             isApiWaiting: true,
             latency: [],
             memory: [],
-            throughput: []
+            throughput: [],
+            hasViewerPermission: true,
+            sessionInvalid: false,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleApi = this.handleApi.bind(this);
@@ -209,10 +220,50 @@ export default class ComponentHistory extends React.Component {
                         isApiWaiting: false
                     });
                 }
-            });
+            }).catch((error) => {
+            let message;
+            if(error.response != null) {
+                if (error.response.status === 401) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if (error.response.status === 403) {
+                    message = "User Have No Viewer Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+            }
+        });
     }
 
     componentWillMount() {
+        AuthenticationAPI.isUserAuthorized('viewer', AuthManager.getUser().SDID)
+            .then((response) => {
+                that.setState({
+                    hasViewerPermission: response.data
+                });
+            }).catch((error) => {
+            let message;
+            if(error.response != null) {
+                if (error.response.status === 401) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if (error.response.status === 403) {
+                    message = "User Have No Viewer Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+            }
+        });
         this.handleApi(this.state.period);
     }
 
@@ -231,7 +282,7 @@ export default class ComponentHistory extends React.Component {
             === ComponentType.SINK_MAPPERS ||
             this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
             return (
-                <Card><CardHeader title="Latency"/><Divider/>
+                <Card><CardHeader title="Latency(milliseconds)"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
                             <h4 style={{marginTop: 0}}>No Data Available</h4>
@@ -242,7 +293,7 @@ export default class ComponentHistory extends React.Component {
         }
         return (
             <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
-                       title="Latency"/>
+                       title="Latency(milliseconds)"/>
         );
     }
 
@@ -258,7 +309,7 @@ export default class ComponentHistory extends React.Component {
         else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
             === ComponentType.TABLES) && this.state.memory.length === 0) {
             return (
-                <Card><CardHeader title="Memory"/><Divider/>
+                <Card><CardHeader title="Memory(bytes)"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
                             <h4 style={{marginTop: 0}}>No Data Available</h4>
@@ -285,7 +336,7 @@ export default class ComponentHistory extends React.Component {
             || this.state.componentType === ComponentType.TABLES || this.state.componentType === ComponentType.SOURCES
             || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
             return (
-                <Card><CardHeader title="Throughput"/><Divider/>
+                <Card><CardHeader title="Throughput(events/second)"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
                             <h4 style={{marginTop: 0}}>No Data Available</h4>
@@ -333,43 +384,55 @@ export default class ComponentHistory extends React.Component {
     }
 
     render() {
-        return (
-            <div style={{backgroundColor: '#222222'}}>
-                <Header/>
-                <div className="navigation-bar">
-                    <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                              icon={<HomeButton color="black"/>}/></Link>
-                    <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
-                        <FlatButton label={this.state.workerID + " >"}/></Link>
-                    <Link
-                        to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
-                        this.props.match.params.appName + "/" + this.state.statsEnable}>
-                        <FlatButton label={this.props.match.params.appName + " >"}/>
-                    </Link>
-                    <RaisedButton label={this.props.match.params.componentId} disabled disabledLabelColor='white'
-                                  disabledBackgroundColor='#f17b31'/>
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
+        if(this.state.hasViewerPermission) {
+            return (
+                <div style={{backgroundColor: '#222222'}}>
+                    <Header/>
+                    <div className="navigation-bar">
+                        <Link to={window.contextPath}><FlatButton label="Overview >"
+                                                                  icon={<HomeButton color="black"/>}/></Link>
+                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
+                            <FlatButton label={this.state.workerID + " >"}/></Link>
+                        <Link
+                            to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
+                            this.props.match.params.appName + "/" + this.state.statsEnable}>
+                            <FlatButton label={this.props.match.params.appName + " >"}/>
+                        </Link>
+                        <RaisedButton label={this.props.match.params.componentId} disabled disabledLabelColor='white'
+                                      disabledBackgroundColor='#f17b31'/>
+                    </div>
+                    <div className="worker-h1">
+                        <h2 style={{marginLeft: 40}}> {this.props.match.params.componentId} Metrics </h2>
+                    </div>
+                    <Toolbar style={toolBar}>
+                        <ToolbarGroup firstChild={true}>
+                            <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
+                                          onClick={() => this.handleChange("5min")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last 1 Hour" backgroundColor={this.setColor('1hr')}
+                                          onClick={() => this.handleChange("1hr")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last 6 Hours" backgroundColor={this.setColor('6hr')}
+                                          onClick={() => this.handleChange("6hr")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last Day" backgroundColor={this.setColor('24hr')}
+                                          onClick={() => this.handleChange("24hr")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last Week" backgroundColor={this.setColor('1wk')}
+                                          onClick={() => this.handleChange("1wk")}
+                                          style={styles.button}/>
+                        </ToolbarGroup>
+                    </Toolbar>
+                    {this.renderCharts()}
                 </div>
-                <div className="worker-h1">
-                    <h2 style={{marginLeft: 40}}> {this.props.match.params.componentId} Metrics </h2>
-                </div>
-                <Toolbar style={toolBar}>
-                    <ToolbarGroup firstChild={true}>
-                        <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
-                                      onClick={() => this.handleChange("5min")}
-                                      style={styles.button}/>
-                        <RaisedButton label="Last 1 Hour" backgroundColor={this.setColor('1hr')}
-                                      onClick={() => this.handleChange("1hr")}
-                                      style={styles.button}/>
-                        <RaisedButton label="Last 6 Hours" backgroundColor={this.setColor('6hr')}
-                                      onClick={() => this.handleChange("6hr")}
-                                      style={styles.button}/>
-                        <RaisedButton label="Last day" backgroundColor={this.setColor('24hr')}
-                                      onClick={() => this.handleChange("24hr")}
-                                      style={styles.button}/>
-                    </ToolbarGroup>
-                </Toolbar>
-                {this.renderCharts()}
-            </div>
-        );
+            );
+        } else {
+            return <Error403/>;
+        }
     }
 }

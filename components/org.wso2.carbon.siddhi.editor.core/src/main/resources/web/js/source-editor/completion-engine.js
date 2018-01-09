@@ -382,7 +382,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             // Query rule
             {
-                regex: "^(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)?" +
+                regex: "^(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)*?" +
                 "(from)\\s+" +
                 "(" +
                 "(?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
@@ -789,6 +789,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         generalInitialSnippets.concat(queryInitialSnippets),
                         constants.SNIPPET_SIDDHI_CONTEXT
                     );
+
+                    // var dynamicSnippets =
+                    //     aceModules.snippetManager.parseSnippetFile(generateDynamicStreamListSnippets());
+                    //
+                    // aceModules.snippetManager.register(
+                    //     dynamicSnippets,
+                    //     constants.SNIPPET_SIDDHI_CONTEXT
+                    // );
                 } else {
                     aceModules.snippetManager.unregister(
                         generalInitialSnippets.concat(queryInitialSnippets),
@@ -1974,7 +1982,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 return (fullEditorText.match(/\s+partition\s+/g) || []).length - 1;
             }
 
-            self.$partition = function (regexResults) {
+            self.$partition = function (regexResults, fullEditorText) {
                 // Regexps used for identifying the suggestions
                 var partitionConditionStatement = regexResults[1];
                 var partitionBody = regexResults[3];
@@ -1991,6 +1999,26 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
                 // Testing to find the relevant suggestion
                 if (partitionBody != undefined) {
+                    //Provide suggestions for queries inside the partition
+                    var queriesInsidePartition = partitionBody.split(";");
+                    var lastQueryInThePartition = queriesInsidePartition[queriesInsidePartition.length-1];
+                    var queryRegex = new RegExp("^(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)?" +
+                        "\\s*(from)\\s+" +
+                        "(" +
+                        "(?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
+                        "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*)" +
+                        "(?:\\s+(group\\s+by)\\s+((?:.(?!having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                        "(?:\\s+(having)\\s+((?:.(?!order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                        "(?:\\s+(order\\s+by)\\s+((?:.(?!limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                        "(?:\\s+(limit)\\s+((?:.(?!output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                        ")?" +
+                        "(?:\\s+(output)\\s+((?:.(?!insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                        "(?:\\s+((?:insert|delete|update\\s+or\\s+insert\\s+into|update))\\s+((?:.(?!;))*.?))?$","ig");
+
+                    var queryRegexResults = queryRegex.exec(lastQueryInThePartition);
+                    if(queryRegexResults!=null){
+                        self.$query(queryRegexResults,fullEditorText);
+                    }
                     // Add suggestions inside partitions that did not match query regexp
                     var isCursorAfterSemicolon = false;
                     if (/;\s*$/.test(partitionBody)) {
@@ -2006,7 +2034,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         );
                     }
                 } else if (unclosedBracketsCount == 0 && /\)\s*[a-zA-Z_0-9]*/.test(partitionConditionStatement)) {
-                    // Ass suggestions after the partition with clause: "begin" keyword
+                    // Add suggestions after the partition with clause: "begin" keyword
                     var completionPrefix = "";
                     if (partitionConditionStatement.charAt(partitionConditionStatement.length - 1) == ")") {
                         completionPrefix = "\n";
@@ -2505,14 +2533,38 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 }
             }
 
+            // function generateDynamicStreamListSnippets(){
+            //     var dynamicStreams = "#Define Statements\n";
+            //
+            //     _.forOwn(self.streamsList, function(value, key) {
+            //         var streamName = key;
+            //         dynamicStreams += "snippet define-" + streamName + "\n" +
+            //             "\tdefine stream ${1:" + streamName + "} (";
+            //         var dynamicAttributes = "";
+            //         var attrCount = 1;
+            //         var attributesLength = _.size(value.attributes);
+            //         var attrList = value.attributes;
+            //         _.forOwn(attrList, function(value, key) {
+            //             dynamicAttributes += "${" + ++attrCount + ":" + key + "} ${" + ++attrCount + ":" + value + "}";
+            //             if(attributesLength * 2 != (attrCount - 1)){
+            //                 dynamicAttributes += ",";
+            //             }
+            //         });
+            //         dynamicStreams += dynamicAttributes + ");\n";
+            //         console.log(dynamicStreams);
+            //     } );
+            //
+            //     return dynamicStreams;
+            // }
+
             function generateCompletionsForExtensions(extensionArray,rules){
                 _.each(extensionArray, function(extension){
-                    var completionString = extension.namespace + "(type=\'" + extension.name + "\'";
+                    var completionString = extension.namespace + "(type=\'" + extension.name + "\' ";
                     var isMandatoryParametersExist = false;
                     _.each(extension.parameters, function(parameter){
                         if(!parameter.optional){
                             if(!isMandatoryParametersExist){
-                                completionString += " , ";
+                                completionString += ", ";
                                 isMandatoryParametersExist = true;
                             }
                             completionString += parameter.name + "=\'option_value\',";
