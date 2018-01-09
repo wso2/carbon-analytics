@@ -79,10 +79,13 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                     'file': {
                         'icon': 'fw-document'
                     }
+                },
+                'sort': function (a, b) {
+                    return this.get_text(a).toLowerCase() > this.get_text(b).toLowerCase() ? 1 : -1;
                 }
             };
 
-            this._plugins = ['types', 'wholerow'];
+            this._plugins = ['types', 'wholerow', 'sort'];
             this._contextMenuProvider = _.get(config, 'contextMenuProvider');
             if(!_.isNil(this._contextMenuProvider)){
                 this._plugins.push('contextmenu');

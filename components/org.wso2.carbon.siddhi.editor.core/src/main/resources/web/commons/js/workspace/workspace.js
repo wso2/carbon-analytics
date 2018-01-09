@@ -101,8 +101,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 });
             };
 
-            this.handleSave = function() {
-                var activeTab = app.tabController.getActiveTab();
+            this.handleSave = function(option) {
+
+                var saveFileTab;
+                if ( option !== undefined && option.tabInstance !== undefined){
+                    saveFileTab = option.tabInstance;
+                } else {
+                    saveFileTab = app.tabController.getActiveTab();
+                }
                 var file = undefined;
                 var siddhiFileEditor;
                 var config = "";
@@ -110,15 +116,16 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var fileName = "";
                 var options = {};
 
-                if(activeTab.getTitle() != "welcome-page"){
-                    file = activeTab.getFile();
+                if(saveFileTab.getTitle() != "welcome-page"){
+                    file = saveFileTab.getFile();
                 }
 
                 if(file !== undefined){
                     if(file.isPersisted()){
                         if(file.isDirty()){
-                            var activeTab = app.tabController.activeTab;
-                            var siddhiFileEditor= activeTab.getSiddhiFileEditor();
+                            //var activeTab = app.tabController.activeTab;
+                            var activeTab = saveFileTab;
+                            siddhiFileEditor= activeTab.getSiddhiFileEditor();
                             config = siddhiFileEditor.getContent();
                             var response = self._serviceClient.writeFile(file,config);
                             if(response.error){
@@ -142,6 +149,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                             options.callback(true);
                         }
                     } else {
+                        options.tabInstance = saveFileTab;
                         app.commandManager.dispatch('open-file-save-dialog', options);
                     }
                 }
@@ -414,8 +422,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if(_.isNil(this._saveFileDialog)){
                     this._saveFileDialog = new Dialogs.save_to_file_dialog(app);
                 }
-                this._saveFileDialog.render();
-
+                if (options !== undefined && options.tabInstance !== undefined){
+                    this._saveFileDialog.render(options.tabInstance);
+                } else {
+                    this._saveFileDialog.render();
+                }
                 if(!_.isNil(options) && _.isFunction(options.callback)){
                     var isSaved = false;
                     this._saveFileDialog.once('save-completed', function(success){
@@ -583,7 +594,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
 
-            app.commandManager.registerHandler('save', this.handleSave);
+            app.commandManager.registerHandler('save', this.handleSave, this);
 
             app.commandManager.registerHandler('export', this.handleExport, this);
 
