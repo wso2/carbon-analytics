@@ -37,6 +37,7 @@
         <module>components/org.wso2.carbon.sp.jobmanager.core</module>
         <module>components/org.wso2.carbon.sp.distributed.resource.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
+        <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
         <module>components/org.wso2.carbon.siddhi.metrics.core</module>
@@ -55,6 +56,7 @@
         <module>features/org.wso2.carbon.sp.jobmanager.core.feature</module>
         <module>features/org.wso2.carbon.sp.distributed.resource.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
@@ -918,6 +920,20 @@
                 <artifactId>commons-io</artifactId>
                 <version>${commons.io.version}</version>
             </dependency>
+
+            <!-- Business Rules Templates Editor related -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.business.rules.templates.editor.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.business.rules.templates.editor.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
 
             <!--siddhi dependencies start-->
 
