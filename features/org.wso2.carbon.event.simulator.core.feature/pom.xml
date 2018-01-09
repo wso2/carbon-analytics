@@ -115,6 +115,11 @@
             <artifactId>generex</artifactId>
         </dependency>
         <!--Dependencies for random event simulation ends here-->
+        <!-- Common query manager -->
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -219,6 +224,10 @@
                                 <bundle>
                                     <symbolicName>generex</symbolicName>
                                     <version>${generex.wso2v1.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.database.query.manager</symbolicName>
+                                    <version>${carbon.analytics-common.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

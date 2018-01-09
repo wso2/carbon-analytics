@@ -19,12 +19,14 @@ package org.wso2.carbon.stream.processor.core.api;
 import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
 import org.wso2.carbon.stream.processor.core.factories.SiddhiAppsApiServiceFactory;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse200;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse400;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppMetrics;
 import org.wso2.carbon.stream.processor.core.model.StatsEnable;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import javax.ws.rs.Consumes;
@@ -36,6 +38,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 /**
@@ -70,9 +73,11 @@ public class SiddhiAppsApi implements Microservice {
                     "already exists.", response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsPost(@ApiParam(value = "Siddhi Application", required = true) String body)
+    public Response siddhiAppsPost(
+            @Context Request request,
+            @ApiParam(value = "Siddhi Application", required = true) String body)
             throws NotFoundException {
-        return delegate.siddhiAppsPost(body);
+        return delegate.siddhiAppsPost(body, getUserName(request));
     }
 
     @PUT
@@ -90,9 +95,11 @@ public class SiddhiAppsApi implements Microservice {
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsPut(@ApiParam(value = "Siddhi Application", required = true) String body)
+    public Response siddhiAppsPut(
+            @Context Request request,
+            @ApiParam(value = "Siddhi Application", required = true) String body)
             throws NotFoundException {
-        return delegate.siddhiAppsPut(body);
+        return delegate.siddhiAppsPut(body, getUserName(request));
     }
 
     @GET
@@ -103,9 +110,10 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications are successfully " +
                     "retrieved.", response = InlineResponse200.class)})
     public Response siddhiAppsGet(
+            @Context Request request,
             @ApiParam(value = "Retrieves only active/inactive Siddhi Applications as specified.", required = false)
             @QueryParam("isActive") String isActive) throws NotFoundException {
-        return delegate.siddhiAppsGet(isActive);
+        return delegate.siddhiAppsGet(isActive, getUserName(request));
     }
 
     @DELETE
@@ -123,9 +131,11 @@ public class SiddhiAppsApi implements Microservice {
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsAppNameDelete(@ApiParam(value = "The name of the Siddhi Application", required = true)
-                                            @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameDelete(appName);
+    public Response siddhiAppsAppNameDelete(
+            @Context Request request,
+            @ApiParam(value = "The name of the Siddhi Application", required = true)
+            @PathParam("appName") String appName) throws NotFoundException {
+        return delegate.siddhiAppsAppNameDelete(appName, getUserName(request));
     }
 
     @GET
@@ -138,9 +148,11 @@ public class SiddhiAppsApi implements Microservice {
                     "retrieved.", response = InlineResponse200.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not found.",
                     response = InlineResponse200.class)})
-    public Response siddhiAppsAppNameGet(@ApiParam(value = "The name of the Siddhi Application", required = true)
-                                         @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameGet(appName);
+    public Response siddhiAppsAppNameGet(
+            @Context Request request,
+            @ApiParam(value = "The name of the Siddhi Application", required = true)
+            @PathParam("appName") String appName) throws NotFoundException {
+        return delegate.siddhiAppsAppNameGet(appName, getUserName(request));
     }
 
     @GET
@@ -153,9 +165,11 @@ public class SiddhiAppsApi implements Microservice {
                     "successfully retrieved.", response = InlineResponse200.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not found.",
                     response = InlineResponse200.class)})
-    public Response siddhiAppsAppNameStatusGet(@ApiParam(value = "The name of the Siddhi Application.", required = true)
-                                               @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameStatusGet(appName);
+    public Response siddhiAppsAppNameStatusGet(
+            @Context Request request,
+            @ApiParam(value = "The name of the Siddhi Application.", required = true)
+            @PathParam("appName") String appName) throws NotFoundException {
+        return delegate.siddhiAppsAppNameStatusGet(appName, getUserName(request));
     }
 
     @POST
@@ -171,10 +185,11 @@ public class SiddhiAppsApi implements Microservice {
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsAppNameSnapshotPost(@ApiParam(value = "The name of the Siddhi Application.",
-            required = true)
-                                                  @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameBackupPost(appName);
+    public Response siddhiAppsAppNameSnapshotPost(
+            @Context Request request,
+            @ApiParam(value = "The name of the Siddhi Application.", required = true)
+            @PathParam("appName") String appName) throws NotFoundException {
+        return delegate.siddhiAppsAppNameBackupPost(appName, getUserName(request));
     }
 
     @POST
@@ -190,11 +205,12 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
     public Response siddhiAppsAppNameRestorePost(
+            @Context Request request,
             @ApiParam(value = "The name of the Siddhi Application.", required = true)
             @PathParam("appName") String appName,
             @ApiParam(value = "The revision number of the backup.", required = false)
             @QueryParam("revision") String revision) throws NotFoundException {
-        return delegate.siddhiAppsAppNameRestorePost(appName, revision);
+        return delegate.siddhiAppsAppNameRestorePost(appName, revision, getUserName(request));
     }
 
     @GET
@@ -207,9 +223,10 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications  statistics data are " +
                     "successfully retrieved.", response = SiddhiAppMetrics.class)})
     public Response siddhiAppsStatisticsGet(
+            @Context Request request,
             @ApiParam(value = "Retrieves only active/inactive Siddhi Applications as specified.", required = false)
             @QueryParam("isActive") String isActive) throws NotFoundException {
-        return delegate.siddhiAppsStatisticsGet(isActive);
+        return delegate.siddhiAppsStatisticsGet(isActive, getUserName(request));
     }
 
     @PUT
@@ -224,10 +241,11 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not" +
                     " found.", response = void.class)})
     public Response siddhiAppMetricsEnable(
+            @Context Request request,
             @ApiParam(value = "The name of the Siddhi Application.", required = true) @PathParam("appName") String appName,
             @ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
             throws NotFoundException {
-        return delegate.siddhiAppStatsEnable(appName, statsEnable.getStatsEnable());
+        return delegate.siddhiAppStatsEnable(appName, statsEnable.getStatsEnable(), getUserName(request));
     }
 
     @PUT
@@ -242,8 +260,13 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not" +
                     " found.", response = void.class)})
     public Response siddhiAllAppMetricsEnable(
+            @Context Request request,
             @ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
             throws NotFoundException {
-        return delegate.siddhiAppsStatsEnable(statsEnable.getStatsEnable());
+        return delegate.siddhiAppsStatsEnable(statsEnable.getStatsEnable(), getUserName(request));
+    }
+
+    private static String getUserName(Request request) {
+        return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();
     }
 }

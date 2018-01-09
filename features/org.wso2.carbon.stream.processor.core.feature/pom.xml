@@ -105,6 +105,11 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
         </dependency>
+        <!-- Common query manager -->
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -262,6 +267,10 @@
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.stream.processor.core</symbolicName>
                                     <version>${carbon.analytics.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.database.query.manager</symbolicName>
+                                    <version>${carbon.analytics-common.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

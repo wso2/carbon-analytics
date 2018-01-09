@@ -27,27 +27,27 @@ import javax.ws.rs.core.Response;
         date = "2017-05-31T15:43:24.557Z")
 public abstract class SiddhiAppsApiService {
 
-    public abstract Response siddhiAppsAppNameDelete(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameDelete(String appName, String username) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameGet(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameGet(String appName, String username) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameStatusGet(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameStatusGet(String appName, String username) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameRestorePost(String appName, String revision) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameRestorePost(String appName, String revision, String username) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameBackupPost(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameBackupPost(String appName, String username) throws NotFoundException;
 
-    public abstract Response siddhiAppsGet(String isActive) throws NotFoundException;
+    public abstract Response siddhiAppsGet(String isActive, String username) throws NotFoundException;
 
-    public abstract Response siddhiAppsPost(String body) throws NotFoundException;
+    public abstract Response siddhiAppsPost(String body, String username) throws NotFoundException;
 
-    public abstract Response siddhiAppsPut(String body) throws NotFoundException;
+    public abstract Response siddhiAppsPut(String body, String username) throws NotFoundException;
 
-    public abstract Response siddhiAppsStatisticsGet(String isActive) throws NotFoundException;
+    public abstract Response siddhiAppsStatisticsGet(String isActive, String username) throws NotFoundException;
 
-    public abstract Response siddhiAppStatsEnable(String appName, boolean statsEnabled) throws
+    public abstract Response siddhiAppStatsEnable(String appName, boolean statsEnabled, String username) throws
             NotFoundException;
 
-    public abstract Response siddhiAppsStatsEnable(boolean statsEnabled) throws
+    public abstract Response siddhiAppsStatsEnable(boolean statsEnabled, String username) throws
             NotFoundException;
 }
