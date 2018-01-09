@@ -26,10 +26,10 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
+    <artifactId>org.wso2.carbon.business.rules.templates.editor.core</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Data Analytics Server - Editor</name>
+    <name>WSO2 Data Analytics Server - Business Rules Templates Editor</name>
     <url>http://wso2.org</url>
 
     <dependencies>
@@ -124,26 +124,22 @@
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
         <Private-Package>
-            org.wso2.carbon.siddhi.editor.core.internal,
-            org.wso2.carbon.siddhi.editor.core.internal.*,
+            org.wso2.carbon.business.rules.templates.editor.core.internal,
+            org.wso2.carbon.business.rules.templates.editor.core.internal.*,
         </Private-Package>
         <export.package>
-            org.wso2.carbon.siddhi.editor.core.*
+            org.wso2.carbon.business.rules.templates.editor.core.*
         </export.package>
         <import.package>
             org.osgi.framework.*;version="[1.8.0, 2.0.0)",
             org.wso2.carbon.kernel;version="[5.0.0, 6.0.0)",
-            org.wso2.siddhi.*;version="0.0.0",
-            org.wso2.carbon.stream.processor.common.*;version="0.0.0",
-            org.wso2.carbon.editor.log.appender.*,
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",
             *;resolution:=optional
         </import.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-            osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer";serviceCount="1"
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
         </carbon.component>
     </properties>
 
