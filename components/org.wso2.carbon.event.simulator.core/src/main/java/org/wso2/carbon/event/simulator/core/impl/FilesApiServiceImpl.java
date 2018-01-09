@@ -1,6 +1,8 @@
 package org.wso2.carbon.event.simulator.core.impl;
 
 import org.apache.commons.io.FilenameUtils;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
+import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.event.simulator.core.api.FilesApiService;
 import org.wso2.carbon.event.simulator.core.api.NotFoundException;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
@@ -8,8 +10,10 @@ import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUploader;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
 import org.wso2.carbon.utils.Utils;
+import org.wso2.msf4j.Request;
 import org.wso2.msf4j.formparam.FileInfo;
 
 import javax.ws.rs.core.Response;
@@ -22,7 +26,11 @@ import java.nio.file.Paths;
 public class FilesApiServiceImpl extends FilesApiService {
     private final Path CSV_BASE_PATH = Paths.get(Utils.getRuntimePath().toString(),
             EventSimulatorConstants.DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES);
-    @Override
+
+    private static final String PERMISSION_APP_NAME = "SIM";
+    private static final String MANAGE_SIMULATOR_PERMISSION_STRING = "simulator.manage";
+    private static final String VIEW_SIMULATOR_PERMISSION_STRING = "simulator.view";
+
     public Response deleteFile(String fileName) throws NotFoundException {
         FileUploader fileUploader = FileUploader.getFileUploaderInstance();
         if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
@@ -57,7 +65,6 @@ public class FilesApiServiceImpl extends FilesApiService {
         }
     }
 
-    @Override
     public Response getFileNames() throws NotFoundException {
         try {
             return Response.status(Response.Status.OK)
@@ -75,7 +82,6 @@ public class FilesApiServiceImpl extends FilesApiService {
         }
     }
 
-    @Override
     public Response updateFile(String fileName, InputStream fileInputStream, FileInfo fileInfo)
             throws NotFoundException {
         FileUploader fileUploader = FileUploader.getFileUploaderInstance();
@@ -135,7 +141,6 @@ public class FilesApiServiceImpl extends FilesApiService {
         }
     }
 
-    @Override
     public Response uploadFile(InputStream fileInputStream, FileInfo fileInfo) throws NotFoundException {
         try {
             FileUploader.getFileUploaderInstance().uploadFile(fileInfo, fileInputStream, CSV_BASE_PATH.toString());
@@ -150,5 +155,55 @@ public class FilesApiServiceImpl extends FilesApiService {
                 .entity(new ResponseMapper(Response.Status.CREATED, "Successfully uploaded file '" +
                         fileInfo.getFileName() + "'"))
                 .build();
+    }
+
+    @Override
+    public Response deleteFile(String fileName, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIMULATOR_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permission to perform the action")
+                    .build();
+        }
+        return deleteFile(fileName);
+    }
+
+    @Override
+    public Response getFileNames(Request request) throws NotFoundException {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new Permission
+                (PERMISSION_APP_NAME, MANAGE_SIMULATOR_PERMISSION_STRING)) || getPermissionProvider().hasPermission
+                (getUserName(request), new Permission(PERMISSION_APP_NAME, VIEW_SIMULATOR_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permission to perform the action")
+                    .build();
+        }
+        return getFileNames();
+    }
+
+    @Override
+    public Response updateFile(String fileName, InputStream fileInputStream, FileInfo fileDetail, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIMULATOR_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permission to perform the action")
+                    .build();
+        }
+        return updateFile(fileName, fileInputStream, fileDetail);
+    }
+
+    @Override
+    public Response uploadFile(InputStream fileInputStream, FileInfo fileDetail, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIMULATOR_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permission to perform the action")
+                    .build();
+        }
+        return uploadFile(fileInputStream, fileDetail);
+    }
+
+    private static String getUserName(Request request) {
+        Object username = request.getProperty("username");
+        return username != null ? username.toString() : null;
+    }
+
+    private PermissionProvider getPermissionProvider() {
+        return EventSimulatorDataHolder.getPermissionProvider();
     }
 }
