@@ -23,6 +23,7 @@ import com.google.gson.GsonBuilder;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.PermissionString;
 import org.wso2.carbon.analytics.permissions.bean.Role;
 import org.wso2.carbon.analytics.permissions.exceptions.PermissionException;
@@ -48,11 +49,15 @@ public class PermissionsApiServiceImpl extends PermissionsApiService {
     @Override
     public Response addPermission(Permission body) throws NotFoundException {
         String permissionID = null;
+        PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
         try {
             org.wso2.carbon.analytics.permissions.bean.Permission permission =
                     new org.wso2.carbon.analytics.permissions.bean.Permission
                             (body.getAppName(), body.getPermissionString());
-            permissionID = DataHolder.getInstance().getPermissionProvider().addPermissionAPI(permission);
+            if (!permissionProvider.isPermissionExists(permission)) {
+                permissionID = permissionProvider.addPermissionAPI(permission);
+
+            }
             return Response.ok().entity(permissionID).build();
         } catch (PermissionException e) {
             String errorMsg = String.format("Failed to add Permission with uuid %s ", permissionID);

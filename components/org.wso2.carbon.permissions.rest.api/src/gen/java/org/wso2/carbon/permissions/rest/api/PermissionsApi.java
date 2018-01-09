@@ -26,6 +26,7 @@ import org.wso2.carbon.permissions.rest.api.factories.PermissionsApiServiceFacto
 import org.wso2.carbon.permissions.rest.api.model.Permission;
 import org.wso2.msf4j.Microservice;
 
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -42,19 +43,17 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 @Path("/permissions")
-@Consumes({"application/json", "application/xml"})
-@Produces({"application/xml", "application/json"})
+@Consumes({"application/json"})
+@Produces({"application/xml"})
+@ApplicationPath("/permissions")
 @io.swagger.annotations.Api(description = "the permissions API")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-        date = "2017-12-07T14:05:52.168Z")
 public class PermissionsApi implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(PermissionsApi.class);
     private final PermissionsApiService delegate = PermissionsApiServiceFactory.getPermissionsApi();
 
     @POST
-
     @Consumes({"application/json"})
-    @Produces({"application/xml", "application/json"})
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Add a new permission and returns its PermissionID",
             response = String.class, tags = {"permission",})
     @io.swagger.annotations.ApiResponses(value = {
@@ -70,8 +69,8 @@ public class PermissionsApi implements Microservice {
 
     @DELETE
     @Path("/{permissionID}")
-    @Consumes({"application/json", "application/xml"})
-    @Produces({"application/xml", "application/json"})
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Deleting an existing permission", response = void.class,
             tags = {"permission",})
     @io.swagger.annotations.ApiResponses(value = {
@@ -87,8 +86,8 @@ public class PermissionsApi implements Microservice {
 
     @GET
     @Path("/{permissionID}/roles")
-    @Consumes({"application/json", "application/xml"})
-    @Produces({"application/xml", "application/json"})
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Get granted roles for PermissionID.",
             response = void.class, tags = {"permission",})
     @io.swagger.annotations.ApiResponses(value = {
@@ -103,7 +102,7 @@ public class PermissionsApi implements Microservice {
 
     @GET
     @Path("/app/{appName}")
-    @Consumes({"application/json", "application/xml"})
+    @Consumes({"application/json"})
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Get app permissions", response = void.class,
             tags = {"permission",})
@@ -112,15 +111,16 @@ public class PermissionsApi implements Microservice {
                     response = void.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "Deleting permission unsuccessful",
                     response = void.class)})
-    public Response getPermissionStrings(@ApiParam(value = "", required = true) @PathParam("appName") String appName)
+    public Response getPermissionStrings(@ApiParam(value = "AppName", required = true)
+                                             @PathParam("appName") String appName)
             throws org.wso2.carbon.permissions.rest.api.NotFoundException {
         return delegate.getPermissionStrings(appName);
     }
 
-    @POST
-    @Path("/{permissionID}}/{roleName}")
-    @Consumes({"application/json", "application/xml"})
-    @Produces({"application/xml", "application/json"})
+    @GET
+    @Path("auth/{permissionID}/{roleName}")
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Check permission for a specific role.",
             response = void.class, tags = {"permission",})
     @io.swagger.annotations.ApiResponses(value = {
@@ -137,8 +137,8 @@ public class PermissionsApi implements Microservice {
 
     @POST
     @Path("/roles/{roleName}")
-    @Consumes({"application/json", "application/xml"})
-    @Produces({"application/xml", "application/json"})
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Grant/Revoke permission from a specific role.",
             response = void.class, tags = {"permission",})
     @io.swagger.annotations.ApiResponses(value = {
@@ -156,9 +156,9 @@ public class PermissionsApi implements Microservice {
     }
 
     @POST
-    @Path("/{permissionID}/revoke")
-    @Consumes({"application/json", "application/xml"})
-    @Produces({"application/xml", "application/json"})
+    @Path("revoke/{permissionID}")
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Revoke permission for all the roles.",
             response = void.class, tags = {"permission",})
     @io.swagger.annotations.ApiResponses(value = {
