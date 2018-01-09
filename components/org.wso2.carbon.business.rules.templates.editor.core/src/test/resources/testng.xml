@@ -19,6 +19,6 @@
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="wso2sp-test-suite">
+<suite name="wso2-template-editor-test-suite">
 
 </suite>

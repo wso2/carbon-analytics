@@ -21,16 +21,16 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.207-SNAPSHOT</version>
+        <version>2.0.264-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>org.wso2.carbon.business.rules.templates.editor.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Business Rules Templates Editor Feature</name>
+    <name>WSO2 Stream Processor - Business Rules Template Editor Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the bundles related to Business Rules Templates Editor</description>
+    <description>This feature contains the bundles related to Business Rules Template Editor</description>
 
     <dependencies>
         <dependency>
@@ -38,20 +38,8 @@
             <artifactId>org.wso2.carbon.business.rules.templates.editor.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.editor.log.appender</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon.utils</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.deployment</groupId>
-            <artifactId>org.wso2.carbon.deployment.engine</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io.wso2</groupId>
-            <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
@@ -61,33 +49,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.wso2.carbon.analytics</groupId>
-                                    <artifactId>org.wso2.carbon.editor.log.appender</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/target/</outputDirectory>
-                                    <includes>resources/launch.properties</includes>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.wso2.carbon.maven</groupId>
                 <artifactId>carbon-feature-plugin</artifactId>
@@ -114,14 +75,6 @@
                             <bundles>
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.business.rules.templates.editor.core</symbolicName>
-                                    <version>${project.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>commons-io</symbolicName>
-                                    <version>${commons.io.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.editor.log.appender</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
                                 <bundle>

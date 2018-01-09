@@ -28,7 +28,7 @@ import org.wso2.msf4j.MicroservicesServer;
 import java.net.SocketException;
 
 /**
- * Startup component of Business Rules Templates Editor.
+ * Startup component of Business Rules Template Editor.
  */
 @Component(
         service = StartupComponent.class,
@@ -40,12 +40,12 @@ public class StartupComponent {
 
     @Activate
     protected void start(BundleContext bundleContext) {
-        logger.debug("Business Rules Templates Editor Core Startup Listener Service Component is Activated");
+        logger.debug("Business Rules Template Editor Core Startup Listener Service Component is Activated");
     }
 
     @Deactivate
     protected void stop() {
-        logger.debug("Business Rules Templates Editor Core Startup Listener Service Component is Deactivated");
+        logger.debug("Business Rules Template Editor Core Startup Listener Service Component is Deactivated");
     }
 
     @Reference(service = MicroservicesServer.class,
@@ -65,7 +65,7 @@ public class StartupComponent {
                 }
                 String startingURL = entry.getValue().getScheme() + "://" + hostname + ":" + entry.getValue()
                         .getPort() + "/template-editor";
-                logger.info("Templates Editor Started on : " + startingURL);
+                logger.info("Template Editor Started on : " + startingURL);
             }
         });
         logger.debug("Microservices server registered to startup component of editor");

@@ -31,7 +31,6 @@ import org.wso2.carbon.business.rules.templates.editor.core.util.MimeMapper;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
-import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -136,45 +135,5 @@ public class TemplatesEditorMicroservice implements Microservice {
     @Deactivate
     protected void stop() throws Exception {
 
-    }
-
-    /**
-     * This bind method will be called when Siddhi ComponentActivator OSGi service is registered.
-     *
-     * @param siddhiComponentActivator The SiddhiComponentActivator instance registered by Siddhi OSGi service
-     */
-    @Reference(
-            name = "siddhi.component.activator.service",
-            service = SiddhiComponentActivator.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetSiddhiComponentActivator"
-    )
-    protected void setSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
-        // Nothing to do
-    }
-
-    /**
-     * This is the unbind method which gets called at the un-registration of CarbonRuntime OSGi service.
-     *
-     * @param siddhiComponentActivator The SiddhiComponentActivator instance registered by Siddhi OSGi service
-     */
-    protected void unsetSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
-        // Nothing to do
-    }
-
-    @Reference(
-            name = "carbon.config.provider",
-            service = ConfigProvider.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterConfigProvider"
-    )
-    protected void registerConfigProvider(ConfigProvider configProvider) {
-        this.configProvider = configProvider;
-    }
-
-    protected void unregisterConfigProvider(ConfigProvider configProvider) {
-        this.configProvider = null;
     }
 }
