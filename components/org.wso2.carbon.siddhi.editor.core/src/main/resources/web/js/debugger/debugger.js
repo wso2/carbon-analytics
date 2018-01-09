@@ -38,16 +38,26 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                     } else {
                         if (self._debugStarted) {
                             self._debugger.release(row, function (d) {
-                                delete self._breakpoints[row];
+                                self._breakpoints[row] = undefined;
                                 e.editor.session.clearBreakpoint(row);
                             });
                         } else {
-                            delete self._breakpoints[row];
+                            self._breakpoints[row] = undefined;
                             e.editor.session.clearBreakpoint(row);
                         }
                         console.info("Release Breakpoint " +
                             JSON.stringify(self._validBreakpoints[row]));
                     }
+                } else if (breakpoints[row] === "ace_breakpoint") {
+                        if (self._debugStarted) {
+                            self._debugger.release(row, function (d) {
+                                self._breakpoints[row] = undefined;
+                                e.editor.session.clearBreakpoint(row);
+                            });
+                        } else {
+                            self._breakpoints[row] = undefined;
+                            e.editor.session.clearBreakpoint(row);
+                        }
                 } else {
                     var warningMessage = "Break points can only be applied for <i><b>from</b></i> or " +
                         "<i><b>query output(insert, delete, update, update or insert into)</b></i>" + " statements";
@@ -65,8 +75,11 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                 var len, firstRow;
 
                 if (e.end.row == e.start.row) {
-                    // editing in same line
-                    return;
+                    //editing in same line
+                    if (self._breakpoints[e.end.row]) {
+                        self._breakpoints[e.end.row] = undefined;
+                        self._editor.session.clearBreakpoint(e.end.row);
+                    }
                 } else {
                     // new line or remove line
                     if (e.action == "insert") {
@@ -87,7 +100,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                             for (var oldBP in rem) {
                                 if (rem[oldBP]) {
                                     self._breakpoints[firstRow] = rem[oldBP];
-                                    break
+                                    break;
                                 }
                             }
                         }
@@ -119,6 +132,22 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                             self._lineIndex[key] = i;
                         }
 
+                    }
+                }
+
+                // Redraw the breakpoints
+                var currentBreakpoints = self._editor.session.getBreakpoints();
+                for (var i = 0; i < currentBreakpoints.length; i++) {
+                    if (currentBreakpoints[i] === "ace_breakpoint") {
+                        // checking whether the current applied breakpoint is valid
+                        if (i in self._validBreakpoints) {
+                            self._breakpoints[i] = true;
+                            self._editor.session.setBreakpoint(i);
+                        } else {
+                            // if the breakpoint is invalid, then remove it
+                            self._breakpoints[i] = undefined;
+                            self._editor.session.clearBreakpoint(i);
+                        }
                     }
                 }
             });
