@@ -16,5 +16,16 @@
 -->
 
 <FindBugsFilter>
-
+    <Match>
+        <Class name="org.wso2.carbon.stream.processor.core.persistence.dto.RDBMSQueryConfiguration"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler"/>
+        <Bug pattern="UW_UNCOND_WAIT, WA_NOT_IN_LOOP"/>
+    </Match>
 </FindBugsFilter>

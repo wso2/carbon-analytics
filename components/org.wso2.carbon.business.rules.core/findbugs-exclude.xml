@@ -16,5 +16,8 @@
 -->
 
 <FindBugsFilter>
-
+    <Match>
+        <Class name="org.wso2.carbon.business.rules.core.datasource.QueryExecutor"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
+    </Match>
 </FindBugsFilter>
