@@ -844,7 +844,6 @@ class TemplateGroupForm extends React.Component {
                 const template = ruleTemplate.templates[t];
                 let templatedElements = TemplatesEditorUtilityFunctions.getRegexMatches(template.content,
                     TemplatesEditorConstants.TEMPLATED_ELEMENT_REGEX);
-                console.log(templatedElements);
                 for (let t = 0; t < templatedElements.length; t++) {
                     if ((this.state.scriptAdditionBins.indexOf(templatedElements[t]) > -1)) {
                         if (Object.prototype.hasOwnProperty.call(ruleTemplate.properties, templatedElements[t])) {

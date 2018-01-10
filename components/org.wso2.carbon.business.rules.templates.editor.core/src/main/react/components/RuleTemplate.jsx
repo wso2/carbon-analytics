@@ -202,7 +202,6 @@ class RuleTemplate extends React.Component {
     detectTemplatedElementsFromTemplates() {
         const state = this.state;
         const properties = [];
-        console.log(this.state.configuration.templates.length)
         for (let i = 0; i < state.configuration.templates.length; i++) {
             const templatedElements = TemplatesEditorUtilityFunctions.getRegexMatches(
                 state.configuration.templates[i].content,
