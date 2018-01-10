@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.264-SNAPSHOT</version>
+        <version>2.0.266-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -104,6 +104,11 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
+        </dependency>
+        <!-- Common query manager -->
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
         </dependency>
     </dependencies>
 
@@ -262,6 +267,10 @@
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.stream.processor.core</symbolicName>
                                     <version>${carbon.analytics.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.database.query.manager</symbolicName>
+                                    <version>${carbon.analytics-common.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

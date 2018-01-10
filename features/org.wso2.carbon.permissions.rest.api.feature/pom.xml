@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.264-SNAPSHOT</version>
+        <version>2.0.266-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -36,57 +36,6 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.permissions.rest.api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.eclipse.osgi</groupId>
-            <artifactId>org.eclipse.osgi.services</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-
-        <!--Dependencies for event simulation begins here-->
-
-        <dependency>
-            <groupId>org.wso2.msf4j</groupId>
-            <artifactId>msf4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.json.wso2</groupId>
-            <artifactId>json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.utils</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
     </dependencies>
 
@@ -160,42 +109,6 @@
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.permissions.rest.api</symbolicName>
                                     <version>${carbon.analytics.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.analytics.permissions</symbolicName>
-                                    <version>${carbon.analytics-common.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>antlr4-runtime</symbolicName>
-                                    <version>${antlr4.runtime.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>com.google.gson</symbolicName>
-                                    <version>${gson.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.stream.processor.core</symbolicName>
-                                    <version>${carbon.analytics.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>json</symbolicName>
-                                    <version>${org.wso2.json.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.commons.csv</symbolicName>
-                                    <version>${apache.commons.csv.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.commons.fileupload</symbolicName>
-                                    <version>${apache.commons.fileupload.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>fabricator_2.10</symbolicName>
-                                    <version>${fabricator.wso2v1.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>generex</symbolicName>
-                                    <version>${generex.wso2v1.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

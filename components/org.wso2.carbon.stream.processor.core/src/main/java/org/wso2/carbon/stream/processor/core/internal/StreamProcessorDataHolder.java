@@ -19,6 +19,7 @@
 package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
@@ -51,6 +52,7 @@ public class StreamProcessorDataHolder {
     private static NodeInfo nodeInfo;
     private static DistributionService distributionService;
     private static RecordTableHandlerManager recordTableHandlerManager;
+    private static PermissionProvider permissionProvider;
     private CarbonRuntime carbonRuntime;
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
@@ -206,5 +208,13 @@ public class StreamProcessorDataHolder {
 
     public void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
+    }
+
+    public static PermissionProvider getPermissionProvider() {
+        return StreamProcessorDataHolder.permissionProvider;
+    }
+
+    public static void setPermissionProvider(PermissionProvider permissionProvider) {
+        StreamProcessorDataHolder.permissionProvider = permissionProvider;
     }
 }

@@ -27,6 +27,8 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.permissions.PermissionManager;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
@@ -400,6 +402,21 @@ public class ServiceComponent {
 
     protected void unregisterMetricsManager(MetricsServiceComponent serviceComponent) {
         //do nothing
+    }
+
+    @Reference(
+            name = "permission-manager",
+            service = PermissionManager.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetPermissionManager"
+    )
+    protected void setPermissionManager(PermissionManager permissionManager) {
+        StreamProcessorDataHolder.setPermissionProvider(permissionManager.getProvider());
+    }
+
+    protected void unsetPermissionManager(PermissionManager permissionManager) {
+        StreamProcessorDataHolder.setPermissionProvider(null);
     }
 
 }

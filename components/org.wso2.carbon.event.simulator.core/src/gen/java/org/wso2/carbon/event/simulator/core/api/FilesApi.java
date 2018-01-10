@@ -13,6 +13,7 @@ import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorMap;
 import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.Request;
 import org.wso2.msf4j.formparam.FileInfo;
 import org.wso2.msf4j.formparam.FormDataParam;
 
@@ -26,6 +27,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
@@ -41,41 +43,44 @@ import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the files API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2017-07-20T09:30:14.336Z")
+        date = "2017-07-20T09:30:14.336Z")
 public class FilesApi implements Microservice {
     private final FilesApiService delegate = FilesApiServiceFactory.getFilesApi();
     private static final Logger log = LoggerFactory.getLogger(FilesApi.class);
+
     @DELETE
     @Path("/{fileName}")
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Update CSV file to simulate event flow", notes = "",
-                                         response = void.class, tags = {"simulator",})
+            response = void.class, tags = {"simulator",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully deleted the csv file",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404,
-                                                message = "No event simulation configuration available under "
-                                                        + "simulation name",
-                                                response = void.class)})
-    public Response deleteFile( @ApiParam(value = "CSV File for name to delete", required = true)
-                                @PathParam("fileName") String fileName) throws NotFoundException {
-        return delegate.deleteFile(fileName);
+                    message = "No event simulation configuration available under "
+                            + "simulation name",
+                    response = void.class)})
+    public Response deleteFile(
+            @Context Request request,
+            @ApiParam(value = "CSV File for name to delete", required = true)
+            @PathParam("fileName") String fileName) throws NotFoundException {
+        return delegate.deleteFile(fileName, request);
     }
 
     @GET
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get CSV file names", notes = "", response = InlineResponse2001.class,
-                                         tags = {"simulator",})
+            tags = {"simulator",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully retrieved file names",
-                                                response = InlineResponse2001.class),
+                    response = InlineResponse2001.class),
             @io.swagger.annotations.ApiResponse(code = 404,
-                                                message = "No event simulation configuration available under "
-                                                        + "simulation name",
-                                                response = InlineResponse2001.class)})
-    public Response getFileNames() throws NotFoundException {
-        return delegate.getFileNames();
+                    message = "No event simulation configuration available under "
+                            + "simulation name",
+                    response = InlineResponse2001.class)})
+    public Response getFileNames(@Context Request request) throws NotFoundException {
+        return delegate.getFileNames(request);
     }
 
     @PUT
@@ -83,39 +88,42 @@ public class FilesApi implements Microservice {
     @Consumes({"multipart/form-data"})
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Update CSV file to simulate event flow", notes = "",
-                                         response = void.class, tags = {"simulator",})
+            response = void.class, tags = {"simulator",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully updated the csv file",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404,
-                                                message = "No event simulation configuration available under "
-                                                        + "simulation name",
-                                                response = void.class)})
-    public Response updateFile(@ApiParam(value = "CSV File for name to update", required = true)
-                                   @PathParam("fileName") String fileName,
-                               @FormDataParam("file") InputStream fileInputStream,
-                               @FormDataParam("file") FileInfo fileDetail)
+                    message = "No event simulation configuration available under "
+                            + "simulation name",
+                    response = void.class)})
+    public Response updateFile(
+            @Context Request request,
+            @ApiParam(value = "CSV File for name to update", required = true)
+            @PathParam("fileName") String fileName,
+            @FormDataParam("file") InputStream fileInputStream,
+            @FormDataParam("file") FileInfo fileDetail)
             throws NotFoundException {
-        return delegate.updateFile(fileName, fileInputStream, fileDetail);
+        return delegate.updateFile(fileName, fileInputStream, fileDetail, request);
     }
 
     @POST
     @Consumes({"multipart/form-data"})
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Upload CSV file to simulate event flow", notes = "",
-                                         response = void.class, tags = {"simulator",})
+            response = void.class, tags = {"simulator",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully uploaded file",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404,
-                                                message = "No event simulation configuration available under simulation name",
-                                                response = void.class)})
+                    message = "No event simulation configuration available under simulation name",
+                    response = void.class)})
     public Response uploadFile(
+            @Context Request request,
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FileInfo fileDetail) throws NotFoundException {
-        return delegate.uploadFile(fileInputStream, fileDetail);
+        return delegate.uploadFile(fileInputStream, fileDetail, request);
     }
 
     /**
@@ -128,7 +136,7 @@ public class FilesApi implements Microservice {
         //set maximum csv file size to 8MB
         EventSimulatorDataHolder.getInstance().setMaximumFileSize(8388608);
         EventSimulatorDataHolder.getInstance().setCsvFileDirectory(Paths.get(Utils.getRuntimePath().toString(),
-            EventSimulatorConstants.DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
         if (log.isDebugEnabled()) {
             log.debug("Event Simulator file service component is activated");
         }
