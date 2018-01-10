@@ -17,6 +17,8 @@
 package org.wso2.carbon.stream.processor.core.api;
 
 
+import org.wso2.msf4j.Request;
+
 import javax.ws.rs.core.Response;
 
 /**
@@ -27,27 +29,27 @@ import javax.ws.rs.core.Response;
         date = "2017-05-31T15:43:24.557Z")
 public abstract class SiddhiAppsApiService {
 
-    public abstract Response siddhiAppsAppNameDelete(String appName, String username) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameDelete(String appName, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameGet(String appName, String username) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameGet(String appName, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameStatusGet(String appName, String username) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameStatusGet(String appName, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameRestorePost(String appName, String revision, String username) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameRestorePost(String appName, String revision, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameBackupPost(String appName, String username) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameBackupPost(String appName, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppsGet(String isActive, String username) throws NotFoundException;
+    public abstract Response siddhiAppsGet(String isActive, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppsPost(String body, String username) throws NotFoundException;
+    public abstract Response siddhiAppsPost(String body, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppsPut(String body, String username) throws NotFoundException;
+    public abstract Response siddhiAppsPut(String body, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppsStatisticsGet(String isActive, String username) throws NotFoundException;
+    public abstract Response siddhiAppsStatisticsGet(String isActive, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppStatsEnable(String appName, boolean statsEnabled, String username) throws
+    public abstract Response siddhiAppStatsEnable(String appName, boolean statsEnabled, Request request) throws
             NotFoundException;
 
-    public abstract Response siddhiAppsStatsEnable(boolean statsEnabled, String username) throws
+    public abstract Response siddhiAppsStatsEnable(boolean statsEnabled, Request request) throws
             NotFoundException;
 }

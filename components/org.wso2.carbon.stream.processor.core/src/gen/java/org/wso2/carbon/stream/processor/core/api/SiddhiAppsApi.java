@@ -77,7 +77,7 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "Siddhi Application", required = true) String body)
             throws NotFoundException {
-        return delegate.siddhiAppsPost(body, getUserName(request));
+        return delegate.siddhiAppsPost(body, request);
     }
 
     @PUT
@@ -99,7 +99,7 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "Siddhi Application", required = true) String body)
             throws NotFoundException {
-        return delegate.siddhiAppsPut(body, getUserName(request));
+        return delegate.siddhiAppsPut(body, request);
     }
 
     @GET
@@ -113,7 +113,7 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "Retrieves only active/inactive Siddhi Applications as specified.", required = false)
             @QueryParam("isActive") String isActive) throws NotFoundException {
-        return delegate.siddhiAppsGet(isActive, getUserName(request));
+        return delegate.siddhiAppsGet(isActive, request);
     }
 
     @DELETE
@@ -135,7 +135,7 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "The name of the Siddhi Application", required = true)
             @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameDelete(appName, getUserName(request));
+        return delegate.siddhiAppsAppNameDelete(appName, request);
     }
 
     @GET
@@ -152,7 +152,7 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "The name of the Siddhi Application", required = true)
             @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameGet(appName, getUserName(request));
+        return delegate.siddhiAppsAppNameGet(appName, request);
     }
 
     @GET
@@ -169,7 +169,7 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "The name of the Siddhi Application.", required = true)
             @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameStatusGet(appName, getUserName(request));
+        return delegate.siddhiAppsAppNameStatusGet(appName, request);
     }
 
     @POST
@@ -189,7 +189,7 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "The name of the Siddhi Application.", required = true)
             @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameBackupPost(appName, getUserName(request));
+        return delegate.siddhiAppsAppNameBackupPost(appName, request);
     }
 
     @POST
@@ -210,7 +210,7 @@ public class SiddhiAppsApi implements Microservice {
             @PathParam("appName") String appName,
             @ApiParam(value = "The revision number of the backup.", required = false)
             @QueryParam("revision") String revision) throws NotFoundException {
-        return delegate.siddhiAppsAppNameRestorePost(appName, revision, getUserName(request));
+        return delegate.siddhiAppsAppNameRestorePost(appName, revision, request);
     }
 
     @GET
@@ -226,7 +226,7 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "Retrieves only active/inactive Siddhi Applications as specified.", required = false)
             @QueryParam("isActive") String isActive) throws NotFoundException {
-        return delegate.siddhiAppsStatisticsGet(isActive, getUserName(request));
+        return delegate.siddhiAppsStatisticsGet(isActive, request);
     }
 
     @PUT
@@ -245,7 +245,7 @@ public class SiddhiAppsApi implements Microservice {
             @ApiParam(value = "The name of the Siddhi Application.", required = true) @PathParam("appName") String appName,
             @ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
             throws NotFoundException {
-        return delegate.siddhiAppStatsEnable(appName, statsEnable.getStatsEnable(), getUserName(request));
+        return delegate.siddhiAppStatsEnable(appName, statsEnable.getStatsEnable(), request);
     }
 
     @PUT
@@ -263,10 +263,6 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
             throws NotFoundException {
-        return delegate.siddhiAppsStatsEnable(statsEnable.getStatsEnable(), getUserName(request));
-    }
-
-    private static String getUserName(Request request) {
-        return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();
+        return delegate.siddhiAppsStatsEnable(statsEnable.getStatsEnable(), request);
     }
 }
