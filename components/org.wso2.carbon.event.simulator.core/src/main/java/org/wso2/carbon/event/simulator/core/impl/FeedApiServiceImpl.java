@@ -628,7 +628,7 @@ public class FeedApiServiceImpl extends FeedApiService {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permission to perform the action")
                     .build();
         }
-        return operateFeedSimulation(simulationName, body);
+        return updateFeedSimulation(simulationName, body);
     }
 
     @Override
