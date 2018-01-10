@@ -16,5 +16,8 @@
 -->
 
 <FindBugsFilter>
-
+    <Match>
+        <Class name="org.wso2.carbon.business.rules.templates.editor.core.internal.TemplatesEditorMicroservice"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
 </FindBugsFilter>
