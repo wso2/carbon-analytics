@@ -125,6 +125,7 @@
                             </arguments>
                         </configuration>
                     </execution>
+
                     <!-- 'npm run clean' which is run in clean lifecycle needs 'rimraf' node module.
                      Make sure it is installed  -->
                     <execution>
