@@ -66,7 +66,7 @@ class Header extends React.Component {
                     &nbsp;
                     &nbsp;
                     <Typography type="subheading" color="inherit" style={{flex: 1}}>
-                        Business Rules Templates Editor
+                        Business Rules Template Editor
                     </Typography>
                     <Tooltip title="New">
                         <IconButton color="contrast" onClick={() => this.props.onNewClick()}>

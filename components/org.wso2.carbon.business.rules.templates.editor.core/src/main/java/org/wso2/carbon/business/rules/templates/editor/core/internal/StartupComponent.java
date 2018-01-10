@@ -63,7 +63,7 @@ public class StartupComponent {
                     logger.error("Error in finding address for provided hostname " + hostname + "." +
                             e.getMessage(), e);
                 }
-                String startingURL = entry.getValue().getScheme() + "://" + hostname + ":" + entry.getValue()
+                String startingURL = entry.getValue().getScheme() + "://localhost:" + entry.getValue()
                         .getPort() + "/template-editor";
                 logger.info("Template Editor Started on : " + startingURL);
             }
