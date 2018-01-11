@@ -1203,7 +1203,7 @@ public class AnalyticsResource extends AbstractResource {
                     return Response.ok(tableName).build();
                 }
             }
-            return Response.ok().build();
+			return Response.status(Response.Status.NOT_FOUND).entity("The table '" + persistName + "' was not found.").build();
         } catch (UserStoreException e) {
             throw new AnalyticsException("Error while getting tenant ID for user: " + username + "[" + e.getMessage() + "]", e);
         }
