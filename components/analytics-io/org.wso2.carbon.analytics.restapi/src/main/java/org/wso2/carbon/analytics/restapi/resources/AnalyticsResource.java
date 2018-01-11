@@ -1176,16 +1176,16 @@ public class AnalyticsResource extends AbstractResource {
 		}
 	}
 
-	/**
-	 * Gets the actual table name from the database persist name for a table
-	 *
-	 * @param persistName the persisted table name for which the actual name needs to be inferred
-	 * @return HTTP response containing the actual table name
-	 * @throws AnalyticsException
-	 */
-	@GET
-	@Produces({MediaType.TEXT_PLAIN})
-	@Path("tables/{persistName}/actualName")
+    /**
+     * Gets the actual table name from the database persist name for a table
+     *
+     * @param persistName the persisted table name for which the actual name needs to be inferred
+     * @return HTTP response containing the actual table name
+     * @throws AnalyticsException
+     */
+    @GET
+    @Produces({MediaType.TEXT_PLAIN})
+    @Path("tables/{persistName}/actualName")
     public Response getTableActualName(@PathParam("persistName") String persistName,
                                        @HeaderParam(AUTHORIZATION_HEADER) String authHeader)
             throws AnalyticsException {
@@ -1193,8 +1193,8 @@ public class AnalyticsResource extends AbstractResource {
             logger.debug("Invoking getTableActualName for table : " + persistName);
         }
         String username = authenticate(authHeader);
-		String tenantDomain = MultitenantUtils.getTenantDomain(username);
-		List<String> tables = Utils.getAnalyticsDataAPIs().listTables(username);
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        List<String> tables = Utils.getAnalyticsDataAPIs().listTables(username);
         try {
             int tenantId = Utils.getRealmService().getTenantManager().getTenantId(tenantDomain);
             for (String tableName : tables) {
@@ -1203,7 +1203,7 @@ public class AnalyticsResource extends AbstractResource {
                     return Response.ok(tableName).build();
                 }
             }
-			return Response.status(Response.Status.NOT_FOUND).entity("The table '" + persistName + "' was not found.").build();
+            return Response.status(Response.Status.NOT_FOUND).entity("The table '" + persistName + "' was not found.").build();
         } catch (UserStoreException e) {
             throw new AnalyticsException("Error while getting tenant ID for user: " + username + "[" + e.getMessage() + "]", e);
         }
