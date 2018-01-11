@@ -42,6 +42,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         self.SiddhiAppStatus = "Siddhi App Status : ";
         self.startAndSendLabel = "Start and Send";
         self.sendLabel = "Send";
+        var consoleListManager = self.app.outputController;
+        self.console = consoleListManager.getGlobalConsole();
 
         // add methods to validate int/long and double/float
         $.validator.addMethod("validateIntOrLong", function (value, element) {
@@ -82,44 +84,58 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
             $streamNameSelect.empty();
             $timestamp.val('');
-            $siddhiAppMode.html(self.SiddhiAppStatus + self.siddhiAppDetailsMap[siddhiAppName]);
-            self.removeSingleEventAttributeRules(uuid);
-            $attributes.empty();
-            $runDebugButtons.empty();
-            if (self.siddhiAppDetailsMap[siddhiAppName] === self.FAULTY) {
-                $streamNameSelect.prop('disabled', true);
-                $timestamp.prop('disabled', true);
-                $send.prop('disabled', true);
-            } else {
-                $streamNameSelect.prop('disabled', false);
-                $timestamp.prop('disabled', false);
-                $send.prop('disabled', false);
-                Simulator.retrieveStreamNames(
-                    siddhiAppName,
-                    function (data) {
-                        self.refreshStreamList($streamNameSelect, data);
-                        var firstOptionVal = $streamNameSelect.children().first().val();
-                        $streamNameSelect.val(firstOptionVal).change();
-                    },
-                    function (data) {
-                        log.info(data);
-                    });
-                $nitificationBox.removeClass("hidden");
-                var $sendButton = $singleEventForm.find('button[name="send"]');
-                if (self.siddhiAppDetailsMap[siddhiAppName] === self.STOP) {
-                    $nitificationBox.removeClass("alert-success");
-                    $nitificationBox.addClass("alert-warning");
-                    $runDebugButtons.html(self.createRunDebugButtons());
-                    $sendButton.text(self.startAndSendLabel);
-                    $form
-                        .find('label[data-name="siddhi-app-start-msg"]')
-                        .html('starting mode for siddhi app');
-                } else {
-                    $nitificationBox.addClass("alert-success");
-                    $nitificationBox.removeClass("alert-warning");
-                    $sendButton.text("Send");
-                }
-            }
+
+            // update the siddhi app status
+            Simulator.retrieveSiddhiAppNames(
+                function (data) {
+                    self.createSiddhiAppMap(data);
+                    $siddhiAppMode.html(self.SiddhiAppStatus + self.siddhiAppDetailsMap[siddhiAppName]);
+                    self.removeSingleEventAttributeRules(uuid);
+                    $attributes.empty();
+                    $runDebugButtons.empty();
+                    if (self.siddhiAppDetailsMap[siddhiAppName] === self.FAULTY) {
+                        $streamNameSelect.prop('disabled', true);
+                        $timestamp.prop('disabled', true);
+                        $send.prop('disabled', true);
+                    } else {
+                        $streamNameSelect.prop('disabled', false);
+                        $timestamp.prop('disabled', false);
+                        $send.prop('disabled', false);
+                        Simulator.retrieveStreamNames(
+                            siddhiAppName,
+                            function (data) {
+                                self.refreshStreamList($streamNameSelect, data);
+                                var firstOptionVal = $streamNameSelect.children().first().val();
+                                $streamNameSelect.val(firstOptionVal).change();
+                            },
+                            function (data) {
+                                log.info(data);
+                            });
+                        $nitificationBox.removeClass("hidden");
+                        var $sendButton = $singleEventForm.find('button[name="send"]');
+                        if (self.siddhiAppDetailsMap[siddhiAppName] === self.STOP) {
+                            $nitificationBox.removeClass("alert-success");
+                            $nitificationBox.addClass("alert-warning");
+                            $runDebugButtons.html(self.createRunDebugButtons());
+                            $sendButton.text(self.startAndSendLabel);
+                            $form
+                                .find('label[data-name="siddhi-app-start-msg"]')
+                                .html('starting mode for siddhi app');
+                        } else {
+                            $nitificationBox.addClass("alert-success");
+                            $nitificationBox.removeClass("alert-warning");
+                            $sendButton.text("Send");
+                        }
+                    }
+                },
+                function (data) {
+                    var message = {
+                        "type" : "ERROR",
+                        "message": data,
+                    };
+                    self.console.println(message);
+                },
+            );
         });
 
         // refresh attributes list when a stream is selected
