@@ -27,6 +27,7 @@ import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle,} f
 import Paper from 'material-ui/Paper';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
+import {CircularProgress} from 'material-ui/Progress';
 // App Components
 import BusinessRule from "./BusinessRule";
 import Header from "./common/Header";
@@ -77,7 +78,7 @@ class BusinessRulesManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            permissions: 1, // 0: manager, 1: viewer
+            permissions: -1, // 0: manager, 1: viewer, -1: waiting for permission
             businessRules: [], // Available Business Rules
 
             // To show the snackbar, after deployment / save
@@ -207,83 +208,97 @@ class BusinessRulesManager extends React.Component {
             isNoneAvailable = true
         }
 
-        if (!isNoneAvailable) {
-            // Business rules are available
-            // Show available business rules
-            let businessRules = this.state.businessRules.map((businessRule) =>
-                <BusinessRule
-                    key={businessRule[0].uuid}
-                    name={businessRule[0].name}
-                    uuid={businessRule[0].uuid}
-                    type={businessRule[0].type}
-                    status={businessRule[1]}
-                    permissions={this.state.permissions}
-                    redeploy={(uuid) => this.redeployBusinessRule(uuid)}
-                    showDeleteDialog={(uuid) => this.displayDeleteDialog(uuid)}
-                />
-            )
+        if (this.state.permissions !== -1) {
+            if (!isNoneAvailable) {
+                // Business rules are available
+                // Show available business rules
+                let businessRules = this.state.businessRules.map((businessRule) =>
+                    <BusinessRule
+                        key={businessRule[0].uuid}
+                        name={businessRule[0].name}
+                        uuid={businessRule[0].uuid}
+                        type={businessRule[0].type}
+                        status={businessRule[1]}
+                        permissions={this.state.permissions}
+                        redeploy={(uuid) => this.redeployBusinessRule(uuid)}
+                        showDeleteDialog={(uuid) => this.displayDeleteDialog(uuid)}
+                    />
+                )
 
-            return (
-                <div style={styles.container}>
-                    {(this.state.permissions === 0) ?
-                        (<Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
-                            <Button fab color="primary" style={{float: 'right'}} aria-label="Add">
-                                <AddIcon/>
-                            </Button>
-                        </Link>) :
-                        (null)}
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Business Rule</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {businessRules}
-                        </TableBody>
-                    </Table>
-                </div>
-            )
-        } else {
-            if (this.state.permissions === 0) {
-                // Manager
-                // Show message for creation
                 return (
-                    <div>
-                        <Paper style={styles.paper}>
-                            <Typography type="title">
-                                No business rules found
-                            </Typography>
-                            <Typography type="subheading">
-                                Get started by creating one
-                            </Typography>
-                            <br/>
-                            <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
-                                <Button raised color="primary">
-                                    Create
+                    <div style={styles.container}>
+                        {(this.state.permissions === 0) ?
+                            (<Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
+                                <Button fab color="primary" style={{float: 'right'}} aria-label="Add">
+                                    <AddIcon/>
                                 </Button>
-                            </Link>
-                        </Paper>
+                            </Link>) :
+                            (null)}
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Business Rule</TableCell>
+                                    <TableCell>Status</TableCell>
+                                    <TableCell>Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {businessRules}
+                            </TableBody>
+                        </Table>
                     </div>
-                );
+                )
             } else {
-                // Viewer
-                // Deny creation
-                return (
-                    <div>
-                        <Paper style={styles.paper}>
-                            <Typography type="title">
-                                Access Denied
-                            </Typography>
-                            <Typography type="subheading">
-                                Please login with valid permissions
-                            </Typography>
-                        </Paper>
-                    </div>
-                );
+                if (this.state.permissions === 0) {
+                    // Manager
+                    // Show message for creation
+                    return (
+                        <div>
+                            <Paper style={styles.paper}>
+                                <Typography type="title">
+                                    No business rules found
+                                </Typography>
+                                <Typography type="subheading">
+                                    Get started by creating one
+                                </Typography>
+                                <br/>
+                                <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
+                                    <Button raised color="primary">
+                                        Create
+                                    </Button>
+                                </Link>
+                            </Paper>
+                        </div>
+                    );
+                } else {
+                    // Viewer
+                    // Deny creation
+                    return (
+                        <div>
+                            <Paper style={styles.paper}>
+                                <Typography type="title">
+                                    Access Denied
+                                </Typography>
+                                <Typography type="subheading">
+                                    Please login with valid permissions
+                                </Typography>
+                            </Paper>
+                        </div>
+                    );
+                }
             }
+        } else {
+            // Show Loading progress
+            return (
+                <div>
+                    <Paper style={styles.paper}>
+                        <CircularProgress size={50}/>
+                        <Typography type="subheading">
+                            Please wait
+                        </Typography>
+                    </Paper>
+                </div>
+            );
         }
     }
 
