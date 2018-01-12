@@ -1199,7 +1199,7 @@ public class AnalyticsResource extends AbstractResource {
             int tenantId = Utils.getRealmService().getTenantManager().getTenantId(tenantDomain);
             for (String tableName : tables) {
                 String candidate = GenericUtils.generateTableUUID(tenantId, tableName);
-                if (candidate.equals(persistName)) {
+                if (candidate.equalsIgnoreCase(persistName)) {
                     return Response.ok(tableName).build();
                 }
             }
