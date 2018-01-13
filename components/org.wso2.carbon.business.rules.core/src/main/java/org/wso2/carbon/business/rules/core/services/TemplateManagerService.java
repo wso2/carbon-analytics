@@ -96,6 +96,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             // Save business rule definition with errors
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, status, status);
+            insertRuleTemplate(businessRuleFromTemplate.getRuleTemplateUUID());
             log.info(String.format("Business rule %s saved into the database.", businessRuleFromTemplate.getName()));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
@@ -133,7 +134,6 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
-            insertRuleTemplate(businessRuleFromTemplate.getRuleTemplateUUID());
             updateDeploymentStatus(businessRuleUUID, status);
         }
 
@@ -157,6 +157,8 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             // Save business rule definition with errors
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch, status, status);
+            insertRuleTemplate(businessRuleFromScratch.getInputRuleTemplateUUID());
+            insertRuleTemplate(businessRuleFromScratch.getOutputRuleTemplateUUID());
             log.info(String.format("Business rule %s saved into the database.", businessRuleFromScratch.getName()));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" + businessRuleFromScratch.getName() +
@@ -199,8 +201,6 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
-            insertRuleTemplate(businessRuleFromScratch.getInputRuleTemplateUUID());
-            insertRuleTemplate(businessRuleFromScratch.getOutputRuleTemplateUUID());
             updateDeploymentStatus(businessRuleUUID, status);
         }
         return status;
@@ -465,7 +465,6 @@ public class TemplateManagerService implements BusinessRulesService {
     private void deployBusinessRule(BusinessRule businessRule, String nodeURL, Map<String, Artifact> derivedArtifacts)
             throws SiddhiAppsApiHelperException, TemplateInstanceCountViolationException,
             TemplateManagerServiceException {
-        resolveInstanceCount(businessRule);
         for (Map.Entry template : derivedArtifacts.entrySet()) {
             deployArtifact(nodeURL, template.getKey().toString(), (Artifact) template.getValue());
         }
@@ -475,7 +474,6 @@ public class TemplateManagerService implements BusinessRulesService {
                                     BusinessRuleFromScratch
             businessRuleFromScratch) throws SiddhiAppsApiHelperException, TemplateInstanceCountViolationException,
             TemplateManagerServiceException {
-        resolveInstanceCount(businessRule);
         deploySiddhiApp(nodeURL, businessRuleFromScratch.getUuid(), deployableSiddhiApp);
     }
 
@@ -483,15 +481,12 @@ public class TemplateManagerService implements BusinessRulesService {
             throws RuleTemplateScriptException, TemplateManagerServiceException,
             TemplateInstanceCountViolationException {
         int status = TemplateManagerConstants.ERROR;
-        int currentDeploymentStatus;
         BusinessRule businessRule;
         try {
             businessRule = queryExecutor.retrieveBusinessRule(businessRuleUUID);
-            currentDeploymentStatus = queryExecutor.executeRetrieveDeploymentStatus(businessRuleUUID);
             if (businessRule == null) {
                 return status;
             }
-            resolveInstanceCount(businessRule);
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Failed to get business rule.", e);
         }
@@ -537,10 +532,6 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
-            if (currentDeploymentStatus == TemplateManagerConstants.SAVED) {
-                insertRuleTemplate(((BusinessRuleFromScratch) businessRule).getOutputRuleTemplateUUID());
-                insertRuleTemplate(((BusinessRuleFromScratch) businessRule).getInputRuleTemplateUUID());
-            }
             updateDeploymentStatus(businessRuleUUID, status);
         } else if (businessRule instanceof BusinessRuleFromTemplate) {
             BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
@@ -576,9 +567,6 @@ public class TemplateManagerService implements BusinessRulesService {
                 status = TemplateManagerConstants.DEPLOYMENT_FAILURE;
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
-            }
-            if (currentDeploymentStatus == TemplateManagerConstants.SAVED) {
-                insertRuleTemplate(((BusinessRuleFromTemplate) businessRule).getRuleTemplateUUID());
             }
             updateDeploymentStatus(businessRuleUUID, status);
         }
@@ -1109,8 +1097,10 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     private boolean saveBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromTemplate businessRuleFromTemplate,
                                                int deploymentStatus, int artifactCount)
-            throws BusinessRulesDatasourceException, TemplateManagerServiceException {
+            throws BusinessRulesDatasourceException, TemplateManagerServiceException,
+            TemplateInstanceCountViolationException {
         byte[] businessRule;
+        resolveInstanceCount(businessRuleFromTemplate);
         try {
             businessRule = TemplateManagerHelper.businessRuleFromTemplateToJson(businessRuleFromTemplate)
                     .getBytes("UTF-8");
@@ -1129,8 +1119,10 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     private boolean saveBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromScratch businessRuleFromScratch,
                                                int deploymentStatus, int artifactCount)
-            throws BusinessRulesDatasourceException, TemplateManagerServiceException {
+            throws BusinessRulesDatasourceException, TemplateManagerServiceException,
+            TemplateInstanceCountViolationException {
         byte[] businessRule;
+        resolveInstanceCount(businessRuleFromScratch);
         try {
             businessRule = TemplateManagerHelper.businessRuleFromScratchToJson(businessRuleFromScratch)
                     .getBytes("UTF-8");
@@ -1294,39 +1286,28 @@ public class TemplateManagerService implements BusinessRulesService {
     private void resolveInstanceCount(BusinessRule businessRule)
             throws TemplateManagerServiceException, TemplateInstanceCountViolationException {
         int count;
-        int deploymentStatus = 0;
-        try {
-            deploymentStatus = queryExecutor.executeRetrieveDeploymentStatus(businessRule.getUuid());
-        } catch (BusinessRulesDatasourceException e) {
-            throw new TemplateManagerServiceException("Failed to retrieve the status of the business rule '" +
-                    businessRule.getUuid() + "'");
-        }
-        if ((deploymentStatus != TemplateManagerConstants.DEPLOYED) &&
-                (deploymentStatus != TemplateManagerConstants.PARTIALLY_DEPLOYED)) {
-            if (businessRule instanceof BusinessRuleFromTemplate) {
-                BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
-                String instanceLimit = getRuleTemplate(businessRuleFromTemplate).getInstanceCount();
-                count = getInstanceCount(businessRuleFromTemplate.getRuleTemplateUUID());
+        if (businessRule instanceof BusinessRuleFromTemplate) {
+            BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
+            String instanceLimit = getRuleTemplate(businessRuleFromTemplate).getInstanceCount();
+            count = getInstanceCount(businessRuleFromTemplate.getRuleTemplateUUID());
+            if ("one".equalsIgnoreCase(instanceLimit) && count >= 1) {
+                throw new TemplateInstanceCountViolationException("Rule Template '" +
+                        ((BusinessRuleFromTemplate) businessRule).getRuleTemplateUUID() + "' can be instantiated " +
+                        "only once and has already been instantiated.");
+            }
+        } else if (businessRule instanceof BusinessRuleFromScratch) {
+            BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
+            List<RuleTemplate> ruleTemplates =
+                    (List<RuleTemplate>) getInputOutputRuleTemplates(businessRuleFromScratch);
+            String instanceLimit;
+            for (RuleTemplate ruleTemplate : ruleTemplates) {
+                instanceLimit = (ruleTemplate.getInstanceCount());
+                count = getInstanceCount(ruleTemplate.getUuid());
                 if ("one".equalsIgnoreCase(instanceLimit) && count >= 1) {
                     throw new TemplateInstanceCountViolationException("Rule Template '" +
-                            ((BusinessRuleFromTemplate) businessRule).getRuleTemplateUUID() + "' can be instantiated " +
-                            "only once and have been already instantiated.");
+                            (ruleTemplate.getUuid() + "' can be instantiated " +
+                                    "only once and has already been instantiated."));
                 }
-            } else if (businessRule instanceof BusinessRuleFromScratch) {
-                BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
-                List<RuleTemplate> ruleTemplates =
-                        (List<RuleTemplate>) getInputOutputRuleTemplates(businessRuleFromScratch);
-                String instanceLimit;
-                for (RuleTemplate ruleTemplate : ruleTemplates) {
-                    instanceLimit = (ruleTemplate.getInstanceCount());
-                    count = getInstanceCount(ruleTemplate.getUuid());
-                    if ("one".equalsIgnoreCase(instanceLimit) && count >= 1) {
-                        throw new TemplateInstanceCountViolationException("Rule Template '" +
-                                (ruleTemplate.getUuid() + "' can be instantiated " +
-                                        "only once and have been already instantiated."));
-                    }
-                }
-
             }
         }
     }
