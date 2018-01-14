@@ -2264,17 +2264,35 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
     self.removeUnavailableSimulationsFromUi = function (simulations) {
         var activeSimulations = simulations.activeSimulations;
         var simulationName, i;
-        for (i = 0; i < activeSimulations.length; i++) {
-            simulationName = activeSimulations[i].properties.simulationName;
-            if (!(simulationName in self.activeSimulationList)) {
-                self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+        for (var simulationName in self.activeSimulationList) {
+            if( self.activeSimulationList.hasOwnProperty(simulationName) ) {
+                var foundSimulaion = false;
+                for (i = 0; i < activeSimulations.length; i++) {
+                    if (activeSimulations[i].properties.simulationName == simulationName ) {
+                        foundSimulaion = true;
+                    }
+                }
+                if (foundSimulaion == false) {
+                    self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+                    delete self.activeSimulationList[simulationName];
+                }
             }
         }
+
         var inActiveSimulations = simulations.inActiveSimulations;
-        for (i = 0; i < inActiveSimulations.length; i++) {
-            simulationName = inActiveSimulations[i].properties.simulationName;
-            if (!(simulationName in self.inactiveSimulationList)) {
-                self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+
+        for (var simulationName in self.inactiveSimulationList) {
+            if( self.inactiveSimulationList.hasOwnProperty(simulationName) ) {
+                var foundSimulaion = false;
+                for (i = 0; i < inActiveSimulations.length; i++) {
+                    if (inActiveSimulations[i].properties.simulationName == simulationName ) {
+                        foundSimulaion = true;
+                    }
+                }
+                if (foundSimulaion == false) {
+                    self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+                    delete self.inactiveSimulationList[simulationName];
+                }
             }
         }
     };
