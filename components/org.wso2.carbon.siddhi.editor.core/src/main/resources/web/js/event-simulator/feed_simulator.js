@@ -2272,7 +2272,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         foundSimulaion = true;
                     }
                 }
-                if (foundSimulaion == false) {
+                if (!foundSimulaion) {
                     self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
                     delete self.activeSimulationList[simulationName];
                 }
@@ -2289,7 +2289,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         foundSimulaion = true;
                     }
                 }
-                if (foundSimulaion == false) {
+                if (!foundSimulaion) {
                     self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
                     delete self.inactiveSimulationList[simulationName];
                 }
