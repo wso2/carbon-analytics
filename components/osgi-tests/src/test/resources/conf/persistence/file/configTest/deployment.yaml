@@ -245,7 +245,7 @@ wso2.artifact.deployment:
   # HA Configuration
 state.persistence:
   enabled: true
-  class: org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore
+  persistenceStore: org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore
   config:
 
   # Secure Vault Configuration

@@ -50,6 +50,7 @@ import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
+import org.wso2.carbon.stream.processor.core.persistence.beans.PersistenceConfigurations;
 import org.wso2.carbon.stream.processor.core.persistence.exception.PersistenceStoreConfigurationException;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -102,47 +103,33 @@ public class ServiceComponent {
         FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
         siddhiManager.setConfigManager(fileConfigManager);
         PersistenceStore persistenceStore;
-        Map persistenceConfig = (Map) configProvider.getConfigurationObject(PersistenceConstants.STATE_PERSISTENCE_NS);
+        PersistenceConfigurations persistenceConfigurations = configProvider.getConfigurationObject
+                (PersistenceConfigurations.class);
 
-        if (persistenceConfig != null &&
-                (boolean) persistenceConfig.get(PersistenceConstants.STATE_PERSISTENCE_ENABLED)) {
-            String persistenceStoreClassName = (String) persistenceConfig.
-                    get(PersistenceConstants.STATE_PERSISTENCE_CLASS);
-
-            if (persistenceStoreClassName != null) {
-                try {
-                    persistenceStore = (PersistenceStore) Class.forName(persistenceStoreClassName).newInstance();
-                    if (log.isDebugEnabled()) {
-                        log.debug(persistenceStoreClassName + " chosen as persistence store");
-                    }
-                } catch (ClassNotFoundException e) {
-                    throw new PersistenceStoreConfigurationException("Persistence Store class with name "
-                            + persistenceStoreClassName + " is invalid. ", e);
-                }
-            } else {
-                persistenceStoreClassName = "org.wso2.carbon.stream.processor.core." +
-                        "persistence.FileSystemPersistenceStore";
-                persistenceStore = new FileSystemPersistenceStore();
-                log.warn("No persistence store class set. FileSystemPersistenceStore used as default store");
-            }
-
-            persistenceStore.setProperties(persistenceConfig);
-            siddhiManager.setPersistenceStore(persistenceStore);
-            Object persistenceInterval = persistenceConfig.get(PersistenceConstants.STATE_PERSISTENCE_INTERVAL_IN_MIN);
-            if (persistenceInterval == null || !(persistenceInterval instanceof Integer)) {
-                persistenceInterval = 1;
+        if (persistenceConfigurations != null && persistenceConfigurations.isEnabled()) {
+            String persistenceStoreClassName = persistenceConfigurations.getPersistenceStore();
+            try {
+                persistenceStore = (PersistenceStore) Class.forName(persistenceStoreClassName).newInstance();
                 if (log.isDebugEnabled()) {
-                    log.warn("Periodic persistence interval not set. Default value of one minute is used");
+                    log.debug(persistenceStoreClassName + " chosen as persistence store");
                 }
+            } catch (ClassNotFoundException e) {
+                throw new PersistenceStoreConfigurationException("Persistence Store class with name "
+                        + persistenceStoreClassName + " is invalid. ", e);
             }
+
+            persistenceStore.setProperties((Map) configProvider.getConfigurationObject(PersistenceConstants.
+                    STATE_PERSISTENCE_NS));
+            siddhiManager.setPersistenceStore(persistenceStore);
+            int persistenceInterval = persistenceConfigurations.getIntervalInMin();
             scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
-            if ((int) persistenceInterval > 0) {
+            if (persistenceInterval > 0) {
                 scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(new PersistenceManager(),
-                        (int) persistenceInterval, (int) persistenceInterval, TimeUnit.MINUTES);
+                        persistenceInterval, persistenceInterval, TimeUnit.MINUTES);
             }
             StreamProcessorDataHolder.setIsPersistenceEnabled(true);
-            log.info("Periodic state persistence started with an interval of " + persistenceInterval.toString() +
+            log.info("Periodic state persistence started with an interval of " + String.valueOf(persistenceInterval) +
                     " using " + persistenceStoreClassName);
         } else {
             if (log.isDebugEnabled()) {

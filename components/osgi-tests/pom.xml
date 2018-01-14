@@ -967,6 +967,7 @@
                                 <DATABASE_PASSWORD>root</DATABASE_PASSWORD>
                                 <PORT>32904</PORT>
                                 <DOCKER_HOST_IP>${docker.container.sp-oracle.ip}</DOCKER_HOST_IP>
+                                <JAVA_OPTS>${jcoverage.command}</JAVA_OPTS>
                             </environmentVariables>
                             <argLine>-Duser.timezone=GMT</argLine>
                             <suiteXmlFiles>

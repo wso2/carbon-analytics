@@ -32,6 +32,7 @@ import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
 import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -55,6 +56,7 @@ public class DBPersistenceStore implements PersistenceStore {
     private String tableName;
     private int numberOfRevisionsToKeep;
     private String databaseType;
+    private String databaseVersion;
 
     @Override
     public void save(String siddhiAppName, String revision, byte[] snapshot) {
@@ -140,7 +142,12 @@ public class DBPersistenceStore implements PersistenceStore {
             datasource = (HikariDataSource) StreamProcessorDataHolder.getDataSourceService().
                     getDataSource(datasourceName);
             try (Connection connection = datasource.getConnection()) {
-                databaseType = connection.getMetaData().getDatabaseProductName().toLowerCase();
+                DatabaseMetaData metaData = connection.getMetaData();
+                databaseType = metaData.getDatabaseProductName().toLowerCase();
+                databaseVersion = metaData.getDatabaseProductVersion();
+                if (log.isDebugEnabled()) {
+                    log.debug("Datasource connected to database: " + databaseType + " " + databaseVersion);
+                }
             }
         } catch (DataSourceException e) {
             throw new DatasourceConfigurationException("Datasource " + datasourceName +
@@ -226,7 +233,7 @@ public class DBPersistenceStore implements PersistenceStore {
     private void initializeDatabaseExecutionInfo() {
         executionInfo = new ExecutionInfo();
         RDBMSQueryConfigurationEntry databaseQueryEntries =
-                RDBMSConfiguration.getInstance().getDatabaseQueryEntries(databaseType, tableName);
+                RDBMSConfiguration.getInstance().getDatabaseQueryEntries(databaseType, databaseVersion, tableName);
 
         if (databaseQueryEntries == null) {
             throw new DatabaseUnsupportedException("The configured database type " +
