@@ -20,16 +20,22 @@ package org.wso2.carbon.stream.processor.core.persistence.util;
 
 public class PersistenceConstants {
 
-    public static final String RDBMS_QUERY_CONFIG_FILE = "rdbms-table-config.xml";
+    private PersistenceConstants(){}
+
     public static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";
     public static final String STATE_PERSISTENCE_NS = "state.persistence";
-    public static final String STATE_PERSISTENCE_ENABLED = "enabled";
-    public static final String STATE_PERSISTENCE_INTERVAL_IN_MIN = "intervalInMin";
     public static final String STATE_PERSISTENCE_REVISIONS_TO_KEEP = "revisionsToKeep";
-    public static final String STATE_PERSISTENCE_CLASS = "class";
     public static final String STATE_PERSISTENCE_CONFIGS = "config";
     public static final String DEFAULT_FILE_PERSISTENCE_FOLDER = "siddhi-app-persistence";
-    public static final String DEFAULT_DB_PERSISTENCE_DATASOURCE = "WSO2_ANALYTICS_DB";
+    public static final String DEFAULT_DB_PERSISTENCE_DATASOURCE = "WSO2_CARBON_DB";
     public static final String DEFAULT_DB_PERSISTENCE_TABLE_NAME = "PERSISTENCE_TABLE";
+
+    public static final String CREATE_TABLE = "CREATE_TABLE";
+    public static final String INSERT_INTO_TABLE = "INSERT_INTO_TABLE";
+    public static final String IS_TABLE_EXISTS = "IS_TABLE_EXISTS";
+    public static final String SELECT_SNAPSHOT = "SELECT_SNAPSHOT";
+    public static final String SELECT_LAST_REVISION = "SELECT_LAST_REVISION";
+    public static final String DELETE_ROW_FROM_TABLE = "DELETE_ROW_FROM_TABLE";
+    public static final String COUNT_NUMBER_REVISIONS = "COUNT_NUMBER_REVISIONS";
 
 }

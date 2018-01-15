@@ -230,7 +230,7 @@ state.persistence:
   enabled: true
   intervalInMin: 1
   revisionsToKeep: 2
-  class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
+  persistenceStore: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
   config:
     datasource: WSO2_ANALYTICS_DB
     table: PERSISTENCE_TABLE

@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Class that maps individual database entries from resources/rdbms-table-config.xml
  */
-@XmlRootElement(name = "database")
 public class RDBMSQueryConfigurationEntry {
     private String databaseName;
     private String createTableQuery;
@@ -36,7 +35,6 @@ public class RDBMSQueryConfigurationEntry {
     private String deleteQuery;
     private String countQuery;
 
-    @XmlAttribute(name = "name", required = true)
     public String getDatabaseName() {
         return databaseName;
     }
@@ -45,7 +43,6 @@ public class RDBMSQueryConfigurationEntry {
         this.databaseName = databaseName;
     }
 
-    @XmlElement(required = true)
     public String getCreateTableQuery() {
         return createTableQuery;
     }
@@ -54,7 +51,6 @@ public class RDBMSQueryConfigurationEntry {
         this.createTableQuery = createTableQuery;
     }
 
-    @XmlElement(required = true)
     public String getInsertTableQuery() {
         return insertTableQuery;
     }
@@ -63,7 +59,6 @@ public class RDBMSQueryConfigurationEntry {
         this.insertTableQuery = insertTableQuery;
     }
 
-    @XmlElement(required = true)
     public String getIsTableExistQuery() {
         return isTableExistQuery;
     }
@@ -72,7 +67,6 @@ public class RDBMSQueryConfigurationEntry {
         this.isTableExistQuery = isTableExistQuery;
     }
 
-    @XmlElement(required = true)
     public String getSelectTableQuery() {
         return selectTableQuery;
     }
@@ -81,7 +75,6 @@ public class RDBMSQueryConfigurationEntry {
         this.selectTableQuery = selectTableQuery;
     }
 
-    @XmlElement(required = true)
     public String getSelectLastQuery() {
         return selectLastQuery;
     }
@@ -90,7 +83,6 @@ public class RDBMSQueryConfigurationEntry {
         this.selectLastQuery = selectLastQuery;
     }
 
-    @XmlElement(required = true)
     public String getDeleteQuery() {
         return deleteQuery;
     }
@@ -99,7 +91,6 @@ public class RDBMSQueryConfigurationEntry {
         this.deleteQuery = deleteQuery;
     }
 
-    @XmlElement(required = true)
     public String getCountQuery() {
         return countQuery;
     }
