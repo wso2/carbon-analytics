@@ -140,9 +140,7 @@ public class CSVReader {
                             timestamp = Long.parseLong(attributes.get(timestampPosition).replaceAll("(^\\h*)|(\\h*$)" +
                                     "",""));
                             if (timestamp >= startTimestamp) {
-                                if (endTimestamp == -1 || timestamp <= endTimestamp) {
-                                    attributes.remove(timestampPosition);
-                                } else {
+                                if (endTimestamp != -1 && timestamp > endTimestamp) {
                                     continue;
                                 }
                             } else {
