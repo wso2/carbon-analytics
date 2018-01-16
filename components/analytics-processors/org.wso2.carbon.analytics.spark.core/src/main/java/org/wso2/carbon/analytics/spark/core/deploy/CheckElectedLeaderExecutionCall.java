@@ -37,7 +37,9 @@ public class CheckElectedLeaderExecutionCall implements Callable<Boolean>, Seria
     @Override
     public Boolean call() throws Exception {
         boolean result = ServiceHolder.getAnalyticskExecutor().isElectedLeader();
-        log.info("Check Elected Leader Request: " + result);
+        if (log.isDebugEnabled()) {
+            log.debug("Check Elected Leader Request: " + result);
+        }
         return result;
     }
 }

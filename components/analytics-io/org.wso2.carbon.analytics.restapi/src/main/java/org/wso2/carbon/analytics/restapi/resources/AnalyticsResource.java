@@ -1198,11 +1198,15 @@ public class AnalyticsResource extends AbstractResource {
         try {
             int tenantId = Utils.getRealmService().getTenantManager().getTenantId(tenantDomain);
             for (String tableName : tables) {
-                String candidate = GenericUtils.generateTableUUID(tenantId, tableName);
-                if (candidate.equalsIgnoreCase(persistName)) {
-                    return Response.ok(tableName).build();
-                }
-            }
+				String candidate = GenericUtils.generateTableUUID(tenantId, tableName);
+				if (candidate.equalsIgnoreCase(persistName)) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Call by " + username + " to getTableActualName for table "
+								+ persistName + " returned " + tableName);
+					}
+					return Response.ok(tableName).build();
+				}
+			}
             return Response.status(Response.Status.NOT_FOUND).entity("The table '" + persistName + "' was not found.").build();
         } catch (UserStoreException e) {
             throw new AnalyticsException("Error while getting tenant ID for user: " + username + "[" + e.getMessage() + "]", e);
