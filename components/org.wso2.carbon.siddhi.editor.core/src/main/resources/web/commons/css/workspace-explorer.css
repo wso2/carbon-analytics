@@ -52,6 +52,11 @@
 .workspace-explorer-container .jstree-default-small .jstree-anchor {
     height: 28px;
     padding-top: 5px;
+    display:inline-block;
+    width:180px;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
 }
 
 .workspace-explorer-container .jstree-default-small .jstree-anchor.jstree-hovered {
@@ -118,16 +123,4 @@
 
 .vakata-context li > a .vakata-contextmenu-sep{
     display: none;
-}
-
-.workspace-explorer-container .jstree-default-small > .jstree-container-ul > .jstree-node{
-    display:inline-block;
-    width:180px;
-    white-space: nowrap;
-    overflow:hidden !important;
-    text-overflow: ellipsis;
-}
-
-.workspace-explorer-container .jstree-default-small > .jstree-container-ul > .jstree-node:hover{
-    overflow: visible;
 }
