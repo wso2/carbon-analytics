@@ -134,7 +134,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         "message": data,
                     };
                     self.console.println(message);
-                },
+                }
             );
         });
 
