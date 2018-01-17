@@ -340,8 +340,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             if ($element
                     .val()
                     .includes('-')) {
-                $element
-                    .val(Date.parse($element.val()));
+                var date = $element.val();
+                var patt = new RegExp("^((\\d)+||NaN)$");
+                if(patt.test(date)){
+                    return;
+                }
+                var dateParts = date.split(/[^0-9]/);
+                var time=new Date(dateParts[0],dateParts[1]-1,dateParts[2],dateParts[3],dateParts[4],dateParts[5]).getTime()
+                    + parseInt(dateParts[6]) ;
+                $element.val(time);
             }
         } else {
             $element
