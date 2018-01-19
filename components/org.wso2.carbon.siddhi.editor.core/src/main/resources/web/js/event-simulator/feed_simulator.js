@@ -2374,6 +2374,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 '</ul>' +
                 '</div>' +
                 '</div>';
+            $('[data-toggle="tooltip"]').tooltip();
             self.$eventFeedConfigTabContent.find("#inactive-simulation-list").append(simulationDiv);
         }
     };
