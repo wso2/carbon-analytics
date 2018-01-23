@@ -163,7 +163,7 @@ class TemplateGroupSelector extends React.Component {
                         <Grid item xs={12}>
                             <Grid container justify="center" spacing={Number(styles.spacing)}>
                                 {(this.state.templateGroups.length > 0) ?
-                                    ({templateGroups}) :
+                                    (templateGroups) :
                                     (<Grid item>
                                         <Typography>
                                             No Template Groups found
