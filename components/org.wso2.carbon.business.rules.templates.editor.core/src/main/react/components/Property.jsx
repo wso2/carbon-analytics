@@ -17,19 +17,20 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
-import {FormControl, FormHelperText} from 'material-ui/Form';
-import Card, {CardActions, CardContent} from 'material-ui/Card';
+import { FormControl, FormHelperText } from 'material-ui/Form';
+import Card, { CardActions, CardContent } from 'material-ui/Card';
 import TextField from 'material-ui/TextField';
-import Table, {TableBody, TableCell, TableHead, TableRow} from 'material-ui/Table';
-import Input, {InputLabel} from 'material-ui/Input';
-import {MenuItem} from 'material-ui/Menu';
+import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+import Input, { InputLabel } from 'material-ui/Input';
+import { MenuItem } from 'material-ui/Menu';
 import Select from 'material-ui/Select';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import Collapse from 'material-ui/transitions/Collapse';
-import {IconButton} from 'material-ui';
+import { IconButton } from 'material-ui';
 import AddIcon from 'material-ui-icons/Add';
 import ClearIcon from 'material-ui-icons/Clear';
 
@@ -63,9 +64,48 @@ class Property extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isExpanded: false,
+            isExpanded: false
         };
         this.toggleExpansion = this.toggleExpansion.bind(this);
+    }
+
+    /**
+     * Gets a text / selection input field for entering / selecting default value,
+     * depending on the number of existing options
+     */
+    getDefaultValueField() {
+        if ((this.props.configuration.propertyObject.options) &&
+            (this.props.configuration.propertyObject.options.length > 0)) {
+            return (
+                <FormControl
+                    fullWidth
+                    margin='normal'
+                    required
+                >
+                    <InputLabel htmlFor='defaultValue'>Default Value</InputLabel>
+                    <Select
+                        value={this.props.configuration.propertyObject.defaultValue}
+                        onChange={e => this.props.handlePropertyValueChange('defaultValue', e.target.value)}
+                        input={<Input id='defaultValue' />}
+                    >
+                        {this.props.configuration.propertyObject.options.map(option =>
+                            (<MenuItem key={option} name={option} value={option}>{option}</MenuItem>))}
+                    </Select>
+                    <FormHelperText>Select one of the provided options</FormHelperText>
+                </FormControl>);
+        } else {
+            return (
+                <TextField
+                    id='defaultValue'
+                    name='defaultValue'
+                    label='Default Value'
+                    placeholder='Enter the value to show as the default value'
+                    value={this.props.configuration.propertyObject.defaultValue}
+                    onChange={e => this.props.handlePropertyValueChange('defaultValue', e.target.value)}
+                    fullWidth
+                    margin='normal'
+                />);
+        }
     }
 
     /**
@@ -78,40 +118,6 @@ class Property extends React.Component {
     }
 
     render() {
-        let defaultValue;
-        if ((this.props.configuration.propertyObject.options) && (this.props.configuration.propertyObject.options.length > 0)) {
-            const options = this.props.configuration.propertyObject.options.map(option =>
-                (<MenuItem key={option} name={option} value={option}>{option}</MenuItem>));
-            defaultValue =
-                (<FormControl
-                    fullWidth
-                    margin='normal'
-                    required
-                >
-                    <InputLabel htmlFor='defaultValue'>Default Value</InputLabel>
-                    <Select
-                        value={this.props.configuration.propertyObject.defaultValue}
-                        onChange={e => this.props.handlePropertyValueChange('defaultValue', e.target.value)}
-                        input={<Input id='defaultvalue' />}
-                    >
-                        {options}
-                    </Select>
-                    <FormHelperText>Select one of the provided options</FormHelperText>
-                </FormControl>);
-        } else {
-            defaultValue =
-                (<TextField
-                    id='defaultValue'
-                    name='defaultValue'
-                    label='Default Value'
-                    placeholder='Enter the value to show as the default value'
-                    value={this.props.configuration.propertyObject.defaultValue}
-                    onChange={e => this.props.handlePropertyValueChange('defaultValue', e.target.value)}
-                    fullWidth
-                    margin='normal'
-                />);
-        }
-
         return (
             <div style={styles.formPaperContainer}>
                 <Card>
@@ -126,7 +132,7 @@ class Property extends React.Component {
                         <IconButton
                             color='primary'
                             aria-label='Remove'
-                            onClick={this.props.removeProperty}
+                            onClick={() => this.props.removeProperty()}
                         >
                             <ClearIcon />
                         </IconButton>
@@ -155,7 +161,7 @@ class Property extends React.Component {
                                 fullWidth
                                 margin='normal'
                             />
-                            {defaultValue}
+                            {this.getDefaultValueField()}
                             <br />
                             <br />
                             {(this.props.configuration.propertyObject.options) ?
@@ -196,12 +202,16 @@ class Property extends React.Component {
                             {(this.props.configuration.propertyObject.options) ?
                                 (<IconButton
                                     color='primary'
-                                    aria-label='Add'
-                                    onClick={() => this.props.addPropertyOption()}
+                                    aria-label='add option'
+                                    onClick={this.props.addPropertyOption}
                                 >
                                     <AddIcon />
                                 </IconButton>) :
-                                (<Button color='primary' onClick={() => this.props.addPropertyOption()}>
+                                (<Button
+                                    color='primary'
+                                    aria-label='add options'
+                                    onClick={this.props.addPropertyOption}
+                                >
                                     <AddIcon />
                                         &nbsp; &nbsp;
                                         Options
@@ -214,5 +224,14 @@ class Property extends React.Component {
         );
     }
 }
+
+Property.propTypes = {
+    configuration: PropTypes.object.isRequired,
+    handlePropertyValueChange: PropTypes.func.isRequired,
+    removeProperty: PropTypes.func.isRequired,
+    handlePropertyOptionChange: PropTypes.func.isRequired,
+    removePropertyOption: PropTypes.func.isRequired,
+    addPropertyOption: PropTypes.func.isRequired,
+};
 
 export default Property;

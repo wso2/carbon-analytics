@@ -14,4 +14,4 @@ export const Orange = {
     'A400': '#FF9100',
     'A700': '#FF6D00',
     contrastDefaultColor: 'light',
-}
+};

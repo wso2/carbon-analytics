@@ -17,6 +17,8 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
+import _ from 'lodash';
 // Ace Editor Components
 import AceEditor from 'react-ace';
 import 'brace/mode/javascript';
@@ -29,28 +31,29 @@ import Button from 'material-ui/Button';
 import Collapse from 'material-ui/transitions/Collapse';
 import AppBar from 'material-ui/AppBar';
 import Select from 'material-ui/Select';
-import {MenuItem} from 'material-ui/Menu';
+import { MenuItem } from 'material-ui/Menu';
 import Input from 'material-ui/Input';
 import Toolbar from 'material-ui/Toolbar';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
-import Radio, {RadioGroup} from 'material-ui/Radio';
-import {FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel} from 'material-ui/Form';
+import Radio, { RadioGroup } from 'material-ui/Radio';
+import { FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel } from 'material-ui/Form';
 import Checkbox from 'material-ui/Checkbox';
-import {IconButton} from 'material-ui';
+import { IconButton } from 'material-ui';
 import AddIcon from 'material-ui-icons/Add';
-import Dialog, {DialogActions, DialogContent, DialogTitle,} from 'material-ui/Dialog';
+import Dialog, { DialogActions, DialogContent, DialogTitle } from 'material-ui/Dialog';
 import ClearIcon from 'material-ui-icons/Clear';
 import Paper from 'material-ui/Paper';
-import Card, {CardActions, CardContent} from 'material-ui/Card';
+import Card, { CardActions, CardContent } from 'material-ui/Card';
 // App Components
 import Property from './Property';
 import Template from './Template';
 // App Utilities
-import BusinessRulesConstants from '../constants/BusinessRulesConstants';
-import TemplatesEditorConstants from '../constants/TemplatesEditorConstants';
-import TemplatesEditorUtilityFunctions from '../utils/TemplatesEditorUtilityFunctions';
+import TemplateEditorConstants from '../constants/TemplateEditorConstants';
+import TemplateEditorUtilityFunctions from '../utils/TemplateEditorUtilityFunctions';
 
-// Styles related to this component
+/**
+ * Styles related to this component
+ */
 const styles = {
     formPaper: {
         margin: 50,
@@ -72,12 +75,8 @@ class RuleTemplate extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            configuration: props.configuration,
-            exposedStreamDefinitions: [],
-            templatedElementsOfTemplates: [],
-            templatedElementsOfScript: [],
-            scriptAdditionsBin: [], // Stores properties sent to script, to avoid re-adding the same variable
-            // Templated elements selected to add to script
+            exposedStreamDefinitions: [], // Stores detected stream definitions from SiddhiApp templates
+            // To display templated elements for selecting and adding to script
             selectableTemplatedElementsForScript: [],
             templatedElementsForScriptSelection: [],
             // UI related
@@ -86,16 +85,15 @@ class RuleTemplate extends React.Component {
             showScriptTemplatedElements: false,
             showSnackbar: false,
             snackbarMessage: '',
-            snackbarAutoHideDuration: 3500,
+            snackbarAutoHideDuration: 3500
         };
         this.toggleExpansion = this.toggleExpansion.bind(this);
-        this.handleValueChange = this.handleValueChange.bind(this);
-        this.handleScriptChange = this.handleScriptChange.bind(this);
         this.addTemplate = this.addTemplate.bind(this);
         this.addTemplatedElementsToScript = this.addTemplatedElementsToScript.bind(this);
         this.loadTemplatedElementSelection = this.loadTemplatedElementSelection.bind(this);
         this.generateProperties = this.generateProperties.bind(this);
-        this.detectExposedStreamDefinition = this.detectExposedStreamDefinition.bind(this);
+        this.handleTemplateValueChange = _.debounce(this.handleTemplateValueChange.bind(this), 900);
+        this.detectExposedStreamDefinitions = this.detectExposedStreamDefinitions.bind(this);
         this.handleExposedStreamDefinitionSelection = this.handleExposedStreamDefinitionSelection.bind(this);
         this.toggleSnackbar = this.toggleSnackbar.bind(this);
     }
@@ -105,7 +103,7 @@ class RuleTemplate extends React.Component {
     }
 
     /**
-     * Toggles expansion
+     * Toggles expansion of the rule template container
      */
     toggleExpansion() {
         this.setState({ isExpanded: !this.state.isExpanded });
@@ -113,125 +111,62 @@ class RuleTemplate extends React.Component {
 
     /**
      * Updates the change of a rule template configuration value
-     * @param event
+     * @param name
+     * @param value
      */
-    handleValueChange(event) {
-        const state = this.state;
-        state.configuration[event.target.name] = event.target.value;
-        this.setState(state);
-        this.props.onChange(state.configuration);
-    }
-
-    /**
-     * Updates the script content
-     * @param content
-     */
-    handleScriptChange(content) {
-        const state = this.state;
-        state.configuration.script = content;
-        this.setState(state);
-        this.props.onChange(state.configuration);
+    handleValueChange(name, value) {
+        const configuration = this.props.configuration;
+        configuration[name] = value;
+        this.props.onChange(configuration);
     }
 
     /**
      * Adds an empty template
      */
     addTemplate() {
-        const state = this.state;
-        state.configuration.templates.push({
+        const configuration = this.props.configuration;
+        configuration.templates.push({
             type: 'siddhiApp',
-            content: '',
+            content: ''
         });
-        this.setState(state);
-        this.props.onChange(state.configuration);
+        this.props.onChange(configuration);
     }
 
     /**
-     * Updates the value of content of a template, that has the given index
+     * Updates the content of SiddhiApp template that has the given index, with given value
      * @param templateIndex
      * @param value
      */
     handleTemplateValueChange(templateIndex, value) {
-        const state = this.state;
-        state.configuration.templates[templateIndex].content = value;
-        this.setState(state);
-        this.props.onChange(state.configuration);
+        const configuration = this.props.configuration;
+        configuration.templates[templateIndex].content = value;
+        if ((this.props.configuration.type === TemplateEditorConstants.RULE_TEMPLATE_TYPE_INPUT) ||
+                (this.props.configuration.type === TemplateEditorConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
+            this.detectExposedStreamDefinitions();
+        }
+        this.props.onChange(configuration);
     }
 
     /**
-     * Removes the template that has the given index
+     * Removes the SiddhiApp template that has the given index
      * @param templateIndex
      */
     removeTemplate(templateIndex) {
-        const state = this.state;
-        state.configuration.templates.splice(templateIndex, 1);
-        this.setState(state);
-        this.props.onChange(state.configuration);
-    }
-
-    /**
-     * Detects and returns all the templated elements, from the templates and the script
-     * @returns {Array}
-     */
-    detectTemplatedElements() {
-        const state = this.state;
-        const properties = [];
-        const elementsFromTemplate = this.detectTemplatedElementsFromTemplates();
-        for (const element of elementsFromTemplate) {
-            properties.push(element);
-        }
-        // Add templated elements from the script
-        if (state.configuration.script) {
-            const templatedElements = TemplatesEditorUtilityFunctions.getRegexMatches(state.configuration.script,
-                TemplatesEditorConstants.TEMPLATED_ELEMENT_REGEX);
-            for (const templatedElement of templatedElements) {
-                // To avoid re-generating same elements
-                if (properties.indexOf(templatedElement) === -1) {
-                    properties.push(templatedElement);
-                }
-            }
-        }
-        return properties;
-    }
-
-    /**
-     * Detects templated elements from SiddhiApp templates.
-     * Only the first SiddhiApp template is considered when the rule template is of type 'input' or 'output'
-     * @returns {Array}
-     */
-    detectTemplatedElementsFromTemplates() {
-        const state = this.state;
-        const properties = [];
-        for (let i = 0; i < state.configuration.templates.length; i++) {
-            const templatedElements = TemplatesEditorUtilityFunctions.getRegexMatches(
-                state.configuration.templates[i].content,
-                TemplatesEditorConstants.TEMPLATED_ELEMENT_REGEX);
-            for (const templatedElement of templatedElements) {
-                // To avoid re-generating same elements
-                if (properties.indexOf(templatedElement) === -1) {
-                    // To avoid re-generation for elements that are already available in properties,
-                    // or added to script.
-                    // However, deleting variables from a script doesn't remove items from the bin
-                    if (!Object.prototype.hasOwnProperty.call(state.configuration.properties, templatedElement) &&
-                        (state.scriptAdditionsBin.indexOf(templatedElement) === -1)) {
-                        properties.push(templatedElement);
-                    }
-                }
-            }
-            if ((state.configuration.type !== BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) && (i === 0)) {
-                break;
-            }
-        }
-        return properties;
+        const configuration = this.props.configuration;
+        configuration.templates.splice(templateIndex, 1);
+        this.props.onChange(configuration);
     }
 
     /* Functions related to adding templated elements to script [START] */
 
     /**
-     * Displays dialog, to select detected templated elements in order to add to script
+     * Displays dialog with detected templated elements from template(s), to select for adding to script
      */
     loadTemplatedElementSelection() {
-        const detectedElements = this.detectTemplatedElementsFromTemplates();
+        // const detectedElements = this.detectTemplatedElementsFromTemplates();
+        const detectedElements = TemplateEditorUtilityFunctions.detectTemplatedElementsFromTemplates(
+            this.props.configuration, this.props.scriptAdditionsBin);
+        // Reset selections
         const selections = [];
         // Initially mark all detected elements as deselected
         for (const element of detectedElements) {
@@ -245,7 +180,7 @@ class RuleTemplate extends React.Component {
     }
 
     /**
-     * Toggles selection state of a detected templated element that has the given index
+     * Toggles selection state of the detected templated element that has the given index
      * @param index
      */
     toggleTemplatedElementForScriptSelection(index) {
@@ -255,59 +190,69 @@ class RuleTemplate extends React.Component {
     }
 
     /**
-     * Adds selected templated elements from templates, as variables to the script
+     * Adds selected templated elements from templates to script, each as a variable with a sample function
      */
     addTemplatedElementsToScript() {
         const state = this.state;
-        for (let i = 0; i < this.state.selectableTemplatedElementsForScript.length; i++) {
-            if (this.state.templatedElementsForScriptSelection[i]) {
-                let elementName = this.state.selectableTemplatedElementsForScript[i];
-                state.scriptAdditionsBin.push(elementName);
-                state.configuration.script = state.configuration.script +
-                    'var ' + elementName + this.generateSampleFunction(state.scriptAdditionsBin) + '\n';
+        const configuration = this.props.configuration;
+        const scriptAdditionsBin = this.props.scriptAdditionsBin;
+        for (let i = 0; i < state.selectableTemplatedElementsForScript.length; i++) {
+            if (state.templatedElementsForScriptSelection[i]) {
+                let elementName = state.selectableTemplatedElementsForScript[i];
+                scriptAdditionsBin.push(elementName);
+                configuration.script = configuration.script +
+                    `var ${elementName} = ${RuleTemplate.generateSampleFunction(scriptAdditionsBin)}\n`;
             }
         }
         state.showScriptTemplatedElements = false;
         state.isScriptExpanded = true;
         this.setState(state);
-        this.props.onScriptAddition(state.scriptAdditionsBin);
+        this.props.onScriptAddition(scriptAdditionsBin);
+        this.props.onChange(configuration);
     }
 
     /**
-     * Returns a string with a sample function.
-     * Function name's suffix number will grow according to the members count for the given script additions bin.
+     * Returns a string with a sample function
      * @param scriptAdditionsBin
      */
-    generateSampleFunction(scriptAdditionsBin) {
-        return (' = myFunction' + scriptAdditionsBin.length + '(\'${userInputFor' +
-        scriptAdditionsBin[scriptAdditionsBin.length -1 ] + '}\');\n\n' +
-        '/**\n* Does some magic on given variable\n* @returns Processed input\n* @param input User given value\n*/\n' +
-        'function myFunction' + scriptAdditionsBin.length + '(input) {\n' +
-        '\treturn input + \' some magic\';\n}\n\n\n\n');
+    static generateSampleFunction(scriptAdditionsBin) {
+        return (`myFunction${scriptAdditionsBin.length}` +
+            `(\'\${userInputFor${scriptAdditionsBin[scriptAdditionsBin.length -1 ]}}\');` +
+            `\n` +
+            `\n/**` +
+            `\n* Does some magic on given variable` +
+            `\n* @returns Processed input` +
+            `\n* @param input User given value` +
+            `\n*/` +
+            `\nfunction myFunction${scriptAdditionsBin.length}(input) {` +
+            `\n\treturn input + \' some magic\';` +
+            `\n}` +
+            `\n\n\n\n`);
     }
 
     /* Functions related to adding templated elements to script [END] */
 
     /**
-     * Generates properties for each templated element from templates and the script,
-     * only when a detected element is not already in properties / not already added to script
+     * Generates property object for each distinct templated element from SiddhiApp templates and the script,
+     * only when the detected element is not already available in properties / added to script
      */
     generateProperties() {
-        const templatedElements = this.detectTemplatedElements();
+        const templatedElements =
+            TemplateEditorUtilityFunctions.detectTemplatedElements(
+                this.props.configuration, this.props.scriptAdditionsBin);
         if (templatedElements.length > 0) {
-            const state = this.state;
+            const configuration = this.props.configuration;
             // Create new property for each detected templated element
-            for (const elementName of this.detectTemplatedElements()) {
+            for (const elementName of templatedElements) {
                 // To avoid re-generation for elements that are already available in properties, or added to script.
                 // However, deleting variables from a script doesn't remove items from the bin
-                if (!Object.prototype.hasOwnProperty.call(state.configuration.properties, elementName) &&
-                    (state.scriptAdditionsBin.indexOf(elementName) === -1)) {
-                    state.configuration.properties[elementName] =
-                        JSON.parse(JSON.stringify(TemplatesEditorConstants.PROPERTY_SKELETON));
+                if (!Object.prototype.hasOwnProperty.call(configuration.properties, elementName) &&
+                    (this.props.scriptAdditionsBin.indexOf(elementName) === -1)) {
+                    configuration.properties[elementName] =
+                        JSON.parse(JSON.stringify(TemplateEditorConstants.PROPERTY_SKELETON));
                 }
             }
-            this.setState(state);
-            this.props.onChange(state.configuration);
+            this.props.onChange(configuration);
         } else {
             this.toggleSnackbar('No templated elements found in template(s)');
         }
@@ -316,14 +261,13 @@ class RuleTemplate extends React.Component {
     /**
      * Updates given properties value
      * @param propertyName
-     * @param fieldName
+     * @param key
      * @param value
      */
-    handlePropertyValueChange(propertyName, fieldName, value) {
-        const state = this.state;
-        state.configuration.properties[propertyName][fieldName] = value;
-        this.setState(state);
-        this.props.onChange(state.configuration);
+    handlePropertyValueChange(propertyName, key, value) {
+        const configuration = this.props.configuration;
+        configuration.properties[propertyName][key] = value;
+        this.props.onChange(configuration);
     }
 
     /**
@@ -331,54 +275,41 @@ class RuleTemplate extends React.Component {
      * @param propertyName
      */
     addPropertyOption(propertyName) {
-        const state = this.state;
-        // Add as a next option, or the first option
-        if (state.configuration.properties[propertyName].options) {
-            state.configuration.properties[propertyName].options.push('');
+        const configuration = this.props.configuration;
+        if (configuration.properties[propertyName].options) {
+            // Add as next option
+            configuration.properties[propertyName].options.push('');
         } else {
-            state.configuration.properties[propertyName].options = [''];
+            // Add as first option
+            configuration.properties[propertyName].options = [''];
         }
-        this.setState(state);
-        this.props.onChange(state.configuration);
+        this.props.onChange(configuration);
     }
 
     /**
-     * Updates value of the option with the given index, that belongs to the given property
+     * Updates value of the option with the given index, that belongs to the property with the given name
      * @param propertyName
      * @param optionIndex
      * @param value
      */
     handlePropertyOptionChange(propertyName, optionIndex, value) {
-        const state = this.state;
-        state.configuration.properties[propertyName].options[optionIndex] = value;
-        this.setState(state);
-        this.props.onChange(state.configuration);
+        const configuration = this.props.configuration;
+        configuration.properties[propertyName].options[optionIndex] = value;
+        this.props.onChange(configuration);
     }
 
     /**
-     * Removes the option with the given index, from the given property name
+     * Removes the option with the given index, from the property with the given name
      * @param propertyName
      * @param optionIndex
      */
     removePropertyOption(propertyName, optionIndex) {
-        const state = this.state;
-        state.configuration.properties[propertyName].options.splice(optionIndex, 1);
-        if (state.configuration.properties[propertyName].options.length === 0) {
-            delete state.configuration.properties[propertyName].options;
+        const configuration = this.props.configuration;
+        configuration.properties[propertyName].options.splice(optionIndex, 1);
+        if (configuration.properties[propertyName].options.length === 0) {
+            delete configuration.properties[propertyName].options;
         }
-        this.setState(state);
-        this.props.onChange(state.configuration);
-    }
-
-    /**
-     * Removes all properties from the property with the given name
-     * @param propertyName
-     */
-    removeAllPropertyOptions(propertyName) {
-        const state = this.state;
-        delete state.configuration.properties[propertyName].options;
-        this.setState(state);
-        this.props.onChange(state.configuration);
+        this.props.onChange(configuration);
     }
 
     /**
@@ -386,26 +317,22 @@ class RuleTemplate extends React.Component {
      * @param propertyName
      */
     removeProperty(propertyName) {
-        const state = this.state;
-        state.templatedElements = this.detectTemplatedElements();
-        if (state.templatedElements.length > 0) {
-            delete state.configuration.properties[propertyName];
-        }
-        this.setState(state);
-        this.props.onChange(state.configuration);
+        const configuration = this.props.configuration;
+        delete configuration.properties[propertyName];
+        this.props.onChange(configuration);
     }
 
     /**
-     * Returns an array of properties, consisting properties - each converted as an array member from an object
+     * Returns a property array, whose members are property objects converted as array members
      * @returns {Array}
      */
     getPropertiesAsArray() {
         const propertiesArray = [];
-        for (const propertyName in this.state.configuration.properties) {
-            if (Object.prototype.hasOwnProperty.call(this.state.configuration.properties, propertyName)) {
+        for (const propertyName in this.props.configuration.properties) {
+            if (Object.prototype.hasOwnProperty.call(this.props.configuration.properties, propertyName)) {
                 propertiesArray.push({
                     propertyName: propertyName.toString(),
-                    propertyObject: this.state.configuration.properties[propertyName.toString()],
+                    propertyObject: this.props.configuration.properties[propertyName.toString()],
                 });
             }
         }
@@ -413,40 +340,43 @@ class RuleTemplate extends React.Component {
     }
 
     /**
-     * Detects exposed stream definitions from the template content, and updates in the state
+     * Detects exposed stream definitions from the template content,
+     * and updates 'exposedStreamDefinitions' in the state
      */
-    detectExposedStreamDefinition() {
+    detectExposedStreamDefinitions() {
         const state = this.state;
-        const exposedStreamDefinitions = TemplatesEditorUtilityFunctions.getRegexMatches(
-            this.state.configuration.templates[0].content, TemplatesEditorConstants.STREAM_DEFINITION_REGEX);
-        // Reset to avoid detected definitions from the last update
+        const configuration = this.props.configuration;
+        const exposedStreamDefinitions = TemplateEditorUtilityFunctions.getRegexMatches(
+            this.props.configuration.templates[0].content, TemplateEditorConstants.STREAM_DEFINITION_REGEX);
+        // Store detected stream definitions in state
         state.exposedStreamDefinitions = [];
         for (const definition of exposedStreamDefinitions) {
             state.exposedStreamDefinitions.push(definition);
         }
-        // Add exposedStreamDefinition key under first template
         if (exposedStreamDefinitions.length === 1) {
-            state.configuration.templates[0].exposedStreamDefinition = exposedStreamDefinitions[0];
+            // Single stream definition detected - Direct assign
+            configuration.templates[0].exposedStreamDefinition = exposedStreamDefinitions[0];
         } else {
-            state.configuration.templates[0].exposedStreamDefinition = '';
+            // Multiple stream definitions detected - Introduce the key
+            configuration.templates[0].exposedStreamDefinition = '';
         }
         this.setState(state);
-        this.props.onChange(state.configuration);
+        this.props.onChange(configuration);
     }
 
     /**
-     * Updates the exposed stream definition when one from dropdown is selected
+     * Updates the exposed stream definition, when one from dropdown is selected
      * @param event
      */
     handleExposedStreamDefinitionSelection(event) {
-        const state = this.state;
-        state.configuration.templates[0].exposedStreamDefinition = event.target.value;
-        this.setState(state);
-        this.props.onChange(state.configuration);
+        const configuration = this.props.configuration;
+        configuration.templates[0].exposedStreamDefinition = event.target.value;
+        this.props.onChange(configuration);
     }
 
     /**
-     * Displays available exposed stream definition(s)
+     * Returns detected exposed stream definitions.
+     * Dropdown for selection, when more than one streams are detected
      * @returns {XML}
      */
     displayExposedStreamDefinition() {
@@ -454,19 +384,19 @@ class RuleTemplate extends React.Component {
             (<div>
                 <Typography type="title">
                     Exposed Stream Definition
-                    <Button
-                        color='primary'
-                        style={{ marginLeft: 10 }}
-                        onClick={this.detectExposedStreamDefinition}
-                    >
-                        Detect
-                    </Button>
                 </Typography>
+                <Button
+                    color='primary'
+                    style={{ marginLeft: 10 }}
+                    onClick={this.detectExposedStreamDefinitions}
+                >
+                    Detect
+                </Button>
             </div>);
-        if (this.state.configuration.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_INPUT ||
-            this.state.configuration.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_OUTPUT) {
+        if (this.props.configuration.type === TemplateEditorConstants.RULE_TEMPLATE_TYPE_INPUT ||
+            this.props.configuration.type === TemplateEditorConstants.RULE_TEMPLATE_TYPE_OUTPUT) {
             if (this.state.exposedStreamDefinitions.length > 1) {
-                // Allow user to select one exposed stream definition
+                // Dropdown with detected stream definitions
                 return (
                     <div>
                         {title}
@@ -476,25 +406,25 @@ class RuleTemplate extends React.Component {
                             required
                         >
                             <Select
-                                value={(this.state.configuration.templates[0].exposedStreamDefinition) ?
-                                    (this.state.configuration.templates[0].exposedStreamDefinition) : ('')}
+                                value={(this.props.configuration.templates[0].exposedStreamDefinition) ?
+                                    (this.props.configuration.templates[0].exposedStreamDefinition) : ('')}
                                 onChange={this.handleExposedStreamDefinitionSelection}
                                 input={<Input id='exposedStreamDefinition' />}
                             >
                                 {this.state.exposedStreamDefinitions.map((definition, index) =>
                                     (<MenuItem key={index} name={index} value={definition}>{definition}</MenuItem>))}
                             </Select>
-                            <FormHelperText>Select a stream from the template</FormHelperText>
+                            <FormHelperText>Select a stream definition from the template</FormHelperText>
                         </FormControl>
                     </div>);
             } else if (this.state.exposedStreamDefinitions.length === 1) {
-                // Display the one and only exposed stream definition from state
+                // The one and only detected stream definition
                 return (
                     <div>
                         {title}
                         <br />
                         <Typography type='subheading'>
-                            {this.state.configuration.templates[0].exposedStreamDefinition}
+                            {this.props.configuration.templates[0].exposedStreamDefinition}
                         </Typography>
                     </div>);
             }
@@ -503,8 +433,8 @@ class RuleTemplate extends React.Component {
                     {title}
                     <br />
                     <Typography type='subheading'>
-                        {(this.state.configuration.templates[0].exposedStreamDefinition) ?
-                            (this.state.configuration.templates[0].exposedStreamDefinition) :
+                        {(this.props.configuration.templates[0].exposedStreamDefinition) ?
+                            (this.props.configuration.templates[0].exposedStreamDefinition) :
                             ('No stream definition found in the template')}
                     </Typography>
                 </div>);
@@ -514,12 +444,12 @@ class RuleTemplate extends React.Component {
 
     /**
      * Toggles display of the snackbar.
-     * Shows snackbar for readable amount of time with the message - if given, hides otherwise
+     * Shows snackbar for readable amount of time with the message - if given, Hides otherwise
      * @param message
      */
     toggleSnackbar(message) {
         this.setState({
-            snackbarAutoHideDuration: (message ? TemplatesEditorUtilityFunctions.calculateReadingTime(message) : 3500),
+            snackbarAutoHideDuration: (message ? TemplateEditorUtilityFunctions.calculateReadingTime(message) : 3500),
             showSnackbar: !!message,
             snackbarMessage: (message ? message : '')
         })
@@ -530,7 +460,7 @@ class RuleTemplate extends React.Component {
             <div>
                 <AppBar position="static" color="default">
                     <Toolbar>
-                        <Typography type='subheading' style={{ flex: 1 }}>{this.state.configuration.uuid}</Typography>
+                        <Typography type='subheading' style={{ flex: 1 }}>{this.props.configuration.uuid}</Typography>
                         <IconButton
                             onClick={this.toggleExpansion}
                         >
@@ -553,31 +483,31 @@ class RuleTemplate extends React.Component {
                                 id='uuid'
                                 name='uuid'
                                 label='UUID'
-                                value={this.state.configuration.uuid}
+                                value={this.props.configuration.uuid}
                                 helperText='Used to identify the rule template'
                                 margin="normal"
-                                onChange={this.handleValueChange}
+                                onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                             />
                             <TextField
                                 fullWidth
                                 id='name'
                                 name='name'
                                 label='Name'
-                                value={this.state.configuration.name}
+                                value={this.props.configuration.name}
                                 helperText='Used for representation'
                                 margin="normal"
-                                onChange={this.handleValueChange}
+                                onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                             />
                             <TextField
                                 fullWidth
                                 id='description'
                                 name='description'
                                 label='Description'
-                                value={this.state.configuration.description ?
-                                    this.state.configuration.description : ''}
+                                value={this.props.configuration.description ?
+                                    this.props.configuration.description : ''}
                                 helperText='Short description of what this rule template does'
                                 margin="normal"
-                                onChange={this.handleValueChange}
+                                onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                             />
                             <br />
                             <br />
@@ -587,8 +517,8 @@ class RuleTemplate extends React.Component {
                                 <RadioGroup
                                     aria-label='type'
                                     name='type'
-                                    value={this.state.configuration.type}
-                                    onChange={this.handleValueChange}
+                                    value={this.props.configuration.type}
+                                    onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                                 >
                                     <FormControlLabel value="template" control={<Radio />} label="Template" />
                                     <FormControlLabel value="input" control={<Radio />} label="Input" />
@@ -606,8 +536,8 @@ class RuleTemplate extends React.Component {
                                 <RadioGroup
                                     aria-label="instanceCount"
                                     name='instanceCount'
-                                    value={this.state.configuration.instanceCount}
-                                    onChange={this.handleValueChange}
+                                    value={this.props.configuration.instanceCount}
+                                    onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                                 >
                                     <FormControlLabel value="one" control={<Radio />} label="One" />
                                     <FormControlLabel value="many" control={<Radio />} label="Many" />
@@ -621,17 +551,18 @@ class RuleTemplate extends React.Component {
                             <br />
                             <Typography type="title">Templates</Typography>
                             <br />
-                            {this.state.configuration.templates.map((template, index) =>
+                            {this.props.configuration.templates.map((template, index) =>
                                 (<div key={index}>
                                     <Template
                                         type={template.type}
                                         content={template.content}
+                                        detectExposedStreamDefinitions={this.detectExposedStreamDefinitions}
                                         handleTemplateValueChange=
                                             {value => this.handleTemplateValueChange(index, value)}
-                                        invalid={((this.state.configuration.type !==
-                                            BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) && (index > 0)) ?
-                                            (this.state.configuration.type) : false}
-                                        notRemovable={this.state.configuration.templates.length === 1}
+                                        invalid={((this.props.configuration.type !==
+                                            TemplateEditorConstants.RULE_TEMPLATE_TYPE_TEMPLATE) && (index > 0)) ?
+                                            (this.props.configuration.type) : false}
+                                        notRemovable={this.props.configuration.templates.length === 1}
                                         removeTemplate={() => this.removeTemplate(index)}
                                         editorSettings={this.props.editorSettings}
                                     />
@@ -639,7 +570,7 @@ class RuleTemplate extends React.Component {
                                 </div>))}
                             <br />
                             {this.displayExposedStreamDefinition()}
-                            {((this.state.configuration.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ?
+                            {((this.props.configuration.type === TemplateEditorConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ?
                                 (<IconButton
                                     color='primary'
                                     style={{ backgroundColor: '#EF6C00', color: 'white' }}
@@ -669,18 +600,18 @@ class RuleTemplate extends React.Component {
                                         onClick={() => this.setState({
                                             isScriptExpanded: !this.state.isScriptExpanded })}
                                     >
-                                        <ExpandMoreIcon/>
+                                        <ExpandMoreIcon />
                                     </IconButton>
                                 </CardActions>
                                 <Collapse in={this.state.isScriptExpanded} transitionDuration='auto' unmountOnExit>
-                                    <CardContent style={{padding: 0, paddingBottom: 0}}>
+                                    <CardContent style={{ padding: 0, paddingBottom: 0 }}>
                                         <AceEditor
                                             mode='javascript'
                                             theme={this.props.editorSettings.theme}
                                             fontSize={this.props.editorSettings.fontSize}
                                             wrapEnabled={this.props.editorSettings.wrapEnabled}
-                                            value={this.state.configuration.script}
-                                            onChange={this.handleScriptChange}
+                                            value={this.props.configuration.script}
+                                            onChange={v => this.handleValueChange('script', v)}
                                             name='script'
                                             showPrintMargin={false}
                                             tabSize={3}
@@ -727,8 +658,6 @@ class RuleTemplate extends React.Component {
                                             this.handlePropertyOptionChange(property.propertyName, optionIndex, value)}
                                         removePropertyOption={optionIndex =>
                                             this.removePropertyOption(property.propertyName, optionIndex)}
-                                        removeAllPropertyOptions={() =>
-                                            this.removeAllPropertyOptions(property.propertyName)}
                                         removeProperty={() => this.removeProperty(property.propertyName)}
                                     />
                                     <br />
@@ -739,10 +668,10 @@ class RuleTemplate extends React.Component {
                 <Dialog
                     open={this.state.showScriptTemplatedElements}
                     onClose={() => this.setState({ showScriptTemplatedElements: false })}
-                    aria-labelledby="add-to-script-dialog-title"
-                    aria-describedby="add-to-script-dialog-description"
+                    aria-labelledby="templatedElementsSelectionDialog"
+                    aria-describedby="templatedElementsSelectionDialog"
                 >
-                    <DialogTitle id="alert-dialog-title">
+                    <DialogTitle id="templatedElementsSelectionTitle">
                         {(this.state.selectableTemplatedElementsForScript.length > 0) ?
                             ('Select templated elements') : ('No Templated Elements Found')}
                     </DialogTitle>
@@ -767,10 +696,10 @@ class RuleTemplate extends React.Component {
                             </FormControl>) :
                             (<Typography type='subheading'>
                                 {'Insert templated elements as: \${templatedElement} in template'}
-                                {((this.state.configuration.type ===
-                                    BusinessRulesConstants.RULE_TEMPLATE_TYPE_INPUT) ||
-                                    (this.state.configuration.type ===
-                                    BusinessRulesConstants.RULE_TEMPLATE_TYPE_OUTPUT)) ? (null) : ('(s)')}
+                                {((this.props.configuration.type ===
+                                    TemplateEditorConstants.RULE_TEMPLATE_TYPE_INPUT) ||
+                                    (this.props.configuration.type ===
+                                    TemplateEditorConstants.RULE_TEMPLATE_TYPE_OUTPUT)) ? (null) : ('(s)')}
                             </Typography>)}
                     </DialogContent>
                     <DialogActions>
@@ -810,5 +739,13 @@ class RuleTemplate extends React.Component {
         );
     }
 }
+
+RuleTemplate.propTypes = {
+    configuration: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    onScriptAddition: PropTypes.func.isRequired,
+    removeRuleTemplate: PropTypes.func.isRequired,
+    editorSettings: PropTypes.object.isRequired
+};
 
 export default RuleTemplate;

@@ -18,6 +18,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TemplateGroupForm from './components/TemplateGroupForm';
+import TemplateEditor from './components/TemplateEditor';
 
-ReactDOM.render(<TemplateGroupForm/>, document.getElementById('root'));
+ReactDOM.render(<TemplateEditor />, document.getElementById('root'));
