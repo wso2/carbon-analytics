@@ -19,16 +19,14 @@
 package org.wso2.carbon.stream.processor.core.persistence.util;
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.persistence.dto.RDBMSQueryConfiguration;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
+import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.dto.RDBMSQueryConfigurationEntry;
-import org.wso2.siddhi.core.exception.CannotLoadConfigurationException;
+import org.wso2.carbon.stream.processor.core.persistence.exception.DatasourceConfigurationException;
+import org.wso2.carbon.stream.processor.core.persistence.query.QueryManager;
 
-import java.io.InputStream;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import static org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants.RDBMS_QUERY_CONFIG_FILE;
+import java.io.IOException;
 
 /**
  * Class used to get Database queries according to RDBMS type used
@@ -46,79 +44,32 @@ public class RDBMSConfiguration {
         return config;
     }
 
-    public RDBMSQueryConfigurationEntry getDatabaseQueryEntries(String databaseType, String tableName) {
-        return resolveTableName(loadDatabaseQueryEntries(databaseType), tableName);
-    }
+    public RDBMSQueryConfigurationEntry getDatabaseQueryEntries(String databaseType, String databaseVersion,
+                                                                String tableName) {
+        RDBMSQueryConfigurationEntry databaseQueryEntries = new RDBMSQueryConfigurationEntry();
+        try {
+            QueryManager queryManager = new QueryManager(databaseType, databaseVersion,
+                    StreamProcessorDataHolder.getInstance().getConfigProvider());
 
-    /**
-     * Method that inserts the Table Names in the DB Queries
-     * @param databaseQueryEntries contains the list of DB Queries
-     * @param tableName is the table name to be used
-     * @return the list of DB Queries with the table name inserted
-     */
-    private RDBMSQueryConfigurationEntry resolveTableName
-            (RDBMSQueryConfigurationEntry databaseQueryEntries, String tableName) {
-        if (databaseQueryEntries == null) {
-            return null;
+            databaseQueryEntries.setCreateTableQuery(queryManager.getQuery(PersistenceConstants.CREATE_TABLE).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setInsertTableQuery(queryManager.getQuery(PersistenceConstants.INSERT_INTO_TABLE).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setIsTableExistQuery(queryManager.getQuery(PersistenceConstants.IS_TABLE_EXISTS).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setSelectTableQuery(queryManager.getQuery(PersistenceConstants.SELECT_SNAPSHOT).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setSelectLastQuery(queryManager.getQuery(PersistenceConstants.SELECT_LAST_REVISION).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setDeleteQuery(queryManager.getQuery(PersistenceConstants.DELETE_ROW_FROM_TABLE).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setCountQuery(queryManager.getQuery(PersistenceConstants.COUNT_NUMBER_REVISIONS).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+
+        } catch (QueryMappingNotAvailableException | ConfigurationException | IOException e) {
+            throw new DatasourceConfigurationException("Error reading queries for database: " + databaseType + " "
+                    + databaseVersion, e);
         }
-        databaseQueryEntries.setCreateTableQuery(databaseQueryEntries.getCreateTableQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setInsertTableQuery(databaseQueryEntries.getInsertTableQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setIsTableExistQuery(databaseQueryEntries.getIsTableExistQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setSelectTableQuery(databaseQueryEntries.getSelectTableQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setSelectLastQuery(databaseQueryEntries.getSelectLastQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setDeleteQuery(databaseQueryEntries.getDeleteQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setCountQuery(databaseQueryEntries.getCountQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-
         return databaseQueryEntries;
-    }
-
-    /**
-     * Method that return the Database Queries from the config XML according the correct Database Type
-     * @param databaseType is the type of RDBMS used
-     * @return the list of DB Queries
-     */
-    private RDBMSQueryConfigurationEntry loadDatabaseQueryEntries(String databaseType) {
-        try {
-            RDBMSQueryConfiguration rdbmsQueryConfiguration = readTableConfigXML();
-            for (RDBMSQueryConfigurationEntry databaseQueryEntries : rdbmsQueryConfiguration
-                    .getDatabaseQueryEntries()) {
-                if (databaseType.equals(databaseQueryEntries.getDatabaseName())) {
-                    return databaseQueryEntries;
-                }
-            }
-
-        } catch (CannotLoadConfigurationException e) {
-            log.error("Error loading configuration file " + RDBMS_QUERY_CONFIG_FILE, e);
-        }
-        return null;
-    }
-
-    /**
-     * Method that reads the RDBMS Query config file
-     * @return All defined Database Queries for all Database Types
-     * @throws CannotLoadConfigurationException
-     */
-    private RDBMSQueryConfiguration readTableConfigXML() throws CannotLoadConfigurationException {
-        try {
-            JAXBContext ctx = JAXBContext.newInstance(RDBMSQueryConfiguration.class);
-            Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            ClassLoader classLoader = getClass().getClassLoader();
-            InputStream inputStream = classLoader.getResourceAsStream(RDBMS_QUERY_CONFIG_FILE);
-            if (inputStream == null) {
-                throw new CannotLoadConfigurationException(RDBMS_QUERY_CONFIG_FILE
-                        + " is not found in the classpath");
-            }
-            return (RDBMSQueryConfiguration) unmarshaller.unmarshal(inputStream);
-        } catch (JAXBException e) {
-            throw new CannotLoadConfigurationException(
-                    "Error in processing RDBMS query configuration: " + e.getMessage(), e);
-        }
     }
 }

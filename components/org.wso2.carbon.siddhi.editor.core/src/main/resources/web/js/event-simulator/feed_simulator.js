@@ -2264,17 +2264,35 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
     self.removeUnavailableSimulationsFromUi = function (simulations) {
         var activeSimulations = simulations.activeSimulations;
         var simulationName, i;
-        for (i = 0; i < activeSimulations.length; i++) {
-            simulationName = activeSimulations[i].properties.simulationName;
-            if (!(simulationName in self.activeSimulationList)) {
-                self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+        for (var simulationName in self.activeSimulationList) {
+            if( self.activeSimulationList.hasOwnProperty(simulationName) ) {
+                var foundSimulaion = false;
+                for (i = 0; i < activeSimulations.length; i++) {
+                    if (activeSimulations[i].properties.simulationName == simulationName ) {
+                        foundSimulaion = true;
+                    }
+                }
+                if (!foundSimulaion) {
+                    self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+                    delete self.activeSimulationList[simulationName];
+                }
             }
         }
+
         var inActiveSimulations = simulations.inActiveSimulations;
-        for (i = 0; i < inActiveSimulations.length; i++) {
-            simulationName = inActiveSimulations[i].properties.simulationName;
-            if (!(simulationName in self.inactiveSimulationList)) {
-                self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+
+        for (var simulationName in self.inactiveSimulationList) {
+            if( self.inactiveSimulationList.hasOwnProperty(simulationName) ) {
+                var foundSimulaion = false;
+                for (i = 0; i < inActiveSimulations.length; i++) {
+                    if (inActiveSimulations[i].properties.simulationName == simulationName ) {
+                        foundSimulaion = true;
+                    }
+                }
+                if (!foundSimulaion) {
+                    self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+                    delete self.inactiveSimulationList[simulationName];
+                }
             }
         }
     };
@@ -2356,6 +2374,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 '</ul>' +
                 '</div>' +
                 '</div>';
+            $('[data-toggle="tooltip"]').tooltip();
             self.$eventFeedConfigTabContent.find("#inactive-simulation-list").append(simulationDiv);
         }
     };
@@ -2426,7 +2445,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             '</span></span>',
             onSelect: self.convertDateToUnix,
             onClose: self.closeTimestampPicker
-
         });
         var $endTimestamp = $('#event-feed-form input[name="end-timestamp"]');
         $endTimestamp.datetimepicker({
@@ -2506,8 +2524,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             if ($element
                     .val()
                     .includes('-')) {
-                $element
-                    .val(Date.parse($element.val()));
+                var date = $element.val();
+                var patt = new RegExp("^((\\d)+||NaN)$");
+                if (patt.test(date)) {
+                    return;
+                }
+                var dateParts = date.split(/[^0-9]/);
+                var time = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], dateParts[3],
+                    dateParts[4], dateParts[5]).getTime()
+                    + parseInt(dateParts[6]);
+                $element.val(time);
             }
         } else {
             $element

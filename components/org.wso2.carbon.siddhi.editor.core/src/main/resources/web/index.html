@@ -125,7 +125,6 @@
                                     <div id="tool-palette-container" style="display: none"></div>
                                     <!-- End: tool-palette -->
                                     <div class="tab-content tab-content-default "></div>
-                                    <div class="notification-container" id="notification-container"></div>
                                 </div>
                             </div>
                         <!-- End: service tabs -->
@@ -338,7 +337,6 @@
                                 <button type="button" class="btn btn-primary" id="createBtn">create
                                 </button>
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">cancel</button>
-
                             </div>
                         </div>
                     </form>
@@ -464,7 +462,8 @@
                             <div id="active-simulation-list" class="nano-content" style="display: none;">
                                 <h5>Active Feed Simulations</h5>
                             </div>
-                            <div id="inactive-simulation-list" class="nano-content" style="display: none;">
+                            <div id="inactive-simulation-list" class="nano-content inactive-simulation-list"
+                                 style="display: none;">
                                 <h5>Inactive Feed Simulations</h5>
                             </div>
                         </div>
@@ -624,6 +623,8 @@
         </div>
     </div>
 </div>
+
+<div class="notification-container" id="notification-container"></div>
 
 <div class="sourceConfigForm" id="csvSourceConfig_dynamicId" data-type="csv" data-uuid="{{dynamicId}}"
      style="display:none;">

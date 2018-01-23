@@ -264,6 +264,11 @@ form[data-form-type="single"] table th label {
   color: #fff;
 }
 
+.simulation-list .inactive-simulation-list  .form-control,
+.simulation-list .inactive-simulation-list  .btn-default {
+  color: #757575;
+}
+
 .simulation-list .btn-default:hover {
   border-color: #555;
 }
@@ -514,4 +519,8 @@ hr {
 
 #addNewSourceError {
   color: #d9534f;
+}
+
+.notification-container {
+  z-index: 100000002 !important;
 }

@@ -38,6 +38,7 @@ import org.wso2.carbon.stream.processor.core.model.SiddhiAppContent;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppMetrics;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppRevision;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppStatus;
+import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
 
@@ -63,15 +64,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
     private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";
 
-    @Override
-    public Response siddhiAppsPost(String body, String username) throws NotFoundException {
+    public Response siddhiAppsPost(String body) throws NotFoundException {
         String jsonString;
         Response.Status status;
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to add Siddhi Apps")
-                    .build();
-        }
         try {
             String siddhiAppName = StreamProcessorDataHolder.
                     getStreamProcessorService().validateAndSave(body, false);
@@ -102,15 +97,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.status(status).entity(jsonString).build();
     }
 
-    @Override
-    public Response siddhiAppsPut(String body, String username) throws NotFoundException {
+    public Response siddhiAppsPut(String body) throws NotFoundException {
         String jsonString = new Gson().toString();
         Response.Status status = Response.Status.OK;
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to update Siddhi " +
-                    "Apps").build();
-        }
         try {
             boolean isAlreadyExists = StreamProcessorDataHolder.
                     getStreamProcessorService().isExists(body);
@@ -142,17 +131,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.status(status).entity(jsonString).build();
     }
 
-    @Override
-    public Response siddhiAppsGet(String isActive, String username) throws NotFoundException {
+    public Response siddhiAppsGet(String isActive) throws NotFoundException {
         String jsonString;
         boolean isActiveValue;
-
-        if (!(getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider().hasPermission(username, new Permission
-                (PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to list Siddhi Apps")
-                    .build();
-        }
 
         List<String> artifactList = new ArrayList<>();
 
@@ -176,16 +157,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.ok().entity(artifactList).build();
     }
 
-    @Override
-    public Response siddhiAppsAppNameDelete(String appFileName, String username) throws NotFoundException {
+    public Response siddhiAppsAppNameDelete(String appFileName) throws NotFoundException {
         String jsonString;
         Response.Status status = Response.Status.OK;
-
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to delete Siddhi " +
-                    "Apps").build();
-        }
 
         try {
             if (StreamProcessorDataHolder.getStreamProcessorService().delete(appFileName)) {
@@ -210,18 +184,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.status(status).entity(jsonString).build();
     }
 
-    @Override
-    public Response siddhiAppsAppNameGet(String appName, String username) throws NotFoundException {
+    public Response siddhiAppsAppNameGet(String appName) throws NotFoundException {
 
         String jsonString;
-
-        if (!(getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider().hasPermission(username, new Permission
-                (PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get Siddhi App"
-                    + appName).build();
-        }
-
         Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.
                 getStreamProcessorService().getSiddhiAppMap();
 
@@ -239,17 +204,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
     }
 
-    @Override
-    public Response siddhiAppsAppNameStatusGet(String appFileName, String username) throws NotFoundException {
+    public Response siddhiAppsAppNameStatusGet(String appFileName) throws NotFoundException {
 
         String jsonString;
-
-        if (!(getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider().hasPermission(username, new Permission
-                (PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get status of " +
-                    "the Siddhi App " + appFileName).build();
-        }
 
         Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.
                 getStreamProcessorService().getSiddhiAppMap();
@@ -269,16 +226,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
     }
 
-    @Override
-    public Response siddhiAppsAppNameBackupPost(String appName, String username) throws NotFoundException {
+    public Response siddhiAppsAppNameBackupPost(String appName) throws NotFoundException {
         String jsonString;
         Response.Status status = Response.Status.OK;
-
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to backup current " +
-                    "state of the Siddhi App" + appName).build();
-        }
 
         try {
             SiddhiAppRuntime siddhiAppRuntime = StreamProcessorDataHolder.getSiddhiManager().
@@ -305,18 +255,11 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.status(status).entity(jsonString).build();
     }
 
-    @Override
-    public Response siddhiAppsAppNameRestorePost(String appName, String revision, String username)
+    public Response siddhiAppsAppNameRestorePost(String appName, String revision)
             throws NotFoundException {
 
         String jsonString;
         Response.Status status = Response.Status.OK;
-
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to restore the " +
-                    "Siddhi App" + appName).build();
-        }
 
         try {
             SiddhiAppRuntime siddhiAppRuntime = StreamProcessorDataHolder.getSiddhiManager().
@@ -350,17 +293,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.status(status).entity(jsonString).build();
     }
 
-    @Override
-    public Response siddhiAppsStatisticsGet(String isActive, String username) throws NotFoundException {
+    public Response siddhiAppsStatisticsGet(String isActive) throws NotFoundException {
         String jsonString;
         boolean isActiveValue;
-
-        if (!(getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider().hasPermission(username, new Permission
-                (PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the stats of" +
-                    " Siddhi Apps").build();
-        }
 
         Map<String, SiddhiAppData> siddhiAppFileMap = StreamProcessorDataHolder.
                 getStreamProcessorService().getSiddhiAppMap();
@@ -412,16 +347,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         }
     }
 
-    @Override
-    public Response siddhiAppStatsEnable(String appFileName, boolean statsEnabled, String username)
+    public Response siddhiAppStatsEnable(String appFileName, boolean statsEnabled)
             throws NotFoundException {
         String jsonString;
-
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
-                    "stats for Siddhi App" + appFileName).build();
-        }
 
         Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
         SiddhiAppData siddiAppData = siddhiAppMap.get(appFileName);
@@ -448,14 +376,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         }
     }
 
-    @Override
-    public Response siddhiAppsStatsEnable(boolean statsEnabled, String username) throws NotFoundException {
-
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
-                    "stats for all Siddhi App").build();
-        }
+    public Response siddhiAppsStatsEnable(boolean statsEnabled) throws NotFoundException {
 
         Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
         for (Map.Entry siddhiAppEntry : siddhiAppMap.entrySet()) {
@@ -471,6 +392,143 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         String jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
                 "All siddhi apps Sucessfully updated."));
         return Response.status(Response.Status.OK).entity(jsonString).build();
+    }
+
+    @Override
+    public Response siddhiAppsPost(String body, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to add Siddhi Apps")
+                    .build();
+        }
+        return siddhiAppsPost(body);
+    }
+
+    @Override
+    public Response siddhiAppsPut(String body, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to update Siddhi " +
+                    "Apps").build();
+        }
+        return siddhiAppsPut(body);
+    }
+
+    @Override
+    public Response siddhiAppsGet(String isActive, Request request) throws NotFoundException {
+
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(PERMISSION_APP_NAME,
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to list Siddhi Apps")
+                    .build();
+        }
+        return siddhiAppsGet(isActive);
+    }
+
+    @Override
+    public Response siddhiAppsAppNameDelete(String appFileName, Request request) throws NotFoundException {
+
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to delete Siddhi " +
+                    "Apps").build();
+        }
+        return siddhiAppsAppNameDelete(appFileName);
+
+    }
+
+    @Override
+    public Response siddhiAppsAppNameGet(String appName, Request request) throws NotFoundException {
+
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(PERMISSION_APP_NAME,
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get Siddhi App"
+                    + appName).build();
+        }
+        return siddhiAppsAppNameGet(appName);
+    }
+
+    @Override
+    public Response siddhiAppsAppNameStatusGet(String appFileName, Request request) throws NotFoundException {
+
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(PERMISSION_APP_NAME,
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get status of " +
+                    "the Siddhi App " + appFileName).build();
+        }
+        return siddhiAppsAppNameStatusGet(appFileName);
+    }
+
+    @Override
+    public Response siddhiAppsAppNameBackupPost(String appName, Request request) throws NotFoundException {
+
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to backup current " +
+                    "state of the Siddhi App" + appName).build();
+        }
+        return siddhiAppsAppNameBackupPost(appName);
+
+    }
+
+    @Override
+    public Response siddhiAppsAppNameRestorePost(String appName, String revision, Request request)
+            throws NotFoundException {
+
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to restore the " +
+                    "Siddhi App" + appName).build();
+        }
+        return siddhiAppsAppNameRestorePost(appName,revision);
+    }
+
+    @Override
+    public Response siddhiAppsStatisticsGet(String isActive, Request request) throws NotFoundException {
+
+        if (getUserName(request) != null && (getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(PERMISSION_APP_NAME,
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the stats of" +
+                    " Siddhi Apps").build();
+        }
+        return siddhiAppsStatisticsGet(isActive);
+    }
+
+    @Override
+    public Response siddhiAppStatsEnable(String appFileName, boolean statsEnabled, Request request)
+            throws NotFoundException {
+
+        if (getUserName(request) != null && getUserName(request) != null && !getPermissionProvider().hasPermission
+                (getUserName(request), new Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
+                    "stats for Siddhi App" + appFileName).build();
+        }
+
+        return siddhiAppStatsEnable(appFileName,statsEnabled);
+    }
+
+    @Override
+    public Response siddhiAppsStatsEnable(boolean statsEnabled, Request request) throws NotFoundException {
+
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
+                    "stats for all Siddhi App").build();
+        }
+        return siddhiAppsStatsEnable(statsEnabled);
+    }
+
+    private static String getUserName(Request request) {
+        Object username = request.getProperty("username");
+        return username != null ? username.toString() : null;
     }
 
     private PermissionProvider getPermissionProvider(){

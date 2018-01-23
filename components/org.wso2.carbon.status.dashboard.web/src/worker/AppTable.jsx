@@ -37,7 +37,8 @@ const sparkLineConfig = {
     width: 100,
     height: 40,
     strokeWidth:1,
-    fillOpacity:0.1
+    fillOpacity:0.1,
+    append: false,
 };
 
 let currentPage = 1;
@@ -177,7 +178,6 @@ export default class AppTable extends React.Component {
                                     <VizG data={row.appMetricsHistory.throughput.data} metadata={metadata}
                                           config={sparkLineConfig}
                                           yDomain={[throughputLimit[0],throughputLimit[1]]}
-                                          append={false}
                                           width={100}
                                           height={50}
                                     />
@@ -203,7 +203,6 @@ export default class AppTable extends React.Component {
                                     <VizG data={row.appMetricsHistory.memory.data} metadata={metadata}
                                           config={sparkLineConfig}
                                           yDomain={[memoryLimit[0],memoryLimit[1]]}
-                                          append={false}
                                           width={100}
                                             height={50}
                                     />
