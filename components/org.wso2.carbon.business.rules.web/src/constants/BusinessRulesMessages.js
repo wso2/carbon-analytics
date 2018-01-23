@@ -16,8 +16,6 @@
  *  under the License.
  */
 
-import React from 'react';
-
 /**
  * Has values for all the string constants related to displaying messages to the user
  */
@@ -34,8 +32,8 @@ const BusinessRulesMessages = {
 
     // Business Rule from scratch form
     // Filter component
-    RULE_LOGIC_HELPER_TEXT: "Enter the Rule Logic, referring filter rule numbers. Eg: (1 OR 2) AND (NOT(3))",
-    RULE_LOGIC_WARNING: "Rule logic contains invalid number(s) for filter rules",
+    RULE_LOGIC_HELPER_TEXT: 'Enter the Rule Logic, referring filter rule numbers. Eg: (1 OR 2) AND (NOT(3))',
+    RULE_LOGIC_WARNING: 'Rule logic contains invalid number(s) for filter rules',
     // Output component
     MAPPING_NOT_AVAILABLE: 'Please select both input & output rule templates',
 
@@ -45,6 +43,6 @@ const BusinessRulesMessages = {
     // Generalized errors with titles
     CONNECTION_FAILURE_ERROR: ['Connection Failed', 'There was an error connecting to the server'],
     API_FAILURE_ERROR: ['Request Failed', 'There was an error processing your request'],
-}
+};
 
 export default BusinessRulesMessages;

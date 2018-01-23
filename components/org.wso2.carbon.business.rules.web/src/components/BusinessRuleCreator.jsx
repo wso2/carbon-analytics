@@ -33,7 +33,9 @@ import '../index.css';
  */
 const appContext = window.contextPath;
 
-// Styles related to this component
+/**
+ * Styles related to this component
+ */
 const styles = {
     root: {
         flexGrow: 1,
@@ -47,7 +49,7 @@ const styles = {
         paddingBottom: 30
     },
     spacing: '40'
-}
+};
 
 /**
  * Allows to create a Business Rule either from scratch or from a Template
@@ -65,7 +67,6 @@ class BusinessRuleCreator extends React.Component {
                     </Typography>
                     <br/>
                     <br/>
-
                     <Grid container style={styles.root}>
                         <Grid item xs={12}>
                             <Grid container justify="center" spacing={Number(styles.spacing)}>
@@ -87,7 +88,6 @@ class BusinessRuleCreator extends React.Component {
                             </Grid>
                         </Grid>
                     </Grid>
-
                 </center>
             </div>
         );

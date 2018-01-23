@@ -23,10 +23,9 @@ import SecuredRouter from './components/auth/SecuredRouter';
 import Login from './components/auth/Login';
 import Logout from './components/auth/Logout';
 // App Components
-import Header from "./components/common/Header";
 // Custom Theme
-import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from './theme/BusinessRulesManagerColors';
+import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
+import { Orange } from './theme/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
     palette: {

@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
@@ -25,11 +25,13 @@ import List from 'material-ui-icons/List';
 import Create from 'material-ui-icons/Create';
 import Paper from 'material-ui/Paper';
 // App Constants
-import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+import BusinessRulesConstants from '../constants/BusinessRulesConstants';
 // CSS
 import '../index.css';
 
-// Styles related to this component
+/**
+ * Styles related to this component
+ */
 const styles = {
     button: {
         height: 100,
@@ -41,7 +43,7 @@ const styles = {
         width: 300,
         padding: 50
     }
-}
+};
 
 /**
  * App context.
@@ -53,23 +55,21 @@ const appContext = window.contextPath;
  * the specific create business rule page
  */
 class CreateButton extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
             mode: props.mode,
             text: props.text,
             onClick: props.onClick
-        }
+        };
     }
 
     render() {
-        let icon
-
+        let icon;
         if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
-            icon = <List/>
+            icon = <List />
         } else {
-            icon = <Create/>
+            icon = <Create />
         }
 
         return (
@@ -82,9 +82,9 @@ class CreateButton extends React.Component {
                         {icon}
                     </Button>
                 </Link>
-                <br/>
-                <br/>
-                <br/>
+                <br />
+                <br />
+                <br />
                 <Typography type="headline" component="h2">
                     {this.props.title}
                 </Typography>

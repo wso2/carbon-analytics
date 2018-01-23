@@ -23,19 +23,19 @@ import Collapse from 'material-ui/transitions/Collapse';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
-import {FormControl, FormHelperText} from 'material-ui/Form';
-import Input, {InputLabel} from 'material-ui/Input';
+import { FormControl, FormHelperText } from 'material-ui/Form';
+import Input, { InputLabel } from 'material-ui/Input';
 import Select from 'material-ui/Select';
-import {MenuItem} from 'material-ui/Menu';
+import { MenuItem } from 'material-ui/Menu';
 import Grid from 'material-ui/Grid';
-import {IconButton} from "material-ui";
+import { IconButton } from 'material-ui';
 import Paper from 'material-ui/Paper';
-import List, {ListItem, ListItemText} from 'material-ui/List';
+import List, { ListItem, ListItemText } from 'material-ui/List';
 // App Utilities
-import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
+import BusinessRulesUtilityFunctions from '../utils/BusinessRulesUtilityFunctions';
 // App Constants
-import BusinessRulesConstants from "../constants/BusinessRulesConstants";
-import BusinessRulesMessages from "../constants/BusinessRulesMessages";
+import BusinessRulesConstants from '../constants/BusinessRulesConstants';
+import BusinessRulesMessages from '../constants/BusinessRulesMessages';
 // CSS
 import '../index.css';
 
@@ -45,9 +45,9 @@ import '../index.css';
  */
 class InputComponent extends React.Component {
     render() {
-        let inputRuleTemplatesToDisplay
-        let inputDataPropertiesToDisplay
-        let exposedInputStreamFieldsToDisplay
+        let inputRuleTemplatesToDisplay;
+        let inputDataPropertiesToDisplay;
+        let exposedInputStreamFieldsToDisplay;
 
         // To display rule templates selection drop down
         let inputRuleTemplateElements = this.props.inputRuleTemplates.map((inputRuleTemplate) =>
@@ -56,7 +56,7 @@ class InputComponent extends React.Component {
             </MenuItem>
         );
         inputRuleTemplatesToDisplay =
-            <FormControl disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}>
+            (<FormControl disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}>
                 <InputLabel htmlFor="inputRuleTemplate">Rule Template</InputLabel>
                 <Select
                     value={(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) ?
@@ -72,7 +72,7 @@ class InputComponent extends React.Component {
                         (BusinessRulesMessages.SELECT_RULE_TEMPLATE)
                     }
                 </FormHelperText>
-            </FormControl>
+            </FormControl>);
 
         // If an input rule template has been selected
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
@@ -81,24 +81,26 @@ class InputComponent extends React.Component {
                 BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT, this.props.mode);
 
             inputDataPropertiesToDisplay =
-                <div>
+                (<div>
                     <Typography type="subheading">
                         Configurations
                     </Typography>
                     {inputConfigurations}
-                </div>
+                </div>);
 
             // Store as a 2 dimensional array of [fieldName, fieldType]s
             let inputStreamFields =
                 this.props.getFields(this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition']);
             let inputStreamFieldsToDisplay = [];
             for (let field in inputStreamFields) {
-                inputStreamFieldsToDisplay.push([field, inputStreamFields[field]]);
+                if (Object.prototype.hasOwnProperty.call(inputStreamFields, field)) {
+                    inputStreamFieldsToDisplay.push([field, inputStreamFields[field]]);
+                }
             }
 
             // To display exposed input stream fields
             let exposedInputStreamFieldElementsToDisplay =
-                <List subheader style={this.props.style.root}>
+                (<List subheader style={this.props.style.root}>
                     {inputStreamFieldsToDisplay.map(field => (
                         <div key={field} style={this.props.style.listSection}>
                             <ListItem button key={field[0]}>
@@ -106,7 +108,7 @@ class InputComponent extends React.Component {
                             </ListItem>
                         </div>
                     ))}
-                </List>
+                </List>);
             exposedInputStreamFieldsToDisplay =
                 <Grid item>
                     <Paper style={{padding: 10}}>
@@ -125,34 +127,36 @@ class InputComponent extends React.Component {
                     <Toolbar>
                         <Typography type="subheading">Input</Typography>
                         <IconButton
-                            onClick={(e) => this.props.toggleExpansion()}
+                            onClick={() => this.props.toggleExpansion()}
                         >
                             <ExpandMoreIcon/>
                         </IconButton>
                     </Toolbar>
                 </AppBar>
-                <Paper style={this.props.style.paper}>
+                <Paper>
                     <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
-                        <br/>
-                        <center>
-                            {inputRuleTemplatesToDisplay}
-                        </center>
-                        <br/>
-                        <br/>
-                        <br/>
-                        <div>
-                            <Grid container spacing={40} styles={{flexGrow: 1}}>
-                                <Grid item xs={12} sm={8}>
-                                    <div>
-                                        {inputDataPropertiesToDisplay}
-                                    </div>
+                        <div style={this.props.style.paperContainer}>
+                            <br/>
+                            <center>
+                                {inputRuleTemplatesToDisplay}
+                            </center>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <div>
+                                <Grid container spacing={40} styles={{flexGrow: 1}}>
+                                    <Grid item xs={12} sm={8}>
+                                        <div>
+                                            {inputDataPropertiesToDisplay}
+                                        </div>
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        {exposedInputStreamFieldsToDisplay}
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
-                                    {exposedInputStreamFieldsToDisplay}
-                                </Grid>
-                            </Grid>
+                            </div>
+                            <br/>
                         </div>
-                        <br/>
                     </Collapse>
                 </Paper>
             </div>

@@ -17,8 +17,7 @@
  */
 
 import React from 'react';
-import {Link} from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
@@ -42,7 +41,7 @@ const styles = {
         // width: '100%',
         // margin: 0
     }
-}
+};
 
 /**
  * App context.
@@ -59,8 +58,7 @@ class Header extends React.Component {
 
     /**
      * Renders right side elements of the header
-     *
-     * @returns {XML} HTML content
+     * @returns {*}
      */
     renderRightLinks() {
         const homeButton = (
@@ -128,7 +126,7 @@ class Header extends React.Component {
                     }}
                 >
                     <MenuItem>
-                        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
+                        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
                             Log out
                         </Link>
                     </MenuItem>

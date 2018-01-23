@@ -18,16 +18,16 @@
 
 import React from 'react';
 // Material UI Components
-import {CircularProgress} from 'material-ui/Progress';
-import {Typography} from "material-ui";
+import { CircularProgress } from 'material-ui/Progress';
+import { Typography } from 'material-ui';
 import Paper from 'material-ui/Paper';
 // App Components
-import Header from "./common/Header";
+import Header from './common/Header';
 // CSS
 import '../index.css';
 // Custom Theme
-import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from '../theme/BusinessRulesManagerColors';
+import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
+import { Orange } from '../theme/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
     palette: {
@@ -35,6 +35,9 @@ const theme = createMuiTheme({
     },
 });
 
+/**
+ * Styles related to this component
+ */
 const styles = {
     progress: {
         color: '#EF6C00',
@@ -44,7 +47,7 @@ const styles = {
         paddingTop: 30,
         paddingBottom: 30
     },
-}
+};
 
 /**
  * Shows circular progress

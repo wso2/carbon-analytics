@@ -17,47 +17,37 @@
  */
 
 import React from 'react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 // Material UI Components
 import IconButton from 'material-ui/IconButton';
 import RefreshIcon from 'material-ui-icons/Refresh';
 import EditIcon from 'material-ui-icons/Edit';
 import DeleteIcon from 'material-ui-icons/Delete';
-import {TableCell, TableRow,} from 'material-ui/Table';
+import { TableCell, TableRow } from 'material-ui/Table';
 import Tooltip from 'material-ui/Tooltip';
 import VisibilityIcon from 'material-ui-icons/Visibility';
-// App Utilities
-import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 // App Constants
-import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+import BusinessRulesConstants from '../constants/BusinessRulesConstants';
 // CSS
 import '../index.css';
 
 /**
  * App context sans starting forward slash.
  */
-const appContext = window.contextPath
+const appContext = window.contextPath;
 
 /**
  * Represents each Business Rule, that is shown as a row, to view, edit, delete / re-deploy Business Rules
  */
 class BusinessRule extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
             name: props.name,
             uuid: props.uuid,
             type: props.type,
-            status: props.status,
-        }
-    }
-
-    /**
-     * Views the business rule form in 'view' mode
-     */
-    viewBusinessRule() {
-        BusinessRulesUtilityFunctions.viewBusinessRuleForm(false, this.props.uuid)
+            status: props.status
+        };
     }
 
     /**
@@ -68,61 +58,54 @@ class BusinessRule extends React.Component {
     }
 
     /**
-     * Opens the business rule form in 'edit' mode
-     */
-    handleEditButtonClick() {
-        BusinessRulesUtilityFunctions.viewBusinessRuleForm(true, this.props.uuid)
-    }
-
-    /**
      * Sends the API call for deleting this business rule
      */
     handleDeleteButtonClick() {
-        this.props.showDeleteDialog(this.props.uuid)
+        this.props.showDeleteDialog(this.props.uuid);
     }
 
     render() {
-        let deploymentStatus = BusinessRulesConstants.BUSINESS_RULE_STATUSES[Number(this.props.status)]
-        let retryDeployButton
+        let deploymentStatus = BusinessRulesConstants.BUSINESS_RULE_STATUSES[Number(this.props.status)];
+        let retryDeployButton;
         switch (this.props.status) {
             case (1) : {
                 retryDeployButton =
-                    <Tooltip id="tooltip-right" title="Deploy" placement="right-end">
+                    (<Tooltip id="tooltip-right" title="Deploy" placement="right-end">
                         <IconButton color="primary" aria-label="Deploy"
-                                    onClick={(e) => this.handleReDeployButtonClick()}>
+                                    onClick={() => this.handleReDeployButtonClick()}>
                             <RefreshIcon/>
                         </IconButton>
-                    </Tooltip>
+                    </Tooltip>);
                 break;
             }
             case (2) : {
                 retryDeployButton =
-                    <Tooltip id="tooltip-right" title="Re-Deploy" placement="right-end">
+                    (<Tooltip id="tooltip-right" title="Re-Deploy" placement="right-end">
                         <IconButton color="primary" aria-label="ReDeploy"
-                                    onClick={(e) => this.handleReDeployButtonClick()}>
+                                    onClick={() => this.handleReDeployButtonClick()}>
                             <RefreshIcon/>
                         </IconButton>
-                    </Tooltip>
+                    </Tooltip>);
                 break;
             }
             case (3) : {
                 retryDeployButton =
-                    <Tooltip id="tooltip-right" title="Retry Un-deploy" placement="right-end">
+                    (<Tooltip id="tooltip-right" title="Retry Un-deploy" placement="right-end">
                         <IconButton color="primary" aria-label="RetryUndeploy"
-                                    onClick={(e) => this.handleReDeployButtonClick()}>
+                                    onClick={() => this.handleReDeployButtonClick()}>
                             <RefreshIcon/>
                         </IconButton>
-                    </Tooltip>
+                    </Tooltip>);
                 break;
             }
             case (4) : {
                 retryDeployButton =
-                    <Tooltip id="tooltip-right" title="Re-Deploy" placement="right-end">
+                    (<Tooltip id="tooltip-right" title="Re-Deploy" placement="right-end">
                         <IconButton color="primary" aria-label="ReDeploy"
-                                    onClick={(e) => this.handleReDeployButtonClick()}>
+                                    onClick={() => this.handleReDeployButtonClick()}>
                             <RefreshIcon/>
                         </IconButton>
-                    </Tooltip>
+                    </Tooltip>);
                 break;
             }
         }
@@ -136,9 +119,9 @@ class BusinessRule extends React.Component {
                 <TableCell>
                     <Tooltip id="tooltip-right" title="View" placement="right-end">
                         <Link
-                            to={appContext + "/businessRuleFrom" +
-                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
-                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + "/templateGroup/businessRule/" +
+                            to={appContext + '/businessRuleFrom' + (this.props.type.charAt(0).toUpperCase() +
+                                this.props.type.substr(1).toLowerCase()) + 'Form/' +
+                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + '/templateGroup/businessRule/' +
                             this.props.uuid}
                             style={{textDecoration: 'none'}}>
                             <IconButton aria-label="View">
@@ -149,9 +132,10 @@ class BusinessRule extends React.Component {
                     &nbsp;
                     <Tooltip id="tooltip-right" title="Edit" placement="right-end">
                         <Link
-                            to={appContext + "/businessRuleFrom" +
-                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
-                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT + "/templateGroup/businessRule/" +
+                            to={appContext + '/businessRuleFrom' +
+                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase())
+                            + 'Form/' +
+                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT + '/templateGroup/businessRule/' +
                             this.props.uuid}
                             style={{textDecoration: 'none'}}>
                             <IconButton aria-label="Edit">
@@ -161,7 +145,7 @@ class BusinessRule extends React.Component {
                     </Tooltip>
                     &nbsp;
                     <Tooltip id="tooltip-right" title="Delete" placement="right-end">
-                        <IconButton aria-label="Delete" onClick={(e) => this.handleDeleteButtonClick()}>
+                        <IconButton aria-label="Delete" onClick={() => this.handleDeleteButtonClick()}>
                             <DeleteIcon/>
                         </IconButton>
                     </Tooltip>
@@ -174,9 +158,10 @@ class BusinessRule extends React.Component {
                 <TableCell>
                     <Tooltip id="tooltip-right" title="View" placement="right-end">
                         <Link
-                            to={appContext + "/businessRuleFrom" +
-                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
-                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + "/templateGroup/businessRule/" +
+                            to={appContext + '/businessRuleFrom' +
+                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) +
+                            'Form/' +
+                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + '/templateGroup/businessRule/' +
                             this.props.uuid}
                             style={{textDecoration: 'none'}}>
                             <IconButton aria-label="View">
