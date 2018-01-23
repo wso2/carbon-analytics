@@ -520,3 +520,7 @@ hr {
 #addNewSourceError {
   color: #d9534f;
 }
+
+.notification-container {
+  z-index: 100000002 !important;
+}
