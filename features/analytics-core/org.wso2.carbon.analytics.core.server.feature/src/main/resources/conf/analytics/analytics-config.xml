@@ -129,4 +129,7 @@
       <!-- All records that insert before the specified retention time will be eligible to purge -->
       <data-retention-days>365</data-retention-days>
    </analytics-data-purging>
+   <static-quorum enabled="false">
+        <quorum-size>2</quorum-size>
+   </static-quorum>
 </analytics-dataservice-configuration>

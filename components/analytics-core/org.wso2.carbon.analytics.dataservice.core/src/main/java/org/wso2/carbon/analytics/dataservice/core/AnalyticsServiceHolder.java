@@ -21,6 +21,7 @@ package org.wso2.carbon.analytics.dataservice.core;
 import com.hazelcast.core.HazelcastInstance;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
+import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsDataServiceConfiguration;
 import org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
@@ -49,7 +50,19 @@ public class AnalyticsServiceHolder {
 
     private static DataSourceService dataSourceService;
 
+
+    private static AnalyticsDataServiceConfiguration analyticsDataServiceConfiguration;
+
     private static Map<String, Class<? extends AggregateFunction>> aggregateFunctions = new HashMap<>();
+
+    public static void setAnalyticsDataServiceConfiguration(AnalyticsDataServiceConfiguration
+                                                                    analyticsDataServiceConfiguration) {
+        AnalyticsServiceHolder.analyticsDataServiceConfiguration = analyticsDataServiceConfiguration;
+    }
+
+    public static AnalyticsDataServiceConfiguration getAnalyticsDataServiceConfiguration() {
+        return analyticsDataServiceConfiguration;
+    }
 
     public static void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         AnalyticsServiceHolder.hazelcastInstance = hazelcastInstance;

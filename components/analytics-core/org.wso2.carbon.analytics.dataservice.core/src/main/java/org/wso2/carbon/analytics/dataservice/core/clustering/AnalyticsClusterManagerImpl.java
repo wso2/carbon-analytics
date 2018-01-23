@@ -27,6 +27,7 @@ import com.hazelcast.spi.exception.TargetNotMemberException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.config.StaticQuorumConfiguration;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -276,13 +277,20 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     public <T> List<T> executeAll(String groupId, Callable<T> callable)
             throws AnalyticsClusterException {
         List<Member> members = this.getGroupMembers(groupId);
+        for (Iterator<Member> iter = members.iterator(); iter.hasNext(); ) {
+            // remove null members
+            if (iter.next() == null) {
+                iter.remove();
+            }
+        }
         List<T> result = new ArrayList<T>();
         Map<Member, Future<T>> executionResult = this.hz.getExecutorService(
                 this.generateGroupExecutorId(groupId)).submitToMembers(callable, members);
         List<Member> invalidMembers = new ArrayList<>();
         for (Map.Entry<Member, Future<T>> entry : executionResult.entrySet()) {
             try {
-                result.add(entry.getValue().get());
+                Future<T> value = entry.getValue();
+                result.add(value.get());
             } catch (TargetNotMemberException e) {
                 invalidMembers.add(entry.getKey());
                 log.warn("Invalid target member: " + entry.getKey() + " removed from group: " + groupId);
@@ -392,6 +400,21 @@ public class AnalyticsClusterManagerImpl implements AnalyticsClusterManager, Mem
     public void memberRemoved(MembershipEvent event) {
         Member member = event.getMember();
         log.info("Member Removed Event : " + member);
+
+        StaticQuorumConfiguration staticQuorumConfiguration = AnalyticsServiceHolder
+                .getAnalyticsDataServiceConfiguration().getStaticQuorumConfiguration();
+        // if static quorum strategy is enabled
+        if (staticQuorumConfiguration != null && staticQuorumConfiguration.isEnabled()) {
+            // check whether this node is in a cluster where the quorum is satisfied
+            if (event.getMembers().size() < staticQuorumConfiguration.getQuorumSize()) {
+                // if this node is in a cluster where the quorum is not satisfied, shutdown itself.
+                log.info(String.format("[Current members]: %s [Quorum size]: %s - Quorum is not satisfied, this node " +
+                        "" + "will be shutdown now...", event.getMembers().size(), staticQuorumConfiguration
+                        .getQuorumSize()));
+                System.exit(0);
+            }
+        }
+
         Set<String> groupIds = this.groups.keySet();
 
         log.info("Group IDs : " + groupIds.size() + " --> " + groupIds);

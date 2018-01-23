@@ -38,7 +38,9 @@ public class AnalyticsDataServiceConfiguration {
     private AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration;
 
     private AnalyticsFacetConfiguration analyticsFacetConfiguration;
-        
+
+    private StaticQuorumConfiguration staticQuorumConfiguration;
+
     private String primaryRecordStore;
         
     private int shardCount;
@@ -183,6 +185,15 @@ public class AnalyticsDataServiceConfiguration {
     public void setAnalyticsDataPurgingConfiguration(
             AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration) {
         this.analyticsDataPurgingConfiguration = analyticsDataPurgingConfiguration;
+    }
+
+    @XmlElement(name = "static-quorum")
+    public StaticQuorumConfiguration getStaticQuorumConfiguration() {
+        return staticQuorumConfiguration;
+    }
+
+    public void setStaticQuorumConfiguration(StaticQuorumConfiguration staticQuorumConfiguration) {
+        this.staticQuorumConfiguration = staticQuorumConfiguration;
     }
 
 }

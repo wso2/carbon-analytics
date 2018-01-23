@@ -58,9 +58,6 @@ import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.TaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -74,6 +71,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 /**
  * The implementation of {@link AnalyticsDataService}.
@@ -131,6 +131,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     
     public AnalyticsDataServiceImpl() throws AnalyticsException {
         AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
+        AnalyticsServiceHolder.setAnalyticsDataServiceConfiguration(config);
         Analyzer luceneAnalyzer;
         this.initARS(config);
         try {
