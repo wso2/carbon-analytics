@@ -21,19 +21,8 @@ import React from 'react';
 import { CircularProgress } from 'material-ui/Progress';
 import { Typography } from 'material-ui';
 import Paper from 'material-ui/Paper';
-// App Components
-import Header from './common/Header';
 // CSS
 import '../index.css';
-// Custom Theme
-import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
-import { Orange } from '../theme/BusinessRulesManagerColors';
-
-const theme = createMuiTheme({
-    palette: {
-        primary: Orange,
-    },
-});
 
 /**
  * Styles related to this component
@@ -50,45 +39,20 @@ const styles = {
 };
 
 /**
- * Shows circular progress
+ * Represents circular progress
  */
 class ProgressDisplay extends React.Component {
     render() {
         return (
-            <MuiThemeProvider theme={theme}>
-                <div>
-                    <center>
-                        <Header />
-                        <br />
-                        <br />
-                        <div>
-                            <Paper style={styles.paper}>
-                                <br/>
-                                {(this.props.error) ?
-                                    (<div>
-                                        <Typography type="headline">
-                                            {this.props.error[0]}
-                                        </Typography>
-                                        <Typography type="body2">
-                                            {this.props.error[1]}
-                                        </Typography>
-                                    </div>) :
-                                    (<div>
-                                        <CircularProgress size={50}/>
-                                        <Typography type="subheading">
-                                            Please wait
-                                        </Typography>
-                                    </div>)
-                                }
-                                <br/>
-                            </Paper>
-                        </div>
-                        <br/>
-                    </center>
-                </div>
-            </MuiThemeProvider>
-        )
-
+            <div>
+                <Paper style={styles.paper}>
+                    <CircularProgress size={50}/>
+                    <Typography type="subheading">
+                        Please wait
+                    </Typography>
+                </Paper>
+            </div>
+        );
     }
 }
 

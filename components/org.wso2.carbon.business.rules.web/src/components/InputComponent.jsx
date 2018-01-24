@@ -90,7 +90,7 @@ class InputComponent extends React.Component {
 
             // Store as a 2 dimensional array of [fieldName, fieldType]s
             let inputStreamFields =
-                this.props.getFields(this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition']);
+                this.props.getFields(this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition);
             let inputStreamFieldsToDisplay = [];
             for (let field in inputStreamFields) {
                 if (Object.prototype.hasOwnProperty.call(inputStreamFields, field)) {

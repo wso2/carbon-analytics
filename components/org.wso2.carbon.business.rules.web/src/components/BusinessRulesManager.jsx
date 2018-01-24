@@ -27,11 +27,10 @@ import Dialog, { DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import Paper from 'material-ui/Paper';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
-import { CircularProgress } from 'material-ui/Progress';
 // App Components
 import BusinessRule from './BusinessRule';
 import Header from './common/Header';
-// App Utilities
+import ProgressDisplay from './ProgressDisplay';
 // App Constants
 import BusinessRulesMessages from '../constants/BusinessRulesMessages';
 import BusinessRulesConstants from '../constants/BusinessRulesConstants';
@@ -277,16 +276,7 @@ class BusinessRulesManager extends React.Component {
             }
         } else {
             // Show Loading progress
-            return (
-                <div>
-                    <Paper style={styles.paper}>
-                        <CircularProgress size={50}/>
-                        <Typography type="subheading">
-                            Please wait
-                        </Typography>
-                    </Paper>
-                </div>
-            );
+            return (<ProgressDisplay />);
         }
     }
 

@@ -290,11 +290,11 @@ class BusinessRuleFromScratchForm extends React.Component {
                 name={property.propertyName}
                 fieldName={property.propertyObject.fieldName}
                 description={property.propertyObject.description ? property.propertyObject.description : ''}
-                value={(this.state['businessRuleProperties'][propertyType][property.propertyName]) ?
-                    (this.state['businessRuleProperties'][propertyType][property.propertyName]) : ('')}
+                value={(this.state.businessRuleProperties[propertyType][property.propertyName]) ?
+                    (this.state.businessRuleProperties[propertyType][property.propertyName]) : ('')}
                 errorState={
                     (this.state.isSubmitPressed) &&
-                    (this.state['businessRuleProperties'][propertyType][property.propertyName] === '')
+                    (this.state.businessRuleProperties[propertyType][property.propertyName] === '')
                 }
                 disabledState={formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
                 options={property.propertyObject.options}
@@ -969,7 +969,7 @@ class BusinessRuleFromScratchForm extends React.Component {
                                     this.handleOutputMappingChange(e, fieldName)}
                                 getPropertyComponents={(propertiesType, formMode) =>
                                     this.getPropertyComponents(propertiesType, formMode)}
-                                businessRuleProperties={this.state['businessRuleProperties']}
+                                businessRuleProperties={this.state.businessRuleProperties}
                                 isExpanded={this.state.isOutputComponentExpanded}
                                 toggleExpansion={() => this.toggleOutputComponentExpansion()}
                                 style={styles}

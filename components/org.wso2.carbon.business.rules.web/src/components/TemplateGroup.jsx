@@ -57,7 +57,7 @@ class TemplateGroup extends React.Component {
      * Generates initials to be shown in the avatar
      */
     generateAvatarInitials() {
-        let avatarInitials = "";
+        let avatarInitials = '';
         // Contains words split by space
         const splitWords = this.state.name.split(' ');
 
@@ -98,7 +98,7 @@ class TemplateGroup extends React.Component {
             <Card style={styles.card}>
                 <CardContent>
                     <br/>
-                    <Avatar style={this.generateAvatarColor()['style']}>
+                    <Avatar style={this.generateAvatarColor().style}>
                         {this.generateAvatarInitials()}
                     </Avatar>
                     <br/>

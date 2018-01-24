@@ -51,7 +51,7 @@ class FilterComponent extends React.Component {
         // If an input rule template has been selected
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
             exposedInputStreamFields = this.props.getFields(
-                this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition']);
+                this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition);
         }
 
         filterRulesToDisplay =
@@ -78,7 +78,7 @@ class FilterComponent extends React.Component {
                     />);
 
         // Display rule logic, when at least one filter rule is present
-        if (this.props.businessRuleProperties['ruleComponents']['filterRules'].length > 0) {
+        if (this.props.businessRuleProperties.ruleComponents.filterRules.length > 0) {
             filterRulesTableToDisplay =
                 (<div style={{ width: '100%', overflowX: 'auto' }}>
                     <div style={{ width: '100%', minWidth: 560 }}>
@@ -111,7 +111,7 @@ class FilterComponent extends React.Component {
                             (BusinessRulesMessages.RULE_LOGIC_WARNING +
                                 '. ' + BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT)
                     }
-                    value={this.props.businessRuleProperties['ruleComponents']['ruleLogic'][0]}
+                    value={this.props.businessRuleProperties.ruleComponents.ruleLogic[0]}
                     onValueChange={(e) => this.props.handleRuleLogicChange(e)}
                     errorState={this.props.ruleLogicWarn}
                     disabledState={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}

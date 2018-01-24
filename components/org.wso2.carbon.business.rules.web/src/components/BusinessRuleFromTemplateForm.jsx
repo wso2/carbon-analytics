@@ -500,11 +500,11 @@ class BusinessRuleFromTemplateForm extends React.Component {
                 name={property.propertyName}
                 fieldName={property.propertyObject.fieldName}
                 description={property.propertyObject.description ? property.propertyObject.description : ''}
-                value={(this.state['businessRuleProperties'][property.propertyName]) ?
-                    (this.state['businessRuleProperties'][property.propertyName]) : ('')}
+                value={(this.state.businessRuleProperties[property.propertyName]) ?
+                    (this.state.businessRuleProperties[property.propertyName]) : ('')}
                 errorState={
                     (this.state.isSubmitPressed) &&
-                    (this.state['businessRuleProperties'][property.propertyName] === '')
+                    (this.state.businessRuleProperties[property.propertyName] === '')
                 }
                 disabledState={formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
                 options={property.propertyObject.options}

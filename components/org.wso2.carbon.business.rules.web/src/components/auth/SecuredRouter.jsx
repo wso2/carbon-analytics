@@ -19,20 +19,19 @@
 
 import React from 'react';
 import Qs from 'qs';
-import {Route, Switch} from 'react-router-dom';
-import {Redirect} from 'react-router';
+import { Route, Switch } from 'react-router-dom';
+import { Redirect } from 'react-router';
 // App Components
-import BusinessRulesManager from "../BusinessRulesManager";
-import TemplateGroupSelector from "../TemplateGroupSelector";
-import ProgressDisplay from "../ProgressDisplay";
-import BusinessRuleFromTemplateForm from "../BusinessRuleFromTemplateForm";
-import BusinessRuleFromScratchForm from "../BusinessRuleFromScratchForm";
-import BusinessRuleCreator from "../BusinessRuleCreator";
+import BusinessRulesManager from '../BusinessRulesManager';
+import TemplateGroupSelector from '../TemplateGroupSelector';
+import BusinessRuleFromTemplateForm from '../BusinessRuleFromTemplateForm';
+import BusinessRuleFromScratchForm from '../BusinessRuleFromScratchForm';
+import BusinessRuleCreator from '../BusinessRuleCreator';
 // Auth Utilities
-import AuthManager from "../../utils/AuthManager";
+import AuthManager from '../../utils/AuthManager';
 // Custom Theme
-import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from "../../theme/BusinessRulesManagerColors";
+import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
+import { Orange } from '../../theme/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
     palette: {
@@ -86,7 +85,6 @@ export default class SecuredRouter extends React.Component {
                                path={`${appContext}/businessRuleFromTemplateForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
                                component={BusinessRuleFromTemplateForm}/>
                         <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager}/>
-                        <Route exact path={`${appContext}/progressDisplay`} component={ProgressDisplay}/>
                         <Route exact path={`${appContext}/templateGroupSelector/:mode`}
                                component={TemplateGroupSelector}/>
                     </div>

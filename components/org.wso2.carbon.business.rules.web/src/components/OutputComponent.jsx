@@ -87,7 +87,7 @@ class OutputComponent extends React.Component {
     }
 
     returnSuggestionsAsLabels() {
-        return this.props.getFieldNames(this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition'])
+        return this.props.getFieldNames(this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition)
             .map(fieldName => ({label: fieldName}));
     }
 
@@ -232,7 +232,7 @@ class OutputComponent extends React.Component {
                 // input stream
                 let exposedOutputStreamFieldNames =
                     this.props.getFieldNames(
-                        this.props.selectedOutputRuleTemplate['templates'][0].exposedStreamDefinition);
+                        this.props.selectedOutputRuleTemplate.templates[0].exposedStreamDefinition);
 
                 let outputMappingElementsToDisplay = exposedOutputStreamFieldNames.map((fieldName, index) =>
                     <div key={index} style={{ width: '100%' }}>
