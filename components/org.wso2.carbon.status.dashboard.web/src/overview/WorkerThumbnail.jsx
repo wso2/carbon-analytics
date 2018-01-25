@@ -31,6 +31,7 @@ import { HttpStatus } from '../utils/Constants';
 import OverviewChart from "./OverviewChart";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
+import Clock from "./Clock";
 
 const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex:1}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
@@ -102,6 +103,17 @@ export default class WorkerThumbnail extends React.Component {
                 }
             });
 
+    }
+    renderTime(lastUpdate) {
+        if (lastUpdate === "#") {
+            return (
+                <Clock lastUpdate={this.props.worker.lastUpdate}/>
+            )
+        } else {
+            return (
+                <text>{lastUpdate}</text>
+            )
+        }
     }
     /**
      * Method which render delete worker button if permission is granted
@@ -175,8 +187,7 @@ export default class WorkerThumbnail extends React.Component {
                         </GridTile>
                     </GridList></Link>
             </div>;
-            lastUpdated = Math.abs((this.props.worker.lastUpdate - this.props.currentTime)) / 1000 + "s ago";
-
+            lastUpdated = "#";
             if (this.props.worker.serverDetails.clusterID === "Non Clusters") {
                 if (this.props.worker.serverDetails.runningStatus === "Reachable") {
                     color = 'green'
@@ -286,7 +297,7 @@ export default class WorkerThumbnail extends React.Component {
                         </GridList>
                     </Link>
                 </div>;
-            lastUpdated = Math.abs((this.props.worker.lastUpdate - this.props.currentTime)) / 1000 + "s ago";
+            lastUpdated = "#";
             if (this.props.worker.serverDetails.clusterID === "Non Clusters") {
                 if (this.props.worker.serverDetails.runningStatus === "Reachable") {
                     color = 'green'
@@ -341,7 +352,7 @@ export default class WorkerThumbnail extends React.Component {
                 <GridTile
                     title={this.state.workerID}
                     subtitle=
-                        {<span>Last Updated: {items[1]}
+                        {<span>Last Updated: {this.renderTime(items[1])}
                             <div style={{float: 'right', display: 'inline'}}><strong>{items[3]}</strong></div>
                         </span>}
                     actionIcon={<IconButton><CircleBorder
