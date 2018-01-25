@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice.core.indexing;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.hazelcast.spi.exception.TargetNotMemberException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -152,7 +153,9 @@ public class AnalyticsDataIndexer {
      * @throws AnalyticsException
      */
     public void init() throws AnalyticsException {
-        this.genericIndexExecutor = Executors.newCachedThreadPool();
+        this.genericIndexExecutor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().
+                setNameFormat("Thread pool- component - AnalyticsDataIndexer.genericIndexExecutor").
+                build());
         if (System.getProperty(ENABLE_INDEXING_STATS_SYS_PROP) != null) {
             this.indexingStatsEnabled = true;
         }
@@ -396,7 +399,8 @@ public class AnalyticsDataIndexer {
         }
         List<List<Integer>> indexWorkerPlan = this.generateIndexWorkerPlan();
         this.workers = new ArrayList<>(indexWorkerPlan.size());
-        this.shardWorkerExecutor = Executors.newFixedThreadPool(indexWorkerPlan.size());
+        this.shardWorkerExecutor = Executors.newFixedThreadPool(indexWorkerPlan.size(),new ThreadFactoryBuilder().
+                setNameFormat("Thread pool- component - AnalyticsDataIndexer.shardWorkerExecutor").build());
         for (List<Integer> indexWorkerIndices : indexWorkerPlan) {
             IndexWorker worker = new IndexWorker(indexWorkerIndices);
             this.workers.add(worker);
@@ -2063,7 +2067,8 @@ public class AnalyticsDataIndexer {
         if (this.reIndexWorkerExecutor == null) {
             this.reIndexWorkerExecutor = new ThreadPoolExecutor(0, REINDEX_THREAD_COUNT,
                     Long.MAX_VALUE, TimeUnit.SECONDS,
-                    new ArrayBlockingQueue<Runnable>(REINDEX_QUEUE_LIMIT));
+                    new ArrayBlockingQueue<Runnable>(REINDEX_QUEUE_LIMIT),new ThreadFactoryBuilder().
+                    setNameFormat("Thread pool- component - AnalyticsDataIndexer.reIndexWorkerExecutor").build());
         }
         try {
             this.reIndexWorkerExecutor.submit(new ReIndexWorker(tenantId, this, table, startTime, endTime));

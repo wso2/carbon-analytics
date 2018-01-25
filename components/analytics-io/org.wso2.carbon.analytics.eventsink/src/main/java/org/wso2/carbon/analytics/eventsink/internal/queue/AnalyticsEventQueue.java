@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.analytics.eventsink.internal.queue;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import org.apache.commons.logging.Log;
@@ -47,7 +48,8 @@ public class AnalyticsEventQueue {
     public AnalyticsEventQueue(int tenantId) {
         Disruptor<WrappedEventFactory.WrappedEvent> eventQueue = new Disruptor<>(new WrappedEventFactory(),
                 ServiceHolder.getAnalyticsEventSinkConfiguration().getQueueSize(),
-                Executors.newCachedThreadPool());
+                Executors.newCachedThreadPool(new ThreadFactoryBuilder().
+                        setNameFormat("Thread pool- component - AnalyticsEventQueue").build()));
         eventQueue.handleEventsWith(new AnalyticsEventQueueWorker(tenantId, this));
         this.currentEventSize = 0;
         this.ringBuffer = eventQueue.start();

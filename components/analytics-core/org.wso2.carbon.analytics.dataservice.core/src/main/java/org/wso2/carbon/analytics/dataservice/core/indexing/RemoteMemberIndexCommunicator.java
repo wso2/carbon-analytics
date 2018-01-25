@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.dataservice.core.indexing;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventHandler;
@@ -50,7 +51,7 @@ public class RemoteMemberIndexCommunicator {
     
     private int remoteIndexerCommunicatorBufferSize;
 
-    private ExecutorService executor = Executors.newCachedThreadPool();
+    private ExecutorService executor;
     
     private Map<Object, Disruptor<RecordsHolder>> disruptorMap = new HashMap<>();
 
@@ -60,6 +61,8 @@ public class RemoteMemberIndexCommunicator {
                                          StagingIndexDataStore stagingIndexDataStore) {
         this.remoteIndexerCommunicatorBufferSize = remoteIndexerCommunicatorBufferSize;
         this.stagingIndexDataStore = stagingIndexDataStore;
+        this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().
+                setNameFormat("Thread pool- component - RemoteMemberIndexCommunicator.executor").build());
     }
 
     public void put(Object member, List<Record> records, String nodeId) throws AnalyticsException {
