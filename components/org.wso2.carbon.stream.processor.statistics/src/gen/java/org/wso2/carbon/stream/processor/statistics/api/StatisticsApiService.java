@@ -18,12 +18,14 @@
  */
 package org.wso2.carbon.stream.processor.statistics.api;
 
+import org.wso2.msf4j.Request;
+
 import javax.ws.rs.core.Response;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-19T09:20:55.612Z")
 public abstract class StatisticsApiService {
 
-    public abstract Response statisticsGet() throws NotFoundException;
+    public abstract Response statisticsGet(Request request) throws NotFoundException;
 
-    public abstract Response enableStats(boolean statsEnable) throws NotFoundException;
+    public abstract Response enableStats(boolean statsEnable,Request request) throws NotFoundException;
 }
