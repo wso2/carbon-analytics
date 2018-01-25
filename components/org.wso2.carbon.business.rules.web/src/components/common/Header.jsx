@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -17,8 +17,7 @@
  */
 
 import React from 'react';
-import {Link} from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
@@ -42,7 +41,7 @@ const styles = {
         // width: '100%',
         // margin: 0
     }
-}
+};
 
 /**
  * App context.
@@ -59,8 +58,7 @@ class Header extends React.Component {
 
     /**
      * Renders right side elements of the header
-     *
-     * @returns {XML} HTML content
+     * @returns {*}
      */
     renderRightLinks() {
         const homeButton = (
@@ -128,7 +126,7 @@ class Header extends React.Component {
                     }}
                 >
                     <MenuItem>
-                        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
+                        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
                             Log out
                         </Link>
                     </MenuItem>
@@ -142,7 +140,7 @@ class Header extends React.Component {
             <AppBar position="static" style={styles.headerStyle}>
                 <Toolbar>
                     <Link to={`${appContext}/businessRulesManager`} style={{ textDecoration: 'none' }}>
-                        <img height='35' src={Logo} style={{ cursor: 'pointer' }}/>
+                        <img height="35" src={Logo} style={{ cursor: 'pointer' }}/>
                     </Link>
                     &nbsp;
                     &nbsp;

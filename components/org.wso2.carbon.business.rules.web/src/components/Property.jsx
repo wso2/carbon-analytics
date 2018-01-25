@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -19,9 +19,9 @@
 import React from 'react';
 // Material UI Components
 import TextField from 'material-ui/TextField';
-import {FormControl, FormHelperText} from 'material-ui/Form';
-import Input, {InputLabel} from 'material-ui/Input';
-import {MenuItem} from 'material-ui/Menu';
+import { FormControl, FormHelperText } from 'material-ui/Form';
+import Input, { InputLabel } from 'material-ui/Input';
+import { MenuItem } from 'material-ui/Menu';
 import Select from 'material-ui/Select';
 // CSS
 import '../index.css';
@@ -32,18 +32,16 @@ import '../index.css';
 class Property extends React.Component {
     /**
      * Handles onChange action of a TextField or a Select
-     * @param name
+     * @param event
      */
     handleOnChange(event) {
-        this.props.onValueChange(event.target.value)
+        this.props.onValueChange(event.target.value);
     }
 
     // Renders each Property either as a TextField or Radio Group, with default values and elements as specified
     render() {
         // If there are options specified, it is a dropdown
         if (this.props.options) {
-            var options = this.props.options.map((option) => (
-                <MenuItem key={option} name={option} value={option}>{option}</MenuItem>))
             return (
                 <div>
                     <FormControl
@@ -57,9 +55,10 @@ class Property extends React.Component {
                             onChange={(e) => this.handleOnChange(e)}
                             input={<Input id={this.props.name}/>}
                         >
-                            {options}
+                            {this.props.options.map((option) => (
+                                <MenuItem key={option} name={option} value={option}>{option}</MenuItem>))}
                         </Select>
-                        <FormHelperText>{this.props.description}</FormHelperText>
+                        <FormHelperText>{this.props.description ? this.props.description : ''}</FormHelperText>
                     </FormControl>
                     <br/>
                 </div>
@@ -76,7 +75,7 @@ class Property extends React.Component {
                         name={this.props.name}
                         label={this.props.fieldName}
                         value={this.props.value}
-                        helperText={this.props.description}
+                        helperText={this.props.description || ''}
                         margin="normal"
                         onChange={(e) => this.handleOnChange(e)}/>
                     <br/>

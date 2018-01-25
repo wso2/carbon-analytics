@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -19,7 +19,7 @@
 import React from 'react';
 import axios from 'axios';
 // Auth Utils
-import AuthManager from "../utils/AuthManager";
+import AuthManager from '../utils/AuthManager';
 
 /**
  * App context.
@@ -31,27 +31,25 @@ const appContext = window.contextPath;
  */
 class BusinessRulesAPICaller {
     constructor(url) {
-        this.url = url
+        this.url = url;
     }
 
     /**
      * Returns the axios http client
      */
     getHTTPClient() {
-        let httpClient = axios.create({
+        return axios.create({
             baseURL: this.url + appContext,
             timeout: 30000,
             headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID}
         });
-        // httpClient.defaults.headers.post['Content-Type'] = 'application/json';
-        return httpClient;
     }
 
     /**
      * Returns available template groups
      */
     getTemplateGroups() {
-        return this.getHTTPClient().get('/template-groups')
+        return this.getHTTPClient().get('/template-groups');
     }
 
     /**
@@ -59,7 +57,7 @@ class BusinessRulesAPICaller {
      * @param templateGroupID
      */
     getTemplateGroup(templateGroupID) {
-        return this.getHTTPClient().get('/template-groups/' + templateGroupID)
+        return this.getHTTPClient().get('/template-groups/' + templateGroupID);
     }
 
     /**
@@ -67,7 +65,7 @@ class BusinessRulesAPICaller {
      * @param templateGroupID
      */
     getRuleTemplates(templateGroupID) {
-        return this.getHTTPClient().get('/template-groups/' + templateGroupID + '/templates')
+        return this.getHTTPClient().get('/template-groups/' + templateGroupID + '/templates');
     }
 
     /**
@@ -78,7 +76,7 @@ class BusinessRulesAPICaller {
      * @param ruleTemplateID
      */
     getRuleTemplate(templateGroupID, ruleTemplateID) {
-        return this.getHTTPClient().get('/template-groups/' + templateGroupID + '/templates/' + ruleTemplateID)
+        return this.getHTTPClient().get('/template-groups/' + templateGroupID + '/templates/' + ruleTemplateID);
     }
 
     /**
@@ -93,14 +91,14 @@ class BusinessRulesAPICaller {
         let formData = new FormData();
         formData.append("businessRule", (businessRuleJSON));
         return this.getHTTPClient().post('/instances?deploy=' + deployStatus, formData,
-            {headers: {'Content-Type': 'multipart/form-data'}})
+            {headers: {'Content-Type': 'multipart/form-data'}});
     }
 
     /**
      * Returns available business rules
      */
     getBusinessRules() {
-        return this.getHTTPClient().get('/instances')
+        return this.getHTTPClient().get('/instances');
     }
 
     /**
@@ -108,7 +106,7 @@ class BusinessRulesAPICaller {
      * @param businessRuleID
      */
     getBusinessRule(businessRuleID) {
-        return this.getHTTPClient().get('/instances/' + businessRuleID)
+        return this.getHTTPClient().get('/instances/' + businessRuleID);
     }
 
     /**
@@ -122,7 +120,7 @@ class BusinessRulesAPICaller {
      */
     updateBusinessRule(businessRuleID, businessRuleJSON, deployStatus) {
         return this.getHTTPClient().put('/instances/' + businessRuleID + '?deploy=' + deployStatus,
-            businessRuleJSON, {headers: {'Content-Type': 'application/json'}})
+            businessRuleJSON, {headers: {'Content-Type': 'application/json'}});
     }
 
     /**

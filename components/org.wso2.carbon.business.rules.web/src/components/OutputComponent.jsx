@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -17,36 +17,170 @@
  */
 
 import React from 'react';
+import Autosuggest from 'react-autosuggest';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
 // Material UI Components
 import Collapse from 'material-ui/transitions/Collapse';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
+import TextField from 'material-ui/TextField';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
-import {FormControl, FormHelperText} from 'material-ui/Form';
-import Input, {InputLabel} from 'material-ui/Input';
+import { FormControl, FormHelperText } from 'material-ui/Form';
+import Input, { InputLabel } from 'material-ui/Input';
 import Select from 'material-ui/Select';
-import {MenuItem} from 'material-ui/Menu';
-import Table, {TableBody, TableCell, TableHead, TableRow} from 'material-ui/Table';
-import {IconButton} from "material-ui";
+import { MenuItem } from 'material-ui/Menu';
+import { IconButton } from 'material-ui';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 // App Utilities
-import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
+import BusinessRulesUtilityFunctions from '../utils/BusinessRulesUtilityFunctions';
 // App Constants
-import BusinessRulesConstants from "../constants/BusinessRulesConstants";
-import BusinessRulesMessages from "../constants/BusinessRulesMessages";
+import BusinessRulesConstants from '../constants/BusinessRulesConstants';
+import BusinessRulesMessages from '../constants/BusinessRulesMessages';
 // CSS
 import '../index.css';
+
+/**
+ * Styles related to autosuggest fields
+ */
+const autoSuggestStyles = {
+    container: {
+        flexGrow: 1,
+        position: 'relative',
+        width: '40%',
+        height: 70,
+        float: 'left',
+    },
+    suggestionsContainerOpen: {
+        position: 'absolute',
+        marginTop: 1,
+        marginBottom: 3,
+        left: 0,
+        right: 0,
+    },
+    suggestion: {
+        display: 'block',
+    },
+    suggestionsList: {
+        margin: 0,
+        padding: 0,
+        listStyleType: 'none',
+    },
+    textField: {
+        width: '100%',
+    },
+};
+
 
 /**
  * Represents the output component of the business rule from scratch form,
  * which will contain output rule template selection, output configurations and input-as-output mappings
  */
 class OutputComponent extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            value: '',
+            suggestions: [],
+        };
+    }
+
+    returnSuggestionsAsLabels() {
+        return this.props.getFieldNames(this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition)
+            .map(fieldName => ({label: fieldName}));
+    }
+
+    renderInput(inputProps, mode) {
+        const { autoFocus, value, ref } = inputProps;
+
+        return (
+            <TextField
+                autoFocus={autoFocus}
+                style={autoSuggestStyles.textField}
+                value={value}
+                inputRef={ref}
+                InputProps={{ inputProps }}
+                disabled={mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+            />
+        );
+    }
+
+    renderSuggestion(suggestion, { query, isHighlighted }) {
+        const matches = match(suggestion.label, query);
+        const parts = parse(suggestion.label, matches);
+
+        return (
+            <MenuItem selected={isHighlighted} component="div">
+                <div>
+                    {parts.map((part, index) => {
+                        return part.highlight ? (
+                            <span key={String(index)} style={{ fontWeight: 300 }}>
+                {part.text}
+              </span>
+                        ) : (
+                            <strong key={String(index)} style={{ fontWeight: 500 }}>
+                                {part.text}
+                            </strong>
+                        );
+                    })}
+                </div>
+            </MenuItem>
+        );
+    }
+
+    renderSuggestionsContainer(options) {
+        const { containerProps, children } = options;
+
+        return (
+            <Paper
+                key={containerProps.key}
+                id={containerProps.id}
+                style={containerProps.style}
+                ref={containerProps.ref}
+                elevation={5}
+                square
+            >
+                {children}
+            </Paper>
+        );
+    }
+
+    getSuggestionValue(suggestion) {
+        return suggestion.label;
+    }
+
+    getSuggestions(value) {
+        const inputValue = value.trim().toLowerCase();
+        const inputLength = inputValue.length;
+        let count = 0;
+
+        let suggestions = this.returnSuggestionsAsLabels();
+
+        return inputLength === 0
+            ? []
+            : suggestions.filter(suggestion => {
+                const keep =
+                    count < 5 && suggestion.label.toLowerCase().slice(0, inputLength) === inputValue;
+
+                if (keep) {
+                    count += 1;
+                }
+
+                return keep;
+            });
+    }
+
+    handleSuggestionsFetchRequested({ value }) {
+        this.setState({
+            suggestions: this.getSuggestions(value),
+        });
+    };
+
     render() {
-        let outputRuleTemplatesToDisplay
-        let outputDataPropertiesToDisplay
-        let outputMappingsToDisplay
+        let outputRuleTemplatesToDisplay;
+        let outputDataPropertiesToDisplay;
+        let outputMappingsToDisplay;
 
         // To display rule templates selection drop down
         let outputRuleTemplateElements = this.props.outputRuleTemplates.map((outputRuleTemplate) =>
@@ -55,7 +189,7 @@ class OutputComponent extends React.Component {
             </MenuItem>
         );
         outputRuleTemplatesToDisplay =
-            <FormControl
+            (<FormControl
                 disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}>
                 <InputLabel htmlFor="inputRuleTemplate">Rule Template</InputLabel>
                 <Select
@@ -73,22 +207,22 @@ class OutputComponent extends React.Component {
                         (BusinessRulesMessages.SELECT_RULE_TEMPLATE)
                     }
                 </FormHelperText>
-            </FormControl>
+            </FormControl>);
 
         // If an output rule template has been selected
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) {
             // To display output data properties
             let outputDataConfigurations = this.props.getPropertyComponents(
                 BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT,
-                this.props.mode)
+                this.props.mode);
 
             outputDataPropertiesToDisplay =
-                <div>
+                (<div>
                     <Typography type="subheading">
                         Configurations
                     </Typography>
                     {outputDataConfigurations}
-                </div>
+                </div>);
 
             // To display Output Mappings
 
@@ -98,74 +232,57 @@ class OutputComponent extends React.Component {
                 // input stream
                 let exposedOutputStreamFieldNames =
                     this.props.getFieldNames(
-                        this.props.selectedOutputRuleTemplate['templates'][0]['exposedStreamDefinition'])
+                        this.props.selectedOutputRuleTemplate.templates[0].exposedStreamDefinition);
 
-                let exposedInputStreamFieldNames =
-                    this.props.getFieldNames(
-                        this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition'])
-
-                // Each drop down will have fields of the exposed input stream as options
-                // Store as a 2 dimensional array of [fieldName, fieldType]s
-                let inputStreamFields =
-                    this.props.getFields(
-                        this.props.selectedInputRuleTemplate.templates[0]['exposedStreamDefinition'])
-                let inputStreamFieldsToDisplay = []
-                for (let field in inputStreamFields) {
-                    inputStreamFieldsToDisplay.push([field, inputStreamFields[field]])
-                }
-
-                let inputStreamFieldsToMap = exposedInputStreamFieldNames.map((fieldName, index) =>
-                    <MenuItem key={index}
-                              value={fieldName}>
-                        {fieldName}
-                    </MenuItem>
-                )
-
-                // To display a row for each output field map
                 let outputMappingElementsToDisplay = exposedOutputStreamFieldNames.map((fieldName, index) =>
-                    <TableRow key={index}>
-                        <TableCell>
-                            <FormControl
-                                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}>
-                                <Select
-                                    // No value when no mapping is specified
-                                    // (used when a different output rule template is selected)
-                                    value={(this.props.businessRuleProperties['outputMappings'][fieldName]) ?
-                                        (this.props.businessRuleProperties['outputMappings'][fieldName]) : ''}
-                                    onChange={(e) => this.props.handleOutputMappingChange(e, fieldName)}
-                                    // the method
-                                    input={<Input id="templateGroup"/>}
-                                >
-                                    {inputStreamFieldsToMap}
-                                </Select>
-                            </FormControl>
-                        </TableCell>
-                        <TableCell>
-                            As
-                        </TableCell>
-                        <TableCell>
-                            {fieldName}
-                        </TableCell>
-                    </TableRow>
-                )
+                    <div key={index} style={{ width: '100%' }}>
+                        <Autosuggest
+                            theme={autoSuggestStyles}
+                            // renderInputComponent={this.renderInput}
+                            renderInputComponent={e => this.renderInput(e, this.props.mode)}
+                            suggestions={this.state.suggestions}
+                            onSuggestionsFetchRequested={e => this.handleSuggestionsFetchRequested(e)}
+                            renderSuggestionsContainer={this.renderSuggestionsContainer}
+                            getSuggestionValue={this.getSuggestionValue}
+                            renderSuggestion={this.renderSuggestion}
+                            inputProps={{
+                                autoFocus: true,
+                                autoSuggestStyles,
+                                placeholder: '',
+                                value: (this.props.businessRuleProperties.outputMappings[fieldName]) ?
+                                    (this.props.businessRuleProperties.outputMappings[fieldName]) : '',
+                                onChange: (e,v) => this.props.handleOutputMappingChange(v, fieldName),
+                            }}
+                        />
+                        <div style={{ float: 'left', width: '20%', height: 70 }}>
+                            <center>
+                                <Typography type="subheading">As</Typography>
+                            </center>
+                        </div>
+                        <div style={{ float: 'left', width: '40%', height: 70 }}>
+                            <Typography type="subheading">{fieldName}</Typography>
+                        </div>
+                    </div>
+                );
 
                 outputMappingsToDisplay =
                     <div>
                         <Typography type="subheading">
                             Mappings
                         </Typography>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Input</TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell>Output</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {outputMappingElementsToDisplay}
-                            </TableBody>
-                        </Table>
+                        <br />
+                        <div style={{ width: '100%' }}>
+                            <div style={{ float: 'left', width: '40%', height: 30 }}>
+                                <Typography type="caption">Input</Typography>
+                            </div>
+                            <div style={{ float: 'left', width: '20%', height: 30 }}>
+                                <Typography />
+                            </div>
+                            <div style={{ float: 'left', width: '40%', height: 30 }}>
+                                <Typography type="caption">Output</Typography>
+                            </div>
+                            {outputMappingElementsToDisplay}
+                        </div>
                     </div>
             }
         }
@@ -176,26 +293,28 @@ class OutputComponent extends React.Component {
                     <Toolbar>
                         <Typography type="subheading">Output</Typography>
                         <IconButton
-                            onClick={(e) => this.props.toggleExpansion()}
+                            onClick={() => this.props.toggleExpansion()}
                         >
                             <ExpandMoreIcon/>
                         </IconButton>
                     </Toolbar>
                 </AppBar>
-                <Paper style={this.props.style.paper}>
+                <Paper>
                     <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
-                        <br/>
-                        <center>
-                            {outputRuleTemplatesToDisplay}
-                        </center>
-                        <br/>
-                        <br/>
-                        <br/>
-                        {outputDataPropertiesToDisplay}
-                        <br/>
-                        <br/>
-                        {outputMappingsToDisplay}
-                        <br/>
+                        <div style={this.props.style.paperContainer}>
+                            <br/>
+                            <center>
+                                {outputRuleTemplatesToDisplay}
+                            </center>
+                            <br/>
+                            <br/>
+                            <br/>
+                            {outputDataPropertiesToDisplay}
+                            <br/>
+                            <br/>
+                            {outputMappingsToDisplay}
+                            <br/>
+                        </div>
                     </Collapse>
                 </Paper>
             </div>

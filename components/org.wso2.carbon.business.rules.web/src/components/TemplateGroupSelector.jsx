@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -17,25 +17,23 @@
  */
 
 import React from 'react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 // App Components
 import TemplateGroup from './TemplateGroup';
-import Header from "./common/Header";
+import Header from './common/Header';
 // App Utilities
-import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 // App Constants
-import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+import BusinessRulesConstants from '../constants/BusinessRulesConstants';
 // CSS
 import '../index.css';
+import BusinessRulesAPICaller from '../api/BusinessRulesAPICaller';
 
 /**
- * Allows to select a Template Group, among Template Groups displayed as thumbnails
+ * Styles related to this component
  */
-
-// Styles related to this component
 const styles = {
     containerDiv: {
         maxWidth: 750
@@ -47,31 +45,33 @@ const styles = {
         padding: 5,
     },
     spacing: '0'
-}
+};
 
 /**
  * App context.
  */
 const appContext = window.contextPath;
 
+/**
+ * Allows to select a Template Group, among Template Groups displayed as thumbnails
+ */
 class TemplateGroupSelector extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             mode: this.props.match.params.mode,
             templateGroups: []
-        }
+        };
     }
 
     componentDidMount() {
-        let that = this
-        let templateGroupsPromise = BusinessRulesUtilityFunctions.getTemplateGroups()
-        templateGroupsPromise.then(function (templateGroupsResponse) {
-            let filteredTemplateGroups = that.removeInvalidTemplateGroups(templateGroupsResponse.data[2])
-            that.setState({
-                templateGroups: filteredTemplateGroups
-            })
-        })
+        new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).getTemplateGroups()
+            .then((templateGroupsResponse) => {
+                let filteredTemplateGroups = this.removeInvalidTemplateGroups(templateGroupsResponse.data[2]);
+                this.setState({
+                    templateGroups: filteredTemplateGroups
+                });
+            });
     }
 
     /**
@@ -82,7 +82,7 @@ class TemplateGroupSelector extends React.Component {
      * @returns {Array}
      */
     removeInvalidTemplateGroups(templateGroups) {
-        let filteredTemplateGroups = [];
+        const filteredTemplateGroups = [];
         for (let i = 0; i < templateGroups.length; i++) {
             let templateRuleTemplatesCount = 0;
             let inputRuleTemplatesCount = 0;
@@ -110,41 +110,43 @@ class TemplateGroupSelector extends React.Component {
     }
 
     render() {
-        let templateGroups
+        let templateGroups;
         // Business rule to be created from template
         if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
                     <Link
                         to={appContext + "/businessRuleFromTemplateForm/" +
-                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
+                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid
+                        + "/businessRule/" + templateGroup.uuid}
                         style={{textDecoration: 'none'}}>
                         <TemplateGroup
                             key={templateGroup.uuid}
                             name={templateGroup.name}
                             uuid={templateGroup.uuid}
-                            description={templateGroup.description}
+                            description={templateGroup.description ? templateGroup.description : ''}
                         />
                     </Link>
                 </Grid>
-            )
+            );
         } else {
-            // Business rule to be created from scratch todo: can optimize this block it seems
+            // Business rule to be created from scratch
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
                     <Link
                         to={appContext + "/businessRuleFromScratchForm/" +
-                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
+                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" +
+                        templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
                         style={{textDecoration: 'none'}}>
                         <TemplateGroup
                             key={templateGroup.uuid}
                             name={templateGroup.name}
                             uuid={templateGroup.uuid}
-                            description={templateGroup.description}
+                            description={templateGroup.description ? templateGroup.description : ''}
                         />
                     </Link>
                 </Grid>
-            )
+            );
         }
 
         return (
@@ -157,18 +159,22 @@ class TemplateGroupSelector extends React.Component {
                         Select a Template Group
                     </Typography>
                     <br/>
-
                     <Grid container style={styles.root}>
                         <Grid item xs={12}>
                             <Grid container justify="center" spacing={Number(styles.spacing)}>
-                                {templateGroups}
+                                {(this.state.templateGroups.length > 0) ?
+                                    (templateGroups) :
+                                    (<Grid item>
+                                        <Typography>
+                                            No Template Groups found
+                                        </Typography>
+                                    </Grid>)}
                             </Grid>
                         </Grid>
                     </Grid>
-
                 </center>
             </div>
-        )
+        );
     }
 }
 

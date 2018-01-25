@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -17,17 +17,21 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 // Ace Editor Components
 import AceEditor from 'react-ace';
 import 'brace/mode/text';
 // Material UI Components
 import Typography from 'material-ui/Typography';
-import Card, {CardActions, CardContent} from 'material-ui/Card';
-import {IconButton} from "material-ui";
+import Card, { CardActions, CardContent } from 'material-ui/Card';
+import { IconButton } from "material-ui";
 import ClearIcon from 'material-ui-icons/Clear';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import Collapse from 'material-ui/transitions/Collapse';
 
+/**
+ * Styles related to this component
+ */
 const styles = {
     formPaper: {
         padding: 30,
@@ -49,7 +53,7 @@ const styles = {
     errorText: {
         color: '#C62828',
     }
-}
+};
 
 /**
  * Represents a SiddhiApp template
@@ -58,9 +62,7 @@ class Template extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            type: 'siddhiApp',
-            content: props.content,
-            isExpanded: false,
+            isExpanded: false
         };
         this.toggleExpansion = this.toggleExpansion.bind(this);
     }
@@ -79,7 +81,7 @@ class Template extends React.Component {
             <div style={styles.formPaperContainer}>
                 <Card>
                     <CardActions disableActionSpacing style={styles.header}>
-                        <Typography type='subheading'>SiddhiApp</Typography>
+                        <Typography type="subheading">SiddhiApp</Typography>
                         <div style={styles.flexGrow} />
                         {(!this.props.invalid) ? (null) :
                             (<Typography type="body2" style={styles.errorText}>
@@ -88,32 +90,40 @@ class Template extends React.Component {
                         <IconButton
                             onClick={this.toggleExpansion}
                         >
-                            <ExpandMoreIcon/>
+                            <ExpandMoreIcon />
                         </IconButton>
                         <IconButton
-                            color='primary'
+                            color="primary"
                             disabled={this.props.notRemovable}
-                            aria-label='Remove'
+                            aria-label="Remove"
                             onClick={this.props.removeTemplate}
                         >
-                            <ClearIcon/>
+                            <ClearIcon />
                         </IconButton>
                     </CardActions>
-                    <Collapse in={this.state.isExpanded} transitionDuration='auto' unmountOnExit>
-                        <CardContent style={{padding: 0, paddingBottom: 0}}>
+                    <Collapse in={this.state.isExpanded} transitionDuration="auto" unmountOnExit>
+                        <CardContent style={{ padding: 0, paddingBottom: 0 }}>
                             <AceEditor
-                                mode='text'
+                                mode="text"
                                 theme={this.props.editorSettings.theme}
                                 fontSize={this.props.editorSettings.fontSize}
                                 wrapEnabled={this.props.editorSettings.wrapEnabled}
                                 value={this.props.content}
                                 onChange={value => this.props.handleTemplateValueChange(value)}
-                                name='siddhiAppTemplate'
-                                ref="siddhiAppTemplate"
-                                editorProps={{$blockScrolling: true}}
+                                name="siddhiAppTemplate"
                                 showPrintMargin={false}
-                                style={{width: '100%'}}
-                            />
+                                tabSize={3}
+                                useSoftTabs="true"
+                                style={{ width: '100%' }}
+                                editorProps={{
+                                    $blockScrolling: Infinity,
+                                    display_indent_guides: true,
+                                    folding: "markbeginandend" }}
+                                setOptions={{
+                                    cursorStyle: "smooth",
+                                    wrapBehavioursEnabled: true
+                                }}
+                             />
                         </CardContent>
                     </Collapse>
                 </Card>
@@ -121,5 +131,14 @@ class Template extends React.Component {
         );
     }
 }
+
+Template.propTypes = {
+    invalid: PropTypes.string.isRequired,
+    notRemovable: PropTypes.bool.isRequired,
+    removeTemplate: PropTypes.func.isRequired,
+    editorSettings: PropTypes.object.isRequired,
+    content: PropTypes.string.isRequired,
+    handleTemplateValueChange: PropTypes.func.isRequired
+};
 
 export default Template;

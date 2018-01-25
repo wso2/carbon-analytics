@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -16,39 +16,37 @@
  *  under the License.
  */
 
-import React from 'react';
-
 /**
  * Has values for all the constants related to Business Rules web app
  */
 const BusinessRulesConstants = {
     // Rule Template types
-    RULE_TEMPLATE_TYPE_TEMPLATE: "template",
-    RULE_TEMPLATE_TYPE_INPUT: "input",
-    RULE_TEMPLATE_TYPE_OUTPUT: "output",
+    RULE_TEMPLATE_TYPE_TEMPLATE: 'template',
+    RULE_TEMPLATE_TYPE_INPUT: 'input',
+    RULE_TEMPLATE_TYPE_OUTPUT: 'output',
 
     // Mode of Business Rule form
-    BUSINESS_RULE_FORM_MODE_CREATE: "create",
-    BUSINESS_RULE_FORM_MODE_EDIT: "edit",
-    BUSINESS_RULE_FORM_MODE_VIEW: "view",
+    BUSINESS_RULE_FORM_MODE_CREATE: 'create',
+    BUSINESS_RULE_FORM_MODE_EDIT: 'edit',
+    BUSINESS_RULE_FORM_MODE_VIEW: 'view',
 
     // Business Rule types
-    BUSINESS_RULE_TYPE_TEMPLATE: "template",
-    BUSINESS_RULE_TYPE_SCRATCH: "scratch",
+    BUSINESS_RULE_TYPE_TEMPLATE: 'template',
+    BUSINESS_RULE_TYPE_SCRATCH: 'scratch',
 
     // Business Rule from scratch property types
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT: "inputData",
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT: "outputData",
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS: "ruleComponents",
-    BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES: "filterRules",
-    BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_RULE_LOGIC: "ruleLogic",
-    BUSINESS_RULE_FROM_SCRATCH_RULE_PROPERTY_TYPE_OUTPUT_MAPPINGS: "outputMappings",
+    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT: 'inputData',
+    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT: 'outputData',
+    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS: 'ruleComponents',
+    BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES: 'filterRules',
+    BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_RULE_LOGIC: 'ruleLogic',
+    BUSINESS_RULE_FROM_SCRATCH_RULE_PROPERTY_TYPE_OUTPUT_MAPPINGS: 'outputMappings',
 
     BUSINESS_RULE_NAME_REGEX: /[a-zA-Z][a-zA-Z0-9\s_-]*/g,
 
     // Business Rule deployment statuses
-    BUSINESS_RULE_DEPLOYMENT_STATUS_DEPLOYED: "deployed",
-    BUSINESS_RULE_DEPLOYMENT_STATUS_NOT_DEPLOYED: "notDeployed",
+    BUSINESS_RULE_DEPLOYMENT_STATUS_DEPLOYED: 'deployed',
+    BUSINESS_RULE_DEPLOYMENT_STATUS_NOT_DEPLOYED: 'notDeployed',
 
     // Business Rule Filter Rule operators
     BUSINESS_RULE_FILTER_RULE_OPERATORS: ['<', '<=', '>', '>=', '==', '!='],
@@ -86,6 +84,6 @@ const BusinessRulesConstants = {
 
     // URL for APIs
     BASE_URL: window.location.origin
-}
+};
 
 export default BusinessRulesConstants;

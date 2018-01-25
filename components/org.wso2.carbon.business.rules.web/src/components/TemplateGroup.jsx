@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -19,16 +19,14 @@
 import React from 'react';
 // Material UI Components
 import Typography from 'material-ui/Typography';
-import Card, {CardContent} from 'material-ui/Card';
+import Card, { CardContent } from 'material-ui/Card';
 import Avatar from 'material-ui/Avatar';
 // CSS
 import '../index.css';
 
 /**
- * Represent each Template Group, that is shown as a thumbnail
+ * Styles related to this component
  */
-
-// Styles related to this component
 const styles = {
     card: {
         width: 345,
@@ -40,58 +38,38 @@ const styles = {
         width: 55,
         height: 55
     }
-}
+};
 
+/**
+ * Represent each Template Group, that is shown as a thumbnail
+ */
 class TemplateGroup extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
             name: props.name,
             uuid: props.uuid,
             description: props.description
-        }
+        };
     }
 
     /**
      * Generates initials to be shown in the avatar
      */
     generateAvatarInitials() {
-        var avatarInitials = "";
+        let avatarInitials = '';
         // Contains words split by space
-        var splitWords = this.state.name.split(" ")
+        const splitWords = this.state.name.split(' ');
 
         if (splitWords.length >= 2) {
             // Two letter initials
-            avatarInitials += (splitWords[0][0] + splitWords[splitWords.length - 1][0])
+            avatarInitials += (splitWords[0][0] + splitWords[splitWords.length - 1][0]);
         } else {
             // One letter initial
-            avatarInitials += splitWords[0][0]
+            avatarInitials += splitWords[0][0];
         }
 
-        return avatarInitials
-    }
-
-    /**
-     * Generates a style with backgroundColor for the given name
-     *
-     * @param name
-     * @returns {{style: {backgroundColor: string}}}
-     */
-    generateAvatarColor(name) {
-        var hash = 0;
-        for (let i = 0; i < name.length; i++) {
-            hash = name.charCodeAt(i) + ((hash << 5) - hash);
-        }
-
-        var c = (hash & 0x00FFFFFF)
-            .toString(16)
-            .toUpperCase();
-
-        var color = "00000".substring(0, 6 - c.length) + c;
-        // Put the random color to an object
-        let style = {backgroundColor: '#' + color.toString()}
-        return {style}
+        return avatarInitials;
     }
 
     /**
@@ -111,7 +89,7 @@ class TemplateGroup extends React.Component {
             backgroundColor: colors[Math.floor(Math.random() * colors.length)],
             width: 55,
             height: 55
-        }
+        };
         return {style}
     }
 
@@ -120,7 +98,7 @@ class TemplateGroup extends React.Component {
             <Card style={styles.card}>
                 <CardContent>
                     <br/>
-                    <Avatar style={this.generateAvatarColor()['style']}>
+                    <Avatar style={this.generateAvatarColor().style}>
                         {this.generateAvatarInitials()}
                     </Avatar>
                     <br/>
@@ -128,11 +106,11 @@ class TemplateGroup extends React.Component {
                         {this.state.name}
                     </Typography>
                     <Typography component="subheading" color="secondary">
-                        {this.state.description}
+                        {this.state.description || ''}
                     </Typography>
                 </CardContent>
             </Card>
-        )
+        );
     }
 }
 

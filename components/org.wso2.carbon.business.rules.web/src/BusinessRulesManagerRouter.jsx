@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -23,10 +23,9 @@ import SecuredRouter from './components/auth/SecuredRouter';
 import Login from './components/auth/Login';
 import Logout from './components/auth/Logout';
 // App Components
-import Header from "./components/common/Header";
 // Custom Theme
-import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from './theme/BusinessRulesManagerColors';
+import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
+import { Orange } from './theme/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
     palette: {

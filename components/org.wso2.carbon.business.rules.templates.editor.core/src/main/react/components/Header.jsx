@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
@@ -32,9 +33,11 @@ import Logo from '../images/wso2-logo.svg';
 // CSS
 import '../index.css';
 
-// Styles related to this component
+/**
+ * Styles related to this component
+ */
 const styles = {
-    headerStyle: {
+    header: {
         color: 'white',
         backgroundColor: '#212121',
     }
@@ -44,66 +47,54 @@ const styles = {
  * Represents the header
  */
 class Header extends React.Component {
-    constructor() {
-        super();
-        this.state = {
-            anchorEl: null,
-            showOpenDialog: false,
-            showSaveConfirmation: false,
-            saveConfirmationAction: '',
-            showSnackbar: false,
-            snackbarMessage: '',
-            snackbarAutoHideDuration: 3500,
-        };
-    }
-
     render() {
         return (
-            <AppBar position="static" style={styles.headerStyle}>
+            <AppBar position="static" style={styles.header}>
                 <Toolbar>
-                    <img height='35' src={Logo} />
+                    <img height="35" src={Logo} />
                     &nbsp;
                     &nbsp;
                     &nbsp;
-                    <Typography type="subheading" color="inherit" style={{flex: 1}}>
+                    <Typography type="subheading" color="inherit" style={{ flex: 1 }}>
                         Business Rules Template Editor
                     </Typography>
                     <Tooltip title="New">
-                        <IconButton color="contrast" onClick={() => this.props.onNewClick()}>
-                            <NewIcon/>
+                        <IconButton
+                            color="contrast"
+                            onClick={this.props.onNewClick}
+                            aria-label="new"
+                        >
+                            <NewIcon />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Open">
-                        <IconButton color="contrast" onClick={() => this.props.onOpenClick()}>
-                            <FolderIcon/>
+                        <IconButton color="contrast" onClick={this.props.onOpenClick}>
+                            <FolderIcon />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Save">
                         <IconButton
                             color={this.props.isUnsaved ? "primary" : "contrast"}
-                            onClick={() => this.props.onSaveClick()}
+                            aria-label="save"
+                            onClick={this.props.onSaveClick}
                         >
-                            <SaveIcon/>
+                            <SaveIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip
-                        id="tooltip-bottom"
-                        title="Editor Appearance Settings"
-                        placement="bottom"
-                    >
+                    <Tooltip title="Editor Appearance Settings">
                         <IconButton
                             color="contrast"
-                            aria-label='toggleLightDark'
-                            onClick={() => this.props.onSettingsClick()}
+                            aria-label="editor appearance settings"
+                            onClick={this.props.onSettingsClick}
                         >
                             <SettingsIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip id="tooltip-bottom" title="Toggle code view" placement="bottom">
+                    <Tooltip title="Toggle code view">
                         <IconButton
                             color={this.props.isCodeViewEnabled ? ('primary') : ('contrast')}
-                            aria-label='toggleCodeView'
-                            onClick={() => this.props.onCodeViewToggle()}
+                            aria-label="toggle code view"
+                            onClick={this.props.onCodeViewToggle}
                         >
                             <CodeIcon />
                         </IconButton>
@@ -113,5 +104,13 @@ class Header extends React.Component {
         );
     }
 }
+
+Header.propTypes = {
+    onNewClick: PropTypes.func.isRequired,
+    onOpenClick: PropTypes.func.isRequired,
+    onSaveClick: PropTypes.func.isRequired,
+    onSettingsClick: PropTypes.func.isRequired,
+    onCodeViewToggle: PropTypes.func.isRequired,
+};
 
 export default Header;

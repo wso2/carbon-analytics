@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -33,7 +33,9 @@ import '../index.css';
  */
 const appContext = window.contextPath;
 
-// Styles related to this component
+/**
+ * Styles related to this component
+ */
 const styles = {
     root: {
         flexGrow: 1,
@@ -47,7 +49,7 @@ const styles = {
         paddingBottom: 30
     },
     spacing: '40'
-}
+};
 
 /**
  * Allows to create a Business Rule either from scratch or from a Template
@@ -65,29 +67,27 @@ class BusinessRuleCreator extends React.Component {
                     </Typography>
                     <br/>
                     <br/>
-
                     <Grid container style={styles.root}>
                         <Grid item xs={12}>
                             <Grid container justify="center" spacing={Number(styles.spacing)}>
                                 <Grid item>
                                     <CreateButton
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
-                                        title='From Template'
-                                        description='Create a business rule based on an existing template'
+                                        title="From Template"
+                                        description="Create a business rule based on an existing template"
                                     />
                                 </Grid>
                                 <Grid item>
                                     <CreateButton
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
-                                        title='From Scratch'
-                                        description='Create a business rules with templates for input & output,
-                                        and customized filters'
+                                        title="From Scratch"
+                                        description="Create a business rules with templates for input & output,
+                                        and customized filters"
                                     />
                                 </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
-
                 </center>
             </div>
         );
