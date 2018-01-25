@@ -73,16 +73,16 @@ class BusinessRuleCreator extends React.Component {
                                 <Grid item>
                                     <CreateButton
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
-                                        title='From Template'
-                                        description='Create a business rule based on an existing template'
+                                        title="From Template"
+                                        description="Create a business rule based on an existing template"
                                     />
                                 </Grid>
                                 <Grid item>
                                     <CreateButton
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
-                                        title='From Scratch'
-                                        description='Create a business rules with templates for input & output,
-                                        and customized filters'
+                                        title="From Scratch"
+                                        description="Create a business rules with templates for input & output,
+                                        and customized filters"
                                     />
                                 </Grid>
                             </Grid>

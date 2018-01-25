@@ -490,7 +490,7 @@ class TemplateEditor extends React.Component {
                     <Select
                         value={this.state.editorSettings.theme}
                         onChange={e => this.updateEditorSettings('theme', e.target.value)}
-                        input={<Input id='editorTheme' />}
+                        input={<Input id="editorTheme" />}
                         fullWidth
                     >
                         {editorThemes.map((theme, index) =>
@@ -502,7 +502,7 @@ class TemplateEditor extends React.Component {
                     <Select
                         value={this.state.editorSettings.fontSize}
                         onChange={e => this.updateEditorSettings('fontSize', e.target.value)}
-                        input={<Input id='editorFontSize' />}
+                        input={<Input id="editorFontSize" />}
                         fullWidth
                     >
                         {editorFontSizes.map((fontSize, index) =>
@@ -578,7 +578,7 @@ class TemplateEditor extends React.Component {
                         Some changes are not saved
                     </DialogTitle>
                     <DialogContent>
-                        <Typography type='subheading'>
+                        <Typography type="subheading">
                             Do you want to save the changes?
                         </Typography>
                     </DialogContent>
@@ -616,11 +616,11 @@ class TemplateEditor extends React.Component {
                     </DialogTitle>
                     <DialogContent>
                         <div style={styles.incompleteTemplateErrorDisplay}>
-                            <Typography type='subheading' color='inherit'>
+                            <Typography type="subheading" color="inherit">
                                 {this.state.incompleteTemplateError}
                             </Typography>
                         </div>
-                        <Typography type='subheading'>
+                        <Typography type="subheading">
                             Do you want to save it for editing later?
                         </Typography>
                     </DialogContent>
@@ -664,7 +664,7 @@ class TemplateEditor extends React.Component {
                         />
                         {<Collapse
                             in={this.state.showCodeViewError && this.state.isCodeViewEnabled}
-                            transitionDuration='auto'
+                            transitionDuration="auto"
                             unmountOnExit
                         >
                                 <div style={styles.codeViewErrorDisplay}>
@@ -730,7 +730,7 @@ class TemplateEditor extends React.Component {
                         autoHideDuration={this.state.snackbarAutoHideDuration}
                         open={this.state.showSnackbar}
                         onRequestClose={() => this.toggleSnackbar()}
-                        transition={<Slide direction='up'/>}
+                        transition={<Slide direction="up"/>}
                         SnackbarContentProps={{
                             'aria-describedby': 'snackbarMessage',
                         }}

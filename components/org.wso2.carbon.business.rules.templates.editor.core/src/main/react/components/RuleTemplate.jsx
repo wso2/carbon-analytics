@@ -386,7 +386,7 @@ class RuleTemplate extends React.Component {
                     Exposed Stream Definition
                 </Typography>
                 <Button
-                    color='primary'
+                    color="primary"
                     style={{ marginLeft: 10 }}
                     onClick={this.detectExposedStreamDefinitions}
                 >
@@ -402,14 +402,14 @@ class RuleTemplate extends React.Component {
                         {title}
                         <FormControl
                             fullWidth
-                            margin='normal'
+                            margin="normal"
                             required
                         >
                             <Select
                                 value={(this.props.configuration.templates[0].exposedStreamDefinition) ?
                                     (this.props.configuration.templates[0].exposedStreamDefinition) : ('')}
                                 onChange={this.handleExposedStreamDefinitionSelection}
-                                input={<Input id='exposedStreamDefinition' />}
+                                input={<Input id="exposedStreamDefinition" />}
                             >
                                 {this.state.exposedStreamDefinitions.map((definition, index) =>
                                     (<MenuItem key={index} name={index} value={definition}>{definition}</MenuItem>))}
@@ -423,7 +423,7 @@ class RuleTemplate extends React.Component {
                     <div>
                         {title}
                         <br />
-                        <Typography type='subheading'>
+                        <Typography type="subheading">
                             {this.props.configuration.templates[0].exposedStreamDefinition}
                         </Typography>
                     </div>);
@@ -432,7 +432,7 @@ class RuleTemplate extends React.Component {
                 <div>
                     {title}
                     <br />
-                    <Typography type='subheading'>
+                    <Typography type="subheading">
                         {(this.props.configuration.templates[0].exposedStreamDefinition) ?
                             (this.props.configuration.templates[0].exposedStreamDefinition) :
                             ('No stream definition found in the template')}
@@ -460,15 +460,15 @@ class RuleTemplate extends React.Component {
             <div>
                 <AppBar position="static" color="default">
                     <Toolbar>
-                        <Typography type='subheading' style={{ flex: 1 }}>{this.props.configuration.uuid}</Typography>
+                        <Typography type="subheading" style={{ flex: 1 }}>{this.props.configuration.uuid}</Typography>
                         <IconButton
                             onClick={this.toggleExpansion}
                         >
                             <ExpandMoreIcon />
                         </IconButton>
                         <IconButton
-                            color='primary'
-                            aria-label='Remove'
+                            color="primary"
+                            aria-label="Remove"
                             onClick={this.props.removeRuleTemplate}
                         >
                             <ClearIcon />
@@ -476,36 +476,36 @@ class RuleTemplate extends React.Component {
                     </Toolbar>
                 </AppBar>
                 <Paper>
-                    <Collapse in={this.state.isExpanded} transitionDuration='auto' unmountOnExit>
+                    <Collapse in={this.state.isExpanded} transitionDuration="auto" unmountOnExit>
                         <div style={styles.formPaper}>
                             <TextField
                                 fullWidth
-                                id='uuid'
-                                name='uuid'
-                                label='UUID'
+                                id="uuid"
+                                name="uuid"
+                                label="UUID"
                                 value={this.props.configuration.uuid}
-                                helperText='Used to identify the rule template'
+                                helperText="Used to identify the rule template"
                                 margin="normal"
                                 onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                             />
                             <TextField
                                 fullWidth
-                                id='name'
-                                name='name'
-                                label='Name'
+                                id="name"
+                                name="name"
+                                label="Name"
                                 value={this.props.configuration.name}
-                                helperText='Used for representation'
+                                helperText="Used for representation"
                                 margin="normal"
                                 onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                             />
                             <TextField
                                 fullWidth
-                                id='description'
-                                name='description'
-                                label='Description'
+                                id="description"
+                                name="description"
+                                label="Description"
                                 value={this.props.configuration.description ?
                                     this.props.configuration.description : ''}
-                                helperText='Short description of what this rule template does'
+                                helperText="Short description of what this rule template does"
                                 margin="normal"
                                 onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                             />
@@ -515,8 +515,8 @@ class RuleTemplate extends React.Component {
                             <FormControl component="fieldset" required>
                                 <FormLabel component="legend">Type</FormLabel>
                                 <RadioGroup
-                                    aria-label='type'
-                                    name='type'
+                                    aria-label="type"
+                                    name="type"
                                     value={this.props.configuration.type}
                                     onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                                 >
@@ -535,7 +535,7 @@ class RuleTemplate extends React.Component {
                                 <FormLabel component="legend">Instance Count</FormLabel>
                                 <RadioGroup
                                     aria-label="instanceCount"
-                                    name='instanceCount'
+                                    name="instanceCount"
                                     value={this.props.configuration.instanceCount}
                                     onChange={e => this.handleValueChange(e.target.name, e.target.value)}
                                 >
@@ -572,9 +572,9 @@ class RuleTemplate extends React.Component {
                             {this.displayExposedStreamDefinition()}
                             {((this.props.configuration.type === TemplateEditorConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ?
                                 (<IconButton
-                                    color='primary'
+                                    color="primary"
                                     style={{ backgroundColor: '#EF6C00', color: 'white' }}
-                                    aria-label='Add'
+                                    aria-label="Add"
                                     onClick={this.addTemplate}
                                 >
                                     <AddIcon />
@@ -589,7 +589,7 @@ class RuleTemplate extends React.Component {
                                 <CardActions disableActionSpacing style={{ padding: 5 }}>
                                     <Button
                                         raised
-                                        color='primary'
+                                        color="primary"
                                         style={{ marginLeft: 5 }}
                                         onClick={this.loadTemplatedElementSelection}
                                     >
@@ -603,23 +603,23 @@ class RuleTemplate extends React.Component {
                                         <ExpandMoreIcon />
                                     </IconButton>
                                 </CardActions>
-                                <Collapse in={this.state.isScriptExpanded} transitionDuration='auto' unmountOnExit>
+                                <Collapse in={this.state.isScriptExpanded} transitionDuration="auto" unmountOnExit>
                                     <CardContent style={{ padding: 0, paddingBottom: 0 }}>
                                         <AceEditor
-                                            mode='javascript'
+                                            mode="javascript"
                                             theme={this.props.editorSettings.theme}
                                             fontSize={this.props.editorSettings.fontSize}
                                             wrapEnabled={this.props.editorSettings.wrapEnabled}
                                             value={this.props.configuration.script}
                                             onChange={v => this.handleValueChange('script', v)}
-                                            name='script'
+                                            name="script"
                                             showPrintMargin={false}
                                             tabSize={3}
-                                            useSoftTabs='true'
-                                            width='100%'
+                                            useSoftTabs="true"
+                                            width="100%"
                                             editorProps={{
                                                 $blockScrolling: Infinity,
-                                                "display_indent_guides": true,
+                                                display_indent_guides: true,
                                                 folding: "markbeginandend" }}
                                             setOptions={{
                                                 cursorStyle: "smooth",
@@ -638,7 +638,7 @@ class RuleTemplate extends React.Component {
                                 &nbsp;
                                 <Button
                                     raised
-                                    color='primary'
+                                    color="primary"
                                     style={{ marginLeft: 10 }}
                                     onClick={this.generateProperties}
                                 >
@@ -694,7 +694,7 @@ class RuleTemplate extends React.Component {
                                         />)}
                                 </FormGroup>
                             </FormControl>) :
-                            (<Typography type='subheading'>
+                            (<Typography type="subheading">
                                 {'Insert templated elements as: \${templatedElement} in template'}
                                 {((this.props.configuration.type ===
                                     TemplateEditorConstants.RULE_TEMPLATE_TYPE_INPUT) ||
@@ -705,7 +705,7 @@ class RuleTemplate extends React.Component {
                     <DialogActions>
                         <Button
                             onClick={() => this.setState({ showScriptTemplatedElements: false })}
-                            color='default'
+                            color="default"
                             autoFocus
                         >
                            Cancel
@@ -713,7 +713,7 @@ class RuleTemplate extends React.Component {
                         {(this.state.selectableTemplatedElementsForScript.length > 0) ?
                             (<Button
                                 onClick={this.addTemplatedElementsToScript}
-                                color='primary'
+                                color="primary"
                                 disabled={this.state.templatedElementsForScriptSelection.indexOf(true) === -1}
                                 autoFocus
                             >
@@ -725,7 +725,7 @@ class RuleTemplate extends React.Component {
                     autoHideDuration={this.state.snackbarAutoHideDuration}
                     open={this.state.showSnackbar}
                     onRequestClose={this.toggleSnackbar}
-                    transition={<Slide direction='up'/>}
+                    transition={<Slide direction="up" />}
                     SnackbarContentProps={{
                         'aria-describedby': 'snackbarMessage',
                     }}

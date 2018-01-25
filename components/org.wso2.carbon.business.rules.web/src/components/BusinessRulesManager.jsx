@@ -100,17 +100,20 @@ class BusinessRulesManager extends React.Component {
      * Loads available business rules from the database, to the state
      */
     loadAvailableBusinessRules() {
-        new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).getBusinessRules().then((response) => {
-            this.setState({
-                permissions: response.data[3],
-                businessRules: response.data[2]
+        new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+            .getBusinessRules()
+            .then((response) => {
+                this.setState({
+                    permissions: response.data[3],
+                    businessRules: response.data[2]
+                })
             })
-        }).catch((error) => {
-            if (error.response.status === 401) {
-                this.displaySnackBar('You do not have enough permissions to view business rules');
-                this.setState({permissions: 1});
-            }
-        });
+            .catch((error) => {
+                if (error.response.status === 401) {
+                    this.displaySnackBar('You do not have enough permissions to view business rules');
+                    this.setState({permissions: 1});
+                }
+            });
     }
 
     /**
@@ -119,15 +122,16 @@ class BusinessRulesManager extends React.Component {
      * @param uuid
      */
     redeployBusinessRule(uuid) {
-        new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).redeployBusinessRule(uuid).then(
-            (redeployResponse) => {
+        new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+            .redeployBusinessRule(uuid)
+            .then((redeployResponse) => {
                 this.displaySnackBar(redeployResponse.data[1]);
                 this.loadAvailableBusinessRules();
-            }
-        ).catch(() => {
-            this.displaySnackBar("Failed to deploy business rule '" + uuid + "'");
-            this.loadAvailableBusinessRules();
-        });
+            })
+            .catch(() => {
+                this.displaySnackBar("Failed to deploy business rule '" + uuid + "'");
+                this.loadAvailableBusinessRules();
+            });
     }
 
     /**
@@ -141,10 +145,11 @@ class BusinessRulesManager extends React.Component {
             .then((deleteResponse) => {
                 this.displaySnackBar(deleteResponse.data[1]);
                 this.loadAvailableBusinessRules();
-            }).catch(() => {
-            this.displaySnackBar("Failed to delete the business rule '" + businessRuleUUID + "'");
-            this.loadAvailableBusinessRules();
-        });
+            })
+            .catch(() => {
+                this.displaySnackBar("Failed to delete the business rule '" + businessRuleUUID + "'");
+                this.loadAvailableBusinessRules();
+            });
     }
 
     /**
@@ -172,10 +177,10 @@ class BusinessRulesManager extends React.Component {
      * @param businessRuleUUID
      */
     displayDeleteDialog(businessRuleUUID) {
-        let state = this.state;
-        state.businessRuleUUIDToBeDeleted = businessRuleUUID;
-        state.displayDeleteDialog = true;
-        this.setState(state);
+        this.setState({
+            businessRuleUUIDToBeDeleted: businessRuleUUID,
+            displayDeleteDialog: true
+        });
     }
 
     /**
@@ -189,11 +194,7 @@ class BusinessRulesManager extends React.Component {
      * Displays list of Business Rules when available, or message for creation when not
      */
     displayAvailableBusinessRules() {
-        // Check whether business rules are available
-        let isNoneAvailable = true;
-        if (this.state.businessRules && this.state.businessRules.length > 0) {
-            isNoneAvailable = false;
-        }
+        let isNoneAvailable = !(this.state.businessRules && this.state.businessRules.length > 0);
 
         if (this.state.permissions !== -1) {
             if (!isNoneAvailable) {

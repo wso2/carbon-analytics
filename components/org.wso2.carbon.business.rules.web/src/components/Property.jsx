@@ -75,7 +75,7 @@ class Property extends React.Component {
                         name={this.props.name}
                         label={this.props.fieldName}
                         value={this.props.value}
-                        helperText={this.props.description ? this.props.description : ''}
+                        helperText={this.props.description || ''}
                         margin="normal"
                         onChange={(e) => this.handleOnChange(e)}/>
                     <br/>

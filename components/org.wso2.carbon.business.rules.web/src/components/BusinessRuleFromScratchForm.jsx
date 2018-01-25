@@ -154,10 +154,12 @@ class BusinessRuleFromScratchForm extends React.Component {
         if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE) {
             // 'Create' mode
             let templateGroupUUID = this.props.match.params.templateGroupUUID;
-            new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).getTemplateGroup(templateGroupUUID)
+            new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+                .getTemplateGroup(templateGroupUUID)
                 .then((templateGroupResponse) => {
                     let templateGroup = templateGroupResponse.data[2];
-                    new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).getRuleTemplates(templateGroupUUID)
+                    new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+                        .getRuleTemplates(templateGroupUUID)
                         .then((ruleTemplatesResponse) => {
                             // Filter rule templates
                             let inputRuleTemplates = [];
@@ -175,53 +177,58 @@ class BusinessRuleFromScratchForm extends React.Component {
                                 outputRuleTemplates: outputRuleTemplates
                             });
                         })
-                })
+                });
         } else {
             // 'Edit' or 'View' mode
             let businessRuleUUID = this.props.match.params.businessRuleUUID;
-            new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).getBusinessRule(businessRuleUUID)
+            new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+                .getBusinessRule(businessRuleUUID)
                 .then((businessRuleResponse) => {
                     let businessRule = businessRuleResponse.data[2];
                     new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-                        .getTemplateGroup(businessRule.templateGroupUUID).then((templateGroupResponse) => {
-                        let templateGroup = templateGroupResponse.data[2];
-                        new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).getRuleTemplates(templateGroup.uuid)
-                            .then((ruleTemplatesResponse) => {
-                                // Filter rule templates
-                                let inputRuleTemplates = [];
-                                let outputRuleTemplates = [];
-                                for (let ruleTemplate of ruleTemplatesResponse.data[2]) {
-                                    if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_OUTPUT) {
-                                        outputRuleTemplates.push(ruleTemplate)
-                                    } else if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_INPUT) {
-                                        inputRuleTemplates.push(ruleTemplate)
-                                    }
-                                    new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).getRuleTemplate(
-                                        businessRule.templateGroupUUID, businessRule.inputRuleTemplateUUID)
-                                        .then((selectedInputRuleTemplateResponse) => {
-                                            let selectedInputRuleTemplate = selectedInputRuleTemplateResponse.data[2];
-                                            new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).getRuleTemplate(
-                                                businessRule.templateGroupUUID, businessRule.outputRuleTemplateUUID)
-                                                .then((selectedOutputRuleTemplateResponse) => {
-                                                    let selectedOutputRuleTemplate
-                                                        = selectedOutputRuleTemplateResponse.data[2];
-                                                    this.setState({
-                                                        businessRuleType:
-                                                        BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH,
-                                                        businessRuleName: businessRule.name,
-                                                        businessRuleUUID: businessRule.uuid,
-                                                        selectedTemplateGroup: templateGroup,
-                                                        inputRuleTemplates: inputRuleTemplates,
-                                                        outputRuleTemplates: outputRuleTemplates,
-                                                        selectedInputRuleTemplate: selectedInputRuleTemplate,
-                                                        selectedOutputRuleTemplate: selectedOutputRuleTemplate,
-                                                        businessRuleProperties: businessRule.properties
+                        .getTemplateGroup(businessRule.templateGroupUUID)
+                        .then((templateGroupResponse) => {
+                            let templateGroup = templateGroupResponse.data[2];
+                            new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+                                .getRuleTemplates(templateGroup.uuid)
+                                .then((ruleTemplatesResponse) => {
+                                    // Filter rule templates
+                                    let inputRuleTemplates = [];
+                                    let outputRuleTemplates = [];
+                                    for (let ruleTemplate of ruleTemplatesResponse.data[2]) {
+                                        if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_OUTPUT) {
+                                            outputRuleTemplates.push(ruleTemplate)
+                                        } else if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_INPUT) {
+                                            inputRuleTemplates.push(ruleTemplate)
+                                        }
+                                        new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+                                            .getRuleTemplate(businessRule.templateGroupUUID,
+                                                businessRule.inputRuleTemplateUUID)
+                                            .then((selectedInputRuleTemplateResponse) => {
+                                                let selectedInputRuleTemplate = selectedInputRuleTemplateResponse.data[2];
+                                                new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+                                                    .getRuleTemplate(businessRule.templateGroupUUID,
+                                                        businessRule.outputRuleTemplateUUID)
+                                                    .then((selectedOutputRuleTemplateResponse) => {
+                                                        let selectedOutputRuleTemplate
+                                                            = selectedOutputRuleTemplateResponse.data[2];
+                                                        this.setState({
+                                                            businessRuleType:
+                                                            BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH,
+                                                            businessRuleName: businessRule.name,
+                                                            businessRuleUUID: businessRule.uuid,
+                                                            selectedTemplateGroup: templateGroup,
+                                                            inputRuleTemplates: inputRuleTemplates,
+                                                            outputRuleTemplates: outputRuleTemplates,
+                                                            selectedInputRuleTemplate: selectedInputRuleTemplate,
+                                                            selectedOutputRuleTemplate: selectedOutputRuleTemplate,
+                                                            businessRuleProperties: businessRule.properties
+                                                        });
                                                     });
-                                                });
-                                        });
-                                }
-                            });
-                    });
+                                            });
+                                    }
+                                });
+                        });
                 });
         }
     }
@@ -350,18 +357,19 @@ class BusinessRuleFromScratchForm extends React.Component {
     handleInputRuleTemplateSelected(event) {
         let state = this.state;
         new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-            .getRuleTemplate(this.state.selectedTemplateGroup.uuid, event.target.value).then((response) => {
-            state.selectedInputRuleTemplate = response.data[2];
-            // Set default values as inputData values in state
-            for (let propertyKey in state.selectedInputRuleTemplate.properties) {
-                if (Object.prototype.hasOwnProperty.call(state.selectedInputRuleTemplate.properties, propertyKey)) {
-                    state.businessRuleProperties[BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT]
-                        [propertyKey.toString()] =
-                        state.selectedInputRuleTemplate.properties[propertyKey].defaultValue;
+            .getRuleTemplate(this.state.selectedTemplateGroup.uuid, event.target.value)
+            .then((response) => {
+                state.selectedInputRuleTemplate = response.data[2];
+                // Set default values as inputData values in state
+                for (let propertyKey in state.selectedInputRuleTemplate.properties) {
+                    if (Object.prototype.hasOwnProperty.call(state.selectedInputRuleTemplate.properties, propertyKey)) {
+                        state.businessRuleProperties[BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT]
+                            [propertyKey.toString()] =
+                            state.selectedInputRuleTemplate.properties[propertyKey].defaultValue;
+                    }
                 }
-            }
-            this.setState(state);
-        });
+                this.setState(state);
+            });
     }
 
     /**
@@ -524,18 +532,19 @@ class BusinessRuleFromScratchForm extends React.Component {
     handleOutputRuleTemplateSelected(event) {
         let state = this.state;
         new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-            .getRuleTemplate(this.state.selectedTemplateGroup.uuid, event.target.value).then((response) => {
-            state.selectedOutputRuleTemplate = response.data[2];
-            // Set default values as outputData values in state
-            for (let propertyKey in state.selectedOutputRuleTemplate.properties) {
-                if (Object.prototype.hasOwnProperty.call(state.selectedOutputRuleTemplate.properties, propertyKey)) {
-                    state.businessRuleProperties[BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT]
-                        [propertyKey.toString()] =
-                        state.selectedOutputRuleTemplate.properties[propertyKey.toString()].defaultValue;
+            .getRuleTemplate(this.state.selectedTemplateGroup.uuid, event.target.value)
+            .then((response) => {
+                state.selectedOutputRuleTemplate = response.data[2];
+                // Set default values as outputData values in state
+                for (let propertyKey in state.selectedOutputRuleTemplate.properties) {
+                    if (Object.prototype.hasOwnProperty.call(state.selectedOutputRuleTemplate.properties, propertyKey)) {
+                        state.businessRuleProperties[BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT]
+                            [propertyKey.toString()] =
+                            state.selectedOutputRuleTemplate.properties[propertyKey.toString()].defaultValue;
+                    }
                 }
-            }
-            this.setState(state);
-        })
+                this.setState(state);
+            });
     }
 
     /**
@@ -582,33 +591,34 @@ class BusinessRuleFromScratchForm extends React.Component {
                     properties: this.state.businessRuleProperties
                 };
                 new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-                    .createBusinessRule(JSON.stringify(businessRuleObject), deployStatus).then(
-                    (response) => {
+                    .createBusinessRule(JSON.stringify(businessRuleObject), deployStatus)
+                    .then((response) => {
                         this.setSnackbar(response.data[1]);
                         setTimeout(function () {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
-                    }).catch((error) => {
-                    // Check for script execution error
-                    if (error.response) {
-                        if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
-                            this.setState({
-                                isFormFillable: true
-                            });
-                            this.setSnackbar(error.response.data[1]);
+                    })
+                    .catch((error) => {
+                        // Check for script execution error
+                        if (error.response) {
+                            if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                                this.setState({
+                                    isFormFillable: true
+                                });
+                                this.setSnackbar(error.response.data[1]);
+                            } else {
+                                this.setSnackbar('Failed to create the Business Rule');
+                                setTimeout(function () {
+                                    window.location.href = appContext + '/businessRulesManager';
+                                }, 3000);
+                            }
                         } else {
                             this.setSnackbar('Failed to create the Business Rule');
                             setTimeout(function () {
                                 window.location.href = appContext + '/businessRulesManager';
                             }, 3000);
                         }
-                    } else {
-                        this.setSnackbar('Failed to create the Business Rule');
-                        setTimeout(function () {
-                            window.location.href = appContext + '/businessRulesManager';
-                        }, 3000);
-                    }
-                });
+                    });
             } else {
                 // Display error
                 this.setState({
@@ -656,34 +666,35 @@ class BusinessRuleFromScratchForm extends React.Component {
                     outputRuleTemplateUUID: this.state.selectedOutputRuleTemplate.uuid,
                     properties: this.state.businessRuleProperties
                 };
-                new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).updateBusinessRule(
-                    businessRuleObject.uuid, JSON.stringify(businessRuleObject), deployStatus).then(
-                    (response) => {
+                new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+                    .updateBusinessRule(businessRuleObject.uuid, JSON.stringify(businessRuleObject), deployStatus)
+                    .then((response) => {
                         this.setSnackbar(response.data[1]);
                         setTimeout(function () {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
-                    }).catch((error) => {
-                    // Check for script execution error
-                    if (error.response) {
-                        if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
-                            this.setState({
-                                isFormFillable: true
-                            });
-                            this.setSnackbar(error.response.data[1]);
+                    })
+                    .catch((error) => {
+                        // Check for script execution error
+                        if (error.response) {
+                            if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                                this.setState({
+                                    isFormFillable: true
+                                });
+                                this.setSnackbar(error.response.data[1]);
+                            } else {
+                                this.setSnackbar('Failed to create the Business Rule');
+                                setTimeout(function () {
+                                    window.location.href = appContext + '/businessRulesManager';
+                                }, 3000);
+                            }
                         } else {
                             this.setSnackbar('Failed to create the Business Rule');
                             setTimeout(function () {
                                 window.location.href = appContext + '/businessRulesManager';
                             }, 3000);
                         }
-                    } else {
-                        this.setSnackbar('Failed to create the Business Rule');
-                        setTimeout(function () {
-                            window.location.href = appContext + '/businessRulesManager';
-                        }, 3000);
-                    }
-                });
+                    });
             } else {
                 // Display error
                 this.setState({
@@ -907,7 +918,7 @@ class BusinessRuleFromScratchForm extends React.Component {
                 <br />
                 {this.showDialog()}
                 {this.showSnackbar()}
-                <Grid container spacing={24} style={styles.formRoot} justify='center'>
+                <Grid container spacing={24} style={styles.formRoot} justify="center">
                     <Grid item xs={12} sm={7}>
                         <Paper style={styles.formPaper}>
                             <center>

@@ -35,35 +35,35 @@ class TemplateGroup extends React.Component {
             <div>
                 <TextField
                     fullWidth
-                    id='uuid'
-                    name='uuid'
-                    label='UUID'
+                    id="uuid"
+                    name="uuid"
+                    label="UUID"
                     value={this.props.configuration.uuid}
-                    helperText='Used to identify the template group'
+                    helperText="Used to identify the template group"
                     margin="normal"
                     onChange={e =>
                         this.props.handleTemplateGroupValueChange(e.target.name, e.target.value)}
                 />
                 <TextField
                     fullWidth
-                    id='name'
-                    name='name'
-                    label='Name'
+                    id="name"
+                    name="name"
+                    label="Name"
                     value={this.props.configuration.name}
-                    helperText='Used for representing the template group'
+                    helperText="Used for representing the template group"
                     margin="normal"
                     onChange={e =>
                         this.props.handleTemplateGroupValueChange(e.target.name, e.target.value)}
                 />
                 <TextField
                     fullWidth
-                    id='description'
-                    name='description'
-                    label='Description'
+                    id="description"
+                    name="description"
+                    label="Description"
                     value={this.props.configuration.description ?
                         this.props.configuration.description : ''}
-                    helperText='Short description of what this template group does'
-                    margin='normal'
+                    helperText="Short description of what this template group does"
+                    margin="normal"
                     onChange={e =>
                         this.props.handleTemplateGroupValueChange(e.target.name, e.target.value)}
                 />
@@ -92,9 +92,9 @@ class TemplateGroup extends React.Component {
                 <br />
                 <div>
                     <IconButton
-                        color='primary'
+                        color="primary"
                         style={{ backgroundColor: '#EF6C00', color: 'white' }}
-                        aria-label='Add'
+                        aria-label="Add"
                         onClick={this.props.addRuleTemplate}
                     >
                         <AddIcon />

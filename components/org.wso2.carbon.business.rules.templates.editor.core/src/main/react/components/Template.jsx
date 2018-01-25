@@ -81,7 +81,7 @@ class Template extends React.Component {
             <div style={styles.formPaperContainer}>
                 <Card>
                     <CardActions disableActionSpacing style={styles.header}>
-                        <Typography type='subheading'>SiddhiApp</Typography>
+                        <Typography type="subheading">SiddhiApp</Typography>
                         <div style={styles.flexGrow} />
                         {(!this.props.invalid) ? (null) :
                             (<Typography type="body2" style={styles.errorText}>
@@ -93,31 +93,31 @@ class Template extends React.Component {
                             <ExpandMoreIcon />
                         </IconButton>
                         <IconButton
-                            color='primary'
+                            color="primary"
                             disabled={this.props.notRemovable}
-                            aria-label='Remove'
+                            aria-label="Remove"
                             onClick={this.props.removeTemplate}
                         >
                             <ClearIcon />
                         </IconButton>
                     </CardActions>
-                    <Collapse in={this.state.isExpanded} transitionDuration='auto' unmountOnExit>
+                    <Collapse in={this.state.isExpanded} transitionDuration="auto" unmountOnExit>
                         <CardContent style={{ padding: 0, paddingBottom: 0 }}>
                             <AceEditor
-                                mode='text'
+                                mode="text"
                                 theme={this.props.editorSettings.theme}
                                 fontSize={this.props.editorSettings.fontSize}
                                 wrapEnabled={this.props.editorSettings.wrapEnabled}
                                 value={this.props.content}
                                 onChange={value => this.props.handleTemplateValueChange(value)}
-                                name='siddhiAppTemplate'
+                                name="siddhiAppTemplate"
                                 showPrintMargin={false}
                                 tabSize={3}
-                                useSoftTabs='true'
+                                useSoftTabs="true"
                                 style={{ width: '100%' }}
                                 editorProps={{
                                     $blockScrolling: Infinity,
-                                    "display_indent_guides": true,
+                                    display_indent_guides: true,
                                     folding: "markbeginandend" }}
                                 setOptions={{
                                     cursorStyle: "smooth",

@@ -79,14 +79,14 @@ class Property extends React.Component {
             return (
                 <FormControl
                     fullWidth
-                    margin='normal'
+                    margin="normal"
                     required
                 >
-                    <InputLabel htmlFor='defaultValue'>Default Value</InputLabel>
+                    <InputLabel htmlFor="defaultValue">Default Value</InputLabel>
                     <Select
                         value={this.props.configuration.propertyObject.defaultValue}
                         onChange={e => this.props.handlePropertyValueChange('defaultValue', e.target.value)}
-                        input={<Input id='defaultValue' />}
+                        input={<Input id="defaultValue" />}
                     >
                         {this.props.configuration.propertyObject.options.map(option =>
                             (<MenuItem key={option} name={option} value={option}>{option}</MenuItem>))}
@@ -96,14 +96,14 @@ class Property extends React.Component {
         } else {
             return (
                 <TextField
-                    id='defaultValue'
-                    name='defaultValue'
-                    label='Default Value'
-                    placeholder='Enter the value to show as the default value'
+                    id="defaultValue"
+                    name="defaultValue"
+                    label="Default Value"
+                    placeholder="Enter the value to show as the default value"
                     value={this.props.configuration.propertyObject.defaultValue}
                     onChange={e => this.props.handlePropertyValueChange('defaultValue', e.target.value)}
                     fullWidth
-                    margin='normal'
+                    margin="normal"
                 />);
         }
     }
@@ -112,9 +112,7 @@ class Property extends React.Component {
      * Toggle expansion of this component
      */
     toggleExpansion() {
-        const state = this.state;
-        state.isExpanded = !state.isExpanded;
-        this.setState(state);
+        this.setState({ isExpanded: !this.state.isExpanded });
     }
 
     render() {
@@ -122,7 +120,7 @@ class Property extends React.Component {
             <div style={styles.formPaperContainer}>
                 <Card>
                     <CardActions disableActionSpacing style={styles.header}>
-                        <Typography type='subheading'>{this.props.configuration.propertyName}</Typography>
+                        <Typography type="subheading">{this.props.configuration.propertyName}</Typography>
                         <div style={styles.flexGrow} />
                         <IconButton
                             onClick={this.toggleExpansion}
@@ -130,36 +128,36 @@ class Property extends React.Component {
                             <ExpandMoreIcon />
                         </IconButton>
                         <IconButton
-                            color='primary'
-                            aria-label='Remove'
+                            color="primary"
+                            aria-label="Remove"
                             onClick={() => this.props.removeProperty()}
                         >
                             <ClearIcon />
                         </IconButton>
                     </CardActions>
-                    <Collapse in={this.state.isExpanded} transitionDuration='auto' unmountOnExit>
+                    <Collapse in={this.state.isExpanded} transitionDuration="auto" unmountOnExit>
                         <CardContent style={styles.cardContent}>
                             <TextField
-                                id='fieldName'
-                                name='fieldName'
-                                label='Field Name'
-                                placeholder='Enter the value to show as the prompt'
+                                id="fieldName"
+                                name="fieldName"
+                                label="Field Name"
+                                placeholder="Enter the value to show as the prompt"
                                 value={this.props.configuration.propertyObject.fieldName}
                                 onChange={e => this.props.handlePropertyValueChange('fieldName', e.target.value)}
                                 required
                                 fullWidth
-                                margin='normal'
+                                margin="normal"
                             />
                             <TextField
-                                id='description'
-                                name='description'
-                                label='Field Description'
-                                placeholder='Enter the value to show as the helper description'
+                                id="description"
+                                name="description"
+                                label="Field Description"
+                                placeholder="Enter the value to show as the helper description"
                                 value={this.props.configuration.propertyObject.description}
                                 onChange={e => this.props.handlePropertyValueChange('description', e.target.value)}
                                 required
                                 fullWidth
-                                margin='normal'
+                                margin="normal"
                             />
                             {this.getDefaultValueField()}
                             <br />
@@ -178,7 +176,7 @@ class Property extends React.Component {
                                                             name={option}
                                                             value={option}
                                                             fullWidth
-                                                            margin='normal'
+                                                            margin="normal"
                                                             onChange={e =>
                                                                 this.props.handlePropertyOptionChange(
                                                                     index, e.target.value)
@@ -187,7 +185,7 @@ class Property extends React.Component {
                                                     </TableCell>
                                                     <TableCell>
                                                         <IconButton
-                                                            aria-label='Remove'
+                                                            aria-label="Remove"
                                                             onClick={() => this.props.removePropertyOption(index)}
                                                         >
                                                             <ClearIcon />
@@ -201,15 +199,15 @@ class Property extends React.Component {
                             <br />
                             {(this.props.configuration.propertyObject.options) ?
                                 (<IconButton
-                                    color='primary'
-                                    aria-label='add option'
+                                    color="primary"
+                                    aria-label="add option"
                                     onClick={this.props.addPropertyOption}
                                 >
                                     <AddIcon />
                                 </IconButton>) :
                                 (<Button
-                                    color='primary'
-                                    aria-label='add options'
+                                    color="primary"
+                                    aria-label="add options"
                                     onClick={this.props.addPropertyOption}
                                 >
                                     <AddIcon />

@@ -65,21 +65,21 @@ class CodeView extends React.Component {
     render() {
         return (
             <AceEditor
-                mode='json'
-                name='templateGroup'
+                mode="json"
+                name="templateGroup"
                 theme={this.props.settings.theme}
                 fontSize={this.props.settings.fontSize}
                 wrapEnabled={this.props.settings.wrapEnabled}
                 onChange={this.props.onChange}
                 value={this.props.content}
                 showPrintMargin={false}
-                width='100%'
-                height='100%'
+                width="100%"
+                height="100%"
                 tabSize={3}
-                useSoftTabs='true'
+                useSoftTabs="true"
                 editorProps={{
                     $blockScrolling: Infinity,
-                    "display_indent_guides": true,
+                    display_indent_guides: true,
                     folding: "markbeginandend"
                 }}
                 setOptions={{

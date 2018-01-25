@@ -106,7 +106,7 @@ class TemplateGroup extends React.Component {
                         {this.state.name}
                     </Typography>
                     <Typography component="subheading" color="secondary">
-                        {this.state.description ? this.state.description : ''}
+                        {this.state.description || ''}
                     </Typography>
                 </CardContent>
             </Card>
