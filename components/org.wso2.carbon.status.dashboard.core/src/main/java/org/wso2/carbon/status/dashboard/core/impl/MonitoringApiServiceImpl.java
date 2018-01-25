@@ -61,11 +61,11 @@ import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
 
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.PROTOCOL;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_COMMITTED;
@@ -80,6 +80,7 @@ import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_
 @Component(service = MonitoringApiService.class,
         immediate = true)
 public class MonitoringApiServiceImpl extends MonitoringApiService {
+
     private static StatusDashboardWorkerDBHandler dashboardStore;
     private static StatusDashboardMetricsDBHandler metricStore;
     private static final int MAX_SIDDHI_APPS_PER_PAGE = 100;
@@ -96,6 +97,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             Constants.PERMISSION_SUFFIX_VIEWER;
 
     public MonitoringApiServiceImpl() {
+
         permissionProvider = MonitoringDataHolder.getInstance().getPermissionProvider();
         dashboardConfigurations = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs();
     }
@@ -107,6 +109,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Activate
     protected void start() {
+
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) Status Dashboard MonitoringApiServiceImpl API");
         }
@@ -122,6 +125,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Deactivate
     protected void stop() {
+
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) Status Dashboard MonitoringApiServiceImpl API");
         }
@@ -136,6 +140,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response addWorker(Worker worker, String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -147,7 +152,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 try {
                     workerDBHandler.insertWorkerConfiguration(workerConfigData);
                 } catch (RDBMSTableException e) {
-                    logger.error("Error occured while inserting the Worker due to " + e.getMessage(),e);
+                    logger.error("Error occured while inserting the Worker due to " + e.getMessage(), e);
                     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
                             "Error occured while inserting the Worker due to " + e.getMessage())).build();
                 }
@@ -198,6 +203,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getAllWorkers(String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -326,6 +332,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     }
 
     private String getErrorMessage(int errorCode) {
+
         if (errorCode == 401) {
             return "Unauthorize to reach worker";
         } else if (errorCode == 404) {
@@ -343,6 +350,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @throws NotFoundException
      */
     public Response populateWorkerGeneralDetails(String id, String userName) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(userName, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -392,6 +400,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     @Override
     public Response getWorkerHistory(String workerId, String period, String type, Boolean more, String username) throws
             NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -718,6 +727,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     @Override
     public Response getAllSiddhiApps(String workerId, String period, String type, Integer pangeNum, String username) throws
             NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -805,6 +815,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         }
                         String jsonString = new Gson().toJson(siddhiAppsData);
                         return Response.ok().entity(jsonString).build();
+                    } else if (workerSiddiAllApps.status() == 401) {
+                        String jsonString = new Gson().toJson(siddhiAppsData);
+                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
                     } else {
                         String jsonString = new Gson().toJson(siddhiAppsData);
                         return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
@@ -815,7 +828,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 }
             }
             logger.error("Inproper format of worker ID:" + workerId);
-            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + workerId).build();
         } else {
             logger.error("Unauthorized to perform get all siddhi apps for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
@@ -835,6 +848,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     @Override
     public Response getAppHistory(String workerId, String appName, String period, String type, String username)
             throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -875,14 +889,13 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.ok().entity(jsonString).build();
             } else {
                 logger.error("Inproper format of worker ID:" + workerId);
-                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId).build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + workerId).build();
             }
         } else {
             logger.error("Unauthorized to perform get siddhi app history for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
 
     /**
      * This method return the both siddi apptext view and flow chart.PS: Currently implemetented till text view.
@@ -894,6 +907,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getSiddhiAppDetails(String id, String appName, String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -906,6 +920,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     String responseAppBody = siddhiAppResponce.body().toString();
                     if (siddhiAppResponce.status() == 200) {
                         return Response.ok().entity(responseAppBody).build();
+                    } else if (siddhiAppResponce.status() == 401) {
+                        String jsonString = new Gson().toJson(responseAppBody);
+                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
                     } else {
                         return Response.status(Response.Status.NOT_FOUND).entity(responseAppBody).build();
                     }
@@ -917,7 +934,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 }
             }
             logger.error("Inproper format of worker ID:" + id);
-            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ id).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + id).build();
         } else {
             logger.error("Unauthorized to perform get siddhi app details for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
@@ -931,10 +948,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return response from the worker.
      */
     private String getWorkerGeneralDetails(String workerURI, String workerId) {
+
         try {
             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURI,
                     this.getUsername(), this.getPassword()).getSystemDetails();
-            if(workerResponse.status() == 200) {
+            if (workerResponse.status() == 200) {
                 return workerResponse.body().toString();
             } else {
                 return workerId + " Unnable to reach worker. Caused by: " + getErrorMessage(workerResponse.status());
@@ -956,6 +974,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return
      */
     private String getCarbonID(String workerId) {
+
         if (workerId != null) {
             String workerGeneralCArbonId = null;
             workerGeneralCArbonId = dashboardStore.selectWorkerCarbonID(workerId);
@@ -991,6 +1010,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getSiddhiAppComponents(String workerId, String appName, String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1010,7 +1030,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.ok().entity(json).build();
             } else {
                 logger.error("Inproper format of worker ID:" + workerId);
-                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId)
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + workerId)
                         .build();
             }
         } else {
@@ -1021,6 +1041,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     @Override
     public Response getRolesByUsername(String username, String permissionSuffix) {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 Constants.PERMISSION_APP_NAME + "." + permissionSuffix));
         if (isAuthorized) {
@@ -1042,6 +1063,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return returnconcadinating the host_port
      */
     private String generateWorkerKey(String host, String port) {
+
         return host + Constants.WORKER_KEY_GENERATOR + port;
     }
 
@@ -1053,6 +1075,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return returnconcadinating the host:port
      */
     private String generateURLHostPort(String host, String port) {
+
         return host + Constants.URL_HOST_PORT_SEPERATOR + port;
     }
 
@@ -1065,6 +1088,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response deleteWorker(String id, String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1098,6 +1122,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     @Override
     public Response enableSiddhiAppStats(String workerId, String appName, StatsEnable statEnable, String username)
             throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 STATS_MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1109,6 +1134,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             getUsername(), getPassword()).enableAppStatistics(appName, statEnable);
                     if (workerResponse.status() == 200) {
                         return Response.ok().entity(workerResponse.body().toString()).build();
+                    } else if (workerResponse.status() == 401) {
+                        String jsonString = new Gson().toJson(workerResponse.body());
+                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
                     } else {
                         logger.error(workerResponse.body());
                         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(workerResponse.body())
@@ -1122,7 +1150,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 }
             } else {
                 logger.error("Inproper format of worker ID:" + workerId);
-                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId)
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + workerId)
                         .build();
             }
         } else {
@@ -1133,6 +1161,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     @Override
     public Response getHADetails(String workerId, String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1161,12 +1190,14 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 }
             } else {
                 logger.error("Inproper format of worker ID:" + workerId);
-                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId)
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + workerId)
                         .build();
             }
             String jsonString = new Gson().toJson(serverHADetails);
             if (status == 200) {
                 return Response.ok().entity(jsonString).build();
+            } else if (status == 401) {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
             }
@@ -1179,6 +1210,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     @Override
     public Response getComponentHistory(String workerId, String appName, String componentType, String componentId
             , String period, String type, String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1336,6 +1368,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getWorkerConfig(String id, String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1363,6 +1396,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response testConnection(String workerId, String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1401,7 +1435,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.ok().entity(jsonString).build();
             } else {
                 logger.error("Inproper format of worker ID:" + workerId);
-                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId)
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + workerId)
                         .build();
             }
         } else {
@@ -1418,6 +1452,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getDashboardConfig(String username) throws NotFoundException {
+
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1438,6 +1473,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
 
     private String getUsername() {
+
         return dashboardConfigurations.getUsername();
     }
 
@@ -1447,6 +1483,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return
      */
     private String getPassword() {
+
         return dashboardConfigurations.getPassword();
     }
 
@@ -1457,6 +1494,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return
      */
     private long parsePeriod(String interval) {
+
         long millisVal = Constants.DEFAULT_TIME_INTERVAL_MILLIS;
         String numberOnly = interval.replaceAll("[^0-9]", "");
         if (interval.contains("sec")) {
@@ -1487,10 +1525,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     }
 
     public static StatusDashboardMetricsDBHandler getMetricStore() {
+
         return metricStore;
     }
 
     private String removeCRLFCharacters(String str) {
+
         if (str != null) {
             str = str.replace('\n', '_').replace('\r', '_');
         }
@@ -1505,6 +1545,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             unbind = "unregisterServiceDatasource"
     )
     public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
+
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DatasourceServiceComponent");
         }
@@ -1512,6 +1553,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     }
 
     public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
+
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");
         }
@@ -1525,12 +1567,14 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             unbind = "unregisterServicePermissionGrantService"
     )
     public void registerServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
+
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) ServicePermissionGrantService");
         }
     }
 
     public void unregisterServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
+
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) ServicePermissionGrantService");
         }
