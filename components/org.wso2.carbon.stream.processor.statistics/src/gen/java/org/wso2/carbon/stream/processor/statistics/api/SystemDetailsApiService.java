@@ -19,10 +19,13 @@
 
 package org.wso2.carbon.stream.processor.statistics.api;
 
+import org.wso2.msf4j.Request;
+
 import javax.ws.rs.core.Response;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-19T13:30:25.867Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-09-19T13:30:25.867Z")
 public abstract class SystemDetailsApiService {
 
-    public abstract Response systemDetailsGet() throws NotFoundException;
+    public abstract Response systemDetailsGet(Request request) throws NotFoundException;
 }

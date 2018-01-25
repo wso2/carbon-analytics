@@ -17,12 +17,8 @@
 package org.wso2.carbon.stream.processor.core.impl;
 
 import com.google.gson.Gson;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.analytics.permissions.PermissionManager;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.stream.processor.core.api.ApiResponseMessage;
@@ -42,14 +38,13 @@ import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
 
-
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.Response;
 
 
 /**
@@ -351,7 +346,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             throws NotFoundException {
         String jsonString;
 
-        Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
+        Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService()
+                .getSiddhiAppMap();
         SiddhiAppData siddiAppData = siddhiAppMap.get(appFileName);
         if (siddiAppData != null) {
             if (statsEnabled && siddiAppData.getSiddhiAppRuntime().isStatsEnabled()) {
@@ -378,7 +374,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
     public Response siddhiAppsStatsEnable(boolean statsEnabled) throws NotFoundException {
 
-        Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
+        Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService()
+                .getSiddhiAppMap();
         for (Map.Entry siddhiAppEntry : siddhiAppMap.entrySet()) {
             SiddhiAppData siddiAppData = (SiddhiAppData) siddhiAppEntry.getValue();
             if ((statsEnabled && !siddiAppData.getSiddhiAppRuntime().isStatsEnabled()) || (!statsEnabled &&
@@ -492,7 +489,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     @Override
     public Response siddhiAppsStatisticsGet(String isActive, Request request) throws NotFoundException {
 
-        if (getUserName(request) != null && (getPermissionProvider().hasPermission(getUserName(request), new
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(PERMISSION_APP_NAME,
                         MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
@@ -506,7 +503,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     public Response siddhiAppStatsEnable(String appFileName, boolean statsEnabled, Request request)
             throws NotFoundException {
 
-        if (getUserName(request) != null && getUserName(request) != null && !getPermissionProvider().hasPermission
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission
                 (getUserName(request), new Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
                     "stats for Siddhi App" + appFileName).build();

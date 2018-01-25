@@ -20,19 +20,26 @@ package org.wso2.carbon.stream.processor.statistics.impl;
 import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.stream.processor.statistics.api.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.statistics.api.NotFoundException;
 import org.wso2.carbon.stream.processor.statistics.api.StatisticsApiService;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
+import org.wso2.msf4j.Request;
 
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder.getPermissionProvider;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-19T09:20:55.612Z")
 public class StatisticsApiServiceImpl extends StatisticsApiService {
     private static final Log log = LogFactory.getLog(StatisticsApiServiceImpl.class);
     private OperatingSystemMetricSet operatingSystemMetricSet = new OperatingSystemMetricSet();
+    private static final String PERMISSION_APP_NAME = "SAPP";
+    private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
+    private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";
 
     public StatisticsApiServiceImpl() {
         operatingSystemMetricSet.initConnection();
@@ -45,9 +52,16 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
      * @throws NotFoundException Api cannot be found.
      */
     @Override
-    public Response statisticsGet() {
+    public Response statisticsGet(Request request) {
         Response.Status status;
         Gson gson = new Gson();
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(PERMISSION_APP_NAME,
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the stats of" +
+                    " system statistics.").build();
+        }
         try {
             String osMetricsJSON = gson.toJson(operatingSystemMetricSet.getMetrics());
             return Response.status(Response.Status.OK).entity(osMetricsJSON).build();
@@ -72,7 +86,12 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
      * @return Statistics state of the worker.
      * @throws NotFoundException API may not be found.
      */
-    public Response enableStats(boolean statsEnable) throws NotFoundException {
+    public Response enableStats(boolean statsEnable,Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
+                    "stats for all node").build();
+        }
         if (!statsEnable) {
             if (operatingSystemMetricSet.isEnableWorkerMetrics()) {
                 operatingSystemMetricSet.disableWorkerMetrics();
@@ -92,5 +111,11 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
                         "Successfully enabled the metrics.")).build();
             }
         }
+    }
+
+    private static String getUserName(org.wso2.msf4j.Request request) {
+
+        Object username = request.getProperty("username");
+        return username != null ? username.toString() : null;
     }
 }

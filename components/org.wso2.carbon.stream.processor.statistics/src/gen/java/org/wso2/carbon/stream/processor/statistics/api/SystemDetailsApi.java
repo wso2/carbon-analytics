@@ -26,11 +26,13 @@ import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationIntercep
 import org.wso2.carbon.stream.processor.statistics.factories.SystemDetailsApiServiceFactory;
 import org.wso2.carbon.stream.processor.statistics.internal.service.ConfigServiceComponent;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 @Path("/system-details")
@@ -73,9 +75,10 @@ public class SystemDetailsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class)})
-    public Response systemDetailsGet()
+    public Response systemDetailsGet(
+            @Context Request request)
             throws NotFoundException, org.wso2.carbon.stream.processor.statistics.api.NotFoundException {
-        return delegate.systemDetailsGet();
+        return delegate.systemDetailsGet(request);
     }
 
     @Reference(
