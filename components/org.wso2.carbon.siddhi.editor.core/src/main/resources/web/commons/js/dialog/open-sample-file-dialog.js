@@ -86,7 +86,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-btn'>" +
-                    "<button id='openButton' type='button' class='btn btn-primary'>open" +
+                    "<button id='openButton' disabled type='button' class='btn btn-primary'>open" +
                     "</button>" +
                     "<div class='divider'/>" +
                     "<button type='button' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
@@ -144,6 +144,14 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
 
                     if(selectedLocation && fileName.lastIndexOf(".siddhi") != -1){
                         location.val(fileName);
+                        $("#openButton").prop({
+                            disabled: false
+                        });
+                    } else {
+                        location.val('');
+                        $("#openButton").prop({
+                            disabled: true
+                        });
                     }
                 });
 

@@ -168,13 +168,8 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                 var linkId = data.node.a_attr.id;
                 var fileName = data.node.text;
                 $("a[id='"+linkId+"']").attr('title', fileName);
-            }).on("dblclick.jstree", function (event) {
-                var item = $(event.target).closest("li");
-                var node = self._$parent_el.jstree(true).get_node(item[0].id);
-                var path = node.id;
-                var fileName = _.last(path.split(self.application.getPathSeperator()));
-                node.id = "workspace" + self.application.getPathSeperator() + fileName;
-                self.trigger("double-click-node", node);
+            }).on('select_node.jstree', function (e, data) {
+                data.instance.toggle_node(data.node);
             });
             return this;
         }
