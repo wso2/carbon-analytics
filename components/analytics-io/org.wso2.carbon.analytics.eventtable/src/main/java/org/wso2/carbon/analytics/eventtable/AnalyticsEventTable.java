@@ -301,7 +301,7 @@ public class AnalyticsEventTable implements EventTable {
                                   Map<String, EventTable> eventTableMap) {
         return new AnalyticsTableOperator(this.tenantId, this.tableName, this.tableDefinition.getAttributeList(),
                 expression, matchingMetaStateHolder, executionPlanContext, variableExpressionExecutors, eventTableMap,
-                this.tableDefinition);
+                this.tableDefinition, tableDefinition.getId());
     }
 
     @Override
@@ -353,7 +353,7 @@ public class AnalyticsEventTable implements EventTable {
                                       Map<String, EventTable> eventTableMap) {
         return new AnalyticsTableOperator(this.tenantId, this.tableName, this.tableDefinition.getAttributeList(),
                 expression, matchingMetaStateHolder, executionPlanContext, variableExpressionExecutors, eventTableMap,
-                this.tableDefinition);
+                this.tableDefinition, this.tableDefinition.getId());
     }
 
     @Override
@@ -450,10 +450,12 @@ public class AnalyticsEventTable implements EventTable {
 
         private TableDefinition tableDefinition;
 
+        private String query;
+
         public AnalyticsTableOperator(int tenantId, String tableName, List<Attribute> attrs, Expression expression,
                                       MatchingMetaStateHolder matchingMetaStateHolder, ExecutionPlanContext executionPlanContext,
                                       List<VariableExpressionExecutor> variableExpressionExecutors,
-                                      Map<String, EventTable> eventTableMap, TableDefinition tableDefinition) {
+                                      Map<String, EventTable> eventTableMap, TableDefinition tableDefinition,String query) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.myAttrs = attrs;
@@ -470,6 +472,7 @@ public class AnalyticsEventTable implements EventTable {
             this.mentionedConstants = new ArrayList<>();
             this.primaryKeyRHSValues = new LinkedHashMap<>();
             this.initMetaStateEvent();
+            this.query = query;
             /* first parse for evaluating the query, since expression evaluation cannot be
              * done in a lazy manner */
             this.luceneQueryFromExpression(this.expression, true);
@@ -647,7 +650,7 @@ public class AnalyticsEventTable implements EventTable {
                     if (firstPass) {
                         ExpressionExecutor expressionExecutor = ExpressionParser.parseExpression(expr,
                                 this.matchingMetaStateHolder.getMetaStateEvent(), this.matchingMetaStateHolder.getDefaultStreamEventIndex(), this.eventTableMap,
-                                this.variableExpressionExecutors, this.executionPlanContext, false, 0);
+                                this.variableExpressionExecutors, this.executionPlanContext, false, 0, this.query);
                         this.expressionExecs.add(expressionExecutor);
                         return LUCENE_QUERY_PARAM;
                     } else {
@@ -737,7 +740,7 @@ public class AnalyticsEventTable implements EventTable {
         public Finder cloneFinder(String key) {
             return new AnalyticsTableOperator(this.tenantId, this.tableName, this.myAttrs, this.expression,
                     this.matchingMetaStateHolder, this.executionPlanContext, this.variableExpressionExecutors,
-                    this.eventTableMap, this.tableDefinition);
+                    this.eventTableMap, this.tableDefinition, this.tableDefinition.getId());
         }
 
         @Override
