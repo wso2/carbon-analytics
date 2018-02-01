@@ -104,9 +104,11 @@
                         <Export-Package>!org.wso2.carbon.analytics.eventtable.internal.*,
                             org.wso2.carbon.analytics.eventtable.*
                         </Export-Package>
-			<Import-Package>com.google.common.cache;version="${guava.import.version}",
-					*;resolution:=optional
-			</Import-Package>
+                        <Import-Package>com.google.common.cache;version="${guava.import.version}",
+                            org.wso2.siddhi.core.*;version="${siddhi.version.range}",
+                            org.wso2.siddhi.query.*;version="${siddhi.version.range}",
+                            *;resolution:=optional
+                        </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
