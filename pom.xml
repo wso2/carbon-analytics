@@ -1477,7 +1477,7 @@
         <roaringbitmap.import.version>[0.4.5, 0.5.0)</roaringbitmap.import.version>
         <objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
 
-        <siddhi.version>3.1.3</siddhi.version>
+        <siddhi.version>3.2.0</siddhi.version>
         <siddhi.version.range>[3.2.0,4.0.0)</siddhi.version.range>
         <version.noggit>0.6.wso2v1</version.noggit>
         <hector.version>1.0-5</hector.version>
