@@ -92,6 +92,24 @@ define(([],function (){
                     }
                 },
                 disabled: true
+            },
+            {
+                id: "format",
+                label: "Reformat code",
+                command: {
+                    id: "format",
+                    shortcuts: {
+                        mac: {
+                            key: "command+option+u",
+                            label: "\u2318\u2325U"
+                        },
+                        other: {
+                            key: "ctrl+alt+u",
+                            label: "Ctrl+Alt+U"
+                        }
+                    }
+                },
+                disabled: false
             }
 
         ]
