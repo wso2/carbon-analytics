@@ -150,11 +150,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "\tdefine trigger ${1:trigger_name} at ${2:time};\n" +
             "snippet define-Aggregation\n" +
             "\tdefine aggregation ${1:aggregator_name}\n" +
-            "\tfrom ${1:input_stream}\n"+
-            "\tselect ${2:attribute1}, ${3:aggregate_function}(${4:attribute2}) as ${5:attribute3}," +
-            "${6:aggregate_function}(${7:attribute4}) as ${8:attribute5}\n"+
-            "\t\tgroup by ${9:attribute6}\n"+
-            "\t\taggregate by ${10:timestamp_attribute} every ${11:time};\n"+
+            "\tfrom ${2:input_stream}\n"+
+            "\tselect ${3:attribute1}, ${4:aggregate_function}(${5:attribute2}) as ${6:attribute3}," +
+            "${7:aggregate_function}(${8:attribute4}) as ${9:attribute5}\n"+
+            "\t\tgroup by ${10:attribute6}\n"+
+            "\t\taggregate by ${11:timestamp_attribute} every ${12:time_periods};\n"+
             "snippet define-Function\n" +
             "\tdefine function ${1:function_name}[${2:lang_name}] return ${3:return_type} { \n" +
             "\t\t${4:function_body} \n" +

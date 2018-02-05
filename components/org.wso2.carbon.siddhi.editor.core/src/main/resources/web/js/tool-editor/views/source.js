@@ -15,9 +15,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-editor/editor','ace/ace'
-    ],
-    function(require , log, _, $, EventChannel, SiddhiEditor,ace) {
+define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-editor/editor', 'ace/ace',
+        'ace/ext/beautify/siddhi_rules'],
+    function (require, log, _, $, EventChannel, SiddhiEditor, ace, beautify) {
 
         /**
          * @class SourceView
@@ -155,16 +155,15 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
             return  $(this._container).is(':visible')
         };
 
-        SourceView.prototype.format = function(doSilently){
-//            var selectedRange = this._editor.selection.getRange();//TODO format selection
-//            if(doSilently){
-//                this._inSilentMode = true;
-//            }
-//            this._fomatter.beautify(this._editor.getSession());
-//            if(doSilently){
-//                this._inSilentMode = false;
-//                this.markClean();
-//            }
+        SourceView.prototype.format = function (doSilently) {
+            if(doSilently){
+                this._inSilentMode = true;
+            }
+            beautify.beautify(this._editor.session);
+            if(doSilently){
+                this._inSilentMode = false;
+                this.markClean();
+            }
         };
 
         SourceView.prototype.isClean = function(){

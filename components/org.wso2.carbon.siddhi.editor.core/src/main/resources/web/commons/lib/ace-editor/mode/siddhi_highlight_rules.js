@@ -45,12 +45,14 @@ define("ace/mode/siddhi_highlight_rules", ["require", "exports", "module", "ace/
         this.$rules = {
             "start": [
                 {
-                    token: "annotation.plan",
-                    regex: "@App\\s*\\:\\s*\\w+"
+                    token: ["annotation.plan.start", "keyword.other", "annotation.plan", "keyword.other"],
+                    regex: "(@\\s*[Aa][Pp][Pp]\\s*)(:)(\\s*[a-zA-Z_][a-zA-Z_0-9]*\\s*)(\\(\\s*)",
+                    next: "annotation"
                 },
                 {
-                    token: "annotation.common",
-                    regex: "@\\w+"
+                    token: ["annotation.common.start", "keyword.other"],
+                    regex: "(@\\s*[a-zA-Z_][a-zA-Z_0-9]*\\s*)(\\(\\s*)",
+                    next: "annotation"
                 },
                 {
                     token: "comment.line",
@@ -79,18 +81,82 @@ define("ace/mode/siddhi_highlight_rules", ["require", "exports", "module", "ace/
                 },
                 {
                     token: "keyword.operator",
-                    regex: "\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|=|->|@|#|\\?|\\[|\\]|\\(|\\)|\\?|:|;|,|\\."
+                    regex: "\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|=|->"
                 },
                 {
-                    token: "paren.lparen",
+                    token: "keyword.other",
+                    regex: "\\?|:|;|,|\\.|#|@|\\[|\\]"
+                },
+                {
+                    token: "keyword.other.lparen",
                     regex: "\\("
                 },
                 {
-                    token: "paren.rparen",
+                    token: "keyword.other.rparen",
                     regex: "\\)"
                 },
                 {
-                    token: "text",
+                    token: "paren.lparen",
+                    regex: "{"
+                },
+                {
+                    token: "paren.rparen",
+                    regex: "}"
+                },
+                {
+                    token: "whitespace",
+                    regex: "\\s+"
+                }
+            ],
+            "annotation": [
+                {
+                    token: ["annotation.common.start", "keyword.other"],
+                    regex: "(@\\s*[a-zA-Z_][a-zA-Z_0-9]*\\s*)(\\(\\s*)"
+                },
+                {
+                    token: "identifier",
+                    regex: "([a-zA-Z_][a-zA-Z_0-9]*\\s*)"
+                },
+                {
+                    token: "comment.line",
+                    regex: "--.*$"
+                },
+                {
+                    token: "comment.block",
+                    start: "/\\*",
+                    end: "\\*/"
+                },
+                {
+                    token: "string.quoted.double",
+                    regex: '".*?"'
+                },
+                {
+                    token: "string.quoted.single",
+                    regex: "'.*?'"
+                },
+                {
+                    token: "constant.numeric",
+                    regex: "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
+                },
+                {
+                    token: "keyword.other.annotation.mid.end",
+                    regex: "\\)+\\s+,"
+                },
+                {
+                    token: "keyword.other.annotation.full.end",
+                    regex: "(\\)+\\s*)+",
+                    next: "start"
+                },
+                {
+                    token: "keyword.operator",
+                    regex: "="
+                },
+                {
+                    token: "keyword.other",
+                    regex: "-|:|,|\\."
+                },
+                {
+                    token: "whitespace",
                     regex: "\\s+"
                 }
             ]

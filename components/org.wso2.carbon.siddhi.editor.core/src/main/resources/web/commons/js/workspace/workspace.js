@@ -16,7 +16,7 @@
  * under the License.
  */
 define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welcome-page'],
-    function (ace, $, _,log,Dialogs,ServiceClient,WelcomePages) {
+    function (ace, $, _, log, Dialogs, ServiceClient, WelcomePages) {
 
         // workspace manager constructor
         /**
@@ -193,6 +193,12 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
             };
 
+            this.handleFormat = function () {
+                if(app.tabController.getActiveTab().getTitle() !== "welcome-page"){
+                    app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().format();
+                }
+            };
+
             this.handleRun = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                 launcher.runApplication(self);
@@ -267,6 +273,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     redoMenuItem = app.menuBar.getMenuItemByID('edit.redo'),
                     findMenuItem = app.menuBar.getMenuItemByID('edit.find'),
                     findAndReplaceMenuItem = app.menuBar.getMenuItemByID('edit.findAndReplace'),
+                    reformatCodeMenuItem = app.menuBar.getMenuItemByID('edit.format'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -279,6 +286,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         var undoManager = fileEditor.getUndoManager();
                         findMenuItem.enable();
                         findAndReplaceMenuItem.enable();
+                        reformatCodeMenuItem.enable();
                         if (undoManager.hasUndo() && undoManager.undoStackTop().canUndo()) {
                             undoMenuItem.enable();
                             undoMenuItem.addLabelSuffix(
@@ -303,6 +311,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     redoMenuItem.clearLabelSuffix();
                     findMenuItem.disable();
                     findAndReplaceMenuItem.disable();
+                    reformatCodeMenuItem.disable();
                 }
             };
 
@@ -628,6 +637,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('find', this.handleFind);
 
             app.commandManager.registerHandler('findAndReplace', this.handleFindAndReplace);
+
+            app.commandManager.registerHandler('format', this.handleFormat);
 
             // Open settings dialog
             app.commandManager.registerHandler('open-settings-dialog', this.openSettingsDialog, this);
