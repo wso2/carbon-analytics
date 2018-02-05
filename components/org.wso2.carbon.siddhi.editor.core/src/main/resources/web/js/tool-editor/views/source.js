@@ -16,8 +16,8 @@
  * under the License.
  */
 define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-editor/editor', 'ace/ace',
-        'ace/ext/beautify/siddhi-rules'],
-    function (require, log, _, $, EventChannel, SiddhiEditor, ace, Beautify) {
+        'ace/ext/beautify/siddhi_rules'],
+    function (require, log, _, $, EventChannel, SiddhiEditor, ace, beautify) {
 
         /**
          * @class SourceView
@@ -159,7 +159,7 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
             if(doSilently){
                 this._inSilentMode = true;
             }
-            Beautify.beautify(this._editor.session);
+            beautify.beautify(this._editor.session);
             if(doSilently){
                 this._inSilentMode = false;
                 this.markClean();

@@ -194,9 +194,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.handleFormat = function () {
-                var activeTab = app.tabController.getActiveTab();
-
-                if(activeTab.getTitle() != "welcome-page"){
+                if(app.tabController.getActiveTab().getTitle() !== "welcome-page"){
                     app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().format();
                 }
             };

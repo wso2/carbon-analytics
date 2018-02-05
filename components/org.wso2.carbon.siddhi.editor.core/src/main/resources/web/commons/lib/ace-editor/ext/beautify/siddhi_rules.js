@@ -300,15 +300,12 @@ define(function (require) {
 
             // trim unnecessary white spaces to a single space other than new lines
             if (token.type === 'whitespace') {
-                // @sink(newLine tabSpace space type = 'log') will be converted to @sink(newLine tabSpace type = 'log')
-                if (commonAnnotationLevel > 0 && _.endsWith(code, tab)) {
-                    token.value = token.value.trim();
-                    value = '';
-                    // all the other whitespaces in the line will be converted to space
-                } else {
-                    token.value = token.value.trim();
-                    value = space;
-                }
+                // space inside an annotation will be removed.
+                // ex: @sink(newLine tabSpace space type = 'log') will be converted to @sink(newLine tabSpace type = 'log')
+                // All the other whitespaces in the line(not in an annotation line) will be converted to space
+                token.value = token.value.trim();
+                value = commonAnnotationLevel > 0 && _.endsWith(code, tab) ? '' : space;
+
             }
 
             // check whether inside an annotation element
