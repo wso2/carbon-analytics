@@ -315,7 +315,7 @@
         </export.package>
         <DynamicImport-Package>*</DynamicImport-Package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="2"
         </carbon.component>
     </properties>
 </project>
