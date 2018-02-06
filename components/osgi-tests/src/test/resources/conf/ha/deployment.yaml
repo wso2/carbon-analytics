@@ -313,7 +313,7 @@ cluster.config:
   strategyConfig:
     datasource: WSO2_ANALYTICS_DB
     heartbeatInterval: 500
-    heartbeatMaxAge: 4
+    heartbeatMaxRetry: 4
     eventPollingInterval: 500
 
 deployment.config:
