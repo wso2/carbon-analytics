@@ -1,0 +1,213 @@
+/*
+ *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+package org.wso2.carbon.sp.jobmanager.core.api;
+
+import io.swagger.annotations.ApiParam;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osgi.service.component.annotations.Component;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
+import org.wso2.carbon.sp.jobmanager.core.factories.ManagersApiServiceFactory;
+import org.wso2.carbon.sp.jobmanager.core.model.Manager;
+import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.Request;
+import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+
+//import org.wso2.carbon.status.dashboard.core.api.ManagersApiService;
+//import org.wso2.carbon.status.dashboard.core.factories.ManagersApiServiceFactory;
+@Component(
+        name = "distributed",
+        service = Microservice.class,
+        immediate = true
+)
+
+@Path("/managers")
+
+@RequestInterceptor(AuthenticationInterceptor.class)
+@io.swagger.annotations.Api(description = "the managers API")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+                            date = "2018-01-29T08:19:07.148Z")
+public class ManagersApi implements Microservice {
+    private static final Log logger = LogFactory.getLog(ManagersApi.class);
+    //public static final String API_CONTEXT_PATH = "/apis/managers";
+    private final ManagersApiService managersApi = ManagersApiServiceFactory.getManagersApi();
+
+    // public ManagersApi(ManagersApiService managersApi) {
+    // this.managersApi = managersApi;
+    //}
+    // private final ManagersApiService delegate = ManagersApiServiceFactory.getManagersApi();
+
+    private static String getUsername(Request request) {
+        return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();
+    }
+
+    @POST
+
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Add a new manager.", notes = "Adds a new manager",
+                                         response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 201, message = "Manager is created successfully.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 409,
+                                                message = "Request accepted but a manager with the given host and "
+                                                        + "port already exists.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                                                response = void.class)})
+    public Response addManager(@Context Request request,
+                               @ApiParam(value = "Manager object need to be added.", required = true) Manager manager
+                              ) throws NotFoundException {
+        return managersApi.addManager(manager, getUsername(request));
+
+    }
+
+    @DELETE
+    //todo:uncomment this
+    //  @Path("/{id}")
+
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Deletes a manager.",
+                                         notes = "Removes the manager with the manager Id specified. Path param "
+                                                 + "**id** determines id of the manager. ",
+                                         response = ApiResponseMessage.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The manager is successfully deleted.",
+                                                response = ApiResponseMessage.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The manager is not found",
+                                                response = ApiResponseMessage.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                                                response = ApiResponseMessage.class)})
+    public Response deleteManager(@Context Request request,
+                                  @ApiParam(value = "Id of the manager.", required = true) @PathParam("id") String id
+                                 )
+            throws NotFoundException {
+        return managersApi.deleteManager(id, getUsername(request));
+    }
+
+    @GET
+
+
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "List all the registered manager nodes.",
+                                         notes = "List all the managers that are connected with the give manager node"
+                                                 + " (HA mode).",
+                                         response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                                                response = void.class)})
+    public Response getAllManagers()
+            throws NotFoundException {
+        return managersApi.getAllManagers();
+    }
+
+    @GET
+    //@Path("/{id}/siddhi-apps")
+    @Path("/siddhi-apps")
+
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get the summary details of all siddhi apps of a given manager.",
+                                         notes = "Retrieves the siddhi app summary details of manager with the "
+                                                 + "specified id.",
+                                         response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Summary successfully retrieved.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Summary not found.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                                                response = void.class)})
+    public Response getSiddhiApps(@ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
+                                 )
+            throws NotFoundException {
+        return managersApi.getSiddhiApps(id);
+    }
+
+    @GET
+    @Path("/siddhi-apps/{appName}")
+
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get the details of child siddhi apps",
+                                         notes = "Retrieves the details of child siddhi apps with the specified "
+                                                 + "parent siddhi app name.",
+                                         response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Child app details fully retrieved.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The parent application is not found.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpexted error occured.",
+                                                response = void.class)})
+    public Response getChildSiddhiAppDetails(
+            @Context Request request,
+            @ApiParam(value = "name of the parent siddhi app.", required = true)
+            @PathParam("appName") String appName)
+            throws NotFoundException {
+        return managersApi.getChildSiddhiAppDetails(appName, request);
+    }
+
+
+    @GET
+    @Path("/{id}/siddhi-apps/{appName}/transport")
+
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get the details of sources and sinks",
+                                         notes = "Retrieves the details of source and sink of the parent siddhi app",
+                                         response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Transport details fully retrieved.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The parent siddhi app is not found.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                                                response = void.class)})
+    public Response getTransportDEtails(
+            @ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
+            , @ApiParam(value = "Name of the parent siddhi app.", required = true) @PathParam("appName") String appName
+                                       )
+            throws NotFoundException {
+        return managersApi.getTransportDEtails(id, appName);
+    }
+
+}
