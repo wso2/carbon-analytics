@@ -16,22 +16,23 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.sp.jobmanager.core.impl.utils;
+
+package org.wso2.carbon.sp.jobmanager.core.exception;
 
 /**
- * Class to define SQL queries and constants.
+ * Exception class that is used for handling the validation of the parameters.
  */
-public class Constants {
+public class StatusDashboardValidationException extends Exception {
 
-
-    public static final String PERMISSION_APP_NAME = "MON";
-    //  public static final String PERMISSION_SUFFIX_VIEWER = ".viewer";
-    public static final String PERMISSION_SUFFIX_MANAGER = ".manager";
-    public static final String MANAGER_KEY_GENERATOR = "_";
-
-
-    private Constants() {
-        //preventing initialization
+    public StatusDashboardValidationException(String message) {
+        super(message);
     }
 
+    public StatusDashboardValidationException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
+
+    public StatusDashboardValidationException(Throwable throwable) {
+        super(throwable);
+    }
 }

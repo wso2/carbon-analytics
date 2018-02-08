@@ -59,10 +59,6 @@ public class ManagersApi implements Microservice {
     //public static final String API_CONTEXT_PATH = "/apis/managers";
     private final ManagersApiService managersApi = ManagersApiServiceFactory.getManagersApi();
 
-    // public ManagersApi(ManagersApiService managersApi) {
-    // this.managersApi = managersApi;
-    //}
-    // private final ManagersApiService delegate = ManagersApiServiceFactory.getManagersApi();
 
     private static String getUsername(Request request) {
         return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();
@@ -94,7 +90,7 @@ public class ManagersApi implements Microservice {
 
     @DELETE
     //todo:uncomment this
-    //  @Path("/{id}")
+    @Path("/{id}")
 
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Deletes a manager.",
@@ -118,8 +114,6 @@ public class ManagersApi implements Microservice {
     }
 
     @GET
-
-
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "List all the registered manager nodes.",
                                          notes = "List all the managers that are connected with the give manager node"
