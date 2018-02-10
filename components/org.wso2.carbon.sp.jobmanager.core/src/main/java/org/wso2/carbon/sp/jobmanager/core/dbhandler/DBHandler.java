@@ -28,11 +28,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-//import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
-
 
 /**
- * This class represents key database operations related to worker data.
+ * This class represents key database operations related to manager data.
  */
 
 public class DBHandler {

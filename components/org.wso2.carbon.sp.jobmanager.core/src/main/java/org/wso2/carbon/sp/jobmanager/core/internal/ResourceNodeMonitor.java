@@ -20,7 +20,6 @@ package org.wso2.carbon.sp.jobmanager.core.internal;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
-import org.wso2.carbon.sp.jobmanager.core.impl.ResourceManagerApiServiceImpl;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 
@@ -34,6 +33,7 @@ public class ResourceNodeMonitor implements Runnable {
     public void run() {
         ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
         Map<String, ResourceNode> resourceNodeMap = resourcePool.getResourceNodeMap();
+
         DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
         if (resourceNodeMap != null) {
             long currentTimestamp = System.currentTimeMillis();

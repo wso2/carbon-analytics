@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
+import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.sp.jobmanager.core.api.ApiResponseMessage;
@@ -40,29 +41,20 @@ import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent;
+import org.wso2.carbon.sp.jobmanager.core.internal.services.PermissionGrantServiceComponent;
 import org.wso2.carbon.sp.jobmanager.core.model.ChildApps;
 import org.wso2.carbon.sp.jobmanager.core.model.Manager;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppHolder;
-import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 import org.wso2.carbon.sp.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.msf4j.Request;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
-//import org.wso2.carbon.sp.distributed.resource.core.internal.*;
-//import org.wso2.carbon.status.dashboard.core.bean.ManagerConfigurationDetails;
-//import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
-//import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardManagerDBHandler;
-//import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
-//import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
-//import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
-//import org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent;
-//import org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent;
-//import org.wso2.carbon.status.dashboard.core.model.Manager;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-01-29T08:19:07.148Z")
@@ -71,13 +63,16 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     private static final Log logger = LogFactory.getLog(ManagersApiServiceImpl.class);
     private static final String MANAGER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
             Constants.PERMISSION_SUFFIX_MANAGER;
+    private static final String VIWER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
+            Constants.PERMISSION_SUFFIX_VIEWER;
     private PermissionProvider permissionProvider;
     private static StatusDashboardManagerDBHandler managerDashboard;
     private ManagerDeploymentConfig managerDashboardConfig;
-    // private Map<String, String> userDefinedManagers = new HashMap<>();
-
+//
 
     public ManagersApiServiceImpl() {
+        //todo:add permissionProvider
+        permissionProvider = ManagerDataHolder.getInstance().getPermissionProvider();
         managerDashboardConfig = ManagerDataHolder.getInstance().getManagerDeploymentConfig();
 
     }
@@ -86,11 +81,11 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         return managerDashboard;
     }
 
-    //    /**
-//     * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
-//     *
-//     * @throws Exception this will be thrown if an issue occurs while executing the activate method
-//     */
+    /**
+     * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
     @Activate
     protected void start() {
 
@@ -100,10 +95,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         managerDashboard = new StatusDashboardManagerDBHandler();
     }
 
-    private static String getUserName(Request request) {
-        Object username = request.getProperty("username");
-        return username != null ? username.toString() : null;
-    }
 
     /**
      * This is the deactivation method of ConfigServiceComponent. This will be called when this component
@@ -120,8 +111,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     }
 
     /**
-     * Add a new manager
-     *
+     * Add new manager nodes : User can add one or manager nodes
      * @param manager  : Manager object that need to be added
      * @param username : username of the user
      * @return : Response whether the manager is successfully added or not.
@@ -131,10 +121,17 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     @Override
     public Response addManager(Manager manager, String username) throws NotFoundException {
         //todo: need to add permission
+//        boolean isAuthorized = permissionProvider.hasPermission(username,new Permission(Constants
+//                                                                                                .PERMISSION_APP_NAME,
+//                                                                                        MANAGER_PERMISSION_STRING));
+//
+//        if(isAuthorized) {
         if (manager.getHost() != null) {
-            String managerId = manager.getHost() + Constants.MANAGER_KEY_GENERATOR + String.valueOf(manager.getPort());
+            String managerId =
+                    manager.getHost() + Constants.MANAGER_KEY_GENERATOR + String.valueOf(manager.getPort());
             ManagerConfigurationDetails managerConfigurationDetails = new ManagerConfigurationDetails(managerId,
                                                                                                       manager.getHost
+
                                                                                                               (),
                                                                                                       Integer.valueOf(
                                                                                                               manager.getPort()));
@@ -143,7 +140,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 managerDBHandler.insertManagerConfiguration(managerConfigurationDetails);
                 logger.info("successfully added");
                 return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
-                                                                   "managerId" + managerId + "successfully added"))
+                                                                   "managerId" + " " + managerId + " " +
+                                                                           "successfully "
+                                                                           + "added"))
                         .build();
 
             } catch (RDBMSTableException e) {
@@ -151,46 +150,39 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error "
                         + "occured while inserting the Manager due to" + e.getMessage())).build();
             }
-
-
         } else {
             logger.error("Invalid data:" + manager.toString());
             return Response.status(Response.Status.BAD_REQUEST).entity("There is no manager nodes. please add a "
                                                                                + "manager:" + manager.toString())
                     .build();
         }
-
-
-        // return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+//        }else {
+//            logger.error("Unauthorized permission to add manager for user: "+username);
+//            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized permission to add manager for "
+//                                                                             + "user"+username).build();
+//        }
     }
 
+
     /**
-     * @return
+     * This method returns all the manager's details in the cluster (manager's host, manager's port, HA
+     * details)
+     * @return manager object with relevant details
      * @throws NotFoundException
      */
     @Override
     public Response getAllManagers() throws NotFoundException {
-
         List<ManagerDetails> connectedManagers = new ArrayList<>();
         ClusterCoordinator clusterCoordinator = ServiceDataHolder.getCoordinator();
-
         if (clusterCoordinator != null) {
             for (NodeDetail nodeDetail : clusterCoordinator.getAllNodeDetails()) {
                 if (nodeDetail.getPropertiesMap() != null) {
                     Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
                     String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
                     int httpInterfacePort = (int) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
-                    String httpInterfaceUsername = (String) propertiesMap.get(
-                            ResourceManagerConstants.KEY_NODE_USERNAME);
-                    String httpInterfacePassword = (String) propertiesMap.get(
-                            ResourceManagerConstants.KEY_NODE_PASSWORD);
                     ManagerDetails managerDetails = new ManagerDetails();
-
                     managerDetails.setHost(httpInterfaceHost);
                     managerDetails.setPort(httpInterfacePort);
-                    managerDetails.setUsername(httpInterfaceUsername);
-                    managerDetails.setPassword(httpInterfacePassword);
-                    // Map<String, Object> propertiesMap = clusterCoordinator.getLeaderNode().getPropertiesMap();
                     if (clusterCoordinator.getLeaderNode().getNodeId().equals(nodeDetail.getNodeId())) {
                         managerDetails.setHaStatus("Active");
                     } else {
@@ -200,7 +192,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 }
             }
             return Response.ok().entity(connectedManagers).build();
-
         } else {
             return Response.status(Response.Status.NO_CONTENT).entity(new ApiResponseMessage(ApiResponseMessage
                                                                                                      .ERROR, "There "
@@ -208,17 +199,13 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                                                                                                      + " nodes found "
                                                                                                      + "in the "
                                                                                                      + "cluster"))
-
                     .build();
         }
-
-
     }
 
     /**
-     * We can get the details of given parent siddhi application
+     * We can get all the details of given parent siddhi application
      * If it is in the waiting mode we can get all the details except deployed worker node details
-     *
      * @param appName
      * @return
      * @throws NotFoundException
@@ -227,18 +214,10 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     public Response getChildSiddhiApps(String appName) throws NotFoundException {
 
         String jsonString;
-
-        //todo: this only displays the active node's child siddhi apps
-
         Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
                 .getSiddhiAppHoldersMap();
         Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
                 .getAppsWaitingForDeploy();
-
-        /**
-         * TODO: Need to display the status of the child siddhi application.
-         */
-
         if (waitingToDeploy.containsKey(appName)) {
             List<SiddhiAppHolder> holder = waitingToDeploy.get(appName);
             ChildApps apps = new ChildApps();
@@ -259,49 +238,34 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         //todo:check whether how can we put permission
         return getChildSiddhiApps(appName);
 
-//        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants
-//         .PERMISSION_APP_NAME,
-
-//        boolean isAuthorized =
-//                permissionProvider.hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
-//                                                                                      MANAGER_PERMISSION_STRING));
-        //      if (isAuthorized) {
-//            return getChildSiddhiApps(appName);
-//        } else {
-//            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get status of " +
-//                                                                                "the Siddhi App " + appName).build();
-//        }
-
-
     }
-//
-//    private PermissionProvider getPermissionProvider(){
-//        return ServiceDataHolder.getPermissionProvider();
+
+    /**
+     * Returns all the deployed siddhi application in the given manager node
+     *
+     * @return
+     * @throws NotFoundException
+     */
+
+    @Override
+    public Response getSiddhiApps() throws NotFoundException {
+        Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
+                .getSiddhiAppHoldersMap();
+        Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
+                .getAppsWaitingForDeploy();
+        Map<String, List<SiddhiAppHolder>> siddhapps = new HashMap<>();
+        siddhapps.putAll(deployedSiddhiAppHolder);
+        siddhapps.putAll(waitingToDeploy);
+
+        return Response.ok().entity(siddhapps).build();
+    }
+
+
+//    @Override
+//    public Response getTransportDetails(String id, String appName) throws NotFoundException {
+//        // do some magic!
+//        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
 //    }
-
-    @Override
-    public Response getSiddhiApps(String id) throws NotFoundException {
-//        try {
-////            Gson gson=new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-////            Map<String,List<SiddhiAppHolder>> holdar=ServiceDataHolder.getResourcePool().getSiddhiAppHoldersMap();
-////            if(){
-////
-////            }
-//        } catch (Exception ex) {
-//
-//        }
-        // do some magic!
-//
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        //  siddhiTopologyCreator.getSiddhiAppName();
-        return Response.ok().entity(siddhiTopologyCreator).build();
-    }
-
-    @Override
-    public Response getTransportDEtails(String id, String appName) throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    }
 
     /**
      * Delete an existing manager.
@@ -334,6 +298,72 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         }
     }
 
+    /**
+     * This method returns the text view of the given siddhi application
+     *
+     * @param appName
+     * @return
+     */
+    @Override
+    public Response getSiddhiAppExecution(String appName) {
+
+        Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
+                .getSiddhiAppHoldersMap();
+        Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
+                .getAppsWaitingForDeploy();
+        Map<String, List<SiddhiAppHolder>> siddhapps = new HashMap<>();
+        siddhapps.putAll(deployedSiddhiAppHolder);
+        siddhapps.putAll(waitingToDeploy);
+        if (siddhapps.containsKey(appName)) {
+            String definedApp = ServiceDataHolder.getUserDefinedSiddhiApp();
+            return Response.ok().entity(definedApp).build();
+        } else {
+            return Response.status(Response.Status.NO_CONTENT).entity(new ApiResponseMessage(ApiResponseMessage
+                                                                                                     .ERROR, "There "
+                                                                                                     + "is no siddhi "
+                                                                                                     + "application "
+                                                                                                     + "deployed in "
+                                                                                                     + "the manager "
+                    + "node"))
+                    .build();
+        }
+    }
+
+//    //todo:need to implement
+//
+//    @Override
+//    public Response getAllDeployedWorkers() throws NotFoundException {
+//
+//        // List<SiddhiAppHolder> affectedPartialApps = resourcePool.getNodeAppMapping();
+//        // do some magic!
+//        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+//    }
+
+    @Override
+    public Response getRolesByUsername(String username, String permissionSuffix) {
+
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                                                                                         Constants.PERMISSION_APP_NAME
+                                                                                                 + "."
+                                                                                                 + permissionSuffix));
+        if (isAuthorized) {
+            return Response.ok()
+                    .entity(isAuthorized)
+                    .build();
+        } else {
+            return Response.ok()
+                    .entity(isAuthorized)
+                    .build();
+        }
+    }
+
+//    private static String getUserName(Request request) {
+//        Object username = request.getProperty("username");
+//        return username != null ? username.toString() : null;
+//    }
+//
+
+
     @Reference(
             name = "org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent",
             service = DatasourceServiceComponent.class,
@@ -355,29 +385,30 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");
         }
     }
+//////////////////////////////////////////////TODO:LIST/////////////////////////////////////////////////////
 
-//    @Reference(
-//            name = "org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent",
-//            service = PermissionGrantServiceComponent.class,
-//            cardinality = ReferenceCardinality.MANDATORY,
-//            policy = ReferencePolicy.DYNAMIC,
-//            unbind = "unregisterServicePermissionGrantService"
-//    )
-//    public void registerServicePermissionGrantService(PermissionGrantServiceComponent
-// permissionGrantServiceComponent) {
-//
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("@Reference(bind) ServicePermissionGrantService");
-//        }
-//    }
-//
-//    public void unregisterServicePermissionGrantService(
-//            PermissionGrantServiceComponent permissionGrantServiceComponent) {
-//
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("@Reference(unbind) ServicePermissionGrantService");
-//        }
-//    }
+    //TODO:ADD ROLES
+    //TODO: VALIDATE ACTIVE PASSIVE NODE AND GIVE THE PROPER ERROR MESSAGES
 
+    @Reference(
+            name = "org.wso2.carbon.sp.jobmanager.core.internal.services.PermissionGrantServiceComponent",
+            service = PermissionGrantServiceComponent.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterServicePermissionGrantService"
+    )
+    public void registerServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) ServicePermissionGrantService");
+        }
+    }
+
+    public void unregisterServicePermissionGrantService(
+            PermissionGrantServiceComponent permissionGrantServiceComponent) {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) ServicePermissionGrantService");
+        }
+    }
 }

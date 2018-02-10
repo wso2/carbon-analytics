@@ -1,3 +1,22 @@
+/*
+ *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+
 package org.wso2.carbon.sp.jobmanager.core.dbhandler;
 
 import org.wso2.carbon.config.annotation.Configuration;
@@ -7,6 +26,7 @@ import org.wso2.carbon.sp.jobmanager.core.bean.ManagerAccessCredentials;
 import org.wso2.carbon.sp.jobmanager.core.bean.ManagerConnectionConfigurations;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Configuration(namespace = "wso2.sp.status", description = "WSO2 status dashboard manager query "
         + "provider")
@@ -19,11 +39,21 @@ public class ManagerDeploymentConfig {
 
     @Element(description = "polling interval to get real-time statistics of worker in seconds")
     private Integer pollingInterval;
+
     @Element(description = "Dasboard ManagerDataSource.")
     private String dashboardManagerDatasourceName;
 
     @Element(description = "Database query map")
     private ArrayList<Queries> queries;
+
+    @Element(description = "Map of sysAdminRoles list")
+    private List<String> sysAdminRoles;
+
+    @Element(description = "Map of developerRoles list")
+    private List<String> developerRoles;
+
+    @Element(description = "Map of viewerRoles list")
+    private List<String> viewerRoles;
 
     public ManagerDeploymentConfig() {
 
@@ -85,5 +115,29 @@ public class ManagerDeploymentConfig {
 
     public void setPassword(String password) {
         managerAccessCredentials.setPassword(password);
+    }
+
+    public List<String> getSysAdminRoles() {
+        return sysAdminRoles;
+    }
+
+    public void setSysAdminRoles(List<String> sysAdminRoles) {
+        this.sysAdminRoles = sysAdminRoles;
+    }
+
+    public List<String> getDeveloperRoles() {
+        return developerRoles;
+    }
+
+    public void setDeveloperRoles(List<String> developerRoles) {
+        this.developerRoles = developerRoles;
+    }
+
+    public List<String> getViewerRoles() {
+        return viewerRoles;
+    }
+
+    public void setViewerRoles(List<String> viewerRoles) {
+        this.viewerRoles = viewerRoles;
     }
 }

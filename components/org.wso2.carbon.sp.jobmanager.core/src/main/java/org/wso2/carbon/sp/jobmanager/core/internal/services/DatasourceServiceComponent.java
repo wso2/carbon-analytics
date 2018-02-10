@@ -32,7 +32,6 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
-//import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 /**
  * This is OSGi-components to register datasource provider class.
@@ -120,31 +119,4 @@ public class DatasourceServiceComponent {
         }
         ManagerDataHolder.getInstance().setConfigProvider(null);
     }
-
-    //todo:check whether we need this
-
-//    @Reference(
-//            name = "carbon.anaytics.common.clientservice",
-//            service = AnalyticsHttpClientBuilderService.class,
-//            cardinality = ReferenceCardinality.MANDATORY,
-//            policy = ReferencePolicy.DYNAMIC,
-//            unbind = "unregisterAnalyticsHttpClient"
-//    )
-//    protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
-//        ManagerDataHolder.getInstance().setClientBuilderService(service);
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("@Reference(bind) AnalyticsHttpClientBuilderService at " +
-//                    AnalyticsHttpClientBuilderService.class.getName());
-//        }
-//    }
-//
-//    protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("@Reference(unbind) AnalyticsHttpClientBuilderService at " +
-//                    AnalyticsHttpClientBuilderService.class.getName());
-//        }
-//        MonitoringDataHolder.getInstance().setClientBuilderService(null);
-//    }
-
-
 }

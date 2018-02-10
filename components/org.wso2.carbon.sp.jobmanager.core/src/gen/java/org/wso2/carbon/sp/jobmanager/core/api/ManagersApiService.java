@@ -37,9 +37,15 @@ public abstract class ManagersApiService {
 
     public abstract Response getAllManagers() throws NotFoundException;
 
+    //public abstract Response getAllDeployedWorkers() throws NotFoundException;
+
     public abstract Response getChildSiddhiAppDetails(String appName, Request request) throws NotFoundException;
 
-    public abstract Response getSiddhiApps(String id) throws NotFoundException;
+    public abstract Response getSiddhiApps() throws NotFoundException;
 
-    public abstract Response getTransportDEtails(String id, String appName) throws NotFoundException;
+    public abstract Response getSiddhiAppExecution(String appName) throws NotFoundException;
+
+    //public abstract Response getTransportDetails(String id, String appName) throws NotFoundException;
+
+    public abstract Response getRolesByUsername(String username, String permisstionString);
 }

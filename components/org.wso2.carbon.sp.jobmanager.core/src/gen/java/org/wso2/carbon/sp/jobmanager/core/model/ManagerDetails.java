@@ -1,3 +1,22 @@
+/*
+ *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+
 package org.wso2.carbon.sp.jobmanager.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -5,9 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Objects;
 
-/**
- * ManagerDetails
- */
+
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-02-05T14:14:09.496Z")
 public class ManagerDetails {
@@ -19,12 +36,6 @@ public class ManagerDetails {
 
     @JsonProperty("haStatus")
     private String haStatus = null;
-
-    @JsonProperty("username")
-    private String username = null;
-
-    @JsonProperty("password")
-    private String password = null;
 
     public ManagerDetails host(String host) {
         this.host = host;
@@ -83,44 +94,6 @@ public class ManagerDetails {
         this.haStatus = haStatus;
     }
 
-    public ManagerDetails username(String username) {
-        this.username = username;
-        return this;
-    }
-
-    /**
-     * Get username
-     *
-     * @return username
-     **/
-    @ApiModelProperty(required = true, value = "")
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public ManagerDetails password(String password) {
-        this.password = password;
-        return this;
-    }
-
-    /**
-     * Get password
-     *
-     * @return password
-     **/
-    @ApiModelProperty(required = true, value = "")
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -133,14 +106,12 @@ public class ManagerDetails {
         ManagerDetails managerDetails = (ManagerDetails) o;
         return Objects.equals(this.host, managerDetails.host) &&
                 Objects.equals(this.port, managerDetails.port) &&
-                Objects.equals(this.haStatus, managerDetails.haStatus) &&
-                Objects.equals(this.username, managerDetails.username) &&
-                Objects.equals(this.password, managerDetails.password);
+                Objects.equals(this.haStatus, managerDetails.haStatus);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(host, port, haStatus, username, password);
+        return Objects.hash(host, port, haStatus);
     }
 
     @Override
@@ -151,8 +122,6 @@ public class ManagerDetails {
         sb.append("    host: ").append(toIndentedString(host)).append("\n");
         sb.append("    port: ").append(toIndentedString(port)).append("\n");
         sb.append("    haStatus: ").append(toIndentedString(haStatus)).append("\n");
-        sb.append("    username: ").append(toIndentedString(username)).append("\n");
-        sb.append("    password: ").append(toIndentedString(password)).append("\n");
         sb.append("}");
         return sb.toString();
     }

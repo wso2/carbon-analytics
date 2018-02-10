@@ -25,7 +25,7 @@ public class Constants {
 
 
     public static final String PERMISSION_APP_NAME = "MON";
-    //  public static final String PERMISSION_SUFFIX_VIEWER = ".viewer";
+    public static final String PERMISSION_SUFFIX_VIEWER = ".viewer";
     public static final String PERMISSION_SUFFIX_MANAGER = ".manager";
     public static final String MANAGER_KEY_GENERATOR = "_";
 

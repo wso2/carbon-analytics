@@ -37,19 +37,6 @@ import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.SE
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.SQL_WHERE;
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.WHITESPACE;
 
-//import org.wso2.carbon.status.dashboard.core.dbhandler.QueryManager;
-//import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
-
-
-//import org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.*;
-////import org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
-//import org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PLACEHOLDER_Q;
-//import org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
-//import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SEPARATOR;
-//import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SQL_WHERE;
-//import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.WHITESPACE;
-
-
 /**
  * Class which holds the utility methods which are used by various units in the RDBMS Event Table implementation.
  */
@@ -63,24 +50,6 @@ public class DBTableUtils {
     public static DBTableUtils getInstance() {
         return instance;
     }
-
-
-    //todo:newly added
-    //todo:check whether we need this
-//    public Map<String, Map<String, String>> loadManagerAttributeTypeMap(QueryManager statusDashboardQueryManager) {
-//        String intgerType = statusDashboardQueryManager.getQuery("integerType");
-//        String stringType = statusDashboardQueryManager.getQuery("stringType");
-//        Map<String, String> attributesManagerConfigTable = new HashMap<>();
-//        attributesManagerConfigTable.put("MANAGERID", stringType);
-//        attributesManagerConfigTable.put("HOST", stringType);
-//        attributesManagerConfigTable.put("PORT", intgerType);
-//        Map<String, Map<String, String>> attributeTypeMaps = new HashMap<>();
-//        attributeTypeMaps.put("MANAGERS_CONFIGURATION", attributesManagerConfigTable);
-//        return attributeTypeMaps;
-//    }
-
-
-    //todo:newly added
 
     public Map<String, String> loadManagerConfigTableTuples(QueryManager statusDashboardQueryManager) {
         String intType = statusDashboardQueryManager.getQuery("integerType");
@@ -179,8 +148,6 @@ public class DBTableUtils {
     public PreparedStatement populateInsertStatement(Map<String, Object> record, PreparedStatement stmt, Map<String,
             String>
             attributesTypeMap, QueryManager statusDashboardQueryManager) {
-        // Set<Map.Entry<String, String>> attributeEntries = attributesTypeMap.entrySet();
-        //todo:check this*****************************
         PreparedStatement populatedStatement = stmt;
         int possition = 0;
         logger.info("mapping" + attributesTypeMap.toString());
@@ -191,7 +158,6 @@ public class DBTableUtils {
             logger.info("objects" + value.toString());
 
             try {
-
                 //changed position+1 to position
                 populatedStatement = instance.populateStatementWithSingleElement(stmt, possition + 1,
                                                                                  attributeEntry.getValue(), value,

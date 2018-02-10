@@ -1,3 +1,22 @@
+/*
+ *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+
 package org.wso2.carbon.sp.jobmanager.core.internal.services;
 
 import org.osgi.framework.BundleContext;
@@ -14,9 +33,9 @@ import org.wso2.carbon.sp.jobmanager.core.configuration.DefaultConfigurationBuil
 import org.wso2.carbon.sp.jobmanager.core.dbhandler.ManagerDeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 
-//import org.wso2.carbon.status.dashboard.core.configuration.DefaultConfigurationBuilder;
-//import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
-//import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * This component handle the all the initialization tasks.
@@ -83,8 +102,6 @@ public class DashboardInitConfigComponent {
                     defaultQueries.getDashboardManagerDatasourceName()
                     : deploymentQueries.getDashboardManagerDatasourceName();
             resolvedConfiguration.setDashboardManagerDatasourceName(dashboardManagerDatasourceName);
-            logger.info("DB NAME" + dashboardManagerDatasourceName);
-
 
             int connectionTimeout = deploymentQueries.getManagerConnectionConfigurations().getConnectionTimeOut() ==
                     null ? defaultQueries.getManagerConnectionConfigurations().getConnectionTimeOut()
@@ -95,6 +112,30 @@ public class DashboardInitConfigComponent {
                     : deploymentQueries.getManagerConnectionConfigurations().getReadTimeOut();
 
             resolvedConfiguration.setManagerConnectionConfigurations(connectionTimeout, readTimeOut);
+
+            //todo:role provider
+
+            List<String> sysAdminRoles = deploymentQueries.getSysAdminRoles();
+
+            List<String> developerRoles = deploymentQueries.getDeveloperRoles();
+
+            List<String> viewerRoles = deploymentQueries.getViewerRoles();
+            if (sysAdminRoles == null) {
+                resolvedConfiguration.setSysAdminRoles(new ArrayList<>());
+            } else {
+                resolvedConfiguration.setSysAdminRoles(sysAdminRoles);
+            }
+
+            if (developerRoles == null) {
+                resolvedConfiguration.setDeveloperRoles(new ArrayList<>());
+            } else {
+                resolvedConfiguration.setDeveloperRoles(developerRoles);
+            }
+            if (viewerRoles == null) {
+                resolvedConfiguration.setViewerRoles(new ArrayList<>());
+            } else {
+                resolvedConfiguration.setViewerRoles(viewerRoles);
+            }
 
             return resolvedConfiguration;
         }

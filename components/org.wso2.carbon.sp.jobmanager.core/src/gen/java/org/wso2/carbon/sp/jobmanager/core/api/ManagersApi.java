@@ -37,11 +37,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-//import org.wso2.carbon.status.dashboard.core.api.ManagersApiService;
-//import org.wso2.carbon.status.dashboard.core.factories.ManagersApiServiceFactory;
+
 @Component(
         name = "distributed",
         service = Microservice.class,
@@ -131,6 +131,7 @@ public class ManagersApi implements Microservice {
         return managersApi.getAllManagers();
     }
 
+
     @GET
     //@Path("/{id}/siddhi-apps")
     @Path("/siddhi-apps")
@@ -148,10 +149,34 @@ public class ManagersApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getSiddhiApps(@ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
-                                 )
+    public Response getSiddhiApps()
             throws NotFoundException {
-        return managersApi.getSiddhiApps(id);
+        return managersApi.getSiddhiApps();
+    }
+
+    @GET
+    //@Path("/{id}/siddhi-apps")
+    @Path("/siddhi-apps-execution/{appName}")
+
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get the siddhi app exection plan of particular siddhi app",
+                                         notes = "Retrieves the text view of the siddhi application.",
+                                         response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Summary successfully retrieved.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Summary not found.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                                                response = void.class)})
+    public Response getSiddhiAppExecution(
+            @Context Request request,
+            @ApiParam(value = "name of the parent siddhi app.", required = true)
+            @PathParam("appName") String appName
+                                         )
+            throws NotFoundException {
+        return managersApi.getSiddhiAppExecution(appName);
     }
 
     @GET
@@ -179,29 +204,72 @@ public class ManagersApi implements Microservice {
         return managersApi.getChildSiddhiAppDetails(appName, request);
     }
 
+//    @GET
+//    @Path("/deployedWorkers")
+//
+//    @Produces({ "application/json" })
+//    @io.swagger.annotations.ApiOperation(value = "List all the workers in the registered manager nodes.", notes =
+// "List all the workers that are connected with the give manager node (HA mode).", response = void.class, tags={
+// "Managers", })
+//    @io.swagger.annotations.ApiResponses(value = {
+//            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+//
+//            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
+//
+//            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response =
+// void.class) })
+//    public Response getAllDeployedWorkers()
+//            throws NotFoundException {
+//        return managersApi.getAllDeployedWorkers();
+//    }
 
+    /**
+     * Get user sysAdminRoles by username.
+     *
+     * @param username
+     * @return User sysAdminRoles.
+     * @throws NotFoundException
+     */
     @GET
-    @Path("/{id}/siddhi-apps/{appName}/transport")
-
+    @Path("/roles")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Get the details of sources and sinks",
-                                         notes = "Retrieves the details of source and sink of the parent siddhi app",
-                                         response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiOperation(value = "Get user roles of a specified user", notes = "Lists sysAdminRoles " +
+            "of a given user.", response = void.class, tags = {"Workers",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Transport details fully retrieved.",
-                                                response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The parent siddhi app is not found.",
-                                                response = void.class),
-
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getTransportDEtails(
-            @ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
-            , @ApiParam(value = "Name of the parent siddhi app.", required = true) @PathParam("appName") String appName
-                                       )
-            throws NotFoundException {
-        return managersApi.getTransportDEtails(id, appName);
+    public Response getRolesByUsername(@Context Request request,
+                                       @ApiParam(value = "Id of the worker.", required = true)
+                                       @QueryParam("permissionSuffix") String permissionSuffix
+                                      ) throws NotFoundException {
+        return managersApi.getRolesByUsername(getUsername(request), permissionSuffix);
     }
+
+
+//    @GET
+//    @Path("/{id}/siddhi-apps/{appName}/transport")
+//
+//    @Produces({"application/json"})
+//    @io.swagger.annotations.ApiOperation(value = "Get the details of sources and sinks",
+//                                         notes = "Retrieves the details of source and sink of the parent siddhi app",
+//                                         response = void.class, tags = {"Managers",})
+//    @io.swagger.annotations.ApiResponses(value = {
+//            @io.swagger.annotations.ApiResponse(code = 200, message = "Transport details fully retrieved.",
+//                                                response = void.class),
+//
+//            @io.swagger.annotations.ApiResponse(code = 404, message = "The parent siddhi app is not found.",
+//                                                response = void.class),
+//
+//            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+//                                                response = void.class)})
+//    public Response getTransportDEtails(
+//            @ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
+//            , @ApiParam(value = "Name of the parent siddhi app.", required = true) @PathParam("appName") String
+// appName
+//                                       )
+//            throws NotFoundException {
+//        return managersApi.getTransportDetails(id, appName);
+//    }
 
 }

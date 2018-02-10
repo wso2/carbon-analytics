@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.sp.jobmanager.core.dbhandler;
 
-
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
@@ -32,9 +31,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-//import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
-//import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 /**
  * Holds the database queries.
