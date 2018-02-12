@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -19,7 +19,6 @@
 
 package org.wso2.carbon.sp.jobmanager.core.bean;
 
-
 import org.wso2.carbon.sp.jobmanager.core.exception.StatusDashboardValidationException;
 
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ManagerConfigurationDetails {
-
     private String managerId;
     private String host;
     private int port;

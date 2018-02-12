@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.sp.jobmanager.core.impl;
 
 import org.apache.commons.logging.Log;
@@ -55,30 +56,23 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
-
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-01-29T08:19:07.148Z")
 @Component(service = ManagersApiService.class, immediate = true)
+
 public class ManagersApiServiceImpl extends ManagersApiService {
     private static final Log logger = LogFactory.getLog(ManagersApiServiceImpl.class);
-    private static final String MANAGER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
-            Constants.PERMISSION_SUFFIX_MANAGER;
-    private static final String VIWER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
-            Constants.PERMISSION_SUFFIX_VIEWER;
+    private static final String MANAGER_PERMISSION_STRING =
+            Constants.PERMISSION_APP_NAME + Constants.PERMISSION_SUFFIX_MANAGER;
+    private static final String VIWER_PERMISSION_STRING =
+            Constants.PERMISSION_APP_NAME + Constants.PERMISSION_SUFFIX_VIEWER;
     private PermissionProvider permissionProvider;
     private static StatusDashboardManagerDBHandler managerDashboard;
     private ManagerDeploymentConfig managerDashboardConfig;
-//
 
     public ManagersApiServiceImpl() {
-        //todo:add permissionProvider
         permissionProvider = ManagerDataHolder.getInstance().getPermissionProvider();
         managerDashboardConfig = ManagerDataHolder.getInstance().getManagerDeploymentConfig();
-
-    }
-
-    public static StatusDashboardManagerDBHandler getDashboardStore() { //todo: remove static
-        return managerDashboard;
     }
 
     /**
@@ -88,13 +82,11 @@ public class ManagersApiServiceImpl extends ManagersApiService {
      */
     @Activate
     protected void start() {
-
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) Status Dashboard ManagerApiServiceImpl API");
         }
         managerDashboard = new StatusDashboardManagerDBHandler();
     }
-
 
     /**
      * This is the deactivation method of ConfigServiceComponent. This will be called when this component
@@ -112,6 +104,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
     /**
      * Add new manager nodes : User can add one or manager nodes
+     *
      * @param manager  : Manager object that need to be added
      * @param username : username of the user
      * @return : Response whether the manager is successfully added or not.
@@ -127,12 +120,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 //
 //        if(isAuthorized) {
         if (manager.getHost() != null) {
-            String managerId =
-                    manager.getHost() + Constants.MANAGER_KEY_GENERATOR + String.valueOf(manager.getPort());
+            String managerId = manager.getHost() + Constants.MANAGER_KEY_GENERATOR + String.valueOf(manager.getPort());
             ManagerConfigurationDetails managerConfigurationDetails = new ManagerConfigurationDetails(managerId,
-                                                                                                      manager.getHost
-
-                                                                                                              (),
+                                                                                                      manager.getHost(),
                                                                                                       Integer.valueOf(
                                                                                                               manager.getPort()));
             StatusDashboardManagerDBHandler managerDBHandler = managerDashboard;
@@ -144,14 +134,13 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                                                                            "successfully "
                                                                            + "added"))
                         .build();
-
             } catch (RDBMSTableException e) {
                 logger.error("Error occured while inserting the Manager due to" + e.getMessage(), e);
                 return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error "
                         + "occured while inserting the Manager due to" + e.getMessage())).build();
             }
         } else {
-            logger.error("Invalid data:" + manager.toString());
+            logger.error("There is no manager node specified:" + manager.toString());
             return Response.status(Response.Status.BAD_REQUEST).entity("There is no manager nodes. please add a "
                                                                                + "manager:" + manager.toString())
                     .build();
@@ -167,12 +156,14 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     /**
      * This method returns all the manager's details in the cluster (manager's host, manager's port, HA
      * details)
+     *
      * @return manager object with relevant details
      * @throws NotFoundException
      */
     @Override
     public Response getAllManagers() throws NotFoundException {
         List<ManagerDetails> connectedManagers = new ArrayList<>();
+        //returns the manger node details with the same group Id
         ClusterCoordinator clusterCoordinator = ServiceDataHolder.getCoordinator();
         if (clusterCoordinator != null) {
             for (NodeDetail nodeDetail : clusterCoordinator.getAllNodeDetails()) {
@@ -206,13 +197,13 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     /**
      * We can get all the details of given parent siddhi application
      * If it is in the waiting mode we can get all the details except deployed worker node details
+     *
      * @param appName
      * @return
      * @throws NotFoundException
      */
 
     public Response getChildSiddhiApps(String appName) throws NotFoundException {
-
         String jsonString;
         Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
                 .getSiddhiAppHoldersMap();
@@ -242,7 +233,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
     /**
      * Returns all the deployed siddhi application in the given manager node
-     *
      * @return
      * @throws NotFoundException
      */
@@ -256,20 +246,11 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         Map<String, List<SiddhiAppHolder>> siddhapps = new HashMap<>();
         siddhapps.putAll(deployedSiddhiAppHolder);
         siddhapps.putAll(waitingToDeploy);
-
         return Response.ok().entity(siddhapps).build();
     }
 
-
-//    @Override
-//    public Response getTransportDetails(String id, String appName) throws NotFoundException {
-//        // do some magic!
-//        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-//    }
-
     /**
      * Delete an existing manager.
-     *
      * @param managerId : id of the manager node (format : managerhost_managerport)
      * @param username  :username of the user
      * @return Response whether the manager successfully deleted or not.
@@ -300,13 +281,11 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
     /**
      * This method returns the text view of the given siddhi application
-     *
      * @param appName
      * @return
      */
     @Override
     public Response getSiddhiAppExecution(String appName) {
-
         Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
                 .getSiddhiAppHoldersMap();
         Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
@@ -324,20 +303,10 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                                                                                                      + "application "
                                                                                                      + "deployed in "
                                                                                                      + "the manager "
-                    + "node"))
+                                                                                                     + "node"))
                     .build();
         }
     }
-
-//    //todo:need to implement
-//
-//    @Override
-//    public Response getAllDeployedWorkers() throws NotFoundException {
-//
-//        // List<SiddhiAppHolder> affectedPartialApps = resourcePool.getNodeAppMapping();
-//        // do some magic!
-//        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-//    }
 
     @Override
     public Response getRolesByUsername(String username, String permissionSuffix) {
@@ -385,10 +354,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");
         }
     }
-//////////////////////////////////////////////TODO:LIST/////////////////////////////////////////////////////
-
-    //TODO:ADD ROLES
-    //TODO: VALIDATE ACTIVE PASSIVE NODE AND GIVE THE PROPER ERROR MESSAGES
 
     @Reference(
             name = "org.wso2.carbon.sp.jobmanager.core.internal.services.PermissionGrantServiceComponent",

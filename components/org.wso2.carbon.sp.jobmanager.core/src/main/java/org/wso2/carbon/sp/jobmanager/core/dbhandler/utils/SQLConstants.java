@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -36,7 +36,7 @@ public class SQLConstants {
     public static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";
     public static final String PLACEHOLDER_Q = "{{Q}}";
     public static final String PLACEHOLDER_COLUMNS_PRIMARYKEY = "{{COLUMNS, PRIMARY_KEYS}}";
-    public static final String String_TEMPLATE = "%s";
+    public static final String STRING_TEMPLATE = "%s";
     public static final String SQL_WHERE = "WHERE";
     public static final String WHITESPACE = " ";
     public static final String SEPARATOR = ", ";
@@ -47,5 +47,4 @@ public class SQLConstants {
     private SQLConstants() {
         //preventing initialization
     }
-
 }

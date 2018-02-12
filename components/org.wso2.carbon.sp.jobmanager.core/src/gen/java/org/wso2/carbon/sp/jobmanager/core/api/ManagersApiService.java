@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -16,17 +16,13 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.sp.jobmanager.core.api;
 
-//import org.wso2.carbon.status.dashboard.core.api.*;
+package org.wso2.carbon.sp.jobmanager.core.api;
 
 import org.wso2.carbon.sp.jobmanager.core.model.Manager;
 import org.wso2.msf4j.Request;
 
 import javax.ws.rs.core.Response;
-
-//import org.wso2.carbon.status.dashboard.core.model.Manager;
-//import javax.ws.rs.core.Request;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-01-29T08:19:07.148Z")
@@ -37,15 +33,11 @@ public abstract class ManagersApiService {
 
     public abstract Response getAllManagers() throws NotFoundException;
 
-    //public abstract Response getAllDeployedWorkers() throws NotFoundException;
-
     public abstract Response getChildSiddhiAppDetails(String appName, Request request) throws NotFoundException;
 
     public abstract Response getSiddhiApps() throws NotFoundException;
 
     public abstract Response getSiddhiAppExecution(String appName) throws NotFoundException;
-
-    //public abstract Response getTransportDetails(String id, String appName) throws NotFoundException;
 
     public abstract Response getRolesByUsername(String username, String permisstionString);
 }

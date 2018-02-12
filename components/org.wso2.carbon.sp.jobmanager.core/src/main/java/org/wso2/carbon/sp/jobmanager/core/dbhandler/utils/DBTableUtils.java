@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -58,9 +58,6 @@ public class DBTableUtils {
         attributeSelection.put("MANAGERID", stringType);
         attributeSelection.put("HOST", stringType);
         attributeSelection.put("PORT", intType);
-        // attributeSelection.put("dummy",stringType);
-
-        logger.info("first map" + attributeSelection.toString());
         return attributeSelection;
     }
 
@@ -146,29 +143,21 @@ public class DBTableUtils {
      * @param stmt   the statement to which the values should be set.
      */
     public PreparedStatement populateInsertStatement(Map<String, Object> record, PreparedStatement stmt, Map<String,
-            String>
-            attributesTypeMap, QueryManager statusDashboardQueryManager) {
-        PreparedStatement populatedStatement = stmt;
+            String> attributesTypeMap, QueryManager statusDashboardQueryManager) {
         int possition = 0;
-        logger.info("mapping" + attributesTypeMap.toString());
-        logger.info("PORT" + attributesTypeMap.get("PORT"));
-        logger.info("HOST" + attributesTypeMap.get("HOST"));
         for (Map.Entry<String, String> attributeEntry : attributesTypeMap.entrySet()) {
             Object value = record.get(attributeEntry.getKey());
-            logger.info("objects" + value.toString());
-
             try {
-                //changed position+1 to position
-                populatedStatement = instance.populateStatementWithSingleElement(stmt, possition + 1,
-                                                                                 attributeEntry.getValue(), value,
-                                                                                 statusDashboardQueryManager);
+                stmt = instance.populateStatementWithSingleElement(stmt, possition + 1,
+                                                                   attributeEntry.getValue(), value,
+                                                                   statusDashboardQueryManager);
             } catch (SQLException e) {
                 throw new RDBMSTableException("Dropping event since value for Attribute name " +
                                                       attributeEntry.getKey() + "cannot be set: " + e.getMessage(), e);
             }
             possition++;
         }
-        return populatedStatement;
+        return stmt;
     }
 
     /**
@@ -207,6 +196,7 @@ public class DBTableUtils {
 
     /**
      * Method for composing the SQL query for INSERT operations with proper placeholders.
+     * Inserting question marks and comma's for respective placeholders
      *
      * @return the composed SQL query in string form.
      */
@@ -222,5 +212,4 @@ public class DBTableUtils {
         }
         return insertQuery.replace(PLACEHOLDER_Q, params.toString());
     }
-
 }

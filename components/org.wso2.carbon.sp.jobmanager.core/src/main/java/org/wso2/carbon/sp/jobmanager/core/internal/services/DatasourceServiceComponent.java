@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.sp.jobmanager.core.internal.services;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -44,7 +45,6 @@ import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 public class DatasourceServiceComponent {
     private static final Logger logger = LoggerFactory.getLogger(DatasourceServiceComponent.class);
     private static final String DASHBOARD_DATASOURCE_DEFAULT = "WSO2_STATUS_DASHBOARD_DISTRIBUTED_DB";
-    // private static final String METRICS_DATASOURCE_DEFAULT = "WSO2_METRICS_DB";
 
     @Activate
     protected void start(BundleContext bundleContext) {
@@ -72,7 +72,6 @@ public class DatasourceServiceComponent {
                 .getDashboardManagerDatasourceName();
         dashboardDatasourceName =
                 dashboardDatasourceName != null ? dashboardDatasourceName : DASHBOARD_DATASOURCE_DEFAULT;
-        logger.info("datasource name" + dashboardDatasourceName);
 
         ManagerDataHolder.getInstance().setDashboardManagerDataSource((HikariDataSource) service.getDataSource
                 (dashboardDatasourceName));
@@ -85,7 +84,6 @@ public class DatasourceServiceComponent {
             logger.debug("@Reference(unbind) DataSourceService");
         }
         ManagerDataHolder.getInstance().setDashboardManagerDataSource(null);
-        // MonitoringDataHolder.getInstance().setMetricsDataSource(null);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -35,7 +35,6 @@ import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * This component handle the all the initialization tasks.
@@ -113,8 +112,6 @@ public class DashboardInitConfigComponent {
 
             resolvedConfiguration.setManagerConnectionConfigurations(connectionTimeout, readTimeOut);
 
-            //todo:role provider
-
             List<String> sysAdminRoles = deploymentQueries.getSysAdminRoles();
 
             List<String> developerRoles = deploymentQueries.getDeveloperRoles();
@@ -139,8 +136,6 @@ public class DashboardInitConfigComponent {
 
             return resolvedConfiguration;
         }
-
-
     }
 
     @Reference(

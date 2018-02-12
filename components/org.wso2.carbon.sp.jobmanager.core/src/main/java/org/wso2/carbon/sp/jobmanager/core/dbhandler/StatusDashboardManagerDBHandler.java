@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -43,7 +43,7 @@ import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PL
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.SQL_WHERE;
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.String_TEMPLATE;
+import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.STRING_TEMPLATE;
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.TUPLES_SEPARATOR;
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.WHITESPACE;
 
@@ -55,7 +55,7 @@ public class StatusDashboardManagerDBHandler {
     private static final String MANAGERID_PLACEHOLDER = "{{MANAGER_ID}}";
     private static final String MANAGERID_EXPRESSION = "MANAGERID={{MANAGER_ID}}";
     private static final String MANAGER_CONFIG_TABLE = "MANAGER_CONFIGURATION";
-    private static boolean isConfigTableCreated = false;
+    private boolean isConfigTableCreated = false;
     private String createTableQuery;
     private String checkTableQUery;
     private String selectQuery;
@@ -68,7 +68,6 @@ public class StatusDashboardManagerDBHandler {
     public StatusDashboardManagerDBHandler() {
         dataSource = ManagerDataHolder.getInstance().getDashboardManagerDataSource();
         Connection connection = null;
-        logger.info("ID" + DATASOURCE_ID);
         if (dataSource != null) {
             try {
                 connection = dataSource.getConnection();
@@ -126,18 +125,16 @@ public class StatusDashboardManagerDBHandler {
     private void createConfiguration() {
         Connection conn = this.getConnection();
         PreparedStatement statement = null;
-        logger.info("creating the tables");
         String resolved = checkTableQUery.replace(PLACEHOLDER_TABLE_NAME, MANAGER_CONFIG_TABLE);
         String resolvedTableCreateQuery = createTableQuery.replace(PLACEHOLDER_TABLE_NAME, MANAGER_CONFIG_TABLE);
-        if (!DBHandler.getInstance().isTableExist(conn, resolved)) {
-            if (!isConfigTableCreated) {
+        if ((!DBHandler.getInstance().isTableExist(conn, resolved)) && !isConfigTableCreated) {
                 Map<String, String> attributeList = DBTableUtils.getInstance().loadManagerConfigTableTuples
                         (managerQueryManager);
-                String resolvedTuples = String.format("MANAGERID " + String_TEMPLATE + "PRIMARY KEY" +
-                                                              TUPLES_SEPARATOR + "PORT " + String_TEMPLATE
-                                                              + TUPLES_SEPARATOR + "HOST" + String_TEMPLATE,
-                                                      attributeList.get("MANAGERID"), attributeList.get("PORT"),
-                                                      attributeList.get("HOST"));
+            String resolvedTuples = String.format("MANAGERID " + STRING_TEMPLATE + "PRIMARY KEY" +
+                                                          TUPLES_SEPARATOR + "PORT " + STRING_TEMPLATE
+                                                          + TUPLES_SEPARATOR + "HOST" + STRING_TEMPLATE,
+                                                  attributeList.get("MANAGERID"), attributeList.get("PORT"),
+                                                  attributeList.get("HOST"));
                 resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
                                                                             resolvedTuples);
                 try {
@@ -157,7 +154,6 @@ public class StatusDashboardManagerDBHandler {
                     }
                     cleanupConnection(conn);
                 }
-            }
         }
     }
 

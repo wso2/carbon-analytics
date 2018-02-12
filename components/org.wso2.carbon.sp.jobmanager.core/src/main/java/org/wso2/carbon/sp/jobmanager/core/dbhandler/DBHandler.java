@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.sp.jobmanager.core.dbhandler;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -27,7 +28,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 
 /**
  * This class represents key database operations related to manager data.
@@ -103,7 +103,7 @@ public class DBHandler {
     }
 
     /**
-     * Select worker from the worker DB.
+     * Select manager from the worker DB.
      *
      * @return list of object.
      */
@@ -125,7 +125,7 @@ public class DBHandler {
      * @param ps
      * @throws RDBMSTableException
      */
-    public void createTable(Connection conn, PreparedStatement ps) throws RDBMSTableException {
+    public void createTable(Connection conn, PreparedStatement ps) {
         try {
             ps.executeUpdate();
             conn.commit();
