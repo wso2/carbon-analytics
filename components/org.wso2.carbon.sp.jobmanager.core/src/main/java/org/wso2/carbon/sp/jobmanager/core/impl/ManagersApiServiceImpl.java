@@ -66,12 +66,12 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             Constants.PERMISSION_APP_NAME + Constants.PERMISSION_SUFFIX_MANAGER;
     private static final String VIWER_PERMISSION_STRING =
             Constants.PERMISSION_APP_NAME + Constants.PERMISSION_SUFFIX_VIEWER;
-    private PermissionProvider permissionProvider;
+    private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
+    private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";
     private static StatusDashboardManagerDBHandler managerDashboard;
     private ManagerDeploymentConfig managerDashboardConfig;
 
     public ManagersApiServiceImpl() {
-        permissionProvider = ManagerDataHolder.getInstance().getPermissionProvider();
         managerDashboardConfig = ManagerDataHolder.getInstance().getManagerDeploymentConfig();
     }
 
@@ -102,23 +102,19 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         }
     }
 
+    private static String getUserName(Request request) {
+        Object username = request.getProperty("username");
+        return username != null ? username.toString() : null;
+    }
+
     /**
-     * Add new manager nodes : User can add one or manager nodes
+     * This method is to add user specified manager's host and the port.
      *
-     * @param manager  : Manager object that need to be added
-     * @param username : username of the user
-     * @return : Response whether the manager is successfully added or not.
-     * @throws NotFoundException
+     * @param manager
+     * @return
      */
 
-    @Override
-    public Response addManager(Manager manager, String username) throws NotFoundException {
-        //todo: need to add permission
-//        boolean isAuthorized = permissionProvider.hasPermission(username,new Permission(Constants
-//                                                                                                .PERMISSION_APP_NAME,
-//                                                                                        MANAGER_PERMISSION_STRING));
-//
-//        if(isAuthorized) {
+    public Response addManager(Manager manager) {
         if (manager.getHost() != null) {
             String managerId = manager.getHost() + Constants.MANAGER_KEY_GENERATOR + String.valueOf(manager.getPort());
             ManagerConfigurationDetails managerConfigurationDetails = new ManagerConfigurationDetails(managerId,
@@ -132,8 +128,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
                                                                    "managerId" + " " + managerId + " " +
                                                                            "successfully "
-                                                                           + "added"))
-                        .build();
+                                                                           + "added")).build();
             } catch (RDBMSTableException e) {
                 logger.error("Error occured while inserting the Manager due to" + e.getMessage(), e);
                 return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error "
@@ -145,23 +140,14 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                                                                                + "manager:" + manager.toString())
                     .build();
         }
-//        }else {
-//            logger.error("Unauthorized permission to add manager for user: "+username);
-//            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized permission to add manager for "
-//                                                                             + "user"+username).build();
-//        }
     }
 
-
-    /**
-     * This method returns all the manager's details in the cluster (manager's host, manager's port, HA
-     * details)
-     *
-     * @return manager object with relevant details
-     * @throws NotFoundException
+    /***
+     * This method is to list down all the manager's details such as manager's host, manager's port and ha status
+     * @return
      */
-    @Override
-    public Response getAllManagers() throws NotFoundException {
+
+    public Response getManagerDetails() {
         List<ManagerDetails> connectedManagers = new ArrayList<>();
         //returns the manger node details with the same group Id
         ClusterCoordinator clusterCoordinator = ServiceDataHolder.getCoordinator();
@@ -185,9 +171,13 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             return Response.ok().entity(connectedManagers).build();
         } else {
             return Response.status(Response.Status.NO_CONTENT).entity(new ApiResponseMessage(ApiResponseMessage
-                                                                                                     .ERROR, "There "
-                                                                                                     + "is no manager"
-                                                                                                     + " nodes found "
+                                                                                                     .ERROR,
+                                                                                             "There "
+                                                                                                     + "is no "
+                                                                                                     + "manager"
+
+                                                                                                     + " nodes "
+                                                                                                     + "found "
                                                                                                      + "in the "
                                                                                                      + "cluster"))
                     .build();
@@ -195,8 +185,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     }
 
     /**
-     * We can get all the details of given parent siddhi application
-     * If it is in the waiting mode we can get all the details except deployed worker node details
+     * This method is to list down the child app details of the given parent siddhi application
      *
      * @param appName
      * @return
@@ -224,25 +213,17 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         }
     }
 
-    @Override
-    public Response getChildSiddhiAppDetails(String appName, Request request) throws NotFoundException {
-        //todo:check whether how can we put permission
-        return getChildSiddhiApps(appName);
-
-    }
-
     /**
-     * Returns all the deployed siddhi application in the given manager node
+     * Returns all the deployed siddhi application details
+     *
      * @return
-     * @throws NotFoundException
      */
 
-    @Override
-    public Response getSiddhiApps() throws NotFoundException {
+    public Response getSiddhiAppDetails() {
         Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
                 .getSiddhiAppHoldersMap();
-        Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
-                .getAppsWaitingForDeploy();
+        Map<String, List<SiddhiAppHolder>> waitingToDeploy =
+                ServiceDataHolder.getResourcePool().getAppsWaitingForDeploy();
         Map<String, List<SiddhiAppHolder>> siddhapps = new HashMap<>();
         siddhapps.putAll(deployedSiddhiAppHolder);
         siddhapps.putAll(waitingToDeploy);
@@ -250,42 +231,13 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     }
 
     /**
-     * Delete an existing manager.
-     * @param managerId : id of the manager node (format : managerhost_managerport)
-     * @param username  :username of the user
-     * @return Response whether the manager successfully deleted or not.
-     * @throws NotFoundException
-     */
-
-    @Override
-    public Response deleteManager(String managerId, String username) throws NotFoundException {
-
-        try {
-            managerDashboard.deleteManagerConfiguration(managerId);
-            return Response.ok()
-                    .entity(new ApiResponseMessage(ApiResponseMessage.OK, managerId + "Successfully deleted"))
-                    .build();
-        } catch (RDBMSTableException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage
-                                                                                         (ApiResponseMessage.ERROR,
-                                                                                          "Error occured while "
-                                                                                                  + "deleting the "
-                                                                                                  +
-                                                                                                  "manager" + managerId
-                                                                                                  + ex.getMessage()))
-                    .build();
-
-
-        }
-    }
-
-    /**
-     * This method returns the text view of the given siddhi application
+     * This method is to display the text view of the siddhi application
+     *
      * @param appName
      * @return
      */
-    @Override
-    public Response getSiddhiAppExecution(String appName) {
+
+    public Response getSiddhiAppExecutionPlan(String appName) {
         Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
                 .getSiddhiAppHoldersMap();
         Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
@@ -298,24 +250,174 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             return Response.ok().entity(definedApp).build();
         } else {
             return Response.status(Response.Status.NO_CONTENT).entity(new ApiResponseMessage(ApiResponseMessage
-                                                                                                     .ERROR, "There "
-                                                                                                     + "is no siddhi "
-                                                                                                     + "application "
-                                                                                                     + "deployed in "
-                                                                                                     + "the manager "
+                                                                                                     .ERROR,
+                                                                                             "There "
+                                                                                                     + "is no "
+                                                                                                     + "siddhi "
+                                                                                                     +
+                                                                                                     "application "
+                                                                                                     + "deployed "
+                                                                                                     + "in "
+                                                                                                     + "the "
+                                                                                                     + "manager "
                                                                                                      + "node"))
                     .build();
         }
     }
 
-    @Override
-    public Response getRolesByUsername(String username, String permissionSuffix) {
+    public Response deleteManager(String managerId) {
+        try {
+            managerDashboard.deleteManagerConfiguration(managerId);
+            return Response.ok()
+                    .entity(new ApiResponseMessage(ApiResponseMessage.OK, managerId + "Successfully deleted"))
+                    .build();
+        } catch (RDBMSTableException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage
+                                                                                         (ApiResponseMessage.ERROR,
+                                                                                          "Error occured while "
+                                                                                                  + "deleting the "
+                                                                                                  +
+                                                                                                  "manager"
+                                                                                                  + managerId
+                                                                                                  + ex
+                                                                                                  .getMessage()))
+                    .build();
+        }
+    }
 
-        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
-                                                                                         Constants.PERMISSION_APP_NAME
-                                                                                                 + "."
-                                                                                                 + permissionSuffix));
-        if (isAuthorized) {
+    /**
+     * Add new manager nodes : User can add one or manager nodes
+     *
+     * @param manager  : Manager object that need to be added
+     * @param username : username of the user
+     * @return : Response whether the manager is successfully added or not.
+     * @throws NotFoundException
+     */
+
+    @Override
+    public Response addManager(Manager manager, Request request) throws NotFoundException {
+
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to add Manager Node")
+                    .build();
+        } else {
+            return addManager(manager);
+        }
+    }
+
+    /**
+     * This method returns all the manager's details in the cluster (manager's host, manager's port, HA
+     * details)
+     *
+     * @return manager object with relevant details
+     * @throws NotFoundException
+     */
+    @Override
+    public Response getAllManagers(Request request) throws NotFoundException {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
+                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the "
+                                                                                + "manager's details")
+                    .build();
+        } else {
+            return getManagerDetails();
+        }
+
+    }
+
+    /**
+     * We can get all the details of given parent siddhi application
+     * If it is in the waiting mode we can get all the details except deployed worker node details
+     *
+     * @param appName
+     * @return
+     * @throws NotFoundException
+     */
+
+    @Override
+    public Response getChildSiddhiAppDetails(String appName, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
+                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get child app "
+                                                                                + "details").build();
+        } else {
+            return getChildSiddhiApps(appName);
+        }
+    }
+
+    /**
+     * Returns all the deployed siddhi application in the given manager node
+     *
+     * @return
+     * @throws NotFoundException
+     */
+
+    @Override
+    public Response getSiddhiApps(Request request) throws NotFoundException {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
+                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the "
+                                                                                + "details of the Siddhi Apps").build();
+        } else {
+            return getSiddhiAppDetails();
+        }
+
+    }
+
+    /**
+     * Delete an existing manager.
+     *
+     * @param managerId : id of the manager node (format : managerhost_managerport)
+     * @param username  :username of the user
+     * @return Response whether the manager successfully deleted or not.
+     * @throws NotFoundException
+     */
+
+    @Override
+    public Response deleteManager(String managerId, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to delete manager "
+                                                                                + "node")
+                    .build();
+        } else {
+            return deleteManager(managerId);
+        }
+    }
+
+    /**
+     * This method returns the text view of the given siddhi application
+     *
+     * @param appName
+     * @return
+     */
+    @Override
+    public Response getSiddhiAppExecution(String appName, Request request) {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
+                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the "
+                                                                                + "execution plan").build();
+        } else {
+            return getSiddhiAppExecutionPlan(appName);
+        }
+
+    }
+
+    @Override
+    public Response getRolesByUsername(Request request, String permissionSuffix) {
+        boolean isAuthorized = getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, Constants.PERMISSION_APP_NAME + "." + permissionSuffix));
+
+        if (getUserName(request) != null && isAuthorized) {
             return Response.ok()
                     .entity(isAuthorized)
                     .build();
@@ -326,11 +428,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         }
     }
 
-//    private static String getUserName(Request request) {
-//        Object username = request.getProperty("username");
-//        return username != null ? username.toString() : null;
-//    }
-//
+    private PermissionProvider getPermissionProvider() {
+        return ManagerDataHolder.getInstance().getPermissionProvider();
+    }
 
 
     @Reference(

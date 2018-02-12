@@ -82,7 +82,7 @@ public class ManagersApi implements Microservice {
     public Response addManager(@Context Request request,
                                @ApiParam(value = "Manager object need to be added.", required = true) Manager manager
                               ) throws NotFoundException {
-        return managersApi.addManager(manager, getUsername(request));
+        return managersApi.addManager(manager, request);
 
     }
 
@@ -107,7 +107,7 @@ public class ManagersApi implements Microservice {
                                   @ApiParam(value = "Id of the manager.", required = true) @PathParam("id") String id
                                  )
             throws NotFoundException {
-        return managersApi.deleteManager(id, getUsername(request));
+        return managersApi.deleteManager(id, request);
     }
 
     @GET
@@ -123,9 +123,9 @@ public class ManagersApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getAllManagers()
+    public Response getAllManagers(@Context Request request)
             throws NotFoundException {
-        return managersApi.getAllManagers();
+        return managersApi.getAllManagers(request);
     }
 
 
@@ -145,9 +145,9 @@ public class ManagersApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getSiddhiApps()
+    public Response getSiddhiApps(@Context Request request)
             throws NotFoundException {
-        return managersApi.getSiddhiApps();
+        return managersApi.getSiddhiApps(request);
     }
 
     @GET
@@ -171,7 +171,7 @@ public class ManagersApi implements Microservice {
             @PathParam("appName") String appName
                                          )
             throws NotFoundException {
-        return managersApi.getSiddhiAppExecution(appName);
+        return managersApi.getSiddhiAppExecution(appName, request);
     }
 
     @GET
@@ -220,6 +220,6 @@ public class ManagersApi implements Microservice {
                                        @ApiParam(value = "Id of the worker.", required = true)
                                        @QueryParam("permissionSuffix") String permissionSuffix
                                       ) throws NotFoundException {
-        return managersApi.getRolesByUsername(getUsername(request), permissionSuffix);
+        return managersApi.getRolesByUsername(request, permissionSuffix);
     }
 }

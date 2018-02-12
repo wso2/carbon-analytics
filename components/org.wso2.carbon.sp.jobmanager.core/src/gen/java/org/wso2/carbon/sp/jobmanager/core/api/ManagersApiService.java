@@ -27,17 +27,17 @@ import javax.ws.rs.core.Response;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-01-29T08:19:07.148Z")
 public abstract class ManagersApiService {
-    public abstract Response addManager(Manager manager, String username) throws NotFoundException;
+    public abstract Response addManager(Manager manager, Request request) throws NotFoundException;
 
-    public abstract Response deleteManager(String id, String username) throws NotFoundException;
+    public abstract Response deleteManager(String id, Request request) throws NotFoundException;
 
-    public abstract Response getAllManagers() throws NotFoundException;
+    public abstract Response getAllManagers(Request request) throws NotFoundException;
 
     public abstract Response getChildSiddhiAppDetails(String appName, Request request) throws NotFoundException;
 
-    public abstract Response getSiddhiApps() throws NotFoundException;
+    public abstract Response getSiddhiApps(Request request) throws NotFoundException;
 
-    public abstract Response getSiddhiAppExecution(String appName) throws NotFoundException;
+    public abstract Response getSiddhiAppExecution(String appName, Request request) throws NotFoundException;
 
-    public abstract Response getRolesByUsername(String username, String permisstionString);
+    public abstract Response getRolesByUsername(Request request, String permisstionString);
 }
