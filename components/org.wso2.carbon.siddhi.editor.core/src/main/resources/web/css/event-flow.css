@@ -2,7 +2,16 @@
     height: 90%;
 }
 
+/*Class For The Button To Open Design View*/
 .toggle-to-design {
+}
+
+/*Class For The Button To Open Source View*/
+.toggle-to-source {
+}
+
+/*Class For The Toggle View Button*/
+.toggle-view {
 }
 
 .design-container {

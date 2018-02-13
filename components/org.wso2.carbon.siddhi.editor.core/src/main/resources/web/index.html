@@ -226,19 +226,20 @@
         <div id="siddhi-editor" class="source-container">
         </div>
         <!-- End Preview Container -->
-        <!--TODO test this-->
+        <!-- Start Design Container -->
         <div class="design-container" style="display: none;">
             <svg id="siddhi-graph">
                 <g></g>
             </svg>
         </div>
+        <!-- End Design Container -->
         <!-- Start: Preview Container -->
         <div class="preview-container">
         </div>
         <!-- End Preview Container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
-            <!--TODO test this-->
+            <!--TODO Remove the AJAX Button Class-->
             <div class="btn  btn-primary toggle-view">Go To Design View</div>
         </div>
         <!-- End: Toggle Controls Container  -->
@@ -1434,7 +1435,6 @@
                                 // relative selector within container for a tab
                                 container: '.source-container'
                             },
-                            //TODO check this
                             design: {
                                 // relative selector within container for a tab
                                 container: '.design-container'
@@ -1447,8 +1447,6 @@
                                 // relative selector within container for a tab
                                 container: '.toggle-controls-container',
                                 toggle_view: '.toggle-view'
-                                // sourceIcon: '.toggle-to-source',
-                                // designIcon: '.toggle-to-design'
                             },
                             notifications: {
                                 container: '#notification-container'
