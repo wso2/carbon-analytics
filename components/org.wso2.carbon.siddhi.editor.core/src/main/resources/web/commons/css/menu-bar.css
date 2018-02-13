@@ -5,6 +5,10 @@
     position: relative;
 }
 
+.menu-group .dropdown-backdrop {
+    display: none;
+}
+
 .menu-list{
     display: none;
     position: absolute;
