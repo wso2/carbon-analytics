@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.data.provider.siddhi;
 
 import com.google.gson.Gson;
@@ -14,8 +32,6 @@ import org.wso2.carbon.data.provider.siddhi.config.SiddhiDataProviderConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.util.parser.SiddhiAppParser;
-import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.execution.query.StoreQuery;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
@@ -37,7 +53,7 @@ public class SiddhiProvider extends AbstractDataProvider {
     private static final String PROVIDER_NAME = "SiddhiStoreDataProvider";
     private static final String SIDDHI_APP = "siddhiApp";
     private static final String STORE_QUERY = "query";
-    private static final String PURGING_INTERVAL = "purgingInterval";
+    private static final String PULISHING_INTERVAL = "publishingInterval";
     private SiddhiDataProviderConfig siddhiDataProviderConfig;
     private DataSetMetadata metadata;
     private static SiddhiManager siddhiManager = null;
@@ -51,7 +67,7 @@ public class SiddhiProvider extends AbstractDataProvider {
         siddhiDataProviderConfig.setQuery(((JsonObject) jsonElement).get(STORE_QUERY).getAsString());
         siddhiDataProviderConfig.setSiddhiAppContext(((JsonObject) jsonElement).get(SIDDHI_APP).getAsString());
         super.init(topic, sessionId, siddhiDataProviderConfig);
-        SiddhiAppRuntime siddhiAppRuntime = getSiddhiAppRuntime(topic);
+        SiddhiAppRuntime siddhiAppRuntime = getSiddhiAppRuntime();
         siddhiAppRuntime.start();
         StoreQuery storeQuery = SiddhiCompiler.parseStoreQuery(siddhiDataProviderConfig.getQuery());
         Attribute[] outputAttributeList = siddhiAppRuntime.getStoreQueryOutputAttributes(storeQuery);
@@ -66,7 +82,8 @@ public class SiddhiProvider extends AbstractDataProvider {
 
     @Override
     public boolean configValidator(ProviderConfig providerConfig) throws DataProviderException {
-        return true;
+        SiddhiDataProviderConfig siddhiDataProviderConfig = (SiddhiDataProviderConfig) providerConfig;
+        return siddhiDataProviderConfig.getSiddhiAppContext() != null && siddhiDataProviderConfig.getQuery() != null;
     }
 
     @Override
@@ -84,7 +101,7 @@ public class SiddhiProvider extends AbstractDataProvider {
         Map<String, String> renderingTypes = new HashMap();
         renderingTypes.put(SIDDHI_APP, InputFieldTypes.SIDDHI_CODE);
         renderingTypes.put(STORE_QUERY, InputFieldTypes.SIDDHI_CODE);
-        renderingTypes.put(PURGING_INTERVAL, InputFieldTypes.NUMBER);
+        renderingTypes.put(PULISHING_INTERVAL, InputFieldTypes.NUMBER);
         return new Gson().toJson(new Object[]{renderingTypes, new SiddhiDataProviderConfig()});
     }
 
@@ -92,8 +109,8 @@ public class SiddhiProvider extends AbstractDataProvider {
     public void publish(String topic, String sessionId) {
         Event[] events = siddhiAppRuntime.query(siddhiDataProviderConfig.getQuery());
         ArrayList<Object[]> data = new ArrayList<>();
-        for (int i = 0; i < events.length; i++) {
-            data.add(events[i].getData());
+        for (Event event : events) {
+            data.add(event.getData());
         }
         publishToEndPoint(data, sessionId, topic);
     }
@@ -122,12 +139,12 @@ public class SiddhiProvider extends AbstractDataProvider {
 
     private static SiddhiManager getSiddhiManager() {
         if (siddhiManager == null) {
-            return new SiddhiManager();
+            siddhiManager = new SiddhiManager();
         }
         return siddhiManager;
     }
 
-    private SiddhiAppRuntime getSiddhiAppRuntime(String topic) throws DataProviderException {
+    private SiddhiAppRuntime getSiddhiAppRuntime() throws DataProviderException {
         if (this.siddhiAppRuntime == null) {
             try {
                 this.siddhiAppRuntime = getSiddhiManager().createSiddhiAppRuntime(siddhiDataProviderConfig.getSiddhiAppContext());
