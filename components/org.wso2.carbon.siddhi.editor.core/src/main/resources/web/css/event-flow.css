@@ -28,7 +28,7 @@
 .edgePath path {
     stroke: #bbb;
     stroke-width: 1.5px;
-    fill: #bbb;
+    fill: none;
 }
 
 /*Style for the SVG element*/

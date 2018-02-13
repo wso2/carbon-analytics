@@ -142,7 +142,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                             if (response.status === "success") {
                                 sourceContainer.hide();
                                 designContainer.show();
-                                console.log(response.responseJSON);
                                 eventFlow.render(response.responseJSON);
                                 toggleViewButton.html("Go To Source View");
                             } else if (response.status === "fail") {

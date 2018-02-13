@@ -46,10 +46,10 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     error: function (error) {
                         if (error.status === 400) {
                             result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                            log.error(error.responseText);
                         } else {
                             result = {status: "fail", errorMessage: "Internal Error Occurred"};
                         }
-                        log.error(error.responseText);
                     }
                 });
             }
@@ -137,13 +137,14 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
                 // Set the edges of the graph
                 data.edges.forEach(function (value) {
-                    var edge = {};
+                    var edge = {arrowheadStyle: "fill: #bbb"};
 
                     // NOTE: To make the edges curve, use -- lineInterpolate : "basis"
                     if (value.type === "arrow") {
                         edge.lineInterpolate = "basis";
                     } else if (value.type === "dotted-line") {
-                        edge.style = "stroke-dasharray: 5, 5; fill:#333;";
+                        // edge.style = "stroke-dasharray: 5, 5; fill:#333;";
+                        edge.style = "stroke-dasharray: 5, 5;";
                     } else {
                         console.error("Error - invalid edge type: " + value.type + " (Parent = " + value.parent + ", Child = " + value.child + ")");
                     }
