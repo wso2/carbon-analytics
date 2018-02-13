@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -50,6 +51,8 @@ import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.EventFlow;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.SiddhiAppInfo;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
@@ -866,14 +869,30 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
+    @Produces("application/json")
     @Path("/event-flow")
     public Response constructEventFlowJsonString(String siddhiAppString) {
-        String jsonString = "{}";
+        Response response;
 
+        try {
+            String siddhiApp = new String(Base64.getDecoder().decode(siddhiAppString),
+                    Charset.defaultCharset());
 
+            SiddhiAppInfo siddhiAppInfo = new SiddhiAppInfo(siddhiApp);
+            EventFlow eventFlow = new EventFlow(siddhiAppInfo);
 
-        return Response.ok(jsonString, MediaType.APPLICATION_JSON)
-                .build();
+            response = Response.status(Response.Status.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(eventFlow.getEventFlowJSON().toString())
+                    .build();
+        } catch (Exception e) {
+            response = Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        }
+
+        return response;
     }
 
     /**

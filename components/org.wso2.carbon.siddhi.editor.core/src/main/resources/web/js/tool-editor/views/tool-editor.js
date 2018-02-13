@@ -17,10 +17,10 @@
  */
 
 define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source", '../constants',
-        'undo_manager','launcher','app/debugger/debugger'],
+        'undo_manager', 'launcher', 'app/debugger/debugger', 'event_flow'],
 
-    function (require, $, Backbone, _, log, DesignView, SourceView, constants,UndoManager,Launcher,
-        DebugManager) {
+    function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
+              DebugManager, EventFlow) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -85,9 +85,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
 
                     /* Start Debug Related Stuff */
                     var debugConfOpts = {
-                        debugger_instance : self._sourceView.getDebugger(),
-                        editorInstance : self._sourceView.getEditor(),
-                        option : self.options.application.config.debugger_instance
+                        debugger_instance: self._sourceView.getDebugger(),
+                        editorInstance: self._sourceView.getEditor(),
+                        option: self.options.application.config.debugger_instance
 
                     };
 
@@ -100,18 +100,18 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     tabContentContainer.removeClass('tab-content-default');
 
                     this._sourceView.on('modified', function (changeEvent) {
-                        if(self.getUndoManager().hasUndo()){
+                        if (self.getUndoManager().hasUndo()) {
                             // clear undo stack from design view
-                            if(!self.getUndoManager().getOperationFactory()
-                                    .isSourceModifiedOperation(self.getUndoManager().undoStackTop())){
+                            if (!self.getUndoManager().getOperationFactory()
+                                    .isSourceModifiedOperation(self.getUndoManager().undoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }
 
-                        if(self.getUndoManager().hasRedo()){
+                        if (self.getUndoManager().hasRedo()) {
                             // clear redo stack from design view
-                            if(!self.getUndoManager().getOperationFactory()
-                                    .isSourceModifiedOperation(self.getUndoManager().redoStackTop())){
+                            if (!self.getUndoManager().getOperationFactory()
+                                    .isSourceModifiedOperation(self.getUndoManager().redoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }
@@ -130,6 +130,32 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                         self._sourceView.setContent(self._file.getContent());
                     }
                     this._sourceView.editorResize();
+
+                    // TODO check this
+                    var designContainer = this._$parent_el.find(_.get(this.options, 'design.container'));
+                    var svgDynamicId = designContainer.find('svg').attr('id') + this._$parent_el.attr('id');
+                    designContainer.find('svg').attr('id', svgDynamicId);
+                    var eventFlow = new EventFlow(designContainer);
+                    var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
+                    toggleViewButton.click(function () {
+                        if (sourceContainer.is(':visible')) {
+                            var response = eventFlow.fetchJSON(self.getContent());
+                            if (response.status === "success") {
+                                sourceContainer.hide();
+                                designContainer.show();
+                                console.log(response.responseJSON);
+                                eventFlow.render(response.responseJSON);
+                                toggleViewButton.html("Go To Source View");
+                            } else if (response.status === "fail") {
+                                eventFlow.alert(response.errorMessage);
+                            }
+                        } else if (designContainer.is(':visible')) {
+                            designContainer.hide();
+                            sourceContainer.show();
+                            toggleViewButton.html("Go To Design View");
+                            eventFlow.clear();
+                        }
+                    });
                 },
 
                 getContent: function () {
@@ -171,7 +197,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     return self._launcher;
                 },
 
-                isInSourceView: function(){
+                isInSourceView: function () {
                     return true;
                 }
 

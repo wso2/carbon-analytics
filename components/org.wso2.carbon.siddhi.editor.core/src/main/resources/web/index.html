@@ -37,6 +37,10 @@
     <link rel="stylesheet" type="text/css" href="/editor/css/debugger.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/console.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/welcome-screen.css"/>
+
+    <!--TODO check this-->
+    <link rel="stylesheet" type="text/css" href="/editor/css/event-flow.css"/>
+
     <title>Stream Processor Studio</title>
 </head>
 
@@ -222,17 +226,26 @@
         <div id="siddhi-editor" class="source-container">
         </div>
         <!-- End Preview Container -->
+        <!--TODO test this-->
+        <div class="design-container" style="display: none;">
+            <svg id="siddhi-graph">
+                <g></g>
+            </svg>
+        </div>
         <!-- Start: Preview Container -->
         <div class="preview-container">
         </div>
         <!-- End Preview Container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
+            <!--TODO test this-->
+            <div class="btn  btn-primary toggle-view">Go To Design View</div>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>
     <!-- End: Tab -->
 </div>
+
 <!-- End: Template for service tab -->
 <div class="hidden">
     <div class="siddhi-app-list">
@@ -1085,6 +1098,8 @@
             nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
             theme_wso2: "commons/lib/theme-wso2-2.0.0/js/theme-wso2.min",
             ace: "commons/lib/ace-editor",
+            d3: "commons/lib/dagre-d3/d3.v3.min",
+            dagre_d3: "commons/lib/dagre-d3/dagre-d3.min",
             //beautify: "commons/lib/beautify",
             ///////////////////////
             // custom modules ////
@@ -1117,7 +1132,8 @@
             output_console_list: "js/output-console/console-list",
             console: "js/output-console/console",
             service_console: "js/output-console/service-console-manager",
-            debugger_console: "js/debugger/debugger"
+            debugger_console: "js/debugger/debugger",
+            event_flow: "js/event-flow/event-flow"
         },
         map: {
             "*": {
@@ -1418,6 +1434,11 @@
                                 // relative selector within container for a tab
                                 container: '.source-container'
                             },
+                            //TODO check this
+                            design: {
+                                // relative selector within container for a tab
+                                container: '.design-container'
+                            },
                             debug: {
                                 // relative selector within container for a tab
                                 container: '.debug-container'
@@ -1425,8 +1446,9 @@
                             toggle_controls: {
                                 // relative selector within container for a tab
                                 container: '.toggle-controls-container',
-                                sourceIcon: '.toggle-to-source',
-                                designIcon: '.toggle-to-design'
+                                toggle_view: '.toggle-view'
+                                // sourceIcon: '.toggle-to-source',
+                                // designIcon: '.toggle-to-design'
                             },
                             notifications: {
                                 container: '#notification-container'

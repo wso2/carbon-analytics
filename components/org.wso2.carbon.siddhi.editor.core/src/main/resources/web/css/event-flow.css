@@ -1,0 +1,58 @@
+.source-view-enabled {
+    height: 90%;
+}
+
+.toggle-to-design {
+}
+
+.design-container {
+    height: 90%;
+    width: 100%;
+}
+
+.node rect {
+    stroke: #bbb;
+    fill: #333;
+    stroke-width: 1.5px;
+}
+
+.edgePath path {
+    stroke: #bbb;
+    stroke-width: 1.5px;
+    fill: #bbb;
+}
+
+/*Style for the SVG element*/
+.design-container svg {
+    width:100%;
+    height: 100%;
+}
+
+/*indicator CSS*/
+.indicator {
+    height: 15px;
+    width: 15px;
+    display: block;
+    float: left;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    /*padding-bottom: 5px;*/
+}
+
+/*nodeLabel CSS*/
+.nodeLabel {
+    font-weight: 100;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+    font-size: 14px;
+    color: #fff;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+/*Partition CSS*/
+.partition {
+    font-weight: 100;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+    font-size: 14px;
+    color: #000;
+}
