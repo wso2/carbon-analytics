@@ -150,6 +150,9 @@
             javax.websocket.*;version="${javax.websocket.version.range}",
             org.slf4j.*;version="${slf4j.version.range}",
             com.google.gson.*; version="${gson.version.range}",
+            org.wso2.siddhi.*,
+            org.wso2.siddhi.annotation.*,
+            org.wso2.siddhi.query.*,
             *;resolution:=optional
         </import.package>
         <carbon.component>
