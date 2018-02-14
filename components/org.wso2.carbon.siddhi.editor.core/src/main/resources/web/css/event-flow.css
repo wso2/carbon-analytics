@@ -1,7 +1,3 @@
-.source-view-enabled {
-    height: 90%;
-}
-
 /*Class For The Button To Open Design View*/
 .toggle-to-design {
 }
@@ -10,12 +6,32 @@
 .toggle-to-source {
 }
 
+.siddhi-app-name {
+    color: white;
+    font-size: 40px;
+    margin-left: 20px;
+}
+
+.siddhi-app-description {
+    color: white;
+    font-size: 20px;
+    margin-left: 20px;
+}
+
 /*Class For The Toggle View Button*/
 .toggle-view {
+    border-radius: 5px;
+}
+
+.toggle-controls-container {
+    position: absolute;
+    left: 90%;
+    top: 94%;
+    z-index: 1;
 }
 
 .design-container {
-    height: 90%;
+    height: 100%;
     width: 100%;
 }
 
@@ -33,8 +49,11 @@
 
 /*Style for the SVG element*/
 .design-container svg {
-    width:100%;
+    width: 99%;
     height: 100%;
+    position: relative;
+    background-color: grey;
+    left: 0.5%;
 }
 
 /*indicator CSS*/
@@ -45,7 +64,6 @@
     float: left;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
-    /*padding-bottom: 5px;*/
 }
 
 /*nodeLabel CSS*/
@@ -64,4 +82,55 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
     font-size: 14px;
     color: #000;
+}
+
+.stream-colour {
+    background-color: violet;
+}
+
+.table-colour {
+    background-color: indigo;
+}
+
+.window-colour {
+    background-color: blue;
+}
+
+.trigger-colour {
+    background-color: green;
+}
+
+.aggregation-colour {
+    background-color: yellow;
+}
+
+.function-colour {
+    background-color: orange;
+}
+
+.query-colour {
+    background-color: red;
+}
+
+.partitionType-colour {
+    background-color: #e0e0d1;
+}
+
+.colour-key {
+    float: right;
+}
+
+.colour-key-table {
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
+
+.colour-key-table td {
+    padding: 5px;
+}
+
+.colour-key-table span {
+    width: 15px;
+    height: 15px;
 }

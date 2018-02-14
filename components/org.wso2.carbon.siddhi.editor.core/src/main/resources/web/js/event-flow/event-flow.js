@@ -20,6 +20,9 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
         var EventFlow = function (designView) {
             this.$designView = designView;
+            this.$siddhiGraph = designView.find('svg');
+            this.$siddhiAppName =  designView.find('.siddhi-app-name');
+            this.$siddhiAppDescription = designView.find('.siddhi-app-description');
             this.url = window.location.protocol + "//" + window.location.host + "/editor/event-flow";
         };
 
@@ -90,28 +93,28 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                         html = "<div title = '" + value.description + "'>";
                         switch (value.type) {
                             case "stream":
-                                html = html + "<span class='indicator' style='background-color: violet'>&nbsp</span>";
+                                html = html + "<span class='indicator stream-colour'></span>";
                                 break;
                             case "table":
-                                html = html + "<span class='indicator' style='background-color: indigo'>&nbsp</span>";
+                                html = html + "<span class='indicator table-colour'></span>";
                                 break;
                             case "window":
-                                html = html + "<span class='indicator' style='background-color: blue'>&nbsp</span>";
+                                html = html + "<span class='indicator window-colour'></span>";
                                 break;
                             case "trigger":
-                                html = html + "<span class='indicator' style='background-color: green'>&nbsp</span>";
+                                html = html + "<span class='indicator trigger-colour'></span>";
                                 break;
                             case "aggregation":
-                                html = html + "<span class='indicator' style='background-color: yellow'>&nbsp</span>";
+                                html = html + "<span class='indicator aggregation-colour'></span>";
                                 break;
                             case "function":
-                                html = html + "<span class='indicator' style='background-color: orange'>&nbsp</span>";
+                                html = html + "<span class='indicator function-colour'></span>";
                                 break;
                             case "query":
-                                html = html + "<span class='indicator' style='background-color: red'>&nbsp</span>";
+                                html = html + "<span class='indicator query-colour'></span>";
                                 break;
                             case "partitionType":
-                                html = html + "<span class='indicator' style='background-color: whitesmoke'>&nbsp</span>";
+                                html = html + "<span class='indicator partitionType-colour'></span>";
                                 break;
                             default:
                                 isValid = false;
@@ -159,6 +162,14 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                         graph.setParent(child, value.id);
                     });
                 });
+
+                if (data.appName !== null || data.appName !== undefined || data.appName !== "") {
+                    self.$siddhiAppName.html(data.appName);
+                }
+
+                if (data.appDescription !== null || data.appDescription !== undefined || data.appDescription !== "") {
+                    self.$siddhiAppDescription.html(data.appDescription);
+                }
 
                 var render = new dagreD3.render();
 
