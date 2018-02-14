@@ -40,7 +40,6 @@ public class RolesProvider {
 
     public RolesProvider(ManagerDeploymentConfig dashboardConfigurations) {
         this.dashboardConfigurations = dashboardConfigurations;
-
     }
 
     /**
@@ -136,6 +135,4 @@ public class RolesProvider {
         }
         return roleList;
     }
-
-
 }

@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
 /**
- * Manager
+ * Manager class that holds host and port of the manager object
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-01-29T08:19:07.148Z")
@@ -72,7 +72,6 @@ public class Manager {
     public void setPort(int port) {
         this.port = port;
     }
-
 
     @Override
     public boolean equals(Object o) {

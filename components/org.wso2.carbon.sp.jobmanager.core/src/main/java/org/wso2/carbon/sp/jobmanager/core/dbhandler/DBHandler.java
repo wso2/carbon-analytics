@@ -38,7 +38,6 @@ public class DBHandler {
     private static DBHandler instance = new DBHandler();
 
     private DBHandler() {
-
     }
 
     public static DBHandler getInstance() {
@@ -65,9 +64,8 @@ public class DBHandler {
         }
     }
 
-
     /**
-     * Insert worker data worker db.
+     * Insert manager data manager db.
      *
      * @return isSuccess
      */
@@ -88,7 +86,7 @@ public class DBHandler {
     }
 
     /**
-     * Delete workers data to worker db.
+     * Delete managers data to manager db.
      *
      * @return isSuccess.
      */
@@ -103,43 +101,9 @@ public class DBHandler {
     }
 
     /**
-     * Select manager from the worker DB.
-     *
-     * @return list of object.
-     */
-
-    ResultSet select(PreparedStatement stmt) {
-        ResultSet rs;
-        try {
-            rs = stmt.executeQuery();
-        } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table.'", e);
-        }
-        return rs;
-    }
-
-    /**
-     * Create table query.
-     *
-     * @param conn
-     * @param ps
-     * @throws RDBMSTableException
-     */
-    public void createTable(Connection conn, PreparedStatement ps) {
-        try {
-            ps.executeUpdate();
-            conn.commit();
-        } catch (SQLException e) {
-            throw new RDBMSTableException("Unable to create table.", e);
-        }
-    }
-
-    /**
      * Check the table is exsists.
      *
      * @return boolean isTableExists.
-     */
-    /**
      * Method for checking whether or not the given table (which reflects the current event table instance) exists.
      *
      * @return true/false based on the table existence.

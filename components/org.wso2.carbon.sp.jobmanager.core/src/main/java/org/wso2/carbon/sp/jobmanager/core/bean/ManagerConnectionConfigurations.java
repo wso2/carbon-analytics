@@ -33,7 +33,7 @@ public class ManagerConnectionConfigurations {
     public ManagerConnectionConfigurations() {
     }
 
-    public ManagerConnectionConfigurations(Integer clientConnectionTimeOut, Integer clientReadTimeOut) {
+    public ManagerConnectionConfigurations(int clientConnectionTimeOut, int clientReadTimeOut) {
         this.clientConnectionTimeOut = clientConnectionTimeOut;
         this.clientReadTimeOut = clientReadTimeOut;
     }

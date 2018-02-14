@@ -93,7 +93,6 @@ public class ManagerDetails {
         this.haStatus = haStatus;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -136,4 +135,3 @@ public class ManagerDetails {
         return o.toString().replace("\n", "\n    ");
     }
 }
-

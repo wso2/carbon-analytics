@@ -22,6 +22,10 @@ package org.wso2.carbon.sp.jobmanager.core.factories;
 import org.wso2.carbon.sp.jobmanager.core.api.WorkersApiService;
 import org.wso2.carbon.sp.jobmanager.core.impl.WorkersApiServiceImpl;
 
+/**
+ * Factory class for stream processor dashboard apis.
+ */
+
 public class WorkersApiServiceFactory {
     private final static WorkersApiService service = new WorkersApiServiceImpl();
 

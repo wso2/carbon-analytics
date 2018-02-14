@@ -50,8 +50,7 @@ public class QueryManager {
                                                                                                 QueryMappingNotAvailableException {
         try {
             ManagerDeploymentConfig deploymentConfigurations = ManagerDataHolder.getInstance()
-                    .getConfigProvider()
-                    .getConfigurationObject(ManagerDeploymentConfig.class);
+                    .getConfigProvider().getConfigurationObject(ManagerDeploymentConfig.class);
             List<Queries> deploymentQueries = deploymentConfigurations.getQueries();
             List<Queries> componentQueries;
             ClassLoader classLoader = getClass().getClassLoader();
@@ -80,8 +79,8 @@ public class QueryManager {
     }
 
     private ManagerDeploymentConfig readYamlContent(InputStream yamlContent) {
-        Yaml yaml = new Yaml(new CustomClassLoaderConstructor
-                                     (ManagerDeploymentConfig.class, ManagerDeploymentConfig.class.getClassLoader()));
+        Yaml yaml = new Yaml(new CustomClassLoaderConstructor(ManagerDeploymentConfig.class,
+                                                              ManagerDeploymentConfig.class.getClassLoader()));
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml.loadAs(yamlContent, ManagerDeploymentConfig.class);
     }

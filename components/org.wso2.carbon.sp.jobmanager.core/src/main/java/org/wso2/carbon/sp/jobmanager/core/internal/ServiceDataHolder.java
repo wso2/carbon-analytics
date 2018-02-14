@@ -28,6 +28,7 @@ import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -45,7 +46,7 @@ public class ServiceDataHolder {
     private static DeploymentManagerImpl deploymentManager;
     private static boolean leader;
     //newly added
-    private static String userDefinedSiddhiApp;
+    private static Map<String, String> userDefinedSiddhiApp;
 
     public static ScheduledExecutorService getExecutorService() {
         return EXECUTOR_SERVICE;
@@ -139,11 +140,11 @@ public class ServiceDataHolder {
         ServiceDataHolder.deploymentManager = deploymentManager;
     }
 
-    public static String getUserDefinedSiddhiApp() {
-        return userDefinedSiddhiApp;
+    public static String getUserDefinedSiddhiApp(String siddhiAppName) {
+        return ServiceDataHolder.userDefinedSiddhiApp.get(siddhiAppName);
     }
 
-    public static void setUserDefinedSiddhiApp(String userDefinedSiddhiApp) {
+    public static void setUserDefinedSiddhiApp(Map<String, String> userDefinedSiddhiApp) {
         ServiceDataHolder.userDefinedSiddhiApp = userDefinedSiddhiApp;
     }
 }

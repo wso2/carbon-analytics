@@ -19,10 +19,16 @@
 
 package org.wso2.carbon.sp.jobmanager.core.api;
 
+import org.wso2.msf4j.Request;
+
 import javax.ws.rs.core.Response;
+
+/**
+ * Auto generated class from Swagger to MSF4J.
+ */
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-02-03T14:53:27.713Z")
 public abstract class WorkersApiService {
-    public abstract Response getWorkers() throws NotFoundException;
+    public abstract Response getWorkers(Request request) throws NotFoundException;
 }

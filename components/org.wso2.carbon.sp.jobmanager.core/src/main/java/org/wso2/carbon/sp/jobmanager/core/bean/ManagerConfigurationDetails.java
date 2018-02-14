@@ -19,11 +19,14 @@
 
 package org.wso2.carbon.sp.jobmanager.core.bean;
 
-import org.wso2.carbon.sp.jobmanager.core.exception.StatusDashboardValidationException;
+import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+/**
+ * ManagerConfigurationDetails class contains the configuration details of the manager
+ */
 
 public class ManagerConfigurationDetails {
     private String managerId;
@@ -69,33 +72,9 @@ public class ManagerConfigurationDetails {
 
     public Map<String, Object> toMap() {
         Map<String, Object> objectObjectHashMap = new HashMap<>();
-        objectObjectHashMap.put("MANAGERID", managerId);
-        objectObjectHashMap.put("HOST", host);
-        objectObjectHashMap.put("PORT", port);
+        objectObjectHashMap.put(Constants.MANAGERID, managerId);
+        objectObjectHashMap.put(Constants.HOST, host);
+        objectObjectHashMap.put(Constants.PORT, port);
         return objectObjectHashMap;
-    }
-
-    public void setArrayList(List values) throws StatusDashboardValidationException {
-        Object[] objects = new Object[]{managerId, host, port};
-        if (values.size() != objects.length) {
-            throw new StatusDashboardValidationException("Invalid length of object which is received data "
-                                                                 + "has:" + values.size() + "while bean has" + objects
-                    .length);
-        }
-        for (int i = 0; i < objects.length; i++) {
-            switch (i) {
-                case 0:
-                    managerId = (String) values.get(i);
-                    break;
-                case 1:
-                    host = (String) values.get(i);
-                    break;
-                case 2:
-                    port = (Integer) values.get(i);
-                    break;
-                default:
-                    throw new StatusDashboardValidationException("Invalid object:" + values.get(i));
-            }
-        }
     }
 }

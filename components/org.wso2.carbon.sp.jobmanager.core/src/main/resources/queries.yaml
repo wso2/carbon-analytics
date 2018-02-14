@@ -20,8 +20,8 @@ queries:
       tableCreateQuery: CREATE TABLE IF NOT EXISTS {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})
       tableCheckQuery: SELECT 1 FROM {{TABLE_NAME}} LIMIT 1
       recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
-      recordInsertQuery: INSERT INTO {{TABLE_NAME}} {{COLUMNS}} VALUES ({{Q}})
-      recordDeleteQuery: DELETE FROM {{TABLE_NAME}} {{CONDITION}}
+      recordInsertQuery: INSERT INTO MANAGER_CONFIGURATION (MANAGERID,PORT,HOST) VALUES (?,?,?)
+      recordDeleteQuery: DELETE FROM MANAGER_CONFIGURATION WHERE MANAGERID=?
       doubleType: DECIMAL
       floatType: FLOAT
       integerType: INTEGER
@@ -35,8 +35,8 @@ queries:
       tableCreateQuery: CREATE TABLE IF NOT EXISTS {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})
       tableCheckQuery: SELECT 1 FROM {{TABLE_NAME}} LIMIT 1
       recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
-      recordInsertQuery: INSERT INTO {{TABLE_NAME}} {{COLUMNS}} VALUES ({{Q}})
-      recordDeleteQuery: DELETE FROM {{TABLE_NAME}} {{CONDITION}}
+      recordInsertQuery: INSERT INTO MANAGER_CONFIGURATION (MANAGERID,PORT,HOST) VALUES (?,?,?)
+      recordDeleteQuery: DELETE FROM MANAGER_CONFIGURATION WHERE MANAGERID=?
       doubleType: DECIMAL
       floatType: FLOAT
       integerType: INTEGER
@@ -50,8 +50,8 @@ queries:
       tableCreateQuery: CREATE TABLE {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})
       tableCheckQuery: SELECT TOP 1 1 from {{TABLE_NAME}}
       recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
-      recordInsertQuery: INSERT INTO {{TABLE_NAME}} {{COLUMNS}} VALUES ({{Q}})
-      recordDeleteQuery: DELETE FROM {{TABLE_NAME}} {{CONDITION}}
+      recordInsertQuery: INSERT INTO MANAGER_CONFIGURATION (MANAGERID,PORT,HOST) VALUES (?,?,?)
+      recordDeleteQuery: DELETE FROM MANAGER_CONFIGURATION WHERE MANAGERID=?
       doubleType: "FLOAT(32)"
       floatType: REAL
       integerType: INTEGER
@@ -65,8 +65,8 @@ queries:
       tableCreateQuery: CREATE TABLE {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})
       tableCheckQuery: SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1
       recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
-      recordInsertQuery: INSERT INTO {{TABLE_NAME}} {{COLUMNS}} VALUES ({{Q}})
-      recordDeleteQuery: DELETE FROM {{TABLE_NAME}} {{CONDITION}}
+      recordInsertQuery: INSERT INTO MANAGER_CONFIGURATION (MANAGERID,PORT,HOST) VALUES (?,?,?)
+      recordDeleteQuery: DELETE FROM MANAGER_CONFIGURATION WHERE MANAGERID=?
       doubleType: "NUMBER(19,4)"
       floatType:  "NUMBER(19,4)"
       integerType: "NUMBER(10)"

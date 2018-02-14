@@ -22,13 +22,19 @@ package org.wso2.carbon.sp.jobmanager.core.impl.utils;
  * Class to define SQL queries and constants.
  */
 public class Constants {
-
-
     public static final String PERMISSION_APP_NAME = "MON";
     public static final String PERMISSION_SUFFIX_VIEWER = ".viewer";
     public static final String PERMISSION_SUFFIX_MANAGER = ".manager";
     public static final String MANAGER_KEY_GENERATOR = "_";
-
+    public static final String MANAGERID = "MANAGERID";
+    public static final String HOST = "HOST";
+    public static final String PORT = "PORT";
+    public static final String INTEGER_TYPE = "integerType";
+    public static final String STRING_TYPE = "stringType";
+    public static final String DOUBLE_TYPE = "doubleType";
+    public static final String LONG_TYPE = "longType";
+    public static final String FLOAT_TYPE = "floatType";
+    public static final String BOOL_TYPE = "booleanType";
 
     private Constants() {
         //preventing initialization

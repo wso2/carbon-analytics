@@ -42,8 +42,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+/**
+ * Auto generated class from Swagger to MSF4J.
+ */
+
 @Component(
-        name = "distributed",
         service = Microservice.class,
         immediate = true
 )
@@ -57,7 +60,6 @@ import javax.ws.rs.core.Response;
 public class ManagersApi implements Microservice {
     private static final Log logger = LogFactory.getLog(ManagersApi.class);
     private final ManagersApiService managersApi = ManagersApiServiceFactory.getManagersApi();
-
 
     private static String getUsername(Request request) {
         return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();
@@ -83,7 +85,6 @@ public class ManagersApi implements Microservice {
                                @ApiParam(value = "Manager object need to be added.", required = true) Manager manager
                               ) throws NotFoundException {
         return managersApi.addManager(manager, request);
-
     }
 
     @DELETE
@@ -104,8 +105,7 @@ public class ManagersApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = ApiResponseMessage.class)})
     public Response deleteManager(@Context Request request,
-                                  @ApiParam(value = "Id of the manager.", required = true) @PathParam("id") String id
-                                 )
+                                  @ApiParam(value = "Id of the manager.", required = true) @PathParam("id") String id)
             throws NotFoundException {
         return managersApi.deleteManager(id, request);
     }
@@ -123,11 +123,9 @@ public class ManagersApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getAllManagers(@Context Request request)
-            throws NotFoundException {
+    public Response getAllManagers(@Context Request request) throws NotFoundException {
         return managersApi.getAllManagers(request);
     }
-
 
     @GET
     @Path("/siddhi-apps")
@@ -145,8 +143,7 @@ public class ManagersApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getSiddhiApps(@Context Request request)
-            throws NotFoundException {
+    public Response getSiddhiApps(@Context Request request) throws NotFoundException {
         return managersApi.getSiddhiApps(request);
     }
 
@@ -168,9 +165,7 @@ public class ManagersApi implements Microservice {
     public Response getSiddhiAppExecution(
             @Context Request request,
             @ApiParam(value = "name of the parent siddhi app.", required = true)
-            @PathParam("appName") String appName
-                                         )
-            throws NotFoundException {
+            @PathParam("appName") String appName) throws NotFoundException {
         return managersApi.getSiddhiAppExecution(appName, request);
     }
 
@@ -194,11 +189,9 @@ public class ManagersApi implements Microservice {
     public Response getChildSiddhiAppDetails(
             @Context Request request,
             @ApiParam(value = "name of the parent siddhi app.", required = true)
-            @PathParam("appName") String appName)
-            throws NotFoundException {
+            @PathParam("appName") String appName) throws NotFoundException, CloneNotSupportedException {
         return managersApi.getChildSiddhiAppDetails(appName, request);
     }
-
 
     /**
      * Get user sysAdminRoles by username.
@@ -218,8 +211,8 @@ public class ManagersApi implements Microservice {
                                                 response = void.class)})
     public Response getRolesByUsername(@Context Request request,
                                        @ApiParam(value = "Id of the worker.", required = true)
-                                       @QueryParam("permissionSuffix") String permissionSuffix
-                                      ) throws NotFoundException {
+                                       @QueryParam("permissionSuffix") String permissionSuffix)
+            throws NotFoundException {
         return managersApi.getRolesByUsername(request, permissionSuffix);
     }
 }

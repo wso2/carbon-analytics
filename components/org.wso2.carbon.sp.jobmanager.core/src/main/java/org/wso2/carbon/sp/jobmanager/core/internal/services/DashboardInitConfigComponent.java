@@ -40,7 +40,6 @@ import java.util.List;
  * This component handle the all the initialization tasks.
  */
 @Component(
-        name = "org.wso2.carbon.sp.jobmanager.core.internal.services.DashboardInitConfigComponent",
         service = DashboardInitConfigComponent.class,
         immediate = true
 )
@@ -50,7 +49,7 @@ public class DashboardInitConfigComponent {
     @Activate
     protected void start(BundleContext bundleContext) {
         if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) DashboardInitConfigComponent");
+            logger.info("DashboardInitConfigComponent started successfully");
         }
         try {
             ManagerDeploymentConfig deploymentConfigurations = ManagerDataHolder.getInstance()
@@ -75,8 +74,7 @@ public class DashboardInitConfigComponent {
     }
 
     /**
-     * Defauld and deployment Query merger.
-     *
+     * Default and deployment Query merger.
      * @param defaultQueries
      * @return
      */

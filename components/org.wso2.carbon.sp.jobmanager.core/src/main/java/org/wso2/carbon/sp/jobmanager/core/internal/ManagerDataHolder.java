@@ -24,6 +24,9 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.sp.jobmanager.core.dbhandler.ManagerDeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.internal.roles.provider.RolesProvider;
 
+/**
+ * This is data holder for config provider implementations.
+ */
 public class ManagerDataHolder {
     private static ManagerDataHolder instance = new ManagerDataHolder();
     private ConfigProvider configProvider;
@@ -33,7 +36,6 @@ public class ManagerDataHolder {
     private RolesProvider rolesProvider;
 
     private ManagerDataHolder() {
-
     }
 
     /**

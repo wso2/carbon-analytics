@@ -55,6 +55,7 @@ public class ResourceNode implements Serializable {
         this.state = state;
     }
 
+
     public InterfaceConfig getHttpInterface() {
         return httpInterface;
     }

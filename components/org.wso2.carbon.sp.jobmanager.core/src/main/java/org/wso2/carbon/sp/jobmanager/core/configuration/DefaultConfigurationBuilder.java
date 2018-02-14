@@ -26,6 +26,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -54,18 +55,24 @@ public class DefaultConfigurationBuilder {
      */
     public ManagerDeploymentConfig getConfiguration() {
         ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(SQLConstants.DASHBOARD_CONFIG_FILE);
-        ManagerDeploymentConfig dashboardConfiguration;
-        if (inputStream != null) {
-            Yaml yaml = new Yaml(new CustomClassLoaderConstructor
-                                         (ManagerDeploymentConfig.class,
-                                          ManagerDeploymentConfig.class.getClassLoader()));
-            yaml.setBeanAccess(BeanAccess.FIELD);
-            dashboardConfiguration = yaml.loadAs(inputStream, ManagerDeploymentConfig.class);
-        } else {
+        try (InputStream inputStream = classLoader.getResourceAsStream(SQLConstants.DASHBOARD_CONFIG_FILE)) {
+            ManagerDeploymentConfig dashboardConfiguration;
+            if (inputStream != null) {
+                Yaml yaml = new Yaml(new CustomClassLoaderConstructor
+                                             (ManagerDeploymentConfig.class,
+                                              ManagerDeploymentConfig.class.getClassLoader()));
+                yaml.setBeanAccess(BeanAccess.FIELD);
+                dashboardConfiguration = yaml.loadAs(inputStream, ManagerDeploymentConfig.class);
+            } else {
+                throw new RuntimeException("Dashboard configuration file not found in: " +
+                                                   " ,hence using default configuration");
+            }
+
+            return dashboardConfiguration;
+        } catch (IOException e) {
             throw new RuntimeException("Dashboard configuration file not found in: " +
                                                " ,hence using default configuration");
+
         }
-        return dashboardConfiguration;
     }
 }

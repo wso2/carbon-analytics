@@ -31,16 +31,20 @@ import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract implementation of {@link DistributionService}. This implementation mandate to use an
  * {@link SiddhiAppCreator}  and {@link DeploymentManager} to fulfill distribution of Siddhi App.
  */
 public class DistributionManagerServiceImpl implements DistributionService {
+
     private SiddhiAppCreator appCreator;
     private DeploymentManager deploymentManager;
     private SiddhiTopologyCreator siddhiTopologyCreator;
+    private Map<String, String> serviceHolder = new HashMap<>();
 
     private DistributionManagerServiceImpl() {
         //Do nothing
@@ -56,7 +60,8 @@ public class DistributionManagerServiceImpl implements DistributionService {
     public DeploymentStatus distribute(String userDefinedSiddhiApp) {
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(userDefinedSiddhiApp);
         List<DeployableSiddhiQueryGroup> deployableQueryGroup = appCreator.createApps(topology);
-        ServiceDataHolder.setUserDefinedSiddhiApp(userDefinedSiddhiApp);
+        serviceHolder.put(topology.getName(), userDefinedSiddhiApp);
+        ServiceDataHolder.setUserDefinedSiddhiApp(serviceHolder);
         return deploymentManager.deploy(new DistributedSiddhiQuery(topology.getName(), deployableQueryGroup));
     }
 

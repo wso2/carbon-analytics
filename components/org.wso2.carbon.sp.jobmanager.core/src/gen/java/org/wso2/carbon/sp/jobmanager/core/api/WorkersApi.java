@@ -25,16 +25,20 @@ import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.sp.jobmanager.core.factories.WorkersApiServiceFactory;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+/**
+ * Auto generated class from Swagger to MSF4J.
+ */
 
 @Component(
-        name = "worker",
         service = Microservice.class,
         immediate = true
 )
@@ -63,8 +67,8 @@ public class WorkersApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getWorkers()
+    public Response getWorkers(@Context Request request)
             throws NotFoundException {
-        return workersApi.getWorkers();
+        return workersApi.getWorkers(request);
     }
 }

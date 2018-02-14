@@ -29,6 +29,7 @@ import org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.DBTableUtils;
 import org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.sp.jobmanager.core.exception.RDBMSTableException;
 import org.wso2.carbon.sp.jobmanager.core.exception.StatusDashboardRuntimeException;
+import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 
 import java.sql.Connection;
@@ -37,28 +38,23 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS_PRIMARYKEY;
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.SQL_WHERE;
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.STRING_TEMPLATE;
 import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.TUPLES_SEPARATOR;
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.WHITESPACE;
 
+/**
+ * This class represents key database operations related to manager data.
+ */
 
 public class StatusDashboardManagerDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardManagerDBHandler.class);
     private static final String DATASOURCE_ID = ManagerDataHolder.getInstance().getManagerDeploymentConfig()
             .getDashboardManagerDatasourceName();
-    private static final String MANAGERID_PLACEHOLDER = "{{MANAGER_ID}}";
-    private static final String MANAGERID_EXPRESSION = "MANAGERID={{MANAGER_ID}}";
     private static final String MANAGER_CONFIG_TABLE = "MANAGER_CONFIGURATION";
     private boolean isConfigTableCreated = false;
     private String createTableQuery;
-    private String checkTableQUery;
-    private String selectQuery;
+    private String checkTableQuery;
     private String deleteQuery;
     private String insertQuery;
     private HikariDataSource dataSource;
@@ -75,23 +71,16 @@ public class StatusDashboardManagerDBHandler {
                 managerQueryManager = new QueryManager(databaseMetaData.getDatabaseProductName(), databaseMetaData
                         .getDatabaseProductVersion());
                 managerAttributeMap = DBTableUtils.getInstance().loadManagerConfigTableTuples(managerQueryManager);
-                selectQuery = managerQueryManager.getQuery(SQLConstants.SELECT_QUERY);
                 deleteQuery = managerQueryManager.getQuery(SQLConstants.DELETE_QUERY);
                 insertQuery = managerQueryManager.getQuery(SQLConstants.INSERT_QUERY);
-                checkTableQUery = managerQueryManager.getQuery(SQLConstants.ISTABLE_EXISTS_QUERY);
+                checkTableQuery = managerQueryManager.getQuery(SQLConstants.ISTABLE_EXISTS_QUERY);
                 createTableQuery = managerQueryManager.getQuery(SQLConstants.CREATE_TABLE);
             } catch (SQLException | QueryMappingNotAvailableException | ConfigurationException ex) {
                 throw new StatusDashboardRuntimeException("Error while initializing the connection", ex);
             } finally {
-                if (connection != null) {
-                    try {
-                        connection.close();
-                    } catch (SQLException e) {
-                        logger.warn("Database error. Could not close the database connection", e);
-                    }
-                }
+                cleanupConnection(connection);
             }
-            createConfiguration();
+            createTables();
         } else {
             throw new RDBMSTableException(DATASOURCE_ID + "Could not find.Hence cannot initialize the status dashboard "
                                                   + "Please check whether database is available");
@@ -104,7 +93,7 @@ public class StatusDashboardManagerDBHandler {
      * @param conn {@link Connection} instance (can be null)
      */
 
-    public static void cleanupConnection(Connection conn) {
+    private void cleanupConnection(Connection conn) {
         if (conn != null) {
             try {
                 conn.close();
@@ -120,40 +109,49 @@ public class StatusDashboardManagerDBHandler {
     }
 
     /**
-     * Function to craete tables
+     * Method which can be used to close the prepared statement.
      */
-    private void createConfiguration() {
+
+    private void closePreparedStatement(PreparedStatement statement) {
+        try {
+            if (statement != null) {
+                statement.close();
+            }
+        } catch (SQLException e) {
+            logger.debug("Error occurred while closing the statement " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Function to create tables
+     */
+    private void createTables() {
         Connection conn = this.getConnection();
         PreparedStatement statement = null;
-        String resolved = checkTableQUery.replace(PLACEHOLDER_TABLE_NAME, MANAGER_CONFIG_TABLE);
+        String resolved = checkTableQuery.replace(PLACEHOLDER_TABLE_NAME, MANAGER_CONFIG_TABLE);
         String resolvedTableCreateQuery = createTableQuery.replace(PLACEHOLDER_TABLE_NAME, MANAGER_CONFIG_TABLE);
-        if ((!DBHandler.getInstance().isTableExist(conn, resolved)) && !isConfigTableCreated) {
-                Map<String, String> attributeList = DBTableUtils.getInstance().loadManagerConfigTableTuples
-                        (managerQueryManager);
-            String resolvedTuples = String.format("MANAGERID " + STRING_TEMPLATE + "PRIMARY KEY" +
-                                                          TUPLES_SEPARATOR + "PORT " + STRING_TEMPLATE
-                                                          + TUPLES_SEPARATOR + "HOST" + STRING_TEMPLATE,
-                                                  attributeList.get("MANAGERID"), attributeList.get("PORT"),
-                                                  attributeList.get("HOST"));
-                resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
-                                                                            resolvedTuples);
-                try {
-                    statement = conn.prepareStatement(resolvedTableCreateQuery);
-                    statement.execute();
-                    isConfigTableCreated = true;
-                } catch (SQLException e) {
-                    logger.error("Error while creating table,please try to create it manuaaly" + MANAGER_CONFIG_TABLE,
-                                 e);
-                } finally {
-                    try {
-                        if (statement != null) {
-                            statement.close();
-                        }
-                    } catch (SQLException e) {
-                        //ignore this
-                    }
-                    cleanupConnection(conn);
-                }
+        if (!isConfigTableCreated && (!DBHandler.getInstance().isTableExist(conn, resolved))) {
+            Map<String, String> attributeList = DBTableUtils.getInstance().loadManagerConfigTableTuples
+                    (managerQueryManager);
+            String resolvedTuples = String.format("MANAGERID " + STRING_TEMPLATE + "PRIMARY KEY " +
+                                                          TUPLES_SEPARATOR + "HOST " + STRING_TEMPLATE
+                                                          + TUPLES_SEPARATOR + "PORT " + STRING_TEMPLATE,
+                                                  attributeList.get(Constants.MANAGERID),
+                                                  attributeList.get(Constants.HOST),
+                                                  attributeList.get(Constants.PORT));
+            resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
+                                                                        resolvedTuples);
+            try {
+                statement = conn.prepareStatement(resolvedTableCreateQuery);
+                statement.execute();
+                isConfigTableCreated = true;
+            } catch (SQLException e) {
+                logger.error("Error while creating table,please try to create it manually " + MANAGER_CONFIG_TABLE,
+                             e);
+            } finally {
+                closePreparedStatement(statement);
+                cleanupConnection(conn);
+            }
         }
     }
 
@@ -166,16 +164,6 @@ public class StatusDashboardManagerDBHandler {
         return DBHandler.getInstance().getConnection(dataSource);
     }
 
-    /**
-     * Resolve the table names in the queries.
-     *
-     * @param query db queries
-     * @return the tableName
-     */
-    private String resolveTableName(String query, String tableName) {
-        return query.replace(PLACEHOLDER_TABLE_NAME, tableName);
-    }
-
 
     /**
      * Method which is used to insert the manager configuration details to the database.
@@ -184,106 +172,45 @@ public class StatusDashboardManagerDBHandler {
      * @return
      */
     public boolean insertManagerConfiguration(ManagerConfigurationDetails managerConfigurationDetails) {
-        String columnNames = ManagerConfigurationDetails.getColumnLabels();
         Map<String, Object> records = managerConfigurationDetails.toMap();
-        try {
-            return this.insert(columnNames, records, MANAGER_CONFIG_TABLE);
-        } catch (RDBMSTableException e) {
-            throw new RDBMSTableException(e.getMessage(), e);
-        }
-    }
-
-
-    /**
-     * Insert manager data to manager database
-     *
-     * @param columnNames colomn label need to get
-     * @param records     object need to be added
-     * @param tableName
-     * @return
-     */
-    private boolean insert(String columnNames, Map<String, Object> records, String tableName) throws
-                                                                                              RDBMSTableException {
-        String resolvedInsertQuery = resolveTableName(insertQuery, tableName);
-        String query = DBTableUtils.getInstance().composeInsertQuery(resolvedInsertQuery.replace(PLACEHOLDER_COLUMNS,
-                                                                                                 "(" + columnNames
-                                                                                                         + ")"),
-                                                                     managerAttributeMap.size());
         Connection conn = this.getConnection();
         PreparedStatement statement = null;
         try {
-            statement = conn.prepareStatement(query);
+            statement = conn.prepareStatement(insertQuery);
             statement = DBTableUtils.getInstance().populateInsertStatement(records, statement, managerAttributeMap,
                                                                            managerQueryManager);
             DBHandler.getInstance().insert(statement);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException(e.getMessage(), e);
+            throw new RDBMSTableException("Error while inserting the data " + e.getMessage(), e);
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    logger.error("error while closing insert query", e);
-                }
-            }
+            closePreparedStatement(statement);
             cleanupConnection(conn);
         }
-    }
-
-    /**
-     * Delete manager config details from managerDB
-     *
-     * @param managerId
-     * @return
-     */
-
-    public boolean deleteManagerConfiguration(String managerId) {
-        return this.delete(managerId, generateConditionManagerID(QUESTION_MARK), MANAGER_CONFIG_TABLE);
     }
 
     /**
      * Delete ManagerId in the manager DB
      *
      * @param managerId : Id of the manager node
-     * @param condition
-     * @param tableName
      * @return
      */
-    private boolean delete(String managerId, String condition, String tableName) {
-        String resolvedDeleteQuery = resolveTableName(deleteQuery, tableName);
+    public boolean deleteManagerConfiguration(String managerId) {
         Connection conn = this.getConnection();
         PreparedStatement statement = null;
         try {
-            statement = conn.prepareStatement(resolvedDeleteQuery.replace(PLACEHOLDER_CONDITION,
-                                                                          SQL_WHERE + WHITESPACE + condition));
+            statement = conn.prepareStatement(deleteQuery);
             statement.setString(1, managerId);
             DBHandler.getInstance().delete(statement);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error occured while deleting the manager:" + managerId + "in a "
-                                                  + "table" + tableName + DATASOURCE_ID, e);
+            throw new RDBMSTableException(
+                    "Error occurred while deleting the manager: " + "\n" + managerId + "\n" + " in"
+                            + " a "
+                            + "table MANAGER_CONFIGURATION" + DATASOURCE_ID, e);
         } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Error occured while closing the statement", e);
-            }
+            closePreparedStatement(statement);
             cleanupConnection(conn);
         }
     }
-
-    /**
-     * To generate the manager ID condition
-     *
-     * @param managerIdPlaceHolder
-     * @return
-     */
-    private String generateConditionManagerID(String managerIdPlaceHolder) {
-        return MANAGERID_EXPRESSION.replace(MANAGERID_PLACEHOLDER, managerIdPlaceHolder);
-    }
-
-
 }
