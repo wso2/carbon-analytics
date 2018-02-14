@@ -41,18 +41,12 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var downloadLink = document.createElement("a");
                     downloadLink.download = title;
                     downloadLink.innerHTML = "export File";
-
-                if (window.webkitURL != null) {
-                    downloadLink.href = window.webkitURL.createObjectURL(payload);
-                } else {
                     downloadLink.href = window.URL.createObjectURL(payload);
                     downloadLink.onclick = destroyClickedElement;
                     downloadLink.style.display = "none";
                     document.body.appendChild(downloadLink);
-                }
                     window.URL.revokeObjectURL(payload);
                     downloadLink.click();
-
               function destroyClickedElement(event) {
                     document.body.removeChild(event.target);
               }
