@@ -37,6 +37,10 @@
     <link rel="stylesheet" type="text/css" href="/editor/css/debugger.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/console.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/welcome-screen.css"/>
+
+    <!-- TODO: Check this -->
+    <link rel="stylesheet" type="text/css" href="/editor/css/drag-and-drop.css"/>
+
     <title>Stream Processor Studio</title>
 </head>
 
@@ -121,9 +125,6 @@
                                 <div class="tab-headers tab-headers-bar">
                                 </div>
                                 <div id="tab-content-wrapper" class="grid-background">
-                                    <!-- Start: tool-palette -->
-                                    <div id="tool-palette-container" style="display: none"></div>
-                                    <!-- End: tool-palette -->
                                     <div class="tab-content tab-content-default "></div>
                                 </div>
                             </div>
@@ -226,8 +227,20 @@
         <div class="preview-container">
         </div>
         <!-- End Preview Container -->
+        <!-- Start: design view container -->
+        <div class="design-view-container" style="display: none">
+            <!-- Start: tool-palette -->
+            <div class="tool-palette-container"></div>
+            <!-- End: tool-palette -->
+            <!-- Start: design-view-grid-container -->
+            <div class="design-view-grid-container"></div>
+            <!-- End: design-view-grid-container -->
+        </div>
+        <!-- End: design view container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
+            <div class="btn  btn-primary toggle-to-source">Source View</div>
+            <div class="btn  btn-primary toggle-to-design">Design View</div>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>
@@ -1069,8 +1082,10 @@
             jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
             jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
             bootstrap: "commons/lib/theme-wso2-2.0.0/js/bootstrap.min",
+            dagre: "commons/lib/dagre-0.7.4/dagre.min",
             jquery_validate: "commons/lib/jquery_validate/jquery.validate.min",
             jquery_timepicker: "commons/lib/jquery_timepicker/jquery-ui-timepicker-addon",
+            json_editor: "commons/lib/json-editor_v0.7.28/jsoneditor",
             log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
             lodash: "commons/lib/lodash_v4.13.1/lodash",
             backbone: "commons/lib/backbone_v1.3.3/backbone",
@@ -1117,7 +1132,9 @@
             output_console_list: "js/output-console/console-list",
             console: "js/output-console/console",
             service_console: "js/output-console/service-console-manager",
-            debugger_console: "js/debugger/debugger"
+            debugger_console: "js/debugger/debugger",
+            design_view: "js/design-view/design-view",
+            designViewGrid: "js/tool-editor/views/design"
         },
         map: {
             "*": {
@@ -1431,6 +1448,26 @@
                             notifications: {
                                 container: '#notification-container'
                             },
+                            design_view: {
+                                // relative selector within container for a tab
+                                container: '.design-view-container',
+                                canvas_container: '.canvas-container',
+                                new_drop_timeout: 3000,
+                                tool_palette: {
+                                    // relative selector within container for design view
+                                    container: ".tool-palette-container",
+                                    toolGroup: {
+                                        tool: {
+                                            containment_element: '#tabs-container',
+                                            cssClass: {
+                                                dragContainer: 'tool-drag-container',
+                                                disabledIconContainer: 'disabled-icon-container',
+                                                disabledIcon: 'fw fw-lg fw-block tool-disabled-icon'
+                                            }
+                                        }
+                                    }
+                                }
+                            },
                             source_view: {
                                 // relative selector within container for a tab
                                 container: '.source-view-container',
@@ -1472,17 +1509,6 @@
                             dialog_boxes:{
                                 parser_error: "#parserErrorModel"
                             }
-                        }
-                    }
-                },
-                tool_palette: {
-                    // relative selector within container for tab controller
-                    container: "#tool-palette-container",
-                    search_bar: {
-                        cssClass: {
-                            search_box: 'search-bar',
-                            search_icon: 'fw fw-search searchIcon',
-                            search_input: 'search-input'
                         }
                     }
                 }

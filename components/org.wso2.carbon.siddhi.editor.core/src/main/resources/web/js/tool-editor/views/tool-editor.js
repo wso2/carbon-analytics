@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source", '../constants',
+define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
         'undo_manager','launcher','app/debugger/debugger'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants,UndoManager,Launcher,
@@ -36,7 +36,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                         throw "container is not defined."
                     }
                     var container = $(_.get(options, 'container'));
-                    var toolPallete = $(_.get(options, 'toolPalette'));
                     if (!container.length > 0) {
                         throw "container not found."
                     }
@@ -56,15 +55,12 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
                     var tabContentContainer = $(_.get(this.options, 'tabs_container'));
-                    var toolPallette = _.get(this.options, 'toolPalette._$parent_el');
 
                     if (!canvasContainer.length > 0) {
                         var errMsg = 'cannot find container to render svg';
                         log.error(errMsg);
                         throw errMsg;
                     }
-                    var designViewOpts = {};
-                    _.set(designViewOpts, 'container', canvasContainer.get(0));
 
                     //use this line to assign dynamic id for canvas and pass the canvas id to initialize jsplumb
                     canvasContainer.attr('id', 'canvasId1');
@@ -96,7 +92,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     canvasContainer.removeClass('show-div').addClass('hide-div');
                     previewContainer.removeClass('show-div').addClass('hide-div');
                     sourceContainer.removeClass('source-view-disabled').addClass('source-view-enabled');
-                    toolPallette.addClass('hide-div');
                     tabContentContainer.removeClass('tab-content-default');
 
                     this._sourceView.on('modified', function (changeEvent) {
@@ -130,6 +125,49 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                         self._sourceView.setContent(self._file.getContent());
                     }
                     this._sourceView.editorResize();
+
+                    var sourceViewBtn = this._$parent_el.find(_.get(this.options, 'toggle_controls.sourceIcon'));
+                    var designViewBtn = this._$parent_el.find(_.get(this.options, 'toggle_controls.designIcon'));
+                    this.designView = new DesignView(this.options);
+                    this.designView.render();
+                    this.sourceContainer = sourceContainer;
+                    this.designViewContainer = this.designView.getDesignViewContainer();
+
+                    sourceViewBtn.click(function () {
+                        if (self.getDesignContainer() !== undefined) {
+                            if (self.getDesignContainer().is(':visible')) {
+                                self.getDesignContainer().hide();
+                                self.getSourceContainer().show();
+                            } else {
+                                self.getSourceContainer().show();
+                            }
+                        }
+                    });
+
+                    designViewBtn.click(function () {
+                        if (self.getDesignContainer() !== undefined) {
+                            self.getDesignView().showToolPalette();
+                            if (self.getSourceContainer().is(':visible')) {
+                                self.getSourceContainer().hide();
+                                self.getDesignContainer().show();
+                            } else {
+                                self.getDesignContainer().show();
+                            }
+                        }
+                    });
+                },
+
+                getSourceContainer: function () {
+                    var self = this;
+                    return self.sourceContainer;
+                },
+
+                getDesignContainer: function () {
+                    var self = this;
+                    return self.designView.getDesignViewContainer();
+                },
+                getDesignView: function () {
+                    return this.designView;
                 },
 
                 getContent: function () {

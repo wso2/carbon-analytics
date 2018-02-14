@@ -17,9 +17,7 @@
  */
 define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash','jquery_ui'],
 
-function (require, log, $, _jsPlumb ,Backbone, _
-
-) {
+function (require, log, $, _jsPlumb ,Backbone, _) {
 
     var DesignView = Backbone.View.extend(
         /** @lends DesignView.prototype */
