@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.data.provider.AbstractDataProvider;
 import org.wso2.carbon.data.provider.DataProvider;
+import org.wso2.carbon.data.provider.InputFieldTypes;
 import org.wso2.carbon.data.provider.ProviderConfig;
 import org.wso2.carbon.data.provider.bean.DataSetMetadata;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
@@ -41,9 +42,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import javax.sql.DataSource;
 
 import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.CUSTOM_QUERY_PLACEHOLDER;
@@ -281,7 +280,18 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
 
     @Override
     public String providerConfig() {
-        return new Gson().toJson(new RDBMSDataProviderConf());
+        Map<String, String> renderingTypes = new HashMap<>();
+        renderingTypes.put("publishingInterval", InputFieldTypes.NUMBER);
+        renderingTypes.put("purgingInterval", InputFieldTypes.NUMBER);
+        renderingTypes.put("isPurgingEnable", InputFieldTypes.SWITCH);
+        renderingTypes.put("publishingLimit", InputFieldTypes.NUMBER);
+        renderingTypes.put("purgingLimit", InputFieldTypes.NUMBER);
+        renderingTypes.put("datasourceName", InputFieldTypes.TEXT_FIELD);
+        renderingTypes.put("query", InputFieldTypes.SQL_CODE);
+        renderingTypes.put("tableName", InputFieldTypes.TEXT_FIELD);
+        renderingTypes.put("incrementalColumn", InputFieldTypes.TEXT_FIELD);
+        renderingTypes.put("timeColumns", InputFieldTypes.TEXT_FIELD);
+        return new Gson().toJson(new Object[]{renderingTypes, new RDBMSDataProviderConf()});
     }
 
     @Override
