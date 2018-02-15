@@ -47,9 +47,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     document.body.appendChild(downloadLink);
                     window.URL.revokeObjectURL(payload);
                     downloadLink.click();
-              function destroyClickedElement(event) {
+
+                function destroyClickedElement(event) {
                     document.body.removeChild(event.target);
-              }
+                }
             }
         });
 
