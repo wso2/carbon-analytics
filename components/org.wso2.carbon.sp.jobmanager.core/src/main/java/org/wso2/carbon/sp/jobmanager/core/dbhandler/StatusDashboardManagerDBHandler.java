@@ -114,7 +114,7 @@ public class StatusDashboardManagerDBHandler {
                 statement.close();
             }
         } catch (SQLException e) {
-            logger.debug("Error occurred while closing the statement " + e.getMessage(), e);
+            logger.debug("Error occurred while closing the statement.", e);
         }
     }
 
@@ -165,7 +165,7 @@ public class StatusDashboardManagerDBHandler {
             DBHandler.getInstance().insert(statement);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error while inserting the data " + e.getMessage(), e);
+            throw new RDBMSTableException("Error while inserting the data ", e);
         } finally {
             closePreparedStatement(statement);
             cleanupConnection(conn);

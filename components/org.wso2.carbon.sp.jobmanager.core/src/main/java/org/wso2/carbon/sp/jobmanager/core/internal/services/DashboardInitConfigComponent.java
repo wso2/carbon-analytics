@@ -147,7 +147,6 @@ public class DashboardInitConfigComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DatasourceServiceComponent");
         }
-
     }
 
     public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
