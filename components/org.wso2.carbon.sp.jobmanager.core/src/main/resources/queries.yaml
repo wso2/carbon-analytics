@@ -3,7 +3,6 @@ queries:
    mappings:
       tableCreateQuery:
       tableCheckQuery:
-      recordSelectQuery:
       recordInsertQuery:
       recordDeleteQuery:
       doubleType:
