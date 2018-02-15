@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.sp.jobmanager.core.impl;
 
 import org.apache.commons.logging.Log;
@@ -96,14 +97,12 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             unbind = "unregisterServiceDatasource"
     )
     public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DatasourceServiceComponent");
         }
     }
 
     public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");
         }

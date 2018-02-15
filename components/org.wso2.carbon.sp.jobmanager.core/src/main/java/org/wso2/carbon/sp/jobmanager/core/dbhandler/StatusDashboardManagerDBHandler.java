@@ -29,7 +29,6 @@ import org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.DBTableUtils;
 import org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.sp.jobmanager.core.exception.RDBMSTableException;
 import org.wso2.carbon.sp.jobmanager.core.exception.StatusDashboardRuntimeException;
-import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 
 import java.sql.Connection;
@@ -38,10 +37,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS_PRIMARYKEY;
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.STRING_TEMPLATE;
-import static org.wso2.carbon.sp.jobmanager.core.dbhandler.utils.SQLConstants.TUPLES_SEPARATOR;
 
 /**
  * This class represents key database operations related to manager data.
@@ -128,26 +123,13 @@ public class StatusDashboardManagerDBHandler {
     private void createTables() {
         Connection conn = this.getConnection();
         PreparedStatement statement = null;
-        String resolved = checkTableQuery.replace(PLACEHOLDER_TABLE_NAME, MANAGER_CONFIG_TABLE);
-        String resolvedTableCreateQuery = createTableQuery.replace(PLACEHOLDER_TABLE_NAME, MANAGER_CONFIG_TABLE);
-        if (!isConfigTableCreated && (!DBHandler.getInstance().isTableExist(conn, resolved))) {
-            Map<String, String> attributeList = DBTableUtils.getInstance().loadManagerConfigTableTuples
-                    (managerQueryManager);
-            String resolvedTuples = String.format("MANAGERID " + STRING_TEMPLATE + "PRIMARY KEY " +
-                                                          TUPLES_SEPARATOR + "HOST " + STRING_TEMPLATE
-                                                          + TUPLES_SEPARATOR + "PORT " + STRING_TEMPLATE,
-                                                  attributeList.get(Constants.MANAGERID),
-                                                  attributeList.get(Constants.HOST),
-                                                  attributeList.get(Constants.PORT));
-            resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
-                                                                        resolvedTuples);
+        if (!isConfigTableCreated && (!DBHandler.getInstance().isTableExist(conn, checkTableQuery))) {
             try {
-                statement = conn.prepareStatement(resolvedTableCreateQuery);
+                statement = conn.prepareStatement(createTableQuery);
                 statement.execute();
                 isConfigTableCreated = true;
             } catch (SQLException e) {
-                logger.error("Error while creating table,please try to create it manually " + MANAGER_CONFIG_TABLE,
-                             e);
+                logger.error("Error while creating table,please try to create it manually " + MANAGER_CONFIG_TABLE, e);
             } finally {
                 closePreparedStatement(statement);
                 cleanupConnection(conn);

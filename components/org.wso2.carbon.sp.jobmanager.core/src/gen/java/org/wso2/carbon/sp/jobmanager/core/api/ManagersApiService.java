@@ -37,8 +37,7 @@ public abstract class ManagersApiService {
 
     public abstract Response getAllManagers(Request request) throws NotFoundException;
 
-    public abstract Response getChildSiddhiAppDetails(String appName,
-                                                      Request request) throws NotFoundException, CloneNotSupportedException;
+    public abstract Response getChildSiddhiAppDetails(String appName, Request request) throws NotFoundException;
 
     public abstract Response getSiddhiApps(Request request) throws NotFoundException;
 

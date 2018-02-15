@@ -61,7 +61,6 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
             if (deployedSiddhiAppHoldersMap.containsKey(distributedSiddhiQuery.getAppName())) {
                 List<SiddhiAppHolder> existingApps = deployedSiddhiAppHoldersMap
                         .get(distributedSiddhiQuery.getAppName());
-
                 if (CollectionUtils.isEqualCollection(existingApps, appsToDeploy)) {
                     boolean waitingToDeploy = false;
                     for (SiddhiAppHolder app : existingApps) {

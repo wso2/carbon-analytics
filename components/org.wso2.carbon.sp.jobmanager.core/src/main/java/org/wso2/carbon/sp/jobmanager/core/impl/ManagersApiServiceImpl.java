@@ -259,7 +259,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
      * @throws NotFoundException
      */
 
-    public Response getChildSiddhiApps(String appName) throws NotFoundException, CloneNotSupportedException {
+    public Response getChildSiddhiApps(String appName) throws NotFoundException {
         Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
                 .getSiddhiAppHoldersMap();
         Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
@@ -416,7 +416,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
     @Override
     public Response getChildSiddhiAppDetails(String appName,
-                                             Request request) throws NotFoundException, CloneNotSupportedException {
+                                             Request request) throws NotFoundException {
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,

@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.sp.jobmanager.core.bean;
 
 import org.wso2.carbon.config.annotation.Element;

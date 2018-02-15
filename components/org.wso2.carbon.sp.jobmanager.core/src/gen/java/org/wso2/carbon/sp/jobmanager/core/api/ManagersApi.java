@@ -189,7 +189,7 @@ public class ManagersApi implements Microservice {
     public Response getChildSiddhiAppDetails(
             @Context Request request,
             @ApiParam(value = "name of the parent siddhi app.", required = true)
-            @PathParam("appName") String appName) throws NotFoundException, CloneNotSupportedException {
+            @PathParam("appName") String appName) throws NotFoundException {
         return managersApi.getChildSiddhiAppDetails(appName, request);
     }
 
