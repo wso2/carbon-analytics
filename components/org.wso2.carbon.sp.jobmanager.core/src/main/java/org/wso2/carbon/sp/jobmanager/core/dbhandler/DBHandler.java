@@ -56,11 +56,11 @@ public class DBHandler {
                 conn.setAutoCommit(true);
                 return conn;
             } else {
-                throw new RDBMSTableException("Datasource Could not be found. " +
+                throw new RDBMSTableException("Data source Could not be found. " +
                                                       "Hence cannot initialize the status dashboard.");
             }
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error initializing connection.", e);
+            throw new RDBMSTableException("Error initializing connection. ", e);
         }
     }
 
@@ -74,7 +74,7 @@ public class DBHandler {
             stmt.execute();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error while inserting manager.", e);
+            throw new RDBMSTableException("Error while inserting manager. ", e);
         } finally {
             try {
                 stmt.close();
@@ -96,7 +96,7 @@ public class DBHandler {
             stmt.close();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException(" Error while processing the dDELETE operation.", e);
+            throw new RDBMSTableException(" Error while processing the dDELETE operation. ", e);
         }
     }
 

@@ -57,7 +57,8 @@ public class RDBMSServiceImpl {
         String datasourceName = ServiceDataHolder.getDeploymentConfig().getDatasource();
         if (datasourceName == null) {
             throw new ResourceManagerException("No datasource specified to be used with RDBMS based resource pool " +
-                                                       "management. Please check configurations under " + ResourceManagerConstants.DEPLOYMENT_CONFIG_NS);
+                                                       "management. Please check configurations under "
+                                                       + ResourceManagerConstants.DEPLOYMENT_CONFIG_NS);
         }
         DataSourceService dataSourceService = ServiceDataHolder.getDataSourceService();
         try {
@@ -117,7 +118,8 @@ public class RDBMSServiceImpl {
             } catch (SQLException e) {
                 rollback(connection, ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING);
                 throw new ResourceManagerException("Error occurred while " +
-                                                           ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING + ". Group ID" +
+                                                           ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING
+                                                           + ". Group ID" +
                                                            resourcePool.getGroupId(), e);
             } catch (IOException e) {
                 throw new ResourceManagerException(e);

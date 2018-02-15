@@ -71,13 +71,14 @@ public class StatusDashboardManagerDBHandler {
                 checkTableQuery = managerQueryManager.getQuery(SQLConstants.ISTABLE_EXISTS_QUERY);
                 createTableQuery = managerQueryManager.getQuery(SQLConstants.CREATE_TABLE);
             } catch (SQLException | QueryMappingNotAvailableException | ConfigurationException ex) {
-                throw new StatusDashboardRuntimeException("Error while initializing the connection", ex);
+                throw new StatusDashboardRuntimeException("Error while initializing the connection ", ex);
             } finally {
                 cleanupConnection(connection);
             }
             createTables();
         } else {
-            throw new RDBMSTableException(DATASOURCE_ID + "Could not find.Hence cannot initialize the status dashboard "
+            throw new RDBMSTableException(DATASOURCE_ID + " Could not find.Hence cannot initialize the status "
+                                                  + "dashboard "
                                                   + "Please check whether database is available");
         }
     }
@@ -189,7 +190,7 @@ public class StatusDashboardManagerDBHandler {
             throw new RDBMSTableException(
                     "Error occurred while deleting the manager: " + "\n" + managerId + "\n" + " in"
                             + " a "
-                            + "table MANAGER_CONFIGURATION" + DATASOURCE_ID, e);
+                            + "table MANAGER_CONFIGURATION " + "\n" + DATASOURCE_ID, e);
         } finally {
             closePreparedStatement(statement);
             cleanupConnection(conn);

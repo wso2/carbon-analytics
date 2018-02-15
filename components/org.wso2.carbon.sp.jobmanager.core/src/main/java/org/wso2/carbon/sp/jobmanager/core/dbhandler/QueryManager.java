@@ -65,7 +65,7 @@ public class QueryManager {
         } catch (ConfigurationException e) {
             throw new ConfigurationException("Unable to read queries.yaml configurations: " + e.getMessage(), e);
         } catch (QueryMappingNotAvailableException e) {
-            throw new QueryMappingNotAvailableException("Unable to load queries.", e);
+            throw new QueryMappingNotAvailableException("Unable to load queries. ", e);
         }
         return queries;
     }

@@ -42,10 +42,6 @@ public class ManagerConfigurationDetails {
     public ManagerConfigurationDetails() {
     }
 
-    public static String getColumnLabels() {
-        return "MANAGERID,PORT,HOST";
-    }
-
     public String getManagerId() {
         return managerId;
     }

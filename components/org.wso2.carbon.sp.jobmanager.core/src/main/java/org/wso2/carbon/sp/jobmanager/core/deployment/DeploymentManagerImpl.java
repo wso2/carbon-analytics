@@ -75,7 +75,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                     if (waitingToDeploy) {
                         LOG.info(String.format("Exact Siddhi app with name: %s is already exists in waiting mode. " +
                                                        "Hence, trying to re-deploy.", distributedSiddhiQuery
-                                .getAppName()));
+                                                       .getAppName()));
                         rollback(existingApps);
                     } else {
                         LOG.info(String.format("Exact Siddhi app with name: %s is already deployed.",
@@ -149,7 +149,8 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         distributedSiddhiQuery.getQueryGroups().forEach(queryGroup -> {
             queryGroup.getSiddhiQueries().forEach(query -> {
                 siddhiAppHolders.add(new SiddhiAppHolder(distributedSiddhiQuery.getAppName(),
-                                                         queryGroup.getGroupName(), query.getAppName(), query.getApp(), null));
+                                                         queryGroup.getGroupName(), query.getAppName(), query.getApp(),
+                                                         null));
             });
         });
         return siddhiAppHolders;
@@ -248,7 +249,8 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                         partialAppHolder.setDeployedNode(deployedNode);
                         currentDeployedPartialApps.add(partialAppHolder);
                         LOG.info(String.format("Siddhi app %s of %s successfully deployed in %s.",
-                                               partialAppHolder.getAppName(), partialAppHolder.getParentAppName(), deployedNode));
+                                               partialAppHolder.getAppName(), partialAppHolder.getParentAppName(),
+                                               deployedNode));
                     } else {
                         deployedCompletely = false;
                         break;
@@ -261,7 +263,8 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                     LOG.info("Siddhi app " + parentSiddhiAppName + " successfully deployed.");
                 } else {
                     LOG.warn(String.format("Still insufficient resources to deploy %s. Hence, rolling back the " +
-                                                   "deployment and waiting for additional resources.", parentSiddhiAppName));
+                                                   "deployment and waiting for additional resources.",
+                                           parentSiddhiAppName));
                     rollback(currentDeployedPartialApps);
                 }
             }
@@ -292,10 +295,13 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                     if (deployedNode != null) {
                         affectedPartialApp.setDeployedNode(deployedNode);
                         LOG.info(String.format("Siddhi app %s of %s successfully deployed in %s.",
-                                               affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName(), deployedNode));
+                                               affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName(),
+                                               deployedNode));
                     } else {
                         LOG.warn(String.format("Insufficient resources to deploy %s. Therefore, cannot re-balance " +
-                                                       "Siddhi app %s. Hence, rolling back the deployment and waiting for " +
+                                                       "Siddhi app %s. Hence, rolling back the deployment and waiting"
+                                                       + " for "
+                                                       +
                                                        "additional resources.", affectedPartialApp.getAppName(),
                                                affectedPartialApp.getParentAppName()));
                         List<SiddhiAppHolder> appHolders = resourcePool.getSiddhiAppHoldersMap()

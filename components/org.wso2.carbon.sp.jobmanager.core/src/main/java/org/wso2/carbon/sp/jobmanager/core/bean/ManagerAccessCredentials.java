@@ -24,6 +24,7 @@ import org.wso2.carbon.config.annotation.Element;
 /**
  * Manager node accessing credentials.
  */
+
 public class ManagerAccessCredentials {
     @Element(description = "Username across cluster", required = true)
     private String username;

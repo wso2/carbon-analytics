@@ -19,11 +19,10 @@
 package org.wso2.carbon.sp.jobmanager.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Objects;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.Objects;
 
 /**
  * Representation of a Manager Node configuration
@@ -164,4 +163,3 @@ public class ManagerNodeConfig {
         return o.toString().replace("\n", "\n    ");
     }
 }
-
