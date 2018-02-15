@@ -20,8 +20,8 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
         var EventFlow = function (designView) {
             this.$designView = designView;
-            this.$siddhiGraph = designView.find('svg');
-            this.$siddhiAppName =  designView.find('.siddhi-app-name');
+            this.$siddhiGraph = designView.find('.siddhi-graph');
+            this.$siddhiAppName = designView.find('.siddhi-app-name');
             this.$siddhiAppDescription = designView.find('.siddhi-app-description');
             this.url = window.location.protocol + "//" + window.location.host + "/editor/event-flow";
         };
@@ -173,18 +173,59 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
                 var render = new dagreD3.render();
 
-                var graphId = "#" + self.$designView.find('svg').attr('id');
+                var graphId = "#" + self.$siddhiGraph.attr("id");
 
                 render(d3.select(graphId + " g"), graph);
 
-                var svg = d3.select(graphId);
-                var inner = svg.select("g");
-                var zoom = d3.behavior.zoom().on("zoom", function () {
-                    inner.attr("transform", "translate(" + d3.event.translate + ")" +
-                        "scale(" + d3.event.scale + ")");
-                });
+                var svg = self.$siddhiGraph;
+                var inner = svg.find('g');
 
-                svg.call(zoom);
+                console.log(svg.get(0).getBoundingClientRect().width);
+                console.log(inner.get(0).getBoundingClientRect().width);
+
+                svg.attr("width", inner.get(0).getBoundingClientRect().width + 50);
+                svg.attr("height", inner.get(0).getBoundingClientRect().height + 50);
+
+                // svg.style("width", inner.style("width"));
+                // svg.style("height", inner.style("height"));
+
+                // UNCOMMENT TO ADD ZOOM & CENTERING SUPPORT
+                // var svg = d3.select(graphId);
+                // var inner = svg.select("g");
+                // var zoom = d3.behavior.zoom().on("zoom", function () {
+                //     inner.attr("transform", "translate(" + d3.event.translate + ")" +
+                //         "scale(" + d3.event.scale + ")");
+                // });
+                //
+                // svg.call(zoom);
+                //
+                // // Obtian the graph width and height
+                // var graphWidth = graph.graph().width;
+                // var graphHeight = graph.graph().height;
+                //
+                // // Obtain the original height of the container
+                // var width = parseInt(svg.style("width").replace(/px/, ""));
+                // var height = parseInt(svg.style("height").replace(/px/, ""));
+                //
+                // // Calculate the scale to zoom
+                // var zoomScale = Math.min((width * 0.75) / graphWidth, (height * 0.75) / graphHeight);
+                //
+                // // recalculate the graph width & height assuming the zoom was implemented onto it
+                // graphWidth = graph.graph().width * zoomScale;
+                // graphHeight = graph.graph().height * zoomScale;
+                //
+                // // calculate the translate values  needed to center the graph
+                // var left = (width - graphWidth) / 2;
+                // var top = (height - graphHeight) / 2;
+                // var translate = [left, top];
+                //
+                // // apply the translate & zoom
+                // zoom.translate(translate);
+                // zoom.scale(zoomScale);
+                //
+                // // Make sure the zoom and translate are done upon render
+                // zoom.event(inner);
+
             }
         };
 
