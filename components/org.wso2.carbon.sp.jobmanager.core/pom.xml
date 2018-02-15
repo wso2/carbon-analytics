@@ -282,7 +282,7 @@
                             <!--Exclude generated sources-->
                             <excludes>**/gen/**/*</excludes>
                             <!--skip for generated resources-->
-                            <skip>true</skip>
+                            <skip>false</skip>
                         </configuration>
                         <goals>
                             <goal>check</goal>
