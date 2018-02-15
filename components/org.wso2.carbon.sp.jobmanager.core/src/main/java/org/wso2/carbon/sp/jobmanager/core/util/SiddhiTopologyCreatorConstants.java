@@ -24,7 +24,7 @@ package org.wso2.carbon.sp.jobmanager.core.util;
 public class SiddhiTopologyCreatorConstants {
     public static final Integer DEFAULT_PARALLEL = 1;
 
-    public static final String INNERSTREAM_IDENTIFIER= "#";
+    public static final String INNERSTREAM_IDENTIFIER = "#";
 
     public static final String SINK_IDENTIFIER = "@sink";
 
@@ -32,23 +32,22 @@ public class SiddhiTopologyCreatorConstants {
 
     public static final String PERSISTENCETABLE_IDENTIFIER = "store";
 
-    public static final String DEFAULT_SIDDHIAPP_NAME="SiddhiApp";
+    public static final String DEFAULT_SIDDHIAPP_NAME = "SiddhiApp";
 
-    public static final String DISTRIBUTED_IDENTIFIER="dist";
+    public static final String DISTRIBUTED_IDENTIFIER = "dist";
 
-    public static final String PARALLEL_IDENTIFIER ="parallel";
+    public static final String PARALLEL_IDENTIFIER = "parallel";
 
-    public static final String EXECGROUP_IDENTIFIER ="execGroup";
+    public static final String EXECGROUP_IDENTIFIER = "execGroup";
 
-    public static final String SIDDHIAPP_NAME_IDENTIFIER ="name";
+    public static final String SIDDHIAPP_NAME_IDENTIFIER = "name";
 
-    public static final String INPUTSTREAMID ="inputStreamID";
+    public static final String INPUTSTREAMID = "inputStreamID";
 
-    public static final String OUTPUTSTREAMID ="outputStreamID";
+    public static final String OUTPUTSTREAMID = "outputStreamID";
 
-    public static final String DEFAULT_INPUTSTREAM_NAME ="InputStream";
+    public static final String DEFAULT_INPUTSTREAM_NAME = "InputStream";
 
-    public static final String DEFAULT_PASSTROUGH_QUERY_TEMPLATE="from ${"+INPUTSTREAMID+"} select * "
-            + "insert into "
-            + "${"+OUTPUTSTREAMID+"}" ;
+    public static final String DEFAULT_PASSTROUGH_QUERY_TEMPLATE = "from ${" + INPUTSTREAMID + "} select * " + "insert"
+            + " into " + "${" + OUTPUTSTREAMID + "}";
 }

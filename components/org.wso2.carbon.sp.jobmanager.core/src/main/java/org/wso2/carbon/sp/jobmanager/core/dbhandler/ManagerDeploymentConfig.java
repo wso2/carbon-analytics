@@ -28,6 +28,9 @@ import org.wso2.carbon.sp.jobmanager.core.bean.ManagerConnectionConfigurations;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Configurations details specified in the deployment.yaml.
+ */
 @Configuration(namespace = "wso2.sp.status", description = "WSO2 status dashboard manager query "
         + "provider")
 public class ManagerDeploymentConfig {

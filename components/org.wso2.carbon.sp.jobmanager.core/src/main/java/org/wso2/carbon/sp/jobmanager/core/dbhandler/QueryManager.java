@@ -40,14 +40,13 @@ public class QueryManager {
 
     private Map<String, String> queries = new HashMap<>();
 
-    public QueryManager(String databaseType, String databaseVersion) throws
-                                                                     QueryMappingNotAvailableException,
-                                                                     ConfigurationException {
+    public QueryManager(String databaseType, String databaseVersion)
+            throws QueryMappingNotAvailableException, ConfigurationException {
         queries = readConfigs(databaseType, databaseVersion);
     }
 
-    private Map<String, String> readConfigs(String databaseType, String databaseVersion) throws ConfigurationException,
-                                                                                                QueryMappingNotAvailableException {
+    private Map<String, String> readConfigs(String databaseType, String databaseVersion)
+            throws ConfigurationException, QueryMappingNotAvailableException {
         try {
             ManagerDeploymentConfig deploymentConfigurations = ManagerDataHolder.getInstance()
                     .getConfigProvider().getConfigurationObject(ManagerDeploymentConfig.class);

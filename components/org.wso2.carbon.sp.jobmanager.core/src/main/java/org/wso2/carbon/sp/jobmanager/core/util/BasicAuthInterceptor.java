@@ -18,13 +18,16 @@
 
 package org.wso2.carbon.sp.jobmanager.core.util;
 
-import java.io.IOException;
-
 import okhttp3.Credentials;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import java.io.IOException;
+
+/**
+ * Details of basic authentication.
+ */
 public class BasicAuthInterceptor implements Interceptor {
 
     private String credentials;

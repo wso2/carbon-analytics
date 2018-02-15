@@ -20,6 +20,9 @@ package org.wso2.carbon.sp.jobmanager.core;
 
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 
+/**
+ *
+ */
 public interface ResourcePoolChangeListener {
 
     void resourceAdded(ResourceNode resourceNode);

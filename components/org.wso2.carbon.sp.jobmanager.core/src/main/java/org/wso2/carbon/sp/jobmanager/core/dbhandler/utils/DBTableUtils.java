@@ -63,10 +63,9 @@ public class DBTableUtils {
      * @param value   the value of the element.
      * @throws SQLException if there are issues when the element is being set.
      */
-    public PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt, int ordinal, String type,
-                                                                Object value,
-                                                                QueryManager statusDashboardQueryManager) throws
-                                                                                                           SQLException {
+    public PreparedStatement populateStatementWithSingleElement(
+            PreparedStatement stmt, int ordinal, String type, Object value, QueryManager statusDashboardQueryManager)
+            throws SQLException {
         String doubleType = statusDashboardQueryManager.getQuery(Constants.DOUBLE_TYPE);
         String longType = statusDashboardQueryManager.getQuery(Constants.LONG_TYPE);
         String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);

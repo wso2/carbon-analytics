@@ -30,8 +30,9 @@ import org.wso2.carbon.sp.jobmanager.core.util.ResourceManagerConstants;
 
 import java.util.Map;
 
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.member;
-
+/**
+ * This class contains the implementation related coordinator changes.
+ */
 public class CoordinatorChangeListener extends MemberEventListener {
     private static final Logger log = LoggerFactory.getLogger(CoordinatorChangeListener.class);
 

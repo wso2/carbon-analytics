@@ -21,10 +21,14 @@ package org.wso2.carbon.sp.jobmanager.core.factories;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApiService;
 import org.wso2.carbon.sp.jobmanager.core.impl.ResourceManagerApiServiceImpl;
 
+/**
+ * Factory class for distributed system apis.
+ */
+
 public class ResourceManagerApiServiceFactory {
-    private final static ResourceManagerApiService service = new ResourceManagerApiServiceImpl();
+    private static final ResourceManagerApiService SERVICE = new ResourceManagerApiServiceImpl();
 
     public static ResourceManagerApiService getResourceManagerApi() {
-        return service;
+        return SERVICE;
     }
 }

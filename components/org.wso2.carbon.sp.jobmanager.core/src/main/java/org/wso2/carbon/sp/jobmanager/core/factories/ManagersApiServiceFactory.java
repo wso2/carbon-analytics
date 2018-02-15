@@ -26,9 +26,9 @@ import org.wso2.carbon.sp.jobmanager.core.impl.ManagersApiServiceImpl;
  * Factory class for stream processor dashboard apis.
  */
 public class ManagersApiServiceFactory {
-    private final static ManagersApiService service = new ManagersApiServiceImpl();
+    private static final ManagersApiService SERVICE = new ManagersApiServiceImpl();
 
     public static ManagersApiService getManagersApi() {
-        return service;
+        return SERVICE;
     }
 }

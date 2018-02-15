@@ -25,6 +25,9 @@ import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 
 import java.util.Map;
 
+/**
+ * This class gives the details of the resource nodes in the resource cluster.
+ */
 public class ResourceNodeMonitor implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(ResourceNodeMonitor.class);

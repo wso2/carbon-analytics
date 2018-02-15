@@ -31,9 +31,10 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.sp.jobmanager.core.CoordinatorChangeListener;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApi;
-import org.wso2.carbon.sp.jobmanager.core.appCreator.SPSiddhiAppCreator;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.SPSiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.deployment.DeploymentManagerImpl;
@@ -42,7 +43,6 @@ import org.wso2.carbon.sp.jobmanager.core.impl.DistributionManagerServiceImpl;
 import org.wso2.carbon.sp.jobmanager.core.impl.RDBMSServiceImpl;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.util.ResourceManagerConstants;
-import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 import org.wso2.msf4j.Microservice;
@@ -71,7 +71,7 @@ public class ServiceComponent {
      * @throws Exception will be thrown if an issue occurs while executing the activate method
      */
     @Activate
-    protected void start(BundleContext bundleContext) throws Exception {
+    protected void start(BundleContext bundleContext) {
         if (ServiceDataHolder.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
             log.info("Starting Manager node in distributed mode.");
             ServiceDataHolder.setRdbmsService(new RDBMSServiceImpl());
@@ -93,7 +93,7 @@ public class ServiceComponent {
      * @throws Exception will be thrown if an issue occurs while executing the de-activate method
      */
     @Deactivate
-    protected void stop() throws Exception {
+    protected void stop() {
         if (resourceManagerAPIServiceRegistration != null) {
             resourceManagerAPIServiceRegistration.unregister();
         }

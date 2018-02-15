@@ -20,15 +20,18 @@ package org.wso2.carbon.sp.jobmanager.core.topology;
 
 import org.wso2.carbon.sp.jobmanager.core.util.TransportStrategy;
 
+/**
+ *
+ */
 public class SubscriptionStrategyDataHolder {
     private TransportStrategy strategy;
     private int offeredParallelism;
     private String partitionKey;
 
-    public SubscriptionStrategyDataHolder(int offeredParallelism, TransportStrategy strategy,String partitionKey) {
+    public SubscriptionStrategyDataHolder(int offeredParallelism, TransportStrategy strategy, String partitionKey) {
         this.offeredParallelism = offeredParallelism;
         this.strategy = strategy;
-        this.partitionKey =partitionKey;
+        this.partitionKey = partitionKey;
     }
 
     public TransportStrategy getStrategy() {

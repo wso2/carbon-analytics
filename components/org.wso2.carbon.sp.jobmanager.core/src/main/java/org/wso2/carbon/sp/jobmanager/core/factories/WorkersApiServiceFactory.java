@@ -27,9 +27,9 @@ import org.wso2.carbon.sp.jobmanager.core.impl.WorkersApiServiceImpl;
  */
 
 public class WorkersApiServiceFactory {
-    private final static WorkersApiService service = new WorkersApiServiceImpl();
+    private static final WorkersApiService SERVICE = new WorkersApiServiceImpl();
 
     public static WorkersApiService getWorkersApi() {
-        return service;
+        return SERVICE;
     }
 }

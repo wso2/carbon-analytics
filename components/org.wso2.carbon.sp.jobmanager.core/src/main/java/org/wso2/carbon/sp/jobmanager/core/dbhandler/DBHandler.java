@@ -105,8 +105,6 @@ public class DBHandler {
      *
      * @return boolean isTableExists.
      * Method for checking whether or not the given table (which reflects the current event table instance) exists.
-     *
-     * @return true/false based on the table existence.
      */
     public boolean isTableExist(Connection conn, String query) {
         try {

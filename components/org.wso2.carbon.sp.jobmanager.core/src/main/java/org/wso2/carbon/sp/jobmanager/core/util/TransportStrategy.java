@@ -18,6 +18,10 @@
 
 package org.wso2.carbon.sp.jobmanager.core.util;
 
+/**
+ * Details of TransportStrategy.
+ */
+
 public enum TransportStrategy {
     FIELD_GROUPING,
     ROUND_ROBIN,
