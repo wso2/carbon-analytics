@@ -38,7 +38,6 @@ import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
  * This is OSGi-components to register datasource provider class.
  */
 @Component(
-        name = "org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent",
         service = DatasourceServiceComponent.class,
         immediate = true
 )
@@ -55,7 +54,6 @@ public class DatasourceServiceComponent {
     protected void stop() {
         logger.debug("Status dashboard datasource service component is deactivated.");
     }
-
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
