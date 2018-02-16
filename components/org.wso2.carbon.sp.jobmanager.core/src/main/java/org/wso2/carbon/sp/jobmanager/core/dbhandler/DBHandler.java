@@ -96,7 +96,7 @@ public class DBHandler {
             stmt.close();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException(" Error while processing the dDELETE operation. ", e);
+            throw new RDBMSTableException(" Error while processing the delete operation. ", e);
         }
     }
 

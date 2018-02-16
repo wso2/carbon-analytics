@@ -155,7 +155,7 @@ public class StatusDashboardManagerDBHandler {
      * @return
      */
     public boolean insertManagerConfiguration(ManagerConfigurationDetails managerConfigurationDetails) {
-        Map<String, Object> records = managerConfigurationDetails.toMap();
+        Map<String, Object> records = managerConfigurationDetails.managerConfigurationDetails();
         Connection conn = this.getConnection();
         PreparedStatement statement = null;
         try {

@@ -66,7 +66,7 @@ public class ManagerConfigurationDetails {
         this.port = port;
     }
 
-    public Map<String, Object> toMap() {
+    public Map<String, Object> managerConfigurationDetails() {
         Map<String, Object> objectObjectHashMap = new HashMap<>();
         objectObjectHashMap.put(Constants.MANAGERID, managerId);
         objectObjectHashMap.put(Constants.HOST, host);
