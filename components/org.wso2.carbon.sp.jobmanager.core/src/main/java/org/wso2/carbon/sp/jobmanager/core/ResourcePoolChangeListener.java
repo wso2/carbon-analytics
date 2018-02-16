@@ -20,6 +20,9 @@ package org.wso2.carbon.sp.jobmanager.core;
 
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 
+/**
+ * Abstract methods to add resource node and remove resource node in the cluster.
+ */
 public interface ResourcePoolChangeListener {
 
     void resourceAdded(ResourceNode resourceNode);

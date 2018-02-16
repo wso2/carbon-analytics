@@ -22,6 +22,9 @@ import org.wso2.carbon.sp.jobmanager.core.model.InterfaceConfig;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerNodeConfig;
 
+/**
+ * This class is to convert Types
+ */
 public class TypeConverter {
 
     public static org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig convert(InterfaceConfig config) {

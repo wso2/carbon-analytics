@@ -35,12 +35,18 @@ public class HACoordinationSinkHandler extends SinkHandler {
     private static final Logger log = Logger.getLogger(HACoordinationSinkHandler.class);
 
     private boolean isActiveNode;
+    private boolean isForcePublishing;
     private long lastPublishedEventTimestamp = 0L;
     private Queue<Event> passiveNodeProcessedEvents;
     private String sinkHandlerElementId;
     private boolean isQueueFlushing;
     private final Object lockObject = new Object();
     private SinkHandlerCallback sinkHandlerCallBack;
+
+    private static final String SINK = "sink";
+    private static final String DISTRIBUTION = "distribution";
+    private static final String FORCE_PUBLISH = "forcePublish";
+    private static final String TRUE = "TRUE";
 
     private final int queueCapacity;
 
@@ -59,6 +65,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
                      SinkHandlerCallback sinkHandlerCallback) {
         this.sinkHandlerElementId = sinkHandlerElementId;
         this.sinkHandlerCallBack = sinkHandlerCallback;
+        setForcePublishing(streamDefinition);
     }
 
     /**
@@ -70,7 +77,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
      */
     @Override
     public void handle(Event event, SinkHandlerCallback sinkHandlerCallback) {
-        if (isActiveNode) {
+        if (isActiveNode || isForcePublishing) {
             if (isQueueFlushing) {
                 synchronized (lockObject) {
                     try {
@@ -103,7 +110,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
      */
     @Override
     public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback) {
-        if (isActiveNode) {
+        if (isActiveNode || isForcePublishing) {
             if (isQueueFlushing) {
                 synchronized (lockObject) {
                     try {
@@ -192,5 +199,28 @@ public class HACoordinationSinkHandler extends SinkHandler {
     @Override
     public String getElementId() {
         return sinkHandlerElementId;
+    }
+
+    /**
+     * Method that would enable force publishing data regardless of the Node's mode,
+     * only when forcePublish is set to true
+     *
+     * @param streamDefinition the stream definition based on which, a sink is identified
+     */
+    private void setForcePublishing(StreamDefinition streamDefinition) {
+        streamDefinition.getAnnotations().forEach(streamAnnotation -> {
+            if (streamAnnotation.getName().equalsIgnoreCase(SINK)) {
+                streamAnnotation.getAnnotations().forEach(sinkAnnotation -> {
+                    if (sinkAnnotation.getName().equalsIgnoreCase(DISTRIBUTION)) {
+                        sinkAnnotation.getElements().forEach(distributedSinkElement -> {
+                            if (distributedSinkElement.getKey().equalsIgnoreCase(FORCE_PUBLISH)) {
+                                this.isForcePublishing =
+                                        distributedSinkElement.getValue().equalsIgnoreCase(TRUE);
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
 }

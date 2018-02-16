@@ -1,0 +1,8 @@
+pollingInterval: 5
+dashboardManagerDatasourceName: "WSO2_STATUS_DASHBOARD_DISTRIBUTED_DB"
+managerAccessCredentials:
+  username: 'admin'
+  password: 'admin'
+managerConnectionConfigurations:
+  clientConnectionTimeOut: 1000
+  clientReadTimeOut: 1000

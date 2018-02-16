@@ -23,9 +23,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.wso2.carbon.sp.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
-import org.wso2.carbon.sp.jobmanager.core.appCreator.SPSiddhiAppCreator;
-import org.wso2.carbon.sp.jobmanager.core.appCreator.SiddhiQuery;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.DeployableSiddhiQueryGroup;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.SPSiddhiAppCreator;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopology;
@@ -531,7 +531,8 @@ public class SiddhiTopologyCreatorTestCase {
                 + "From filteredStockStream#window.time(5 min)\n"
                 + "Select symbol, avg(price) as avgPrice, quantity\n"
                 + "Insert into #avgPriceStream;\n"
-                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerInternalStream#window.length"
+                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerInternalStream#window"
+                + ".length"
                 + "(1)\n"
                 + "On (companyTriggerInternalStream.symbol == a.symbol)\n"
                 + "Select a.symbol, a.avgPrice, a.quantity\n"
@@ -708,9 +709,9 @@ public class SiddhiTopologyCreatorTestCase {
      * execGroup.Newly created execGroup will be moved to as the first element of already created passthrough queries
      */
     @Test
-    public void testUsergivenSourceNoGroup(){
+    public void testUsergivenSourceNoGroup() {
 
-        String siddhiApp ="@App:name('TestPlan12') \n"
+        String siddhiApp = "@App:name('TestPlan12') \n"
                 + "@source(type='kafka', topic.list='TestPlan12.stockStream', group.id='1', threading.option='single"
                 + ".thread', bootstrap.servers='localhost:9092', @map(type='xml'))  "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
@@ -755,6 +756,4 @@ public class SiddhiTopologyCreatorTestCase {
         }
 
     }
-
-
 }

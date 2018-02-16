@@ -26,12 +26,12 @@ import org.wso2.carbon.sp.jobmanager.core.util.EventHolder;
  */
 public class StreamDataHolder {
 
-    private String StreamDefinition;
+    private String streamDefinition;
     private EventHolder eventHolderType;
     private boolean isUserGiven;
 
     public StreamDataHolder(String streamDefinition, EventHolder eventHolderType, boolean isUserGiven) {
-        StreamDefinition = streamDefinition;
+        this.streamDefinition = streamDefinition;
         this.eventHolderType = eventHolderType;
         this.isUserGiven = isUserGiven;
     }
@@ -46,11 +46,11 @@ public class StreamDataHolder {
     }
 
     public String getStreamDefinition() {
-        return StreamDefinition;
+        return streamDefinition;
     }
 
     public void setStreamDefinition(String streamDefinition) {
-        StreamDefinition = streamDefinition;
+        this.streamDefinition = streamDefinition;
     }
 
     public EventHolder getEventHolderType() {
