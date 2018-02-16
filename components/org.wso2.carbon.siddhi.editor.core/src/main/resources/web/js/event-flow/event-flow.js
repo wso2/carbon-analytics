@@ -20,19 +20,19 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
         var EventFlow = function (designView) {
             this.$designView = designView;
-            this.$siddhiGraph = designView.find('.siddhi-graph');
             this.$siddhiAppName = designView.find('.siddhi-app-name');
             this.$siddhiAppDescription = designView.find('.siddhi-app-description');
+            this.$graphView = designView.find('.graph-container');
+            this.$siddhiGraph = designView.find('.siddhi-graph');
             this.url = window.location.protocol + "//" + window.location.host + "/editor/event-flow";
         };
 
         EventFlow.prototype.fetchJSON = function (siddhiCode) {
-
             var self = this;
             var result = {};
 
             if (siddhiCode === null || siddhiCode === undefined || siddhiCode === "") {
-                result = {status: "fail", errorMessage: "Siddhi App Is Empty"};
+                result = {status: "fail", errorMessage: "The Siddhi App Cannot Be Empty"};
             } else {
                 fetch(siddhiCode);
             }
@@ -58,7 +58,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             }
 
             return result;
-
         };
 
         EventFlow.prototype.render = function (data) {
@@ -66,7 +65,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             var self = this;
 
             if (data !== null || data !== undefined || data !== {}) {
-                createGraph(this.responseJSON);
+                createGraph();
             } else {
                 this.alert("Data Not Available");
             }
@@ -124,8 +123,8 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                         node = {
                             labelType: "html",
                             label: html,
-                            rx: 5,
-                            ry: 5,
+                            rx: 7,
+                            ry: 7,
                             padding: 0
                         };
                     }
@@ -180,16 +179,29 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 var svg = self.$siddhiGraph;
                 var inner = svg.find('g');
 
-                console.log(svg.get(0).getBoundingClientRect().width);
-                console.log(inner.get(0).getBoundingClientRect().width);
+                svg.attr("width", inner.get(0).getBoundingClientRect().width + 60);
+                svg.attr("height", inner.get(0).getBoundingClientRect().height + 60);
 
-                svg.attr("width", inner.get(0).getBoundingClientRect().width + 50);
-                svg.attr("height", inner.get(0).getBoundingClientRect().height + 50);
 
-                // svg.style("width", inner.style("width"));
-                // svg.style("height", inner.style("height"));
+                var graphWidth = parseInt(svg.attr("width"));
+                var graphHeight = parseInt(svg.attr("height"));
+                var width = self.$graphView.width();
+                var height = self.$graphView.height();
 
-                // UNCOMMENT TO ADD ZOOM & CENTERING SUPPORT
+                var left = diff(width, graphWidth) / 2;
+                var top = diff(height, graphHeight) / 2;
+                svg.attr("transform", "translate(" + left + "," + top + ")");
+
+                function diff(divValue, graphValue) {
+                    if (divValue > graphValue) {
+                        return (divValue - graphValue);
+                    } else {
+                        return 0;
+                    }
+                }
+
+
+                /*-------------------UNCOMMENT TO ADD ZOOM & CENTERING------------------------------------*/
                 // var svg = d3.select(graphId);
                 // var inner = svg.select("g");
                 // var zoom = d3.behavior.zoom().on("zoom", function () {
