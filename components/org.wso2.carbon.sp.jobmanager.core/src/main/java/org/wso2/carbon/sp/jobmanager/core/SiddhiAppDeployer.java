@@ -19,8 +19,9 @@
 package org.wso2.carbon.sp.jobmanager.core;
 
 import com.google.gson.Gson;
+import okhttp3.Response;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.sp.jobmanager.core.appCreator.SiddhiQuery;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.sp.jobmanager.core.util.HTTPClientUtil;
 
@@ -28,8 +29,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import okhttp3.Response;
-
+/**
+ * This class gives the details of the deployed siddhi application's details.
+ */
 public class SiddhiAppDeployer {
     private static final Logger LOG = Logger.getLogger(SiddhiAppDeployer.class);
     private static final String SERVICE_ENDPOINT = "http://%s:%s/siddhi-apps%s";

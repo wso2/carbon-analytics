@@ -282,7 +282,7 @@
                             <!--Exclude generated sources-->
                             <excludes>**/gen/**/*</excludes>
                             <!--skip for generated resources-->
-                            <skip>true</skip>
+                            <skip>false</skip>
                         </configuration>
                         <goals>
                             <goal>check</goal>
@@ -315,7 +315,7 @@
         </export.package>
         <DynamicImport-Package>*</DynamicImport-Package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="2"
         </carbon.component>
     </properties>
 </project>

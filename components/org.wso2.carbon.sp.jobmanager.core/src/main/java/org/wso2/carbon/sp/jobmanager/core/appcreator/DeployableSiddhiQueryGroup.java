@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.sp.jobmanager.core.appCreator;
+package org.wso2.carbon.sp.jobmanager.core.appcreator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,9 @@ public class DeployableSiddhiQueryGroup {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }

@@ -150,7 +150,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 AnnotationHelper.getAnnotationElement(SiddhiTopologyCreatorConstants.SIDDHIAPP_NAME_IDENTIFIER,
                                                       null, siddhiApp.getAnnotations());
         if (element == null) {
-            return SiddhiTopologyCreatorConstants.DEFAULT_SIDDHIAPP_NAME + "-" + UUID.randomUUID();//defaultName
+            return SiddhiTopologyCreatorConstants.DEFAULT_SIDDHIAPP_NAME + "-" + UUID.randomUUID(); //defaultName
         } else {
             return element.getValue();
         }
@@ -622,7 +622,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     private void createPassthroughQuery(SiddhiQueryGroup siddhiQueryGroup, InputStreamDataHolder inputStreamDataHolder,
                                         String runtimeDefinition) {
         String streamId = inputStreamDataHolder.getStreamName();
-        Map<String,String> valuesMap = new HashMap();
+        Map<String, String> valuesMap = new HashMap();
         String inputStreamID = SiddhiTopologyCreatorConstants.DEFAULT_INPUTSTREAM_NAME
                 + UUID.randomUUID().toString().replaceAll("-", "");
         valuesMap.put(SiddhiTopologyCreatorConstants.INPUTSTREAMID, inputStreamID);
@@ -722,7 +722,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * Details required while processing Partitions are stored.
      */
     private void storePartitionInfo(Partition partition, String execGroupName) {
-        List<String> partitionGroupList;//contains all the execGroups containing partitioned streamId
+        List<String> partitionGroupList; //contains all the execGroups containing partitioned streamId
         String partitionKey;
 
         //assign partitionGroupMap

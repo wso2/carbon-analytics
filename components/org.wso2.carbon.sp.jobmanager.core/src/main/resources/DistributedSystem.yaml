@@ -1,0 +1,402 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Stream Processor Distributed View Service
+  description: >-
+    This provides information about the REST APIs available for displaying
+    distributed view in the WSO2 Stream Processor Status Dashboard.
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/analytics'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - https
+host: analytics.wso2.com
+basePath: /distribution/apis
+paths:
+  /managers:
+    post:
+      x-wso2-curl: >-
+        curl -k -H "Content-Type: application/json" -X POST -d @data.json
+        http://localhost:9090/distribution/apis/managers
+      x-wso2-request: |-
+        POST http://localhost:9090/distribution/apis/managers
+        {"host":"localhost","port":"9090"}
+      x-wso2-response: >-
+        HTTP/1.1 201 Created Content-Type: application/json Etags:
+        "{manager-id:managerID}"
+      tags:
+        - Managers
+      summary: Add a new manager.
+      description: Adds a new manager
+      operationId: addManager
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: manager
+          description: Manager object need to be added.
+          required: true
+          schema:
+            $ref: '#/definitions/Manager'
+      responses:
+        '201':
+          description: Manager is created successfully.
+        '409':
+          description: >-
+            Request accepted but a manager with the given host and port already
+            exists.
+        '500':
+          description: An unexpected error occured.
+    get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/distribution/apis/managers'
+      x-wso2-request: 'GET http://localhost:9090/distribution/apis/managers'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json {
+          "manager":{
+            "managerID":"localhost:9090",
+            "ha-status": "active"
+          },
+          "manager":{
+            "managerID":"localhost:9095",
+            "ha-status": "passive"
+          }
+        }
+      tags:
+        - Managers
+      summary: List all the managers registered manager nodes.
+      description: >-
+        List all the managers that are connected with the give manager node (HA
+        mode).
+      operationId: getAllManagers
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK.
+        '404':
+          description: Not Found.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+  '/managers/{id}':
+    delete:
+      x-wso2-curl: 'curl -k -X DELETE http://localhost:9090/distribution/apis/managers/{id}'
+      x-wso2-request: 'DELETE http://localhost:9090/distribution/apis/managers/{id}'
+      x-wso2-response: HTTP/1.1 200 OK
+      tags:
+        - Managers
+      summary: Deletes a manager.
+      description: >
+        Removes the manager with the manager Id specified. Path param **id**
+        determines id of the manager.
+      operationId: deleteManager
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Id of the manager.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: The manager is successfully deleted.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+        '404':
+          description: The manager is not found
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+  '/managers/{id}/siddhi-apps':
+    get:
+      x-wso2-curl: >-
+        curl -k -X GET
+        http://localhost:9090/distribution/apis/managers/{id}/siddhi-apps
+      x-wso2-request: 'GET http://localhost:9090/distribution/apis/managers/{id}/siddhi-apps'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json{"app":{
+          "name":"test",
+          "status":"active",
+          "number-of-groups": 4,
+          "number-of-apps": 2,
+          "deployed-worker-node": 3
+        }, "app":{
+          "name":"test1",
+          "status":"passive",
+          "number-of-groups": 2,
+          "number-of-apps": 2,
+          "deployed-worker-node": 1
+          }
+        }
+      tags:
+        - Managers
+      summary: Get the summary details of all siddhi apps of a given manager.
+      description: >-
+        Retrieves the siddhi app summary details of manager with the specified
+        id.
+      operationId: getSiddhiApps
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the manager.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Summary successfully retrieved.
+        '404':
+          description: Summary not found.
+        '500':
+          description: An unexpected error occured.
+  '/managers/{id}/siddhi-apps/{appName}':
+    get:
+      x-wso2-curl: >-
+        curl -k -X GET
+        http://localhost:9090/distribution/apis/managers/{id}/siddhi-apps/{appName}
+      x-wso2-request: >-
+        GET
+        http://localhost:9090/distribution/apis/managers/{id}/siddhi-apps/{appName}
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json{"siddhi-app":{
+          "app-name":"testApp",
+          "app-flow" : " " ,
+          "exec-groups":{
+            "exec-group":{
+              "name":"group1",
+              "child-apps":{
+                "child-app":{
+                  "name":"group1_1",
+                  "status" : "active",
+                  "deployed-worker-nodeId":"localhost:9090",
+                  "sources":{
+                    "source":{
+                      "kafka-topic":"topic_1",
+                      "partiotion-name":"partition_1"
+                    },
+                    "source":{
+                      "kafka-topic":"topic_2",
+                      "partiotion-name":"partition_2"
+                    }
+                  }
+                  "sinks":{
+                    "sink":{
+                      "kafka-topic":"topic_3",
+                      "partiotion-name":"partition_3"
+                    },
+                    "sink":{
+                      "kafka-topic":"topic_4",
+                      "partiotion-name":"partition_4"
+                    }
+                  }
+                },
+                "child-app":{
+                  "name":"group1_2",
+                  "status" : "active",
+                  "deployed-worker-nodeId":"localhost:9090",
+                  "sources":{
+                    "source":{
+                      "kafka-topic":"topic_1",
+                      "partiotion-name":"partition_1"
+                    }
+                  }
+                  "sinks":{
+                    "sink":{
+                      "kafka-topic":"topic_3",
+                      "partiotion-name":"partition_3"
+                    },
+                  }
+                }
+              }
+            },
+            "exec-group":{
+              "name":"group1",
+              "child-apps":{
+                "child-app":{
+                  "name":"group1_1",
+                  "status" : "active",
+                  "deployed-worker-nodeId":"localhost:9090"
+                  "sources":{
+                    "source":{
+                      "kafka-topic":"topic_1",
+                      "partiotion-name":"partition_1"
+                    },
+                  }
+                  "sinks":{
+                    "sink":{
+                      "kafka-topic":"topic_3",
+                      "partiotion-name":"partition_3"
+                    },
+                    "sink":{
+                      "kafka-topic":"topic_4",
+                      "partiotion-name":"partition_4"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        }
+      tags:
+        - Managers
+      summary: Get the details of child siddhi apps
+      description: >-
+        Retrieves the details of child siddhi apps with the specified parent
+        siddhi app name.
+      operationId: getChildSiddhiAppDetails
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the manager.
+          required: true
+          type: string
+        - name: appName
+          in: path
+          description: name of the parent siddhi app.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Child app details fully retrieved.
+        '404':
+          description: The parent application is not found.
+        '500':
+          description: An unexpexted error occured.
+  '/managers/{id}/siddhi-apps/{appName}/transport':
+    get:
+      x-wso2-curl: >-
+        curl -k -X GET
+        http://localhost:9090/distribution/apis/managers/{id}/siddhi-apps/{appName}/transport
+      x-wso2-request: >-
+        GET
+        http://localhost:9090/distribution/apis/managers/{id}/siddhi-apps/{appName}/transport
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json{
+          "sources":{
+            "source":{
+              "name":"kafka",
+              "connection-details":"localhost:8080"
+            }
+          },
+          "sinks":{
+            "sink":{
+              "name" : "log",
+              "connection-details" : "localhost:9090"
+            }
+          }
+        }
+      tags:
+        - Managers
+      summary: Get the details of sources and sinks
+      description: Retrieves the details of source and sink of the parent siddhi app
+      operationId: getTransportDEtails
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the manager.
+          required: true
+          type: string
+        - name: appName
+          in: path
+          description: Name of the parent siddhi app.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Transport details fully retrieved.
+        '404':
+          description: The parent siddhi app is not found.
+        '500':
+          description: An unexpected error occured.
+  /workers:
+    get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/distribution/apis/workers'
+      x-wso2-request: 'GET http://localhost:9090/distribution/apis/workers'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json{
+          {
+            "workers": 4
+          }
+        }
+      tags:
+        - Workers
+      summary: Get the number worker nodes in the resource cluster.
+      description: Retrieve number of worker nodes in the resource cluster
+      operationId: getWorkers
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Worker node details retrieved successfully.
+        '404':
+          description: Worker node is not found.
+        '500':
+          description: An unexpected error occured.
+definitions:
+  Manager:
+    type: object
+    required:
+      - host
+      - port
+    properties:
+      host:
+        type: string
+      port:
+        type: string
+  ApiResponseMessage:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Error message
+  ChildApps:
+    type: object
+    required:
+      - parentAppName
+      - siddhiContent
+      - executionGroupName
+      - childAppName
+      - DeployedNode
+      - status
+      - sourceKafkaTopic
+      - sourcePartitionName
+      - sinkKafkaTopicName
+      - sinkKafkaPartitionName
+    properties:
+      parentAppName:
+        type: string
+      siddhiContent:
+        type: string
+      executionGroupName:
+        type: string
+      childAppName:
+        type: string
+      DeployedNode:
+        type: string
+      status:
+        type: string
+      sourceKafkaTopic:
+        type: string
+      sourcePartitionName:
+        type: string
+      sinkKafkaTopicName:
+        type: string
+      sinkKafkaPartitionName:
+        type: string

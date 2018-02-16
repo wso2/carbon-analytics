@@ -17,9 +17,10 @@
  */
 package org.wso2.carbon.sp.jobmanager.core.model;
 
+import org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig;
 
 import java.io.Serializable;
-import org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig;
+
 
 /**
  * This class represents a Manager node.

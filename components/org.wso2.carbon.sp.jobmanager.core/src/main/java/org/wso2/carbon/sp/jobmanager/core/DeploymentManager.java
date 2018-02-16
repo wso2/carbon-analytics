@@ -16,7 +16,8 @@
  * under the License.
  */
 
-package org.wso2.carbon.sp.jobmanager.core;/*
+package org.wso2.carbon.sp.jobmanager.core;
+/*
  * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org)
  * All Rights Reserved.
  *
@@ -35,8 +36,12 @@ package org.wso2.carbon.sp.jobmanager.core;/*
  * under the License.
  */
 
-import org.wso2.carbon.sp.jobmanager.core.appCreator.DistributedSiddhiQuery;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.DistributedSiddhiQuery;
 import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
+
+/**
+ * This interface contains abstract method to deploy, undeploy distributed siddhi app.
+ */
 
 public interface DeploymentManager {
     /**

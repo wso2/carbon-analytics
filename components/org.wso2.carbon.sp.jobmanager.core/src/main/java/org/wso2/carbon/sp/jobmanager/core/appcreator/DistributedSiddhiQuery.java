@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.sp.jobmanager.core.appCreator;
+package org.wso2.carbon.sp.jobmanager.core.appcreator;
 
 import java.util.List;
 
