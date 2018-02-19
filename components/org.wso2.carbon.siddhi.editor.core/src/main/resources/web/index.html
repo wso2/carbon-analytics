@@ -37,8 +37,7 @@
     <link rel="stylesheet" type="text/css" href="/editor/css/debugger.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/console.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/welcome-screen.css"/>
-
-    <!--TODO check this-->
+    <!-- CSS For The Design View -->
     <link rel="stylesheet" type="text/css" href="/editor/css/event-flow.css"/>
 
     <title>Stream Processor Studio</title>
@@ -222,30 +221,46 @@
         <div class="canvas-container">
         </div>
         <!-- End: Canvas Container -->
-        <!-- Start: Preview Container -->
+        <!-- Start: Source Container -->
         <div id="siddhi-editor" class="source-container">
         </div>
-        <!-- End Preview Container -->
+        <!-- End Source Container -->
         <!-- Start Design Container -->
         <div class="design-container" style="display: none;">
             <div class="colour-key">
                 <table class="colour-key-table">
                     <tr>
-                        <td>Stream</td>
-                        <td>Table</td>
-                        <td>Window</td>
-                        <td>Trigger</td>
+                        <td>
+                            <span class="stream-colour"></span> Stream
+                        </td>
+                        <td>
+                            <span class="table-colour"></span> Table
+                        </td>
+                        <td>
+                            <span class="window-colour"></span> Window
+                        </td>
+                        <td>
+                            <span class="trigger-colour"></span> Trigger
+                        </td>
                     </tr>
                     <tr>
-                        <td>Aggregation</td>
-                        <td>Function</td>
-                        <td>Query</td>
-                        <td>Partition</td>
+                        <td>
+                            <span class="aggregation-colour"></span> Aggregation
+                        </td>
+                        <td>
+                            <span class="function-colour"></span> Function
+                        </td>
+                        <td>
+                            <span class="query-colour"></span> Query
+                        </td>
+                        <td>
+                            <span class="partitionType-colour"></span> Partition
+                        </td>
                     </tr>
                 </table>
             </div>
-            <div class="siddhi-app-name">SiddhiApp</div>
-            <div class="siddhi-app-description">Description of the plan</div>
+            <div class="siddhi-app-name"></div>
+            <div class="siddhi-app-description"></div>
             <div class="graph-container">
                 <svg class="siddhi-graph" id="siddhi-graph">
                     <g></g>

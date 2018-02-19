@@ -867,6 +867,13 @@ public class EditorMicroservice implements Microservice {
                 new DebuggerEventStreamService(), null);
     }
 
+    /**
+     * Converts a given Siddhi App string to a specific JSON format for a graph, that diagrammatically
+     * display's the Siddhi App, to be generated in the Editor design view.
+     *
+     * @param siddhiAppString The Siddhi App to be converted
+     * @return The JSON result
+     */
     @POST
     @Produces("application/json")
     @Path("/event-flow")

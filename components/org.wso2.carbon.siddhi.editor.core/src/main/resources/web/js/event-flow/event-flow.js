@@ -25,13 +25,21 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             this.$graphView = designView.find('.graph-container');
             this.$siddhiGraph = designView.find('.siddhi-graph');
             this.url = window.location.protocol + "//" + window.location.host + "/editor/event-flow";
+            this.defaultCode = "@App:name(\"SiddhiApp\")\n" +
+                "@App:description(\"Description of the plan\")\n" +
+                "\n" +
+                "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide" +
+                " on getting started with SP editor. \n" +
+                "\n";
         };
 
         EventFlow.prototype.fetchJSON = function (siddhiCode) {
             var self = this;
             var result = {};
 
-            if (siddhiCode === null || siddhiCode === undefined || siddhiCode === "") {
+            if (siddhiCode === self.defaultCode) {
+                result = {status: "success", responseJSON: null};
+            } else if (siddhiCode === null || siddhiCode === undefined || siddhiCode === "") {
                 result = {status: "fail", errorMessage: "The Siddhi App Cannot Be Empty"};
             } else {
                 fetch(siddhiCode);
@@ -64,10 +72,10 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
             var self = this;
 
-            if (data !== null || data !== undefined || data !== {}) {
-                createGraph();
+            if (data === null || data === undefined || data === {}) {
+                showDefaultGraph();
             } else {
-                this.alert("Data Not Available");
+                createGraph();
             }
 
             function createGraph() {
@@ -162,11 +170,15 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     });
                 });
 
-                if (data.appName !== null || data.appName !== undefined || data.appName !== "") {
+                if (data.appName === null || data.appName === undefined || data.appName === "") {
+                    self.$siddhiAppName.html("SiddhiApp");
+                } else {
                     self.$siddhiAppName.html(data.appName);
                 }
 
-                if (data.appDescription !== null || data.appDescription !== undefined || data.appDescription !== "") {
+                if (data.appDescription === null || data.appDescription === undefined || data.appDescription === "") {
+                    self.$siddhiAppDescription.html("Description of the plan");
+                } else {
                     self.$siddhiAppDescription.html(data.appDescription);
                 }
 
@@ -211,7 +223,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 //
                 // svg.call(zoom);
                 //
-                // // Obtian the graph width and height
+                // // Obtain the graph width and height
                 // var graphWidth = graph.graph().width;
                 // var graphHeight = graph.graph().height;
                 //
@@ -239,11 +251,16 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 // zoom.event(inner);
 
             }
+
+            function showDefaultGraph() {
+                self.$siddhiAppName.html("SiddhiApp");
+                self.$siddhiAppDescription.html("Description of the plan");
+            }
         };
 
         EventFlow.prototype.clear = function () {
-            this.$designView.find('svg').empty();
-            this.$designView.find('svg').html('<g></g>');
+            this.$siddhiGraph.empty();
+            this.$siddhiGraph.html('<g></g>');
         };
 
         EventFlow.prototype.alert = function (message) {

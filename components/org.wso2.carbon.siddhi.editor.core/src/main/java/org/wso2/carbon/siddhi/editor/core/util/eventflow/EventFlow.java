@@ -1,8 +1,34 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.siddhi.editor.core.util.eventflow;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.*;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.AggregationInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.FunctionInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionTypeInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.QueryInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.StreamInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TableInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TriggerInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.WindowInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +37,9 @@ import java.util.regex.Pattern;
 
 public class EventFlow {
 
-    // TODO: 2/2/18 Add license headers to all the classes
     private SiddhiAppInfo siddhiAppInfo;
 
-    private JSONObject eventFlow = new JSONObject();
+    private JSONObject eventFlowJSON = new JSONObject();
 
     private JSONArray nodes = new JSONArray();
     private JSONArray edges = new JSONArray();
@@ -27,8 +52,8 @@ public class EventFlow {
 
     private void setEventFlowJSON() {
         // Set App Name & Description
-        eventFlow.put("appName", siddhiAppInfo.getAppName());
-        eventFlow.put("appDescription", siddhiAppInfo.getAppDescription());
+        eventFlowJSON.put("appName", siddhiAppInfo.getAppName());
+        eventFlowJSON.put("appDescription", siddhiAppInfo.getAppDescription());
 
         // Set Nodes
         setNodes();
@@ -92,7 +117,7 @@ public class EventFlow {
         }
 
         // Add All The Created Nodes To The Event Flow
-        eventFlow.put("nodes", nodes);
+        eventFlowJSON.put("nodes", nodes);
     }
 
     private void createNode(String type, String id, String name, String description) {
@@ -128,22 +153,24 @@ public class EventFlow {
     }
 
     private void setEdges() {
+        final String ARROW = "arrow";
+        final String DOTTED_LINE = "dotted-line";
         // Set Edges With Aggregations
         for (AggregationInfo aggregation : siddhiAppInfo.getAggregations()) {
-            createEdge("arrow", aggregation.getInputStreamId(), aggregation.getId());
+            createEdge(ARROW, aggregation.getInputStreamId(), aggregation.getId());
         }
 
         // Set Edges With Queries
         for (QueryInfo query : siddhiAppInfo.getQueries()) {
 
             for (String inputStreamId : query.getInputStreamIds()) {
-                createEdge("arrow", inputStreamId, query.getId());
+                createEdge(ARROW, inputStreamId, query.getId());
             }
 
-            createEdge("arrow", query.getId(), query.getOutputStreamId());
+            createEdge(ARROW, query.getId(), query.getOutputStreamId());
 
             for (String functionId : query.getFunctionIds()) {
-                createEdge("arrow", functionId, query.getId());
+                createEdge(ARROW, functionId, query.getId());
             }
 
             // Search for the 'in' keyword
@@ -151,7 +178,7 @@ public class EventFlow {
             Matcher matcher = pattern.matcher(query.getDefinition());
             while (matcher.find()) {
                 String tableId = matcher.group(1);
-                createEdge("dotted-line", tableId, query.getId());
+                createEdge(DOTTED_LINE, tableId, query.getId());
             }
         }
 
@@ -175,21 +202,20 @@ public class EventFlow {
 
                     if (partitionedStreamId != null) {
                         // If The Input Stream Is Partitioned
-                        createEdge("arrow", inputStreamId, partitionedStreamId);
-                        createEdge("arrow", partitionedStreamId, query.getId());
+                        createEdge(ARROW, inputStreamId, partitionedStreamId);
+                        createEdge(ARROW, partitionedStreamId, query.getId());
                     } else {
                         // If The Input Stream Is Not Partitioned
-                        createEdge("arrow", inputStreamId, query.getId());
+                        createEdge(ARROW, inputStreamId, query.getId());
                     }
-
                 }
 
                 // Connect The Query With Its Output Stream
-                createEdge("arrow", query.getId(), query.getOutputStreamId());
+                createEdge(ARROW, query.getId(), query.getOutputStreamId());
 
                 // Connect All The Functions That Are Used By This Query
                 for (String functionId : query.getFunctionIds()) {
-                    createEdge("arrow", functionId, query.getId());
+                    createEdge(ARROW, functionId, query.getId());
                 }
 
                 // Connects Any Tables That Are Used By The Queries Using The In Keyword
@@ -197,7 +223,7 @@ public class EventFlow {
                 Matcher matcher = pattern.matcher(query.getDefinition());
                 while (matcher.find()) {
                     String tableId = matcher.group(1);
-                    createEdge("dotted-line", tableId, query.getId());
+                    createEdge(DOTTED_LINE, tableId, query.getId());
                 }
 
             }
@@ -205,7 +231,7 @@ public class EventFlow {
         }
 
         // Set All The Edges To The Event Flow
-        eventFlow.put("edges", edges);
+        eventFlowJSON.put("edges", edges);
     }
 
     private void createEdge(String type, String parent, String child) {
@@ -224,7 +250,7 @@ public class EventFlow {
             createGroup(partition.getId(), partition.getName(), partition.getQueries(), partition.getPartitionTypes());
         }
 
-        eventFlow.put("groups", groups);
+        eventFlowJSON.put("groups", groups);
     }
 
     private void createGroup(String id, String name, List<QueryInfo> queries, List<PartitionTypeInfo> partitionTypes) {
@@ -254,7 +280,7 @@ public class EventFlow {
 
     // Getters
     public JSONObject getEventFlowJSON() {
-        return eventFlow;
+        return eventFlowJSON;
     }
 
 }

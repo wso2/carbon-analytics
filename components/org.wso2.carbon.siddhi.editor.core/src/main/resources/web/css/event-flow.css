@@ -16,7 +16,7 @@
 .colour-key-table {
     color: white;
     font-size: 20px;
-    text-align: center;
+    text-align: left;
 }
 
 .colour-key-table td {
@@ -26,6 +26,8 @@
 .colour-key-table span {
     width: 15px;
     height: 15px;
+    float: left;
+    margin: 5px;
 }
 
 
@@ -35,6 +37,7 @@
 .siddhi-app-name {
     color: white;
     font-size: 40px;
+    padding-top: 10px;
 }
 
 .siddhi-app-description {

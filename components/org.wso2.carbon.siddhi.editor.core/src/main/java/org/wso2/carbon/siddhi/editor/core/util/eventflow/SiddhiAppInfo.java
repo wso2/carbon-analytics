@@ -1,12 +1,43 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.siddhi.editor.core.util.eventflow;
 
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.*;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.AggregationInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.FunctionInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionTypeInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.QueryInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.StreamInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TableInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TriggerInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.WindowInfo;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.SiddhiElement;
 import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.*;
+import org.wso2.siddhi.query.api.definition.AggregationDefinition;
+import org.wso2.siddhi.query.api.definition.FunctionDefinition;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import org.wso2.siddhi.query.api.definition.TableDefinition;
+import org.wso2.siddhi.query.api.definition.TriggerDefinition;
+import org.wso2.siddhi.query.api.definition.WindowDefinition;
 import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
 import org.wso2.siddhi.query.api.execution.partition.PartitionType;
@@ -68,7 +99,7 @@ public class SiddhiAppInfo {
         }
 
         // Get Stream Info
-        // NOTE - This information is taken from the SiddhiAppRuntime class.
+        // NOTE - This information is taken from the SiddhiAppRuntime class
         for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
             StreamInfo streamInfo = generateStreamInfo(streamDefinition);
             if (streamInfo != null) {
