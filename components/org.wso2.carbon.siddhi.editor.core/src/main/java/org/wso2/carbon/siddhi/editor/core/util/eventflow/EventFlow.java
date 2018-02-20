@@ -37,6 +37,9 @@ import java.util.regex.Pattern;
 
 public class EventFlow {
 
+    private static final String ARROW = "arrow";
+    private static final String DOTTED_LINE = "dotted-line";
+
     private SiddhiAppInfo siddhiAppInfo;
 
     private JSONObject eventFlowJSON = new JSONObject();
@@ -50,6 +53,10 @@ public class EventFlow {
         setEventFlowJSON();
     }
 
+    /**
+     * Main method that is called in the constructor to generate a JSON
+     * object from the provided SiddhiAppInfo object.
+     */
     private void setEventFlowJSON() {
         // Set App Name & Description
         eventFlowJSON.put("appName", siddhiAppInfo.getAppName());
@@ -65,6 +72,10 @@ public class EventFlow {
         setGroups();
     }
 
+    /**
+     * Creates all the node objects and adds it to the nodes JSONArray
+     * which is then added to the returned JSONObject.
+     */
     private void setNodes() {
         // Set Trigger Nodes
         for (TriggerInfo trigger : siddhiAppInfo.getTriggers()) {
@@ -112,7 +123,8 @@ public class EventFlow {
 
             // Create Nodes For The Range & Value Partitions Inside The Partition
             for (PartitionTypeInfo partitionType : partition.getPartitionTypes()) {
-                createNode("partitionType", partitionType.getId(), partitionType.getName(), partitionType.getDefinition());
+                createNode("partitionType", partitionType.getId(), partitionType.getName(),
+                        partitionType.getDefinition());
             }
         }
 
@@ -120,6 +132,14 @@ public class EventFlow {
         eventFlowJSON.put("nodes", nodes);
     }
 
+    /**
+     * Creates a JSONObject that defines a node and adds it to the nodes JSONArray.
+     *
+     * @param type        Defines the type of node (Ex: stream, table, trigger etc.)
+     * @param id          A unique name given to identify a particular node
+     * @param name        The name of this node (not always unique - this is the name that will be displayed in the UI)
+     * @param description A piece of the Siddhi code where the node (stream, table etc.) is defined
+     */
     private void createNode(String type, String id, String name, String description) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", type);
@@ -131,6 +151,12 @@ public class EventFlow {
         nodes.put(jsonObject);
     }
 
+    /**
+     * Creates a JSONObject(s) that defines a query, as the logic to create a query node
+     * is a bit different from the `createNode()` method.
+     *
+     * @param queryInfo The object that defines the Siddhi query in which the node(s) is to be created from
+     */
     private void createQueryNode(QueryInfo queryInfo) {
         // If The OutputStream Of This Query Has Not Been Defined,
         // Create Another Node For The Undefined OutputStream
@@ -152,14 +178,32 @@ public class EventFlow {
         createNode("query", queryInfo.getId(), queryInfo.getName(), queryInfo.getDefinition());
     }
 
+    /**
+     * Calls all the relevant functions to create the edge JSONObjects
+     * and then add these JSONObjects to the edges JSONArray.
+     */
     private void setEdges() {
-        final String ARROW = "arrow";
-        final String DOTTED_LINE = "dotted-line";
+        setAggregationEdges();
+        setQueryEdges();
+        setPartitionEdges();
+        // Set All The Edges To The Event Flow
+        eventFlowJSON.put("edges", edges);
+    }
+
+    /**
+     * Creates all the edge JSONObjects for all the aggregations in the SiddhiAppInfo object.
+     */
+    private void setAggregationEdges() {
         // Set Edges With Aggregations
         for (AggregationInfo aggregation : siddhiAppInfo.getAggregations()) {
             createEdge(ARROW, aggregation.getInputStreamId(), aggregation.getId());
         }
+    }
 
+    /**
+     * Creates all the edge JSONObjects for all the queries in the SiddhiAppInfo object.
+     */
+    private void setQueryEdges() {
         // Set Edges With Queries
         for (QueryInfo query : siddhiAppInfo.getQueries()) {
 
@@ -181,7 +225,12 @@ public class EventFlow {
                 createEdge(DOTTED_LINE, tableId, query.getId());
             }
         }
+    }
 
+    /**
+     * Creates all the edge JSONObjects for all the partitions in the SiddhiAppInfo object.
+     */
+    private void setPartitionEdges() {
         // Set Edges With Partition Queries
         for (PartitionInfo partition : siddhiAppInfo.getPartitions()) {
 
@@ -190,7 +239,6 @@ public class EventFlow {
 
                 // For Each Input Stream In This Query
                 for (String inputStreamId : query.getInputStreamIds()) {
-
                     // Check Whether This Input Stream Is Partitioned Or Not
                     String partitionedStreamId = null;
                     for (PartitionTypeInfo partitionType : partition.getPartitionTypes()) {
@@ -229,11 +277,15 @@ public class EventFlow {
             }
 
         }
-
-        // Set All The Edges To The Event Flow
-        eventFlowJSON.put("edges", edges);
     }
 
+    /**
+     * Creates a JSONObject that defines an edge and adds it to the edges JSONArray.
+     *
+     * @param type   The type of edge (can be either a 'arrow' or 'dotted-line')
+     * @param parent The Id of the parent node where the edge starts from
+     * @param child  The Id of the child node where the edge should point towards
+     */
     private void createEdge(String type, String parent, String child) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", type);
@@ -244,6 +296,10 @@ public class EventFlow {
         edges.put(jsonObject);
     }
 
+    /**
+     * Creates all the group objects and adds it to the groups JSONArray
+     * which is then added to the returned JSONObject.
+     */
     private void setGroups() {
         // Groups Are Only For Partitions
         for (PartitionInfo partition : siddhiAppInfo.getPartitions()) {
@@ -253,6 +309,16 @@ public class EventFlow {
         eventFlowJSON.put("groups", groups);
     }
 
+    /**
+     * Creates a JSONObject that defines a group and adds it to the groups JSONArray.
+     * Groups are only meant for partitions as they define what streams/queries and partition types that
+     * belong to a particular partition.
+     *
+     * @param id             The unique Id of the partition which the group belongs to
+     * @param name           The name of the partition (i.e. the name to be displayed in the UI)
+     * @param queries        The list of queries defined inside a particular partition
+     * @param partitionTypes The list of nodes that define's how a particular stream is partitioned by
+     */
     private void createGroup(String id, String name, List<QueryInfo> queries, List<PartitionTypeInfo> partitionTypes) {
         // Create A Group To Define A Partition
         JSONObject jsonObject = new JSONObject();

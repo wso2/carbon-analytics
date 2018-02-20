@@ -76,6 +76,10 @@ public class SiddhiAppInfo {
         loadSiddhiAppInfo();
     }
 
+    /**
+     * The main method that is called from the constructor to obtain the
+     * information of a Siddhi App from the SiddhiAppStr.
+     */
     private void loadSiddhiAppInfo() {
         // Compile 'siddhiAppStr' To A SiddhiApp Object
         SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppStr);
@@ -94,7 +98,7 @@ public class SiddhiAppInfo {
 
         // Get Trigger Info
         for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
-            String triggerDefinitionStr = getContext(triggerDefinition);
+            String triggerDefinitionStr = getDefinition(triggerDefinition);
             triggers.add(new TriggerInfo(triggerDefinition.getId(), triggerDefinition.getId(), triggerDefinitionStr));
         }
 
@@ -109,26 +113,26 @@ public class SiddhiAppInfo {
 
         // Get Table Info
         for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
-            String tableDefinitionStr = getContext(tableDefinition);
+            String tableDefinitionStr = getDefinition(tableDefinition);
             tables.add(new TableInfo(tableDefinition.getId(), tableDefinition.getId(), tableDefinitionStr));
         }
 
         // Get Window Info
         for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
-            String windowDefinitionStr = getContext(windowDefinition);
+            String windowDefinitionStr = getDefinition(windowDefinition);
             windows.add(new WindowInfo(windowDefinition.getId(), windowDefinition.getId(), windowDefinitionStr));
         }
 
         // Get Aggregation Info
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
-            String aggregationDefinitionStr = getContext(aggregationDefinition);
+            String aggregationDefinitionStr = getDefinition(aggregationDefinition);
             aggregations.add(new AggregationInfo(aggregationDefinition.getId(), aggregationDefinition.getId(),
                     aggregationDefinitionStr, aggregationDefinition.getBasicSingleInputStream().getStreamId()));
         }
 
         // Get Function Info
         for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
-            String functionDefinitionStr = getContext(functionDefinition);
+            String functionDefinitionStr = getDefinition(functionDefinition);
             functions.add(new FunctionInfo(functionDefinition.getId(), functionDefinition.getId(),
                     functionDefinitionStr));
         }
@@ -149,6 +153,12 @@ public class SiddhiAppInfo {
         }
     }
 
+    /**
+     * Creates and returns an instance of the StreamInfo class based on the given Siddhi StreamDefinition object.
+     *
+     * @param streamDefinition The given Siddhi StreamDefinition object
+     * @return The created StreamInfo object
+     */
     private StreamInfo generateStreamInfo(StreamDefinition streamDefinition) {
         StreamInfo streamInfo = null;
         if (!triggers.isEmpty()) {
@@ -173,6 +183,12 @@ public class SiddhiAppInfo {
         return streamInfo;
     }
 
+    /**
+     * Creates and returns an instance of the QueryInfo class based on the given Siddhi Query object.
+     *
+     * @param query The given Siddhi Query object
+     * @return The created QueryInfo object
+     */
     private QueryInfo generateQueryInfo(Query query) {
         QueryInfo queryInfo = new QueryInfo();
 
@@ -191,7 +207,7 @@ public class SiddhiAppInfo {
         }
 
         // Set The Code That Defines This Query
-        String queryDefinitionStr = getContext(query);
+        String queryDefinitionStr = getDefinition(query);
         queryInfo.setDefinition(queryDefinitionStr);
 
         // Set The Input & Output Streams
@@ -204,6 +220,12 @@ public class SiddhiAppInfo {
         return queryInfo;
     }
 
+    /**
+     * Creates and returns an instance of the PartitionInfo class based on the given Siddhi Partition object.
+     *
+     * @param partition The given Siddhi Partition object
+     * @return The created PartitionInfo object
+     */
     private PartitionInfo generatePartitionInfo(Partition partition) {
         // Create Partition If ExecutionElement Is An Instance Of Partition
         PartitionInfo partitionInfo = new PartitionInfo();
@@ -223,7 +245,7 @@ public class SiddhiAppInfo {
         }
 
         // Set The Code That Defines This Partition
-        String partitionDefinitionStr = getContext(partition);
+        String partitionDefinitionStr = getDefinition(partition);
         partitionInfo.setDefinition(partitionDefinitionStr);
 
         // Set The Queries Defined Inside This Partition
@@ -243,6 +265,12 @@ public class SiddhiAppInfo {
         return partitionInfo;
     }
 
+    /**
+     * Creates and returns an instance of the PartitionTypeInfo class based on the given Siddhi PartitionType object.
+     *
+     * @param partitionType The given Siddhi PartitionType object
+     * @return The created PartitionTypeInfo object
+     */
     private PartitionTypeInfo generatePartitionTypeInfo(PartitionType partitionType) {
         PartitionTypeInfo partitionTypeInfo = new PartitionTypeInfo();
 
@@ -258,7 +286,7 @@ public class SiddhiAppInfo {
             numberOfRangePartitionTypes++;
         }
 
-        String partitionTypeDefinition = getContext(partitionType);
+        String partitionTypeDefinition = getDefinition(partitionType);
         partitionTypeInfo.setDefinition(partitionTypeDefinition);
 
         partitionTypeInfo.setStreamId(partitionType.getStreamId());
@@ -266,6 +294,12 @@ public class SiddhiAppInfo {
         return partitionTypeInfo;
     }
 
+    /**
+     * Returns the list of user defined functions that are used in a given Siddhi Query object.
+     *
+     * @param query The Siddhi Query object to obtain the user define function references from
+     * @return The list of the names of the user defined functions used in the given query
+     */
     private List<String> getFunctionIdsInQuery(Query query) {
         List<String> queryFunctions = new ArrayList<>();
         for (OutputAttribute outputAttribute : query.getSelector().getSelectionList()) {
@@ -288,35 +322,36 @@ public class SiddhiAppInfo {
         return queryFunctions;
     }
 
-
     /**
-     * Used To Obtain A Specific Piece Of Code From The Siddhi App String
-     * From The Given Start & End Index - Taken From Siddhi Source 'ExceptionUtil.getContext()'
+     * Obtains the piece of the code from the siddhiAppStr variable where the given SiddhiElement object is defined.
+     *
+     * @param siddhiElement The SiddhiElement object where the definition needs to be obtained from
+     * @return The definition of the given SiddhiElement object as a String
      */
-    private String getContext(SiddhiElement siddhiElement) {
-
+    private String getDefinition(SiddhiElement siddhiElement) {
         int[] startIndex = siddhiElement.getQueryContextStartIndex();
         int[] endIndex = siddhiElement.getQueryContextEndIndex();
 
-        int startLinePosition = ordinalIndexOf(siddhiAppStr, startIndex[0]);
-        int endLinePosition = ordinalIndexOf(siddhiAppStr, endIndex[0]);
+        int startLinePosition = ordinalIndexOf(startIndex[0]);
+        int endLinePosition = ordinalIndexOf(endIndex[0]);
         return siddhiAppStr.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1])
                 .replaceAll("'", "\"");
     }
 
     /**
-     * Finds The Ordinal Index To Help The 'getContext()' Method Obtain The
-     * Definition Of A Siddhi Element - Taken From Siddhi Source 'ExceptionUtil.ordinalIndexOf()'
+     * Gets the relative position in the siddhiAppStr of the start of the given line number.
+     *
+     * @param lineNumber The line number in which the relative start position should be obtained
+     * @return The relative position of where the given line starts in the siddhiAppStr
      */
-    private int ordinalIndexOf(String str, int num) {
+    private int ordinalIndexOf(int lineNumber) {
         int position = 0;
-
         while (true) {
-            num--;
-            if (num <= 0) {
+            lineNumber--;
+            if (lineNumber <= 0) {
                 return position;
             }
-            position = str.indexOf('\n', position) + 1;
+            position = siddhiAppStr.indexOf('\n', position) + 1;
         }
     }
 
