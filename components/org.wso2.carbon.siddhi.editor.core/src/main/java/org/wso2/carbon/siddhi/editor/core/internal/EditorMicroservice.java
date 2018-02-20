@@ -868,11 +868,11 @@ public class EditorMicroservice implements Microservice {
     }
 
     /**
-     * Converts a given Siddhi App string to a specific JSON format for a graph, that diagrammatically
+     * Converts a given Siddhi App string to a specific JSON format for a graph that diagrammatically
      * display's the Siddhi App, to be generated in the Editor design view.
      *
-     * @param siddhiAppString The Siddhi App to be converted
-     * @return The JSON result
+     * @param siddhiAppString The Siddhi App to be converted to JSON
+     * @return The JSON result in a predefined format
      */
     @POST
     @Produces("application/json")
