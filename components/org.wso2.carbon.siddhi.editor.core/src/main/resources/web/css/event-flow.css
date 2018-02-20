@@ -4,11 +4,6 @@
     padding: 10px;
 }
 
-
-
-
-
-
 .colour-key {
     float: right;
 }
@@ -30,10 +25,6 @@
     margin: 5px;
 }
 
-
-
-
-
 .siddhi-app-name {
     color: white;
     font-size: 40px;
@@ -45,11 +36,6 @@
     font-size: 20px;
 }
 
-
-
-
-
-
 .graph-container {
     width: 100%;
     height: 85%;
@@ -59,11 +45,6 @@
 .siddhi-graph {
     padding: 30px;
 }
-
-
-
-
-
 
 .node rect {
     stroke: #bbb;
@@ -77,12 +58,6 @@
     fill: none;
 }
 
-
-
-
-
-
-/*indicator CSS*/
 .indicator {
     height: 25px;
     width: 25px;
@@ -92,7 +67,6 @@
     border-bottom-left-radius: 7px;
 }
 
-/*nodeLabel CSS*/
 .nodeLabel {
     font-weight: 100;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
@@ -102,7 +76,6 @@
     margin-left: 5px;
 }
 
-/*Partition CSS*/
 .partition {
     font-weight: 100;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
@@ -142,13 +115,6 @@
     background-color: #e0e0d1;
 }
 
-
-
-
-
-
-
-
 .toggle-controls-container {
     position: absolute;
     left: 90%;
@@ -156,15 +122,12 @@
     z-index: 1;
 }
 
-/*Class For The Toggle View Button*/
 .toggle-view {
     border-radius: 5px;
 }
 
-/*Class For The Button To Open Design View*/
 .toggle-to-design {
 }
 
-/*Class For The Button To Open Source View*/
 .toggle-to-source {
 }
