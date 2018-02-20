@@ -28,6 +28,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+/**
+ * Auto generated class from Swagger to MSF4J.
+ */
+
 @Component(
         service = Microservice.class,
         immediate = true

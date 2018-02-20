@@ -24,7 +24,7 @@ import org.wso2.carbon.stream.processor.core.api.RunTimeApiService;
 import javax.ws.rs.core.Response;
 
 /**
- * RunTime Service Implementataion Class
+ * RunTime Service Implementataion Class that exposes the run time of the node.
  */
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response;
 @Component(service = RunTimeApiService.class, immediate = true)
 
 public class RunTimeApiServiceImpl extends RunTimeApiService {
+
     @Override
     public Response getRunTime(String host, String port) throws NotFoundException {
         if (System.getProperty("wso2.runtime") != null) {
