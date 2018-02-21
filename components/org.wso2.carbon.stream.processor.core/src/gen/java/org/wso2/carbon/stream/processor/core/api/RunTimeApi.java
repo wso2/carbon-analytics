@@ -20,10 +20,12 @@ import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.stream.processor.core.factories.RunTimeApiServiceFactory;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 /**
@@ -55,8 +57,8 @@ public class RunTimeApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getRunTime()
+    public Response getRunTime(@Context Request request)
             throws NotFoundException {
-        return delegate.getRunTime();
+        return delegate.getRunTime(request);
     }
 }
