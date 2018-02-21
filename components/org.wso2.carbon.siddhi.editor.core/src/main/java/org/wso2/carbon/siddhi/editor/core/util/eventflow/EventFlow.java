@@ -200,9 +200,10 @@ public class EventFlow {
                 createEdge(ARROW, inputStreamId, query.getId());
             }
 
+            // Create An Edge Between The Query And It's OutputStream
             createEdge(ARROW, query.getId(), query.getOutputStreamId());
 
-            // For Every Function In The Query
+            // For Every User Defined Function Used In The Query
             for (String functionId : query.getFunctionIds()) {
                 createEdge(ARROW, functionId, query.getId());
             }
@@ -223,49 +224,55 @@ public class EventFlow {
     private void setPartitionEdges() {
         // Set Edges With Partition Queries
         for (PartitionInfo partition : siddhiAppInfo.getPartitions()) {
-
             // For Each Query In This Partition
             for (QueryInfo query : partition.getQueries()) {
+                createEdgesForQueryInPartition(query, partition);
+            }
+        }
+    }
 
-                // For Each Input Stream In This Query
-                for (String inputStreamId : query.getInputStreamIds()) {
-                    // Check Whether This Input Stream Is Partitioned Or Not
-                    String partitionedStreamId = null;
-                    for (PartitionTypeInfo partitionType : partition.getPartitionTypes()) {
-                        if (inputStreamId.equals(partitionType.getStreamId())) {
-                            partitionedStreamId = partitionType.getId();
-                            break;
-                        }
-                    }
-
-                    if (partitionedStreamId != null) {
-                        // If The Input Stream Is Partitioned
-                        createEdge(ARROW, inputStreamId, partitionedStreamId);
-                        createEdge(ARROW, partitionedStreamId, query.getId());
-                    } else {
-                        // If The Input Stream Is Not Partitioned
-                        createEdge(ARROW, inputStreamId, query.getId());
-                    }
+    /**
+     * Creates all the edges for a particular query inside a partition.
+     *
+     * @param query     The query in which the edges should be made to and from
+     * @param partition The partition in which the given query belongs to
+     */
+    private void createEdgesForQueryInPartition(QueryInfo query, PartitionInfo partition) {
+        // For Each Input Stream In This Query
+        for (String inputStreamId : query.getInputStreamIds()) {
+            // Check Whether This Input Stream Is Partitioned Or Not
+            String partitionedStreamId = null;
+            for (PartitionTypeInfo partitionType : partition.getPartitionTypes()) {
+                if (inputStreamId.equals(partitionType.getStreamId())) {
+                    partitionedStreamId = partitionType.getId();
+                    break;
                 }
-
-                // Connect The Query With Its Output Stream
-                createEdge(ARROW, query.getId(), query.getOutputStreamId());
-
-                // Connect All The Functions That Are Used By This Query
-                for (String functionId : query.getFunctionIds()) {
-                    createEdge(ARROW, functionId, query.getId());
-                }
-
-                // Connects Any Tables That Are Used By The Queries Using The In Keyword
-                Pattern pattern = Pattern.compile("\\b[i|I][n|N]\\b\\s+(\\w+)");
-                Matcher matcher = pattern.matcher(query.getDefinition());
-                while (matcher.find()) {
-                    String tableId = matcher.group(1);
-                    createEdge(DOTTED_LINE, tableId, query.getId());
-                }
-
             }
 
+            if (partitionedStreamId != null) {
+                // If The Input Stream Is Partitioned
+                createEdge(ARROW, inputStreamId, partitionedStreamId);
+                createEdge(ARROW, partitionedStreamId, query.getId());
+            } else {
+                // If The Input Stream Is Not Partitioned
+                createEdge(ARROW, inputStreamId, query.getId());
+            }
+        }
+
+        // Connect The Query With Its Output Stream
+        createEdge(ARROW, query.getId(), query.getOutputStreamId());
+
+        // Connect All The Functions That Are Used By This Query
+        for (String functionId : query.getFunctionIds()) {
+            createEdge(ARROW, functionId, query.getId());
+        }
+
+        // Connects Any Tables That Are Used By The Queries Using The 'in' Keyword
+        Pattern pattern = Pattern.compile("\\b[i|I][n|N]\\b\\s+(\\w+)");
+        Matcher matcher = pattern.matcher(query.getDefinition());
+        while (matcher.find()) {
+            String tableId = matcher.group(1);
+            createEdge(DOTTED_LINE, tableId, query.getId());
         }
     }
 
@@ -294,7 +301,6 @@ public class EventFlow {
         for (PartitionInfo partition : siddhiAppInfo.getPartitions()) {
             createGroup(partition.getId(), partition.getName(), partition.getQueries(), partition.getPartitionTypes());
         }
-
         eventFlowJSON.put("groups", groups);
     }
 
@@ -326,7 +332,6 @@ public class EventFlow {
         for (PartitionTypeInfo partitionType : partitionTypes) {
             children.add(partitionType.getId());
         }
-
         jsonObject.put("children", children.toArray());
 
         // Add The Created JSONObject To The Groups JSONArray

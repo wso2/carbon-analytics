@@ -132,8 +132,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     this._sourceView.editorResize();
 
                     var designContainer = this._$parent_el.find(_.get(this.options, 'design.container'));
-                    var svgDynamicId = designContainer.find('svg').attr('id') + this._$parent_el.attr('id');
-                    designContainer.find('svg').attr('id', svgDynamicId);
+                    var svgDynamicId = designContainer.find('.siddhi-graph').attr('id') + this._$parent_el.attr('id');
+                    designContainer.find('.siddhi-graph').attr('id', svgDynamicId);
                     var eventFlow = new EventFlow(designContainer);
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     toggleViewButton.click(function () {

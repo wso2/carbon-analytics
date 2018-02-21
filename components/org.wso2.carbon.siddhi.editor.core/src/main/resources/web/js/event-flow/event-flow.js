@@ -20,10 +20,10 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
         var EventFlow = function (designView) {
             this.$designView = designView;
-            this.$siddhiAppName = designView.find('.siddhi-app-name');
-            this.$siddhiAppDescription = designView.find('.siddhi-app-description');
-            this.$graphView = designView.find('.graph-container');
-            this.$siddhiGraph = designView.find('.siddhi-graph');
+            this.$siddhiAppName = this.$designView.find('.siddhi-app-name');
+            this.$siddhiAppDescription = this.$designView.find('.siddhi-app-description');
+            this.$graphView = this.$designView.find('.graph-container');
+            this.$siddhiGraph = this.$designView.find('.siddhi-graph');
             this.url = window.location.protocol + "//" + window.location.host + "/editor/event-flow";
             this.defaultCode = "@App:name(\"SiddhiApp\")\n" +
                 "@App:description(\"Description of the plan\")\n" +
@@ -33,6 +33,13 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 "\n";
         };
 
+        /**
+         * Does an AJAX call to the backend MSF4J service that converts the 'siddhiCode'
+         * to a specific JSON format to be displayed in the UI.
+         *
+         * @param siddhiCode The Siddhi App as a string
+         * @returns A JSON with a response status, and the JSON returned by the back-end
+         */
         EventFlow.prototype.fetchJSON = function (siddhiCode) {
             var self = this;
             var result = {};
@@ -57,7 +64,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     error: function (error) {
                         if (error.status === 400) {
                             result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
-                            log.error(error.responseText);
+                            log.info(error.responseText);
                         } else {
                             result = {status: "fail", errorMessage: "Internal Error Occurred"};
                         }
@@ -68,8 +75,13 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             return result;
         };
 
+        /**
+         * Renders a graph in the design view based on the information of the structure
+         * of the graph in the 'data' argument.
+         *
+         * @param data A JSON object that defines the graph that is to be rendered in the UI
+         */
         EventFlow.prototype.render = function (data) {
-
             var self = this;
 
             if (data === null || data === undefined || data === {}) {
@@ -87,7 +99,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     var html;
                     var node;
 
-                    var isValid = true;
                     if (value.type === "partition") {
                         html = "<div class='partition' title='" + value.description + "'>" + value.name + "</div>";
                         node = {
@@ -123,40 +134,30 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             case "partitionType":
                                 html = html + "<span class='indicator partitionType-colour'></span>";
                                 break;
-                            default:
-                                isValid = false;
-                                break;
                         }
                         html = html + "<span class='nodeLabel'>" + value.name + "</span>" + "</div>";
                         node = {
-                            labelType: "html",
                             label: html,
+                            labelType: "html",
                             rx: 7,
                             ry: 7,
                             padding: 0
                         };
                     }
-
-                    if (isValid) {
-                        graph.setNode(value.id, node);
-                    } else {
-                        console.error("Error - invalid node type " + value.type + " for " + value.name);
-                    }
-
+                    // Set the node
+                    graph.setNode(value.id, node);
                 });
 
                 // Set the edges of the graph
                 data.edges.forEach(function (value) {
                     var edge = {arrowheadStyle: "fill: #bbb"};
 
-                    // NOTE: To make the edges curve, use -- lineInterpolate : "basis"
                     if (value.type === "arrow") {
+                        // This makes the lines curve
                         edge.lineInterpolate = "basis";
                     } else if (value.type === "dotted-line") {
-                        // edge.style = "stroke-dasharray: 5, 5; fill:#333;";
+                        // This makes the lines dotted
                         edge.style = "stroke-dasharray: 5, 5;";
-                    } else {
-                        console.error("Error - invalid edge type: " + value.type + " (Parent = " + value.parent + ", Child = " + value.child + ")");
                     }
 
                     // Set the edge
@@ -183,9 +184,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 }
 
                 var render = new dagreD3.render();
-
                 var graphId = "#" + self.$siddhiGraph.attr("id");
-
                 render(d3.select(graphId + " g"), graph);
 
                 var svg = self.$siddhiGraph;
@@ -193,7 +192,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
                 svg.attr("width", inner.get(0).getBoundingClientRect().width + 60);
                 svg.attr("height", inner.get(0).getBoundingClientRect().height + 60);
-
 
                 var graphWidth = parseInt(svg.attr("width"));
                 var graphHeight = parseInt(svg.attr("height"));
@@ -211,45 +209,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                         return 0;
                     }
                 }
-
-
-                /*-------------------UNCOMMENT TO ADD ZOOM & CENTERING------------------------------------*/
-                // var svg = d3.select(graphId);
-                // var inner = svg.select("g");
-                // var zoom = d3.behavior.zoom().on("zoom", function () {
-                //     inner.attr("transform", "translate(" + d3.event.translate + ")" +
-                //         "scale(" + d3.event.scale + ")");
-                // });
-                //
-                // svg.call(zoom);
-                //
-                // // Obtain the graph width and height
-                // var graphWidth = graph.graph().width;
-                // var graphHeight = graph.graph().height;
-                //
-                // // Obtain the original height of the container
-                // var width = parseInt(svg.style("width").replace(/px/, ""));
-                // var height = parseInt(svg.style("height").replace(/px/, ""));
-                //
-                // // Calculate the scale to zoom
-                // var zoomScale = Math.min((width * 0.75) / graphWidth, (height * 0.75) / graphHeight);
-                //
-                // // recalculate the graph width & height assuming the zoom was implemented onto it
-                // graphWidth = graph.graph().width * zoomScale;
-                // graphHeight = graph.graph().height * zoomScale;
-                //
-                // // calculate the translate values  needed to center the graph
-                // var left = (width - graphWidth) / 2;
-                // var top = (height - graphHeight) / 2;
-                // var translate = [left, top];
-                //
-                // // apply the translate & zoom
-                // zoom.translate(translate);
-                // zoom.scale(zoomScale);
-                //
-                // // Make sure the zoom and translate are done upon render
-                // zoom.event(inner);
-
             }
 
             function showDefaultGraph() {
@@ -258,11 +217,19 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             }
         };
 
+        /**
+         * Clears the design view of all it's contents when called.
+         */
         EventFlow.prototype.clear = function () {
             this.$siddhiGraph.empty();
             this.$siddhiGraph.html('<g></g>');
         };
 
+        /**
+         * Display's a warning using the AlertsManager.
+         *
+         * @param message The content to be displayed in the alert
+         */
         EventFlow.prototype.alert = function (message) {
             alerts.warn(message);
         };
