@@ -57,8 +57,7 @@ public class RunTimeApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getRunTime(@Context Request request)
-            throws NotFoundException {
+    public Response getRunTime(@Context Request request) throws NotFoundException {
         return delegate.getRunTime(request);
     }
 }
