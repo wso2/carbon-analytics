@@ -16,7 +16,7 @@ schemes:
 host: analytics.wso2.com
 basePath: /distributed/apis
 paths:
-  '/runTime/{host}/{port}':
+  '/runTime':
     get:
       x-wso2-curl: 'curl -k -X GET http://localhost:9090/stream-processor/runTime/{host}/{port}'
       x-wso2-request: 'GET http://localhost:9090/stream-processor/runTime/{host}/{port}'
