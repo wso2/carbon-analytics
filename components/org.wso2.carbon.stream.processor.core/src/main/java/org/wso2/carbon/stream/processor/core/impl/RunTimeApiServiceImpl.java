@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response;
 public class RunTimeApiServiceImpl extends RunTimeApiService {
 
     @Override
-    public Response getRunTime(String host, String port) throws NotFoundException {
+    public Response getRunTime() throws NotFoundException {
         if (System.getProperty("wso2.runtime") != null) {
             return Response.ok().entity(System.getProperty("wso2.runtime")).build();
         } else {

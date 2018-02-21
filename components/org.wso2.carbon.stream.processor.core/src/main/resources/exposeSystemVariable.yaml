@@ -30,17 +30,6 @@ paths:
       description: >-
         Returns the run time given in the carbon.sh.
       operationId: getRunTime
-      parameters:
-        - name: host
-          in: path
-          description: host of the node.
-          required: true
-          type: string
-        - name: port
-          in: path
-          description: port of the node
-          required: true
-          type: string
       responses:
         '200':
           description: OK.

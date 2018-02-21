@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.stream.processor.core.api;
 
-import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.stream.processor.core.factories.RunTimeApiServiceFactory;
@@ -25,7 +24,6 @@ import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 /**
@@ -59,10 +57,8 @@ public class RunTimeApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getRunTime(@ApiParam(value = "host of the node.", required = true) @PathParam("host") String host
-            , @ApiParam(value = "port of the node", required = true) @PathParam("port") String port
-                              )
+    public Response getRunTime()
             throws NotFoundException {
-        return delegate.getRunTime(host, port);
+        return delegate.getRunTime();
     }
 }
