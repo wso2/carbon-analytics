@@ -45,8 +45,6 @@ public class RunTimeApi implements Microservice {
     private final RunTimeApiService delegate = RunTimeApiServiceFactory.getRunTimeApi();
 
     @GET
-    @Path("/{host}/{port}")
-
     @io.swagger.annotations.ApiOperation(value = "Returns the runtime of the stream processor.",
                                          notes = "Returns the run time given in the carbon.sh.", response = void.class,
                                          tags = {"RunTime",})
