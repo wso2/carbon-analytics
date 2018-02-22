@@ -84,7 +84,7 @@ public class SiddhiAppInfo {
         // Compile 'siddhiAppStr' To A SiddhiApp Object
         SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppStr);
 
-        // This is done just to check for any runtime errors.
+        // This is done to check for any runtime errors and to obtain all the streams.
         SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiAppStr);
 
         // Get The App Name And Description
@@ -334,6 +334,7 @@ public class SiddhiAppInfo {
 
         int startLinePosition = ordinalIndexOf(startIndex[0]);
         int endLinePosition = ordinalIndexOf(endIndex[0]);
+
         return siddhiAppStr.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1])
                 .replaceAll("'", "\"");
     }
