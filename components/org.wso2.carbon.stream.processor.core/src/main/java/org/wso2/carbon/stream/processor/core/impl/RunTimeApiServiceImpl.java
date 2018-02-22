@@ -47,7 +47,6 @@ public class RunTimeApiServiceImpl extends RunTimeApiService {
 
     @Override
     public Response getRunTime(Request request) throws NotFoundException {
-
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(PERMISSION_APP_NAME,
@@ -58,11 +57,10 @@ public class RunTimeApiServiceImpl extends RunTimeApiService {
             if (System.getProperty("wso2.runtime") != null) {
                 return Response.ok().entity(System.getProperty("wso2.runtime")).build();
             } else {
-                return Response.status(Response.Status.NOT_FOUND).entity(
-                        new ApiResponseMessageWithCode(ApiResponseMessageWithCode.FILE_PROCESSING_ERROR,
-                                                       "something went wrong please check")).build();
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.FILE_PROCESSING_ERROR,
+                                                               "something went wrong please check")).build();
             }
-
         }
     }
 }
