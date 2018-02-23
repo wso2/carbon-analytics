@@ -64,4 +64,10 @@ public interface WorkerServiceStub {
     @Headers("Content-Type: application/json")
     @RequestLine("POST /login")
     Response testConnection();
+
+    //TODO:NEWLY ADDED
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /runTime")
+    Response getRunTime();
+
 }

@@ -48,6 +48,8 @@ import java.sql.SQLException;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
 public class MonitoringRESTApi implements Microservice{
     private static final Log logger = LogFactory.getLog(MonitoringRESTApi.class);
+    //todo: NEED TO DISCUSS WHETHER WE CAN CHANGE THIS CONTEXT TO "/apis/nodes"
+    //todo:just apis = DAMITH AYYA TOLD
     public static final String API_CONTEXT_PATH = "/apis/workers";
 
     private final MonitoringApiService workersApi;
@@ -74,11 +76,41 @@ public class MonitoringRESTApi implements Microservice{
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
     public Response addWorker(@Context Request request,
-            @ApiParam(value = "Worker object that needs to be added." ,required=true) Worker worker
-    )
+                              @ApiParam(value = "Worker object that needs to be added." ,required=true) Worker worker
+                             )
             throws NotFoundException {
         return workersApi.addWorker(worker,getUserName(request));
     }
+
+    /**
+     * TODO: NEWLY ADDED
+     */
+
+    @POST
+    @Path("/manager")
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Add a new manager.", notes = "Adds a new manager",
+                                         response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 201, message = "Manager is created successfully.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 409,
+                                                message = "Request accepted but a manager with the given host and "
+                                                        + "port already exists.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                                                response = void.class)})
+    public Response addManager(@Context Request request,
+                               @ApiParam(value = "Manager object need to be added.", required = true) Worker manager
+                              ) throws NotFoundException {
+        return workersApi.addManager(manager, getUserName(request));
+    }
+
+
+
 
     /**
      * This API is responsible of handling the test connection function at the adding the new worker.
@@ -95,13 +127,13 @@ public class MonitoringRESTApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request", response = void.class),
             @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized", response = void.class),
             @io.swagger.annotations.ApiResponse(code = 407, message = "Proxy Authentication Required",
-                    response = void.class),
+                                                response = void.class),
             @io.swagger.annotations.ApiResponse(code = 408, message = "Request Timeout", response = void.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                    response = void.class) })
+                                                response = void.class) })
     public Response testConnection(@Context Request request,
-            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-    ) throws NotFoundException {
+                                   @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+                                  ) throws NotFoundException {
         return workersApi.testConnection(id,getUserName(request));
     }
 
@@ -124,6 +156,25 @@ public class MonitoringRESTApi implements Microservice{
         return workersApi.getAllWorkers(getUserName(request));
     }
 
+    @GET
+    @Path("/{id}/runTime")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Read the system runtime.", notes = "Lists all configuration.",
+                                         response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                                                response = void.class) })
+    public Response getRuntime(@Context Request request,
+                               @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id)
+            throws NotFoundException{
+        return workersApi.getRuntimeEnv(id,getUserName(request));
+    }
+
+
     /**
      * Delete worker from the status dashboard. PS. Do not delete metrics details.
      * @param id workerId
@@ -136,19 +187,43 @@ public class MonitoringRESTApi implements Microservice{
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Deletes a worker.", notes = "Removes the worker with the worker " +
             "id specified. Path param of **id** determines id of the worker. ", response = ApiResponseMessage.class,
-            tags={ "Workers", })
+                                         tags={ "Workers", })
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The worker is successfully deleted.",
-                    response = ApiResponseMessage.class),
+                                                response = ApiResponseMessage.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker is not found.",
-                    response = ApiResponseMessage.class),
+                                                response = ApiResponseMessage.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                    response = ApiResponseMessage.class) })
+                                                response = ApiResponseMessage.class) })
     public Response deleteWorker(@Context Request request,
-            @ApiParam(value = "Id of the worker.",required=true) @PathParam("id") String id
-    )
+                                 @ApiParam(value = "Id of the worker.",required=true) @PathParam("id") String id
+                                )
             throws NotFoundException, SQLException {
         return workersApi.deleteWorker(id,getUserName(request));
+    }
+
+    //TODO:NEWLY ADDED
+    @DELETE
+    @Path("/manager/{id}")
+
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Deletes a manager.",
+                                         notes = "Removes the manager with the manager Id specified. Path param "
+                                                 + "**id** determines id of the manager. ",
+                                         response = ApiResponseMessage.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The manager is successfully deleted.",
+                                                response = ApiResponseMessage.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The manager is not found",
+                                                response = ApiResponseMessage.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                                                response = ApiResponseMessage.class)})
+    public Response deleteManager(@Context Request request,
+                                  @ApiParam(value = "Id of the manager.", required = true) @PathParam("id") String id)
+            throws NotFoundException,SQLException {
+        return workersApi.deleteManager(id, getUserName(request));
     }
 
     /**
@@ -161,14 +236,14 @@ public class MonitoringRESTApi implements Microservice{
     @Path("/config")
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Read configuration details.", notes = "Lists all configuration.",
-            response = void.class, tags={ "Workers", })
+                                         response = void.class, tags={ "Workers", })
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                    response = void.class) })
+                                                response = void.class) })
     public Response getDashboardConfig(@Context Request request)
             throws NotFoundException, SQLException {
         return workersApi.getDashboardConfig(getUserName(request));
@@ -188,10 +263,10 @@ public class MonitoringRESTApi implements Microservice{
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                    response = void.class) })
+                                                response = void.class) })
     public Response getRolesByUsername(@Context Request request,
-    @ApiParam(value = "Id of the worker.",required=true) @QueryParam("permissionSuffix") String permissionSuffix
-    ) throws NotFoundException {
+                                       @ApiParam(value = "Id of the worker.",required=true) @QueryParam("permissionSuffix") String permissionSuffix
+                                      ) throws NotFoundException {
         return workersApi.getRolesByUsername(getUserName(request),permissionSuffix);
     }
 
@@ -212,8 +287,8 @@ public class MonitoringRESTApi implements Microservice{
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
     public Response getWorkerGeneral(@Context Request request,
-            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-    )
+                                     @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+                                    )
             throws NotFoundException {
         return workersApi.populateWorkerGeneralDetails(id,getUserName(request));
     }
@@ -241,7 +316,7 @@ public class MonitoringRESTApi implements Microservice{
             ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
             ,@ApiParam(value = "Is required more statistics.") @QueryParam("more") Boolean more
-    )
+                                    )
             throws NotFoundException {
         return workersApi.getWorkerHistory(id,period,type,more,getUserName(request));
     }
@@ -268,7 +343,7 @@ public class MonitoringRESTApi implements Microservice{
             ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
             ,@ApiParam(value = "Page Number") @QueryParam("page") Integer pageNum
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
-    )
+                                    )
             throws NotFoundException {
         return workersApi.getAllSiddhiApps(id,period,type,pageNum,getUserName(request));
     }
@@ -292,7 +367,7 @@ public class MonitoringRESTApi implements Microservice{
     public Response getHAStatus(
             @Context Request request,
             @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-    )
+                               )
             throws NotFoundException {
         return workersApi.getHADetails(id,getUserName(request));
     }
@@ -316,7 +391,7 @@ public class MonitoringRESTApi implements Microservice{
             @Context Request request,
             @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
-    )
+                                       )
             throws NotFoundException {
         return workersApi.getSiddhiAppDetails(id,appName,getUserName(request));
     }
@@ -341,10 +416,10 @@ public class MonitoringRESTApi implements Microservice{
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = ApiResponseMessage.class) })
     public Response enableSiddhiAppStats(@Context Request request,
-            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+                                         @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
             ,@ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable
-    )
+                                        )
             throws NotFoundException {
         return workersApi.enableSiddhiAppStats(id,appName, statsEnable,getUserName(request));
     }
@@ -372,7 +447,7 @@ public class MonitoringRESTApi implements Microservice{
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
             ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
-    )
+                                 )
             throws NotFoundException {
         return workersApi.getAppHistory(id,appName,period,type,getUserName(request));
     }
@@ -396,7 +471,7 @@ public class MonitoringRESTApi implements Microservice{
             @Context Request request,
             @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
-    )
+                                          )
             throws NotFoundException {
         return workersApi.getSiddhiAppComponents(id,appName,getUserName(request));
     }
@@ -428,10 +503,14 @@ public class MonitoringRESTApi implements Microservice{
             ,@ApiParam(value = "ID of the siddhi app compnent id.",required=true) @PathParam("componentId") String componentId
             ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
-    )
+                                       )
             throws NotFoundException {
         return workersApi.getComponentHistory(id,appName,componentType,componentId,period,type,getUserName(request));
     }
+
+
+    //todo: newly added
+
 
 
     private static String getUserName(Request request) {

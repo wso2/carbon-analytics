@@ -99,4 +99,13 @@ export default class StatusDashboardOverViewAPI {
         return StatusDashboardOverViewAPI.getHTTPClient().post('', worker);
     }
 
+    /**
+     * This method will create a worker with given worker details json.
+     * @param worker
+     * @returns {*}
+     */
+    static createManager(manager) {
+        return StatusDashboardOverViewAPI.getHTTPClient().post('/manager', manager);
+    }
+
 }

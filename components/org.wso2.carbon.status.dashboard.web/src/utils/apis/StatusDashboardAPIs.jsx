@@ -146,4 +146,11 @@ export default class StatusDashboardAPIS {
             '/components/' + componentType + '/' + componentID + '/history', queryParams);
     }
 
+    /**
+     * TODO:NEWLY ADDED
+     */
+    static getRuntimeEnv(workerId){
+        return StatusDashboardAPIS.getHTTPClient().get('/'+workerId+'/runTime');
+    }
+
 }

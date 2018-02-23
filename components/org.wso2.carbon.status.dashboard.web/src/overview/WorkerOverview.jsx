@@ -81,7 +81,7 @@ export default class WorkerOverview extends React.Component {
             counter: 0,
             hasManagerPermission: false,
             hasViewPermission: true,
-            statusMessage: "Currently there are no workers to display",
+            statusMessage: "Currently there are no nodes to display",
             isError: false
 
         };
@@ -128,7 +128,7 @@ export default class WorkerOverview extends React.Component {
                     clustersList: response.data,
                     isApiCalled: true,
                     statusMessage:!WorkerOverview.hasWorkers(this.state.clustersList) ? "Currently there are no" +
-                        " workers to display" : ''
+                        " nodes to display" : ''
                 });
             }).catch((error) => {
             if(error.response != null){
@@ -195,7 +195,7 @@ export default class WorkerOverview extends React.Component {
             return (
                 <div className="add-button">
                     <Link to={window.contextPath + '/add-worker'}><FlatButton
-                        label="Add New Worker"
+                        label="Add New Node"
                         icon={<ContentAdd />}
                         style={{marginTop: 10}}
                     /></Link>
@@ -205,7 +205,7 @@ export default class WorkerOverview extends React.Component {
             return (
                 <div className="add-button-disabled">
                     <FlatButton
-                        label="Add New Worker"
+                        label="Add New Node"
                         icon={<ContentAdd />}
                         style={{marginTop: 10, display: 'none'}}
                     />

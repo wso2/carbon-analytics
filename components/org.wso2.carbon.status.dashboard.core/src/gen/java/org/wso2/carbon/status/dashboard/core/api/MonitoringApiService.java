@@ -29,7 +29,11 @@ import java.sql.SQLException;
 public abstract class MonitoringApiService {
     public abstract Response addWorker(Worker worker,String username) throws NotFoundException;
 
+    public abstract Response addManager(Worker manager, String username) throws NotFoundException;
+
     public abstract Response deleteWorker(String id,String username) throws NotFoundException, SQLException;
+
+    public abstract Response deleteManager(String id, String username) throws NotFoundException,SQLException;
 
     public abstract Response enableSiddhiAppStats(String workerId, String appName, StatsEnable statEnable,
                                                   String username) throws NotFoundException;
@@ -37,7 +41,7 @@ public abstract class MonitoringApiService {
     public abstract Response getHADetails(String id,String username) throws NotFoundException;
 
     public abstract Response getAllSiddhiApps(String id ,String period, String type,Integer pageName,String username) throws
-            NotFoundException;
+                                                                                                                      NotFoundException;
 
     public abstract Response getAllWorkers(String username) throws NotFoundException, SQLException;
 
@@ -53,7 +57,7 @@ public abstract class MonitoringApiService {
     public abstract Response populateWorkerGeneralDetails(String id, String username) throws NotFoundException;
 
     public abstract Response getWorkerHistory(String id,String period,String type,Boolean more,String username) throws
-            NotFoundException;
+                                                                                                                NotFoundException;
 
     public abstract Response testConnection(String id,String username) throws NotFoundException;
 
@@ -62,4 +66,6 @@ public abstract class MonitoringApiService {
     public abstract Response getSiddhiAppComponents(String id,String appName,String username) throws NotFoundException;
 
     public abstract Response getRolesByUsername(String username,String permisstionString);
+
+    public abstract Response getRuntimeEnv(String id,String username) throws NotFoundException;
 }

@@ -61,6 +61,7 @@ import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -142,32 +143,32 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     public Response addWorker(Worker worker, String username) throws NotFoundException {
 
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
-                MANAGER_PERMISSION_STRING));
+                                                                                         MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
             if (worker.getHost() != null) {
                 String workerID = generateWorkerKey(worker.getHost(), String.valueOf(worker.getPort()));
                 WorkerConfigurationDetails workerConfigData = new WorkerConfigurationDetails(workerID, worker.getHost(),
-                        Integer.valueOf(worker.getPort()));
+                                                                                             Integer.valueOf(worker.getPort()));
                 StatusDashboardWorkerDBHandler workerDBHandler = dashboardStore;
                 try {
                     workerDBHandler.insertWorkerConfiguration(workerConfigData);
                 } catch (RDBMSTableException e) {
                     logger.error("Error occured while inserting the Worker due to " + e.getMessage(), e);
                     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                            "Error occured while inserting the Worker due to " + e.getMessage())).build();
+                                                                                "Error occured while inserting the Worker due to " + e.getMessage())).build();
                 }
                 //This part to be sucess is optional at this level
                 String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
-                        String.valueOf(worker.getPort())), workerID);
+                                                                              String.valueOf(worker.getPort())), workerID);
                 if (!response.contains("Unnable to reach worker.")) {
                     WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
-                            WorkerGeneralDetails.class);
+                                                                              WorkerGeneralDetails.class);
                     workerGeneralDetails.setWorkerId(workerID);
                     try {
                         workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
                     } catch (RDBMSTableException e) {
                         logger.warn("Worker " + removeCRLFCharacters(workerID) +
-                                " currently not active. Retry to reach " + "later");
+                                            " currently not active. Retry to reach " + "later");
                     }
                     workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: "
@@ -175,14 +176,14 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 } else if (response.contains("Unnable to reach worker.")) {
                     //shold able to add a worker so the responce is ok
                     return Response.status(Response.Status.OK).entity(new ApiResponseMessage
-                            (ApiResponseMessage.OK, "Worker id: "
-                                    + workerID + "sucessfully added. But worker not reachable.")).build();
+                                                                              (ApiResponseMessage.OK, "Worker id: "
+                                                                                      + workerID + "sucessfully added. But worker not reachable.")).build();
                 } else {
                     //if the respnce is null but should able to add a worker
                     return Response.status(Response.Status.OK).entity(new ApiResponseMessage
-                            (ApiResponseMessage.OK, "Worker id: "
-                                    + workerID + ("sucessfully added. But unknown error has occured while trying to reach " +
-                                    "worker"))).build();
+                                                                              (ApiResponseMessage.OK, "Worker id: "
+                                                                                      + workerID + ("sucessfully added. But unknown error has occured while trying to reach " +
+                                                                                      "worker"))).build();
                 }
             } else {
                 logger.error("Invalid data :" + worker.toString());
@@ -193,6 +194,45 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
+
+
+    /**
+     * Todo: newly added
+     */
+
+    @Override
+    public Response addManager(Worker manager, String username) throws NotFoundException {
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                                                                                         MANAGER_PERMISSION_STRING));
+        if (isAuthorized) {
+            if (manager.getHost() != null) {
+                String managerId = manager.getHost() + Constants.WORKER_KEY_GENERATOR + String.valueOf(manager.getPort());
+                WorkerConfigurationDetails managerConfigurationDetails =
+                        new WorkerConfigurationDetails(managerId, manager.getHost(), Integer.valueOf(manager.getPort()));
+                try {
+                    dashboardStore.insertManagerConfiguration(managerConfigurationDetails);
+                    return Response.ok().entity(
+                            new ApiResponseMessage(ApiResponseMessage.OK, "managerId " + "\n" + managerId + "\n" +
+                                    "successfully " + " added")).build();
+                } catch (RDBMSTableException e) {
+                    logger.error("Error occured while inserting the Manager due to " + e.getMessage(), e);
+                    return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error "
+                            + "occured while inserting the Manager due to " + e.getMessage())).build();
+                }
+            } else {
+                logger.error("There is no manager node specified:" + manager.toString());
+                return Response.status(Response.Status.BAD_REQUEST).entity("There is no manager nodes. Please add a "
+                                                                                   + "manager: " + manager.toString())
+                        .build();
+            }
+        }else {
+            logger.error("Unauthorized to perform add worker for user : " + username);
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
+        }
+    }
+
+
+
 
     /**
      * Return all realtime statistics of the workers.If worker is not currently reachable then send the last
@@ -1055,6 +1095,53 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         }
     }
 
+    /***
+     * TODO:NEWLY ADDED
+     * @param username
+     * @return
+     * @throws NotFoundException
+     */
+
+    @Override
+    public Response getRuntimeEnv(String id,String username) throws NotFoundException {
+
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                                                                                         VIWER_PERMISSION_STRING));
+        if (isAuthorized) {
+            String[] hostPort = id.split(Constants.WORKER_KEY_GENERATOR);
+            if (hostPort.length == 2) {
+                String workerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
+                try {
+                    feign.Response siddhiAppResponce = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                                                                                                         workerURIBody, this.getUsername(), this.getPassword()).getRunTime();
+                    String responseAppBody = siddhiAppResponce.toString();
+                    if (siddhiAppResponce.status() == 200) {
+                        logger.info(siddhiAppResponce.body().toString());
+                        return Response.ok().entity(siddhiAppResponce.body().toString()).build();
+
+
+                    } else if (siddhiAppResponce.status() == 401) {
+                        String jsonString = new Gson().toJson(responseAppBody);
+                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
+                    } else {
+                        return Response.status(Response.Status.NOT_FOUND).entity(responseAppBody).build();
+                    }
+                } catch (feign.RetryableException e) {
+                    String jsonString = new Gson().
+                            toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
+                                                                  e.getMessage()));
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                }
+            }
+            logger.error("Inproper format of worker ID:" + id);
+            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + id).build();
+        } else {
+            logger.error("Unauthorized to perform get siddhi app details for user : " + username);
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
+        }
+    }
+
+
     /**
      * Generate the worker ker wich is uniquelyidenfy in the status dashboard as wellas routing.
      *
@@ -1104,6 +1191,35 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error while deleting the " +
                                 "worker " + e.getMessage())).build();
+            }
+        } else {
+            logger.error("Unauthorized to perform delete worker for user : " + username);
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
+        }
+    }
+
+    /**
+     * Delete an existing worker.
+     *
+     * @param id worker Id
+     * @return Response whether the worker is sucessfully deleted or not.
+     * @throws NotFoundException
+     */
+    @Override
+    public Response deleteManager(String id, String username) throws NotFoundException {
+
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                                                                                         MANAGER_PERMISSION_STRING));
+        if (isAuthorized) {
+            try {
+                dashboardStore.deleteManagerConfiguration(id);
+                return Response.ok()
+                        .entity(new ApiResponseMessage(ApiResponseMessage.OK, id + " Successfully deleted"))
+                        .build();
+            } catch (RDBMSTableException ex) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                        new ApiResponseMessage(ApiResponseMessage.ERROR, "Error occured while deleting the "
+                                + "manager" + "\n" + id + "\n" + ex.getMessage())).build();
             }
         } else {
             logger.error("Unauthorized to perform delete worker for user : " + username);

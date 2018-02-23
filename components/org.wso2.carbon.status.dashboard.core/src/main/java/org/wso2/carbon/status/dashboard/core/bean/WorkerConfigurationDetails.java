@@ -97,4 +97,8 @@ public class WorkerConfigurationDetails {
     public static String getColumnLabeles() {
         return "WORKERID,HOST,PORT";
     }
+
+    public static String getManagerColumnLabeles() {
+        return "MANAGERID,HOST,PORT";
+    }
 }

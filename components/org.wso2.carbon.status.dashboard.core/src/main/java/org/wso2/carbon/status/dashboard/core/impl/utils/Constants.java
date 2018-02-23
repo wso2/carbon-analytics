@@ -88,6 +88,19 @@ public class Constants {
     public static final String NEVER_REACHED = "Never Reached";
     public static final int DEFAULT_TIME_INTERVAL_MILLIS = 300000;
 
+
+    //todo: newly added
+    public static final String MANAGERID = "MANAGERID";
+    public static final String WORKERID = "WORKERID";
+    public static final String HOST = "HOST";
+    public static final String PORT = "PORT";
+    public static final String INTEGER_TYPE = "integerType";
+    public static final String STRING_TYPE = "stringType";
+    public static final String DOUBLE_TYPE = "doubleType";
+    public static final String LONG_TYPE = "longType";
+    public static final String FLOAT_TYPE = "floatType";
+    public static final String BOOL_TYPE = "booleanType";
+
     private Constants() {
         //preventing initialization
     }
