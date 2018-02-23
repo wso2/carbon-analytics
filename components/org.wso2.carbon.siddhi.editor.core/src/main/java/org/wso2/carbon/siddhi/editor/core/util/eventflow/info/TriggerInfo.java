@@ -18,17 +18,10 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
-public class TriggerInfo extends Info {
+public class TriggerInfo extends SiddhiElementInfo {
 
-    // Default Constructor
-    public TriggerInfo() {
-    }
-
-    // Constructor
     public TriggerInfo(String id, String name, String definition) {
-        setId(id);
-        setName(name);
-        setDefinition(definition);
+        super(id, name, definition);
     }
 
 }

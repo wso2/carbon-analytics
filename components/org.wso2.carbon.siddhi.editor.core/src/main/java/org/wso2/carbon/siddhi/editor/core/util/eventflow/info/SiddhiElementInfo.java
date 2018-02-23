@@ -18,14 +18,21 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
-public abstract class Info {
+public abstract class SiddhiElementInfo {
 
-    // Variables
     private String id;
     private String name;
     private String definition;
 
-    // Setters
+    SiddhiElementInfo() {
+    }
+
+    SiddhiElementInfo(String id, String name, String definition) {
+        this.id = id;
+        this.name = name;
+        this.definition = definition;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -38,7 +45,6 @@ public abstract class Info {
         this.definition = definition;
     }
 
-    // Getters
     public String getId() {
         return id;
     }

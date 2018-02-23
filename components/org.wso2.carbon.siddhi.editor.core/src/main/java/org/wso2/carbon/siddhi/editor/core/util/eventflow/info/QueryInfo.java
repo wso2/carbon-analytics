@@ -21,29 +21,12 @@ package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QueryInfo extends Info {
+public class QueryInfo extends SiddhiElementInfo {
 
-    // Variables
     private List<String> inputStreamIds = new ArrayList<>();
     private String outputStreamId;
     private List<String> functionIds = new ArrayList<>();
 
-    // Default Constructor
-    public QueryInfo() {
-    }
-
-    // Constructor
-    public QueryInfo(String id, String name, String definition, List<String> inputStreamIds, String outputStreamId,
-                     List<String> functionsUsed) {
-        setId(id);
-        setName(name);
-        setDefinition(definition);
-        setInputStreamIds(inputStreamIds);
-        setOutputStreamId(outputStreamId);
-        setFunctionIds(functionsUsed);
-    }
-
-    // Setters
     public void setInputStreamIds(List<String> inputStreamIds) {
         this.inputStreamIds = inputStreamIds;
     }
@@ -56,7 +39,6 @@ public class QueryInfo extends Info {
         this.functionIds = functionIds;
     }
 
-    // Getters
     public List<String> getInputStreamIds() {
         return inputStreamIds;
     }

@@ -51,7 +51,7 @@ import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.EventFlow;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.SiddhiAppInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.SiddhiAppMap;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
@@ -89,6 +89,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -847,6 +848,59 @@ public class EditorMicroservice implements Microservice {
     }
 
     /**
+     * Converts a given Siddhi App string to a specific JSON format for a graph that diagrammatically
+     * display's the Siddhi App, to be generated in the Editor design view.
+     *
+     * @param siddhiAppBase64 The Siddhi App (encoded to Base64) to be converted to JSON
+     * @return The JSON result in a predefined format
+     */
+    @POST
+    @Path("/event-flow")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response constructEventFlowJsonString(String siddhiAppBase64) {
+        Response response;
+
+        try {
+            String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64),
+                    Charset.defaultCharset());
+
+            SiddhiAppMap siddhiAppMap = new SiddhiAppMap(siddhiAppString);
+            EventFlow eventFlow = new EventFlow(siddhiAppMap);
+
+            response = Response.status(Response.Status.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(eventFlow.getEventFlowJSON().toString())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            // If an IllegalArgumentException occurs when converting 'siddhiAppBase64' to 'siddhiAppString'
+            response = Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("Invalid Media Type: must send a value of media type 'application/x-www-form-urlencoded'")
+                    .build();
+        } catch (Throwable e) {
+            // TODO: 2/22/18 change the status type to a more suitable one
+            // TODO: 2/22/18 comment on why this exception occurs
+            // TODO: 2/22/18 mention why Access-Control-Allow-Origin * is used
+            // Throwable is caught because in the SiddhiAppMap class a SiddhiAppRuntime instance is created,
+            // which could throw many different types of errors that the developer cannot predict.
+            if (e.getMessage() != null) {
+                response = Response.status(Response.Status.BAD_REQUEST)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(e.getMessage())
+                        .build();
+            } else {
+                response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity("Failed To Generate Graph")
+                        .build();
+            }
+        }
+
+        return response;
+    }
+
+    /**
      * This is the activation method of EditorMicroservice. This will be called when its references are
      * satisfied.
      *
@@ -865,40 +919,6 @@ public class EditorMicroservice implements Microservice {
 
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new DebuggerEventStreamService(), null);
-    }
-
-    /**
-     * Converts a given Siddhi App string to a specific JSON format for a graph that diagrammatically
-     * display's the Siddhi App, to be generated in the Editor design view.
-     *
-     * @param siddhiAppString The Siddhi App to be converted to JSON
-     * @return The JSON result in a predefined format
-     */
-    @POST
-    @Produces("application/json")
-    @Path("/event-flow")
-    public Response constructEventFlowJsonString(String siddhiAppString) {
-        Response response;
-
-        try {
-            String siddhiApp = new String(Base64.getDecoder().decode(siddhiAppString),
-                    Charset.defaultCharset());
-
-            SiddhiAppInfo siddhiAppInfo = new SiddhiAppInfo(siddhiApp);
-            EventFlow eventFlow = new EventFlow(siddhiAppInfo);
-
-            response = Response.status(Response.Status.OK)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(eventFlow.getEventFlowJSON().toString())
-                    .build();
-        } catch (Exception e) {
-            response = Response.status(Response.Status.BAD_REQUEST)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(e.getMessage())
-                    .build();
-        }
-
-        return response;
     }
 
     /**

@@ -41,6 +41,7 @@ import org.wso2.siddhi.query.api.definition.WindowDefinition;
 import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
 import org.wso2.siddhi.query.api.execution.partition.PartitionType;
+import org.wso2.siddhi.query.api.execution.partition.RangePartitionType;
 import org.wso2.siddhi.query.api.execution.partition.ValuePartitionType;
 import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
@@ -50,9 +51,12 @@ import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SiddhiAppInfo {
+/**
+ * Obtains a Siddhi App as a string and parses it to a SiddhiApp object to identify map the data in it.
+ */
+public class SiddhiAppMap {
 
-    private String siddhiAppStr;
+    private String siddhiAppString;
 
     private String appName;
     private String appDescription;
@@ -71,8 +75,8 @@ public class SiddhiAppInfo {
     private int numberOfValuePartitionTypes;
     private int numberOfRangePartitionTypes;
 
-    public SiddhiAppInfo(String siddhiAppStr) {
-        this.siddhiAppStr = siddhiAppStr;
+    public SiddhiAppMap(String siddhiAppString) throws ClassNotFoundException {
+        this.siddhiAppString = siddhiAppString;
         loadSiddhiAppInfo();
     }
 
@@ -80,75 +84,96 @@ public class SiddhiAppInfo {
      * The main method that is called from the constructor to obtain the
      * information of a Siddhi App from the SiddhiAppStr.
      */
-    private void loadSiddhiAppInfo() {
-        // Compile 'siddhiAppStr' To A SiddhiApp Object
-        SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppStr);
+    private void loadSiddhiAppInfo() throws ClassNotFoundException {
+        // Compile 'siddhiAppString' To A SiddhiApp Object
+        SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppString);
 
         // This is done to check for any runtime errors and to obtain all the streams.
-        SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiAppStr);
+        SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiAppString);
 
-        // Get The App Name And Description
-        for (Annotation annotation : siddhiApp.getAnnotations()) {
-            if (annotation.getName().equals("name")) {
-                appName = annotation.getElements().get(0).getValue();
-            } else if (annotation.getName().equals("description")) {
-                appDescription = annotation.getElements().get(0).getValue();
-            }
-        }
+        // todo refactor the loops with seperate methods
+        loadAppNameAndDescription(siddhiApp);
+        loadTriggers(siddhiApp);
+        loadStreams(siddhiAppRuntime);
+        loadTables(siddhiApp);
+        loadWindows(siddhiApp);
+        loadAggregations(siddhiApp);
+        loadFunctions(siddhiApp);
+        loadQueriesAndPartitions(siddhiApp);
+    }
 
-        // Get Trigger Info
-        for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
-            String triggerDefinitionStr = getDefinition(triggerDefinition);
-            triggers.add(new TriggerInfo(triggerDefinition.getId(), triggerDefinition.getId(), triggerDefinitionStr));
-        }
-
-        // Get Stream Info
-        // NOTE - This information is taken from the SiddhiAppRuntime class
-        for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
-            StreamInfo streamInfo = generateStreamInfo(streamDefinition);
-            if (streamInfo != null) {
-                streams.add(streamInfo);
-            }
-        }
-
-        // Get Table Info
-        for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
-            String tableDefinitionStr = getDefinition(tableDefinition);
-            tables.add(new TableInfo(tableDefinition.getId(), tableDefinition.getId(), tableDefinitionStr));
-        }
-
-        // Get Window Info
-        for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
-            String windowDefinitionStr = getDefinition(windowDefinition);
-            windows.add(new WindowInfo(windowDefinition.getId(), windowDefinition.getId(), windowDefinitionStr));
-        }
-
-        // Get Aggregation Info
-        for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
-            String aggregationDefinitionStr = getDefinition(aggregationDefinition);
-            aggregations.add(new AggregationInfo(aggregationDefinition.getId(), aggregationDefinition.getId(),
-                    aggregationDefinitionStr, aggregationDefinition.getBasicSingleInputStream().getStreamId()));
-        }
-
-        // Get Function Info
-        for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
-            String functionDefinitionStr = getDefinition(functionDefinition);
-            functions.add(new FunctionInfo(functionDefinition.getId(), functionDefinition.getId(),
-                    functionDefinitionStr));
-        }
-
-        // Get Query and Partition Info
+    private void loadQueriesAndPartitions(SiddhiApp siddhiApp) throws ClassNotFoundException {
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
                 Query query = (Query) executionElement;
                 QueryInfo queryInfo = generateQueryInfo(query);
                 queries.add(queryInfo);
                 numberOfQueries++;
-            } else {
+            } else if (executionElement instanceof Partition) {
                 Partition partition = (Partition) executionElement;
                 PartitionInfo partitionInfo = generatePartitionInfo(partition);
                 partitions.add(partitionInfo);
                 numberOfPartitions++;
+            } else {
+                // todo throw an error here
+                throw new ClassNotFoundException("");
+            }
+        }
+    }
+
+    private void loadFunctions(SiddhiApp siddhiApp) {
+        for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
+            String functionDefinitionStr = getDefinition(functionDefinition);
+            functions.add(new FunctionInfo(functionDefinition.getId(), functionDefinition.getId(),
+                    functionDefinitionStr));
+        }
+    }
+
+    private void loadAggregations(SiddhiApp siddhiApp) {
+        for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
+            String aggregationDefinitionStr = getDefinition(aggregationDefinition);
+            aggregations.add(new AggregationInfo(aggregationDefinition.getId(), aggregationDefinition.getId(),
+                    aggregationDefinitionStr, aggregationDefinition.getBasicSingleInputStream().getStreamId()));
+        }
+    }
+
+    private void loadWindows(SiddhiApp siddhiApp) {
+        for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
+            String windowDefinitionStr = getDefinition(windowDefinition);
+            windows.add(new WindowInfo(windowDefinition.getId(), windowDefinition.getId(), windowDefinitionStr));
+        }
+    }
+
+    private void loadTables(SiddhiApp siddhiApp) {
+        for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
+            String tableDefinitionStr = getDefinition(tableDefinition);
+            tables.add(new TableInfo(tableDefinition.getId(), tableDefinition.getId(), tableDefinitionStr));
+        }
+    }
+
+    private void loadStreams(SiddhiAppRuntime siddhiAppRuntime) {
+        for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
+            StreamInfo streamInfo = generateStreamInfo(streamDefinition);
+            if (streamInfo != null) {
+                streams.add(streamInfo);
+            }
+        }
+    }
+
+    private void loadTriggers(SiddhiApp siddhiApp) {
+        for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
+            String triggerDefinitionStr = getDefinition(triggerDefinition);
+            triggers.add(new TriggerInfo(triggerDefinition.getId(), triggerDefinition.getId(), triggerDefinitionStr));
+        }
+    }
+
+    private void loadAppNameAndDescription(SiddhiApp siddhiApp) {
+        for (Annotation annotation : siddhiApp.getAnnotations()) {
+            // todo NOTE - SIDDHI IS NOT CASE SENSITIVE, NEED TO change this
+            if (annotation.getName().equals("name")) {
+                appName = annotation.getElements().get(0).getValue();
+            } else if (annotation.getName().equals("description")) {
+                appDescription = annotation.getElements().get(0).getValue();
             }
         }
     }
@@ -202,6 +227,7 @@ public class SiddhiAppInfo {
         }
         // If Query Does Not Have A Name, Assign A Predefined Name To It
         if (queryInfo.getId() == null || queryInfo.getName() == null) {
+            // TODO: 2/22/18 this has to be fixed, generate unique query names instead of query0 query1 etc, same should be done for partitions
             queryInfo.setId("query" + Integer.toString(numberOfQueries));
             queryInfo.setName("Query");
         }
@@ -258,7 +284,7 @@ public class SiddhiAppInfo {
         // Set The Value And Range Partition Information
         for (PartitionType partitionType : partition.getPartitionTypeMap().values()) {
             PartitionTypeInfo partitionTypeInfo = generatePartitionTypeInfo(partitionType);
-            // Add This Partition Type Information To The Partition Info
+            // Add This Partition Type Information To The Partition SiddhiElementInfo
             partitionInfo.addPartitionType(partitionTypeInfo);
         }
 
@@ -279,11 +305,13 @@ public class SiddhiAppInfo {
             partitionTypeInfo.setId("valuePartition" + Integer.toString(numberOfValuePartitionTypes));
             partitionTypeInfo.setName("Value Partition");
             numberOfValuePartitionTypes++;
-        } else {
+        } else if (partitionType instanceof RangePartitionType) {
             // Set A Predefined Name & Id For The RangePartition
             partitionTypeInfo.setId("rangePartition" + Integer.toString(numberOfRangePartitionTypes));
             partitionTypeInfo.setName("Range Partition");
             numberOfRangePartitionTypes++;
+        } else {
+            // todo throw error here
         }
 
         String partitionTypeDefinition = getDefinition(partitionType);
@@ -323,7 +351,7 @@ public class SiddhiAppInfo {
     }
 
     /**
-     * Obtains the piece of the code from the siddhiAppStr variable where the given SiddhiElement object is defined.
+     * Obtains the piece of the code from the siddhiAppString variable where the given SiddhiElement object is defined.
      *
      * @param siddhiElement The SiddhiElement object where the definition needs to be obtained from
      * @return The definition of the given SiddhiElement object as a String
@@ -335,28 +363,28 @@ public class SiddhiAppInfo {
         int startLinePosition = ordinalIndexOf(startIndex[0]);
         int endLinePosition = ordinalIndexOf(endIndex[0]);
 
-        return siddhiAppStr.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1])
+        return siddhiAppString.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1])
                 .replaceAll("'", "\"");
     }
 
     /**
-     * Gets the relative position in the siddhiAppStr of the start of the given line number.
+     * Gets the relative position in the siddhiAppString of the start of the given line number.
      *
      * @param lineNumber The line number in which the relative start position should be obtained
-     * @return The relative position of where the given line starts in the siddhiAppStr
+     * @return The relative position of where the given line starts in the siddhiAppString
      */
     private int ordinalIndexOf(int lineNumber) {
         int position = 0;
+        // TODO: 2/22/18 replace while true with a definite value in the while loop
         while (true) {
             lineNumber--;
             if (lineNumber <= 0) {
                 return position;
             }
-            position = siddhiAppStr.indexOf('\n', position) + 1;
+            position = siddhiAppString.indexOf('\n', position) + 1;
         }
     }
 
-    // Getters
     public String getAppName() {
         return appName;
     }

@@ -57,13 +57,16 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     type: "POST",
                     url: self.url,
                     data: window.btoa(code),
+                    // todo make async and handle loading issues
                     async: false,
                     success: function (response) {
                         result = {status: "success", responseJSON: response};
+                        log.info(response);
                     },
                     error: function (error) {
                         if (error.status === 400) {
                             result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                            // todo find a way to log this in the editor console
                             log.info(error.responseText);
                         } else {
                             result = {status: "fail", errorMessage: "Internal Error Occurred"};
@@ -101,6 +104,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
                     if (value.type === "partition") {
                         html = "<div class='partition' title='" + value.description + "'>" + value.name + "</div>";
+                        // todo specify these values as fixed values in a seperate file
                         node = {
                             label: html,
                             labelType: "html",
@@ -187,6 +191,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 var graphId = "#" + self.$siddhiGraph.attr("id");
                 render(d3.select(graphId + " g"), graph);
 
+                // todo add this in a seperate function
                 var svg = self.$siddhiGraph;
                 var inner = svg.find('g');
 
@@ -221,6 +226,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
          * Clears the design view of all it's contents when called.
          */
         EventFlow.prototype.clear = function () {
+            // todo if the app has not been changed, then no need to re-render
             this.$siddhiGraph.empty();
             this.$siddhiGraph.html('<g></g>');
         };
