@@ -59,6 +59,7 @@ import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
+import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 
 import java.io.File;
@@ -389,7 +390,7 @@ public class EditorMicroservice implements Microservice {
             }
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            java.nio.file.Path filePath =  SecurityUtil.resolvePath(
+            java.nio.file.Path filePath = SecurityUtil.resolvePath(
                     Paths.get(location).toAbsolutePath(),
                     Paths.get(new String(base64ConfigName, Charset.defaultCharset())));
             Files.write(filePath, base64Config);
@@ -521,7 +522,7 @@ public class EditorMicroservice implements Microservice {
             errorMap.put("Error", "File access denied. You don't have enough permission to access");
             return Response.serverError().entity(errorMap)
                     .build();
-        }catch (IOException e) {
+        } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
@@ -533,7 +534,7 @@ public class EditorMicroservice implements Microservice {
     @DELETE
     @Path("/workspace/delete")
     @Produces("application/json")
-    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName,@QueryParam("relativePath") String
+    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName, @QueryParam("relativePath") String
             relativePath) {
         try {
             java.nio.file.Path location = SecurityUtil.
@@ -878,23 +879,16 @@ public class EditorMicroservice implements Microservice {
                     .header("Access-Control-Allow-Origin", "*")
                     .entity("Invalid Media Type: must send a value of media type 'application/x-www-form-urlencoded'")
                     .build();
-        } catch (Throwable e) {
+        } catch (SiddhiAppCreationException e) {
             // TODO: 2/22/18 change the status type to a more suitable one
             // TODO: 2/22/18 comment on why this exception occurs
             // TODO: 2/22/18 mention why Access-Control-Allow-Origin * is used
-            // Throwable is caught because in the SiddhiAppMap class a SiddhiAppRuntime instance is created,
+            // SiddhiAppCreationException is caught because in the SiddhiAppMap class a SiddhiAppRuntime instance is created,
             // which could throw many different types of errors that the developer cannot predict.
-            if (e.getMessage() != null) {
-                response = Response.status(Response.Status.BAD_REQUEST)
-                        .header("Access-Control-Allow-Origin", "*")
-                        .entity(e.getMessage())
-                        .build();
-            } else {
-                response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .header("Access-Control-Allow-Origin", "*")
-                        .entity("Failed To Generate Graph")
-                        .build();
-            }
+            response = Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
         }
 
         return response;

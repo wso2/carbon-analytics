@@ -156,7 +156,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 data.edges.forEach(function (value) {
                     var edge = {arrowheadStyle: "fill: #bbb"};
 
-                    if (value.type === "arrow") {
+                    if (value.type === "default") {
                         // This makes the lines curve
                         edge.lineInterpolate = "basis";
                     } else if (value.type === "dotted-line") {

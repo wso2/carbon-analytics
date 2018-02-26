@@ -104,7 +104,6 @@ public class EventFlow {
 
         // Set Query Nodes
         for (QueryInfo query : siddhiAppMap.getQueries()) {
-//            createQueryNode(query);
             createNode(NodeType.QUERY, query.getId(), query.getName(), query.getDefinition());
         }
 
@@ -114,7 +113,6 @@ public class EventFlow {
 
             // Create Nodes For The Queries Inside The Partition
             for (QueryInfo query : partition.getQueries()) {
-//                createQueryNode(query);
                 createNode(NodeType.QUERY, query.getId(), query.getName(), query.getDefinition());
             }
 
@@ -146,32 +144,6 @@ public class EventFlow {
 
         nodes.put(jsonObject);
     }
-
-    /**
-     * Creates a JSONObject(s) that defines a query node, as the logic to create a query node
-     * is a bit different from the `createNode()` method.
-     *
-     * @param queryInfo The object that defines the Siddhi query in which the node(s) is to be created from
-     */
-//    private void createQueryNode(QueryInfo queryInfo) {
-//        // Finds Out If The Output Stream Of The Query Is Defined As A Node Or Not
-//        boolean isOutputQueryDefined = false;
-//        for (int i = 0; i < nodes.length(); i++) {
-//            if (nodes.getJSONObject(i).get("id").equals(queryInfo.getOutputStreamId())) {
-//                isOutputQueryDefined = true;
-//                break;
-//            }
-//        }
-//        // If The Query's OutputStream Node Is Not Defined
-//        if (!isOutputQueryDefined) {
-//            // Create The New OutputStream Node
-//            createNode(NodeType.STREAM, queryInfo.getOutputStreamId(), queryInfo.getOutputStreamId(),
-//                    "undefined");
-//        }
-//
-//        // Create The Actual Query Node
-//        createNode(NodeType.QUERY, queryInfo.getId(), queryInfo.getName(), queryInfo.getDefinition());
-//    }
 
     /**
      * Calls all the relevant functions to create the edge JSONObjects

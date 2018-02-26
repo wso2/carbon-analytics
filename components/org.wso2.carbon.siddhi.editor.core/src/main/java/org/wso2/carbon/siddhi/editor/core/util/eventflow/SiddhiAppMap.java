@@ -34,7 +34,13 @@ import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.SiddhiElement;
 import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.*;
+import org.wso2.siddhi.query.api.definition.AbstractDefinition;
+import org.wso2.siddhi.query.api.definition.AggregationDefinition;
+import org.wso2.siddhi.query.api.definition.FunctionDefinition;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import org.wso2.siddhi.query.api.definition.TableDefinition;
+import org.wso2.siddhi.query.api.definition.TriggerDefinition;
+import org.wso2.siddhi.query.api.definition.WindowDefinition;
 import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
 import org.wso2.siddhi.query.api.execution.partition.PartitionType;
@@ -70,11 +76,6 @@ public class SiddhiAppMap {
     private List<FunctionInfo> functions = new ArrayList<>();
     private List<QueryInfo> queries = new ArrayList<>();
     private List<PartitionInfo> partitions = new ArrayList<>();
-
-    private int numberOfQueries;
-    private int numberOfPartitions;
-    private int numberOfValuePartitionTypes;
-    private int numberOfRangePartitionTypes;
 
     public SiddhiAppMap(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
@@ -112,14 +113,11 @@ public class SiddhiAppMap {
                 Query query = (Query) executionElement;
                 QueryInfo queryInfo = generateQueryInfo(query);
                 queries.add(queryInfo);
-                numberOfQueries++;
             } else if (executionElement instanceof Partition) {
                 Partition partition = (Partition) executionElement;
                 PartitionInfo partitionInfo = generatePartitionInfo(partition);
                 partitions.add(partitionInfo);
-                numberOfPartitions++;
             } else {
-                // todo throw an error here
                 throw new ClassNotFoundException("An unidentified instance of the ExecutionElement Class was found");
             }
         }
@@ -172,7 +170,6 @@ public class SiddhiAppMap {
                         streams.add(streamInfo);
                     }
                 } else {
-                    // todo throw a suitable error here
                     throw new ClassNotFoundException("The partitioned inner stream definition map" +
                             " can only have instances of class type 'StreamDefinition'");
                 }
@@ -189,7 +186,6 @@ public class SiddhiAppMap {
 
     private void loadAppNameAndDescription() {
         for (Annotation annotation : siddhiApp.getAnnotations()) {
-            // todo NOTE - SIDDHI IS NOT CASE SENSITIVE, NEED TO change this
             if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.NAME.getTypeAsString())) {
                 appName = annotation.getElements().get(0).getValue();
             } else if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.DESCRIPTION.getTypeAsString())) {
@@ -247,8 +243,6 @@ public class SiddhiAppMap {
         }
         // If Query Does Not Have A Name, Assign A Predefined Name To It
         if (queryInfo.getId() == null || queryInfo.getName() == null) {
-            // TODO: 2/22/18 this has to be fixed, generate unique query names instead of query0 query1 etc, same should be done for partitions
-//            queryInfo.setId("query" + Integer.toString(numberOfQueries));
             queryInfo.setId(UUID.randomUUID().toString());
             queryInfo.setName("Query");
         }
@@ -287,8 +281,6 @@ public class SiddhiAppMap {
         }
         // If The Partition Does Not Have A Name, Assign A Predefined Name To It
         if (partitionInfo.getId() == null || partitionInfo.getName() == null) {
-            // TODO: 2/22/18 this has to be fixed, generate unique query names instead of query0 query1 etc, same should be done for partitions
-//            partitionInfo.setId("partition" + Integer.toString(numberOfPartitions));
             partitionInfo.setId(UUID.randomUUID().toString());
             partitionInfo.setName("Partition");
         }
@@ -301,7 +293,6 @@ public class SiddhiAppMap {
         for (Query query : partition.getQueryList()) {
             QueryInfo queryInfo = generateQueryInfo(query);
             partitionInfo.addQuery(queryInfo);
-            numberOfQueries++;
         }
 
         // Set The Value And Range Partition Information
@@ -325,18 +316,13 @@ public class SiddhiAppMap {
 
         if (partitionType instanceof ValuePartitionType) {
             //Set A Predefined Name & Id For This Value Partition
-//            partitionTypeInfo.setId("valuePartition" + Integer.toString(numberOfValuePartitionTypes));
             partitionTypeInfo.setId(UUID.randomUUID().toString());
             partitionTypeInfo.setName("Value Partition");
-            numberOfValuePartitionTypes++;
         } else if (partitionType instanceof RangePartitionType) {
             // Set A Predefined Name & Id For The RangePartition
-//            partitionTypeInfo.setId("rangePartition" + Integer.toString(numberOfRangePartitionTypes));
             partitionTypeInfo.setId(UUID.randomUUID().toString());
             partitionTypeInfo.setName("Range Partition");
-            numberOfRangePartitionTypes++;
         } else {
-            // todo throw error here
             throw new ClassNotFoundException("An unidentified instance of the PartitionType Class was found");
         }
 
@@ -402,13 +388,14 @@ public class SiddhiAppMap {
     private int ordinalIndexOf(int lineNumber) {
         int position = 0;
         // TODO: 2/22/18 replace while true with a definite value in the while loop
-        while (true) {
+        while (lineNumber >= 0) {
             lineNumber--;
             if (lineNumber <= 0) {
-                return position;
+                break;
             }
             position = siddhiAppString.indexOf('\n', position) + 1;
         }
+        return position;
     }
 
     public String getAppName() {
