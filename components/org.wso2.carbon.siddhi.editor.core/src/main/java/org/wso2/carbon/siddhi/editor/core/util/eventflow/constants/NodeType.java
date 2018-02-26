@@ -11,9 +11,14 @@ public enum NodeType {
     TRIGGER("trigger"),
     WINDOW("window");
 
-    private String constant;
+    private String type;
 
-    NodeType(String constant) {
-        this.constant = constant;
+    NodeType(String type) {
+        this.type = type;
     }
+
+    public String getTypeAsString() {
+        return type;
+    }
+
 }

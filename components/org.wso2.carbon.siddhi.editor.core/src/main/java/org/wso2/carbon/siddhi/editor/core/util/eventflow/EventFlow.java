@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.eventflow;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.constants.EdgeType;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.constants.NodeType;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.AggregationInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.FunctionInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionInfo;
@@ -51,7 +52,6 @@ public class EventFlow {
 
     public EventFlow(SiddhiAppMap siddhiAppMap) {
         this.siddhiAppMap = siddhiAppMap;
-        // todo this should be called on demand
         setEventFlowJSON();
     }
 
@@ -74,51 +74,53 @@ public class EventFlow {
     private void setNodes() {
         // Set Trigger Nodes
         for (TriggerInfo trigger : siddhiAppMap.getTriggers()) {
-            createNode("trigger", trigger.getId(), trigger.getName(), trigger.getDefinition());
+            createNode(NodeType.TRIGGER, trigger.getId(), trigger.getName(), trigger.getDefinition());
         }
 
         // Set Stream Nodes
         for (StreamInfo stream : siddhiAppMap.getStreams()) {
-            createNode("stream", stream.getId(), stream.getName(), stream.getDefinition());
+            createNode(NodeType.STREAM, stream.getId(), stream.getName(), stream.getDefinition());
         }
 
         // Set Table Nodes
         for (TableInfo table : siddhiAppMap.getTables()) {
-            createNode("table", table.getId(), table.getName(), table.getDefinition());
+            createNode(NodeType.TABLE, table.getId(), table.getName(), table.getDefinition());
         }
 
         // Set Window Nodes
         for (WindowInfo window : siddhiAppMap.getWindows()) {
-            createNode("window", window.getId(), window.getName(), window.getDefinition());
+            createNode(NodeType.WINDOW, window.getId(), window.getName(), window.getDefinition());
         }
 
         // Set Aggregation Nodes
         for (AggregationInfo aggregation : siddhiAppMap.getAggregations()) {
-            createNode("aggregation", aggregation.getId(), aggregation.getName(), aggregation.getDefinition());
+            createNode(NodeType.AGGREGATION, aggregation.getId(), aggregation.getName(), aggregation.getDefinition());
         }
 
         // Set Function Nodes
         for (FunctionInfo function : siddhiAppMap.getFunctions()) {
-            createNode("function", function.getId(), function.getName(), function.getDefinition());
+            createNode(NodeType.FUNCTION, function.getId(), function.getName(), function.getDefinition());
         }
 
         // Set Query Nodes
         for (QueryInfo query : siddhiAppMap.getQueries()) {
-            createQueryNode(query);
+//            createQueryNode(query);
+            createNode(NodeType.QUERY, query.getId(), query.getName(), query.getDefinition());
         }
 
         // Set Partition, It's Query & PartitionType Nodes
         for (PartitionInfo partition : siddhiAppMap.getPartitions()) {
-            createNode("partition", partition.getId(), partition.getName(), partition.getDefinition());
+            createNode(NodeType.PARTITION, partition.getId(), partition.getName(), partition.getDefinition());
 
             // Create Nodes For The Queries Inside The Partition
             for (QueryInfo query : partition.getQueries()) {
-                createQueryNode(query);
+//                createQueryNode(query);
+                createNode(NodeType.QUERY, query.getId(), query.getName(), query.getDefinition());
             }
 
             // Create Nodes For The Range & Value Partition Types Inside The Partition
             for (PartitionTypeInfo partitionType : partition.getPartitionTypes()) {
-                createNode("partitionType", partitionType.getId(), partitionType.getName(),
+                createNode(NodeType.PARTITION_TYPE, partitionType.getId(), partitionType.getName(),
                         partitionType.getDefinition());
             }
         }
@@ -135,9 +137,9 @@ public class EventFlow {
      * @param name        The name of the node (not always unique - this is the name that will be displayed in the UI)
      * @param description A piece of the Siddhi code where the node (stream, table etc.) is defined
      */
-    private void createNode(String type, String id, String name, String description) {
+    private void createNode(NodeType type, String id, String name, String description) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", type);
+        jsonObject.put("type", type.getTypeAsString());
         jsonObject.put("id", id);
         jsonObject.put("name", name);
         jsonObject.put("description", description);
@@ -151,25 +153,25 @@ public class EventFlow {
      *
      * @param queryInfo The object that defines the Siddhi query in which the node(s) is to be created from
      */
-    private void createQueryNode(QueryInfo queryInfo) {
-        // Finds Out If The Output Stream Of The Query Is Defined As A Node Or Not
-        boolean isOutputQueryDefined = false;
-        for (int i = 0; i < nodes.length(); i++) {
-            if (nodes.getJSONObject(i).get("id").equals(queryInfo.getOutputStreamId())) {
-                isOutputQueryDefined = true;
-                break;
-            }
-        }
-        // If The Query's OutputStream Node Is Not Defined
-        if (!isOutputQueryDefined) {
-            // Create The New OutputStream Node
-            createNode("stream", queryInfo.getOutputStreamId(), queryInfo.getOutputStreamId(),
-                    "undefined");
-        }
-
-        // Create The Actual Query Node
-        createNode("query", queryInfo.getId(), queryInfo.getName(), queryInfo.getDefinition());
-    }
+//    private void createQueryNode(QueryInfo queryInfo) {
+//        // Finds Out If The Output Stream Of The Query Is Defined As A Node Or Not
+//        boolean isOutputQueryDefined = false;
+//        for (int i = 0; i < nodes.length(); i++) {
+//            if (nodes.getJSONObject(i).get("id").equals(queryInfo.getOutputStreamId())) {
+//                isOutputQueryDefined = true;
+//                break;
+//            }
+//        }
+//        // If The Query's OutputStream Node Is Not Defined
+//        if (!isOutputQueryDefined) {
+//            // Create The New OutputStream Node
+//            createNode(NodeType.STREAM, queryInfo.getOutputStreamId(), queryInfo.getOutputStreamId(),
+//                    "undefined");
+//        }
+//
+//        // Create The Actual Query Node
+//        createNode(NodeType.QUERY, queryInfo.getId(), queryInfo.getName(), queryInfo.getDefinition());
+//    }
 
     /**
      * Calls all the relevant functions to create the edge JSONObjects
@@ -287,7 +289,7 @@ public class EventFlow {
      */
     private void createEdge(EdgeType edgeType, String parent, String child) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", edgeType.getType());
+        jsonObject.put("type", edgeType.getTypeAsString());
         jsonObject.put("parent", parent);
         jsonObject.put("child", child);
 

@@ -135,7 +135,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             case "query":
                                 html = html + "<span class='indicator query-colour'></span>";
                                 break;
-                            case "partitionType":
+                            case "partition-type":
                                 html = html + "<span class='indicator partitionType-colour'></span>";
                                 break;
                         }

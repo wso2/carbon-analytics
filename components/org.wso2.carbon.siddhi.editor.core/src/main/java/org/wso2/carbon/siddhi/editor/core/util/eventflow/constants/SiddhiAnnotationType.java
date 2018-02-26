@@ -5,9 +5,14 @@ public enum SiddhiAnnotationType {
     INFO("info"),
     NAME("name");
 
-    private String constant;
+    private String type;
 
-    SiddhiAnnotationType(String constant) {
-        this.constant = constant;
+    SiddhiAnnotationType(String type) {
+        this.type = type;
     }
+
+    public String getTypeAsString() {
+        return type;
+    }
+
 }

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow;
 
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.constants.SiddhiAnnotationType;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.AggregationInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.FunctionInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionInfo;
@@ -29,15 +30,11 @@ import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TriggerInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.WindowInfo;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.SiddhiElement;
 import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.AggregationDefinition;
-import org.wso2.siddhi.query.api.definition.FunctionDefinition;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
-import org.wso2.siddhi.query.api.definition.TableDefinition;
-import org.wso2.siddhi.query.api.definition.TriggerDefinition;
-import org.wso2.siddhi.query.api.definition.WindowDefinition;
+import org.wso2.siddhi.query.api.definition.*;
 import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
 import org.wso2.siddhi.query.api.execution.partition.PartitionType;
@@ -50,6 +47,8 @@ import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Obtains a Siddhi App as a string and parses it to a SiddhiApp object to identify map the data in it.
@@ -57,6 +56,8 @@ import java.util.List;
 public class SiddhiAppMap {
 
     private String siddhiAppString;
+    private SiddhiApp siddhiApp;
+    private SiddhiAppRuntime siddhiAppRuntime;
 
     private String appName;
     private String appDescription;
@@ -75,7 +76,7 @@ public class SiddhiAppMap {
     private int numberOfValuePartitionTypes;
     private int numberOfRangePartitionTypes;
 
-    public SiddhiAppMap(String siddhiAppString) throws ClassNotFoundException {
+    public SiddhiAppMap(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
         loadSiddhiAppInfo();
     }
@@ -84,25 +85,28 @@ public class SiddhiAppMap {
      * The main method that is called from the constructor to obtain the
      * information of a Siddhi App from the SiddhiAppStr.
      */
-    private void loadSiddhiAppInfo() throws ClassNotFoundException {
-        // Compile 'siddhiAppString' To A SiddhiApp Object
-        SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppString);
+    private void loadSiddhiAppInfo() {
+        try {
+            // Compile 'siddhiAppString' To A SiddhiApp Object
+            siddhiApp = SiddhiCompiler.parse(siddhiAppString);
+            // This is done to check for any runtime errors and to obtain all the streams.
+            siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiAppString);
 
-        // This is done to check for any runtime errors and to obtain all the streams.
-        SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiAppString);
+            loadAppNameAndDescription();
+            loadTriggers();
+            loadStreams();
+            loadTables();
+            loadWindows();
+            loadAggregations();
+            loadFunctions();
+            loadQueriesAndPartitions();
 
-        // todo refactor the loops with seperate methods
-        loadAppNameAndDescription(siddhiApp);
-        loadTriggers(siddhiApp);
-        loadStreams(siddhiAppRuntime);
-        loadTables(siddhiApp);
-        loadWindows(siddhiApp);
-        loadAggregations(siddhiApp);
-        loadFunctions(siddhiApp);
-        loadQueriesAndPartitions(siddhiApp);
+        } catch (Throwable e) {
+            throw new SiddhiAppCreationException(e.getMessage());
+        }
     }
 
-    private void loadQueriesAndPartitions(SiddhiApp siddhiApp) throws ClassNotFoundException {
+    private void loadQueriesAndPartitions() throws ClassNotFoundException {
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
                 Query query = (Query) executionElement;
@@ -116,12 +120,12 @@ public class SiddhiAppMap {
                 numberOfPartitions++;
             } else {
                 // todo throw an error here
-                throw new ClassNotFoundException("");
+                throw new ClassNotFoundException("An unidentified instance of the ExecutionElement Class was found");
             }
         }
     }
 
-    private void loadFunctions(SiddhiApp siddhiApp) {
+    private void loadFunctions() {
         for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
             String functionDefinitionStr = getDefinition(functionDefinition);
             functions.add(new FunctionInfo(functionDefinition.getId(), functionDefinition.getId(),
@@ -129,7 +133,7 @@ public class SiddhiAppMap {
         }
     }
 
-    private void loadAggregations(SiddhiApp siddhiApp) {
+    private void loadAggregations() {
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
             String aggregationDefinitionStr = getDefinition(aggregationDefinition);
             aggregations.add(new AggregationInfo(aggregationDefinition.getId(), aggregationDefinition.getId(),
@@ -137,42 +141,58 @@ public class SiddhiAppMap {
         }
     }
 
-    private void loadWindows(SiddhiApp siddhiApp) {
+    private void loadWindows() {
         for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
             String windowDefinitionStr = getDefinition(windowDefinition);
             windows.add(new WindowInfo(windowDefinition.getId(), windowDefinition.getId(), windowDefinitionStr));
         }
     }
 
-    private void loadTables(SiddhiApp siddhiApp) {
+    private void loadTables() {
         for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
             String tableDefinitionStr = getDefinition(tableDefinition);
             tables.add(new TableInfo(tableDefinition.getId(), tableDefinition.getId(), tableDefinitionStr));
         }
     }
 
-    private void loadStreams(SiddhiAppRuntime siddhiAppRuntime) {
+    private void loadStreams() throws ClassNotFoundException {
         for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
             StreamInfo streamInfo = generateStreamInfo(streamDefinition);
             if (streamInfo != null) {
                 streams.add(streamInfo);
             }
         }
+
+        for (Map<String, AbstractDefinition> map : siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
+            for (AbstractDefinition abstractDefinition : map.values()) {
+                if (abstractDefinition instanceof StreamDefinition) {
+                    StreamDefinition streamDefinition = (StreamDefinition) abstractDefinition;
+                    StreamInfo streamInfo = generateStreamInfo(streamDefinition);
+                    if (streamInfo != null) {
+                        streams.add(streamInfo);
+                    }
+                } else {
+                    // todo throw a suitable error here
+                    throw new ClassNotFoundException("The partitioned inner stream definition map" +
+                            " can only have instances of class type 'StreamDefinition'");
+                }
+            }
+        }
     }
 
-    private void loadTriggers(SiddhiApp siddhiApp) {
+    private void loadTriggers() {
         for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
             String triggerDefinitionStr = getDefinition(triggerDefinition);
             triggers.add(new TriggerInfo(triggerDefinition.getId(), triggerDefinition.getId(), triggerDefinitionStr));
         }
     }
 
-    private void loadAppNameAndDescription(SiddhiApp siddhiApp) {
+    private void loadAppNameAndDescription() {
         for (Annotation annotation : siddhiApp.getAnnotations()) {
             // todo NOTE - SIDDHI IS NOT CASE SENSITIVE, NEED TO change this
-            if (annotation.getName().equals("name")) {
+            if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.NAME.getTypeAsString())) {
                 appName = annotation.getElements().get(0).getValue();
-            } else if (annotation.getName().equals("description")) {
+            } else if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.DESCRIPTION.getTypeAsString())) {
                 appDescription = annotation.getElements().get(0).getValue();
             }
         }
@@ -219,16 +239,17 @@ public class SiddhiAppMap {
 
         // Set The Name Of The Query
         for (Annotation annotation : query.getAnnotations()) {
-            if (annotation.getName().equals("info")) {
-                queryInfo.setId(annotation.getElement("name"));
-                queryInfo.setName(annotation.getElement("name"));
+            if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.INFO.getTypeAsString())) {
+                queryInfo.setId(annotation.getElement(SiddhiAnnotationType.NAME.getTypeAsString()));
+                queryInfo.setName(annotation.getElement(SiddhiAnnotationType.NAME.getTypeAsString()));
                 break;
             }
         }
         // If Query Does Not Have A Name, Assign A Predefined Name To It
         if (queryInfo.getId() == null || queryInfo.getName() == null) {
             // TODO: 2/22/18 this has to be fixed, generate unique query names instead of query0 query1 etc, same should be done for partitions
-            queryInfo.setId("query" + Integer.toString(numberOfQueries));
+//            queryInfo.setId("query" + Integer.toString(numberOfQueries));
+            queryInfo.setId(UUID.randomUUID().toString());
             queryInfo.setName("Query");
         }
 
@@ -252,21 +273,23 @@ public class SiddhiAppMap {
      * @param partition The given Siddhi Partition object
      * @return The created PartitionInfo object
      */
-    private PartitionInfo generatePartitionInfo(Partition partition) {
+    private PartitionInfo generatePartitionInfo(Partition partition) throws ClassNotFoundException {
         // Create Partition If ExecutionElement Is An Instance Of Partition
         PartitionInfo partitionInfo = new PartitionInfo();
 
         // Get The Name Of The Partition
         for (Annotation annotation : partition.getAnnotations()) {
-            if (annotation.getName().equals("info")) {
-                partitionInfo.setId(annotation.getElement("name"));
-                partitionInfo.setName(annotation.getElement("name"));
+            if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.INFO.getTypeAsString())) {
+                partitionInfo.setId(annotation.getElement(SiddhiAnnotationType.NAME.getTypeAsString()));
+                partitionInfo.setName(annotation.getElement(SiddhiAnnotationType.NAME.getTypeAsString()));
                 break;
             }
         }
         // If The Partition Does Not Have A Name, Assign A Predefined Name To It
         if (partitionInfo.getId() == null || partitionInfo.getName() == null) {
-            partitionInfo.setId("partition" + Integer.toString(numberOfPartitions));
+            // TODO: 2/22/18 this has to be fixed, generate unique query names instead of query0 query1 etc, same should be done for partitions
+//            partitionInfo.setId("partition" + Integer.toString(numberOfPartitions));
+            partitionInfo.setId(UUID.randomUUID().toString());
             partitionInfo.setName("Partition");
         }
 
@@ -297,21 +320,24 @@ public class SiddhiAppMap {
      * @param partitionType The given Siddhi PartitionType object
      * @return The created PartitionTypeInfo object
      */
-    private PartitionTypeInfo generatePartitionTypeInfo(PartitionType partitionType) {
+    private PartitionTypeInfo generatePartitionTypeInfo(PartitionType partitionType) throws ClassNotFoundException {
         PartitionTypeInfo partitionTypeInfo = new PartitionTypeInfo();
 
         if (partitionType instanceof ValuePartitionType) {
             //Set A Predefined Name & Id For This Value Partition
-            partitionTypeInfo.setId("valuePartition" + Integer.toString(numberOfValuePartitionTypes));
+//            partitionTypeInfo.setId("valuePartition" + Integer.toString(numberOfValuePartitionTypes));
+            partitionTypeInfo.setId(UUID.randomUUID().toString());
             partitionTypeInfo.setName("Value Partition");
             numberOfValuePartitionTypes++;
         } else if (partitionType instanceof RangePartitionType) {
             // Set A Predefined Name & Id For The RangePartition
-            partitionTypeInfo.setId("rangePartition" + Integer.toString(numberOfRangePartitionTypes));
+//            partitionTypeInfo.setId("rangePartition" + Integer.toString(numberOfRangePartitionTypes));
+            partitionTypeInfo.setId(UUID.randomUUID().toString());
             partitionTypeInfo.setName("Range Partition");
             numberOfRangePartitionTypes++;
         } else {
             // todo throw error here
+            throw new ClassNotFoundException("An unidentified instance of the PartitionType Class was found");
         }
 
         String partitionTypeDefinition = getDefinition(partitionType);
