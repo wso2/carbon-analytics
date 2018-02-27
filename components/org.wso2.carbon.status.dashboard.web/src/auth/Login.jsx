@@ -39,6 +39,9 @@ const buttonStyle = {marginLeft: '35%', width: '40%'};
 const styles = {
     messageBox: {textAlign: 'center', color: 'white'},
     errorMessage: {backgroundColor: '#333333', color: 'white', border: '2px solid #e74c3c'},
+    cookiePolicy: {padding: '10px', backgroundColor: '#fcf8e3', fontFamily: muiTheme.fontFamily,
+        border: '1px solid #faebcc', color: '#8a6d3b'},
+    cookiePolicyAnchor: {fontWeight: 'bold', color: '#8a6d3b'}
 };
 
 /**
@@ -177,6 +180,33 @@ export default class Login extends Component {
                             backgroundColor='#f17b31'
                             disabledBackgroundColor="rgb(51, 51, 51)"
                         />
+                        <br />
+                        <br />
+                        <div style={styles.cookiePolicy}>
+                            <div>
+                                After a successful sign in, we use a cookie in your browser to track your session.&nbsp;
+                                You can refer our&nbsp;
+                                <a
+                                    style={styles.cookiePolicyAnchor}
+                                    href="/privacy-policy/cookie-policy"
+                                    target="_blank"
+                                >
+                                    Cookie Policy
+                                </a> for more details.
+                            </div>
+                        </div>
+                        <br />
+                        <div style={styles.cookiePolicy}>
+                            <div>
+                                By signing in, you agree to our&nbsp;
+                                <a
+                                    style={styles.cookiePolicyAnchor}
+                                    href="/privacy-policy/privacy-policy"
+                                    target="_blank">
+                                    Privacy Policy
+                                </a>.
+                            </div>
+                        </div>
                     </FormPanel>
                     <Snackbar
                         message={this.state.error}

@@ -45,6 +45,12 @@ const theme = createMuiTheme({
  */
 const appContext = window.contextPath;
 
+const styles = {
+    cookiePolicy: {padding: '10px', backgroundColor: '#fcf8e3', border: '1px solid #faebcc', color: '#8a6d3b',
+        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'},
+    cookiePolicyAnchor: {fontWeight: 'bold', color: '#8a6d3b'}
+};
+
 /**
  * Login page.
  */
@@ -188,6 +194,33 @@ export default class Login extends React.Component {
                         >
                             Login
                         </Button>
+                        <br />
+                        <br />
+                        <div style={styles.cookiePolicy}>
+                            <div>
+                                After a successful sign in, we use a cookie in your browser to track your session.&nbsp;
+                                You can refer our&nbsp;
+                                <a
+                                    style={styles.cookiePolicyAnchor}
+                                    href="/privacy-policy/cookie-policy"
+                                    target="_blank"
+                                >
+                                    Cookie Policy
+                                </a> for more details.
+                            </div>
+                        </div>
+                        <br />
+                        <div style={styles.cookiePolicy}>
+                            <div>
+                                By signing in, you agree to our&nbsp;
+                                <a
+                                    style={styles.cookiePolicyAnchor}
+                                    href="/privacy-policy/privacy-policy"
+                                    target="_blank">
+                                    Privacy Policy
+                                </a>.
+                            </div>
+                        </div>
                     </FormPanel>
                     <Snackbar
                         autoHideDuration={3500}
