@@ -877,6 +877,7 @@ public class EditorMicroservice implements Microservice {
                     .build();
         } catch (SiddhiAppCreationException e) {
             // SiddhiAppCreationException is caught if the provided 'SiddhiAppString' contains any syntax errors.
+            log.info("Cannot Generate Graph View: " + e.getMessage());
             response = Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())

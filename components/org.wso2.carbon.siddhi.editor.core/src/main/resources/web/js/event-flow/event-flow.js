@@ -39,6 +39,82 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide" +
                 " on getting started with SP editor. \n" +
                 "\n";
+
+            var defaultNodeStyle = {
+                labelType: "html",
+                rx: 7,
+                ry: 7,
+                padding: 0
+            };
+            this.renderOptions = {
+                node: {
+                    stream: {
+                        name: "stream",
+                        nodeStyle: defaultNodeStyle,
+                        cssClass: "indicator stream-colour"
+                    },
+                    table: {
+                        name: "table",
+                        nodeStyle: defaultNodeStyle,
+                        cssClass: "indicator table-colour"
+                    },
+                    window: {
+                        name: "window",
+                        nodeStyle: defaultNodeStyle,
+                        cssClass: "indicator window-colour"
+                    },
+                    trigger: {
+                        name: "trigger",
+                        nodeStyle: defaultNodeStyle,
+                        cssClass: "indicator trigger-colour"
+                    },
+                    aggregation: {
+                        name: "aggregation",
+                        nodeStyle: defaultNodeStyle,
+                        cssClass: "indicator aggregation-colour"
+                    },
+                    function: {
+                        name: "function",
+                        nodeStyle: defaultNodeStyle,
+                        cssClass: "indicator function-colour"
+                    },
+                    query: {
+                        name: "query",
+                        nodeStyle: defaultNodeStyle,
+                        cssClass: "indicator query-colour"
+                    },
+                    partition: {
+                        name: "partition",
+                        nodeStyle: {
+                            labelType: "html",
+                            clusterLabelPos: "top",
+                            style: "fill: #e0e0d1"
+                        },
+                        cssClass: "partition"
+                    },
+                    partition_type: {
+                        name: "partition-type",
+                        nodeStyle: defaultNodeStyle,
+                        cssClass: "indicator partition-type-colour"
+                    }
+                },
+                edge: {
+                    default: {
+                        name: "default",
+                        edgeStyle: {
+                            arrowheadStyle: "fill: #bbb",
+                            lineInterpolate: "basis"
+                        }
+                    },
+                    dotted_line: {
+                        name: "dotted-line",
+                        edgeStyle: {
+                            arrowheadStyle: "fill: #bbb",
+                            style: "stroke-dasharray: 5, 5;"
+                        }
+                    }
+                }
+            };
         };
 
         /**
@@ -69,16 +145,14 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     async: false,
                     success: function (response) {
                         result = {status: "success", responseJSON: response};
+                        // todo remove this log once done
                         log.info(response);
                     },
                     error: function (error) {
                         if (error.status === 400) {
                             result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
-                            // todo find a way to log this in the editor console
-                            log.info(error.responseText);
                         } else {
                             result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
-                            log.info(error.responseText);
                         }
                     }
                 });
@@ -103,6 +177,10 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             }
 
             function createGraph() {
+
+                var nodeOptions = self.renderOptions.node;
+                var edgeOptions = self.renderOptions.edge;
+
                 // todo set any fixed values to a seperate JSON and obtain it from there.
                 // Create an instance of the dagreD3 graph.
                 var graph = new dagreD3.graphlib.Graph({compound: true}).setGraph({});
@@ -114,55 +192,55 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     var html;
                     var nodeStyle;
 
-                    if (node.type === "partition") {
-                        html = "<div class='partition' title='" + node.description + "'>" + node.name + "</div>";
-                        // todo specify these values as fixed values in a seperate file
-                        nodeStyle = {
-                            label: html,
-                            labelType: "html",
-                            clusterLabelPos: 'top',
-                            style: 'fill: #e0e0d1'
-                        };
+                    if (node.type === nodeOptions.partition.name) {
+                        html = "<div class='" + nodeOptions.partition.cssClass + "' title='"
+                            + node.description + "'>" + node.name + "</div>";
+                        nodeStyle = _.clone(nodeOptions.partition.nodeStyle);
+                        nodeStyle.label = html;
                     } else {
                         html = "<div title = '" + node.description + "'>";
                         switch (node.type) {
-                            case "stream":
+                            case nodeOptions.stream.name:
                                 html = html + "<span class='indicator stream-colour'></span>";
+                                nodeStyle = _.clone(nodeOptions.stream.nodeStyle);
                                 break;
-                            case "table":
+                            case nodeOptions.table.name:
                                 html = html + "<span class='indicator table-colour'></span>";
+                                nodeStyle = _.clone(nodeOptions.table.nodeStyle);
                                 break;
-                            case "window":
+                            case nodeOptions.window.name:
                                 html = html + "<span class='indicator window-colour'></span>";
+                                nodeStyle = _.clone(nodeOptions.window.nodeStyle);
                                 break;
-                            case "trigger":
+                            case nodeOptions.trigger.name:
                                 html = html + "<span class='indicator trigger-colour'></span>";
+                                nodeStyle = _.clone(nodeOptions.trigger.nodeStyle);
                                 break;
-                            case "aggregation":
+                            case nodeOptions.aggregation.name:
                                 html = html + "<span class='indicator aggregation-colour'></span>";
+                                nodeStyle = _.clone(nodeOptions.aggregation.nodeStyle);
                                 break;
-                            case "function":
+                            case nodeOptions.function.name:
                                 html = html + "<span class='indicator function-colour'></span>";
+                                nodeStyle = _.clone(nodeOptions.function.nodeStyle);
                                 break;
-                            case "query":
+                            case nodeOptions.query.name:
                                 html = html + "<span class='indicator query-colour'></span>";
+                                nodeStyle = _.clone(nodeOptions.query.nodeStyle);
                                 break;
-                            case "partition-type":
-                                html = html + "<span class='indicator partitionType-colour'></span>";
+                            case nodeOptions.partition_type.name:
+                                html = html + "<span class='indicator partition-type-colour'></span>";
+                                nodeStyle = _.clone(nodeOptions.partition_type.nodeStyle);
                                 break;
                         }
                         html = html + "<span class='nodeLabel'>" + node.name + "</span>" + "</div>";
-                        nodeStyle = {
-                            label: html,
-                            labelType: "html",
-                            rx: 7,
-                            ry: 7,
-                            padding: 0
-                        };
+                        nodeStyle.label = html;
                     }
                     // Set the node
                     graph.setNode(node.id, nodeStyle);
+
                 });
+                console.log(self.renderOptions);
 
                 // Set the edges of the graph
                 data.edges.forEach(function (edge) {
@@ -181,6 +259,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 });
 
                 // Set the groups of the graph
+                // NOTE - The nodes and edges should be created first before the groups can be created
                 data.groups.forEach(function (group) {
                     group.children.forEach(function (child) {
                         graph.setParent(child, group.id);
