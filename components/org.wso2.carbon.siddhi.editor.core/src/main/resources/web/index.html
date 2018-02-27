@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16" />
+    <!-- JSONEditor doesn't suppot AMD/RequireJS -->
+    <script src="/editor/commons/lib/json-editor_v0.7.28/jsoneditor.js"></script>
     <script src="/editor/commons/lib/css-browser-selector_0.4.0/css_browser_selector.js"></script>
     <link href="/editor/commons/lib/font-wso2-1.2.2/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/lib/theme-wso2-2.0.0/css/theme-wso2.css" rel="stylesheet" type="text/css"/>
@@ -219,21 +221,17 @@
         <div class="canvas-container">
         </div>
         <!-- End: Canvas Container -->
-        <!-- Start: Preview Container -->
+        <!-- Start: Source Container -->
         <div id="siddhi-editor" class="source-container">
         </div>
-        <!-- End Preview Container -->
-        <!-- Start: Preview Container -->
-        <div class="preview-container">
-        </div>
-        <!-- End Preview Container -->
+        <!-- End Source Container -->
         <!-- Start: design view container -->
         <div class="design-view-container" style="display: none">
             <!-- Start: tool-palette -->
-            <div class="tool-palette-container"></div>
+            <div id="tool-palette-container" class="tool-palette-container"></div>
             <!-- End: tool-palette -->
             <!-- Start: design-view-grid-container -->
-            <div class="design-view-grid-container"></div>
+            <div id="grid-container" class="grid-container"></div>
             <!-- End: design-view-grid-container -->
         </div>
         <!-- End: design view container -->
@@ -1085,7 +1083,6 @@
             dagre: "commons/lib/dagre-0.7.4/dagre.min",
             jquery_validate: "commons/lib/jquery_validate/jquery.validate.min",
             jquery_timepicker: "commons/lib/jquery_timepicker/jquery-ui-timepicker-addon",
-            json_editor: "commons/lib/json-editor_v0.7.28/jsoneditor",
             log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
             lodash: "commons/lib/lodash_v4.13.1/lodash",
             backbone: "commons/lib/backbone_v1.3.3/backbone",
@@ -1134,7 +1131,24 @@
             service_console: "js/output-console/service-console-manager",
             debugger_console: "js/debugger/debugger",
             design_view: "js/design-view/design-view",
-            designViewGrid: "js/tool-editor/views/design"
+            designViewGrid: "js/design-view/design-grid",
+            dropElements: "js/design-view/drop-elements",
+            appData: "js/design-view/app-data",
+            elementArray: "js/design-view/element-lists/element-array",
+            formBuilder: "js/design-view/form-builder/form-builder",
+            // element data holding objects starts here
+            filterQuery: "js/design-view/elements/filter-query",
+            joinQuery: "js/design-view/elements/join-query",
+            partition: "js/design-view/elements/partition",
+            passThroughQuery: "js/design-view/elements/passthrough-query",
+            patternQuery: "js/design-view/elements/pattern-query",
+            query: "js/design-view/elements/query",
+            stream: "js/design-view/elements/stream",
+            windowQuery: "js/design-view/elements/window-query",
+            leftStream: "js/design-view/elements/join-query-sub-elements/left-stream",
+            rightStream: "js/design-view/elements/join-query-sub-elements/right-stream",
+            join: "js/design-view/elements/join-query-sub-elements/join"
+            // element data holding objects ends here
         },
         map: {
             "*": {
@@ -1451,7 +1465,7 @@
                             design_view: {
                                 // relative selector within container for a tab
                                 container: '.design-view-container',
-                                canvas_container: '.canvas-container',
+                                grid_container: '.grid-container',
                                 new_drop_timeout: 3000,
                                 tool_palette: {
                                     // relative selector within container for design view

@@ -24,13 +24,12 @@
     height: 90%;
 }
 
-.design-view-grid-container {
+.grid-container {
     /* Temp */
     float: left;
-    display: inline-block;
-    width: 95%;
+    width: calc(100% - 75px);
     height: 100%;
-
+    position: relative;
     background: linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
     linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
     linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
@@ -50,3 +49,228 @@
     background-color: #fff;
 }
 
+.streamdrop{
+    background-image: url("../images/stream.png") ;
+}
+.wstreamdrop {
+    background-image: url("../images/windowStream.png");
+}
+
+.squerydrop {
+    background-image: url("../images/passthrough.png");
+}
+
+.filterdrop {
+    background-image: url("../images/filter.png");
+}
+
+.wquerydrop {
+    background-image: url("../images/windowQuery.png");
+}
+
+.joquerydrop {
+    background-image: url("../images/join.png");
+}
+
+.stquerydrop {
+    background-image: url("../images/pattern.png");
+}
+
+/*
+    Dropped Elements corresponding to their toolbox elements
+*/
+
+.streamdrop, .wstreamdrop ,.squerydrop, .filterdrop, .wquerydrop, .joquerydrop, .stquerydrop {
+    border-radius: 0.5em;
+    opacity: 0.8;
+    width: 60px;
+    height: 40px;
+    line-height: 80px;
+    cursor: pointer;
+    text-align: center;
+    z-index: 20;
+    position: absolute;
+    background-size: 60px 40px;
+    background-repeat: no-repeat;
+    color: black;
+    font-family: helvetica, sans-serif;
+    padding: 0.5em;
+    font-size: 0.9em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+}
+
+.connectorInStream{
+    float: left;
+    margin-top: -33%;
+    margin-left: -13px;
+}
+
+.connectorOutStream{
+    float: right;
+    margin-top: -33%;
+    margin-right: -13px;
+}
+
+/*
+    Element Divisions added as classes when the element is appended
+*/
+.title {
+    padding: 10px;
+    cursor: move;
+}
+.connection {
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 50px;
+    border-radius: 50px;
+    font-size:10px;
+    text-align: center;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    margin-top: 80px;
+    border: 1px solid darkblue;
+    background-color: darkblue;
+}
+.property {
+    float: left;
+    margin-top: 10px;
+    background: #f4f4f4;
+    border: 1px solid #aaaaaa;
+    height: 800px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
+/*
+*Styles for the configuration icons
+*/
+.element-prop-icon , .element-conn-icon , .element-close-icon{
+    float:right;
+    width:26px;
+    height:26px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    margin-top:-65px;
+    cursor:pointer;
+    color: red;
+    border-radius: 40px;
+}
+
+.element-prop-icon{
+    margin-right:25px;
+}
+.element-conn-icon{
+    margin-right:50px;
+}
+.element-close-icon{
+    margin-right:0;
+}
+
+
+input {
+.form-control input-md;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.disabledbutton{
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+table {
+    border: 2px solid transparent;
+}
+
+td {
+    padding: 5px;
+    border: 1px solid transparent;
+}
+.queryDiv{
+    margin: 20px 0 20px 0;
+    width: 600px;
+    box-shadow: 3px 4px 5px 6px #707070;
+}
+
+.simpleQueryLabel, .windowStreamLabel{
+    background-color: #565656;
+    text-align: center;
+    margin:20px 0 20px 0;
+    color: transparent;
+    text-shadow: 0 2px 3px rgba(255,255,255,0.3);
+    -webkit-background-clip: text;
+}
+
+.connectorInStream{
+    float: left;
+    margin-top: -33%;
+    margin-left: -13px;
+}
+
+.connectorOutStream{
+    float: right;
+    margin-top: -33%;
+    margin-right: -13px;
+}
+
+.connectorInWindow, .connectorIn{
+    float: left;
+    margin-top: -37%;
+    margin-left: -13px;
+}
+
+.connectorOutWindow, .connectorOut{
+    float: right;
+    margin-top: -37%;
+    margin-right: -13px;
+}
+
+.connectorInPart{
+    margin-left: -5px;
+    margin-top: 20px;
+    width: 15px;
+    height: 15px;
+    border: 1px solid darkblue;
+    background-color: darkblue;
+}
+
+.connectorStream{
+    float: right;
+    margin-top: 25%;
+    margin-right: -10%;
+}
+
+.streamNameNode , .queryNameNode , .windowNameNode, .partitionNameNode{
+    float:right;
+    width:inherit;
+    height:inherit;
+    background-color: transparent;
+    border: 1px solid transparent;
+    margin-top:-10px;
+    margin-right:-3px;
+    font-weight:bolder;
+}
+
+/* Window Stream */
+
+.checkboxStyleWindow{
+    float:right;
+    width:20px;
+    height:20px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    margin-top:-82px;
+    margin-right:0;
+    cursor:pointer;
+    color: red;
+    border-radius: 40px;
+    padding-left: 10px;
+    padding-top: 4px;
+}

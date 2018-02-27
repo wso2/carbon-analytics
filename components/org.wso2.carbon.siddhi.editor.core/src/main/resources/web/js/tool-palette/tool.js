@@ -26,6 +26,7 @@ define(['require', 'backbone'], function (require, Backbone) {
 
         defaults: {
             id: "",
+            className: "",
             title: "",
             icon: ""
         }

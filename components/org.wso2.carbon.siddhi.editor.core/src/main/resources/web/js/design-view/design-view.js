@@ -19,43 +19,66 @@
 define(['require', 'log', 'lodash', 'jquery', 'app/tool-palette/tool-palette', 'designViewGrid'],
     function (require, log, _, $, ToolPalette, DesignViewGrid) {
 
+        /**
+         * @class DesignView
+         * @constructor
+         * @class DesignView  Wraps the Ace editor for design view
+         * @param {Object} options Rendering options for the view
+         */
         var DesignView = function (options) {
+            var errorMessage = 'unable to find design view container';
             if (!_.has(options, 'container')) {
-                throw "container is not defined."
+                log.error(errorMessage);
+                throw errorMessage;
             }
             var container = $(_.get(options, 'container'));
             if (!container.length > 0) {
-                throw "container not found."
+                log.error(errorMessage);
+                throw errorMessage;
             }
             this._$parent_el = container;
             this.options = options;
         };
 
-        //TODO: add logs,use jquery($) if needed
         DesignView.prototype.render = function () {
-            var self = this;
-            var canvasContainer = this._$parent_el.find(_.get(this.options, 'canvas.container'));
-            var designViewOpts = {};
-            _.set(designViewOpts, 'container', canvasContainer.get(0));
-            self.designViewContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
-
+            this.designViewContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
+            var errMsg = '';
             // check whether container element exists in dom
-            if (!self.designViewContainer.length > 0) {
+            if (!this.designViewContainer.length > 0) {
                 errMsg = 'unable to find container for file composer with selector: '
                     + _.get(this.options, 'design_view.container');
                 log.error(errMsg);
                 throw errMsg;
             }
-
-            var toolPaletteContainer = self._$parent_el.find(_.get(self.options, 'design_view.tool_palette.container')).get(0);
-            var toolPaletteOpts = _.clone(_.get(self.options, 'design_view.tool_palette'));
+            var toolPaletteContainer = this._$parent_el.find(_.get(this.options, 'design_view.tool_palette.container')).get(0);
+            if (toolPaletteContainer === undefined) {
+                errMsg = 'unable to find tool palette container with selector: '
+                    + _.get(this.options, 'design_view.tool_palette.container');
+                log.error(errMsg);
+                throw errMsg;
+            }
+            var toolPaletteOpts = _.clone(_.get(this.options, 'design_view.tool_palette'));
+            if (toolPaletteOpts === undefined) {
+                errMsg = 'unable to find tool palette with selector: '
+                    + _.get(this.options, 'design_view.tool_palette');
+                log.error(errMsg);
+                throw errMsg;
+            }
             toolPaletteOpts.container = toolPaletteContainer;
-            self.toolPalette = new ToolPalette(toolPaletteOpts);
-            self.toolPalette.render();
-            //TODO: set the grid from jsplumb
+            this.toolPalette = new ToolPalette(toolPaletteOpts);
+            this.toolPalette.render();
 
+            var designViewGridContainer = this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
+            if (!designViewGridContainer.length > 0) {
+                errMsg = 'unable to find design view grid container with selector: '
+                    + _.get(this.options, 'design_view.grid_container');
+                log.error(errMsg);
+                throw errMsg;
+            }
+            var designViewOpts = {};
+            _.set(designViewOpts, 'container', designViewGridContainer);
             var designViewGrid = new DesignViewGrid(designViewOpts);
-
+            designViewGrid.render();
         };
 
         DesignView.prototype.getDesignViewContainer = function () {

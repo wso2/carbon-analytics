@@ -19,9 +19,10 @@
 // define(['require', 'jquery', 'd3', 'backbone', 'lodash', 'd3utils'], function (require, $, d3, Backbone, _, D3Utils) {
     define(['require', 'jquery', 'backbone', 'lodash'], function (require, $, Backbone, _) {
 
+        //TODO: remove d3 d3utils from lib
     var toolView = Backbone.View.extend({
 
-        toolTemplate: _.template("<div id=\"<%=id%>\" class=\"tool-container\"  data-placement=\"bottom\" data-toggle=\"tooltip\" title='<%=title%>'> <img src=\"<%=icon%>\" class=\"tool-image\"  /><p class=\"tool-title\"><%=title%></p></div>"),
+        toolTemplate: _.template("<div id=\"<%=id%>\" class=\"<%=className%> tool-container\"  data-placement=\"bottom\" data-toggle=\"tooltip\" title='<%=title%>'> <img src=\"<%=icon%>\" class=\"tool-image\"  /><p class=\"tool-title\"><%=title%></p></div>"),
 
         initialize: function (options) {
             _.extend(this, _.pick(options, ["toolPalette"]));
@@ -61,8 +62,8 @@
             this.$el.html(this.toolTemplate(this.model.attributes));
             this.$el.tooltip();
             parent.append(this.$el);
-            var id = '#'+this.model.id;
-            $(id).draggable({
+            var className = '.' + this.model.get("className");
+            $(className).draggable({
                 helper: 'clone',
                 cursor: 'pointer',
                 tolerance: 'fit',

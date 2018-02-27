@@ -44,37 +44,50 @@ define(['require', 'log', 'jquery', 'backbone', './tool', './tool-view', './drag
             var definitionTools = [
                 {
                     id : "stream",
+                    className : "stream",
                     title : "Stream",
                     icon : "/editor/images/stream.png"
                 },
                 {
                     id : "window-stream",
+                    className : "window-stream",
                     title : "window",
                     icon : "/editor/images/windowStream.png"
                 },
                 {
                     id : "pass-through",
+                    className : "pass-through",
                     title : "Pass Through",
                     icon : "/editor/images/passthrough.png"
                 },
                 {
                     id : "filter-query",
+                    className : "filter-query",
                     title : "Filter Query",
                     icon : "/editor/images/filter.png"
                 },
                 {
                     id : "window-query",
+                    className : "window-query",
                     title : "Window Query",
                     icon : "/editor/images/windowQuery.png"
                 },
                 {
                     id : "join-query",
+                    className : "join-query",
                     title : "Join Query",
                     icon : "/editor/images/join.png"
                 },
                 {
                     id : "pattern",
+                    className : "pattern",
                     title : "Pattern",
+                    icon : "/editor/images/pattern.png"
+                },
+                {
+                    id : "partition",
+                    className : "partition",
+                    title : "Partition",
                     icon : "/editor/images/pattern.png"
                 }
             ];
@@ -102,13 +115,9 @@ define(['require', 'log', 'jquery', 'backbone', './tool', './tool-view', './drag
             groupDiv.attr('id', "tool-group-elements");
             groupDiv.attr('class', "tool-group");
 
-            var groupBodyDiv = $("<div></div>");
-            groupDiv.append(groupBodyDiv);
-            groupBodyDiv.attr('class', "tool-group-body");
-
             this.tools.forEach(function (tool) {
                 var toolView = new ToolView({model: tool, toolPalette: self.toolPalette});
-                toolView.render(groupBodyDiv);
+                toolView.render(groupDiv);
             });
         },
 
