@@ -850,7 +850,7 @@ public class EditorMicroservice implements Microservice {
 
     /**
      * Converts a given Siddhi App string to a specific JSON format for a graph that diagrammatically
-     * display's the Siddhi App, to be generated in the Editor design view.
+     * display's the Siddhi App to be generated in the Editor design view.
      *
      * @param siddhiAppBase64 The Siddhi App (encoded to Base64) to be converted to JSON
      * @return The JSON result in a predefined format
@@ -869,23 +869,23 @@ public class EditorMicroservice implements Microservice {
             SiddhiAppMap siddhiAppMap = new SiddhiAppMap(siddhiAppString);
             EventFlow eventFlow = new EventFlow(siddhiAppMap);
 
+            // The 'Access-Control-Allow-Origin' header must be set to '*' as this might be accessed
+            // by other domains in the future.
             response = Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(eventFlow.getEventFlowJSON().toString())
                     .build();
-        } catch (IllegalArgumentException e) {
-            // If an IllegalArgumentException occurs when converting 'siddhiAppBase64' to 'siddhiAppString'
-            response = Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity("Invalid Media Type: must send a value of media type 'application/x-www-form-urlencoded'")
-                    .build();
         } catch (SiddhiAppCreationException e) {
-            // TODO: 2/22/18 change the status type to a more suitable one
-            // TODO: 2/22/18 comment on why this exception occurs
-            // TODO: 2/22/18 mention why Access-Control-Allow-Origin * is used
-            // SiddhiAppCreationException is caught because in the SiddhiAppMap class a SiddhiAppRuntime instance is created,
-            // which could throw many different types of errors that the developer cannot predict.
+            // SiddhiAppCreationException is caught if the provided 'SiddhiAppString' contains any syntax errors.
             response = Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        } catch (Throwable e) {
+            // Throwable is caught, if any unknown errors occur when executing the code in the try block.
+            // An example of this could be an 'IllegalArgumentException' thrown from the 'SiddhiAppMap' class.
+            log.error("Unexpected error occurred: " + e.getMessage());
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();

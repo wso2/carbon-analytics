@@ -88,72 +88,53 @@ public class SiddhiAppMap {
      */
     private void loadSiddhiAppInfo() {
         try {
-            // Compile 'siddhiAppString' To A SiddhiApp Object
+            // Create The SiddhiApp And SiddhiAppRuntime Objects For The Given Siddhi App String
             siddhiApp = SiddhiCompiler.parse(siddhiAppString);
-            // This is done to check for any runtime errors and to obtain all the streams.
             siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiAppString);
-
-            loadAppNameAndDescription();
-            loadTriggers();
-            loadStreams();
-            loadTables();
-            loadWindows();
-            loadAggregations();
-            loadFunctions();
-            loadQueriesAndPartitions();
-
         } catch (Throwable e) {
             throw new SiddhiAppCreationException(e.getMessage());
         }
+
+        // Obtain All The Necessary Information From The SiddhiApp And SiddhiAppRuntime Objects
+        loadAppNameAndDescription();
+        // NOTE- Always call the loadTriggers() function before the loadStreams() function
+        // as the latter is dependent on the former.
+        loadTriggers();
+        loadStreams();
+        loadTables();
+        loadWindows();
+        loadAggregations();
+        loadFunctions();
+        loadQueriesAndPartitions();
     }
 
-    private void loadQueriesAndPartitions() throws ClassNotFoundException {
-        for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
-            if (executionElement instanceof Query) {
-                Query query = (Query) executionElement;
-                QueryInfo queryInfo = generateQueryInfo(query);
-                queries.add(queryInfo);
-            } else if (executionElement instanceof Partition) {
-                Partition partition = (Partition) executionElement;
-                PartitionInfo partitionInfo = generatePartitionInfo(partition);
-                partitions.add(partitionInfo);
-            } else {
-                throw new ClassNotFoundException("An unidentified instance of the ExecutionElement Class was found");
+    /**
+     * Obtains the Siddhi application name and description from the SiddhiApp object.
+     */
+    private void loadAppNameAndDescription() {
+        for (Annotation annotation : siddhiApp.getAnnotations()) {
+            if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.NAME.getTypeAsString())) {
+                appName = annotation.getElements().get(0).getValue();
+            } else if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.DESCRIPTION.getTypeAsString())) {
+                appDescription = annotation.getElements().get(0).getValue();
             }
         }
     }
 
-    private void loadFunctions() {
-        for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
-            String functionDefinitionStr = getDefinition(functionDefinition);
-            functions.add(new FunctionInfo(functionDefinition.getId(), functionDefinition.getId(),
-                    functionDefinitionStr));
+    /**
+     * Obtains information of all the Triggers from the SiddhiApp object.
+     */
+    private void loadTriggers() {
+        for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
+            String triggerDefinitionStr = getDefinition(triggerDefinition);
+            triggers.add(new TriggerInfo(triggerDefinition.getId(), triggerDefinition.getId(), triggerDefinitionStr));
         }
     }
 
-    private void loadAggregations() {
-        for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
-            String aggregationDefinitionStr = getDefinition(aggregationDefinition);
-            aggregations.add(new AggregationInfo(aggregationDefinition.getId(), aggregationDefinition.getId(),
-                    aggregationDefinitionStr, aggregationDefinition.getBasicSingleInputStream().getStreamId()));
-        }
-    }
-
-    private void loadWindows() {
-        for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
-            String windowDefinitionStr = getDefinition(windowDefinition);
-            windows.add(new WindowInfo(windowDefinition.getId(), windowDefinition.getId(), windowDefinitionStr));
-        }
-    }
-
-    private void loadTables() {
-        for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
-            String tableDefinitionStr = getDefinition(tableDefinition);
-            tables.add(new TableInfo(tableDefinition.getId(), tableDefinition.getId(), tableDefinitionStr));
-        }
-    }
-
-    private void loadStreams() throws ClassNotFoundException {
+    /**
+     * Obtains information of all the Streams and Partitioned Inner Streams from the SiddhiAppRuntime object.
+     */
+    private void loadStreams() {
         for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
             StreamInfo streamInfo = generateStreamInfo(streamDefinition);
             if (streamInfo != null) {
@@ -170,26 +151,70 @@ public class SiddhiAppMap {
                         streams.add(streamInfo);
                     }
                 } else {
-                    throw new ClassNotFoundException("The partitioned inner stream definition map" +
-                            " can only have instances of class type 'StreamDefinition'");
+                    throw new IllegalArgumentException("The partitioned inner stream definition map" +
+                            " does not have an instance of class type 'StreamDefinition'");
                 }
             }
         }
     }
 
-    private void loadTriggers() {
-        for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
-            String triggerDefinitionStr = getDefinition(triggerDefinition);
-            triggers.add(new TriggerInfo(triggerDefinition.getId(), triggerDefinition.getId(), triggerDefinitionStr));
+    /**
+     * Obtains information of all the Tables from the SiddhiApp object.
+     */
+    private void loadTables() {
+        for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
+            String tableDefinitionStr = getDefinition(tableDefinition);
+            tables.add(new TableInfo(tableDefinition.getId(), tableDefinition.getId(), tableDefinitionStr));
         }
     }
 
-    private void loadAppNameAndDescription() {
-        for (Annotation annotation : siddhiApp.getAnnotations()) {
-            if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.NAME.getTypeAsString())) {
-                appName = annotation.getElements().get(0).getValue();
-            } else if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.DESCRIPTION.getTypeAsString())) {
-                appDescription = annotation.getElements().get(0).getValue();
+    /**
+     * Obtains information of all the Windows from the SiddhiApp object.
+     */
+    private void loadWindows() {
+        for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
+            String windowDefinitionStr = getDefinition(windowDefinition);
+            windows.add(new WindowInfo(windowDefinition.getId(), windowDefinition.getId(), windowDefinitionStr));
+        }
+    }
+
+    /**
+     * Obtains information of all the Aggregations from the SiddhiApp object.
+     */
+    private void loadAggregations() {
+        for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
+            String aggregationDefinitionStr = getDefinition(aggregationDefinition);
+            aggregations.add(new AggregationInfo(aggregationDefinition.getId(), aggregationDefinition.getId(),
+                    aggregationDefinitionStr, aggregationDefinition.getBasicSingleInputStream().getStreamId()));
+        }
+    }
+
+    /**
+     * Obtains information of all the user defined Functions from the SiddhiApp object.
+     */
+    private void loadFunctions() {
+        for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
+            String functionDefinitionStr = getDefinition(functionDefinition);
+            functions.add(new FunctionInfo(functionDefinition.getId(), functionDefinition.getId(),
+                    functionDefinitionStr));
+        }
+    }
+
+    /**
+     * Obtains all the information regarding the Queries and Partitions from the SiddhiApp object.
+     */
+    private void loadQueriesAndPartitions() {
+        for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
+            if (executionElement instanceof Query) {
+                Query query = (Query) executionElement;
+                QueryInfo queryInfo = generateQueryInfo(query);
+                queries.add(queryInfo);
+            } else if (executionElement instanceof Partition) {
+                Partition partition = (Partition) executionElement;
+                PartitionInfo partitionInfo = generatePartitionInfo(partition);
+                partitions.add(partitionInfo);
+            } else {
+                throw new IllegalArgumentException("An unidentified instance of the ExecutionElement Class was found");
             }
         }
     }
@@ -267,7 +292,7 @@ public class SiddhiAppMap {
      * @param partition The given Siddhi Partition object
      * @return The created PartitionInfo object
      */
-    private PartitionInfo generatePartitionInfo(Partition partition) throws ClassNotFoundException {
+    private PartitionInfo generatePartitionInfo(Partition partition) {
         // Create Partition If ExecutionElement Is An Instance Of Partition
         PartitionInfo partitionInfo = new PartitionInfo();
 
@@ -311,7 +336,7 @@ public class SiddhiAppMap {
      * @param partitionType The given Siddhi PartitionType object
      * @return The created PartitionTypeInfo object
      */
-    private PartitionTypeInfo generatePartitionTypeInfo(PartitionType partitionType) throws ClassNotFoundException {
+    private PartitionTypeInfo generatePartitionTypeInfo(PartitionType partitionType) {
         PartitionTypeInfo partitionTypeInfo = new PartitionTypeInfo();
 
         if (partitionType instanceof ValuePartitionType) {
@@ -323,7 +348,7 @@ public class SiddhiAppMap {
             partitionTypeInfo.setId(UUID.randomUUID().toString());
             partitionTypeInfo.setName("Range Partition");
         } else {
-            throw new ClassNotFoundException("An unidentified instance of the PartitionType Class was found");
+            throw new IllegalArgumentException("An unidentified instance of the PartitionType Class was found");
         }
 
         String partitionTypeDefinition = getDefinition(partitionType);
@@ -387,7 +412,6 @@ public class SiddhiAppMap {
      */
     private int ordinalIndexOf(int lineNumber) {
         int position = 0;
-        // TODO: 2/22/18 replace while true with a definite value in the while loop
         while (lineNumber >= 0) {
             lineNumber--;
             if (lineNumber <= 0) {

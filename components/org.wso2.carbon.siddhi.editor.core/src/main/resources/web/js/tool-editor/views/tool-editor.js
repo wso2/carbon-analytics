@@ -131,6 +131,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     }
                     this._sourceView.editorResize();
 
+                    // Implementation to toggle between the source view and the design view
                     var designContainer = this._$parent_el.find(_.get(this.options, 'design.container'));
                     var svgDynamicId = designContainer.find('.siddhi-graph').attr('id') + this._$parent_el.attr('id');
                     designContainer.find('.siddhi-graph').attr('id', svgDynamicId);

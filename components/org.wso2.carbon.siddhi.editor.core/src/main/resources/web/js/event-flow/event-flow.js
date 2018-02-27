@@ -15,9 +15,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
     function (require, log, _, $, alerts, d3, dagreD3) {
 
+        /**
+         * Create an instance of the EventFlow class in JavaScript.
+         * This class is what is used to connect to the back-end and generate a graph in the front end design view.
+         *
+         * @param designView
+         * @constructor Sets the default variables
+         */
         var EventFlow = function (designView) {
             this.$designView = designView;
             this.$siddhiAppName = this.$designView.find('.siddhi-app-name');
@@ -69,7 +77,8 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             // todo find a way to log this in the editor console
                             log.info(error.responseText);
                         } else {
-                            result = {status: "fail", errorMessage: "Internal Error Occurred"};
+                            result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                            log.info(error.responseText);
                         }
                     }
                 });
@@ -94,26 +103,29 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             }
 
             function createGraph() {
+                // todo set any fixed values to a seperate JSON and obtain it from there.
+                // Create an instance of the dagreD3 graph.
                 var graph = new dagreD3.graphlib.Graph({compound: true}).setGraph({});
+                // This makes sure the graph grows from left-to-right.
                 graph.graph().rankDir = "LR";
 
                 // Set the nodes of the graph
-                data.nodes.forEach(function (value) {
+                data.nodes.forEach(function (node) {
                     var html;
-                    var node;
+                    var nodeStyle;
 
-                    if (value.type === "partition") {
-                        html = "<div class='partition' title='" + value.description + "'>" + value.name + "</div>";
+                    if (node.type === "partition") {
+                        html = "<div class='partition' title='" + node.description + "'>" + node.name + "</div>";
                         // todo specify these values as fixed values in a seperate file
-                        node = {
+                        nodeStyle = {
                             label: html,
                             labelType: "html",
                             clusterLabelPos: 'top',
                             style: 'fill: #e0e0d1'
                         };
                     } else {
-                        html = "<div title = '" + value.description + "'>";
-                        switch (value.type) {
+                        html = "<div title = '" + node.description + "'>";
+                        switch (node.type) {
                             case "stream":
                                 html = html + "<span class='indicator stream-colour'></span>";
                                 break;
@@ -139,8 +151,8 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                                 html = html + "<span class='indicator partitionType-colour'></span>";
                                 break;
                         }
-                        html = html + "<span class='nodeLabel'>" + value.name + "</span>" + "</div>";
-                        node = {
+                        html = html + "<span class='nodeLabel'>" + node.name + "</span>" + "</div>";
+                        nodeStyle = {
                             label: html,
                             labelType: "html",
                             rx: 7,
@@ -149,29 +161,29 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                         };
                     }
                     // Set the node
-                    graph.setNode(value.id, node);
+                    graph.setNode(node.id, nodeStyle);
                 });
 
                 // Set the edges of the graph
-                data.edges.forEach(function (value) {
-                    var edge = {arrowheadStyle: "fill: #bbb"};
+                data.edges.forEach(function (edge) {
+                    var edgeStyle = {arrowheadStyle: "fill: #bbb"};
 
-                    if (value.type === "default") {
+                    if (edge.type === "default") {
                         // This makes the lines curve
-                        edge.lineInterpolate = "basis";
-                    } else if (value.type === "dotted-line") {
+                        edgeStyle.lineInterpolate = "basis";
+                    } else if (edge.type === "dotted-line") {
                         // This makes the lines dotted
-                        edge.style = "stroke-dasharray: 5, 5;";
+                        edgeStyle.style = "stroke-dasharray: 5, 5;";
                     }
 
                     // Set the edge
-                    graph.setEdge(value.parent, value.child, edge);
+                    graph.setEdge(edge.parent, edge.child, edgeStyle);
                 });
 
                 // Set the groups of the graph
-                data.groups.forEach(function (value) {
-                    value.children.forEach(function (child) {
-                        graph.setParent(child, value.id);
+                data.groups.forEach(function (group) {
+                    group.children.forEach(function (child) {
+                        graph.setParent(child, group.id);
                     });
                 });
 
@@ -191,21 +203,23 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 var graphId = "#" + self.$siddhiGraph.attr("id");
                 render(d3.select(graphId + " g"), graph);
 
-                // todo add this in a seperate function
-                var svg = self.$siddhiGraph;
-                var inner = svg.find('g');
+                centerGraphPosition(self.$siddhiGraph);
 
-                svg.attr("width", inner.get(0).getBoundingClientRect().width + 60);
-                svg.attr("height", inner.get(0).getBoundingClientRect().height + 60);
+                function centerGraphPosition(svg) {
+                    var inner = svg.find('g');
 
-                var graphWidth = parseInt(svg.attr("width"));
-                var graphHeight = parseInt(svg.attr("height"));
-                var width = self.$graphView.width();
-                var height = self.$graphView.height();
+                    svg.attr("width", inner.get(0).getBoundingClientRect().width + 60);
+                    svg.attr("height", inner.get(0).getBoundingClientRect().height + 60);
 
-                var left = diff(width, graphWidth) / 2;
-                var top = diff(height, graphHeight) / 2;
-                svg.attr("transform", "translate(" + left + "," + top + ")");
+                    var graphWidth = parseInt(svg.attr("width"));
+                    var graphHeight = parseInt(svg.attr("height"));
+                    var width = self.$graphView.width();
+                    var height = self.$graphView.height();
+
+                    var left = diff(width, graphWidth) / 2;
+                    var top = diff(height, graphHeight) / 2;
+                    svg.attr("transform", "translate(" + left + "," + top + ")");
+                }
 
                 function diff(divValue, graphValue) {
                     if (divValue > graphValue) {

@@ -42,6 +42,8 @@ import java.util.regex.Pattern;
  */
 public class EventFlow {
 
+    private static final Pattern PATTERN = Pattern.compile("\\b[i|I][n|N]\\b\\s+(\\w+)");
+
     private SiddhiAppMap siddhiAppMap;
 
     private JSONObject eventFlowJSON = new JSONObject();
@@ -72,42 +74,42 @@ public class EventFlow {
      * which is then added to the returned JSONObject.
      */
     private void setNodes() {
-        // Set Trigger Nodes
+        // Create Trigger Nodes
         for (TriggerInfo trigger : siddhiAppMap.getTriggers()) {
             createNode(NodeType.TRIGGER, trigger.getId(), trigger.getName(), trigger.getDefinition());
         }
 
-        // Set Stream Nodes
+        // Create Stream Nodes
         for (StreamInfo stream : siddhiAppMap.getStreams()) {
             createNode(NodeType.STREAM, stream.getId(), stream.getName(), stream.getDefinition());
         }
 
-        // Set Table Nodes
+        // Create Table Nodes
         for (TableInfo table : siddhiAppMap.getTables()) {
             createNode(NodeType.TABLE, table.getId(), table.getName(), table.getDefinition());
         }
 
-        // Set Window Nodes
+        // Create Window Nodes
         for (WindowInfo window : siddhiAppMap.getWindows()) {
             createNode(NodeType.WINDOW, window.getId(), window.getName(), window.getDefinition());
         }
 
-        // Set Aggregation Nodes
+        // Create Aggregation Nodes
         for (AggregationInfo aggregation : siddhiAppMap.getAggregations()) {
             createNode(NodeType.AGGREGATION, aggregation.getId(), aggregation.getName(), aggregation.getDefinition());
         }
 
-        // Set Function Nodes
+        // Create Function Nodes
         for (FunctionInfo function : siddhiAppMap.getFunctions()) {
             createNode(NodeType.FUNCTION, function.getId(), function.getName(), function.getDefinition());
         }
 
-        // Set Query Nodes
+        // Create Query Nodes
         for (QueryInfo query : siddhiAppMap.getQueries()) {
             createNode(NodeType.QUERY, query.getId(), query.getName(), query.getDefinition());
         }
 
-        // Set Partition, It's Query & PartitionType Nodes
+        // Create Partition Nodes
         for (PartitionInfo partition : siddhiAppMap.getPartitions()) {
             createNode(NodeType.PARTITION, partition.getId(), partition.getName(), partition.getDefinition());
 
@@ -141,7 +143,6 @@ public class EventFlow {
         jsonObject.put("id", id);
         jsonObject.put("name", name);
         jsonObject.put("description", description);
-
         nodes.put(jsonObject);
     }
 
@@ -169,7 +170,6 @@ public class EventFlow {
      * Creates all the edge JSONObjects for all the queries in the SiddhiAppMap object.
      */
     private void setQueryEdges() {
-        Pattern pattern = Pattern.compile("\\b[i|I][n|N]\\b\\s+(\\w+)");
         // Set Edges With Queries
         for (QueryInfo query : siddhiAppMap.getQueries()) {
             // For Each Input Stream Id In The Query
@@ -186,7 +186,7 @@ public class EventFlow {
             }
 
             // Search For The 'in' Keyword Inside The Query To `Create Dotted Lined Edge`
-            Matcher matcher = pattern.matcher(query.getDefinition());
+            Matcher matcher = PATTERN.matcher(query.getDefinition());
             while (matcher.find()) {
                 String tableId = matcher.group(1);
                 createEdge(EdgeType.DOTTED_LINE, tableId, query.getId());
@@ -214,7 +214,6 @@ public class EventFlow {
      * @param partition The partition in which the given query belongs to
      */
     private void createEdgesForQueryInPartition(QueryInfo query, PartitionInfo partition) {
-        Pattern pattern = Pattern.compile("\\b[i|I][n|N]\\b\\s+(\\w+)");
         // For Each Input Stream In This Query
         for (String inputStreamId : query.getInputStreamIds()) {
             // Check Whether This Input Stream Is Partitioned Or Not
@@ -245,7 +244,7 @@ public class EventFlow {
         }
 
         // Connects Any Tables That Are Used By The Queries Using The 'in' Keyword
-        Matcher matcher = pattern.matcher(query.getDefinition());
+        Matcher matcher = PATTERN.matcher(query.getDefinition());
         while (matcher.find()) {
             String tableId = matcher.group(1);
             createEdge(EdgeType.DOTTED_LINE, tableId, query.getId());
@@ -264,7 +263,6 @@ public class EventFlow {
         jsonObject.put("type", edgeType.getTypeAsString());
         jsonObject.put("parent", parent);
         jsonObject.put("child", child);
-
         edges.put(jsonObject);
     }
 
@@ -273,7 +271,7 @@ public class EventFlow {
      * which is then added to the returned JSONObject.
      */
     private void setGroups() {
-        // NOTE - Groups Are Only To Be Created For Partitions
+        // Create A Group For Every Partition
         for (PartitionInfo partition : siddhiAppMap.getPartitions()) {
             createGroup(partition.getId(), partition.getName(), partition.getQueries(), partition.getPartitionTypes());
         }
