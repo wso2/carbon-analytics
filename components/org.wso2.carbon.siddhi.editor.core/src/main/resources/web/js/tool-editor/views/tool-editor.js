@@ -136,23 +136,33 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     var svgDynamicId = designContainer.find('.siddhi-graph').attr('id') + this._$parent_el.attr('id');
                     designContainer.find('.siddhi-graph').attr('id', svgDynamicId);
                     var eventFlow = new EventFlow(designContainer);
+                    var isInitialRender = true;
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
-                            var response = eventFlow.fetchJSON(self.getContent());
-                            if (response.status === "success") {
+                            if (isInitialRender || !self._sourceView.isClean()) {
+                                var response = eventFlow.fetchJSON(self.getContent());
+                                if (response.status === "success") {
+                                    eventFlow.clear();
+                                    sourceContainer.hide();
+                                    designContainer.show();
+                                    eventFlow.render(response.responseJSON);
+                                    eventFlow.centerGraph();
+                                    toggleViewButton.html("Go To Source View");
+                                    isInitialRender = false;
+                                } else if (response.status === "fail") {
+                                    eventFlow.alert(response.errorMessage);
+                                }
+                            } else {
                                 sourceContainer.hide();
                                 designContainer.show();
-                                eventFlow.render(response.responseJSON);
+                                eventFlow.centerGraph();
                                 toggleViewButton.html("Go To Source View");
-                            } else if (response.status === "fail") {
-                                eventFlow.alert(response.errorMessage);
                             }
                         } else if (designContainer.is(':visible')) {
                             designContainer.hide();
                             sourceContainer.show();
                             toggleViewButton.html("Go To Design View");
-                            eventFlow.clear();
                         }
                     });
                 },

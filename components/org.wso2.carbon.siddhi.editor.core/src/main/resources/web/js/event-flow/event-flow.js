@@ -47,7 +47,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 padding: 0
             };
             this.renderOptions = {
-                node: {
+                nodeOptions: {
                     stream: {
                         name: "stream",
                         nodeStyle: defaultNodeStyle,
@@ -98,7 +98,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                         cssClass: "indicator partition-type-colour"
                     }
                 },
-                edge: {
+                edgeOptions: {
                     default: {
                         name: "default",
                         edgeStyle: {
@@ -141,12 +141,9 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     type: "POST",
                     url: self.url,
                     data: window.btoa(code),
-                    // todo make async and handle loading issues
                     async: false,
                     success: function (response) {
                         result = {status: "success", responseJSON: response};
-                        // todo remove this log once done
-                        log.info(response);
                     },
                     error: function (error) {
                         if (error.status === 400) {
@@ -177,11 +174,9 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             }
 
             function createGraph() {
+                var nodeOptions = self.renderOptions.nodeOptions;
+                var edgeOptions = self.renderOptions.edgeOptions;
 
-                var nodeOptions = self.renderOptions.node;
-                var edgeOptions = self.renderOptions.edge;
-
-                // todo set any fixed values to a seperate JSON and obtain it from there.
                 // Create an instance of the dagreD3 graph.
                 var graph = new dagreD3.graphlib.Graph({compound: true}).setGraph({});
                 // This makes sure the graph grows from left-to-right.
@@ -192,66 +187,94 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     var html;
                     var nodeStyle;
 
-                    if (node.type === nodeOptions.partition.name) {
-                        html = "<div class='" + nodeOptions.partition.cssClass + "' title='"
-                            + node.description + "'>" + node.name + "</div>";
-                        nodeStyle = _.clone(nodeOptions.partition.nodeStyle);
-                        nodeStyle.label = html;
-                    } else {
-                        html = "<div title = '" + node.description + "'>";
-                        switch (node.type) {
-                            case nodeOptions.stream.name:
-                                html = html + "<span class='indicator stream-colour'></span>";
-                                nodeStyle = _.clone(nodeOptions.stream.nodeStyle);
-                                break;
-                            case nodeOptions.table.name:
-                                html = html + "<span class='indicator table-colour'></span>";
-                                nodeStyle = _.clone(nodeOptions.table.nodeStyle);
-                                break;
-                            case nodeOptions.window.name:
-                                html = html + "<span class='indicator window-colour'></span>";
-                                nodeStyle = _.clone(nodeOptions.window.nodeStyle);
-                                break;
-                            case nodeOptions.trigger.name:
-                                html = html + "<span class='indicator trigger-colour'></span>";
-                                nodeStyle = _.clone(nodeOptions.trigger.nodeStyle);
-                                break;
-                            case nodeOptions.aggregation.name:
-                                html = html + "<span class='indicator aggregation-colour'></span>";
-                                nodeStyle = _.clone(nodeOptions.aggregation.nodeStyle);
-                                break;
-                            case nodeOptions.function.name:
-                                html = html + "<span class='indicator function-colour'></span>";
-                                nodeStyle = _.clone(nodeOptions.function.nodeStyle);
-                                break;
-                            case nodeOptions.query.name:
-                                html = html + "<span class='indicator query-colour'></span>";
-                                nodeStyle = _.clone(nodeOptions.query.nodeStyle);
-                                break;
-                            case nodeOptions.partition_type.name:
-                                html = html + "<span class='indicator partition-type-colour'></span>";
-                                nodeStyle = _.clone(nodeOptions.partition_type.nodeStyle);
-                                break;
-                        }
-                        html = html + "<span class='nodeLabel'>" + node.name + "</span>" + "</div>";
-                        nodeStyle.label = html;
+                    switch (node.type) {
+                        case nodeOptions.stream.name:
+                            html = "<div title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.stream.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>"
+                                + "</div>";
+                            // The _.clone() method must be used to avoid passing by reference.
+                            nodeStyle = _.clone(nodeOptions.stream.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.table.name:
+                            html = "<div title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.table.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>"
+                                + "</div>";
+                            nodeStyle = _.clone(nodeOptions.table.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.window.name:
+                            html = "<div title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.window.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>"
+                                + "</div>";
+                            nodeStyle = _.clone(nodeOptions.window.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.trigger.name:
+                            html = "<div title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.trigger.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>"
+                                + "</div>";
+                            nodeStyle = _.clone(nodeOptions.trigger.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.aggregation.name:
+                            html = "<div title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.aggregation.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>"
+                                + "</div>";
+                            nodeStyle = _.clone(nodeOptions.aggregation.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.function.name:
+                            html = "<div title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.function.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>"
+                                + "</div>";
+                            nodeStyle = _.clone(nodeOptions.function.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.query.name:
+                            html = "<div title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.query.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>"
+                                + "</div>";
+                            nodeStyle = _.clone(nodeOptions.query.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.partition.name:
+                            html = "<div class='" + nodeOptions.partition.cssClass
+                                + "' title='" + node.description + "'>"
+                                + node.name
+                                + "</div>";
+                            nodeStyle = _.clone(nodeOptions.partition.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.partition_type.name:
+                            html = "<div title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.partition_type.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>" + "</div>";
+                            nodeStyle = _.clone(nodeOptions.partition_type.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
                     }
+
                     // Set the node
                     graph.setNode(node.id, nodeStyle);
 
                 });
-                console.log(self.renderOptions);
 
                 // Set the edges of the graph
                 data.edges.forEach(function (edge) {
-                    var edgeStyle = {arrowheadStyle: "fill: #bbb"};
-
-                    if (edge.type === "default") {
-                        // This makes the lines curve
-                        edgeStyle.lineInterpolate = "basis";
-                    } else if (edge.type === "dotted-line") {
+                    var edgeStyle;
+                    if (edge.type === "dotted-line") {
                         // This makes the lines dotted
-                        edgeStyle.style = "stroke-dasharray: 5, 5;";
+                        edgeStyle = _.clone(edgeOptions.dotted_line.edgeStyle);
+                    } else {
+                        edgeStyle = _.clone(edgeOptions.default.edgeStyle);
                     }
 
                     // Set the edge
@@ -282,31 +305,14 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 var graphId = "#" + self.$siddhiGraph.attr("id");
                 render(d3.select(graphId + " g"), graph);
 
-                centerGraphPosition(self.$siddhiGraph);
+                resizeGraph(self.$siddhiGraph);
 
-                function centerGraphPosition(svg) {
+                function resizeGraph(svg) {
                     var inner = svg.find('g');
-
                     svg.attr("width", inner.get(0).getBoundingClientRect().width + 60);
                     svg.attr("height", inner.get(0).getBoundingClientRect().height + 60);
-
-                    var graphWidth = parseInt(svg.attr("width"));
-                    var graphHeight = parseInt(svg.attr("height"));
-                    var width = self.$graphView.width();
-                    var height = self.$graphView.height();
-
-                    var left = diff(width, graphWidth) / 2;
-                    var top = diff(height, graphHeight) / 2;
-                    svg.attr("transform", "translate(" + left + "," + top + ")");
                 }
 
-                function diff(divValue, graphValue) {
-                    if (divValue > graphValue) {
-                        return (divValue - graphValue);
-                    } else {
-                        return 0;
-                    }
-                }
             }
 
             function showDefaultGraph() {
@@ -315,11 +321,29 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             }
         };
 
+        EventFlow.prototype.centerGraph = function () {
+            var graphWidth = parseInt(this.$siddhiGraph.attr("width"));
+            var graphHeight = parseInt(this.$siddhiGraph.attr("height"));
+            var width = this.$graphView.width();
+            var height = this.$graphView.height();
+
+            var left = diff(width, graphWidth) / 2;
+            var top = diff(height, graphHeight) / 2;
+            this.$siddhiGraph.attr("transform", "translate(" + left + "," + top + ")");
+
+            function diff(divValue, graphValue) {
+                if (divValue > graphValue) {
+                    return (divValue - graphValue);
+                } else {
+                    return 0;
+                }
+            }
+        };
+
         /**
          * Clears the design view of all it's contents when called.
          */
         EventFlow.prototype.clear = function () {
-            // todo if the app has not been changed, then no need to re-render
             this.$siddhiGraph.empty();
             this.$siddhiGraph.html('<g></g>');
         };
