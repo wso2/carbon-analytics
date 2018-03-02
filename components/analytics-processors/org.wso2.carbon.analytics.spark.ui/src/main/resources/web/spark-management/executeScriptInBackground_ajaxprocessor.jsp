@@ -81,7 +81,7 @@
         e.printStackTrace();
     %>
     <div id="returnedResults">
-        <span class="errorView"> <b>ERROR: </b><%=e.getMessage()%> </span>
+        <span class="errorView"> <b>ERROR: </b><%=Encode.forHtmlContent(e.getMessage())%> </span>
     </div>
 
     <% }

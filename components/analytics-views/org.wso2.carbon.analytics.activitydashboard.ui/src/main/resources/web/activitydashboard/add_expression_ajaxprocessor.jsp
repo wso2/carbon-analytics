@@ -16,6 +16,7 @@
 ~ under the License.
 --%>
 <%@ page import="org.wso2.carbon.analytics.activitydashboard.commons.*" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <%
     if (!"post".equalsIgnoreCase(request.getMethod())) {
@@ -35,7 +36,7 @@
     try {
         if (isQueryExpression) {
             String tableName = request.getParameter("tableName");
-            String searchQuery = request.getParameter("searchQuery");
+            String searchQuery = Encode.forHtmlContent(request.getParameter("searchQuery"));
             Query query = new Query(expressionNodeId, tableName, searchQuery);
             searchExpressionTree.putExpressionNode(query);
         } else {
@@ -51,7 +52,7 @@
         }
         request.getSession().setAttribute("SearchExpression", searchExpressionTree);
     } catch (InvalidExpressionNodeException e) {
-        response.getWriter().print(e.getMessage());
+        response.getWriter().print(Encode.forHtmlContent(e.getMessage()));
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 %>
