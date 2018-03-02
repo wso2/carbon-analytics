@@ -42,6 +42,18 @@ import java.util.regex.Pattern;
  */
 public class EventFlow {
 
+    private static final String APP_NAME = "appName";
+    private static final String APP_DESCRIPTION = "appDescription";
+    private static final String TYPE = "type";
+    private static final String NAME = "name";
+    private static final String ID = "id";
+    private static final String DESCRIPTION = "description";
+    private static final String PARENT = "parent";
+    private static final String CHILD = "child";
+    private static final String NODE = "nodes";
+    private static final String EDGE = "edges";
+    private static final String GROUP = "groups";
+    private static final String CHILDREN = "children";
     private static final Pattern PATTERN = Pattern.compile("\\b[i|I][n|N]\\b\\s+(\\w+)");
 
     private SiddhiAppMap siddhiAppMap;
@@ -62,8 +74,8 @@ public class EventFlow {
      * object from the provided SiddhiAppMap object.
      */
     private void setEventFlowJSON() {
-        eventFlowJSON.put("appName", siddhiAppMap.getAppName());
-        eventFlowJSON.put("appDescription", siddhiAppMap.getAppDescription());
+        eventFlowJSON.put(APP_NAME, siddhiAppMap.getAppName());
+        eventFlowJSON.put(APP_DESCRIPTION, siddhiAppMap.getAppDescription());
         setNodes();
         setEdges();
         setGroups();
@@ -126,7 +138,7 @@ public class EventFlow {
         }
 
         // Add All The Created Nodes To The Event Flow
-        eventFlowJSON.put("nodes", nodes);
+        eventFlowJSON.put(NODE, nodes);
     }
 
     /**
@@ -139,10 +151,10 @@ public class EventFlow {
      */
     private void createNode(NodeType type, String id, String name, String description) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", type.getTypeAsString());
-        jsonObject.put("id", id);
-        jsonObject.put("name", name);
-        jsonObject.put("description", description);
+        jsonObject.put(TYPE, type.getTypeAsString());
+        jsonObject.put(ID, id);
+        jsonObject.put(NAME, name);
+        jsonObject.put(DESCRIPTION, description);
         nodes.put(jsonObject);
     }
 
@@ -154,7 +166,7 @@ public class EventFlow {
         setAggregationEdges();
         setQueryEdges();
         setPartitionEdges();
-        eventFlowJSON.put("edges", edges);
+        eventFlowJSON.put(EDGE, edges);
     }
 
     /**
@@ -260,9 +272,9 @@ public class EventFlow {
      */
     private void createEdge(EdgeType edgeType, String parent, String child) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", edgeType.getTypeAsString());
-        jsonObject.put("parent", parent);
-        jsonObject.put("child", child);
+        jsonObject.put(TYPE, edgeType.getTypeAsString());
+        jsonObject.put(PARENT, parent);
+        jsonObject.put(CHILD, child);
         edges.put(jsonObject);
     }
 
@@ -275,7 +287,7 @@ public class EventFlow {
         for (PartitionInfo partition : siddhiAppMap.getPartitions()) {
             createGroup(partition.getId(), partition.getName(), partition.getQueries(), partition.getPartitionTypes());
         }
-        eventFlowJSON.put("groups", groups);
+        eventFlowJSON.put(GROUP, groups);
     }
 
     /**
@@ -291,8 +303,8 @@ public class EventFlow {
     private void createGroup(String id, String name, List<QueryInfo> queries, List<PartitionTypeInfo> partitionTypes) {
         // Create A Group To Define A Partition
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
-        jsonObject.put("name", name);
+        jsonObject.put(ID, id);
+        jsonObject.put(NAME, name);
 
         List<String> children = new ArrayList<>();
         // Add All The Queries To The Partition As Children
@@ -306,7 +318,7 @@ public class EventFlow {
         for (PartitionTypeInfo partitionType : partitionTypes) {
             children.add(partitionType.getId());
         }
-        jsonObject.put("children", children.toArray());
+        jsonObject.put(CHILDREN, children.toArray());
 
         // Add The Created JSONObject To The Groups JSONArray
         groups.put(jsonObject);
