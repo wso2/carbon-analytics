@@ -92,6 +92,10 @@ public class SiddhiAppMap {
             siddhiApp = SiddhiCompiler.parse(siddhiAppString);
             siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiAppString);
         } catch (Throwable e) {
+            // If an exception occurs while creating a SiddhiApp/SiddhiAppRuntime instance,
+            // then the error/exception is converted to a SiddhiAppCreation exception.
+            // This is done so the error can be easily identified and be logged in the console
+            // of the Stream Processor Editor whenever this code is called.
             throw new SiddhiAppCreationException(e.getMessage());
         }
 

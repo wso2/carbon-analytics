@@ -39,7 +39,9 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                 "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide" +
                 " on getting started with SP editor. \n" +
                 "\n";
-
+            // The render options contains any settings/options for rendering the graph,
+            // this has been added here separately for easier access if the style of the
+            // graph generated needs to be changed.
             var defaultNodeStyle = {
                 labelType: "html",
                 rx: 7,
@@ -122,7 +124,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
          * to a specific JSON format to be displayed in the UI.
          *
          * @param siddhiCode The Siddhi App as a string
-         * @returns A JSON with a response status, and the JSON returned by the back-end
+         * @returns A JSON with a response status, and the JSON value returned by the back-end
          */
         EventFlow.prototype.fetchJSON = function (siddhiCode) {
             var self = this;
@@ -321,6 +323,9 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             }
         };
 
+        /**
+         * Center's the graph generated in the design view to the middle of it's parent container.
+         */
         EventFlow.prototype.centerGraph = function () {
             var graphWidth = parseInt(this.$siddhiGraph.attr("width"));
             var graphHeight = parseInt(this.$siddhiGraph.attr("height"));
@@ -343,7 +348,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
         /**
          * Clears the design view of all it's contents when called.
          */
-        EventFlow.prototype.clear = function () {
+        EventFlow.prototype.clearContent = function () {
             this.$siddhiGraph.empty();
             this.$siddhiGraph.html('<g></g>');
         };

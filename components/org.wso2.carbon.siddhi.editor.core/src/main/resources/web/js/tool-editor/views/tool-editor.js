@@ -143,13 +143,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                             if (isInitialRender || !self._sourceView.isClean()) {
                                 var response = eventFlow.fetchJSON(self.getContent());
                                 if (response.status === "success") {
-                                    eventFlow.clear();
+                                    eventFlow.clearContent();
                                     sourceContainer.hide();
                                     designContainer.show();
                                     eventFlow.render(response.responseJSON);
                                     eventFlow.centerGraph();
                                     toggleViewButton.html("Go To Source View");
-                                    isInitialRender = false;
+                                    if (isInitialRender) {
+                                        isInitialRender = false;
+                                    }
                                 } else if (response.status === "fail") {
                                     eventFlow.alert(response.errorMessage);
                                 }
