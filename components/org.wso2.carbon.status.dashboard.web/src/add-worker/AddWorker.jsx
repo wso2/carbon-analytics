@@ -34,7 +34,6 @@ import FormPanel from "../common/FormPanel";
 import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
 import Error403 from "../error-pages/Error403";
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
-import CommonAPI from "../utils/apis/CommonAPI";
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
@@ -126,9 +125,50 @@ export default class AddWorker extends React.Component {
                                 if (response.status === HttpStatus.OK) {
                                     console.log("Manager added");
                                     that._showMessage("Manager " + nodeID + " is added successfully !");
-                                    setTimeout(function () {
-                                        window.location.href = window.contextPath;
-                                    }, 1000)
+                                     setTimeout(function () {
+                                    // <Redirect to={{pathname: `${window.contextPath}/siddhi-apps`}}/>
+                                    window.location.href = window.contextPath +"/"+nodeID+"/siddhi-apps";
+                                     }, 1000)
+
+
+
+
+
+                                    //TODO:FOR TESTING
+                                    // StatusDashboardAPIS.getManagerSiddhiApps(nodeID)
+                                    //     .then((response) => {
+                                    //         if (response.status = HttpStatus.OK) {
+                                    //             console.log(response.data);
+                                    //         }
+                                    //     }).catch((error) => {
+                                    //     if (error.response != null) {
+                                    //         if (error.response.status === 401) {
+                                    //             this.setState({
+                                    //                 isApiCalled: true,
+                                    //                 sessionInvalid: true,
+                                    //                 statusMessage: "Authentication fail. Please login again."
+                                    //             })
+                                    //         } else if (error.response.status === 403) {
+                                    //             this.setState({
+                                    //                 isApiCalled: true,
+                                    //                 hasPermission: false,
+                                    //                 statusMessage: "User Have No Permission to view this"
+                                    //             })
+                                    //         } else {
+                                    //             this.setState({
+                                    //                 isApiCalled: true,
+                                    //                 statusMessage: "Unknown error occurred!"
+                                    //             })
+                                    //         }
+                                    //     }
+                                    //     that._showError(that.state.statusMessage);
+                                    // });
+
+
+                                  //  setTimeout(function () {
+                                      //  <Redirect to={{pathname: `${window.contextPath}/siddhi-apps`}}/>
+                                       // window.location.href = window.contextPath +"siddhi-apps";
+                                  //  }, 1000)
                                 } else {
                                     that._showError("Error while adding manager " + nodeID + " .Try Again !");
                                 }
@@ -155,6 +195,45 @@ export default class AddWorker extends React.Component {
                             }
                             that._showError(that.state.statusMessage);
                         });
+                        //TODO: ONLY FOR TESTING NEED TO BE REMOVED
+                        // StatusDashboardOverViewAPI.getManagerHADetails(nodeID)
+                        //     .then((response) => {
+                        //         if(response.status == HttpStatus.OK){
+                        //             console.log(response.data);
+                        //         }else {
+                        //             that._showError("Error while connecting with the node" + nodeID);
+                        //         }
+                        //     }).catch((error) => {
+                        //     if (error.response != null) {
+                        //         if (error.response.status === 401) {
+                        //             this.setState({
+                        //                 isApiCalled: true,
+                        //                 sessionInvalid: true,
+                        //                 statusMessage: "Authentication fail. Please login again."
+                        //             })
+                        //         } else if (error.response.status === 403) {
+                        //             this.setState({
+                        //                 isApiCalled: true,
+                        //                 hasPermission: false,
+                        //                 statusMessage: "User Have No Permission to view this"
+                        //             })
+                        //         } else if (error.response.status === 500) {
+                        //             this.setState({
+                        //                 isApiCalled: true,
+                        //                 hasPermission: false,
+                        //                 statusMessage: "Unreachable node. Try again !"
+                        //             })
+                        //         } else {
+                        //             this.setState({
+                        //                 isApiCalled: true,
+                        //                 statusMessage: "Unknown error occurred!"
+                        //             })
+                        //         }
+                        //     }
+                        //     that._showError(that.state.statusMessage);
+                        // });
+
+
                     } else if (response.data === "worker") {
                         console.log("Hi am worker");
                         StatusDashboardOverViewAPI.createWorker(node)
@@ -295,19 +374,10 @@ export default class AddWorker extends React.Component {
             }
             that._showError(that.state.statusMessage);
         });
-
-
-        // StatusDashboardAPIS.testConnection(workerID)
-        //     .then((response) => {
-        //         if (response.data.code === 200) {
-        //             that._showMessage(response.data.message)
-        //         } else {
-        //             that._showError(response.data.message)
-        //         }
-        //     }).catch((error) => {
-        //     that._showError("Error while testing the connection!! ");
-        // });
     }
+
+    //TODO:NEWLY ADDED
+
 
     _showError(message) {
         this.setState({
@@ -443,4 +513,3 @@ export default class AddWorker extends React.Component {
     }
 
 }
-

@@ -173,3 +173,7 @@ body {
     opacity: 1;
 }
 
+.deployed-apps-details {
+    color: white;
+    display: inline;
+}

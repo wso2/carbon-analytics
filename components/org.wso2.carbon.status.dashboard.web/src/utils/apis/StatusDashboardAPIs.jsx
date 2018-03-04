@@ -153,4 +153,8 @@ export default class StatusDashboardAPIS {
         return StatusDashboardAPIS.getHTTPClient().get('/'+workerId+'/runTime');
     }
 
+    static getManagerSiddhiApps(workerId){
+        return StatusDashboardAPIS.getHTTPClient().get('/manager' +'/'+workerId+'/siddhi-apps');
+    }
+
 }
