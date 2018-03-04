@@ -70,4 +70,16 @@ public interface WorkerServiceStub {
     @RequestLine("GET /runTime")
     Response getRunTime();
 
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers")
+    Response getManagerDetails();
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers/siddhi-apps")
+    Response getSiddhiApps();
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /resourceClusterWorkers")
+    Response getResourceClusterWorkers();
+
 }

@@ -68,4 +68,10 @@ public abstract class MonitoringApiService {
     public abstract Response getRolesByUsername(String username,String permisstionString);
 
     public abstract Response getRuntimeEnv(String id,String username) throws NotFoundException;
+
+    public abstract Response getAllManagers(String id,String username) throws NotFoundException;
+
+    public abstract Response getSiddhiApps(String id,String username) throws NotFoundException;
+
+    public abstract Response getManagers(String username) throws NotFoundException, SQLException;
 }

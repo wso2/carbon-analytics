@@ -578,6 +578,44 @@ public class StatusDashboardWorkerDBHandler {
 
 
     /**
+     * select managers in the database.
+     */
+    public List<WorkerConfigurationDetails> selectAllManagers() {
+        String resolvedSelectQuery = resolveTableName(this.selectQuery, MANAGER_CONFIG_TABLE);
+        Map<String, String> attributesTypes = workerAttributeTypeMap.get(MANAGER_CONFIG_TABLE);
+        Connection conn = this.getConnection();
+        WorkerConfigurationDetails row;
+        List<WorkerConfigurationDetails> workerConfigurationDetails = new ArrayList<>();
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement(resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, WHITESPACE +
+                    WorkerConfigurationDetails.getManagerColumnLabeles()).replace(PLACEHOLDER_CONDITION, ""));
+            ResultSet rs = DBHandler.getInstance().select(stmt);
+            while (rs.next()) {
+                row = new WorkerConfigurationDetails();
+                row.setPort((Integer) DBTableUtils.getInstance().fetchData(rs, "PORT", attributesTypes.get
+                        (Constants.PORT), statusDashboardQueryManager));
+                row.setHost((String) DBTableUtils.getInstance().fetchData(rs, "HOST", attributesTypes.get
+                        (Constants.HOST), statusDashboardQueryManager));
+                row.setWorkerId((String) DBTableUtils.getInstance().fetchData(rs, "MANAGERID",
+                                                                              attributesTypes.get(Constants.MANAGERID),
+                                                                              statusDashboardQueryManager));
+                workerConfigurationDetails.add(row);
+
+            }
+            stmt.close();
+            rs.close();
+        } catch (SQLException e) {
+            throw new RDBMSTableException("Error retrieving records from table '" + "MANAGER CONFIGURATION", e);
+        } finally {
+            closePreparedStatement(stmt);
+            cleanupConnection(conn);
+        }
+        return workerConfigurationDetails;
+    }
+
+
+    /**
      * Generated thw worker ID condition.
      *
      * @param workerIdPlaceHolder sp-workerID
