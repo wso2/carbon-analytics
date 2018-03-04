@@ -43,7 +43,7 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 
-@Path("/workers")
+@Path("/resourceClusterWorkers")
 
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the workers API")
