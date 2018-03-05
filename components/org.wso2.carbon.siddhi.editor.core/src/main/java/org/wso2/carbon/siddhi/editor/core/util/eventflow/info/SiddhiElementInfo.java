@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
+/**
+ * Defines any generic Siddhi Element.
+ */
 public abstract class SiddhiElementInfo {
 
     private String id;

@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
+/**
+ * Defines a Siddhi Function.
+ */
 public class FunctionInfo extends SiddhiElementInfo {
 
     public FunctionInfo(String id, String name, String definition) {

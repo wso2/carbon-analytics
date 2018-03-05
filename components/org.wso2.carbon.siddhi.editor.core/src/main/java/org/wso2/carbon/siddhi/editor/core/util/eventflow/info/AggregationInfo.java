@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
+/**
+ * Defines a Siddhi Aggregation.
+ */
 public class AggregationInfo extends SiddhiElementInfo {
 
     private String inputStreamId;

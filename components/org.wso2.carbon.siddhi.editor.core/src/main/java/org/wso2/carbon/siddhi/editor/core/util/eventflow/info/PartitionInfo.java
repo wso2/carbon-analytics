@@ -21,6 +21,9 @@ package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Defines a Siddhi Partition.
+ */
 public class PartitionInfo extends SiddhiElementInfo {
 
     private List<QueryInfo> queries = new ArrayList<>();

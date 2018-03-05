@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.constants;
 
+/**
+ * Used to define the names of different annotations that are used in SiddhiQL.
+ */
 public enum SiddhiAnnotationType {
     DESCRIPTION("description"),
     INFO("info"),

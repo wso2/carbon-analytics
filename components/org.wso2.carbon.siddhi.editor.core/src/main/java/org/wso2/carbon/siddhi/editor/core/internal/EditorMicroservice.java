@@ -69,6 +69,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -863,8 +864,7 @@ public class EditorMicroservice implements Microservice {
         Response response;
 
         try {
-            String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64),
-                    Charset.defaultCharset());
+            String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
 
             SiddhiAppMap siddhiAppMap = new SiddhiAppMap(siddhiAppString);
             EventFlow eventFlow = new EventFlow(siddhiAppMap);
@@ -876,16 +876,13 @@ public class EditorMicroservice implements Microservice {
                     .entity(eventFlow.getEventFlowJSON().toString())
                     .build();
         } catch (SiddhiAppCreationException e) {
-            // SiddhiAppCreationException is caught if the provided 'SiddhiAppString' contains any syntax errors.
-            log.info("Cannot Generate Graph View: " + e.getMessage());
+            log.error("Cannot Generate Graph View: {}.", e.getMessage(), e);
             response = Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();
-        } catch (Throwable e) {
-            // Throwable is caught, if any unknown errors occur when executing the code in the try block.
-            // An example of this could be an 'IllegalArgumentException' thrown from the 'SiddhiAppMap' class.
-            log.error("Unexpected error occurred: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("Unexpected error occurred: {}.", e.getMessage(), e);
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())

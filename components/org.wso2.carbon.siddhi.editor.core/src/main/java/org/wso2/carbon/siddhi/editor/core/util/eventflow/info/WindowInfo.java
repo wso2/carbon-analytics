@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
+/**
+ * Defines a Siddhi Window.
+ */
 public class WindowInfo extends SiddhiElementInfo {
 
     public WindowInfo(String id, String name, String definition) {

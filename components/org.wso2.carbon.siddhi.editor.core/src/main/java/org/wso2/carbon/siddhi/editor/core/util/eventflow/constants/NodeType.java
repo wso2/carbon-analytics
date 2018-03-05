@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.constants;
 
+/**
+ * Used to define the different types of nodes that are available when generating a graph.
+ */
 public enum NodeType {
     AGGREGATION("aggregation"),
     FUNCTION("function"),

@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
+/**
+ * Defines a Siddhi Table.
+ */
 public class TableInfo extends SiddhiElementInfo {
 
     public TableInfo(String id, String name, String definition) {

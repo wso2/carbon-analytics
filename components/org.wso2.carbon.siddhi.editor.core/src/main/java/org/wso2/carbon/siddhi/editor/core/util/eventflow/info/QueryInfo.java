@@ -21,6 +21,9 @@ package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Defines a Siddhi Query.
+ */
 public class QueryInfo extends SiddhiElementInfo {
 
     private List<String> inputStreamIds = new ArrayList<>();

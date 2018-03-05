@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.constants;
 
+/**
+ * Used to define the different types of edges that can be used when generating a graph.
+ */
 public enum EdgeType {
     DEFAULT("default"),
     DOTTED_LINE("dotted-line");

@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
+/**
+ * Defines a Siddhi Trigger.
+ */
 public class TriggerInfo extends SiddhiElementInfo {
 
     public TriggerInfo(String id, String name, String definition) {

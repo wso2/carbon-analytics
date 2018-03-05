@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
+/**
+ * Defines the type by which an input stream in a partition is partitioned (partitioned by range/value).
+ */
 public class PartitionTypeInfo extends SiddhiElementInfo {
 
     private String streamId;
