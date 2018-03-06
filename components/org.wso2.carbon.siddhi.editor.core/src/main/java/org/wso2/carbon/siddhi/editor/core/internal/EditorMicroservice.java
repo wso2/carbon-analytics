@@ -861,8 +861,6 @@ public class EditorMicroservice implements Microservice {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response constructEventFlowJsonString(String siddhiAppBase64) {
-        Response response;
-
         try {
             String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
 
@@ -871,25 +869,23 @@ public class EditorMicroservice implements Microservice {
 
             // The 'Access-Control-Allow-Origin' header must be set to '*' as this might be accessed
             // by other domains in the future.
-            response = Response.status(Response.Status.OK)
+            return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(eventFlow.getEventFlowJSON().toString())
                     .build();
         } catch (SiddhiAppCreationException e) {
-            log.error("Cannot Generate Graph View: {}.", e.getMessage(), e);
-            response = Response.status(Response.Status.BAD_REQUEST)
+            log.error("Unable To Generate Graph View", e);
+            return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();
-        } catch (Exception e) {
-            log.error("Unexpected error occurred: {}.", e.getMessage(), e);
-            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+        } catch (IllegalArgumentException e) {
+            log.error("Illegal argument exception occurred", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();
         }
-
-        return response;
     }
 
     /**
