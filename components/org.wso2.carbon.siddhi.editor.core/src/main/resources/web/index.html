@@ -227,41 +227,45 @@
         <!-- End Source Container -->
         <!-- Start Design Container -->
         <div class="design-container" style="display: none;">
-            <div class="colour-key">
-                <table class="colour-key-table">
-                    <tr>
-                        <td>
-                            <span class="stream-colour"></span> Stream
-                        </td>
-                        <td>
-                            <span class="table-colour"></span> Table
-                        </td>
-                        <td>
-                            <span class="window-colour"></span> Window
-                        </td>
-                        <td>
-                            <span class="trigger-colour"></span> Trigger
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="aggregation-colour"></span> Aggregation
-                        </td>
-                        <td>
-                            <span class="function-colour"></span> Function
-                        </td>
-                        <td>
-                            <span class="query-colour"></span> Query
-                        </td>
-                        <td>
-                            <span class="partition-type-colour"></span> Partition
-                        </td>
-                    </tr>
-                </table>
+            <div class="design-container-data">
+                <div class="colour-key">
+                    <table class="colour-key-table">
+                        <tr>
+                            <td>
+                                <span class="stream-colour"></span> Stream
+                            </td>
+                            <td>
+                                <span class="table-colour"></span> Table
+                            </td>
+                            <td>
+                                <span class="window-colour"></span> Window
+                            </td>
+                            <td>
+                                <span class="trigger-colour"></span> Trigger
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="aggregation-colour"></span> Aggregation
+                            </td>
+                            <td>
+                                <span class="function-colour"></span> Function
+                            </td>
+                            <td>
+                                <span class="query-colour"></span> Query
+                            </td>
+                            <td>
+                                <span class="partition-type-colour"></span> Partition
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="siddhi-app-name"></div>
+                <div class="siddhi-app-description"></div>
             </div>
-            <div class="siddhi-app-name"></div>
-            <div class="siddhi-app-description"></div>
             <div class="graph-container">
+                <div class="loading-screen">Loading</div>
+                <!-- TODO Calculate the size % of the graph dynamically in the JS-->
                 <svg class="siddhi-graph" id="siddhi-graph">
                     <g></g>
                 </svg>
@@ -274,7 +278,7 @@
         <!-- End Preview Container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
-            <div class="btn btn-primary toggle-view">Go To Design View</div>
+            <div class="btn toggle-view-button">Design View</div>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>
@@ -1480,7 +1484,7 @@
                             toggle_controls: {
                                 // relative selector within container for a tab
                                 container: '.toggle-controls-container',
-                                toggle_view: '.toggle-view'
+                                toggle_view: '.toggle-view-button'
                             },
                             notifications: {
                                 container: '#notification-container'

@@ -1,6 +1,9 @@
 .design-container {
     height: 100%;
     width: 100%;
+}
+
+.design-container-data {
     padding: 10px;
 }
 
@@ -40,6 +43,18 @@
     width: 100%;
     height: 85%;
     overflow: scroll;
+}
+
+.loading-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: #333333;
+    color: white;
+    font-size: 30px;
+    text-align: center;
+    padding: 10% 0;
 }
 
 .siddhi-graph {
@@ -117,17 +132,20 @@
 
 .toggle-controls-container {
     position: absolute;
-    left: 90%;
-    top: 94%;
+    bottom: 2%;
+    right: 2%;
     z-index: 1;
 }
 
-.toggle-view {
+.toggle-view-button {
     border-radius: 5px;
+    transition: 0.15s;
+    font-weight: bold;
+    color: white;
+    background-color: #f57e30;
 }
 
-.toggle-to-design {
-}
-
-.toggle-to-source {
+.toggle-view-button:hover {
+    color: #333;
+    transition: 0.15s;
 }

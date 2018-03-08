@@ -137,34 +137,40 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     designContainer.find('.siddhi-graph').attr('id', svgDynamicId);
                     var eventFlow = new EventFlow(designContainer);
                     var isInitialRender = true;
+                    var initialSiddhiCode = self.getContent().replace(/\s+/g, '');
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
-                            if (isInitialRender || !self._sourceView.isClean()) {
+                            if (isInitialRender || (initialSiddhiCode !== self.getContent().replace(/\s+/g, ''))) {
                                 var response = eventFlow.fetchJSON(self.getContent());
                                 if (response.status === "success") {
-                                    eventFlow.clearContent();
-                                    sourceContainer.hide();
-                                    designContainer.show();
-                                    eventFlow.render(response.responseJSON);
-                                    eventFlow.centerGraph();
-                                    toggleViewButton.html("Go To Source View");
                                     if (isInitialRender) {
                                         isInitialRender = false;
                                     }
+                                    initialSiddhiCode = self.getContent().replace(/\s+/g, '');
+                                    sourceContainer.hide();
+                                    designContainer.show();
+                                    eventFlow.clearContent();
+                                    toggleViewButton.html("Source View");
+                                    setTimeout(function () {
+                                        eventFlow.render(response.responseJSON);
+                                        eventFlow.resizeGraph();
+                                        eventFlow.centerGraph();
+                                    }, 1);
                                 } else if (response.status === "fail") {
                                     eventFlow.alert(response.errorMessage);
                                 }
                             } else {
                                 sourceContainer.hide();
                                 designContainer.show();
+                                eventFlow.resizeGraph();
                                 eventFlow.centerGraph();
-                                toggleViewButton.html("Go To Source View");
+                                toggleViewButton.html("Source View");
                             }
                         } else if (designContainer.is(':visible')) {
                             designContainer.hide();
                             sourceContainer.show();
-                            toggleViewButton.html("Go To Design View");
+                            toggleViewButton.html("Design View");
                         }
                     });
                 },
