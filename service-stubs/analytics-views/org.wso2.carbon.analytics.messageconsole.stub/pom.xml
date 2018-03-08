@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-views-stubs</artifactId>
-        <version>1.3.16-SNAPSHOT</version>
+        <version>1.3.16</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
