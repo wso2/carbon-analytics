@@ -36,14 +36,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             this.$siddhiGraph = this.$designView.find('.siddhi-graph');
 
             this.url = window.location.protocol + "//" + window.location.host + "/editor/event-flow";
-            // TODO replace this with the regex implementation
-            // TODO might have to remove this as the regex does not work in all situations.
-            this.defaultCode = "@App:name(\"SiddhiApp\")\n" +
-                "@App:description(\"Description of the plan\")\n" +
-                "\n" +
-                "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide" +
-                " on getting started with SP editor. \n" +
-                "\n";
             // The render options contains any settings/options for rendering the graph,
             // this has been added here separately for easier access if the style of the
             // graph generated needs to be changed.
@@ -124,6 +116,13 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     }
                 }
             };
+
+            var self = this;
+            $(window).on('resize', function () {
+                if (self.isVisible()) {
+                    self.graphResize();
+                }
+            });
         };
 
         /**
@@ -139,9 +138,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
             if (siddhiCode === null || siddhiCode === undefined || siddhiCode === "") {
                 result = {status: "fail", errorMessage: "The Siddhi App Cannot Be Empty"};
-                // TODO add regex check instead of string check.
             } else {
-                // TODO make the regex in the constructor as this may take too much time
                 siddhiCode = siddhiCode.replace(/--.*/g, '');
                 siddhiCode = siddhiCode.replace(/\/\*(.|\s)*?\*\//g, '');
                 var regex = /^\s*@\s*app\s*:\s*name\s*\(\s*["|'](.*)["|']\s*\)\s*@\s*app\s*:\s*description\s*\(\s*["|'](.*)["|']\s*\)\s*$/gi;
@@ -193,16 +190,13 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
          * @param data A JSON object that defines the graph that is to be rendered in the UI
          */
         EventFlow.prototype.render = function (data) {
-            //TODO add a loading section for when rendering.
+            //TODO add a proper loading section for when rendering.
             var self = this;
 
             if (data === null || data === undefined || data === {}) {
-                // TODO add a proper default view with the regex check.
-                showDefaultGraph();
+                log.error("The argument sent to the render method is null/undefined");
             } else {
                 createGraph();
-                // self.resizeGraph();
-                // self.centerGraph();
                 self.$loadingScreen.hide();
             }
 
@@ -345,43 +339,43 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     svg.attr("width", inner.get(0).getBoundingClientRect().width + 60);
                     svg.attr("height", inner.get(0).getBoundingClientRect().height + 60);
                 }
-
             }
-
-            // TODO if the app does not have a name and description defined then, show them as empty and not the default values
-            function showDefaultGraph() {
-                self.$siddhiAppName.html("SiddhiApp");
-                self.$siddhiAppDescription.html("Description of the plan");
-            }
-
         };
 
-        /**
-         * Center's the graph generated in the design view to the middle of it's parent container.
-         */
-        EventFlow.prototype.centerGraph = function () {
-            // TODO make sure the graph is auto re-centered when resized.
-            var graphWidth = parseInt(this.$siddhiGraph.attr("width"));
-            var graphHeight = parseInt(this.$siddhiGraph.attr("height"));
-            var width = this.$graphView.width();
-            var height = this.$graphView.height();
+        EventFlow.prototype.graphResize = function () {
+            var self = this;
 
-            var left = diff(width, graphWidth) / 2;
-            var top = diff(height, graphHeight) / 2;
-            this.$siddhiGraph.attr("transform", "translate(" + left + "," + top + ")");
+            resizeGraph();
+            centerSVG();
 
-            function diff(divValue, graphValue) {
-                if (divValue > graphValue) {
-                    return (divValue - graphValue);
-                } else {
-                    return 0;
+            function resizeGraph() {
+                var height = self.$designView.height() - self.$designViewData.height() - 20;
+                self.$graphView.height(height);
+            }
+
+            function centerSVG() {
+                // TODO make sure the graph is auto re-centered when resized.
+                var graphWidth = parseInt(self.$siddhiGraph.attr("width"));
+                var graphHeight = parseInt(self.$siddhiGraph.attr("height"));
+                var width = self.$graphView.width();
+                var height = self.$graphView.height();
+
+                var left = diff(width, graphWidth) / 2;
+                var top = diff(height, graphHeight) / 2;
+                self.$siddhiGraph.attr("transform", "translate(" + left + "," + top + ")");
+
+                function diff(divValue, graphValue) {
+                    if (divValue > graphValue) {
+                        return (divValue - graphValue);
+                    } else {
+                        return 0;
+                    }
                 }
             }
         };
 
-        EventFlow.prototype.resizeGraph = function () {
-            var height = this.$designView.height() - this.$designViewData.height() - 20;
-            this.$graphView.height(height);
+        EventFlow.prototype.isVisible = function () {
+            return this.$designView.is(':visible');
         };
 
         /**

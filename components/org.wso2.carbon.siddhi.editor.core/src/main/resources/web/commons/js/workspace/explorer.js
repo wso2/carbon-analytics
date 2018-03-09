@@ -160,7 +160,11 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                 e.stopPropagation();
                 self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
                 if(self.application.tabController.activeTab._title != "welcome-page"){
-                    self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                    if (self.application.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
+                        self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                    } else {
+                        self.application.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
+                    }
                 }
             });
 
@@ -183,7 +187,11 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                     self._lastWidth = newWidth;
                     self._isActive = true;
                     if(self.application.tabController.activeTab._title != "welcome-page"){
-                        self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                        if (self.application.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
+                            self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                        } else {
+                            self.application.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
+                        }
                     }
                 }
                 event.preventDefault();
