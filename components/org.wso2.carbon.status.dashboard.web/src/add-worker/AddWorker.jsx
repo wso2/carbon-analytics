@@ -126,8 +126,10 @@ export default class AddWorker extends React.Component {
                                     console.log("Manager added");
                                     that._showMessage("Manager " + nodeID + " is added successfully !");
                                      setTimeout(function () {
+                                        // window.location.href = window.contextPath;
                                     // <Redirect to={{pathname: `${window.contextPath}/siddhi-apps`}}/>
-                                    window.location.href = window.contextPath +"/"+nodeID+"/siddhi-apps";
+                                  //  window.location.href = window.contextPath +"/"+nodeID+"/siddhi-apps";
+                                         window.location.href = window.contextPath;
                                      }, 1000)
 
 
@@ -243,6 +245,7 @@ export default class AddWorker extends React.Component {
                                     setTimeout(function () {
                                         window.location.href = window.contextPath;
                                     }, 1000)
+
                                 } else {
                                     that._showError("Error while adding worker '" + nodeID + "' . Try Again !");
                                 }
@@ -273,6 +276,10 @@ export default class AddWorker extends React.Component {
                     } else {
                         that._showError(nodeID + "is unreachable. please try again");
                     }
+
+                    // setTimeout(function () {
+                    //     window.location.href = window.contextPath;
+                    // }, 1000)
                 } else {
                     that._showError("Error while connecting with the node" + nodeID);
                 }

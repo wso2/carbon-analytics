@@ -153,8 +153,23 @@ export default class StatusDashboardAPIS {
         return StatusDashboardAPIS.getHTTPClient().get('/'+workerId+'/runTime');
     }
 
-    static getManagerSiddhiApps(workerId){
-        return StatusDashboardAPIS.getHTTPClient().get('/manager' +'/'+workerId+'/siddhi-apps');
+    static getManagerSiddhiApps(managerId){
+        return StatusDashboardAPIS.getHTTPClient().get('/manager' +'/'+managerId+'/siddhi-apps');
     }
 
+    static getManagerHADetails(managerId){
+        return StatusDashboardAPIS.getHTTPClient().get('/manager'+'/'+managerId);
+    }
+
+    static getSiddhiAppTextView(managerId,appName){
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/'+managerId+'/siddhi-apps/'+appName);
+    }
+
+    static getChildAppDetails(managerId,appName){
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/'+managerId+'/siddhi-apps/'+appName+'/child-apps')
+    }
+
+    static deleteManagerById(managerId){
+        return StatusDashboardAPIS.getHTTPClient().delete('/manager/'+managerId)
+    }
 }

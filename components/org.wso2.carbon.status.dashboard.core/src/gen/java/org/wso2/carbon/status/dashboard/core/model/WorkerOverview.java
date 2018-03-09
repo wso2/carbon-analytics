@@ -26,6 +26,15 @@ public class WorkerOverview {
     private Long lastUpdate;
     private String statusMessage;
     private ServerDetails serverDetails;
+    // private String haStatus;
+
+//    public String getHaStatus() {
+//        return haStatus;
+//    }
+//
+//    public void setHaStatus(String haStatus) {
+//        this.haStatus = haStatus;
+//    }
 
     public WorkerOverview() {
         serverDetails = new ServerDetails();

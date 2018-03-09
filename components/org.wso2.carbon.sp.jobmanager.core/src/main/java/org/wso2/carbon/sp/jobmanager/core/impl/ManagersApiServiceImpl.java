@@ -165,6 +165,8 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     ManagerDetails managerDetails = new ManagerDetails();
                     managerDetails.setHost(httpInterfaceHost);
                     managerDetails.setPort(httpInterfacePort);
+                    managerDetails.setGroupId(nodeDetail.getGroupId());
+                    //logger.info("groupId" + " " + clusterCoordinator.getLeaderNode().getGroupId());
                     if (clusterCoordinator.getLeaderNode().getNodeId().equals(nodeDetail.getNodeId())) {
                         managerDetails.setHaStatus("Active");
                     } else {
@@ -229,6 +231,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
     /**
      * This method is to display the text view of the siddhi application
+     *
      * @param appName
      * @return
      */
@@ -303,6 +306,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
     /**
      * Add new manager nodes : User can add one or manager nodes
+     *
      * @param manager  : Manager object that need to be added
      * @param username : username of the user
      * @return : Response whether the manager is successfully added or not.

@@ -82,4 +82,12 @@ public interface WorkerServiceStub {
     @RequestLine("GET /resourceClusterWorkers")
     Response getResourceClusterWorkers();
 
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers/siddhi-apps-execution/{appName}")
+    Response getManagerSiddhiAppTextView(@Param("appName") String appName);
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers/siddhi-apps/{appName}")
+    Response getChildAppDetails(@Param("appName") String appName);
+
 }

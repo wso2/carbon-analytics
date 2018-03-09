@@ -29,6 +29,7 @@ import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
+import java.sql.SQLException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -40,7 +41,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.sql.SQLException;
 
 
 @RequestInterceptor(AuthenticationInterceptor.class)
@@ -596,7 +596,7 @@ public class MonitoringRESTApi implements Microservice {
     public Response getAllManagers(@Context Request request,
                                    @ApiParam(value = "ID of the worker.", required = true) @PathParam("id")
                                            String id) throws NotFoundException {
-        return workersApi.getAllManagers(id, getUserName(request));
+        return workersApi.getManagerHADetails(id, getUserName(request));
     }
 
     @GET
@@ -635,6 +635,83 @@ public class MonitoringRESTApi implements Microservice {
                                           String id) throws NotFoundException {
         return workersApi.getSiddhiApps(id, getUserName(request));
     }
+
+    //todo: newly added
+
+    /**
+     * Get text view of the siddhi app.
+     *
+     * @param id
+     * @param appName
+     * @return
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/manager/{id}/siddhi-apps/{appName}")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.",
+                                         notes = "Retrieves the general text view and flow of a siddhi-app",
+                                         response = void.class, tags = {"Workers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.",
+                                                response = void.class)})
+    public Response getManagerSiddhiAppTextView(
+            @Context Request request,
+            @ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
+            , @ApiParam(value = "Name of the siddhi app.", required = true) @PathParam("appName") String appName
+                                               )
+            throws NotFoundException {
+        return workersApi.getManagerSiddhiAppTextView(id, appName, getUserName(request));
+    }
+
+
+    @GET
+    @Path("/manager/{id}/siddhi-apps/{appName}/child-apps")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.",
+                                         notes = "Retrieves the general text view and flow of a siddhi-app",
+                                         response = void.class, tags = {"Workers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.",
+                                                response = void.class)})
+    public Response getChildAppsDetails(
+            @Context Request request,
+            @ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
+            , @ApiParam(value = "Name of the siddhi app.", required = true) @PathParam("appName") String appName
+                                       )
+            throws NotFoundException {
+        return workersApi.getChildAppsDetails(id, appName, getUserName(request));
+    }
+
+    //todo:testing
+    @GET
+    @Path("/manager/{id}/siddhi-apps/{appName}/child-apps/transport")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.",
+                                         notes = "Retrieves the general text view and flow of a siddhi-app",
+                                         response = void.class, tags = {"Workers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.",
+                                                response = void.class)})
+    public Response getChildAppsTransportDetails(
+            @Context Request request,
+            @ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
+            , @ApiParam(value = "Name of the siddhi app.", required = true) @PathParam("appName") String appName
+                                                )
+            throws NotFoundException {
+        return workersApi.getChildAppsTransportDetails(id, appName, getUserName(request));
+    }
+
+
 
     //todo: newly added
 

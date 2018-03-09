@@ -36,6 +36,9 @@ public class ManagerDetails {
     @JsonProperty("haStatus")
     private String haStatus = null;
 
+    @JsonProperty("groupId")
+    private String groupId = null;
+
     public ManagerDetails host(String host) {
         this.host = host;
         return this;
@@ -92,6 +95,24 @@ public class ManagerDetails {
     public void setHaStatus(String haStatus) {
         this.haStatus = haStatus;
     }
+
+
+    //todo:for testing
+    public ManagerDetails groupId(String groupId) {
+        this.groupId = groupId;
+        return this;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    @ApiModelProperty(required = true, value = "")
+
 
     @Override
     public boolean equals(Object o) {

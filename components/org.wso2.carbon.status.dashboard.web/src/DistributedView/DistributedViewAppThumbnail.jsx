@@ -18,6 +18,7 @@
  */
 
 import React from "react";
+import {Link} from "react-router-dom";
 //Material UI
 import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar} from "material-ui";
 import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
@@ -81,16 +82,19 @@ export default class DistributedViewAppThumbnail extends React.Component {
 
 
     renderGridTile() {
-        let gridTiles, lastUpdate, color, haStatus;
+        let gridTiles;
         // if(this.props.worker.ParentAppName != null){
         console.log("AM passing here");
         console.log(this.props.distributedApp);
         console.log("data" + this.props.distributedApp.parentAppName);
 
 
+
         // if(this.props.distributedApp.parentAppName != null){
         gridTiles =
             <div>
+                <Link style={{textDecoration: 'none'}}
+                      to={window.contextPath +"/" + this.props.distributedApp.managerId+'/siddhi-apps/'+this.props.distributedApp.parentAppName}>
                 <GridList cols={4} cellHeight={180} style={styles.gridList}>
                     <GridTile title="Groups" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                         <div style={{display: 'inline', float: 'right', marginTop: '65%', marginRight: '60%'}}>
@@ -116,12 +120,12 @@ export default class DistributedViewAppThumbnail extends React.Component {
                         </div>
                     </GridTile>
                 </GridList>
-
+                </Link>
             </div>
-        lastUpdate = "N/A";
-        color = 'red';
+        // lastUpdate = "N/A";
+        // color = 'red';
 
-        return [gridTiles, lastUpdate, color];
+        return [gridTiles];
     }
 
     render() {
@@ -131,9 +135,9 @@ export default class DistributedViewAppThumbnail extends React.Component {
             <div>
                 <GridTile
                     title={this.props.distributedApp.parentAppName}
-                    actionIcon={<IconButton><CircleBorder
-                        color={items[2]}/></IconButton>}
-                    actionPosition="left"
+                    // actionIcon={<IconButton><CircleBorder
+                    //     color={items[2]}/></IconButton>}
+                    actionPosition="center"
                     style={{background: 'black'}}
                     titleBackground={'#424242'}
                 >

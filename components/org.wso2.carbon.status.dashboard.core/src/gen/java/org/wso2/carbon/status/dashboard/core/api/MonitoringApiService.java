@@ -18,12 +18,11 @@
  */
 package org.wso2.carbon.status.dashboard.core.api;
 
-import org.wso2.carbon.status.dashboard.core.exception.DashboardException;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 
-import javax.ws.rs.core.Response;
 import java.sql.SQLException;
+import javax.ws.rs.core.Response;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
 public abstract class MonitoringApiService {
@@ -69,9 +68,18 @@ public abstract class MonitoringApiService {
 
     public abstract Response getRuntimeEnv(String id,String username) throws NotFoundException;
 
-    public abstract Response getAllManagers(String id,String username) throws NotFoundException;
+    public abstract Response getManagerHADetails(String id, String username) throws NotFoundException;
 
     public abstract Response getSiddhiApps(String id,String username) throws NotFoundException;
 
     public abstract Response getManagers(String username) throws NotFoundException, SQLException;
+
+    public abstract Response getManagerSiddhiAppTextView(String id, String appName,
+                                                         String username) throws NotFoundException;
+
+    public abstract Response getChildAppsDetails(String id, String appName, String username) throws NotFoundException;
+
+    public abstract Response getChildAppsTransportDetails(String id, String appName,
+                                                          String username) throws NotFoundException;
+
 }

@@ -289,7 +289,12 @@ export default class DistributedOverview extends React.Component {
                 <div style={styles.background}>
                     <Header/>
                     <div className="navigation-bar">
-                        <FlatButton label="Overview" icon={<HomeButton color="black"/>}/>
+                        <Link to={window.contextPath}> <FlatButton label="Overview" icon={<HomeButton color="black"/>}/></Link>
+                        {/*<Link to={window.contextPath + '/worker/' + this.props.match.params.id }>*/}
+
+                        <RaisedButton label={this.props.match.params.id} disabled disabledLabelColor='white'
+                                      disabledBackgroundColor='#f17b31'/>
+
                     </div>
                     {this.renderWorkers(this.state.clustersList)}
                 </div>

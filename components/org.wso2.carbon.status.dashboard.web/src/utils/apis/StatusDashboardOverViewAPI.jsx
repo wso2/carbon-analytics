@@ -112,4 +112,8 @@ export default class StatusDashboardOverViewAPI {
         return StatusDashboardOverViewAPI.getHTTPClient().get('/manager'+'/'+managerId);
     }
 
+    static getManagerList(){
+        return StatusDashboardOverViewAPI.getHTTPClient().get('/manager');
+    }
+
 }
