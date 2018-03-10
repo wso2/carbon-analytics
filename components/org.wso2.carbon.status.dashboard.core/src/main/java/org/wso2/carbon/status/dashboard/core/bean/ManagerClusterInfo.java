@@ -4,7 +4,16 @@ public class ManagerClusterInfo {
     private String host;
     private String port;
     private String groupId;
+    private String nodeId;
     private String haStatus;
+
+    public String getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
+    }
 
     public String getHost() {
         return host;

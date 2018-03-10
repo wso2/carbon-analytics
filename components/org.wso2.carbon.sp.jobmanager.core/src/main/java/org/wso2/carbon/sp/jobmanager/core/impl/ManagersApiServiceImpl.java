@@ -45,7 +45,6 @@ import org.wso2.carbon.sp.jobmanager.core.model.Manager;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppHolder;
-import org.wso2.carbon.sp.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.msf4j.Request;
 
 import java.util.ArrayList;
@@ -148,34 +147,49 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         }
     }
 
+
+//    public Response getManagerHADetails(String managerId){
+//        Boolean isActive;
+//        if(ServiceDataHolder.getDeploymentMode()==DeploymentMode.DISTRIBUTED){
+//            ClusterCoordinator clusterCoordinator = ServiceDataHolder.getCoordinator();
+//            if(clusterCoordinator!= null){
+//
+//            }
+//
+//        }
+//    }
+
+
     /***
      * This method is to list down all the manager's details that are belongs to the same cluster
      * @return :Manager's host and the port
      */
 
     public Response getManagerDetails() {
-        List<ManagerDetails> connectedManagers = new ArrayList<>();
+        //List<ManagerDetails> connectedManagers = new ArrayList<>();
         ClusterCoordinator clusterCoordinator = ServiceDataHolder.getCoordinator();
+        ManagerDetails managerDetails = new ManagerDetails();
         if (clusterCoordinator != null) {
             for (NodeDetail nodeDetail : clusterCoordinator.getAllNodeDetails()) {
                 if (nodeDetail.getPropertiesMap() != null) {
                     Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
-                    String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
-                    int httpInterfacePort = (int) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
-                    ManagerDetails managerDetails = new ManagerDetails();
-                    managerDetails.setHost(httpInterfaceHost);
-                    managerDetails.setPort(httpInterfacePort);
-                    managerDetails.setGroupId(nodeDetail.getGroupId());
-                    //logger.info("groupId" + " " + clusterCoordinator.getLeaderNode().getGroupId());
-                    if (clusterCoordinator.getLeaderNode().getNodeId().equals(nodeDetail.getNodeId())) {
+                    if (clusterCoordinator.isLeaderNode()) {
+                        managerDetails.setGroupId(nodeDetail.getGroupId());
                         managerDetails.setHaStatus("Active");
                     } else {
-                        managerDetails.setHaStatus("Pasive");
+                        managerDetails.setGroupId(nodeDetail.getGroupId());
+                        managerDetails.setHaStatus("pasive");
                     }
-                    connectedManagers.add(managerDetails);
+                    //logger.info("groupId" + " " + clusterCoordinator.getLeaderNode().getGroupId());
+//                    if (clusterCoordinator.getLeaderNode().getNodeId().equals(nodeDetail.getNodeId())) {
+//                        managerDetails.setHaStatus("Active");
+//                    } else {
+//                        managerDetails.setHaStatus("Pasive");
+//                    }
+                    // connectedManagers.add(managerDetails);
                 }
             }
-            return Response.ok().entity(connectedManagers).build();
+            return Response.ok().entity(managerDetails).build();
         } else {
             return Response.status(Response.Status.NO_CONTENT).entity(
                     new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no manager nodes found in the "

@@ -27,11 +27,11 @@ import java.util.Objects;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-02-05T14:14:09.496Z")
 public class ManagerDetails {
-    @JsonProperty("host")
-    private String host = null;
-
-    @JsonProperty("port")
-    private Integer port = null;
+//    @JsonProperty("host")
+//    private String host = null;
+//
+//    @JsonProperty("port")
+//    private Integer port = null;
 
     @JsonProperty("haStatus")
     private String haStatus = null;
@@ -39,48 +39,51 @@ public class ManagerDetails {
     @JsonProperty("groupId")
     private String groupId = null;
 
-    public ManagerDetails host(String host) {
-        this.host = host;
-        return this;
-    }
+//    @JsonProperty("nodeId")
+//    private String nodeId = null;
+//
+//    public ManagerDetails host(String host) {
+//        this.host = host;
+//        return this;
+//    }
 
-    /**
-     * Get host
-     *
-     * @return host
-     **/
-    @ApiModelProperty(required = true, value = "")
-    public String getHost() {
-        return host;
-    }
+//    /**
+//     * Get host
+//     *
+//     * @return host
+//     **/
+//    @ApiModelProperty(required = true, value = "")
+//    public String getHost() {
+//        return host;
+//    }
+//
+//    public void setHost(String host) {
+//        this.host = host;
+//    }
+//
+//    public ManagerDetails port(Integer port) {
+//        this.port = port;
+//        return this;
+//    }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public ManagerDetails port(Integer port) {
-        this.port = port;
-        return this;
-    }
-
-    /**
-     * Get port
-     *
-     * @return port
-     **/
-    @ApiModelProperty(required = true, value = "")
-    public Integer getPort() {
-        return port;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
-    public ManagerDetails haStatus(String haStatus) {
-        this.haStatus = haStatus;
-        return this;
-    }
+//    /**
+//     * Get port
+//     *
+//     * @return port
+//     **/
+//    @ApiModelProperty(required = true, value = "")
+//    public Integer getPort() {
+//        return port;
+//    }
+//
+//    public void setPort(Integer port) {
+//        this.port = port;
+//    }
+//
+//    public ManagerDetails haStatus(String haStatus) {
+//        this.haStatus = haStatus;
+//        return this;
+//    }
 
     /**
      * Get haStatus
@@ -111,6 +114,19 @@ public class ManagerDetails {
         this.groupId = groupId;
     }
 
+//    public ManagerDetails nodeId(String nodeId){
+//        this.nodeId=nodeId;
+//        return this;
+//    }
+//
+//    public String getNodeId() {
+//        return nodeId;
+//    }
+//
+//    public void setNodeId(String nodeId) {
+//        this.nodeId = nodeId;
+//    }
+
     @ApiModelProperty(required = true, value = "")
 
 
@@ -123,24 +139,22 @@ public class ManagerDetails {
             return false;
         }
         ManagerDetails managerDetails = (ManagerDetails) o;
-        return Objects.equals(this.host, managerDetails.host) &&
-                Objects.equals(this.port, managerDetails.port) &&
-                Objects.equals(this.haStatus, managerDetails.haStatus);
+        return
+                Objects.equals(this.haStatus, managerDetails.haStatus)&&
+                Objects.equals(this.groupId,managerDetails.groupId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(host, port, haStatus);
+        return Objects.hash(haStatus,groupId);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class ManagerDetails {\n");
-
-        sb.append("    host: ").append(toIndentedString(host)).append("\n");
-        sb.append("    port: ").append(toIndentedString(port)).append("\n");
         sb.append("    haStatus: ").append(toIndentedString(haStatus)).append("\n");
+        sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
         sb.append("}");
         return sb.toString();
     }
