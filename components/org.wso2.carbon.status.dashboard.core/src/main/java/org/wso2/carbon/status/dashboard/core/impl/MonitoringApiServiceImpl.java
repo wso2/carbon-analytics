@@ -37,6 +37,7 @@ import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkerServiceFactory;
 import org.wso2.carbon.status.dashboard.core.bean.ChildApps;
 import org.wso2.carbon.status.dashboard.core.bean.ManagerClusterInfo;
+import org.wso2.carbon.status.dashboard.core.bean.ManagerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.ParentSiddhiApp;
 import org.wso2.carbon.status.dashboard.core.bean.ParentSummaryDetails;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppMetricsHistory;
@@ -496,10 +497,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                                                         TypeToken<List<String>>() {
                                                                         }.getType());
                             serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
-                            //TODO:COMMENTED METRICS
-//                            WorkerMetricsSnapshot snapshot = new WorkerMetricsSnapshot(serverDetails, timeInMillis);
-//                                                                WorkerStateHolder.addMetrics(worker.getWorkerId(),
-//                                                                                             snapshot);
+//                            //TODO:COMMENTED METRICS
+                            ManagerMetricsSnapshot snapshot = new ManagerMetricsSnapshot(serverDetails, timeInMillis);
+                                                                WorkerStateHolder.addManagerMetrics(worker.getWorkerId(),
+                                                                                             snapshot);
                             workerOverview.setLastUpdate(timeInMillis);
                             workerOverview.setWorkerId(worker.getWorkerId());
 //                            workerOverview.setHaStatus(serverDetails.getHAStatus());
@@ -516,9 +517,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                                                                 , getUsername(), getPassword())
                                                                         .getManagerDetails();
                             String haResponseBody = haDetails.body().toString();
-                            List<ManagerClusterInfo> managerClusterInfos = gson.fromJson(haResponseBody, new
-                                                                        TypeToken<List<ManagerClusterInfo>>() {
-                                                                        }.getType());
+
                             //DistributedServerDetails serverDetails = gson.fromJson(responseBody,
                                                                                   //  DistributedServerDetails.class);
                             ManagerClusterInfo clusterInfo = gson.fromJson(haResponseBody,ManagerClusterInfo.class);
@@ -545,9 +544,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         } else {
                             workerOverview.setWorkerId(worker.getWorkerId());
                             DistributedServerDetails serverDetails = new DistributedServerDetails();
+                            ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
                             serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
                             workerOverview.setStatusMessage(getErrorMessage(workerResponse.status()));
                             workerOverview.setServerDetails(serverDetails);
+                            workerOverview.setClusterInfo(clusterInfo);
                             workerOverview.setLastUpdate((long) 0);
                             //grouping the never reached
                             if (groupedWorkers.get(Constants.NEVER_REACHED) == null) {
@@ -560,41 +561,45 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             }
                         }
                     } catch (feign.RetryableException e) {
-//                        WorkerMetricsSnapshot lastSnapshot = WorkerStateHolder.getMetrics(worker.getWorkerId());
-//                        if (lastSnapshot != null) {
-//                            lastSnapshot.updateRunningStatus(Constants.NOT_REACHABLE_ID);
-//                            ManagerOverView workerOverview = new ManagerOverView();
-//                            workerOverview.setLastUpdate(lastSnapshot.getTimeStamp());
-//                            workerOverview.setWorkerId(worker.getWorkerId());
-//                           // workerOverview.setServerDetails(lastSnapshot.getServerDetails());
-//                            workerOverview.setServerDetails(lastSnapshot.getServerDetails());
-//                                                                if (groupedWorkers.get(lastSnapshot.getServerDetails().getClusterId()) != null) {
-//                                                                    groupedWorkers.get(lastSnapshot.getServerDetails().getClusterId()).add(workerOverview);
-//                                                                } else {
-//                                                                    List<WorkerOverview> workers = new ArrayList<>();
-//                                                                    workers.add(workerOverview);
-//                                                                    groupedWorkers.put(lastSnapshot.getServerDetails().getClusterId(), workers);
-//                                                                }
-//                                                            } else {
-//                                                                WorkerOverview workerOverview = new WorkerOverview();
-//                                                                workerOverview.setWorkerId(worker.getWorkerId());
-//                                                                ServerDetails serverDetails = new ServerDetails();
-//                                                                serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
-//                                                                workerOverview.setServerDetails(serverDetails);
-//                                                                workerOverview.setLastUpdate((long) 0);
-////                          //grouping the never reached
-//                                                                if (groupedWorkers.get(Constants.NEVER_REACHED) == null) {
-//                                                                    List<WorkerOverview> workers = new ArrayList<>();
-//                                                                    workers.add(workerOverview);
-//                                                                    groupedWorkers.put(Constants.NEVER_REACHED, workers);
-//                                                                } else {
-//                                                                    List existing = groupedWorkers.get(Constants.NEVER_REACHED);
-//                                                                    existing.add(workerOverview);
-//                                                                }
-//                                                            }
-                                                        }
-                                                    }
-                                                   );
+
+                        ManagerMetricsSnapshot lastSnapshot = WorkerStateHolder.getManagerMetrics(worker.getWorkerId());
+                        if (lastSnapshot != null) {
+                            lastSnapshot.updateRunningStatus(Constants.NOT_REACHABLE_ID);
+                            ManagerOverView workerOverview = new ManagerOverView();
+                            workerOverview.setLastUpdate(lastSnapshot.getTimeStamp());
+                            workerOverview.setWorkerId(worker.getWorkerId());
+                           // workerOverview.setServerDetails(lastSnapshot.getServerDetails());
+                            workerOverview.setServerDetails(lastSnapshot.getServerDetails());
+                            workerOverview.setClusterInfo(lastSnapshot.getClusterInfo());
+                            if (groupedWorkers.get(lastSnapshot.getClusterInfo().getGroupId()) != null) {
+                                groupedWorkers.get(lastSnapshot.getClusterInfo().getGroupId()).add(workerOverview);
+                            } else {
+                                List<ManagerOverView> workers = new ArrayList<>();
+                                workers.add(workerOverview);
+                                groupedWorkers.put(lastSnapshot.getClusterInfo().getGroupId(), workers);
+                            }
+                        } else {
+                            ManagerOverView workerOverview = new ManagerOverView();
+                            workerOverview.setWorkerId(worker.getWorkerId());
+                            DistributedServerDetails serverDetails = new DistributedServerDetails();
+                            ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
+                            serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
+                            workerOverview.setServerDetails(serverDetails);
+                            workerOverview.setClusterInfo(clusterInfo);
+                            workerOverview.setLastUpdate((long) 0);
+//                          //grouping the never reached
+                            if (groupedWorkers.get(Constants.NEVER_REACHED) == null) {
+                                List<ManagerOverView> workers = new ArrayList<>();
+                                workers.add(workerOverview);
+                                groupedWorkers.put(Constants.NEVER_REACHED, workers);
+                            } else {
+                                List existing = groupedWorkers.get(Constants.NEVER_REACHED);
+                                existing.add(workerOverview);
+                            }
+                        }
+                    }
+                }
+                );
             }
             String jsonString = new Gson().toJson(groupedWorkers);
            // logger.info("final" + jsonString);

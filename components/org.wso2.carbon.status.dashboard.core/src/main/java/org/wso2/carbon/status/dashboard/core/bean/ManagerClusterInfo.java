@@ -3,7 +3,7 @@ package org.wso2.carbon.status.dashboard.core.bean;
 public class ManagerClusterInfo {
     private String host;
     private String port;
-    private String groupId;
+    private String groupId =" ";
     private String nodeId;
     private String haStatus;
 

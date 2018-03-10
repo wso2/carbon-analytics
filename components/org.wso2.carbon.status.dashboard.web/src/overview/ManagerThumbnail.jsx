@@ -141,7 +141,7 @@ export default class ManagerThumbnail extends React.Component {
         let gridTiles, lastUpdated, color, haStatus;
         //console.log("id"+this.props.worker);
         //never reached workers
-        if (this.props.worker.serverDetails.clusterID == null) {
+        if (this.props.worker.clusterInfo.groupId == null) {
             if(this.props.worker.statusMessage == null) {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={180} style={styles.gridList}>
@@ -190,7 +190,7 @@ export default class ManagerThumbnail extends React.Component {
                     </GridList>
             </div>;
             lastUpdated = "#";
-            if (this.props.worker.serverDetails.clusterID === "Non Clusters") {
+            if (this.props.worker.clusterInfo.groupId === "Non Clusters") {
                 if (this.props.worker.serverDetails.runningStatus === "Reachable") {
                     color = 'green'
                 } else {
@@ -198,10 +198,10 @@ export default class ManagerThumbnail extends React.Component {
                 }
             } else {
                 if (this.props.worker.serverDetails.runningStatus === "Reachable") {
-                    if (this.props.worker.serverDetails.haStatus === "Active") {
+                    if (this.props.worker.clusterInfo.haStatus === "Active") {
                         color = 'green';
                         haStatus = 'Active'
-                    } else if (this.props.worker.serverDetails.haStatus === "Passive") {
+                    } else if (this.props.worker.clusterInfo.haStatus === "Passive") {
                         color = 'grey';
                         haStatus = 'Passive'
                     }
@@ -300,7 +300,7 @@ export default class ManagerThumbnail extends React.Component {
                     </Link>
                 </div>;
             lastUpdated = "#";
-            if (this.props.worker.serverDetails.clusterID === "Non Clusters") {
+            if (this.props.worker.clusterInfo.groupId === "Non Clusters") {
                 if (this.props.worker.serverDetails.runningStatus === "Reachable") {
                     color = 'green'
                 } else {
@@ -308,10 +308,10 @@ export default class ManagerThumbnail extends React.Component {
                 }
             } else {
                 if (this.props.worker.serverDetails.runningStatus === "Reachable") {
-                    if (this.props.worker.serverDetails.haStatus === "Active") {
+                    if (this.props.worker.clusterInfo.haStatus === "Active") {
                         color = 'green';
                         haStatus = 'Active'
-                    } else if (this.props.worker.serverDetails.haStatus === "Passive") {
+                    } else if (this.props.worker.clusterInfo.haStatus === "Pasive") {
                         color = 'grey';
                         haStatus = 'Passive'
                     }

@@ -148,17 +148,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     }
 
 
-//    public Response getManagerHADetails(String managerId){
-//        Boolean isActive;
-//        if(ServiceDataHolder.getDeploymentMode()==DeploymentMode.DISTRIBUTED){
-//            ClusterCoordinator clusterCoordinator = ServiceDataHolder.getCoordinator();
-//            if(clusterCoordinator!= null){
-//
-//            }
-//
-//        }
-//    }
-
 
     /***
      * This method is to list down all the manager's details that are belongs to the same cluster
@@ -180,13 +169,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                         managerDetails.setGroupId(nodeDetail.getGroupId());
                         managerDetails.setHaStatus("pasive");
                     }
-                    //logger.info("groupId" + " " + clusterCoordinator.getLeaderNode().getGroupId());
-//                    if (clusterCoordinator.getLeaderNode().getNodeId().equals(nodeDetail.getNodeId())) {
-//                        managerDetails.setHaStatus("Active");
-//                    } else {
-//                        managerDetails.setHaStatus("Pasive");
-//                    }
-                    // connectedManagers.add(managerDetails);
                 }
             }
             return Response.ok().entity(managerDetails).build();
