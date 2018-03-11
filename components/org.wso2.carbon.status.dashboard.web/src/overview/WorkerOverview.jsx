@@ -131,7 +131,7 @@ export default class WorkerOverview extends React.Component {
                 this.setState({
                     clustersList: response.data,
                     isApiCalled: true,
-                    statusMessage:!WorkerOverview.hasWorkers(this.state.clustersList) ? "Currently there are no" +
+                    statusMessage:!WorkerOverview.hasNodes(this.state.clustersList) ? "Currently there are no" +
                         " nodes to display" : ''
                 });
             }).catch((error) => {
@@ -165,7 +165,7 @@ export default class WorkerOverview extends React.Component {
                     this.setState({
                         managerClusterList: response.data,
                         isApiCalled: true,
-                        statusMessage:!WorkerOverview.hasWorkers(this.state.managerClusterList)?"Currently there are no nodes to display" :''
+                        statusMessage:!WorkerOverview.hasNodes(this.state.managerClusterList)?"Currently there are no nodes to display" :''
                     });
                 }else {
                     console.log("manager connection failed");
@@ -347,7 +347,7 @@ export default class WorkerOverview extends React.Component {
      */
     renderWorkers(workersList,managerList) {
 
-        if (this.state.isApiCalled && !WorkerOverview.hasWorkers(this.state.clustersList) && !WorkerOverview.hasWorkers(this.state.managerClusterList)) {
+        if (this.state.isApiCalled && !WorkerOverview.hasNodes(this.state.clustersList) && !WorkerOverview.hasNodes(this.state.managerClusterList)) {
             if(this.state.hasViewPermission) {
                 return (
                     <div style={styles.background}>
@@ -384,7 +384,7 @@ export default class WorkerOverview extends React.Component {
                     </div>
                 );
             }
-        }else if(this.state.isApiCalled && ((WorkerOverview.hasWorkers(this.state.clustersList)) && (WorkerOverview.hasWorkers(this.state.managerClusterList)))){
+        }else if(this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList)) && (WorkerOverview.hasNodes(this.state.managerClusterList)))){
             {console.log("we have both")}
             return(
                 <div style={styles.background}>
@@ -426,9 +426,6 @@ export default class WorkerOverview extends React.Component {
                     })}
 
                     {Object.keys(managerList).map((id, workerList) => {
-                        {
-                            console.log("id is" + id)
-                        }
                         return (
                             <div>
                                 <h3 style={styles.h3}>Distributed Set</h3>
@@ -450,7 +447,7 @@ export default class WorkerOverview extends React.Component {
                     })}
                 </div>
             );
-        } else if (this.state.isApiCalled && ((WorkerOverview.hasWorkers(this.state.clustersList))) && (!WorkerOverview.hasWorkers(this.state.managerClusterList))) {
+        } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList))) && (!WorkerOverview.hasNodes(this.state.managerClusterList))) {
             console.log("we have only workers");
             //console.log("manager list"+this.state.managerClusterList);
             return (
@@ -495,7 +492,7 @@ export default class WorkerOverview extends React.Component {
                 </div>
             );
 
-        }else if(this.state.isApiCalled && (WorkerOverview.hasWorkers(this.state.managerClusterList)) && (!WorkerOverview.hasWorkers(this.state.clustersList))) {
+        }else if(this.state.isApiCalled && (WorkerOverview.hasNodes(this.state.managerClusterList)) && (!WorkerOverview.hasNodes(this.state.clustersList))) {
             {console.log("we have only manager")}
             return (
                 <div style={styles.background}>
@@ -577,7 +574,7 @@ export default class WorkerOverview extends React.Component {
             }
      }
 
-    static hasWorkers(clusters) {
+    static hasNodes(clusters) {
         for (let prop in clusters) {
             if (clusters.hasOwnProperty(prop)) {
                 return true;

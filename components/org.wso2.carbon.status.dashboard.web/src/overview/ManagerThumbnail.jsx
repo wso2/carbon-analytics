@@ -53,7 +53,7 @@ export default class ManagerThumbnail extends React.Component {
             worker: this.props.worker,
             hasPermission: false
         };
-        this.deleteWorker = this.deleteWorker.bind(this);
+        this.deleteManager = this.deleteManager.bind(this);
         this.showError = this.showError.bind(this);
         this.showMessage = this.showMessage.bind(this);
     }
@@ -87,7 +87,7 @@ export default class ManagerThumbnail extends React.Component {
         console.log("props"+nextProps);
     }
 
-    deleteWorker() {
+    deleteManager() {
         let that = this;
         StatusDashboardAPIS.deleteManagerById(this.props.worker.workerId)
             .then((response) => {
@@ -121,7 +121,7 @@ export default class ManagerThumbnail extends React.Component {
      * @param workersList
      * @returns {XML}
      */
-    renderDeleteWorker() {
+    renderDeleteManager() {
         if (this.state.hasPermission) {
             return (
                 <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker" style={{zIndex:1}}
@@ -262,30 +262,30 @@ export default class ManagerThumbnail extends React.Component {
                     <Link style={{textDecoration: 'none'}}
                           to={window.contextPath +"/"+this.props.worker.workerId+"/siddhi-apps"} >
                         <GridList cols={4} cellHeight={180} style={styles.gridList}>
-                            {/*<GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>*/}
-                                {/*<div><OverviewChart*/}
-                                    {/*chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}*/}
-                                    {/*color="#19cdd7"/></div>*/}
-                                {/*<div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>*/}
-                                    {/*{cpuTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :*/}
-                                        {/*<TrendDown style={{color: 'green'}}/>}</div>*/}
-                            {/*</GridTile>*/}
+                            <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                <div><OverviewChart
+                                    chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}
+                                    color="#19cdd7"/></div>
+                                <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
+                                    {cpuTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                                        <TrendDown style={{color: 'green'}}/>}</div>
+                            </GridTile>
 
-                            {/*<GridTile title="Memory Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>*/}
-                                {/*<div><OverviewChart*/}
-                                    {/*chartValue={this.state.worker.serverDetails.workerMetrics.memoryUsage * 100}*/}
-                                    {/*color="#f17b31"/></div>*/}
-                                {/*<div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>*/}
-                                    {/*{memoryTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :*/}
-                                        {/*<TrendDown style={{color: 'green'}}/>}</div>*/}
-                            {/*</GridTile>*/}
+                            <GridTile title="Memory Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                <div><OverviewChart
+                                    chartValue={this.state.worker.serverDetails.workerMetrics.memoryUsage * 100}
+                                    color="#f17b31"/></div>
+                                <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
+                                    {memoryTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                                        <TrendDown style={{color: 'green'}}/>}</div>
+                            </GridTile>
 
-                            {/*<GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>*/}
-                                {/*<div className="grid-tile-h1" style={{marginTop: 50}}>*/}
-                                    {/*{loadAvg}</div>*/}
-                                {/*<div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>*/}
-                                    {/*{loadTrendImg}</div>*/}
-                            {/*</GridTile>*/}
+                            <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                <div className="grid-tile-h1" style={{marginTop: 50}}>
+                                    {loadAvg}</div>
+                                <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
+                                    {loadTrendImg}</div>
+                            </GridTile>
 
                             <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                 <div className="grid-tile-h1" style={{marginTop: 50}}><h1
@@ -329,7 +329,7 @@ export default class ManagerThumbnail extends React.Component {
             <FlatButton
                 label="Yes"
                 backgroundColor='#f17b31'
-                onClick={this.deleteWorker}
+                onClick={this.deleteManager}
             />,
             <FlatButton
                 label="No"
@@ -364,7 +364,7 @@ export default class ManagerThumbnail extends React.Component {
                     titleBackground={items[2] === 'red' ? '#570404' : '#424242'}
                 >
                     <CardActions style={{boxSizing: 'border-box', float: 'right', display: 'inline', height: 20}}>
-                        {this.renderDeleteWorker()}
+                        {this.renderDeleteManager()}
                     </CardActions>
                     {items[0]}
                 </GridTile>
