@@ -141,7 +141,7 @@ export default class ManagerThumbnail extends React.Component {
         let gridTiles, lastUpdated, color, haStatus;
         //console.log("id"+this.props.worker);
         //never reached workers
-        if (this.props.worker.clusterInfo.groupId == null) {
+        if (this.props.worker.clusterInfo.groupId === " ") {
             if(this.props.worker.statusMessage == null) {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={180} style={styles.gridList}>
@@ -201,9 +201,9 @@ export default class ManagerThumbnail extends React.Component {
                     if (this.props.worker.clusterInfo.haStatus === "Active") {
                         color = 'green';
                         haStatus = 'Active'
-                    } else if (this.props.worker.clusterInfo.haStatus === "Passive") {
+                    } else if (this.props.worker.clusterInfo.haStatus === "Pasive") {
                         color = 'grey';
-                        haStatus = 'Passive'
+                        haStatus = 'Pasive'
                     }
                 } else {
                     color = 'red'
@@ -257,48 +257,91 @@ export default class ManagerThumbnail extends React.Component {
                 loadTrendImg = loadTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
                     <TrendDown style={{color: 'green'}}/>
             }
-            gridTiles =
-                <div>
-                    <Link style={{textDecoration: 'none'}}
-                          to={window.contextPath +"/"+this.props.worker.workerId+"/siddhi-apps"} >
-                        <GridList cols={4} cellHeight={180} style={styles.gridList}>
-                            <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
-                                <div><OverviewChart
-                                    chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}
-                                    color="#19cdd7"/></div>
-                                <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
-                                    {cpuTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
-                                        <TrendDown style={{color: 'green'}}/>}</div>
-                            </GridTile>
+            if (this.props.worker.clusterInfo.haStatus === "Active") {
+                gridTiles =
+                    <div>
+                        <Link style={{textDecoration: 'none'}}
+                              to={window.contextPath +"/"+this.props.worker.workerId+"/siddhi-apps"} >
+                            <GridList cols={4} cellHeight={180} style={styles.gridList}>
+                                <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                    <div><OverviewChart
+                                        chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}
+                                        color="#19cdd7"/></div>
+                                    <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
+                                        {cpuTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                                            <TrendDown style={{color: 'green'}}/>}</div>
+                                </GridTile>
 
-                            <GridTile title="Memory Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
-                                <div><OverviewChart
-                                    chartValue={this.state.worker.serverDetails.workerMetrics.memoryUsage * 100}
-                                    color="#f17b31"/></div>
-                                <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
-                                    {memoryTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
-                                        <TrendDown style={{color: 'green'}}/>}</div>
-                            </GridTile>
+                                <GridTile title="Memory Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                    <div><OverviewChart
+                                        chartValue={this.state.worker.serverDetails.workerMetrics.memoryUsage * 100}
+                                        color="#f17b31"/></div>
+                                    <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
+                                        {memoryTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                                            <TrendDown style={{color: 'green'}}/>}</div>
+                                </GridTile>
 
-                            <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
-                                <div className="grid-tile-h1" style={{marginTop: 50}}>
-                                    {loadAvg}</div>
-                                <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
-                                    {loadTrendImg}</div>
-                            </GridTile>
+                                <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                    <div className="grid-tile-h1" style={{marginTop: 50}}>
+                                        {loadAvg}</div>
+                                    <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
+                                        {loadTrendImg}</div>
+                                </GridTile>
+                                {/*Active Nodes display the siddhi detils*/}
+                                <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                    <div className="grid-tile-h1" style={{marginTop: 50}}><h1
+                                        className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
+                                        <h1 style={{display: 'inline'}}> |</h1>
+                                        <h1 className="inactive-apps">
+                                            {this.props.worker.serverDetails.siddhiApps.inactive}
+                                        </h1>
+                                    </div>
+                                </GridTile>
+                            </GridList>
+                        </Link>
+                    </div>;
+            }else{
+                gridTiles =
+                    <div>
+                              to={window.contextPath +"/"+this.props.worker.workerId+"/siddhi-apps"} >
+                            <GridList cols={4} cellHeight={180} style={styles.gridList}>
+                                <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                    <div><OverviewChart
+                                        chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}
+                                        color="#19cdd7"/></div>
+                                    <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
+                                        {cpuTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                                            <TrendDown style={{color: 'green'}}/>}</div>
+                                </GridTile>
 
-                            <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10}}>
-                                <div className="grid-tile-h1" style={{marginTop: 50}}><h1
-                                    className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
-                                    <h1 style={{display: 'inline'}}> |</h1>
-                                    <h1 className="inactive-apps">
-                                        {this.props.worker.serverDetails.siddhiApps.inactive}
-                                    </h1>
-                                </div>
-                            </GridTile>
-                        </GridList>
-                    </Link>
-                </div>;
+                                <GridTile title="Memory Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                    <div><OverviewChart
+                                        chartValue={this.state.worker.serverDetails.workerMetrics.memoryUsage * 100}
+                                        color="#f17b31"/></div>
+                                    <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
+                                        {memoryTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                                            <TrendDown style={{color: 'green'}}/>}</div>
+                                </GridTile>
+
+                                <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                    <div className="grid-tile-h1" style={{marginTop: 50}}>
+                                        {loadAvg}</div>
+                                    <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
+                                        {loadTrendImg}</div>
+                                </GridTile>
+                                <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                    <div className="grid-tile-h1" style={{marginTop: 50}}>
+                                        <h4 style={{
+                                            textAlign: 'center',
+                                            color: 'white',
+                                            padding: 20
+                                        }}>Siddhi Apps are disabled</h4>
+                                    </div>
+                                </GridTile>
+                            </GridList>
+                    </div>;
+            }
+
             lastUpdated = "#";
             if (this.props.worker.clusterInfo.groupId === "Non Clusters") {
                 if (this.props.worker.serverDetails.runningStatus === "Reachable") {
