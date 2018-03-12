@@ -22,10 +22,12 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.internal.AnalyticsPersistenceManager;
 import org.wso2.carbon.analytics.spark.core.internal.ServiceHolder;
+import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionException;
 import org.wso2.carbon.ntask.common.TaskException;
+import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.TaskManager;
 
 import java.util.ArrayList;
@@ -56,6 +58,58 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
         } catch (AnalyticsPersistenceException e) {
             log.error("Error occurred when persisting the script. " + e.getMessage(), e);
             throw e;
+        }
+    }
+
+    @Override
+    public void pauseAllScripts(int tenantId) throws AnalyticsExecutionException {
+        try {
+            List<TaskInfo> taskInfoList = ServiceHolder.getTaskManager().getAllTasks();
+            for (TaskInfo task : taskInfoList) {
+                if(task.getProperties().get(AnalyticsConstants.TASK_TENANT_ID_PROPERTY).
+                        equals(String.valueOf(tenantId))){
+                    ServiceHolder.getTaskManager().pauseTask(task.getName());
+                    if (log.isDebugEnabled()) {
+                        log.debug("Spark script " + task.getName() + " of tenant " + tenantId +
+                                " is successfully paused.");
+                    }
+                }
+            }
+        } catch (TaskException e) {
+            String errorMessage = "Error occurred when pausing the scripts for tenant " + tenantId;
+            log.error(errorMessage + e.getMessage(), e);
+            throw new AnalyticsExecutionException(e.getMessage() + errorMessage,e);
+        }
+    }
+
+    @Override
+    public List<TaskInfo> getScheduledTasks() throws AnalyticsExecutionException {
+        try {
+            return ServiceHolder.getTaskManager().getAllTasks();
+        } catch (TaskException e) {
+            String errorMessage = "Error while retrieving scheduled task scripts.";
+            throw new AnalyticsExecutionException(e.getMessage() + errorMessage,e);
+        }
+    }
+
+    @Override
+    public void resumeAllScripts(int tenantId) throws AnalyticsExecutionException {
+        try {
+            List<TaskInfo> taskInfoList = ServiceHolder.getTaskManager().getAllTasks();
+            for (TaskInfo task : taskInfoList) {
+                if(task.getProperties().get(AnalyticsConstants.TASK_TENANT_ID_PROPERTY).
+                        equals(String.valueOf(tenantId))){
+                    ServiceHolder.getTaskManager().resumeTask(task.getName());
+                    if (log.isDebugEnabled()) {
+                        log.debug("Spark script " + task.getName() + " of tenant " + tenantId +
+                                " is successfully resumed.");
+                    }
+                }
+            }
+        } catch (TaskException e) {
+            String errorMessage = "Error occurred when resuming the scripts for tenant " + tenantId;
+            log.error(errorMessage, e);
+            throw new AnalyticsExecutionException(errorMessage + e.getMessage(),e);
         }
     }
 
@@ -139,7 +193,8 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
             AnalyticsPersistenceException {
         if (ServiceHolder.isAnalyticsExecutionEnabled()) {
             try {
-                AnalyticsScript script = AnalyticsPersistenceManager.getInstance().getAnalyticsScript(tenantId, scriptName);
+                AnalyticsScript script = AnalyticsPersistenceManager.getInstance().getAnalyticsScript(tenantId,
+                        scriptName);
                 String[] queries = getQueries(script.getScriptContent());
                 if (queries == null) {
                     throw new AnalyticsExecutionException("No complete queries provided in the script. "
@@ -157,8 +212,8 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
                 throw e;
             }
         } else {
-            String errorMsg = "Analytics query execution is disabled in this node. Therefore cannot executed the script " +
-                    " - " + scriptName;
+            String errorMsg = "Analytics query execution is disabled in this node. Therefore cannot executed the " +
+                    "script  - " + scriptName;
             log.error(errorMsg);
             throw new AnalyticsExecutionException(errorMsg);
         }
@@ -238,7 +293,8 @@ public class CarbonAnalyticsProcessorService implements AnalyticsProcessorServic
                     return false;
                 } else {
                     log.error("Error while retrieving the status of the task:" + scriptName, e);
-                    throw new AnalyticsExecutionException("Error while retrieving the status of the task:" + scriptName, e);
+                    throw new AnalyticsExecutionException("Error while retrieving the status of the task:" +
+                            scriptName, e);
                 }
             }
         } else {

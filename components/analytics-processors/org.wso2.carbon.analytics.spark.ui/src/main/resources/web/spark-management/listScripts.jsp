@@ -27,6 +27,7 @@
 <%@ taglib uri="http://www.owasp.org/index.php/Category:OWASP_CSRFGuard_Project/Owasp.CsrfGuard.tld" prefix="csrf" %>
 
 <fmt:bundle basename="org.wso2.carbon.analytics.spark.ui.i18n.Resources">
+    <script type="text/javascript" src="../ajax/js/prototype.js"></script>
     <carbon:breadcrumb label="analytics_list.menu"
                        resourceBundle="org.wso2.carbon.analytics.hive.ui.i18n.Resources"
                        topPage="true" request="<%=request%>"/>
@@ -34,6 +35,33 @@
         function deleteRow(name, msg) {
             CARBON.showConfirmationDialog(msg + "' " + name + " ' ?", function () {
                 document.location.href = "deleteScript.jsp?" + "scriptName=" + name;
+            });
+        }
+
+        function pauseAllScripts(){
+            new Ajax.Request('pauseScripts_ajaxprocessor.jsp', {
+                method: 'post',
+                onSuccess: function (transport) {
+                    debugger;
+                    document.getElementById("idPauseAll").remove();
+                    location.href = "listScripts.jsp";
+                },
+                onFailure: function (transport) {
+                    CARBON.showErrorDialog("Error while Pausing scripts.");
+                }
+            });
+        }
+
+        function resumeAllScripts(){
+            new Ajax.Request('resumeScripts_ajaxprocessor.jsp', {
+                method: 'post',
+                onSuccess: function (transport) {
+                    document.getElementById("idResumeAll").remove();
+                    location.href = "listScripts.jsp";
+                },
+                onFailure: function (transport) {
+                    CARBON.showErrorDialog("Error while Resuming scripts.");
+                }
             });
         }
     </script>
@@ -45,9 +73,22 @@
 
         AnalyticsExecutionClient client = new AnalyticsExecutionClient(cookie, serverURL, configContext);
         AnalyticsProcessorAdminServiceStub.AnalyticsScriptDto[] scriptNames = null;
+        AnalyticsProcessorAdminServiceStub.AnalyticsScheduledScriptDto[] scheduledScripts = null;
+        Boolean isAnyOfScriptsArePaused = false;
 
         try {
             scriptNames = client.getAllScripts();
+            scheduledScripts = client.getScheduledTaskStatuses();
+
+            if(null != scheduledScripts){
+                for(AnalyticsProcessorAdminServiceStub.AnalyticsScheduledScriptDto
+                        scheduledScript : scheduledScripts) {
+                    if (scheduledScript.getStatus().equals("PAUSED")) {
+                        isAnyOfScriptsArePaused = true;
+                        break;
+                    }
+                }
+            }
         } catch (Exception e) {
     %>
     <script type="text/javascript">
@@ -68,6 +109,7 @@
                             <fmt:message key="spark.scripts"/>
                         </th>
                         <th class="leftCol-med">Actions</th>
+                        <th class="leftCol-med">Status</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -133,21 +175,51 @@
                             }
                             %>
                         </td>
+                        <td><label>
+                            <%
+                                boolean isFound = false;
+                                AnalyticsProcessorAdminServiceStub.AnalyticsScheduledScriptDto
+                                        matchedScheduledScript = null;
+                                if(null != scheduledScripts && scheduledScripts.length != 0){
+                                    for(AnalyticsProcessorAdminServiceStub.AnalyticsScheduledScriptDto
+                                            scheduledScript : scheduledScripts) {
+                                        if (scheduledScript.getName().equals(aScript.getName())) {
+                                            isFound = true;
+                                            matchedScheduledScript = scheduledScript;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                if(isFound){
+                                    if(matchedScheduledScript.getStatus().equals("NORMAL") ||
+                                            matchedScheduledScript.getStatus().equals("BLOCKED")){%>
+                                        SCHEDULED<%
+                                    } else {
+                                    %>
+                                    <%=matchedScheduledScript.getStatus()%>
 
+                                    <%}
+                                } else {%>
+                                    NOT SCHEDULED
+                                <%
+                                }
+                                %>
+                        </label>
+                        </td>
                     </tr>
-
                     <%
-                        }
+                            }
                     } else { %>
                     <tr>
-                        <td colspan="2">No analytics scripts found</td>
+                        <td colspan="3">No analytics scripts found</td>
                     </tr>
 
                     <% }
                     %>
                     </tbody>
                 </table>
-            <table>
+            <table id="operationElementstbl">
                 <tbody>
                 <tr>
                     <td></td>
@@ -156,6 +228,25 @@
                     <td><a class="icon-link" style="background-image:url(images/add.gif);"
                            href="addOrEditScript.jsp"><fmt:message
                             key="spark.script.add"/></a></td>
+                    <%if(null != scriptNames){
+                        if (!isAnyOfScriptsArePaused) {%>
+                    <td id="resumePauseWrapper"><a class="icon-link" id="idPauseAll"
+                           onclick="pauseAllScripts();"
+                           href="#"
+                           style="background: url('../spark-management/images/pause.png') no-repeat left center;
+                           background-size: 12px;">
+                        Pause Scripts</a></td>
+                    <%
+                        } else { %>
+                    <td id="resumePauseWrapper"><a class="icon-link" id="idResumeAll"
+                           onclick="resumeAllScripts();"
+                           href="#"
+                           style="background: url('../spark-management/images/resume.png') no-repeat left center;
+                           background-size: 12px;">
+                        Resume Scripts</a></td>
+                    <% }
+                    }
+                    %>
                 </tr>
                 </tbody>
             </table>

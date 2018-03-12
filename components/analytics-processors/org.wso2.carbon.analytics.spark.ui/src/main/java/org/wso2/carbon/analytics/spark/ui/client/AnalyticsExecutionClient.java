@@ -96,12 +96,9 @@ public class AnalyticsExecutionClient {
         return resObj.toString();
     }
 
-    public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScriptContent(String scriptContent) throws Exception {
-        try {
-            return stub.execute(scriptContent);
-        } catch (AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
-            throw new Exception(e.getFaultMessage().getAnalyticsProcessorAdminException().getMessage(), e);
-        }
+    public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScriptContent(String scriptContent) throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        return stub.execute(scriptContent);
     }
 
     public void executeScriptContentInBackground(String scriptContent) throws RemoteException,
@@ -110,12 +107,8 @@ public class AnalyticsExecutionClient {
     }
 
     public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScript(String scriptName)
-            throws Exception {
-        try {
-            return stub.executeScript(scriptName);
-        } catch (AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
-            throw new Exception(e.getFaultMessage().getAnalyticsProcessorAdminException().getMessage(), e);
-        }
+            throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        return stub.executeScript(scriptName);
     }
 
     public void executeScriptInBackground(String scriptName)
@@ -133,9 +126,25 @@ public class AnalyticsExecutionClient {
         stub.saveScript(scriptName, scriptContent, cron);
     }
 
+    public void pauseScripts() throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        stub.pauseAllScripts();
+    }
+
+    public void resumeScripts() throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        stub.resumeAllScripts();
+    }
+
     public AnalyticsProcessorAdminServiceStub.AnalyticsScriptDto[] getAllScripts() throws RemoteException,
             AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         return stub.getAllScripts();
+    }
+
+    public AnalyticsProcessorAdminServiceStub.AnalyticsScheduledScriptDto[]
+        getScheduledTaskStatuses() throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        return stub.getScheduledTaskStatuses();
     }
 
     public AnalyticsProcessorAdminServiceStub.AnalyticsScriptDto getScriptContent(String scriptName)
