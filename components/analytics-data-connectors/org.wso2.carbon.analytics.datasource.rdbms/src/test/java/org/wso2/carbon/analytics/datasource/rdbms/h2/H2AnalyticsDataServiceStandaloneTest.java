@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms.h2;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.naming.NamingException;
@@ -25,8 +26,10 @@ import javax.naming.NamingException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
+import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataServiceTest;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 /**
@@ -37,6 +40,11 @@ public class H2AnalyticsDataServiceStandaloneTest extends AnalyticsDataServiceTe
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
+        File dataDir = new File(GenericUtils.resolveLocation(AnalyticsDataSourceConstants.CARBON_HOME_VAR + File
+                .separator + "repository"));
+        if (!dataDir.exists() || !dataDir.isDirectory()) {
+            dataDir.mkdir();
+        }
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf1");
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsClusterManager(null);
