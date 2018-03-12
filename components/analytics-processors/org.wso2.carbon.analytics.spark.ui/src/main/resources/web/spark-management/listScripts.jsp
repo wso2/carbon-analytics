@@ -75,6 +75,7 @@
         AnalyticsProcessorAdminServiceStub.AnalyticsScriptDto[] scriptNames = null;
         AnalyticsProcessorAdminServiceStub.AnalyticsScheduledScriptDto[] scheduledScripts = null;
         Boolean isAnyOfScriptsArePaused = false;
+        Boolean isAnyOfScriptsAreScheduled = false;
 
         try {
             scriptNames = client.getAllScripts();
@@ -85,6 +86,14 @@
                         scheduledScript : scheduledScripts) {
                     if (scheduledScript.getStatus().equals("PAUSED")) {
                         isAnyOfScriptsArePaused = true;
+                        break;
+                    }
+                }
+                for(AnalyticsProcessorAdminServiceStub.AnalyticsScheduledScriptDto
+                        scheduledScript : scheduledScripts) {
+                    if(scheduledScript.getStatus().equals("PAUSED") || scheduledScript.getStatus().equals("NORMAL") ||
+                            scheduledScript.getStatus().equals("BLOCKED")){
+                        isAnyOfScriptsAreScheduled = true;
                         break;
                     }
                 }
@@ -229,7 +238,7 @@
                            href="addOrEditScript.jsp"><fmt:message
                             key="spark.script.add"/></a></td>
                     <%if(null != scriptNames){
-                        if (!isAnyOfScriptsArePaused) {%>
+                        if (!isAnyOfScriptsArePaused && isAnyOfScriptsAreScheduled) {%>
                     <td id="resumePauseWrapper"><a class="icon-link" id="idPauseAll"
                            onclick="pauseAllScripts();"
                            href="#"
@@ -237,7 +246,7 @@
                            background-size: 12px;">
                         Pause Scripts</a></td>
                     <%
-                        } else { %>
+                        } else if(isAnyOfScriptsArePaused){ %>
                     <td id="resumePauseWrapper"><a class="icon-link" id="idResumeAll"
                            onclick="resumeAllScripts();"
                            href="#"
