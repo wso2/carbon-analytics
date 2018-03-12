@@ -1789,10 +1789,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         return Response.status(Response.Status.NOT_FOUND).entity(responseAppBody).build();
                     }
                 } catch (feign.RetryableException e) {
-                    String jsonString = new Gson().
-                            toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
-                                                                  e.getMessage()));
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                    //todo: need to check
+                    String jsonString = new Gson().toJson(Constants.NOT_REACHABLE_ID);
+                   // return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(jsonString).build();
+                    return Response.ok().entity(jsonString).build();
                 }
             }
             logger.error("Inproper format of worker ID:" + id);
