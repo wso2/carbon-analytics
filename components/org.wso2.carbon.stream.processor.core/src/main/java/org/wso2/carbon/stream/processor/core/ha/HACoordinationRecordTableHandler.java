@@ -102,7 +102,7 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
         if (isActiveNode) {
             lastEventChunkTimestamp = timestamp;
             recordTableHandlerCallback.update(compiledCondition, updateConditionParameterMaps, updateSetMap,
-                    updateConditionParameterMaps);
+                    updateSetParameterMaps);
             if (log.isDebugEnabled()) {
                 log.debug("Last Timestamp for Record Table Update " + timestamp);
             }
