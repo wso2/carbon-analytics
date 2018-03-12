@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -90,8 +91,10 @@ public class IndexNodeCoordinator implements GroupEventListener {
     private StagingIndexDataStore stagingIndexDataStore;
 
     private ExecutorService stagingWorkerExecutor;
+    private ExecutorService oldStagingWorkerExecutor;
 
     private List<StagingDataIndexWorker> stagingIndexWorkers;
+    private List<OldStagingDataIndexWorker> oldStagingDataIndexWorkers;
 
     private int failedIndexOperationCount;
 
@@ -107,10 +110,12 @@ public class IndexNodeCoordinator implements GroupEventListener {
     public IndexNodeCoordinator(AnalyticsDataIndexer indexer) throws AnalyticsException {
         this.indexer = indexer;
         this.localShardAllocationConfig = new LocalShardAllocationConfig();
-        this.globalShardAllocationConfig = new GlobalShardAllocationConfig(this.indexer.getAnalyticsRecordStore());
+        // this.globalShardAllocationConfig = new GlobalShardAllocationConfig(this.indexer.getAnalyticsRecordStore());
+        this.globalShardAllocationConfig = new GlobalShardAllocationConfig();
+
         this.shardMemberMap = new GlobalShardMemberMapping(this.indexer.getShardCount(),
                                                            this.globalShardAllocationConfig);
-        this.stagingIndexDataStore = new StagingIndexDataStore(this.indexer);
+        this.stagingIndexDataStore = new StagingIndexDataStore(this.indexer, this.localShardAllocationConfig);
         this.remoteCommunicator = new RemoteMemberIndexCommunicator(indexer.getAnalyticsIndexerInfo()
                 .getIndexCommunicatorBufferSize(), this.stagingIndexDataStore);
         this.indexingNode = checkIfIndexingNode();
@@ -155,14 +160,18 @@ public class IndexNodeCoordinator implements GroupEventListener {
 
     private void handleInitAndRestoreShards() throws AnalyticsException {
         ShardStatus status;
+        int replicaIndex;
         for (int shardIndex : this.localShardAllocationConfig.getShardIndices()) {
             status = this.localShardAllocationConfig.getShardStatus(shardIndex);
-            if (status.equals(ShardStatus.RESTORE)) {
-                this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, this.myNodeId);
-                this.localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.NORMAL);
+            replicaIndex = this.localShardAllocationConfig.getShardReplica(shardIndex);
+                        if (status.equals(ShardStatus.NORMAL)) {
+                                this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, replicaIndex, this.myNodeId);
+                            } else if (status.equals(ShardStatus.RESTORE)) {
+                                this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, replicaIndex, this.myNodeId);
+                                this.localShardAllocationConfig.setShardStatus(shardIndex, replicaIndex, ShardStatus.NORMAL);
             } else if (status.equals(ShardStatus.INIT)) {
-                this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, this.myNodeId);
-            }
+                            this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, replicaIndex, this.myNodeId);
+                        }
         }
     }
 
@@ -190,11 +199,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
         int shardCount = this.indexer.getShardCount();
         for (int i = 0; i < shardCount; i++) {
             if (this.globalShardAllocationConfig.getNodeIdsForShard(i).contains(this.myNodeId)) {
-                this.localShardAllocationConfig.setShardStatus(i, ShardStatus.NORMAL);
+                int replica = globalShardAllocationConfig.getShardReplica(i, this.myNodeId);
+                this.localShardAllocationConfig.setShardStatus(i, replica, ShardStatus.NORMAL);
             }
         }
         for (int shardIndex : initShards) {
-            this.localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.INIT);
+            int replica = globalShardAllocationConfig.getShardReplica(shardIndex, this.myNodeId);
+            this.localShardAllocationConfig.setShardStatus(shardIndex, replica, ShardStatus.INIT);
         }
         this.localShardAllocationConfig.save();
     }
@@ -242,6 +253,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.initClustering();
         if (this.indexingNode) {
             this.initShardAllocation();
+            this.stagingIndexDataStore.initStagingTables(this.myNodeId);
         }
         if (this.isClusteringEnabled()) {
             AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
@@ -251,6 +263,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
             acm.executeAll(Constants.ANALYTICS_INDEXING_GROUP, new IndexRefreshShardInfoCall());
         } else {
             this.refreshIndexShardInfo();
+            this.processOldStagingData();
         }
         if (this.indexingNode) {
             this.processLocalShards();
@@ -302,7 +315,9 @@ public class IndexNodeCoordinator implements GroupEventListener {
                     try {
                         processLocalInitShards(initShards);
                         for (int shardIndex : initShards) {
-                            localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.NORMAL);
+                            int replica = globalShardAllocationConfig.getShardReplica(shardIndex,
+                                    IndexNodeCoordinator.this.myNodeId);
+                            localShardAllocationConfig.setShardStatus(shardIndex, replica, ShardStatus.NORMAL);
                         }
                         localShardAllocationConfig.save();
                     } catch (AnalyticsException e) {
@@ -367,6 +382,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
 
     public void put(List<Record> records) throws AnalyticsException {
         Map<Integer, List<Record>> shardedRecords = this.indexer.extractShardedRecords(records);
+        int shardCopyCount = this.indexer.getReplicationFactor() + 1;
         List<Record> localRecords = new ArrayList<>();
         Map<String, List<Record>> remoteRecordsMap = new HashMap<>();
         for (Map.Entry<Integer, List<Record>> entry : shardedRecords.entrySet()) {
@@ -388,6 +404,13 @@ public class IndexNodeCoordinator implements GroupEventListener {
                     }
                 }
             }
+            //if this.put() is called from within spark executor, the jvm is not the CarbonJVM,
+            //So we need a way to identify that, and specifically insert records to staging area.
+                                if (!AnalyticsDataServiceUtils.isCarbonServer() && nodeIds.isEmpty()) {
+                                for (int replica = 1; replica <= shardCopyCount; replica++) {
+                                        this.addToStaging(entry.getKey(), replica, entry.getValue());
+                                    }
+                            }
         }
         this.indexer.putLocal(localRecords);
         for (Map.Entry<String, List<Record>> entry : remoteRecordsMap.entrySet()) {
@@ -454,6 +477,10 @@ public class IndexNodeCoordinator implements GroupEventListener {
         this.stagingIndexDataStore.put(nodeId, records);
     }
 
+    private void addToStaging(int shardIndex, int replica, List<Record> records) throws AnalyticsException {
+        this.stagingIndexDataStore.put(shardIndex, replica, records);
+        }
+
     private void addToStaging(String nodeId, int tenantId, String tableName, List<String> ids)
             throws AnalyticsException {
         this.stagingIndexDataStore.delete(nodeId, tenantId, tableName, ids);
@@ -488,27 +515,30 @@ public class IndexNodeCoordinator implements GroupEventListener {
         }
     }
 
-    private Map<String, List<Integer>> loadGlobalShards() throws AnalyticsException {
+    private Map<String, Map<Integer, Integer>> loadGlobalShards() throws AnalyticsException {
         int shardCount = this.indexer.getShardCount();
-        Map<String, List<Integer>> result = new HashMap<String, List<Integer>>();
-        Set<String> nodeIds;
-        List<Integer> shards;
+        Map<String, Map<Integer, Integer>> result = new HashMap<>();
+               Set<String> nodeIdsWithShardReplica;
+                Map<Integer, Integer> shards;
         for (int i = 0; i < shardCount; i++) {
-            nodeIds = this.globalShardAllocationConfig.getNodeIdsForShard(i);
-            for (String nodeId : nodeIds) {
+            nodeIdsWithShardReplica = this.globalShardAllocationConfig.getNodeIdsWithReplica(i);
+            for (String nodeIdWithReplica : nodeIdsWithShardReplica) {
+                String nodeId = nodeIdWithReplica.split(GlobalShardAllocationConfig.GSAC_NODEID_REPLICA_SEPERATOR)[0];
+                Integer replica = Integer.valueOf(nodeIdWithReplica.split(GlobalShardAllocationConfig
+                        .GSAC_NODEID_REPLICA_SEPERATOR)[1]);
                 shards = result.get(nodeId);
                 if (shards == null) {
-                    shards = new ArrayList<>();
+                    shards = new HashMap<>();
                     result.put(nodeId, shards);
                 }
-                shards.add(i);
+                shards.put(i, replica);
             }
         }
         return result;
     }
 
-    private Set<Integer> allocateNewLocalShards(boolean initialAllocation) throws AnalyticsException {
-        Set<Integer> result = new HashSet<>();
+    private Map<Integer, Integer> allocateNewLocalShards(boolean initialAllocation) throws AnalyticsException {
+                Map<Integer, Integer> result = new HashMap<>();
         int shardCopyCount = this.indexer.getReplicationFactor() + 1;
         if (log.isDebugEnabled()) {
             log.debug("Replication Factor: " + this.indexer.getReplicationFactor());
@@ -518,31 +548,35 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (int i = 0; i < this.indexer.getShardCount(); i++) {
             nodeIds = this.globalShardAllocationConfig.getNodeIdsForShard(i);
             if (!nodeIds.contains(this.myNodeId) && nodeIds.size() < shardCopyCount) {
-                result.add(i);
+                //(nodeIds.size() +1) is taken as the replication index of that particular shard
+                result.put(i, nodeIds.size() + 1);
             }
         }
         if (initialAllocation) {
             /* if initial, try to snatch shards from other nodes who has more than me */
-            Map<String, List<Integer>> globalShards = this.loadGlobalShards();
-            Set<Integer> existingShards;
+            Map<String, Map<Integer, Integer>> globalShards = this.loadGlobalShards();
+            Map<Integer, Integer> existingShards;
             if (globalShards.get(this.myNodeId) != null) {
-                existingShards = new HashSet<>(globalShards.get(this.myNodeId));
+                existingShards = new HashMap<>(globalShards.get(this.myNodeId));
             } else {
-                existingShards = new HashSet<>(0);
+                existingShards = new HashMap<>(0);
             }
             boolean resume = true;
             while (resume) {
                 resume = false;
-                for (Map.Entry<String, List<Integer>> entry : globalShards.entrySet()) {
+                for (Map.Entry<String, Map<Integer, Integer>> entry : globalShards.entrySet()) {
                     if (entry.getValue().size() > (result.size() + existingShards.size())) {
-                        Iterator<Integer> itr = entry.getValue().iterator();
-                        int val;
+                        Iterator<Map.Entry<Integer, Integer>> itr = entry.getValue().entrySet().iterator();
+                        Map.Entry<Integer, Integer> shardReplica;
                         while (itr.hasNext()) {
-                            val = itr.next();
-                            if (!result.contains(val) && !existingShards.contains(val)) {
+                            shardReplica = itr.next();
+                            Integer shardIndex = shardReplica.getKey();
+                            if (!result.keySet().contains(shardIndex) &&
+                                    !existingShards.keySet().contains(shardIndex)) {
                                 itr.remove();
-                                this.globalShardAllocationConfig.removeNodeIdFromShard(val, entry.getKey());
-                                result.add(val);
+                                this.globalShardAllocationConfig.removeNodeIdFromShard(shardReplica.getKey(),
+                                        entry.getKey());
+                                result.put(shardReplica.getKey(), shardReplica.getValue());
                                 resume = true;
                                 break;
                             }
@@ -555,10 +589,12 @@ public class IndexNodeCoordinator implements GroupEventListener {
     }
 
     private void allocateLocalShardsFromGlobal(boolean initialAllocation) throws AnalyticsException {
-        Set<Integer> newShards = this.allocateNewLocalShards(initialAllocation);
-        for (Integer shardIndex : newShards) {
-            this.localShardAllocationConfig.setShardStatus(shardIndex, ShardStatus.INIT);
-            this.globalShardAllocationConfig.addNodeIdForShard(shardIndex, this.myNodeId);
+        Map<Integer, Integer> newShards = this.allocateNewLocalShards(initialAllocation);
+        if (initialAllocation) {
+            for (Map.Entry<Integer, Integer> entry : newShards.entrySet()) {
+                this.localShardAllocationConfig.setShardStatus(entry.getKey(), entry.getValue(), ShardStatus.INIT);
+                this.globalShardAllocationConfig.addNodeIdForShard(entry.getKey(), entry.getValue(), this.myNodeId);
+                }
         }
     }
 
@@ -573,37 +609,52 @@ public class IndexNodeCoordinator implements GroupEventListener {
         return myShards;
     }
 
-    private void populateMyNodeId() throws AnalyticsException {
+        private boolean populateMyNodeId() throws AnalyticsException {
+                   boolean shouldCreateNodeId = false;
         if (this.myNodeId == null) {
-            boolean create = false;
             try {
-                this.myNodeId = FileUtil.readFileToString(GenericUtils.resolveLocation(
-                        Constants.MY_NODEID_LOCATION)).trim();
+                File oldNodeIdFile = new File(GenericUtils.resolveLocation(Constants.DEPRECATED_MY_NODEID_LOCATION));
+                File newNodeIdFile = new File(GenericUtils.resolveLocation(Constants.MY_NODEID_LOCATION));
+                loadNodeIdIfExists(oldNodeIdFile, newNodeIdFile);
                 if (this.myNodeId.isEmpty()) {
-                    create = true;
+                    shouldCreateNodeId = true;
                 }
             } catch (FileNotFoundException e) {
                 if (log.isDebugEnabled()) {
                     log.debug("My node id file not found: " + e.getMessage(), e);
                 }
-                create = true;
+                shouldCreateNodeId = true;
             } catch (Exception e) {
                 throw new AnalyticsException("Error in reading my node id: " + e.getMessage(), e);
             }
-            if (create) {
-                this.myNodeId = UUID.randomUUID().toString();
-                try {
-                    FileUtils.writeStringToFile(new File(GenericUtils.resolveLocation(
-                            Constants.MY_NODEID_LOCATION)), this.myNodeId);
-                } catch (IOException e) {
-                    throw new AnalyticsException("Error in writing my node id: " + e.getMessage(), e);
-                }
-                if (this.indexingNode) {
-                    this.stagingIndexDataStore.initStagingTables(this.myNodeId);
-                }
+            if (shouldCreateNodeId) {
+                createNewNodeIDFile();
             }
         }
         log.info("My Analytics Node ID: " + this.myNodeId);
+            return shouldCreateNodeId;
+            }
+
+            private void loadNodeIdIfExists(File oldNodeIdFile, File newNodeIdFile) throws IOException {
+                if (oldNodeIdFile.exists() && !newNodeIdFile.exists()) {
+                        this.myNodeId = FileUtil.readFileToString(GenericUtils.resolveLocation(
+                                        Constants.DEPRECATED_MY_NODEID_LOCATION)).trim();
+                        FileUtils.copyFile(oldNodeIdFile, newNodeIdFile);
+                        oldNodeIdFile.delete();
+                    } else {
+                        this.myNodeId = FileUtil.readFileToString(GenericUtils.resolveLocation(
+                                        Constants.MY_NODEID_LOCATION)).trim();
+                    }
+            }
+
+            private void createNewNodeIDFile() throws AnalyticsException {
+                this.myNodeId = UUID.randomUUID().toString();
+                try {
+                        FileUtils.writeStringToFile(new File(GenericUtils.resolveLocation(
+                                        Constants.MY_NODEID_LOCATION)), this.myNodeId);
+                    } catch (IOException e) {
+                        throw new AnalyticsException("Error in writing my node id: " + e.getMessage(), e);
+                    }
     }
 
     @Override
@@ -649,6 +700,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
         for (LocalShardAddressInfo entry : result) {
             this.shardMemberMap.updateMemberMapping(entry);
         }
+        Set<String> nonExistingNodeIds = this.shardMemberMap.removeAndGetNonExistingMemberNodeIds();
+        globalShardAllocationConfig.removeNodeIdsFromShards(nonExistingNodeIds);
     }
 
     public Map<Object, Set<Integer>> generateMemberShardMappingForIndexLookup() throws AnalyticsIndexException {
@@ -696,6 +749,28 @@ public class IndexNodeCoordinator implements GroupEventListener {
             log.debug("Created " + this.stagingIndexWorkers.size() + " staging worker threads.");
         }
     }
+
+    private void processOldStagingData() {
+                if (!this.indexingNode) {
+                        return;
+                    }
+                int localShardIndices = this.indexer.getShardCount();
+                if (localShardIndices == 0) {
+                        return;
+                    }
+                this.oldStagingWorkerExecutor = Executors.newFixedThreadPool(localShardIndices,
+                                new ThreadFactoryBuilder().setNameFormat("Thread pool- component - IndexNodeCoordinator.OldStagingWorkerExecutor").build());
+                this.oldStagingDataIndexWorkers = new ArrayList<>(this.indexer.getShardCount());
+                for (int i = 0; i < localShardIndices; i++) {
+                        OldStagingDataIndexWorker worker = new OldStagingDataIndexWorker(i);
+                        this.oldStagingDataIndexWorkers.add(worker);
+                        this.oldStagingWorkerExecutor.execute(worker);
+                    }
+                if (log.isDebugEnabled()) {
+                        log.debug("Created " + this.oldStagingDataIndexWorkers.size() + " staging worker threads for older " +
+                                "staging tables");
+                    }
+            }
 
     public void close() {
         this.remoteCommunicator.close();
@@ -753,6 +828,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
             if (ads instanceof AnalyticsDataServiceImpl) {
                 AnalyticsDataServiceImpl adsImpl = (AnalyticsDataServiceImpl) ads;
                 adsImpl.getIndexer().getIndexNodeCoordinator().refreshIndexShardInfo();
+                adsImpl.getIndexer().getIndexNodeCoordinator().processOldStagingData();
             }
             return "OK";
         }
@@ -952,20 +1028,21 @@ public class IndexNodeCoordinator implements GroupEventListener {
         try {
             AnalyticsDataService ads = this.indexer.getAnalyticsDataService();
             List<Record> records = AnalyticsDataServiceUtils.listRecords(ads,
-                                                                         ads.get(entry.getTenantId(), entry.getTableName(), 1, null, entry.getIds()));
+                    ads.get(entry.getTenantId(), entry.getTableName(), 1, null, entry.getIds()));
             this.indexer.putLocal(records);
             Set<String> deleteIds = new HashSet<>(entry.getIds());
             deleteIds.removeAll(this.extractIds(records));
             this.indexer.deleteLocal(entry.getTenantId(), entry.getTableName(), new ArrayList<>(deleteIds));
             if (log.isDebugEnabled()) {
-                log.debug("Processing staged operation [" + shardIndex + "] PUT: " + records.size() + " DELETE: " + deleteIds.size());
+                log.debug("Processing staged operation [" + shardIndex + "] PUT: " +
+                        +                          records.size() + " DELETE: " + deleteIds.size());
             }
         } catch (AnalyticsInterruptException e) {
             throw e;
         } catch (Exception e) {
             throw new AnalyticsException("Error in processing index staging entry: " + e.getMessage(), e);
         }
-        this.stagingIndexDataStore.removeEntries(this.myNodeId, shardIndex, Arrays.asList(entry.getRecordId()));
+
     }
 
     private Set<String> extractIds(List<Record> records) {
@@ -1000,6 +1077,8 @@ public class IndexNodeCoordinator implements GroupEventListener {
                     if (!entries.isEmpty()) {
                         for (StagingIndexDataEntry entry : entries) {
                             processStagingEntry(this.shardIndex, entry);
+                            stagingIndexDataStore.removeEntries(myNodeId, shardIndex,
+                                    Arrays.asList(entry.getRecordId()));
                         }
                     } else {
                         Thread.sleep(STAGING_INDEXER_WORKER_SLEEP);
@@ -1022,5 +1101,58 @@ public class IndexNodeCoordinator implements GroupEventListener {
         }
 
     }
+
+    /**
+         * This class consumes the index staging data that is been put by data publishers like the Spark analytics tables,
+          * which does not have direct visibility to indexing nodes.
+     */
+    private class OldStagingDataIndexWorker implements Runnable {
+        private static final int STAGING_INDEXER_WORKER_SLEEP = 5000;
+        private int shardIndex;
+        private boolean stop;
+        public OldStagingDataIndexWorker(int shardIndex) {
+            this.shardIndex = shardIndex;
+            }
+
+                    @Override
+                    public void run() {
+                       while (!this.stop) {
+                                try {
+                                        List<StagingIndexDataEntry> entries =
+                                                stagingIndexDataStore.loadEntriesInOldStagingTables(myNodeId, this.shardIndex);
+                                        if (!entries.isEmpty()) {
+                                                for (StagingIndexDataEntry entry : entries) {
+                                                        processStagingEntry(this.shardIndex, entry);
+                                                        stagingIndexDataStore.removeEntriesFromOldStagingTables(myNodeId, shardIndex,
+                                                                Arrays.asList(entry.getRecordId()));
+                                                    }
+                                            } else {
+                                                Thread.sleep(STAGING_INDEXER_WORKER_SLEEP);
+                                                if (log.isDebugEnabled()) {
+                                                        log.debug("No data available in Old staging table for shard: " + shardIndex + ", hence " +
+                                                                          "stopping the old staging index worker for shard: " + shardIndex + ".");
+                                                    }
+                                                stop();
+                                                stagingIndexDataStore.deleteStagingEntryLocation(myNodeId, this.shardIndex);
+                                            }
+                                    } catch (AnalyticsInterruptException | InterruptedException e) {
+                                        // This exception can be thrown from data queues, if the shutdown hook is triggered
+                                                log.debug("Old staging Data Index Worker Interuppted [" + this.shardIndex + "]: " + e.getMessage(),
+                                                                  e);
+                                        return;
+                                    } catch (Exception e) {
+                                        log.error("Error in processing Old staging index data: " + e.getMessage(), e);
+                                    }
+                            }
+                        if (log.isDebugEnabled()) {
+                                log.debug("Old Staging Data Index Worker Exiting [" + this.shardIndex + "]");
+                            }
+        }
+
+                public void stop() {
+                        this.stop = true;
+                    }
+    }
+
 
 }
