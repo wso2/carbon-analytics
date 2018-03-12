@@ -1326,7 +1326,7 @@
         <carbon.commons.version>4.6.19</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.5, 5)</carbon.commons.imp.pkg.version>
         <carbon.data.version>4.4.2</carbon.data.version>
-        <carbon.event-processing.version>2.1.20</carbon.event-processing.version>
+        <carbon.event-processing.version>2.1.21</carbon.event-processing.version>
         <carbon.analytics.common.version>5.1.33</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.0, 6.0)</carbon.analytics.common.imp.pkg.version>
 
