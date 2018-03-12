@@ -8,7 +8,7 @@
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
+ *  Unless requi    red by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.analytics.datasource.rdbms.h2;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.naming.NamingException;
@@ -29,6 +30,7 @@ import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManagerImpl;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataServiceTest;
+import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
 import com.hazelcast.core.Hazelcast;
@@ -41,13 +43,18 @@ public class H2AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTes
     @BeforeClass
     public void setup() throws NamingException, AnalyticsException, IOException {
         GenericUtils.clearGlobalCustomDataSourceRepo();
+        File dataDir = new File(GenericUtils.resolveLocation(AnalyticsDataSourceConstants.CARBON_HOME_VAR + File
+                .separator + "repository"));
+        if (!dataDir.exists() || !dataDir.isDirectory()) {
+            dataDir.mkdir();
+        }
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf8");
         Hazelcast.shutdownAll();
         AnalyticsServiceHolder.setHazelcastInstance(Hazelcast.newHazelcastInstance());
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.init(new AnalyticsDataServiceImpl());
     }
-    
+
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
@@ -55,5 +62,5 @@ public class H2AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTes
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsDataService(null);
     }
-    
+
 }

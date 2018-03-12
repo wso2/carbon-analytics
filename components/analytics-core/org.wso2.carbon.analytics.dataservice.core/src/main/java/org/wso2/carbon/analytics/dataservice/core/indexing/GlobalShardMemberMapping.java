@@ -35,21 +35,21 @@ import java.util.Set;
 public class GlobalShardMemberMapping {
 
     private int shardCount;
-    
+
     private GlobalShardAllocationConfig config;
-    
+
     private Map<String, Object> nodeIdMemberMap;
-    
+
     private Map<Integer, Set<String>> shardNodeIdMap;
-    
+
     private Random random = new Random();
-    
+
     public GlobalShardMemberMapping(int shardCount, GlobalShardAllocationConfig config) throws AnalyticsException {
         this.shardCount = shardCount;
         this.config = config;
         this.reset();
     }
-    
+
     public void reset() throws AnalyticsException {
         this.nodeIdMemberMap = new HashMap<>();
         this.shardNodeIdMap = new HashMap<>();
@@ -57,7 +57,7 @@ public class GlobalShardMemberMapping {
             this.shardNodeIdMap.put(i, this.config.getNodeIdsForShard(i));
         }
     }
-    
+
     public Map<Object, Set<Integer>> generateMemberShardMappingForIndexLookup() {
         Map<Object, Set<Integer>> result = new HashMap<>();
         Object member;
@@ -74,7 +74,7 @@ public class GlobalShardMemberMapping {
         }
         return result;
     }
-    
+
     private Object lookupCandidateMemberFromNodeIds(Set<String> nodeIds) {
         List<Object> members = new ArrayList<>(nodeIds.size());
         Object member;
@@ -89,19 +89,43 @@ public class GlobalShardMemberMapping {
         }
         return members.get(AnalyticsDataIndexer.abs(this.random.nextInt()) % members.size());
     }
-    
+
     public Set<String> getNodeIdsForShard(int shardIndex) throws AnalyticsException {
         return this.shardNodeIdMap.get(shardIndex);
     }
-    
+
     public Object getMemberFromNodeId(String nodeId) {
         return this.nodeIdMemberMap.get(nodeId);
     }
-    
+
     public void updateMemberMapping(LocalShardAddressInfo localShardAddressInfo) {
         this.nodeIdMemberMap.put(localShardAddressInfo.getNodeId(), localShardAddressInfo.getMember());
     }
-    
+
+    public Set<String> removeAndGetNonExistingMemberNodeIds() throws AnalyticsException {
+        Set<String> allNodeIds = new HashSet<>();
+        Set<String> removedNodeIds = new HashSet<>();
+        for (Map.Entry<Integer, Set<String>> entry : this.shardNodeIdMap.entrySet()) {
+            allNodeIds.addAll(entry.getValue());
+        }
+        for (String nodeId : allNodeIds) {
+            Object member = nodeIdMemberMap.get(nodeId);
+            if (member == null) {
+                nodeIdMemberMap.remove(nodeId);
+                removedNodeIds.add(nodeId);
+            }
+        }
+        if (!removedNodeIds.isEmpty()) {
+            for (Map.Entry<Integer, Set<String>> entry : this.shardNodeIdMap.entrySet()) {
+                Set<String> shardNodeIds = entry.getValue();
+                shardNodeIds.removeAll(removedNodeIds);
+                shardNodeIdMap.put(entry.getKey(), shardNodeIds);
+            }
+        }
+        return removedNodeIds;
+    }
+
+
     @Override
     public String toString() {
         Map<Integer, Map<String, Object>> shardNodeMemberMap = new HashMap<>();
@@ -114,5 +138,5 @@ public class GlobalShardMemberMapping {
         }
         return shardNodeMemberMap.toString();
     }
-    
+
 }

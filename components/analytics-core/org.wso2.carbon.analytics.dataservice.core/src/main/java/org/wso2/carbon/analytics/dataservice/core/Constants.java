@@ -25,7 +25,7 @@ import java.io.File;
  * This class hold constants that required for data service
  */
 public class Constants {
-    
+
     public static final String PERMISSION_LIST_TABLE = "/permission/admin/manage/analytics/table/list";
     public static final String PERMISSION_CREATE_TABLE = "/permission/admin/manage/analytics/table/create";
     public static final String PERMISSION_DROP_TABLE = "/permission/admin/manage/analytics/table/drop";
@@ -73,14 +73,26 @@ public class Constants {
     public static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
     public static final String DISABLE_LOCAL_INDEX_QUEUE_OPTION = "disableLocalIndexQueue";
-    
-    public static final String DEFAULT_INDEX_STORE_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
-            + File.separator + "data" + File.separator + "index_data" + File.separator;
-    public static final String INDEX_STORE_DIR_PREFIX = "shard";    
-    public static final String LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
-            + File.separator + "conf" + File.separator + "analytics" + File.separator + "local-shard-allocation-config.conf";    
-    public static final String MY_NODEID_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
-            + File.separator + "conf" + File.separator + "analytics" + File.separator + "my-node-id.dat";
+
+    public static final String DEFAULT_INDEX_STORE_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR
+            + File.separator + "repository" + File.separator + "data" + File.separator + "index_data" + File.separator;
+
+    public static final String INDEX_STORE_DIR_PREFIX = "shard";
+
+    public static final String LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR
+            + File.separator + "repository" + File.separator + "data" + File.separator
+            + "local-shard-allocation-config.conf";
+    public static final String LOCAL_SHARD_REPLICA_CONFIG_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR
+            + File.separator + "repository" + File.separator + "data" + File.separator
+            + "local-shard-replica-config.conf";
+    public static final String MY_NODEID_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator +
+            "repository" + File.separator + "data" + File.separator + "my-node-id.dat";
+    public static final String DEPRECATED_LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION = AnalyticsDataSourceConstants
+            .CARBON_HOME_VAR + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
+            + File.separator + "local-shard-allocation-config.conf";
+    public static final String DEPRECATED_MY_NODEID_LOCATION = AnalyticsDataSourceConstants
+            .CARBON_HOME_VAR + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
+            + File.separator + "my-node-id.dat";
     public static final String DEFAULT_LOCAL_INDEX_STAGING_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
             + File.separator + "data" + File.separator + "index_staging_queues" + File.separator;
 }
