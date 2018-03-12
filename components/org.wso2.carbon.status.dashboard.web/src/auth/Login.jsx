@@ -188,7 +188,7 @@ export default class Login extends Component {
                                 You can refer our&nbsp;
                                 <a
                                     style={styles.cookiePolicyAnchor}
-                                    href="/privacy-policy/cookie-policy"
+                                    href="/policies/cookie-policy"
                                     target="_blank"
                                 >
                                     Cookie Policy
@@ -201,7 +201,7 @@ export default class Login extends Component {
                                 By signing in, you agree to our&nbsp;
                                 <a
                                     style={styles.cookiePolicyAnchor}
-                                    href="/privacy-policy/privacy-policy"
+                                    href="/policies/privacy-policy"
                                     target="_blank">
                                     Privacy Policy
                                 </a>.
