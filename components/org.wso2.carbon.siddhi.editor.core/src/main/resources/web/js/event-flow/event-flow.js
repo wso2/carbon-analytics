@@ -41,6 +41,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             // graph generated needs to be changed.
             // TODO Update the overall style and beautify the UI.
             // TODO add the OverlayScroll Library in this implementation.
+            // TODO fix the issue where the graph renders differently in other computers.
             var defaultNodeStyle = {
                 labelType: "html",
                 rx: 7,
@@ -190,7 +191,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
          * @param data A JSON object that defines the graph that is to be rendered in the UI
          */
         EventFlow.prototype.render = function (data) {
-            //TODO add a proper loading section for when rendering.
             var self = this;
 
             if (data === null || data === undefined || data === {}) {
@@ -216,7 +216,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
 
                     switch (node.type) {
                         case nodeOptions.stream.name:
-                            html = "<div title='" + node.description + "'>"
+                            html = "<div class='node-content' title='" + node.description + "'>"
                                 + "<span class='" + nodeOptions.stream.cssClass + "'></span>"
                                 + "<span class='nodeLabel'>" + node.name + "</span>"
                                 + "</div>";
@@ -225,7 +225,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             nodeStyle.label = html;
                             break;
                         case nodeOptions.table.name:
-                            html = "<div title='" + node.description + "'>"
+                            html = "<div class='node-content' title='" + node.description + "'>"
                                 + "<span class='" + nodeOptions.table.cssClass + "'></span>"
                                 + "<span class='nodeLabel'>" + node.name + "</span>"
                                 + "</div>";
@@ -233,7 +233,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             nodeStyle.label = html;
                             break;
                         case nodeOptions.window.name:
-                            html = "<div title='" + node.description + "'>"
+                            html = "<div class='node-content' title='" + node.description + "'>"
                                 + "<span class='" + nodeOptions.window.cssClass + "'></span>"
                                 + "<span class='nodeLabel'>" + node.name + "</span>"
                                 + "</div>";
@@ -241,7 +241,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             nodeStyle.label = html;
                             break;
                         case nodeOptions.trigger.name:
-                            html = "<div title='" + node.description + "'>"
+                            html = "<div class='node-content' title='" + node.description + "'>"
                                 + "<span class='" + nodeOptions.trigger.cssClass + "'></span>"
                                 + "<span class='nodeLabel'>" + node.name + "</span>"
                                 + "</div>";
@@ -249,7 +249,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             nodeStyle.label = html;
                             break;
                         case nodeOptions.aggregation.name:
-                            html = "<div title='" + node.description + "'>"
+                            html = "<div class='node-content' title='" + node.description + "'>"
                                 + "<span class='" + nodeOptions.aggregation.cssClass + "'></span>"
                                 + "<span class='nodeLabel'>" + node.name + "</span>"
                                 + "</div>";
@@ -257,7 +257,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             nodeStyle.label = html;
                             break;
                         case nodeOptions.function.name:
-                            html = "<div title='" + node.description + "'>"
+                            html = "<div class='node-content' title='" + node.description + "'>"
                                 + "<span class='" + nodeOptions.function.cssClass + "'></span>"
                                 + "<span class='nodeLabel'>" + node.name + "</span>"
                                 + "</div>";
@@ -265,7 +265,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             nodeStyle.label = html;
                             break;
                         case nodeOptions.query.name:
-                            html = "<div title='" + node.description + "'>"
+                            html = "<div class='node-content' title='" + node.description + "'>"
                                 + "<span class='" + nodeOptions.query.cssClass + "'></span>"
                                 + "<span class='nodeLabel'>" + node.name + "</span>"
                                 + "</div>";
@@ -281,7 +281,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                             nodeStyle.label = html;
                             break;
                         case nodeOptions.partition_type.name:
-                            html = "<div title='" + node.description + "'>"
+                            html = "<div class='node-content' title='" + node.description + "'>"
                                 + "<span class='" + nodeOptions.partition_type.cssClass + "'></span>"
                                 + "<span class='nodeLabel'>" + node.name + "</span>" + "</div>";
                             nodeStyle = _.clone(nodeOptions.partition_type.nodeStyle);
@@ -354,7 +354,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             }
 
             function centerSVG() {
-                // TODO make sure the graph is auto re-centered when resized.
                 var graphWidth = parseInt(self.$siddhiGraph.attr("width"));
                 var graphHeight = parseInt(self.$siddhiGraph.attr("height"));
                 var width = self.$graphView.width();
