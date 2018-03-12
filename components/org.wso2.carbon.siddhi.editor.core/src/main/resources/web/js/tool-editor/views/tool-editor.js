@@ -170,6 +170,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                         } else if (designContainer.is(':visible')) {
                             designContainer.hide();
                             sourceContainer.show();
+                            self._sourceView.editorResize();
                             toggleViewButton.html("Design View");
                         }
                     });
