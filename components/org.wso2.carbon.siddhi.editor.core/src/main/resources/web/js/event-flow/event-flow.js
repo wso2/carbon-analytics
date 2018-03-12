@@ -140,10 +140,12 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             if (siddhiCode === null || siddhiCode === undefined || siddhiCode === "") {
                 result = {status: "fail", errorMessage: "The Siddhi App Cannot Be Empty"};
             } else {
-                siddhiCode = siddhiCode.replace(/--.*/g, '');
-                siddhiCode = siddhiCode.replace(/\/\*(.|\s)*?\*\//g, '');
+                // Remove Single Line Comments
+                var regexStr = siddhiCode.replace(/--.*/g, '');
+                // Remove Multi-line Comments
+                var regexStr = regexStr.replace(/\/\*(.|\s)*?\*\//g, '');
                 var regex = /^\s*@\s*app\s*:\s*name\s*\(\s*["|'](.*)["|']\s*\)\s*@\s*app\s*:\s*description\s*\(\s*["|'](.*)["|']\s*\)\s*$/gi;
-                var match = regex.exec(siddhiCode);
+                var match = regex.exec(regexStr);
 
                 if (match !== null) {
                     result = {
