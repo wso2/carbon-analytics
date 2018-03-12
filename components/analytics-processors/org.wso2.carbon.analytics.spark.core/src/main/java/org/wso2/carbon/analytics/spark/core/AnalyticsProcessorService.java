@@ -21,6 +21,7 @@ import org.wso2.carbon.analytics.spark.core.exception.AnalyticsExecutionExceptio
 import org.wso2.carbon.analytics.spark.core.exception.AnalyticsPersistenceException;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsQueryResult;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsScript;
+import org.wso2.carbon.ntask.core.TaskInfo;
 
 import java.util.List;
 
@@ -44,6 +45,30 @@ public interface AnalyticsProcessorService {
      */
     void saveScript(int tenantId, String scriptName, String scriptContent, String cronExpression)
             throws AnalyticsPersistenceException;
+
+    /**
+     * Pause all spark scripts from the provided tenant space.
+     *
+     * @param tenantId Id of the tenant for which this operation belongs to.
+     * @throws AnalyticsExecutionException
+     */
+    void pauseAllScripts(int tenantId) throws AnalyticsExecutionException;
+
+    /**
+     * Resume all spark scripts from the provided tenant space.
+     *
+     * @param tenantId Id of the tenant for which this operation belongs to.
+     * @throws AnalyticsExecutionException
+     */
+    void resumeAllScripts(int tenantId) throws AnalyticsExecutionException;
+
+    /**
+     * get all statuses of scheduled tasks .
+     *
+     * @return List of scheduled Analytics Scripts which has the statues of execution.
+     * @throws AnalyticsExecutionException
+     */
+    List<TaskInfo> getScheduledTasks() throws AnalyticsExecutionException;
 
     /**
      * Delete the script with provided name, from the analytics store
@@ -124,7 +149,6 @@ public interface AnalyticsProcessorService {
      * @return
      */
     boolean isAnalyticsExecutionEnabled();
-
 
     /**
      * Checks whether the analytics scheduled task for analytics script is running in background.
