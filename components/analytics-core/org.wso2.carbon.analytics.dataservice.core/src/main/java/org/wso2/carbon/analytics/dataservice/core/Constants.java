@@ -1,20 +1,20 @@
 /*
-* Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* WSO2 Inc. licenses this file to you under the Apache License,
-* Version 2.0 (the "License"); you may not use this file except
-* in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.analytics.dataservice.core;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
@@ -25,7 +25,7 @@ import java.io.File;
  * This class hold constants that required for data service
  */
 public class Constants {
-    
+
     public static final String PERMISSION_LIST_TABLE = "/permission/admin/manage/analytics/table/list";
     public static final String PERMISSION_CREATE_TABLE = "/permission/admin/manage/analytics/table/create";
     public static final String PERMISSION_DROP_TABLE = "/permission/admin/manage/analytics/table/drop";
@@ -80,19 +80,19 @@ public class Constants {
     public static final String INDEX_STORE_DIR_PREFIX = "shard";
 
     public static final String LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR
-                        + File.separator + "repository" + File.separator + "data" + File.separator
-                        + "local-shard-allocation-config.conf";
+            + File.separator + "repository" + File.separator + "data" + File.separator
+            + "local-shard-allocation-config.conf";
     public static final String LOCAL_SHARD_REPLICA_CONFIG_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR
-                        + File.separator + "repository" + File.separator + "data" + File.separator
-                        + "local-shard-replica-config.conf";
-   public static final String MY_NODEID_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator +
-                        "repository" + File.separator + "data" + File.separator + "my-node-id.dat";
+            + File.separator + "repository" + File.separator + "data" + File.separator
+            + "local-shard-replica-config.conf";
+    public static final String MY_NODEID_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator +
+            "repository" + File.separator + "data" + File.separator + "my-node-id.dat";
     public static final String DEPRECATED_LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION = AnalyticsDataSourceConstants
-                        .CARBON_HOME_VAR + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
-                        + File.separator + "local-shard-allocation-config.conf";
+            .CARBON_HOME_VAR + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
+            + File.separator + "local-shard-allocation-config.conf";
     public static final String DEPRECATED_MY_NODEID_LOCATION = AnalyticsDataSourceConstants
-                        .CARBON_HOME_VAR + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
-                        + File.separator + "my-node-id.dat";
+            .CARBON_HOME_VAR + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
+            + File.separator + "my-node-id.dat";
     public static final String DEFAULT_LOCAL_INDEX_STAGING_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
             + File.separator + "data" + File.separator + "index_staging_queues" + File.separator;
 }

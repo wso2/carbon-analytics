@@ -55,54 +55,55 @@ public class LocalShardAllocationConfig implements Serializable {
             throw new AnalyticsException("Error in loading local shard allocation configuration: " + e.getMessage(), e);
         }
     }
-            private void initShardReplicaMap() throws AnalyticsException {
-                String[] entries;
-                String[] entryStrArray;
-                int shardIndex;
-                String shardReplicaConfig;
-                try {
-                        shardReplicaConfig = FileUtil.readFileToString(GenericUtils.resolveLocation(Constants
-                                       .LOCAL_SHARD_REPLICA_CONFIG_LOCATION));
-                    } catch (FileNotFoundException e) {
-                        shardReplicaConfig = "";
-                    }  catch (IOException e) {
-                        throw new AnalyticsException("Error in loading local shard allocation configuration: " + e.getMessage(), e);
-                    }
-                entries = shardReplicaConfig.split("\n");
-                int replica;
-                for (String entry : entries) {
-                        entry = entry.trim();
-                        if (!entry.isEmpty()) {
-                            entryStrArray = entry.split(",");
-                                shardIndex = Integer.parseInt(entryStrArray[0].trim());
-                                replica = Integer.valueOf(entryStrArray[1].trim());
-                                this.shardReplicaMap.put(shardIndex, replica);
-                            }
-                    }
-        }
 
-            private void initShardStatusMap() throws IOException {
-                String shardStatusConfig;
-                        File oldShardAllocationFile = new File(
-                                GenericUtils.resolveLocation(Constants.DEPRECATED_LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION));
-                File newShardAllocationFile = new File(
-                                GenericUtils.resolveLocation(Constants.LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION));
-                File indexStagingLocation = new File(GenericUtils.resolveLocation(
-                                Constants.DEFAULT_LOCAL_INDEX_STAGING_LOCATION));
-                File indexStoreLocation = new File(GenericUtils.resolveLocation(
-                                Constants.DEFAULT_LOCAL_INDEX_STAGING_LOCATION));
-                if (oldShardAllocationFile.exists() && !newShardAllocationFile.exists()) {
-                        if (indexStagingLocation.exists()) {
-                                FileUtils.deleteDirectory(indexStagingLocation);
-                            }
-                        if (indexStoreLocation.exists()) {
-                                FileUtils.deleteDirectory(indexStoreLocation);
-                            }
-                        oldShardAllocationFile.delete();
-                    }
-                shardStatusConfig = FileUtil.readFileToString(GenericUtils.resolveLocation(Constants
-                                .LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION));
-                String[] entries = shardStatusConfig.split("\n");
+    private void initShardReplicaMap() throws AnalyticsException {
+        String[] entries;
+        String[] entryStrArray;
+        int shardIndex;
+        String shardReplicaConfig;
+        try {
+            shardReplicaConfig = FileUtil.readFileToString(GenericUtils.resolveLocation(Constants
+                    .LOCAL_SHARD_REPLICA_CONFIG_LOCATION));
+        } catch (FileNotFoundException e) {
+            shardReplicaConfig = "";
+        } catch (IOException e) {
+            throw new AnalyticsException("Error in loading local shard allocation configuration: " + e.getMessage(), e);
+        }
+        entries = shardReplicaConfig.split("\n");
+        int replica;
+        for (String entry : entries) {
+            entry = entry.trim();
+            if (!entry.isEmpty()) {
+                entryStrArray = entry.split(",");
+                shardIndex = Integer.parseInt(entryStrArray[0].trim());
+                replica = Integer.valueOf(entryStrArray[1].trim());
+                this.shardReplicaMap.put(shardIndex, replica);
+            }
+        }
+    }
+
+    private void initShardStatusMap() throws IOException {
+        String shardStatusConfig;
+        File oldShardAllocationFile = new File(
+                GenericUtils.resolveLocation(Constants.DEPRECATED_LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION));
+        File newShardAllocationFile = new File(
+                GenericUtils.resolveLocation(Constants.LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION));
+        File indexStagingLocation = new File(GenericUtils.resolveLocation(
+                Constants.DEFAULT_LOCAL_INDEX_STAGING_LOCATION));
+        File indexStoreLocation = new File(GenericUtils.resolveLocation(
+                Constants.DEFAULT_LOCAL_INDEX_STAGING_LOCATION));
+        if (oldShardAllocationFile.exists() && !newShardAllocationFile.exists()) {
+            if (indexStagingLocation.exists()) {
+                FileUtils.deleteDirectory(indexStagingLocation);
+            }
+            if (indexStoreLocation.exists()) {
+                FileUtils.deleteDirectory(indexStoreLocation);
+            }
+            oldShardAllocationFile.delete();
+        }
+        shardStatusConfig = FileUtil.readFileToString(GenericUtils.resolveLocation(Constants
+                .LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION));
+        String[] entries = shardStatusConfig.split("\n");
         int shardIndex;
         ShardStatus status;
         String[] entryStrArray;
@@ -124,10 +125,10 @@ public class LocalShardAllocationConfig implements Serializable {
 
     public int getShardReplica(int shardIndex) {
         if (this.shardReplicaMap.containsKey(shardIndex)) {
-                        return this.shardReplicaMap.get(shardIndex);
-                    }
-                return 0;
+            return this.shardReplicaMap.get(shardIndex);
         }
+        return 0;
+    }
 
     public ShardStatus getShardStatus(int shardIndex) {
         return this.shardStatusMap.get(shardIndex);
@@ -142,7 +143,7 @@ public class LocalShardAllocationConfig implements Serializable {
             FileUtils.writeStringToFile(new File(GenericUtils.resolveLocation(
                     Constants.LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION)), this.toString());
             FileUtils.writeStringToFile(new File(GenericUtils.resolveLocation(Constants
-                                        .LOCAL_SHARD_REPLICA_CONFIG_LOCATION)), this.shardReplicaToString());
+                    .LOCAL_SHARD_REPLICA_CONFIG_LOCATION)), this.shardReplicaToString());
         } catch (IOException e) {
             throw new AnalyticsException("Error in saving local shard allocation configuration: " + e.getMessage(), e);
         }
@@ -158,17 +159,17 @@ public class LocalShardAllocationConfig implements Serializable {
     }
 
     void setShardStatus(int shardIndex, int replica, ShardStatus status) throws AnalyticsException {
-                this.shardStatusMap.put(shardIndex, status);
-                this.shardReplicaMap.put(shardIndex, replica);
-            }
+        this.shardStatusMap.put(shardIndex, status);
+        this.shardReplicaMap.put(shardIndex, replica);
+    }
 
-            private String shardReplicaToString() {
-                StringBuilder builder = new StringBuilder();
-                for (Map.Entry<Integer, Integer> entry : this.shardReplicaMap.entrySet()) {
-                        builder.append(entry.getKey() + "," + entry.getValue().toString() + "\n");
-                    }
-                return builder.toString();
-            }
+    private String shardReplicaToString() {
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<Integer, Integer> entry : this.shardReplicaMap.entrySet()) {
+            builder.append(entry.getKey() + "," + entry.getValue().toString() + "\n");
+        }
+        return builder.toString();
+    }
 
 
     @Override

@@ -45,16 +45,16 @@ public class H2AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTes
         GenericUtils.clearGlobalCustomDataSourceRepo();
         File dataDir = new File(GenericUtils.resolveLocation(AnalyticsDataSourceConstants.CARBON_HOME_VAR + File
                 .separator + "repository"));
-                if (!dataDir.exists() || !dataDir.isDirectory()) {
-                        dataDir.mkdir();
-                    }
+        if (!dataDir.exists() || !dataDir.isDirectory()) {
+            dataDir.mkdir();
+        }
         System.setProperty(GenericUtils.WSO2_ANALYTICS_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf8");
         Hazelcast.shutdownAll();
         AnalyticsServiceHolder.setHazelcastInstance(Hazelcast.newHazelcastInstance());
         AnalyticsServiceHolder.setAnalyticsClusterManager(new AnalyticsClusterManagerImpl());
         this.init(new AnalyticsDataServiceImpl());
     }
-    
+
     @AfterClass
     public void done() throws NamingException, AnalyticsException, IOException {
         this.service.destroy();
@@ -62,5 +62,5 @@ public class H2AnalyticsDataServiceClusteredTest extends AnalyticsDataServiceTes
         AnalyticsServiceHolder.setHazelcastInstance(null);
         AnalyticsServiceHolder.setAnalyticsDataService(null);
     }
-    
+
 }
