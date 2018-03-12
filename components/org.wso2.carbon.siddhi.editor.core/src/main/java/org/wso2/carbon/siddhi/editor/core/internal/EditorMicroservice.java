@@ -874,13 +874,13 @@ public class EditorMicroservice implements Microservice {
                     .entity(eventFlow.getEventFlowJSON().toString())
                     .build();
         } catch (SiddhiAppCreationException e) {
-            log.error("Unable To Generate Graph View", e);
+            log.error("Unable to generate graph view.", e);
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();
         } catch (IllegalArgumentException e) {
-            log.error("Illegal argument exception occurred", e);
+            log.error("Unable to construct event flow JSON string.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
