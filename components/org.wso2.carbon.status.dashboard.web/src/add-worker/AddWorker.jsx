@@ -59,7 +59,8 @@ export default class AddWorker extends React.Component {
             open: false,
             hasPermission: false,
             isApiCalled: false,
-            isError: false
+            isError: false,
+            //isPopUpOpen: false
         };
         this._handleSubmit = this._handleSubmit.bind(this);
         this._showMessage = this._showMessage.bind(this);
@@ -102,6 +103,14 @@ export default class AddWorker extends React.Component {
     }
 
     /**
+     * Method to handle popup open
+     */
+
+    handlePopupOpen() {
+        this.setState({open: true})
+    };
+
+    /**
      * Method to handle add worker submit button.
      */
     _handleSubmit(e) {
@@ -120,167 +129,16 @@ export default class AddWorker extends React.Component {
                     console.log(response.data);
                     if (response.data === "manager") {
                         console.log("Hi am manager");
-                        StatusDashboardOverViewAPI.createManager(node)
-                            .then((response) => {
-                                if (response.status === HttpStatus.OK) {
-                                    console.log("Manager added");
-                                    that._showMessage("Manager " + nodeID + " is added successfully !");
-                                     setTimeout(function () {
-                                        // window.location.href = window.contextPath;
-                                    // <Redirect to={{pathname: `${window.contextPath}/siddhi-apps`}}/>
-                                  //  window.location.href = window.contextPath +"/"+nodeID+"/siddhi-apps";
-                                         window.location.href = window.contextPath;
-                                     }, 1000)
-
-
-
-
-
-                                    //TODO:FOR TESTING
-                                    // StatusDashboardAPIS.getManagerSiddhiApps(nodeID)
-                                    //     .then((response) => {
-                                    //         if (response.status = HttpStatus.OK) {
-                                    //             console.log(response.data);
-                                    //         }
-                                    //     }).catch((error) => {
-                                    //     if (error.response != null) {
-                                    //         if (error.response.status === 401) {
-                                    //             this.setState({
-                                    //                 isApiCalled: true,
-                                    //                 sessionInvalid: true,
-                                    //                 statusMessage: "Authentication fail. Please login again."
-                                    //             })
-                                    //         } else if (error.response.status === 403) {
-                                    //             this.setState({
-                                    //                 isApiCalled: true,
-                                    //                 hasPermission: false,
-                                    //                 statusMessage: "User Have No Permission to view this"
-                                    //             })
-                                    //         } else {
-                                    //             this.setState({
-                                    //                 isApiCalled: true,
-                                    //                 statusMessage: "Unknown error occurred!"
-                                    //             })
-                                    //         }
-                                    //     }
-                                    //     that._showError(that.state.statusMessage);
-                                    // });
-
-
-                                  //  setTimeout(function () {
-                                      //  <Redirect to={{pathname: `${window.contextPath}/siddhi-apps`}}/>
-                                       // window.location.href = window.contextPath +"siddhi-apps";
-                                  //  }, 1000)
-                                } else {
-                                    that._showError("Error while adding manager " + nodeID + " .Try Again !");
-                                }
-                            }).catch((error) => {
-                            if (error.response != null) {
-                                if (error.response.status === 401) {
-                                    this.setState({
-                                        isApiCalled: true,
-                                        sessionInvalid: true,
-                                        statusMessage: "Authentication fail. Please login again."
-                                    })
-                                } else if (error.response.status === 403) {
-                                    this.setState({
-                                        isApiCalled: true,
-                                        hasPermission: false,
-                                        statusMessage: "User Have No Permission to view this"
-                                    })
-                                } else {
-                                    this.setState({
-                                        isApiCalled: true,
-                                        statusMessage: "Unknown error occurred!"
-                                    })
-                                }
-                            }
-                            that._showError(that.state.statusMessage);
-                        });
-                        //TODO: ONLY FOR TESTING NEED TO BE REMOVED
-                        // StatusDashboardOverViewAPI.getManagerHADetails(nodeID)
-                        //     .then((response) => {
-                        //         if(response.status == HttpStatus.OK){
-                        //             console.log(response.data);
-                        //         }else {
-                        //             that._showError("Error while connecting with the node" + nodeID);
-                        //         }
-                        //     }).catch((error) => {
-                        //     if (error.response != null) {
-                        //         if (error.response.status === 401) {
-                        //             this.setState({
-                        //                 isApiCalled: true,
-                        //                 sessionInvalid: true,
-                        //                 statusMessage: "Authentication fail. Please login again."
-                        //             })
-                        //         } else if (error.response.status === 403) {
-                        //             this.setState({
-                        //                 isApiCalled: true,
-                        //                 hasPermission: false,
-                        //                 statusMessage: "User Have No Permission to view this"
-                        //             })
-                        //         } else if (error.response.status === 500) {
-                        //             this.setState({
-                        //                 isApiCalled: true,
-                        //                 hasPermission: false,
-                        //                 statusMessage: "Unreachable node. Try again !"
-                        //             })
-                        //         } else {
-                        //             this.setState({
-                        //                 isApiCalled: true,
-                        //                 statusMessage: "Unknown error occurred!"
-                        //             })
-                        //         }
-                        //     }
-                        //     that._showError(that.state.statusMessage);
-                        // });
-
-
+                        that._addManager(nodeID);
                     } else if (response.data === "worker") {
                         console.log("Hi am worker");
-                        StatusDashboardOverViewAPI.createWorker(node)
-                            .then((response) => {
-                                if (response.status === HttpStatus.OK) {
-                                    that._showMessage("Worker '" + nodeID + "' is added successfully !");
-                                    setTimeout(function () {
-                                        window.location.href = window.contextPath;
-                                    }, 1000)
-
-                                } else {
-                                    that._showError("Error while adding worker '" + nodeID + "' . Try Again !");
-                                }
-                            }).catch((error) => {
-                            if (error.response != null) {
-                                if (error.response.status === 401) {
-                                    this.setState({
-                                        isApiCalled: true,
-                                        sessionInvalid: true,
-                                        statusMessage: "Authentication fail. Please login again."
-                                    })
-                                } else if (error.response.status === 403) {
-                                    this.setState({
-                                        isApiCalled: true,
-                                        hasPermission: false,
-                                        statusMessage: "User Have No Permission to view this"
-                                    })
-                                } else {
-                                    this.setState({
-                                        isApiCalled: true,
-                                        statusMessage: "Unknown error occurred!"
-                                    })
-                                }
-                            }
-                            that._showError(that.state.statusMessage);
-                        });
-                        //console.log("Hi am worker");
+                        that._addWorker(nodeID);
                     } else {
-                        that._showError(nodeID + "is unreachable. please try again");
+                        this.handlePopupOpen();
+                        console.log("am here");
                     }
-
-                    // setTimeout(function () {
-                    //     window.location.href = window.contextPath;
-                    // }, 1000)
                 } else {
+
                     that._showError("Error while connecting with the node" + nodeID);
                 }
             }).catch((error) => {
@@ -402,6 +260,99 @@ export default class AddWorker extends React.Component {
         });
     }
 
+
+    _addWorker(nodeID){
+        let node = JSON.stringify({
+            host: this.refs.host.input.value,
+            port: this.refs.port.input.value,
+        });
+
+        let that = this;
+        nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+        StatusDashboardOverViewAPI.createWorker(node)
+            .then((response) => {
+                if (response.status === HttpStatus.OK) {
+                    that._showMessage("Worker '" + nodeID + "' is added successfully !");
+                    setTimeout(function () {
+                        window.location.href = window.contextPath;
+                    }, 1000)
+
+                } else {
+                    that._showError("Error while adding worker '" + nodeID + "' . Try Again !");
+                }
+            }).catch((error) => {
+            if (error.response != null) {
+                if (error.response.status === 401) {
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
+                    })
+                } else if (error.response.status === 403) {
+                    this.setState({
+                        isApiCalled: true,
+                        hasPermission: false,
+                        statusMessage: "User Have No Permission to view this"
+                    })
+                } else {
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred!"
+                    })
+                }
+            }
+            that._showError(that.state.statusMessage);
+        });
+    }
+
+    _addManager(nodeID){
+        let node = JSON.stringify({
+            host: this.refs.host.input.value,
+            port: this.refs.port.input.value,
+        });
+
+        let that = this;
+        nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+        StatusDashboardOverViewAPI.createManager(node)
+            .then((response) => {
+                if (response.status === HttpStatus.OK) {
+                    console.log("Manager added");
+                    this._showMessage("Manager " + nodeID + " is added successfully !");
+                    setTimeout(function () {
+                        // window.location.href = window.contextPath;
+                        // <Redirect to={{pathname: `${window.contextPath}/siddhi-apps`}}/>
+                        //  window.location.href = window.contextPath +"/"+nodeID+"/siddhi-apps";
+                        window.location.href = window.contextPath;
+                    }, 1000)
+                } else {
+                    that._showError("Error while adding manager " + nodeID + " .Try Again !");
+                }
+            }).catch((error) => {
+            if (error.response != null) {
+                if (error.response.status === 401) {
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
+                    })
+                } else if (error.response.status === 403) {
+                    this.setState({
+                        isApiCalled: true,
+                        hasPermission: false,
+                        statusMessage: "User Have No Permission to view this"
+                    })
+                } else {
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred!"
+                    })
+                }
+            }
+            that._showError(that.state.statusMessage);
+        });
+
+    }
+
     render() {
         if (this.state.isError) {
             return <Error500 message={this.state.statusMessage}/>;
@@ -425,6 +376,27 @@ export default class AddWorker extends React.Component {
                 />
             ];
 
+            let nodeButtons = [
+                <FlatButton
+                    label="Worker"
+                    backgroundColor='#f17b31'
+                    style={buttonStyle}
+                    onClick={() => {
+                        let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+                        this._addWorker(nodeID);
+
+                    }}
+                />,
+                <FlatButton
+                    label="Manager"
+                    backgroundColor='#f17b31'
+                    style={buttonStyle}
+                    onClick={() => {
+                        let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+                        this._addManager(nodeID);
+                    }}
+                />
+            ];
             return (
                 <div>
                     <Dialog
@@ -436,6 +408,17 @@ export default class AddWorker extends React.Component {
                         }}>
                         {this.state.message}
                     </Dialog>
+
+                    <Dialog
+                        actions={nodeButtons}
+                        modal={false}
+                        open={this.state.open}
+                        onRequestClose={() => {
+                            this.setState({open: false, openAdd: false});
+                        }}>
+                        Node details you entered is currently unreachable. Please chose the run time environment
+                    </Dialog>
+
                     <Header/>
                     <div className="navigation-bar">
                         <Link to={window.contextPath}><FlatButton label="Overview >"

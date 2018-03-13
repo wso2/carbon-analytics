@@ -124,7 +124,7 @@ export default class ManagerThumbnail extends React.Component {
     renderDeleteManager() {
         if (this.state.hasPermission) {
             return (
-                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker" style={{zIndex:1}}
+                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Manager" style={{zIndex:1}}
                             tooltipPosition="bottom-center" onClick={() => {
                     this.setState({open: true})
                 }}><Delete color="grey"/></IconButton>
