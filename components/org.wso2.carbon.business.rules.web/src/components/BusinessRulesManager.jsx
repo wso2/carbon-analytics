@@ -17,18 +17,19 @@
  */
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+import Table, {TableBody, TableCell, TableHead, TableRow} from 'material-ui/Table';
 import Button from 'material-ui/Button';
 import AddIcon from 'material-ui-icons/Add';
-import Dialog, { DialogActions, DialogContent, DialogContentText, DialogTitle } from 'material-ui/Dialog';
+import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle} from 'material-ui/Dialog';
 import Paper from 'material-ui/Paper';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
 // App Components
 import BusinessRule from './BusinessRule';
+import DeploymentInfo from './DeploymentInfo';
 import Header from './common/Header';
 import ProgressDisplay from './ProgressDisplay';
 // App Constants
@@ -38,31 +39,31 @@ import BusinessRulesConstants from '../constants/BusinessRulesConstants';
 import BusinessRulesAPICaller from '../api/BusinessRulesAPICaller';
 // CSS
 import '../index.css';
-// Custom Theme
-import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
-import { Orange } from '../theme/BusinessRulesManagerColors';
-
-const theme = createMuiTheme({
-    palette: {
-        primary: Orange,
-    },
-});
 
 /**
  * Styles related to this component
  */
 const styles = {
     container: {
-        maxWidth: 1020,
+        maxWidth: 1020
     },
     paper: {
         maxWidth: 400,
         paddingTop: 30,
         paddingBottom: 30
     },
+    card: {
+        width: 345,
+        height: 200,
+        margin: 15
+    },
+    chip: {
+        margin: 5
+    },
+    spacing: '0',
     snackbar: {
         direction: 'up'
-    },
+    }
 };
 
 /**
@@ -89,6 +90,11 @@ class BusinessRulesManager extends React.Component {
             // To show dialog when deleting a business rule
             displayDeleteDialog: false,
             businessRuleUUIDToBeDeleted: '',
+
+            // To show business rule's deployment info
+            displayDeploymentInfo: false,
+            deploymentInfo: {},
+            deploymentInfoBusinessRule: {}
         };
     }
 
@@ -153,6 +159,31 @@ class BusinessRulesManager extends React.Component {
     }
 
     /**
+     * Views the given business rule's deployment info
+     * @param businessRule  Array with Business rule object and status
+     */
+    showDeploymentInfo(businessRule) {
+        new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL).getDeploymentInfo(businessRule[0].uuid)
+            .then((response) => {
+                this.setState({
+                    deploymentInfo: response.data[2],
+                    deploymentInfoBusinessRule: businessRule
+                });
+                this.toggleDeploymentInfoView();
+            })
+            .catch(() => {
+                this.displaySnackBar('Unable to retrieve deployment info');
+            });
+    }
+
+    /**
+     * Toggles the visibility of deployment info display
+     */
+    toggleDeploymentInfoView() {
+        this.setState({displayDeploymentInfo: !this.state.displayDeploymentInfo});
+    }
+
+    /**
      * Displays snackbar with the given message
      *
      * @param message
@@ -210,6 +241,7 @@ class BusinessRulesManager extends React.Component {
                         permissions={this.state.permissions}
                         redeploy={(uuid) => this.redeployBusinessRule(uuid)}
                         showDeleteDialog={(uuid) => this.displayDeleteDialog(uuid)}
+                        showDeploymentInfo={() => this.showDeploymentInfo(businessRule)}
                     />
                 );
 
@@ -317,12 +349,18 @@ class BusinessRulesManager extends React.Component {
             </Dialog>);
 
         return (
-            <MuiThemeProvider theme={theme}>
+            <div>
                 <Header hideHomeButton />
                 <br />
                 <div>
                     {snackbar}
                     {deleteConfirmationDialog}
+                    <DeploymentInfo
+                        businessRule={this.state.deploymentInfoBusinessRule}
+                        info={this.state.deploymentInfo}
+                        open={this.state.displayDeploymentInfo}
+                        onRequestClose={() => this.toggleDeploymentInfoView()}
+                    />
                     <center>
                         <br />
                         <div>
@@ -337,7 +375,7 @@ class BusinessRulesManager extends React.Component {
                         {this.displayAvailableBusinessRules()}
                     </center>
                 </div>
-            </MuiThemeProvider>
+            </div>
         )
     }
 }

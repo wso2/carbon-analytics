@@ -110,6 +110,14 @@ class BusinessRulesAPICaller {
     }
 
     /**
+     * Gets deployment info of the business rule with the given ID
+     * @param businessRuleID
+     */
+    getDeploymentInfo(businessRuleID) {
+        return this.getHTTPClient().get('/instances/' + businessRuleID + '/deployment-info');
+    }
+
+    /**
      * Updates the business rule with the given ID, with the given JSON of a business rule; with deployment status
      * as specified
      *

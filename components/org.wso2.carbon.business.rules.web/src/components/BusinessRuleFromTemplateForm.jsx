@@ -42,15 +42,6 @@ import BusinessRulesMessages from '../constants/BusinessRulesMessages';
 import BusinessRulesAPICaller from '../api/BusinessRulesAPICaller';
 // CSS
 import '../index.css';
-// Custom Theme
-import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
-import { Orange } from '../theme/BusinessRulesManagerColors';
-
-const theme = createMuiTheme({
-    palette: {
-        primary: Orange,
-    },
-});
 
 /**
  * Styles related to this component
@@ -627,7 +618,7 @@ class BusinessRuleFromTemplateForm extends React.Component {
         }
 
         return (
-            <MuiThemeProvider theme={theme}>
+            <div>
                 <Header />
                 <br />
                 <div>
@@ -660,7 +651,7 @@ class BusinessRuleFromTemplateForm extends React.Component {
                         </Grid>
                     </Grid>
                 </div>
-            </MuiThemeProvider>
+            </div>
         )
     }
 }
