@@ -582,7 +582,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private void setAdditionalConfigs(SparkConf conf) throws AnalyticsException {
         //executor constants for spark env
-        String carbonHome = null, carbonConfDir, analyticsSparkConfDir;
+        String carbonHome = null, carbonConfDir = null, analyticsSparkConfDir;
         try {
             carbonHome = conf.get(AnalyticsConstants.CARBON_DAS_SYMBOLIC_LINK);
             logDebug("[Spark init - configs] CARBON HOME set with the symbolic link " + carbonHome);
@@ -594,15 +594,14 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         } catch (NoSuchElementException e) {
             try {
                 carbonHome = CarbonUtils.getCarbonHome();
+                carbonConfDir = CarbonUtils.getCarbonConfigDirPath();
             } catch (Throwable ex) {
                 logDebug("CARBON HOME can not be found. Spark conf in non-carbon environment");
             }
         }
         logDebug("CARBON HOME used for Spark Conf : " + carbonHome);
 
-        if (carbonHome != null) {
-            carbonConfDir = carbonHome + File.separator + "repository" + File.separator + "conf";
-        } else {
+        if (carbonConfDir == null) {
             logDebug("CARBON HOME is NULL. Spark conf in non-carbon environment. Using the custom conf path");
             carbonConfDir = GenericUtils.getAnalyticsConfDirectory();
         }
@@ -646,8 +645,7 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         conf.setIfMissing(AnalyticsConstants.SPARK_RECOVERY_MODE_FACTORY,
                 AnalyticsRecoveryModeFactory.class.getName());
 
-        String agentConfPath = carbonHome + File.separator + "repository" + File.separator +
-                "conf" + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
+        String agentConfPath = carbonConfDir + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
 
         String jvmOpts = " -Dwso2_custom_conf_dir=" + carbonConfDir
                 + " -Dcarbon.home=" + carbonHome
