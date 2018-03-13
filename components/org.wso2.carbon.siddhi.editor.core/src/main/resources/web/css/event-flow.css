@@ -7,31 +7,40 @@
     padding: 10px;
 }
 
-.colour-key {
+.legend-table {
     float: right;
 }
 
-.colour-key-table {
+.legend {
     color: white;
-    font-size: 20px;
+    font-size: 14px;
     text-align: left;
+    display: inline-block;
+    float: right;
+    width: 100%;
+    max-width: 440px;
 }
 
-.colour-key-table td {
+.legend-key {
     padding: 5px;
+    display: inline-block;
 }
 
-.colour-key-table span {
+.legend-text {
+    line-height: 24px;
+}
+
+.legend-colour {
     width: 15px;
     height: 15px;
     float: left;
     margin: 5px;
 }
 
+
 .siddhi-app-name {
     color: white;
     font-size: 40px;
-    padding-top: 10px;
 }
 
 .siddhi-app-description {
@@ -41,7 +50,7 @@
 
 .graph-container {
     width: 100%;
-    height: 85%;
+    background-color: #333333;
     overflow: scroll;
 }
 
@@ -80,7 +89,7 @@
 
 .indicator {
     height: 30px;
-    width: 20px;
+    width: 15px;
     display: block;
     float: left;
     border-top-left-radius: 7px;
@@ -89,18 +98,15 @@
 }
 
 .nodeLabel {
-    font-weight: 100;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
-    font-size: 24px;
+    font-size: 16px;
     color: #fff;
     margin-right: 10px;
 }
 
 .partition {
-    font-weight: 100;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
-    font-size: 24px;
+    font-size: 20px;
     color: #000;
+    padding-top: 5px;
 }
 
 .stream-colour {
@@ -143,7 +149,6 @@
 }
 
 .toggle-view-button {
-    border-radius: 5px;
     transition: 0.15s;
     font-weight: bold;
     color: white;

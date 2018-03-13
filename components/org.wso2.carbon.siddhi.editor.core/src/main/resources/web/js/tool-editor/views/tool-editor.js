@@ -153,7 +153,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                                     sourceContainer.hide();
                                     designContainer.show();
                                     self._eventFlow.clearContent();
-                                    toggleViewButton.html("Source View");
+                                    toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
                                     setTimeout(function () {
                                         self._eventFlow.render(response.responseJSON);
                                         self._eventFlow.graphResize();
@@ -165,13 +165,13 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                                 sourceContainer.hide();
                                 designContainer.show();
                                 self._eventFlow.graphResize();
-                                toggleViewButton.html("Source View");
+                                toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
                             }
                         } else if (designContainer.is(':visible')) {
                             designContainer.hide();
                             sourceContainer.show();
                             self._sourceView.editorResize();
-                            toggleViewButton.html("Design View");
+                            toggleViewButton.html("<i class=\"fw fw-design-view\"></i>&nbsp;&nbsp;Design View");
                         }
                     });
                 },

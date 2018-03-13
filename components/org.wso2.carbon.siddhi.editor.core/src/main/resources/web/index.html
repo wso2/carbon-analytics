@@ -38,6 +38,7 @@
     <link rel="stylesheet" type="text/css" href="/editor/css/console.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/welcome-screen.css"/>
     <!-- CSS For The Design View -->
+    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/overlay_scroll/css/OverlayScrollbars.min.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/event-flow.css"/>
 
     <title>Stream Processor Studio</title>
@@ -231,38 +232,78 @@
                 <i class="fw fw-wso2-logo fw-pulse fw-2x"></i>
             </div>
             <div class="design-container-data">
-                <div class="colour-key">
-                    <table class="colour-key-table">
-                        <tr>
-                            <td>
-                                <span class="stream-colour"></span> Stream
-                            </td>
-                            <td>
-                                <span class="table-colour"></span> Table
-                            </td>
-                            <td>
-                                <span class="window-colour"></span> Window
-                            </td>
-                            <td>
-                                <span class="trigger-colour"></span> Trigger
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="aggregation-colour"></span> Aggregation
-                            </td>
-                            <td>
-                                <span class="function-colour"></span> Function
-                            </td>
-                            <td>
-                                <span class="query-colour"></span> Query
-                            </td>
-                            <td>
-                                <span class="partition-type-colour"></span> Partition
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                <!--<div class="legend-table">
+                    <div class="legend-row">
+                        <div class="legend-column">
+                            <span class="legend-colour stream-colour"></span>
+                            <span>Stream</span>
+                        </div>
+                        <div class="legend-column">
+                            <span class="legend-colour stream-colour"></span>
+                            <span>Stream</span>
+                        </div>
+                        <div class="legend-column">
+                            <span class="legend-colour stream-colour"></span>
+                            <span>Stream</span>
+                        </div>
+                        <div class="legend-column">
+                            <span class="legend-colour stream-colour"></span>
+                            <span>Stream</span>
+                        </div>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-column">
+                            <span class="legend-colour stream-colour"></span>
+                            <span>Stream</span>
+                        </div>
+                        <div class="legend-column">
+                            <span class="legend-colour stream-colour"></span>
+                            <span>Stream</span>
+                        </div>
+                        <div class="legend-column">
+                            <span class="legend-colour stream-colour"></span>
+                            <span>Stream</span>
+                        </div>
+                        <div class="legend-column">
+                            <span class="legend-colour stream-colour"></span>
+                            <span>Stream</span>
+                        </div>
+                    </div>
+                </div>-->
+                <ul class="legend">
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour stream-colour"></span>
+                        <span class="legend-text">Stream</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour table-colour"></span>
+                        <span class="legend-text">Table</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour window-colour"></span>
+                        <span class="legend-text">Window</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour trigger-colour"></span>
+                        <span class="legend-text">Trigger</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour aggregation-colour"></span>
+                        <span class="legend-text">Aggregation</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour function-colour"></span>
+                        <span class="legend-text">Function</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour query-colour"></span>
+                        <span class="legend-text">Query</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour partition-type-colour"></span>
+                        <span class="legend-text">Partition</span>
+                    </li>
+                </ul>
                 <div class="siddhi-app-name"></div>
                 <div class="siddhi-app-description"></div>
             </div>
@@ -279,7 +320,7 @@
         <!-- End Preview Container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
-            <div class="btn toggle-view-button">Design View</div>
+            <div class="btn toggle-view-button"><i class="fw fw-design-view"></i>&nbsp;&nbsp;Design View</div>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>
@@ -1140,6 +1181,7 @@
             ace: "commons/lib/ace-editor",
             d3: "commons/lib/dagre-d3/d3.v3.min",
             dagre_d3: "commons/lib/dagre-d3/dagre-d3.min",
+            overlay_scroller: "commons/lib/overlay_scroll/js/jquery.overlayScrollbars.min",
             //beautify: "commons/lib/beautify",
             ///////////////////////
             // custom modules ////
