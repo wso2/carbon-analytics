@@ -153,7 +153,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                                     sourceContainer.hide();
                                     designContainer.show();
                                     self._eventFlow.clearContent();
-                                    toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
+                                    toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
+                                        "<span class='toggle-button-text'>Source View</span>");
                                     setTimeout(function () {
                                         self._eventFlow.render(response.responseJSON);
                                         self._eventFlow.graphResize();
@@ -165,13 +166,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                                 sourceContainer.hide();
                                 designContainer.show();
                                 self._eventFlow.graphResize();
-                                toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
+                                toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
+                                    "<span class='toggle-button-text'>Source View</span>");
                             }
                         } else if (designContainer.is(':visible')) {
                             designContainer.hide();
                             sourceContainer.show();
                             self._sourceView.editorResize();
-                            toggleViewButton.html("<i class=\"fw fw-design-view\"></i>&nbsp;&nbsp;Design View");
+                            toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
+                                "<span class='toggle-button-text'>Design View</span>");
                         }
                     });
                 },
