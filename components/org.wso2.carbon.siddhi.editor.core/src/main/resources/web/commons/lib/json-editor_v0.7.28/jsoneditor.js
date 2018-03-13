@@ -8044,5 +8044,3 @@ JSONEditor.defaults.resolvers.unshift(function(schema) {
 
   window.JSONEditor = JSONEditor;
 })();
-
-//# sourceMappingURL=jsoneditor.js.map
