@@ -95,9 +95,17 @@ public class ComputeClasspath {
         result.addAll(getAdditionalJars());
 
         // Read from the file
-        File jarsFile = new File(
-                System.getProperty(CONF_DIRECTORY_PATH) + File.separator + "analytics" + File.separator + "spark"
-                                 + File.separator + "carbon-spark-classpath.conf");
+        String confDirPath = System.getProperty(CONF_DIRECTORY_PATH);
+        File jarsFile;
+        if (confDirPath != null && !confDirPath.isEmpty()) {
+            jarsFile = new File(confDirPath + File.separator + "analytics" + File.separator + "spark" + File.separator
+                    + "carbon-spark-classpath.conf");
+        } else {
+            jarsFile = new File(
+                    carbonHome + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
+                            + File.separator + "spark" + File.separator + "carbon-spark-classpath.conf");
+        }
+
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(jarsFile), StandardCharsets.UTF_8));
@@ -161,9 +169,17 @@ public class ComputeClasspath {
 
     private static String addJarsFromConfig(String scp, String carbonHome, String separator)
             throws IOException {
-        File cpFile = new File(
-                System.getProperty(CONF_DIRECTORY_PATH) + File.separator + "analytics" + File.separator + "spark"
-                        + File.separator + "external-spark-classpath.conf");
+
+        String confDirPath = System.getProperty(CONF_DIRECTORY_PATH);
+        File cpFile;
+        if (confDirPath != null && !confDirPath.isEmpty()) {
+            cpFile = new File(confDirPath + File.separator + "analytics" + File.separator + "spark" + File.separator
+                    + "external-spark-classpath.conf");
+        } else {
+            cpFile = new File(
+                    carbonHome + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
+                            + File.separator + "spark" + File.separator + "external-spark-classpath.conf");
+        }
 
         BufferedReader reader = null;
         StringBuilder buf = new StringBuilder();
