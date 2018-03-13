@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQuery', 'partition', 'passThroughQuery',
-    'patternQuery', 'query', 'stream', 'windowQuery'],
+    'patternQuery', 'query', 'stream', 'windowQuery', 'formBuilder'],
     function (require, log, _, $, _jsPlumb, FilterQuery, JoinQuery, Partition, PassThroughQuery, PatternQuery, Query,
-              Stream, WindowQuery) {
+              Stream, WindowQuery, FormBuilder) {
 
         var constants = {
             STREAM: 'streamdrop',
@@ -50,13 +50,21 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 log.error(errorMessage);
                 throw errorMessage;
             }
-            this.app = options.app;
+            this.appData = options.appData;
             this.container = options.container;
-            this.formBuilder = options.formBuilder;
+            this.application = options.application;
+            this.newAgentId = options.newAgentId;
+            this.finalElementCount =options.finalElementCount;
             this.options = options;
+
+            var formBuilderOptions = {};
+            _.set(formBuilderOptions, 'application', this.application);
+            _.set(formBuilderOptions, 'appData', this.appData);
+            _.set(formBuilderOptions, 'dropElements', this);
+            this.formBuilder = new FormBuilder(formBuilderOptions);
         };
 
-        dropElements.prototype.dropStream = function (newAgent,i,top,left, name) {
+        dropElements.prototype.dropStream = function (newAgent,i,top,left) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
@@ -64,6 +72,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             */
 
             var self= this;
+            var name = self.formBuilder.DefineStream(i);
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
             node.attr('id', i+"-nodeInitial");
@@ -74,10 +83,13 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
              showIcon --> An icon that elucidates whether the dropped stream element is an Import/Export/Defined stream (In this case: an Import arrow icon)
              conIcon --> Clicking this icon is supposed to toggle between showing and hiding the "Connection Anchor Points" (Not implemented)
             */
-            // TODO: not implemented (from earlier version)
-            var prop = $('<img src="/editor/images/settings.png" class="element-prop-icon collapse" ' +
-                'onclick ="self.formBuilder.GeneratePropertiesFormForStreams(this)">');
+            var prop = $('<img src="/editor/images/settings.png" id="dropStreamSettingsId" class="element-prop-icon collapse">');
             newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">').append(prop);
+
+            var settingsIconElement = $('#dropStreamSettingsId')[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForStreams(this);
+            });
 
             var finalElement = newAgent;
 
@@ -110,9 +122,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 deleteEndpointsOnDetach : true,
                 anchor : 'Right'
             });
-
-            // $("#grid-container").removeClass("disabledbutton");
-            // $("#tool-palette-container").removeClass("disabledbutton");
         };
 
         /**
@@ -123,12 +132,13 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @param streamAttributes      projections list for output stream
          */
         dropElements.prototype.dropStreamFromQuery = function (position , id, outStream, streamAttributes) {
-            var elementID = i;
+            var self = this;
+            var elementID = self.newAgentId;
             var newAgent = $('<div>').attr('id', elementID).addClass('streamdrop');
 
-            // The container and the toolbox are disabled to prevent the user from dropping any elements before initializing a Stream Element
-            // $("#grid-container").removeClass("disabledbutton");
-            // $("#tool-palette-container").removeClass("disabledbutton");
+            // The container and the tool palette are disabled to prevent the user from dropping any elements before initializing a Stream Element
+            $("#grid-container").removeClass("disabledbutton");
+            $("#tool-palette-container").removeClass("disabledbutton");
             $(this.container).append(newAgent);
 
             // drop the stream
@@ -141,18 +151,18 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             _.set(streamOptions, 'type', 'define-stream');
             _.set(streamOptions, 'attributes', streamAttributes);
             var stream = new Stream(streamOptions);
-            this.app.AddStream(stream);
+            this.appData.AddStream(stream);
             // make the connection
             _jsPlumb.connect({
                 source: id+'-out',
                 target: elementID+'-in'
             });
             // update the query model with output stream
-            var query = this.app.getQuery(id);
+            var query = this.appData.getQuery(id);
             query.setInsertInto(elementID);
-            // increment the global variable i and the final element count
-            finalElementCount = i; //tODO:check this variable
-            i++;
+            // increment the variable newAgentId and the final element count
+            self.finalElementCount = self.newAgentId; //tODO:check this variable
+            self.newAgentId++;
             this.registerElementEventListeners(newAgent);
         };
 
@@ -170,6 +180,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element everytime theuser changes it
             */
+            var self= this;
             //TODO : check text node division. we might need to add a new div to handle this.
             var node = $('<div>' + text + '</div>');
             newAgent.append(node);
@@ -190,12 +201,18 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 _.set(queryOptions, 'projection', '');
                 var newQuery = new Query(queryOptions);
                 newQuery.setId(i);
-                this.app.AddQuery(newQuery);
-                var propertiesIcon = $('<img src="/editor/images/settings.png" class="element-prop-icon collapse" ' +
-                    'onclick="this.formBuilder.GeneratePropertiesFormForQueries(this)">');
+                this.appData.AddQuery(newQuery);
+                var propertiesIcon = $('<img src="/editor/images/settings.png" id="dropQuerySettingsId" ' +
+                    'class="element-prop-icon collapse">');
                 newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
                     .append(propertiesIcon);
+
                 this.dropSimpleQueryElement(newAgent, i, top, left);
+
+                var settingsIconElement = $('#dropQuerySettingsId')[0];
+                settingsIconElement.addEventListener('click', function () {
+                    self.formBuilder.GeneratePropertiesFormForQueries(this);
+                });
             }
 
             else if(droptype === constants.JOIN)
@@ -210,12 +227,18 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 _.set(joinQueryOptions, 'from', '');
                 var newJoinQuery = new JoinQuery(joinQueryOptions);
                 newJoinQuery.setId(i);
-                this.app.AddJoinQuery(newJoinQuery);
-                var propertiesIcon = $('<img src="/editor/images/settings.png" class="element-prop-icon collapse" ' +
-                    'onclick="this.formBuilder.GeneratePropertiesFormForJoinQuery(this)">');
+                this.appData.AddJoinQuery(newJoinQuery);
+                var propertiesIcon = $('<img src="/editor/images/settings.png" id="dropJoinQuerySettingsId" ' +
+                    'class="element-prop-icon collapse">');
                 newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
                     .append(propertiesIcon);
+
                 this.dropCompleteJoinQueryElement(newAgent , i, top, left);
+
+                var settingsIconElement = $('#dropJoinQuerySettingsId')[0];
+                settingsIconElement.addEventListener('click', function () {
+                    self.formBuilder.GeneratePropertiesFormForJoinQuery(this);
+                });
             }
             else if(droptype === constants.PATTERN)
             {
@@ -237,12 +260,18 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
                 var newPattern = new PatternQuery(patternQueryOptions);
                 newPattern.setId(i);
-                this.app.AddPatternQuery(newPattern);
-                var propertiesIcon = $('<img src="/editor/images/settings.png" class="element-prop-icon collapse" ' +
-                    'onclick="this.formBuilder.GeneratePropertiesFormForPattern(this)">');
+                this.appData.AddPatternQuery(newPattern);
+                var propertiesIcon = $('<img src="/editor/images/settings.png" id="dropPatternQuerySettingsId" ' +
+                    'class="element-prop-icon collapse">');
                 newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
                     .append(propertiesIcon);
+
                 this.dropPatternQueryElement(newAgent, i, top, left);
+
+                var settingsIconElement = $('#dropPatternQuerySettingsId')[0];
+                settingsIconElement.addEventListener('click', function () {
+                    self.formBuilder.GeneratePropertiesFormForPattern(this);
+                });
             }
         };
 
@@ -371,6 +400,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @param mouseLeft
          */
         dropElements.prototype.dropPartition = function (newAgent, i, mouseTop, mouseLeft) {
+            var self = this;
             var finalElement =  newAgent;
 
             $(finalElement).draggable({
@@ -405,7 +435,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
                 x++;
                 $(connectionIn).on('click', function(endpoint){
-                    this.formBuilder.GeneratePartitionKeyForm(endpoint);
+                    self.formBuilder.GeneratePartitionKeyForm(endpoint);
                 });
             });
 
@@ -426,7 +456,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             _.set(partitionOptions, 'queries', '');
             var newPartition = new Partition(partitionOptions);
             newPartition.setId(i);
-            this.app.AddPartition(newPartition);
+            this.appData.AddPartition(newPartition);
         };
 
         /**
@@ -451,7 +481,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             newAgent.append(windowNode);
             windowNode.attr('id', i+"-windowNode");
             windowNode.attr('class', "windowNameNode");
-
+//TODO: onclick
             var prop = $('<img src="/editor/images/settings.png" class="element-prop-icon collapse" onclick="">')
                 .attr('id', (i+('-prop')));
             newAgent.append(windowNode).append('<img src="/editor/images/cancel.png" ' +
@@ -508,16 +538,17 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
             //register event listener to remove the element when the close icon is clicked
             newElement.on('click', '.element-close-icon', function () {
+                //TODO: check these remove events
                 if(_jsPlumb.getGroupFor(newElement)){
-                    var queries = this.app.getPartition(_jsPlumb.getGroupFor(newElement)).getQueries();
+                    var queries = this.appData.getPartition(_jsPlumb.getGroupFor(newElement)).getQueries();//TODO: check id[_jsPlumb.getGroupFor(newElement)] in here
                     var removedQueryIndex = null;
                     $.each( queries , function (index, query) {
-                        if(query.getId() === $(newElement).attr('id')){
+                        if(query.getId() === $(newElement).attr('id')){//TODO: check id in here
                             removedQueryIndex = index;
                         }
                     });
                     queries.splice(removedQueryIndex,1);
-                    this.app.getPartition(_jsPlumb.getGroupFor(newElement)).setQueries(queries);
+                    this.appData.getPartition(_jsPlumb.getGroupFor(newElement)).setQueries(queries);
                     _jsPlumb.remove(newElement);
                     _jsPlumb.removeFromGroup(newElement);
                 }

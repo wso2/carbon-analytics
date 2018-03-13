@@ -24,20 +24,27 @@ define(['require', 'log', 'lodash', 'jquery', 'app/tool-palette/tool-palette', '
          * @constructor
          * @class DesignView  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view
+         * @param application Application data
          */
-        var DesignView = function (options) {
-            var errorMessage = 'unable to find design view container';
+        var DesignView = function (options, application) {
+            var errorMessage1 = 'unable to find design view container in design-view.js';
+            var errorMessage2 = 'unable to find application in design-view.js';
             if (!_.has(options, 'container')) {
-                log.error(errorMessage);
-                throw errorMessage;
+                log.error(errorMessage1);
+                throw errorMessage1;
             }
             var container = $(_.get(options, 'container'));
             if (!container.length > 0) {
-                log.error(errorMessage);
-                throw errorMessage;
+                log.error(errorMessage1);
+                throw errorMessage1;
+            }
+            if (!_.has(options, 'application')) {
+                log.error(errorMessage2);
+                throw errorMessage2;
             }
             this._$parent_el = container;
             this.options = options;
+            this.application = application;
         };
 
         DesignView.prototype.render = function () {
@@ -50,7 +57,8 @@ define(['require', 'log', 'lodash', 'jquery', 'app/tool-palette/tool-palette', '
                 log.error(errMsg);
                 throw errMsg;
             }
-            var toolPaletteContainer = this._$parent_el.find(_.get(this.options, 'design_view.tool_palette.container')).get(0);
+            var toolPaletteContainer = this._$parent_el.find(_.get(this.options, 'design_view.tool_palette.container'))
+                .get(0);
             if (toolPaletteContainer === undefined) {
                 errMsg = 'unable to find tool palette container with selector: '
                     + _.get(this.options, 'design_view.tool_palette.container');
@@ -75,9 +83,10 @@ define(['require', 'log', 'lodash', 'jquery', 'app/tool-palette/tool-palette', '
                 log.error(errMsg);
                 throw errMsg;
             }
-            var designViewOpts = {};
-            _.set(designViewOpts, 'container', designViewGridContainer);
-            var designViewGrid = new DesignViewGrid(designViewOpts);
+            var designViewGridOpts = {};
+            _.set(designViewGridOpts, 'container', designViewGridContainer);
+            _.set(designViewGridOpts, 'application', this.application);
+            var designViewGrid = new DesignViewGrid(designViewGridOpts);
             designViewGrid.render();
         };
 

@@ -70,35 +70,35 @@ define(['require', 'elementArray'],
         };
 
         AppData.prototype.getStream = function (streamId) {
-            this.streamList.getElement(streamId);
+            return this.streamList.getElement(streamId);
         };
 
         AppData.prototype.getFilterQuery = function (filterQueryId) {
-            this.filterList.getElement(filterQueryId);
+            return this.filterList.getElement(filterQueryId);
         };
 
         AppData.prototype.getPassThroughQuery = function (passThroughQueryId) {
-            this.passThroughList.getElement(passThroughQueryId);
+            return this.passThroughList.getElement(passThroughQueryId);
         };
 
         AppData.prototype.getWindowQuery = function (windowQueryId) {
-            this.windowQueryList.getElement(windowQueryId);
+            return this.windowQueryList.getElement(windowQueryId);
         };
 
         AppData.prototype.getQuery = function (queryId) {
-            this.queryList.getElement(queryId);
+            return this.queryList.getElement(queryId);
         };
 
         AppData.prototype.getPatternQuery = function (patternQueryId) {
-            this.patternList.getElement(patternQueryId);
+            return this.patternList.getElement(patternQueryId);
         };
 
         AppData.prototype.getJoinQuery = function (joinQueryId) {
-            this.joinQueryList.getElement(joinQueryId);
+            return this.joinQueryList.getElement(joinQueryId);
         };
 
         AppData.prototype.getPartition = function (partitionId) {
-            this.partitionList.getElement(partitionId);
+            return this.partitionList.getElement(partitionId);
         };
 
         return AppData;

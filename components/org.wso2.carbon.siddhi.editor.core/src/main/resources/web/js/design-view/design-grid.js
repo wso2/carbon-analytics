@@ -15,10 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'appData', 'dagre', 'formBuilder',
+define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'appData', 'dagre',
         'jquery_ui'],
 
-    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, AppData, dagre, FormBuilder) {
+    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, AppData, dagre) {
 
         var constants = {
             STREAM: 'streamdrop',
@@ -50,22 +50,24 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             }
             this.options = options;
             this.container = this.options.container;
+            this.application = this.options.application;
         };
 
         DesignView.prototype.render = function () {
             var self = this;
 
-            // i --> newAgent ID (Dropped Element ID)
-            var i = 1;
+            // newAgentId --> newAgent ID (Dropped Element ID)
+            this.newAgentId = 1;
             // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
-            var finalElementCount=0;
-            var appData = new AppData();
-            var formBuilder = new FormBuilder();
+            this.finalElementCount = 0;
+            this.appData = new AppData();
             var dropElementsOpts = {};
             _.set(dropElementsOpts, 'container', self.container);
-            _.set(dropElementsOpts, 'app', appData);
-            _.set(dropElementsOpts, 'formBuilder', formBuilder);
-            this.dropElements =new DropElements(dropElementsOpts);
+            _.set(dropElementsOpts, 'appData', self.appData);
+            _.set(dropElementsOpts, 'application', self.application);
+            _.set(dropElementsOpts, 'newAgentId', self.newAgentId);
+            _.set(dropElementsOpts, 'finalElementCount', self.finalElementCount);
+            this.dropElements = new DropElements(dropElementsOpts);
 
             /**
              * @description jsPlumb function opened
@@ -132,95 +134,94 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
                         // If the dropped Element is a Stream then->
                         if ($(droppedElement).hasClass('stream')) {
-                            newAgent = $('<div>').attr('id', i).addClass('streamdrop ');
+                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('streamdrop ');
 
                             // The container and the toolbox are disabled to prevent the user from dropping any elements before initializing a Stream Element
-                            //canvas.addClass("disabledbutton");
-                            //$("#toolbox").addClass("disabledbutton");
+                            canvas.addClass("disabledbutton");
+                            $("#tool-palette-container").addClass("disabledbutton");
 
                             canvas.append(newAgent);
-                            // generate the stream definition form
-                            formBuilder.DefineStream(newAgent,i,mouseTop,mouseLeft);
-                            //self.dropElements.dropStream(newAgent, i, mouseTop, mouseLeft, "Stream");
-                            finalElementCount = i;
-                            i++;    // Increment the Element ID for the next dropped Element
+                            // Drop the stream element. Inside this a it generates the stream definition form.
+                            self.dropElements.dropStream(newAgent, self.newAgentId, mouseTop, mouseLeft);
+                            self.finalElementCount = self.newAgentId;
+                            self.newAgentId++;    // Increment the Element ID for the next dropped Element
 
                         }
 
                         // If the dropped Element is a Window(not window query) then->
                         else if ($(droppedElement).hasClass('window-stream')) {
-                            newAgent = $('<div>').attr('id', i).addClass('wstreamdrop');
+                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('wstreamdrop');
                             // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropWindowStream(newAgent, i, mouseTop, mouseLeft ,"Window");
-                            finalElementCount=i;
-                            i++;
+                            self.dropElements.dropWindowStream(newAgent, self.newAgentId, mouseTop, mouseLeft ,"Window");
+                            self.finalElementCount = self.newAgentId;
+                            self.newAgentId++;
                         }
 
                         // If the dropped Element is a Pass through Query then->
                         else if ($(droppedElement).hasClass('pass-through')) {
-                            newAgent = $('<div>').attr('id', i).addClass('squerydrop');
+                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('squerydrop');
                             droptype = "squerydrop";
                             // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, i, droptype, mouseTop, mouseLeft, "Empty Query");
-                            finalElementCount=i;
-                            i++;
+                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query");
+                            self.finalElementCount = self.newAgentId;
+                            self.newAgentId++;
                         }
 
                         // If the dropped Element is a Filter query then->
                         else if ($(droppedElement).hasClass('filter-query')) {
-                            newAgent = $('<div>').attr('id', i).addClass('filterdrop ');
+                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('filterdrop ');
                             droptype = "filterdrop";
                             // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, i, droptype, mouseTop, mouseLeft, "Empty Query");
-                            finalElementCount=i;
-                            i++;
+                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query");
+                            self.finalElementCount = self.newAgentId;
+                            self.newAgentId++;
                         }
 
                         // If the dropped Element is a Window Query then->
                         else if ($(droppedElement).hasClass('window-query')) {
-                            newAgent = $('<div>').attr('id', i).addClass('wquerydrop ');
+                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('wquerydrop ');
                             droptype = "wquerydrop";
                             // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, i, droptype, mouseTop, mouseLeft, "Empty Query");
-                            finalElementCount=i;
-                            i++;
+                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query");
+                            self.finalElementCount=self.newAgentId;
+                            self.newAgentId++;
                         }
 
                         // If the dropped Element is a Join Query then->
                         else if ($(droppedElement).hasClass('join-query')) {
-                            newAgent = $('<div>').attr('id', i).addClass('joquerydrop');
+                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('joquerydrop');
                             droptype = "joquerydrop";
                             // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, i, droptype, mouseTop, mouseLeft, "Join Query");
-                            finalElementCount=i;
-                            i++;
+                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Join Query");
+                            self.finalElementCount = self.newAgentId;
+                            self.newAgentId++;
                         }
 
                         // If the dropped Element is a State machine Query(Pattern and Sequence) then->
                         else if($(droppedElement).hasClass('pattern')) {
-                            newAgent = $('<div>').attr('id', i).addClass('stquerydrop');
+                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('stquerydrop');
                             droptype = "stquerydrop";
                             // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, i, droptype, mouseTop, mouseLeft, "Pattern Query");
-                            finalElementCount=i;
-                            i++;
+                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Pattern Query");
+                            self.finalElementCount = self.newAgentId;
+                            self.newAgentId++;
                         }
 
                         // If the dropped Element is a Partition then->
                         else if($(droppedElement).hasClass('partition')) {
-                            newAgent = $('<div>').attr('id', i).addClass('partitiondrop');
+                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('partitiondrop');
                             // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropPartition(newAgent, i, mouseTop, mouseLeft);
-                            finalElementCount=i;
+                            self.dropElements.dropPartition(newAgent, self.newAgentId, mouseTop, mouseLeft);
+                            self.finalElementCount = self.newAgentId;
 
-                            i++;
+                            self.newAgentId++;
                         }
                         self.dropElements.registerElementEventListeners(newAgent);
                     }
                 });
 
                 // auto align the diagram when the button is clicked
-                $('#auto-align').click(function(){
+                $('#auto-align').click(function(){//TODO: check
                     autoAlign();
                 });
 
@@ -291,12 +292,12 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 if (sourceElement.hasClass(constants.STREAM)) {
                     if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)) {
-                        model = appData.getQuery(targetId);
+                        model = self.appData.getQuery(targetId);
                         model.setFrom(sourceId);
                     }
 
                     else if (targetElement.hasClass(constants.PATTERN)){
-                        model = appData.getPatternQuery(targetId);
+                        model = self.appData.getPatternQuery(targetId);
                         var streams = model.getFrom();
                         if (streams === undefined){
                             streams = [sourceId];
@@ -306,7 +307,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         model.setFrom(streams);
                     }
                     else if (targetElement.hasClass(constants.JOIN)) {
-                        model = appData.getJoinQuery(targetId);
+                        model = self.appData.getJoinQuery(targetId);
                         var streams = model.getFrom();
                         if (streams === undefined) {
                             streams = [sourceId];
@@ -316,7 +317,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         model.setFrom(streams);
                     }
                     else if (targetElement.hasClass(constants.PARTITION)){
-                        model = appData.getPartition(targetId);
+                        model = self.appData.getPartition(targetId);
                         var newPartitionKey = { 'stream' : sourceId , 'property' :''};
                         var partitionKeys = (model.getPartition('partition'));
                         partitionKeys['with'].push(newPartitionKey);
@@ -328,11 +329,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             var queryElement = $('#'+queryID);
                             if( queryElement.hasClass(constants.PASS_THROUGH) || queryElement.hasClass(constants.FILTER)
                                 || queryElement.hasClass(constants.WINDOW_QUERY)){
-                                model = appData.getQuery(queryID);
+                                model = self.appData.getQuery(queryID);
                                 model.setFrom(sourceId);
                             }
                             else if (queryElement.hasClass(constants.JOIN)){
-                                model = appData.getJoinQuery(queryID);
+                                model = self.appData.getJoinQuery(queryID);
                                 var streams = model.getFrom();
                                 if (streams === undefined) {
                                     streams = [sourceId];
@@ -342,7 +343,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 model.setFrom(streams);
                             }
                             else if (queryElement.hasClass(constants.PATTERN)){
-                                model = appData.getPatternQuery(queryID);
+                                model = self.appData.getPatternQuery(queryID);
                                 var streams = model.getFrom();
                                 if (streams === undefined){
                                     streams = [sourceId];
@@ -366,11 +367,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     if(streamID != null){
                         if( targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
                             || targetElement.hasClass(constants.WINDOW_QUERY)){
-                            model = appData.getQuery(targetId);
+                            model = self.appData.getQuery(targetId);
                             model.setFrom(streamID);
                         }
                         else if (targetElement.hasClass(constants.JOIN)){
-                            model = appData.getJoinQuery(targetId);
+                            model = self.appData.getJoinQuery(targetId);
                             var streams = model.getFrom();
                             if (streams === undefined) {
                                 streams = [streamID];
@@ -380,7 +381,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             model.setFrom(streams);
                         }
                         else if (targetElement.hasClass(constants.PATTERN)){
-                            model = appData.getPatternQuery(targetId);
+                            model = self.appData.getPatternQuery(targetId);
                             var streams = model.getFrom();
                             if (streams === undefined){
                                 streams = [streamID];
@@ -395,15 +396,15 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 else if (targetElement.hasClass(constants.STREAM)){
                     if( sourceElement.hasClass(constants.PASS_THROUGH) || sourceElement.hasClass(constants.FILTER)
                         || sourceElement.hasClass(constants.WINDOW_QUERY)){
-                        model = appData.getQuery(sourceId);
+                        model = self.appData.getQuery(sourceId);
                         model.setInsertInto(targetId);
                     }
                     else if (sourceElement.hasClass(constants.PATTERN)){
-                        model = appData.getPatternQuery(sourceId);
+                        model = self.appData.getPatternQuery(sourceId);
                         model.setInsertInto(targetId);
                     }
                     else if (sourceElement.hasClass(constants.JOIN)){
-                        model = appData.getJoinQuery(sourceId);
+                        model = self.appData.getJoinQuery(sourceId);
                         model.setInsertInto(targetId);
                     }
                 }
@@ -454,13 +455,13 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 if ( sourceElement.hasClass(constants.STREAM)){
                     if( targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)){
-                        model = appData.getQuery(targetId);
+                        model = self.appData.getQuery(targetId);
                         if (model !== undefined){
                             model.setFrom('');
                         }
                     }
                     else if (targetElement.hasClass(constants.JOIN)){
-                        model = appData.getJoinQuery(targetId);
+                        model = self.appData.getJoinQuery(targetId);
                         if (model !== undefined){
                             streams = model.getFrom();
                             var removedStream = streams.indexOf(sourceId);
@@ -469,7 +470,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                     }
                     else if ( targetElement.hasClass(constants.PATTERN)){
-                        model = appData.getPatternQuery(targetId);
+                        model = self.appData.getPatternQuery(targetId);
                         if (model !== undefined){
                             streams = model.getFrom();
                             var removedStream = streams.indexOf(sourceId);
@@ -478,7 +479,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                     }
                     else if ( targetElement.hasClass(constants.PARTITION)){
-                        model = appData.getPatternQuery(targetId);
+                        model = self.appData.getPartition(targetId);
                         if (model !== undefined){
                             var removedPartitionKey = null;
                             var partitionKeys = (model.getPartition().with);
@@ -499,13 +500,13 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 if( queryElement.hasClass(constants.PASS_THROUGH)
                                     || queryElement.hasClass(constants.FILTER)
                                     || queryElement.hasClass(constants.WINDOW_QUERY)){
-                                    model = appData.getQuery(queryID);
+                                    model = self.appData.getQuery(queryID);
                                     if (model !== undefined){
                                         model.setFrom('');
                                     }
                                 }
                                 else if (queryElement.hasClass(constants.JOIN)){
-                                    model = appData.getJoinQuery(queryID);
+                                    model = self.appData.getJoinQuery(queryID);
                                     if (model !== undefined){
                                         streams = model.getFrom();
                                         var removedStream = streams.indexOf(sourceId);
@@ -514,7 +515,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                     }
                                 }
                                 else if (queryElement.hasClass(constants.PATTERN)){
-                                    model = appData.getPatternQuery(queryID);
+                                    model = self.appData.getPatternQuery(queryID);
                                     if (model !== undefined){
                                         streams = model.getFrom();
                                         var removedStream = streams.indexOf(sourceId);
@@ -537,13 +538,13 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     });
                     if( targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)){
-                        model = appData.getQuery(targetId);
+                        model = self.appData.getQuery(targetId);
                         if (model !== undefined){
                             model.setFrom('');
                         }
                     }
                     else if (targetElement.hasClass(constants.JOIN)){
-                        model = appData.getJoinQuery(targetId);
+                        model = self.appData.getJoinQuery(targetId);
                         if (model !== undefined){
                             streams = model.getFrom();
                             var removedStream = streams.indexOf(streamID);
@@ -552,7 +553,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                     }
                     else if (targetElement.hasClass(constants.PATTERN)) {
-                        model = appData.getPatternQuery(targetId);
+                        model = self.appData.getPatternQuery(targetId);
                         if (model !== undefined) {
                             streams = model.getFrom();
                             var removedStream = streams.indexOf(streamID);
@@ -564,14 +565,14 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 if(targetElement.hasClass(constants.STREAM)){
                     if( sourceElement.hasClass(constants.PASS_THROUGH) || sourceElement.hasClass(constants.FILTER)
                         || sourceElement.hasClass(constants.WINDOW_QUERY)){
-                        model = appData.getQuery(sourceId);
+                        model = self.appData.getQuery(sourceId);
                         if (model !== undefined){
                             model.setInsertInto('');
                         }
                     }
                     else if (sourceElement.hasClass(constants.JOIN)){
                         if(targetElement.hasClass(constants.STREAM)){
-                            model = appData.getJoinQuery(sourceId);
+                            model = self.appData.getJoinQuery(sourceId);
                             if (model !== undefined){
                                 model.setInsertInto('');
                             }
@@ -579,7 +580,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     }
                     else if (sourceElement.hasClass(constants.PATTERN)){
                         if(targetElement.hasClass(constants.STREAM)){
-                            model = appData.getPatternQuery(sourceId);
+                            model = self.appData.getPatternQuery(sourceId);
                             if (model !== undefined){
                                 model.setInsertInto('');
                             }
@@ -590,16 +591,16 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             });
 
             _jsPlumb.bind('group:addMember' , function (event){
-                var partitionId = $(event.group).attr('id');
-                var partition = appData.getPartition(partitionId);
+                var partitionId = parseInt($(event.group).attr('id'));
+                var partition = self.appData.getPartition(partitionId);
                 var queries = partition.getQueries();
                 if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PASS_THROUGH)
                     || $(event.el).hasClass(constants.WINDOW_QUERY)){
-                    queries.push(appData.getQuery($(event.el).attr('id')));
+                    queries.push(self.appData.getQuery($(event.el).attr('id')));
                     partition.setQueries(queries);
                 }
                 else if($(event.el).hasClass(constants.JOIN)){
-                    queries.push(appData.getJoinQuery($(event.el).attr('id')));
+                    queries.push(self.appData.getJoinQuery($(event.el).attr('id')));
                     partition.setQueries(queries);
                 }
             });
