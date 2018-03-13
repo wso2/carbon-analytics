@@ -204,7 +204,7 @@ public class BusinessRulesApi implements Microservice {
                 response = Object.class,
             tags = {"business-rules",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class),
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successful operation", response = Object.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not found",
                     response = Object.class)})

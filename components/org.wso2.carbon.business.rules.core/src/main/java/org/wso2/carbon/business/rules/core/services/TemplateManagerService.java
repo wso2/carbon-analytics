@@ -22,21 +22,34 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.business.rules.core.bean.*;
+import org.wso2.carbon.business.rules.core.bean.Artifact;
+import org.wso2.carbon.business.rules.core.bean.BusinessRule;
+import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
+import org.wso2.carbon.business.rules.core.bean.Template;
+import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratchProperty;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.datasource.QueryExecutor;
 import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.deployer.SiddhiAppApiHelper;
-import org.wso2.carbon.business.rules.core.exceptions.*;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
+import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
+import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The exposed Template Manager service, which contains methods related to
@@ -322,14 +335,14 @@ public class TemplateManagerService implements BusinessRulesService {
      * Gets deployment information of the business rule with the given UUID
      *
      * @param businessRuleUUID                  UUID of the business rule
-     * @return                                  List of nodes & Siddhi app deployment statuses
+     * @return                                  List of nodes and Siddhi app deployment statuses
      * @throws TemplateManagerServiceException  Exception occurred in Template Manager Service
      * @throws BusinessRulesDatasourceException Exception occurred within the data source
      */
     public List<Map<String, Object>> loadDeploymentInfo(String businessRuleUUID)
             throws TemplateManagerServiceException, BusinessRulesDatasourceException {
         BusinessRule businessRule = loadBusinessRule(businessRuleUUID);
-        List<String> deployingNodes = null;
+        List<String> deployingNodes;
         if (businessRule instanceof BusinessRuleFromTemplate) {
             deployingNodes = getNodesList(((BusinessRuleFromTemplate) businessRule).getRuleTemplateUUID());
         } else {
