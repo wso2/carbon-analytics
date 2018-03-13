@@ -196,6 +196,26 @@ public class BusinessRulesApi implements Microservice {
         return delegate.loadBusinessRule(request, businessRuleInstanceID);
     }
 
+    @GET
+    @Path("/instances/{businessRuleInstanceID}/deployment-info")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Returns deployment information of a business rule instance",
+            notes = "Gets deployment information of the business rule instance that has the given ID",
+                response = Object.class,
+            tags = {"business-rules",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not found",
+                    response = Object.class)})
+    public Response loadDeploymentInfo(@Context Request request,
+                                     @ApiParam(value = "ID of the business rule instance", required = true)
+                                     @PathParam("businessRuleInstanceID") String businessRuleInstanceID
+    )
+            throws NotFoundException {
+        return delegate.loadDeploymentInfo(request, businessRuleInstanceID);
+    }
+
     @POST
     @Path("/instances/{businessRuleInstanceID}")
     @Consumes({"application/json"})

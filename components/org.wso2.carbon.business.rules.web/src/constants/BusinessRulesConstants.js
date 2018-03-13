@@ -67,6 +67,13 @@ const BusinessRulesConstants = {
         'Error', // 5
     ],
 
+    // Siddhi App deployment statuses
+    SIDDHI_APP_DEPLOYMENT_STATUSES: [
+        'Unreachable', // -1
+        'Not Deployed', // 0
+        'Deployed' // 1
+    ],
+
     BUSINESS_RULE_STATUS_DEPLOYED_STRING: 'Deployed',
     BUSINESS_RULE_STATUS_NOT_DEPLOYED_STRING: 'Not Deployed',
     BUSINESS_RULE_STATUS_DEPLOYMENT_FAILED_STRING: 'Deployment Failed',
