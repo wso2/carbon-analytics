@@ -5,8 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16" />
-    <!-- JSONEditor doesn't suppot AMD/RequireJS -->
-    <script src="/editor/commons/lib/json-editor_v0.7.28/jsoneditor.js"></script>
     <script src="/editor/commons/lib/css-browser-selector_0.4.0/css_browser_selector.js"></script>
     <link href="/editor/commons/lib/font-wso2-1.2.2/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/lib/theme-wso2-2.0.0/css/theme-wso2.css" rel="stylesheet" type="text/css"/>
@@ -31,6 +29,9 @@
     <script src="/editor/commons/lib/html5shiv_3.7.2/html5shiv.min.js"></script>
     <script src="/editor/commons/lib/respond_1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <!-- JSONEditor doesn't suppot AMD/RequireJS -->
+    <script src="/editor/commons/lib/json-editor_v0.7.28/jsoneditor.js"></script>
 
     <!--<link rel="stylesheet" type="text/css" href="commons/css/sequence_diagram/sequenced-styles.css"/>-->
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/tool-palette.css"/>
@@ -172,6 +173,12 @@
         </div>
 </div>
 <!-- End: Template for console -->
+<div class="hidden">
+    <div id="form-template">
+        <div class="design-view-form-content">
+        </div>
+    </div>
+</div>
 <div class="hidden">
     <div id="debugger-template">
         <div class="output-console-content">

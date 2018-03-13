@@ -110,7 +110,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
 //                              commandManager.dispatch("go-to-welcome-page");
 //                          }
                         }
-                    }
+                    };
 
                     remove();
                 },
@@ -126,12 +126,16 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 },
                 getConsoleForType: function (type, uniqueId) {
                     return _.find(this._consoles, function (console) {
-                        if (type == "DEBUG") {
-                            if (console._uniqueId == uniqueId) {
+                        if (type === "DEBUG") {
+                            if (console._uniqueId === uniqueId) {
+                                return console;
+                            }
+                        }else if (type === "FORM") {
+                            if (console._uniqueId === uniqueId) {
                                 return console;
                             }
                         } else {
-                            if (console.getType() == type) {
+                            if (console.getType() === type) {
                                 return console;
                             }
                         }

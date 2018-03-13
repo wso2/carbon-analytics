@@ -102,6 +102,28 @@
     transition: box-shadow 0.15s ease-in;
 }
 
+.partitiondrop {
+    border: 1px solid #346789;
+    width: 250px;
+    height: 250px;
+    border-radius: 0.5em;
+    opacity: 0.8;
+    line-height: 80px;
+    cursor: move;
+    text-align: center;
+    z-index: 1;
+    position: absolute;
+    background-color: transparent;
+    color: black;
+    font-family: helvetica, sans-serif;
+    font-size: 0.9em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+    box-sizing: border-box;
+}
+
 .connectorInStream{
     float: left;
     margin-top: -33%;
@@ -273,4 +295,13 @@ td {
     border-radius: 40px;
     padding-left: 10px;
     padding-top: 4px;
+}
+
+.disabledbutton{
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+.design-view-form-content .well {
+    background: transparent;
 }

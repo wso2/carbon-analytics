@@ -128,7 +128,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     var sourceViewBtn = this._$parent_el.find(_.get(this.options, 'toggle_controls.sourceIcon'));
                     var designViewBtn = this._$parent_el.find(_.get(this.options, 'toggle_controls.designIcon'));
-                    this.designView = new DesignView(this.options);
+                    var applicationData = this.options.application;
+                    this.designView = new DesignView(this.options, applicationData);
                     this.designView.render();
                     this.sourceContainer = sourceContainer;
                     this.designViewContainer = this.designView.getDesignViewContainer();

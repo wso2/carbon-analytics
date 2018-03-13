@@ -177,7 +177,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             },
             /**
              * gets Console
-             * @param {string} console id
+             * @param {string} consoleId id of the console
              * @returns {*}
              */
             getConsole: function (consoleId) {
@@ -222,15 +222,18 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             },
             /**
              * set selected console
-             * @param {Console} tab the console instance
+             * @param {Console} console the console instance
              * @fires ConsoleList#active-console-changed
              */
             setActiveConsole: function (console) {
 
                 //set the corresponding active console for Tab
-                if (console._type == "CONSOLE") {
+                if (console._type === "CONSOLE") {
                     $(".consoleToolbar").removeClass("hidden");
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
+                } else if (console._type === "FORM"){
+                    $(".consoleToolbar").addClass("hidden");
+                    this.options.application.tabController.getActiveTab()._lastActiveConsole = "FORM";
                 } else {
                     $(".consoleToolbar").addClass("hidden");
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "DEBUG";
@@ -280,11 +283,12 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             },
             showActiveConsole: function (activeConsole) {
                 activeConsole.show(true);
-                _.each(this._consoles, function (console) {
-                    if (console._type != "CONSOLE" && console._uniqueId != activeConsole._uniqueId) {
-                        console.hide();
-                    }
-                });
+                //TODO: check the usage of this
+                // _.each(this._consoles, function (console) {
+                //     if (console._type != "CONSOLE" && console._uniqueId != activeConsole._uniqueId) {
+                //         console.hide();
+                //     }
+                // });
             },
             hideConsoles: function () {
                 _.each(this._consoles, function (console) {
@@ -292,14 +296,13 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 });
             },
             enableConsoleByTitle: function (title,type) {
-                var globalConsole;
                 var exist = false;
                 var self = this;
-                var globalConsole = this._consoles[_.findIndex(this._consoles, function(o) { return o._type ==
-                    'CONSOLE'; })]
+                var globalConsole = this._consoles[_.findIndex(this._consoles, function(o) { return o._type ===
+                    'CONSOLE'; })];
                 _.each(this._consoles, function (console) {
-                    if(console._type == type){
-                        if (console._appName == title) {
+                    if(console._type === type){
+                        if (console._appName === title) {
                             console.show(true);
                             self.setActiveConsole(console);
                             globalConsole._isActive = false;
@@ -385,6 +388,42 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     // activate by default
                     this.setActiveConsole(newConsole);
                 }
+                this.showActiveConsole(newConsole);
+                this.showConsoleComponents();
+                this.getConsoleActivateBtn().parent('li').addClass('active');
+                return newConsole;
+            },
+
+            /**
+             * Creates a new console tab for a form.
+             * @param opts
+             *          switchToNewConsole: indicate whether to switch to new console of type after creation
+             *          consoleOptions: constructor args for the console
+             * @returns {Console} created console instance
+             * @event ConsoleList#console-added
+             * @fires ConsoleList#active-console-changed
+             */
+            newFormConsole: function (opts) {
+                var consoleOptions = _.get(opts, 'consoleOptions') || {};
+                _.set(consoleOptions, 'application', this.options.application);
+                _.assign(consoleOptions, _.get(this.options, 'consoles.console'));
+                _.set(consoleOptions, 'consoles_container', _.get(this.options, 'consoles.container'));
+                _.set(consoleOptions, 'parent', this);
+                var consoleType = _.get(consoleOptions, '_type');
+                var uniqueTabId = _.get(consoleOptions, 'uniqueTabId');
+                var newConsole = this.getConsoleForType(consoleType, uniqueTabId);
+                var currentFocusedFile = _.get(opts, 'consoleOptions.currentFocusedFile');
+
+                if (newConsole === undefined) {
+                    newConsole = new this.ConsoleModel(consoleOptions);
+                    if (consoleType === "FORM") {
+                        _.set(newConsole, '_title', _.get(consoleOptions, 'title') + " - " + _.get(consoleOptions, 'appName'));
+                        this.addConsole(newConsole);
+                        this.options.application.tabController.getActiveTab()._lastActiveConsole = "FORM";
+
+                    }
+                }
+                this.setActiveConsole(newConsole);
                 this.showActiveConsole(newConsole);
                 this.showConsoleComponents();
                 this.getConsoleActivateBtn().parent('li').addClass('active');
