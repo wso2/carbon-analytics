@@ -66,6 +66,7 @@
             $(className).draggable({
                 helper: 'clone',
                 cursor: 'pointer',
+                zIndex: 10001,
                 tolerance: 'fit',
                 revert: true
             });
