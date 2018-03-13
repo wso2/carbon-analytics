@@ -19,6 +19,7 @@
 define(['require'],
     function (require) {
 
+    //TODO: remove unwanted requrirejs imports
         /**
          * @class Partition
          * @constructor

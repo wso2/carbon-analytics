@@ -92,7 +92,7 @@ define(['require'],
             this.filter = filter;
         };
 
-        FilterQuery.prototype.etAttributes = function (attributes) {
+        FilterQuery.prototype.setAttributes = function (attributes) {
             this.attributes = attributes;
         };
 

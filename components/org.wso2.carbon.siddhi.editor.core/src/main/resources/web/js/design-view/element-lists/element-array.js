@@ -36,12 +36,13 @@ define(['require'],
          * @returns {element}
          */
         ElementArray.prototype.getElement = function (elementId) {
-            ElementArray.forEach(function(element){
+            var foundElement = undefined;
+            this.forEach(function(element){
                 if (typeof element.getId === 'function' && element.getId() === elementId) {
-                    return element;
+                    foundElement = element;
                 }
             });
-            return null;
+            return foundElement;
         };
 
         /**
@@ -49,11 +50,11 @@ define(['require'],
          * @param {number} elementId id of the element to be removed.
          */
         ElementArray.prototype.removeElement = function (elementId) {
-            ElementArray.forEach(function(element){
+            this.every(function(element){
                 if (element.id === elementId) {
-                    var index = ElementArray.indexOf(element);
+                    var index = this.indexOf(element);
                     if (index > -1) {
-                        ElementArray.splice(index, 1);
+                        this.splice(index, 1);
                     }
                 }
             });

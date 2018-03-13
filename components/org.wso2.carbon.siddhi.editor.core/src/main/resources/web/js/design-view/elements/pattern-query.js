@@ -119,47 +119,47 @@ define(['require'],
             this.name = name;
         };
 
-        PatternQuery.prototype.getStates = function (states) {
+        PatternQuery.prototype.setStates = function (states) {
             this.states = states;
         };
 
-        PatternQuery.prototype.getLogic = function (logic) {
+        PatternQuery.prototype.setLogic = function (logic) {
             this.logic = logic;
         };
 
-        PatternQuery.prototype.getProjection = function (projection) {
+        PatternQuery.prototype.setProjection = function (projection) {
             this.projection = projection;
         };
 
-        PatternQuery.prototype.getFilter = function (filter) {
+        PatternQuery.prototype.setFilter = function (filter) {
             this.filter = filter;
         };
 
-        PatternQuery.prototype.getPostWindowFilter = function (postWindowFilter) {
+        PatternQuery.prototype.setPostWindowFilter = function (postWindowFilter) {
             this.postWindowFilter = postWindowFilter;
         };
 
-        PatternQuery.prototype.getWindow = function (window) {
+        PatternQuery.prototype.setWindow = function (window) {
             this.window = window;
         };
 
-        PatternQuery.prototype.getHaving = function (having) {
+        PatternQuery.prototype.setHaving = function (having) {
             this.having = having;
         };
 
-        PatternQuery.prototype.getGroupBy = function (groupBy) {
+        PatternQuery.prototype.setGroupBy = function (groupBy) {
             this.groupBy = groupBy;
         };
 
-        PatternQuery.prototype.getOutputType = function (outputType) {
+        PatternQuery.prototype.setOutputType = function (outputType) {
             this.outputType = outputType;
         };
 
-        PatternQuery.prototype.getInsertInto = function (insertInto) {
+        PatternQuery.prototype.setInsertInto = function (insertInto) {
             this.insertInto = insertInto;
         };
 
-        PatternQuery.prototype.getFrom = function (from) {
+        PatternQuery.prototype.setFrom = function (from) {
             this.from = from;
         };
 
