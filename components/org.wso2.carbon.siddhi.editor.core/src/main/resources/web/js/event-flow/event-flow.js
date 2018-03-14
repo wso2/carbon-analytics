@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
-    function (require, log, _, $, alerts, d3, dagreD3) {
+define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3', 'overlay_scroller'],
+    function (require, log, _, $, alerts, d3, dagreD3, overlayScroller) {
 
         /**
          * Create an instance of the EventFlow class in JavaScript.
@@ -39,9 +39,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
             // The render options contains any settings/options for rendering the graph,
             // this has been added here separately for easier access if the style of the
             // graph generated needs to be changed.
-            // TODO Update the overall style and beautify the UI.
-            // TODO add the OverlayScroll Library in this implementation.
-            // TODO fix the issue where the graph renders differently in other computers.
             var defaultNodeStyle = {
                 labelType: "html",
                 rx: 7,
@@ -124,6 +121,8 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3'],
                     self.graphResize();
                 }
             });
+
+            this.$graphView.overlayScrollbars({className: "os-theme-light"});
         };
 
         /**
