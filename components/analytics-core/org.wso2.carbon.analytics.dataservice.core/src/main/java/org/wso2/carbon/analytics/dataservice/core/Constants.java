@@ -73,8 +73,8 @@ public class Constants {
     public static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
     public static final String DISABLE_LOCAL_INDEX_QUEUE_OPTION = "disableLocalIndexQueue";
-    private static final String CARBON_CONFIG_DIR_PATH = "carbon.config.dir.path";
-    private static final String CARBON_DATA_DIR_PATH = "carbon.data.dir.path";
+    private static final String CARBON_CONFIG_DIR_PATH = "CARBON_CONFIG_DIR_PATH";
+    private static final String CARBON_DATA_DIR_PATH = "CARBON_DATA_DIR_PATH";
 
     public static final String DEFAULT_INDEX_STORE_LOCATION =
             getDataDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator +
@@ -101,7 +101,7 @@ public class Constants {
                     "index_staging_queues" + File.separator;
 
     public static String getDataDirPath(String carbonHome) {
-        String dataDirPath = System.getProperty(CARBON_DATA_DIR_PATH);
+        String dataDirPath = System.getenv(CARBON_DATA_DIR_PATH);
         if (dataDirPath != null && !dataDirPath.isEmpty()) {
             return dataDirPath;
         } else {
@@ -110,7 +110,7 @@ public class Constants {
     }
 
     public static String getConfDirPath(String carbonHome) {
-        String confDirPath = System.getProperty(CARBON_CONFIG_DIR_PATH);
+        String confDirPath = System.getenv(CARBON_CONFIG_DIR_PATH);
         if (confDirPath != null && !confDirPath.isEmpty()) {
             return confDirPath;
         } else {
