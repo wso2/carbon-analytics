@@ -41,7 +41,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         self.application.commandManager.dispatch(_.get(self._options, 'commandClearConsole.id'));
                     });
 
-                    this._activateBtn.attr("data-placement", "right").attr("data-container", "body");
+                    this._activateBtn.attr("id", "output-console-activate-button").attr("data-placement", "right").attr("data-container", "body");
                     if (this.application.isRunningOnMacOS()) {
                         this._activateBtn.attr("title", "Output Console (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
                     } else {
