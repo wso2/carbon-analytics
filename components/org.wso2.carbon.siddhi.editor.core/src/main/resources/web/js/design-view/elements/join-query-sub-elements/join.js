@@ -53,7 +53,7 @@ define(['require'],
             this.on = options.on;
         };
 
-        Join.prototype.getTypeValue = function () {
+        Join.prototype.getType = function () {
             return this.type;
         };
 
@@ -69,7 +69,7 @@ define(['require'],
             return this.on;
         };
 
-        Join.prototype.setTypeValue = function (type) {
+        Join.prototype.setType = function (type) {
             this.type = type;
         };
 

@@ -301,10 +301,12 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             var queryType = $(element).parent().attr('class');
             var type= $(element).parent();
             if (!(clickedElement.getFrom())) {
-                alert('Connect an input stream');//TODO:check this
-                //TODO: check whether this is wanted for places like this. self.consoleListManager.removeConsole(formConsole);
+                alert('Connect an input stream');
                 $("#grid-container").removeClass('disabledbutton');
                 $("#tool-palette-container").removeClass('disabledbutton');
+
+                //close the form window
+                self.consoleListManager.removeConsole(formConsole);
             }
             else if (!(clickedElement.getInsertInto())) {
                 //retrieve the query information from the collection
@@ -502,7 +504,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                         attrString.push(attr);
                     }
                 } else {
-                    var selectedAttributes = clickedElement.get('projection');
+                    var selectedAttributes = clickedElement.getProjection();
                     for (var i = 0; i < outStreamAttributes.length; i++) {
                         var attr = {select: selectedAttributes[i], newName: outStreamAttributes[i].attribute};
                         attrString.push(attr);
@@ -694,10 +696,16 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 alert('Connect input streams');
                 $("#grid-container").removeClass('disabledbutton');
                 $("#tool-palette-container").removeClass('disabledbutton');
+
+                //close the form window
+                self.consoleListManager.removeConsole(formConsole);
             } else if (clickedElement.getInsertInto() == '') {
                 alert('Connect an output stream');
                 $("#grid-container").removeClass('disabledbutton');
                 $("#tool-palette-container").removeClass('disabledbutton');
+
+                //close the form window
+                self.consoleListManager.removeConsole(formConsole);
             } else {
                 //retrieve the pattern information from the collection
                 var streams = [];
@@ -926,7 +934,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                         projections.push(attribute.select);
                     });
                     clickedElement.setProjection(projections);
-                    clickedElement.setOutpuType(config.outputType);
+                    clickedElement.setOutputType(config.outputType);
                     var textNode = $(element).parent().find('.queryNameNode');
                     textNode.html(config.name);
                 });
@@ -960,11 +968,16 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 alert('Connect TWO input streams');
                 $("#grid-container").removeClass('disabledbutton');
                 $("#tool-palette-container").removeClass('disabledbutton');
+
+                //close the form window
+                self.consoleListManager.removeConsole(formConsole);
             }
             else if (!(clickedElement.getInsertInto())) {
                 alert('Connect an output stream');
                 $("#grid-container").removeClass('disabledbutton');
                 $("#tool-palette-container").removeClass('disabledbutton');
+                //close the form window
+                self.consoleListManager.removeConsole(formConsole);
             }
 
             else {
@@ -1224,6 +1237,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 alert('Connect a stream for partitioning');
                 $("#grid-container").removeClass('disabledbutton');
                 $("#tool-palette-container").removeClass('disabledbutton');
+
+                //close the form window
+                self.consoleListManager.removeConsole(formConsole);
             }
             else{
                 var fillWith= {};
