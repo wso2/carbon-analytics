@@ -135,6 +135,7 @@ export default class Login extends Component {
                             //style={textField}
                             fullWidth
                             floatingLabelText={"Username"}
+                            autoComplete="off"
                             value={this.state.username}
                             onChange={(e) => {
                                 this.setState({
@@ -147,6 +148,7 @@ export default class Login extends Component {
                         <TextField
                             fullWidth
                             type="password"
+                            autoComplete="off"
                             floatingLabelText={"Password"}
                             floatingLabelFocusStyle={{color: '#f17b31'}}
                             underlineFocusStyle={{borderColor: '#f17b31'}}

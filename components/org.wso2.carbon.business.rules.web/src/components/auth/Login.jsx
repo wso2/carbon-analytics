@@ -143,6 +143,7 @@ export default class Login extends React.Component {
                             id="username"
                             label="Username"
                             margin="normal"
+                            autoComplete="off"
                             value={this.state.username}
                             onChange={(e) => {
                                 this.setState({
@@ -158,6 +159,7 @@ export default class Login extends React.Component {
                             id="password"
                             label="Password"
                             margin="normal"
+                            autoComplete="off"
                             value={this.state.password}
                             onChange={(e) => {
                                 this.setState({
