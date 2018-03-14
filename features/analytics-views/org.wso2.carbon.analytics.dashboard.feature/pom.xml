@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-views-feature</artifactId>
-        <version>1.3.25</version>
+        <version>1.3.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
