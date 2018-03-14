@@ -6132,7 +6132,7 @@ JSONEditor.AbstractTheme = Class.extend({
   },
   getModal: function() {
     var el = document.createElement('div');
-    el.style.backgroundColor = 'white';
+    el.style.backgroundColor = 'black';
     el.style.border = '1px solid black';
     el.style.boxShadow = '3px 3px black';
     el.style.position = 'absolute';
