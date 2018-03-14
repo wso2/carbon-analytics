@@ -39,11 +39,11 @@ import java.util.Set;
 public class ComputeClasspath {
     private static final Log log = LogFactory.getLog(ComputeClasspath.class);
     private static final String SEP = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
-    private static final String CARBON_CONFIG_DIR_PATH = "carbon.config.dir.path";
-    private static final String CARBON_INTERNAL_LIB_DIR_PATH = "carbon.internal.lib.dir.path";
-    private static final String CARBON_EXTERNAL_LIB_DIR_PATH = "carbon.external.lib.dir.path";
-    private static final String CARBON_DROPINS_DIR_PATH = "carbon.dropins.dir.path";
-    private static final String COMPONENTS_REPO = "components.repo";
+    private static final String CARBON_CONFIG_DIR_PATH = "CARBON_CONFIG_DIR_PATH";
+    private static final String CARBON_INTERNAL_LIB_DIR_PATH = "CARBON_INTERNAL_LIB_DIR_PATH";
+    private static final String CARBON_EXTERNAL_LIB_DIR_PATH = "CARBON_EXTERNAL_LIB_DIR_PATH";
+    private static final String CARBON_DROPINS_DIR_PATH = "CARBON_DROPINS_DIR_PATH";
+    private static final String COMPONENTS_REPO = "COMPONENTS_REPO";
 
     private static Set<String> additionalJars = new HashSet<>();
 
@@ -67,7 +67,7 @@ public class ComputeClasspath {
     }
 
     public static String getConfDirPath(String carbonHome) {
-        String confDirPath = System.getProperty(CARBON_CONFIG_DIR_PATH);
+        String confDirPath = System.getenv(CARBON_CONFIG_DIR_PATH);
         if (confDirPath != null && !confDirPath.isEmpty()) {
             return confDirPath;
         } else {
@@ -76,7 +76,7 @@ public class ComputeClasspath {
     }
 
     public static String getExternalLibDirPath(String carbonHome) {
-        String externalLibDirPath = System.getProperty(CARBON_EXTERNAL_LIB_DIR_PATH);
+        String externalLibDirPath = System.getenv(CARBON_EXTERNAL_LIB_DIR_PATH);
         if (externalLibDirPath != null && !externalLibDirPath.isEmpty()) {
             return externalLibDirPath;
         } else {
@@ -85,7 +85,7 @@ public class ComputeClasspath {
     }
 
     public static String getInternalLibDirPath(String carbonHome) {
-        String internalLibDirPath = System.getProperty(CARBON_INTERNAL_LIB_DIR_PATH);
+        String internalLibDirPath = System.getenv(CARBON_INTERNAL_LIB_DIR_PATH);
         if (internalLibDirPath != null && !internalLibDirPath.isEmpty()) {
             return internalLibDirPath;
         } else {
@@ -94,7 +94,7 @@ public class ComputeClasspath {
     }
 
     public static String getDropinsDirPath(String carbonHome) {
-        String dropinsDirPath = System.getProperty(CARBON_DROPINS_DIR_PATH);
+        String dropinsDirPath = System.getenv(CARBON_DROPINS_DIR_PATH);
         if (dropinsDirPath != null && !dropinsDirPath.isEmpty()) {
             return dropinsDirPath;
         } else {
@@ -104,7 +104,7 @@ public class ComputeClasspath {
     }
 
     public static String getComponentsRepoDirPath(String carbonHome) {
-        String componentsRepoDirPath = System.getProperty(COMPONENTS_REPO);
+        String componentsRepoDirPath = System.getenv(COMPONENTS_REPO);
         if (componentsRepoDirPath != null && !componentsRepoDirPath.isEmpty()) {
             return componentsRepoDirPath;
         } else {
