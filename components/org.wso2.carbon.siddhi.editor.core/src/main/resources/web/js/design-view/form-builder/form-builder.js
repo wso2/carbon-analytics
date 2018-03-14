@@ -306,7 +306,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 $("#grid-container").removeClass('disabledbutton');
                 $("#tool-palette-container").removeClass('disabledbutton');
             }
-            else if (!(clickedElement.get('insert-into'))) {
+            else if (!(clickedElement.getInsertInto())) {
                 //retrieve the query information from the collection
                 var name = clickedElement.getName();
                 var inStream = (self.appData.getStream(clickedElement.getFrom())).getDefine();
@@ -473,7 +473,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     textNode.html(config.name);
                     //generate the stream defined as the output stream
                     var position = $(element).parent().position();
-                    this.dropElements.dropStreamFromQuery(position, id, config.insertInto, streamAttributes);
+                    //TODO: check whether it is needed to add a stream since there might be a stream with that name alredy existed
+                    self.dropElements.dropStreamFromQuery(position, id, config.insertInto, streamAttributes);
                 });
 
                 // 'Cancel' button action

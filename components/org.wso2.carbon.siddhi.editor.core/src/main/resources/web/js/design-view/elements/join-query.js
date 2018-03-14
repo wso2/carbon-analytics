@@ -86,7 +86,7 @@ define(['require'],
         };
 
         JoinQuery.prototype.setId = function (id) {
-            this.join = id;
+            this.id = id;
         };
 
         JoinQuery.prototype.setJoin = function (join) {
