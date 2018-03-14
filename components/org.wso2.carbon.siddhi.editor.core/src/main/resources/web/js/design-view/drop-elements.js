@@ -53,8 +53,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             this.appData = options.appData;
             this.container = options.container;
             this.application = options.application;
-            this.newAgentId = options.newAgentId;
-            this.finalElementCount =options.finalElementCount;
+            this.designGrid = options.designGrid;
             this.options = options;
 
             var formBuilderOptions = {};
@@ -64,7 +63,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             this.formBuilder = new FormBuilder(formBuilderOptions);
         };
 
-        dropElements.prototype.dropStream = function (newAgent,i,top,left) {
+        dropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode, isGenerateStreamFromQueryOutput, streamName) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
@@ -72,7 +71,16 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             */
 
             var self= this;
-            var name = self.formBuilder.DefineStream(i);
+            var name;
+            if(isCodeToDesignMode) {
+                name = streamName;
+            } else {
+                if(isGenerateStreamFromQueryOutput) {
+                    name = streamName;
+                } else {
+                    name = self.formBuilder.DefineStream(i);
+                }
+            }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
             node.attr('id', i+"-nodeInitial");
@@ -83,10 +91,11 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
              showIcon --> An icon that elucidates whether the dropped stream element is an Import/Export/Defined stream (In this case: an Import arrow icon)
              conIcon --> Clicking this icon is supposed to toggle between showing and hiding the "Connection Anchor Points" (Not implemented)
             */
-            var prop = $('<img src="/editor/images/settings.png" id="dropStreamSettingsId" class="element-prop-icon collapse">');
+            var settingsIconId = ""+ i + "-dropStreamSettingsId";
+            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" class="element-prop-icon collapse">');
             newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">').append(prop);
 
-            var settingsIconElement = $('#dropStreamSettingsId')[0];
+            var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForStreams(this);
             });
@@ -108,7 +117,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 'left': left
             });
 
-            $(this.container).append(finalElement);
+            $(self.container).append(finalElement);
 
             _jsPlumb.draggable(finalElement, {
                 containment: 'grid-container'
@@ -133,16 +142,16 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          */
         dropElements.prototype.dropStreamFromQuery = function (position , id, outStream, streamAttributes) {
             var self = this;
-            var elementID = self.newAgentId;
+            var elementID = self.designGrid.getNewAgentId();
             var newAgent = $('<div>').attr('id', elementID).addClass('streamdrop');
 
             // The container and the tool palette are disabled to prevent the user from dropping any elements before initializing a Stream Element
             $("#grid-container").removeClass("disabledbutton");
             $("#tool-palette-container").removeClass("disabledbutton");
-            $(this.container).append(newAgent);
+            $(self.container).append(newAgent);
 
             // drop the stream
-            this.dropStream(newAgent, i, position.top, position.left + 200, outStream);
+            self.dropStream(newAgent, elementID, position.top, position.left + 200, false, true, outStream);
 
             // add the new out stream to the stream array
             var streamOptions = {};
@@ -150,20 +159,21 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             _.set(streamOptions, 'define', outStream);
             _.set(streamOptions, 'type', 'define-stream');
             _.set(streamOptions, 'attributes', streamAttributes);
+
             var stream = new Stream(streamOptions);
-            this.appData.AddStream(stream);
+            self.appData.AddStream(stream);
             // make the connection
             _jsPlumb.connect({
                 source: id+'-out',
                 target: elementID+'-in'
             });
             // update the query model with output stream
-            var query = this.appData.getQuery(id);
+            var query = self.appData.getQuery(id);
             query.setInsertInto(elementID);
             // increment the variable newAgentId and the final element count
-            self.finalElementCount = self.newAgentId; //tODO:check this variable
-            self.newAgentId++;
-            this.registerElementEventListeners(newAgent);
+            self.designGrid.setFinalElementCount(elementID);
+            self.designGrid.setNewAgentId(elementID+1);
+            self.registerElementEventListeners(newAgent);
         };
 
         /**
@@ -174,8 +184,9 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @param top
          * @param left
          * @param text
+         * @param isCodeToDesignMode //TODO: complete all javadoc comments
          */
-        dropElements.prototype.dropQuery = function (newAgent, i, droptype, top, left, text) {
+        dropElements.prototype.dropQuery = function (newAgent, i, droptype, top, left, text, isCodeToDesignMode) {
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element everytime theuser changes it
@@ -187,88 +198,94 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             node.attr('id', i+"-nodeInitial");
             node.attr('class', "queryNameNode");
 
-            if( droptype === constants.PASS_THROUGH || droptype === constants.WINDOW_QUERY || droptype === constants.FILTER){
-                //add the new query to the query array
-                var queryOptions = {};
-                _.set(queryOptions, 'id', '');
-                _.set(queryOptions, 'name', '');
-                _.set(queryOptions, 'from', '');
-                _.set(queryOptions, 'insertInto', '');
-                _.set(queryOptions, 'filter', '');
-                _.set(queryOptions, 'postWindowFilter', '');
-                _.set(queryOptions, 'window', '');
-                _.set(queryOptions, 'outputType', '');
-                _.set(queryOptions, 'projection', '');
-                var newQuery = new Query(queryOptions);
-                newQuery.setId(i);
-                this.appData.AddQuery(newQuery);
-                var propertiesIcon = $('<img src="/editor/images/settings.png" id="dropQuerySettingsId" ' +
+            if(droptype === constants.PASS_THROUGH || droptype === constants.WINDOW_QUERY || droptype === constants.FILTER){
+                if(!isCodeToDesignMode) {
+                    //add the new query to the query array
+                    var queryOptions = {};
+                    _.set(queryOptions, 'id', '');
+                    _.set(queryOptions, 'name', '');
+                    _.set(queryOptions, 'from', '');
+                    _.set(queryOptions, 'insertInto', '');
+                    _.set(queryOptions, 'filter', '');
+                    _.set(queryOptions, 'postWindowFilter', '');
+                    _.set(queryOptions, 'window', '');
+                    _.set(queryOptions, 'outputType', '');
+                    _.set(queryOptions, 'projection', '');
+
+                    var newQuery = new Query(queryOptions);
+                    newQuery.setId(i);
+                    self.appData.AddQuery(newQuery);
+                }
+                var settingsIconId = ""+ i + "-dropQuerySettingsId";
+                var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
                     'class="element-prop-icon collapse">');
                 newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
                     .append(propertiesIcon);
-
-                this.dropSimpleQueryElement(newAgent, i, top, left);
-
-                var settingsIconElement = $('#dropQuerySettingsId')[0];
+                self.dropSimpleQueryElement(newAgent, i, top, left);
+                var settingsIconElement = $('#'+settingsIconId)[0];
                 settingsIconElement.addEventListener('click', function () {
                     self.formBuilder.GeneratePropertiesFormForQueries(this);
                 });
             }
 
-            else if(droptype === constants.JOIN)
-            {
-                //add the new join query to the join query array
-                var joinQueryOptions = {};
-                _.set(joinQueryOptions, 'id', '');
-                _.set(joinQueryOptions, 'join', '');
-                _.set(joinQueryOptions, 'projection', '');
-                _.set(joinQueryOptions, 'outputType', '');
-                _.set(joinQueryOptions, 'insertInto', '');
-                _.set(joinQueryOptions, 'from', '');
-                var newJoinQuery = new JoinQuery(joinQueryOptions);
-                newJoinQuery.setId(i);
-                this.appData.AddJoinQuery(newJoinQuery);
-                var propertiesIcon = $('<img src="/editor/images/settings.png" id="dropJoinQuerySettingsId" ' +
+            else if(droptype === constants.JOIN) {
+                if(!isCodeToDesignMode) {
+                    //add the new join query to the join query array
+                    var joinQueryOptions = {};
+                    _.set(joinQueryOptions, 'id', '');
+                    _.set(joinQueryOptions, 'join', '');
+                    _.set(joinQueryOptions, 'projection', '');
+                    _.set(joinQueryOptions, 'outputType', '');
+                    _.set(joinQueryOptions, 'insertInto', '');
+                    _.set(joinQueryOptions, 'from', '');
+
+                    var newJoinQuery = new JoinQuery(joinQueryOptions);
+                    newJoinQuery.setId(i);
+                    self.appData.AddJoinQuery(newJoinQuery);
+                }
+                var settingsIconId = ""+ i + "-dropJoinQuerySettingsId";
+                var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
                     'class="element-prop-icon collapse">');
                 newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
                     .append(propertiesIcon);
+                self.dropCompleteJoinQueryElement(newAgent , i, top, left);
 
-                this.dropCompleteJoinQueryElement(newAgent , i, top, left);
-
-                var settingsIconElement = $('#dropJoinQuerySettingsId')[0];
+                var settingsIconElement = $('#'+settingsIconId)[0];
                 settingsIconElement.addEventListener('click', function () {
                     self.formBuilder.GeneratePropertiesFormForJoinQuery(this);
                 });
             }
-            else if(droptype === constants.PATTERN)
-            {
-                //add the new join query to the join query array
-                var patternQueryOptions = {};
-                _.set(patternQueryOptions, 'id', '');
-                _.set(patternQueryOptions, 'name', '');
-                _.set(patternQueryOptions, 'states', '');
-                _.set(patternQueryOptions, 'logic', '');
-                _.set(patternQueryOptions, 'projection', '');
-                _.set(patternQueryOptions, 'filter', '');
-                _.set(patternQueryOptions, 'postWindowFilter', '');
-                _.set(patternQueryOptions, 'window', '');
-                _.set(patternQueryOptions, 'having', '');
-                _.set(patternQueryOptions, 'groupBy', '');
-                _.set(patternQueryOptions, 'outputType', '');
-                _.set(patternQueryOptions, 'insertInto', '');
-                _.set(patternQueryOptions, 'from', '');
+            else if(droptype === constants.PATTERN) {
+                if(!isCodeToDesignMode) {
+                    //add the new join query to the join query array
+                    var patternQueryOptions = {};
+                    _.set(patternQueryOptions, 'id', '');
+                    _.set(patternQueryOptions, 'name', '');
+                    _.set(patternQueryOptions, 'states', '');
+                    _.set(patternQueryOptions, 'logic', '');
+                    _.set(patternQueryOptions, 'projection', '');
+                    _.set(patternQueryOptions, 'filter', '');
+                    _.set(patternQueryOptions, 'postWindowFilter', '');
+                    _.set(patternQueryOptions, 'window', '');
+                    _.set(patternQueryOptions, 'having', '');
+                    _.set(patternQueryOptions, 'groupBy', '');
+                    _.set(patternQueryOptions, 'outputType', '');
+                    _.set(patternQueryOptions, 'insertInto', '');
+                    _.set(patternQueryOptions, 'from', '');
 
-                var newPattern = new PatternQuery(patternQueryOptions);
-                newPattern.setId(i);
-                this.appData.AddPatternQuery(newPattern);
-                var propertiesIcon = $('<img src="/editor/images/settings.png" id="dropPatternQuerySettingsId" ' +
+                    var newPattern = new PatternQuery(patternQueryOptions);
+                    newPattern.setId(i);
+                    self.appData.AddPatternQuery(newPattern);
+                }
+                var settingsIconId = ""+ i + "-dropPatternQuerySettingsId";
+                var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
                     'class="element-prop-icon collapse">');
                 newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
                     .append(propertiesIcon);
 
-                this.dropPatternQueryElement(newAgent, i, top, left);
+                self.dropPatternQueryElement(newAgent, i, top, left);
 
-                var settingsIconElement = $('#dropPatternQuerySettingsId')[0];
+                var settingsIconElement = $('#'+settingsIconId)[0];
                 settingsIconElement.addEventListener('click', function () {
                     self.formBuilder.GeneratePropertiesFormForPattern(this);
                 });
@@ -284,6 +301,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @description allows single input stream and single output stream
          */
         dropElements.prototype.dropSimpleQueryElement = function (newAgent, i, top, left) {
+            var self = this;
             var finalElement =  newAgent;
             var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
             var connectionOut = $('<div class="connectorOut">').attr('id', i + '-out').addClass('connection');
@@ -296,7 +314,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             finalElement.append(connectionIn);
             finalElement.append(connectionOut);
 
-            $(this.container).append(finalElement);
+            $(self.container).append(finalElement);
 
             _jsPlumb.draggable(finalElement, {
                 containment: 'grid-container'
@@ -326,6 +344,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          *
          */
         dropElements.prototype.dropPatternQueryElement = function (newAgent, i, top, left) {
+            var self = this;
             var finalElement =  newAgent;
             var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
             var connectionOut = $('<div class="connectorOut">').attr('id', i + '-out').addClass('connection');
@@ -338,7 +357,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             finalElement.append(connectionIn);
             finalElement.append(connectionOut);
 
-            $(this.container).append(finalElement);
+            $(self.container).append(finalElement);
 
             _jsPlumb.draggable(finalElement, {
                 containment: 'grid-container'
@@ -362,6 +381,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @param left
          */
         dropElements.prototype.dropCompleteJoinQueryElement = function (newAgent, i, top, left) {
+            var self = this;
             var finalElement =  newAgent;
             var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
             var connectionOut = $('<div class="connectorOut">').attr('id', i + '-out').addClass('connection');
@@ -374,7 +394,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             finalElement.append(connectionIn);
             finalElement.append(connectionOut);
 
-            $(this.container).append(finalElement);
+            $(self.container).append(finalElement);
 
             _jsPlumb.draggable(finalElement, {
                 containment: 'grid-container'
@@ -398,8 +418,9 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @param i
          * @param mouseTop
          * @param mouseLeft
+         * @param isCodeToDesignMode
          */
-        dropElements.prototype.dropPartition = function (newAgent, i, mouseTop, mouseLeft) {
+        dropElements.prototype.dropPartition = function (newAgent, i, mouseTop, mouseLeft, isCodeToDesignMode) {
             var self = this;
             var finalElement =  newAgent;
 
@@ -439,7 +460,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 });
             });
 
-            $(this.container).append(finalElement);
+            $(self.container).append(finalElement);
             _jsPlumb.addGroup({
                 el: $('#' + i),
                 id: i,
@@ -449,14 +470,16 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 draggable:false
             });
 
-            //add the new partition to the partition array
-            var partitionOptions = {};
-            _.set(partitionOptions, 'id', '');
-            _.set(partitionOptions, 'partition', '');
-            _.set(partitionOptions, 'queries', '');
-            var newPartition = new Partition(partitionOptions);
-            newPartition.setId(i);
-            this.appData.AddPartition(newPartition);
+            if(isCodeToDesignMode) {
+                //add the new partition to the partition array
+                var partitionOptions = {};
+                _.set(partitionOptions, 'id', '');
+                _.set(partitionOptions, 'partition', '');
+                _.set(partitionOptions, 'queries', '');
+                var newPartition = new Partition(partitionOptions);
+                newPartition.setId(i);
+                self.appData.AddPartition(newPartition);
+            }
         };
 
         /**
@@ -469,6 +492,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          */
         // TODO: not updated (from earlier version)
         dropElements.prototype.dropWindowStream = function (newAgent, i, topP, left, asName) {
+            var self= this;
             /*
              The node hosts a text node where the Window's name, input by the user will be held.
              Rather than simply having a `newAgent.text(windowName)` statement, as the text function tends to
@@ -499,7 +523,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             finalElement.append(connectionIn);
             finalElement.append(connectionOut);
 
-            $(this.container).append(finalElement);
+            $(self.container).append(finalElement);
 
             _jsPlumb.draggable(finalElement, {
                 containment: 'parent'
@@ -520,6 +544,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @param newElement dropped element
          */
         dropElements.prototype.registerElementEventListeners = function (newElement) {
+            var self = this;
             //register event listener to show configuration icons when mouse is over the element
             newElement.on( "mouseenter", function() {
                 var element = $(this);
@@ -539,8 +564,9 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             //register event listener to remove the element when the close icon is clicked
             newElement.on('click', '.element-close-icon', function () {
                 //TODO: check these remove events
+                //TODO: update the final element count (check whether it is needed)
                 if(_jsPlumb.getGroupFor(newElement)){
-                    var queries = this.appData.getPartition(_jsPlumb.getGroupFor(newElement)).getQueries();//TODO: check id[_jsPlumb.getGroupFor(newElement)] in here
+                    var queries = self.appData.getPartition(_jsPlumb.getGroupFor(newElement)).getQueries();//TODO: check id[_jsPlumb.getGroupFor(newElement)] in here
                     var removedQueryIndex = null;
                     $.each( queries , function (index, query) {
                         if(query.getId() === $(newElement).attr('id')){//TODO: check id in here
@@ -548,7 +574,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                         }
                     });
                     queries.splice(removedQueryIndex,1);
-                    this.appData.getPartition(_jsPlumb.getGroupFor(newElement)).setQueries(queries);
+                    self.appData.getPartition(_jsPlumb.getGroupFor(newElement)).setQueries(queries);
                     _jsPlumb.remove(newElement);
                     _jsPlumb.removeFromGroup(newElement);
                 }
@@ -557,7 +583,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 }
             });
         };
-
 
         return dropElements;
     });

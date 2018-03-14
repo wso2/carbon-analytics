@@ -32,12 +32,12 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
         };
 
         /**
-         * @class DesignView
+         * @class DesignGrid
          * @constructor
-         * @class DesignView  Wraps the Ace editor for design view
+         * @class DesignGrid  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view
          */
-        var DesignView = function (options) {
+        var DesignGrid = function (options) {
             var errorMessage = 'unable to find design view grid container';
             if (!_.has(options, 'container')) {
                 log.error(errorMessage);
@@ -53,7 +53,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             this.application = this.options.application;
         };
 
-        DesignView.prototype.render = function () {
+        DesignGrid.prototype.render = function () {
             var self = this;
 
             // newAgentId --> newAgent ID (Dropped Element ID)
@@ -65,9 +65,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             _.set(dropElementsOpts, 'container', self.container);
             _.set(dropElementsOpts, 'appData', self.appData);
             _.set(dropElementsOpts, 'application', self.application);
-            _.set(dropElementsOpts, 'newAgentId', self.newAgentId);
-            _.set(dropElementsOpts, 'finalElementCount', self.finalElementCount);
+            _.set(dropElementsOpts, 'designGrid', self);
             this.dropElements = new DropElements(dropElementsOpts);
+            this.canvas = $(self.container);
+            //TODO: if close button in output console is clicked disabled containers should active
+            //TODO: once an element is dropped source view/ design view buttons should be disabled
 
             /**
              * @description jsPlumb function opened
@@ -98,12 +100,12 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 });
                 _jsPlumb.setContainer($(self.container));
 
-                var canvas = $(self.container);
+
 
                 /**
                  * @function droppable method for the 'stream' & the 'query' objects
                  */
-                canvas.droppable
+                self.canvas.droppable
                 ({
                     accept: '.stream, .window-stream, .pass-through, .filter-query, .join-query, .window-query, ' +
                     '.pattern, .partition',
@@ -117,106 +119,55 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                      */
 
                     drop: function (e, ui) {
-                        var mouseTop = e.pageY - canvas.offset().top +canvas.scrollTop()- 40;
-                        var mouseLeft = e.pageX - canvas.offset().left +canvas.scrollLeft()- 60;
+                        var mouseTop = e.pageY - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                        var mouseLeft = e.pageX - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                         // Clone the element in the toolbox in order to drop the clone on the canvas
                         var droppedElement = ui.helper.clone();
                         // To further manipulate the jsplumb element, remove the jquery UI clone helper as jsPlumb doesn't support it
                         ui.helper.remove();
                         $(droppedElement).draggable({containment: "parent"});
                         // Repaint to reposition all the elements that are on the canvas after the drop/addition of a new element on the canvas
-                        _jsPlumb.repaint(ui.helper);
-
-                        // droptype --> Type of query being dropped on the canvas (e.g. droptype = "squerydrop";)
-                        var droptype;
-                        var newAgent;
-
+                        _jsPlumb.repaint(ui.helper);//TODO: check this
 
                         // If the dropped Element is a Stream then->
                         if ($(droppedElement).hasClass('stream')) {
-                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('streamdrop ');
-
-                            // The container and the toolbox are disabled to prevent the user from dropping any elements before initializing a Stream Element
-                            canvas.addClass("disabledbutton");
-                            $("#tool-palette-container").addClass("disabledbutton");
-
-                            canvas.append(newAgent);
-                            // Drop the stream element. Inside this a it generates the stream definition form.
-                            self.dropElements.dropStream(newAgent, self.newAgentId, mouseTop, mouseLeft);
-                            self.finalElementCount = self.newAgentId;
-                            self.newAgentId++;    // Increment the Element ID for the next dropped Element
-
+                            self.handleStream(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Window(not window query) then->
                         else if ($(droppedElement).hasClass('window-stream')) {
-                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('wstreamdrop');
-                            // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropWindowStream(newAgent, self.newAgentId, mouseTop, mouseLeft ,"Window");
-                            self.finalElementCount = self.newAgentId;
-                            self.newAgentId++;
+                            self.handleWindowStream(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Pass through Query then->
                         else if ($(droppedElement).hasClass('pass-through')) {
-                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('squerydrop');
-                            droptype = "squerydrop";
-                            // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query");
-                            self.finalElementCount = self.newAgentId;
-                            self.newAgentId++;
+                            self.handlePassThroughQuery(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Filter query then->
                         else if ($(droppedElement).hasClass('filter-query')) {
-                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('filterdrop ');
-                            droptype = "filterdrop";
-                            // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query");
-                            self.finalElementCount = self.newAgentId;
-                            self.newAgentId++;
+                            self.handleFilterQuery(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Window Query then->
                         else if ($(droppedElement).hasClass('window-query')) {
-                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('wquerydrop ');
-                            droptype = "wquerydrop";
-                            // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query");
-                            self.finalElementCount=self.newAgentId;
-                            self.newAgentId++;
+                            self.handleWindowQuery(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Join Query then->
                         else if ($(droppedElement).hasClass('join-query')) {
-                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('joquerydrop');
-                            droptype = "joquerydrop";
-                            // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Join Query");
-                            self.finalElementCount = self.newAgentId;
-                            self.newAgentId++;
+                            self.handleJoinQuery(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a State machine Query(Pattern and Sequence) then->
                         else if($(droppedElement).hasClass('pattern')) {
-                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('stquerydrop');
-                            droptype = "stquerydrop";
-                            // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Pattern Query");
-                            self.finalElementCount = self.newAgentId;
-                            self.newAgentId++;
+                            self.handlePatternQuery(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Partition then->
                         else if($(droppedElement).hasClass('partition')) {
-                            newAgent = $('<div>').attr('id', self.newAgentId).addClass('partitiondrop');
-                            // Drop the element instantly since its projections will be set only when the user requires it
-                            self.dropElements.dropPartition(newAgent, self.newAgentId, mouseTop, mouseLeft);
-                            self.finalElementCount = self.newAgentId;
-
-                            self.newAgentId++;
+                            self.handlePartition(mouseTop, mouseLeft, false);
                         }
-                        self.dropElements.registerElementEventListeners(newAgent);
                     }
                 });
 
@@ -231,11 +182,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             _jsPlumb.bind('beforeDrop', function(connection){
                 var connectionValidity= true;
                 var target = connection.targetId;
-                var targetId= target.substr(0, target.indexOf('-'));
+                var targetId= parseInt(target.substr(0, target.indexOf('-')));
                 var targetElement = $('#'+targetId);
 
                 var source = connection.sourceId;
-                var sourceId = source.substr(0, source.indexOf('-'));
+                var sourceId = parseInt(source.substr(0, source.indexOf('-')));
                 var sourceElement = $('#'+sourceId);
 
 
@@ -252,7 +203,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         alert("Invalid Connection: Inner Streams are not exposed to outside");
                     }
                 }
-                if($('#'+sourceId).hasClass(constants.PARTITION)){
+                if(sourceElement.hasClass(constants.PARTITION)){
                     if($(_jsPlumb.getGroupFor(targetId)).attr('id') !== sourceId){
                         connectionValidity = false;
                         alert("Invalid Connection: Connect to a partition query");
@@ -280,11 +231,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Update the model when a connection is established and bind events for the connection
             _jsPlumb.bind('connection' , function(connection){
                 var target = connection.targetId;
-                var targetId= target.substr(0, target.indexOf('-'));
+                var targetId= parseInt(target.substr(0, target.indexOf('-')));
                 var targetElement = $('#'+targetId);
 
                 var source = connection.sourceId;
-                var sourceId = source.substr(0, source.indexOf('-'));
+                var sourceId = parseInt(source.substr(0, source.indexOf('-')));
                 var sourceElement = $('#'+sourceId);
 
                 var model;
@@ -299,7 +250,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     else if (targetElement.hasClass(constants.PATTERN)){
                         model = self.appData.getPatternQuery(targetId);
                         var streams = model.getFrom();
-                        if (streams === undefined){
+                        if (streams === undefined || streams === ""){
                             streams = [sourceId];
                         } else {
                             streams.push(sourceId);
@@ -309,7 +260,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     else if (targetElement.hasClass(constants.JOIN)) {
                         model = self.appData.getJoinQuery(targetId);
                         var streams = model.getFrom();
-                        if (streams === undefined) {
+                        if (streams === undefined || streams === "") {
                             streams = [sourceId];
                         } else {
                             streams.push(sourceId);
@@ -325,7 +276,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         var connectedQueries = _jsPlumb.getConnections({source : target});
                         $.each(connectedQueries , function (index, connectedQuery) {
                             var query= connectedQuery.targetId;
-                            var queryID = query.substr(0, query.indexOf('-'));
+                            var queryID = parseInt(query.substr(0, query.indexOf('-')));
                             var queryElement = $('#'+queryID);
                             if( queryElement.hasClass(constants.PASS_THROUGH) || queryElement.hasClass(constants.FILTER)
                                 || queryElement.hasClass(constants.WINDOW_QUERY)){
@@ -335,7 +286,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             else if (queryElement.hasClass(constants.JOIN)){
                                 model = self.appData.getJoinQuery(queryID);
                                 var streams = model.getFrom();
-                                if (streams === undefined) {
+                                if (streams === undefined || streams === "") {
                                     streams = [sourceId];
                                 } else {
                                     streams.push(sourceId);
@@ -345,7 +296,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             else if (queryElement.hasClass(constants.PATTERN)){
                                 model = self.appData.getPatternQuery(queryID);
                                 var streams = model.getFrom();
-                                if (streams === undefined){
+                                if (streams === undefined || streams === ""){
                                     streams = [sourceId];
                                 } else {
                                     streams.push(sourceId);
@@ -362,7 +313,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var streamID = null;
                     $.each(connectedStreams , function (index, connectedStream) {
                         var stream= connectedStream.sourceId;
-                        streamID = stream.substr(0, stream.indexOf('-'));
+                        streamID = parseInt(stream.substr(0, stream.indexOf('-')));
                     });
                     if(streamID != null){
                         if( targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
@@ -373,7 +324,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         else if (targetElement.hasClass(constants.JOIN)){
                             model = self.appData.getJoinQuery(targetId);
                             var streams = model.getFrom();
-                            if (streams === undefined) {
+                            if (streams === undefined || streams === "") {
                                 streams = [streamID];
                             } else {
                                 streams.push(streamID);
@@ -383,7 +334,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         else if (targetElement.hasClass(constants.PATTERN)){
                             model = self.appData.getPatternQuery(targetId);
                             var streams = model.getFrom();
-                            if (streams === undefined){
+                            if (streams === undefined || streams === ""){
                                 streams = [streamID];
                             } else {
                                 streams.push(streamID);
@@ -443,11 +394,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             _jsPlumb.bind('connectionDetached', function (connection) {
 
                 var target = connection.targetId;
-                var targetId= target.substr(0, target.indexOf('-'));
+                var targetId= parseInt(target.substr(0, target.indexOf('-')));
                 var targetElement = $('#'+targetId);
 
                 var source = connection.sourceId;
-                var sourceId = source.substr(0, source.indexOf('-'));
+                var sourceId = parseInt(source.substr(0, source.indexOf('-')));
                 var sourceElement = $('#'+sourceId);
 
                 var model;
@@ -495,7 +446,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             var connectedQueries = _jsPlumb.getConnections({source : target});
                             $.each(connectedQueries , function (index, connectedQuery) {
                                 var query= connectedQuery.targetId;
-                                var queryID = query.substr(0, query.indexOf('-'));
+                                var queryID = parseInt(query.substr(0, query.indexOf('-')));
                                 var queryElement = $('#'+queryID);
                                 if( queryElement.hasClass(constants.PASS_THROUGH)
                                     || queryElement.hasClass(constants.FILTER)
@@ -534,7 +485,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var streamID = null;
                     $.each(connectedStreams , function (index, connectedStream) {
                         var stream= connectedStream.sourceId;
-                        streamID = stream.substr(0, stream.indexOf('-'));
+                        streamID = parseInt(stream.substr(0, stream.indexOf('-')));
                     });
                     if( targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)){
@@ -638,8 +589,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var connection = edges[i];
                     var target = connection.targetId;
                     var source = connection.sourceId;
-                    var targetId= target.substr(0, target.indexOf('-'));
-                    var sourceId= source.substr(0, source.indexOf('-'));
+                    var targetId= parseInt(target.substr(0, target.indexOf('-')));
+                    var sourceId= parseInt(source.substr(0, source.indexOf('-')));
                     g.setEdge(sourceId, targetId);
                 }
                 // calculate the layout (i.e. node positions)
@@ -667,5 +618,114 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
         };
 
-        return DesignView;
+        DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamName) {
+            var self = this;
+            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('streamdrop ');
+
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                // The container and the toolbox are disabled to prevent the user from dropping any elements before initializing a Stream Element
+                self.canvas.addClass("disabledbutton");
+                $("#tool-palette-container").addClass("disabledbutton");
+                $("#output-console-activate-button").addClass("disabledbutton");
+            }
+            self.canvas.append(newAgent);
+            // Drop the stream element. Inside this a it generates the stream definition form.
+            self.dropElements.dropStream(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode, false, streamName);
+            self.finalElementCount = self.newAgentId;
+            self.newAgentId++;    // Increment the Element ID for the next dropped Element
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handleWindowStream = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+            var self = this;
+            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('wstreamdrop');
+            // Drop the element instantly since its projections will be set only when the user requires it
+            self.dropElements.dropWindowStream(newAgent, self.newAgentId, mouseTop, mouseLeft ,"Window", isCodeToDesignMode);
+            self.finalElementCount = self.newAgentId;
+            self.newAgentId++;
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handlePassThroughQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+            var self = this;
+            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('squerydrop');
+            var droptype = "squerydrop";
+            // Drop the element instantly since its projections will be set only when the user requires it
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query", isCodeToDesignMode);
+            self.finalElementCount = self.newAgentId;
+            self.newAgentId++;
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handleFilterQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+            var self =this;
+            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('filterdrop ');
+            var droptype = "filterdrop";
+            // Drop the element instantly since its projections will be set only when the user requires it
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query", isCodeToDesignMode);
+            self.finalElementCount = self.newAgentId;
+            self.newAgentId++;
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handleWindowQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+            var self = this;
+            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('wquerydrop ');
+            var droptype = "wquerydrop";
+            // Drop the element instantly since its projections will be set only when the user requires it
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query", isCodeToDesignMode);
+            self.finalElementCount=self.newAgentId;
+            self.newAgentId++;
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handleJoinQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+            var self = this;
+            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('joquerydrop');
+            var droptype = "joquerydrop";
+            // Drop the element instantly since its projections will be set only when the user requires it
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Join Query", isCodeToDesignMode);
+            self.finalElementCount = self.newAgentId;
+            self.newAgentId++;
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handlePatternQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+            var self = this;
+            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('stquerydrop');
+            var droptype = "stquerydrop";
+            // Drop the element instantly since its projections will be set only when the user requires it
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Pattern Query", isCodeToDesignMode);
+            self.finalElementCount = self.newAgentId;
+            self.newAgentId++;
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+            var self = this;
+            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('partitiondrop');
+            // Drop the element instantly since its projections will be set only when the user requires it
+            self.dropElements.dropPartition(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode);
+            self.finalElementCount = self.newAgentId;
+            self.newAgentId++;
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.getNewAgentId = function () {
+            return this.newAgentId;
+        };
+
+        DesignGrid.prototype.getFinalElementCount = function () {
+            return this.finalElementCount;
+        };
+
+        DesignGrid.prototype.setNewAgentId = function (newAgentId) {
+            this.newAgentId = newAgentId;
+        };
+
+        DesignGrid.prototype.setFinalElementCount = function (finalElementCount) {
+            this.finalElementCount = finalElementCount;
+        };
+
+        return DesignGrid;
     });
