@@ -39,7 +39,11 @@ import java.util.Set;
 public class ComputeClasspath {
     private static final Log log = LogFactory.getLog(ComputeClasspath.class);
     private static final String SEP = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
-    private static final String CONF_DIRECTORY_PATH = "carbon.config.dir.path";
+    private static final String CARBON_CONFIG_DIR_PATH = "carbon.config.dir.path";
+    private static final String CARBON_INTERNAL_LIB_DIR_PATH = "carbon.internal.lib.dir.path";
+    private static final String CARBON_EXTERNAL_LIB_DIR_PATH = "carbon.external.lib.dir.path";
+    private static final String CARBON_DROPINS_DIR_PATH = "carbon.dropins.dir.path";
+    private static final String COMPONENTS_REPO = "components.repo";
 
     private static Set<String> additionalJars = new HashSet<>();
 
@@ -62,6 +66,53 @@ public class ComputeClasspath {
         System.out.println(getSparkClasspath(sparkClasspath, carbonHome));
     }
 
+    public static String getConfDirPath(String carbonHome) {
+        String confDirPath = System.getProperty(CARBON_CONFIG_DIR_PATH);
+        if (confDirPath != null && !confDirPath.isEmpty()) {
+            return confDirPath;
+        } else {
+            return carbonHome + File.separator + "repository" + File.separator + "conf";
+        }
+    }
+
+    public static String getExternalLibDirPath(String carbonHome) {
+        String externalLibDirPath = System.getProperty(CARBON_EXTERNAL_LIB_DIR_PATH);
+        if (externalLibDirPath != null && !externalLibDirPath.isEmpty()) {
+            return externalLibDirPath;
+        } else {
+            return carbonHome + File.separator + "repository" + File.separator + "components" + File.separator + "lib";
+        }
+    }
+
+    public static String getInternalLibDirPath(String carbonHome) {
+        String internalLibDirPath = System.getProperty(CARBON_INTERNAL_LIB_DIR_PATH);
+        if (internalLibDirPath != null && !internalLibDirPath.isEmpty()) {
+            return internalLibDirPath;
+        } else {
+            return carbonHome + File.separator + "lib";
+        }
+    }
+
+    public static String getDropinsDirPath(String carbonHome) {
+        String dropinsDirPath = System.getProperty(CARBON_DROPINS_DIR_PATH);
+        if (dropinsDirPath != null && !dropinsDirPath.isEmpty()) {
+            return dropinsDirPath;
+        } else {
+            return carbonHome + File.separator + "repository" + File.separator + "components" +
+                    File.separator + "dropins";
+        }
+    }
+
+    public static String getComponentsRepoDirPath(String carbonHome) {
+        String componentsRepoDirPath = System.getProperty(COMPONENTS_REPO);
+        if (componentsRepoDirPath != null && !componentsRepoDirPath.isEmpty()) {
+            return componentsRepoDirPath;
+        } else {
+            return carbonHome + File.separator + "repository" + File.separator + "components" +
+                    File.separator + "plugins";
+        }
+    }
+
     public static String getSparkClasspath(String sparkClasspath, String carbonHome)
             throws IOException {
         if (!isDirectory(carbonHome)) {
@@ -82,7 +133,7 @@ public class ComputeClasspath {
         Set<String> requiredJars = getCarbonJars(carbonHome);
         String cp = createInitialSparkClasspath(sparkClasspath, carbonHome, requiredJars, SEP, excludeJars);
         return cp + addJarsFromDropins("", carbonHome, SEP) + addJarsFromLib("", carbonHome, SEP) +
-               addJarsFromEndorsedLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
+                addJarsFromEndorsedLib("", carbonHome, SEP) + addJarsFromConfig("", carbonHome, SEP);
     }
 
     private static Set<String> getCarbonJars(String carbonHome) {
@@ -95,16 +146,8 @@ public class ComputeClasspath {
         result.addAll(getAdditionalJars());
 
         // Read from the file
-        String confDirPath = System.getProperty(CONF_DIRECTORY_PATH);
-        File jarsFile;
-        if (confDirPath != null && !confDirPath.isEmpty()) {
-            jarsFile = new File(confDirPath + File.separator + "analytics" + File.separator + "spark" + File.separator
-                    + "carbon-spark-classpath.conf");
-        } else {
-            jarsFile = new File(
-                    carbonHome + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
-                            + File.separator + "spark" + File.separator + "carbon-spark-classpath.conf");
-        }
+        File jarsFile = new File(getConfDirPath(carbonHome) + File.separator + "analytics" + File.separator
+                + "spark" + File.separator + "carbon-spark-classpath.conf");
 
         BufferedReader reader = null;
         try {
@@ -138,8 +181,7 @@ public class ComputeClasspath {
 
 
     private static String addJarsFromLib(String scp, String carbonHome, String separator) {
-        File libDir = new File(carbonHome + File.separator + "repository" + File.separator
-                               + "components" + File.separator + "lib");
+        File libDir = new File(getExternalLibDirPath(carbonHome));
         File[] libJars = listJars(libDir);
         return appendFilesToString(scp, libJars, separator);
     }
@@ -155,14 +197,13 @@ public class ComputeClasspath {
     }
 
     private static String addJarsFromDropins(String scp, String carbonHome, String separator) {
-        File libDir = new File(carbonHome + File.separator + "repository" + File.separator
-                               + "components" + File.separator + "dropins");
+        File libDir = new File(getDropinsDirPath(carbonHome));
         File[] libJars = listJars(libDir);
         return appendFilesToString(scp, libJars, separator);
     }
 
     private static String addJarsFromEndorsedLib(String scp, String carbonHome, String separator) {
-        File libDir = new File(carbonHome + File.separator + "lib" + File.separator + "endorsed");
+        File libDir = new File(getInternalLibDirPath(carbonHome) + File.separator + "endorsed");
         File[] libJars = listJars(libDir);
         return appendFilesToString(scp, libJars, separator);
     }
@@ -170,16 +211,8 @@ public class ComputeClasspath {
     private static String addJarsFromConfig(String scp, String carbonHome, String separator)
             throws IOException {
 
-        String confDirPath = System.getProperty(CONF_DIRECTORY_PATH);
-        File cpFile;
-        if (confDirPath != null && !confDirPath.isEmpty()) {
-            cpFile = new File(confDirPath + File.separator + "analytics" + File.separator + "spark" + File.separator
-                    + "external-spark-classpath.conf");
-        } else {
-            cpFile = new File(
-                    carbonHome + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
-                            + File.separator + "spark" + File.separator + "external-spark-classpath.conf");
-        }
+        File cpFile = new File(getConfDirPath(carbonHome) + File.separator + "analytics" + File.separator +
+                "spark" + File.separator + "external-spark-classpath.conf");
 
         BufferedReader reader = null;
         StringBuilder buf = new StringBuilder();
@@ -245,8 +278,7 @@ public class ComputeClasspath {
     private static String createInitialSparkClasspath(String sparkClasspath, String carbonHome,
                                                       Set<String> requiredJars, String separator,
                                                       String[] excludeJars) {
-        File pluginsDir = new File(carbonHome + File.separator + "repository" + File.separator + "components" +
-                                   File.separator + "plugins");
+        File pluginsDir = new File(getComponentsRepoDirPath(carbonHome));
         File[] pluginJars = listJars(pluginsDir);
         StringBuilder buf = new StringBuilder();
 
