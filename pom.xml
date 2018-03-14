@@ -1326,9 +1326,9 @@
         <carbon.commons.version>4.6.21</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.5, 5)</carbon.commons.imp.pkg.version>
         <carbon.data.version>4.4.42</carbon.data.version>
-        <carbon.event-processing.version>2.1.22</carbon.event-processing.version>
-        <carbon.analytics.common.version>5.1.35</carbon.analytics.common.version>
-        <carbon.analytics.common.imp.pkg.version>[5.1.35, 6.0)</carbon.analytics.common.imp.pkg.version>
+        <carbon.event-processing.version>2.1.23</carbon.event-processing.version>
+        <carbon.analytics.common.version>5.1.37</carbon.analytics.common.version>
+        <carbon.analytics.common.imp.pkg.version>[5.1.37, 6.0)</carbon.analytics.common.imp.pkg.version>
 
         <carbon.data.import.pkg.version>[4.3, 5)</carbon.data.import.pkg.version>
 
@@ -1472,8 +1472,8 @@
         <roaringbitmap.import.version>[0.4.5, 0.5.0)</roaringbitmap.import.version>
         <objenesis.orbit.version>2.1.wso2v1</objenesis.orbit.version>
 
-        <siddhi.version>3.2.2</siddhi.version>
-        <siddhi.version.range>[3.2.0,4.0.0)</siddhi.version.range>
+        <siddhi.version>3.2.3</siddhi.version>
+        <siddhi.version.range>[3.2.3,4.0.0)</siddhi.version.range>
         <version.noggit>0.6.wso2v1</version.noggit>
         <hector.version>1.0-5</hector.version>
 
