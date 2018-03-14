@@ -1,20 +1,20 @@
 /*
-* Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* WSO2 Inc. licenses this file to you under the Apache License,
-* Version 2.0 (the "License"); you may not use this file except
-* in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.analytics.dataservice.core;
 
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants;
@@ -73,26 +73,48 @@ public class Constants {
     public static final String ANALYTICS_INDEXING_GROUP = "__ANALYTICS_INDEXING_GROUP__";
 
     public static final String DISABLE_LOCAL_INDEX_QUEUE_OPTION = "disableLocalIndexQueue";
+    private static final String CARBON_CONFIG_DIR_PATH = "carbon.config.dir.path";
+    private static final String CARBON_DATA_DIR_PATH = "carbon.data.dir.path";
 
-    public static final String DEFAULT_INDEX_STORE_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR
-            + File.separator + "repository" + File.separator + "data" + File.separator + "index_data" + File.separator;
+    public static final String DEFAULT_INDEX_STORE_LOCATION =
+            getDataDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator +
+                    "index_data" + File.separator;
 
     public static final String INDEX_STORE_DIR_PREFIX = "shard";
 
-    public static final String LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR
-            + File.separator + "repository" + File.separator + "data" + File.separator
-            + "local-shard-allocation-config.conf";
-    public static final String LOCAL_SHARD_REPLICA_CONFIG_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR
-            + File.separator + "repository" + File.separator + "data" + File.separator
-            + "local-shard-replica-config.conf";
-    public static final String MY_NODEID_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator +
-            "repository" + File.separator + "data" + File.separator + "my-node-id.dat";
-    public static final String DEPRECATED_LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION = AnalyticsDataSourceConstants
-            .CARBON_HOME_VAR + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
-            + File.separator + "local-shard-allocation-config.conf";
-    public static final String DEPRECATED_MY_NODEID_LOCATION = AnalyticsDataSourceConstants
-            .CARBON_HOME_VAR + File.separator + "repository" + File.separator + "conf" + File.separator + "analytics"
-            + File.separator + "my-node-id.dat";
-    public static final String DEFAULT_LOCAL_INDEX_STAGING_LOCATION = AnalyticsDataSourceConstants.CARBON_HOME_VAR + File.separator + "repository"
-            + File.separator + "data" + File.separator + "index_staging_queues" + File.separator;
+    public static final String LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION =
+            getDataDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator +
+                    "local-shard-allocation-config.conf";
+    public static final String LOCAL_SHARD_REPLICA_CONFIG_LOCATION =
+            getDataDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator +
+                    "local-shard-replica-config.conf";
+    public static final String MY_NODEID_LOCATION = getDataDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) +
+            "my-node-id.dat";
+    public static final String DEPRECATED_LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION =
+            getConfDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator + "analytics" +
+                    File.separator + "local-shard-allocation-config.conf";
+    public static final String DEPRECATED_MY_NODEID_LOCATION =
+            getConfDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator + "analytics" +
+                    File.separator + "my-node-id.dat";
+    public static final String DEFAULT_LOCAL_INDEX_STAGING_LOCATION =
+            getDataDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator +
+                    "index_staging_queues" + File.separator;
+
+    public static String getDataDirPath(String carbonHome) {
+        String dataDirPath = System.getProperty(CARBON_DATA_DIR_PATH);
+        if (dataDirPath != null && !dataDirPath.isEmpty()) {
+            return dataDirPath;
+        } else {
+            return carbonHome + File.separator + "repository" + File.separator + "data";
+        }
+    }
+
+    public static String getConfDirPath(String carbonHome) {
+        String confDirPath = System.getProperty(CARBON_CONFIG_DIR_PATH);
+        if (confDirPath != null && !confDirPath.isEmpty()) {
+            return confDirPath;
+        } else {
+            return carbonHome + File.separator + "repository" + File.separator + "conf";
+        }
+    }
 }
