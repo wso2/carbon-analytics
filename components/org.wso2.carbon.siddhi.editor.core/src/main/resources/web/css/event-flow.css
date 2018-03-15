@@ -8,22 +8,24 @@
 }
 
 .legend {
-    color: white;
+    color: #fff;
     font-size: 14px;
     text-align: left;
-    display: inline-block;
     float: right;
     width: 100%;
     max-width: 440px;
+    padding: 10px;
+    background: #333;
 }
 
 .legend-key {
-    padding: 5px;
+    padding: 0 5px;
     display: inline-block;
 }
 
 .legend-text {
     line-height: 24px;
+    font-size: 12px;
 }
 
 .legend-colour {
@@ -35,18 +37,18 @@
 
 
 .siddhi-app-name {
-    color: white;
-    font-size: 30px;
+    color: #fff;
+    font-size: 1.8rem;
+    text-transform: capitalize;
 }
 
 .siddhi-app-description {
-    color: white;
-    font-size: 20px;
+    color: #fff;
+    font-size: 1.4rem;
 }
 
 .graph-container {
     width: 100%;
-    background-color: #333;
     overflow: scroll;
 }
 
@@ -56,7 +58,7 @@
     height: 100%;
     z-index: 1;
     background-color: #282828;
-    color: white;
+    color: #fff;
     font-size: 40px;
     text-align: center;
     padding: 20% 0;
@@ -70,6 +72,7 @@
     stroke: #bbb;
     fill: #333;
     stroke-width: 2px;
+    height: 30px;
 }
 
 .edgePath path {
@@ -84,19 +87,18 @@
 }
 
 .indicator {
-    height: 30px;
+    height: 28px;
     width: 15px;
     display: block;
     float: left;
-    border-top-left-radius: 7px;
-    border-bottom-left-radius: 7px;
-    margin-right: 5px;
+    margin: 1px 10px 1px 1px;
 }
 
 .nodeLabel {
-    font-size: 16px;
+    font-size: 1em;
     color: #fff;
     margin-right: 10px;
+    font-weight: 500;
 }
 
 .partition {
@@ -106,35 +108,35 @@
 }
 
 .stream-colour {
-    background-color: violet;
+    background-color: #2196F3;
 }
 
 .table-colour {
-    background-color: indigo;
+    background-color: #8BC34A;
 }
 
 .window-colour {
-    background-color: blue;
+    background-color: #009688;
 }
 
 .trigger-colour {
-    background-color: green;
+    background-color: #F44336;
 }
 
 .aggregation-colour {
-    background-color: yellow;
+    background-color: #FF9800;
 }
 
 .function-colour {
-    background-color: orange;
+    background-color: #FF5722;
 }
 
 .query-colour {
-    background-color: red;
+    background-color: #9C27B0;
 }
 
 .partition-type-colour {
-    background-color: #e0e0d1;
+    background-color: #FFEB3B;
 }
 
 .toggle-controls-container {
@@ -158,4 +160,8 @@
 
 .toggle-button-text {
     padding-left: 5px;
+}
+
+.nodes .label {
+    text-align: left;
 }

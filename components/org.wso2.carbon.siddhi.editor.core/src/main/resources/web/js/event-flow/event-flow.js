@@ -41,9 +41,9 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3', 'overl
             // graph generated needs to be changed.
             var defaultNodeStyle = {
                 labelType: "html",
-                rx: 7,
-                ry: 7,
-                padding: 0
+                rx: 0,
+                ry: 0,
+                padding: 0,
             };
             this.renderOptions = {
                 nodeOptions: {
