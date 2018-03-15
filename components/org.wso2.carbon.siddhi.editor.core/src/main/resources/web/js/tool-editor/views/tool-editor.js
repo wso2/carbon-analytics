@@ -158,7 +158,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                                     setTimeout(function () {
                                         self._eventFlow.render(response.responseJSON);
                                         self._eventFlow.graphResize();
-                                    }, 1);
+                                    }, 250);
                                 } else if (response.status === "fail") {
                                     self._eventFlow.alert(response.errorMessage);
                                 }
