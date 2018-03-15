@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'backbone', './tool', './tool-view', './drag-drop-manager'],
-    function (require, log, $, Backbone, Tool, ToolView, DragDropManager) {
+define(['require', 'log', 'jquery', 'backbone', './tool', './tool-view'],
+    function (require, log, $, Backbone, Tool, ToolView) {
 
     var ToolPalette = Backbone.View.extend({
         initialize: function (options) {
@@ -36,7 +36,6 @@ define(['require', 'log', 'jquery', 'backbone', './tool', './tool-view', './drag
             this._$parent_el = container;
             this._options = options;
             this._initTools();
-            this.dragDropManager = new DragDropManager();
         },
 
         _initTools: function(){

@@ -16,49 +16,19 @@
  * under the License.
  */
 
-// define(['require', 'jquery', 'd3', 'backbone', 'lodash', 'd3utils'], function (require, $, d3, Backbone, _, D3Utils) {
-    define(['require', 'jquery', 'backbone', 'lodash'], function (require, $, Backbone, _) {
+define(['require', 'jquery', 'backbone', 'lodash'], function (require, $, Backbone, _) {
 
-        //TODO: remove d3 d3utils from lib
     var toolView = Backbone.View.extend({
 
-        toolTemplate: _.template("<div id=\"<%=id%>\" class=\"<%=className%> tool-container\"  data-placement=\"bottom\" data-toggle=\"tooltip\" title='<%=title%>'> <img src=\"<%=icon%>\" class=\"tool-image\"  /><p class=\"tool-title\"><%=title%></p></div>"),
+        toolTemplate: _.template("<div id=\"<%=id%>\" class=\"<%=className%> tool-container\"  " +
+            "data-placement=\"bottom\" data-toggle=\"tooltip\" title='<%=title%>'> <img src=\"<%=icon%>\" " +
+            "class=\"tool-image\"  /><p class=\"tool-title\"><%=title%></p></div>"),
 
         initialize: function (options) {
             _.extend(this, _.pick(options, ["toolPalette"]));
        },
 
-        createHandleDragStopEvent: function (event, ui) {
-            this.toolPalette.dragDropManager.reset();
-        },
-
-        createHndleOnDragEvent : function(event,ui){
-            var helperElm = ui.helper;
-            var span = helperElm[0].childNodes;
-            var validator = document.getElementById("validator");
-
-            //Visual feedback on invalid drop targets
-            if(!this.toolPalette.dragDropManager.isAtValidDropTarget()){
-                validator.innerText="X";
-                validator.className = "tool-validator";
-                validator.style.display="block";
-            }
-            else{
-                validator.style.display="none";
-            }
-        },
-
-        createHandleDragStartEvent : function(){
-            var toolView = this;
-            return function(event,ui){
-                toolView.toolPalette.dragDropManager.setTypeBeingDragged(this.model);
-            }
-        },
-
         render: function (parent) {
-            var createCloneCallback = this.model.get("createCloneCallback");
-            var dragCursorOffset = this.model.get("dragCursorOffset");
-            var self = this;
             this.$el.html(this.toolTemplate(this.model.attributes));
             this.$el.tooltip();
             parent.append(this.$el);
@@ -70,28 +40,9 @@
                 tolerance: 'fit',
                 revert: true
             });
-            // this.$el.draggable({
-            //     helper: _.isUndefined(createCloneCallback) ?  'clone' : createCloneCallback(self),
-            //     cursor: 'move',
-            //     cursorAt: _.isUndefined(dragCursorOffset) ?  { left: -2, top: -2 } : dragCursorOffset,
-            //     zIndex: 10001
-            //     // stop: this.createHandleDragStartEvent(),
-            //     // start : this.createHandleDragStartEvent(),
-            //     // drag:this.createHandleDragStartEvent()
-            // });
 
             return this;
         }
-
-        // createContainerForDraggable: function(){
-        //     var body = d3.select("body");
-        //     var div = body.append("div").attr("id", "draggingToolClone");
-        //     //For validation feedback
-        //     div.append('span').attr("id","validator");
-        //     div =  D3Utils.decorate(div);
-        //     return div;
-        // }
-
     });
 
     return toolView;

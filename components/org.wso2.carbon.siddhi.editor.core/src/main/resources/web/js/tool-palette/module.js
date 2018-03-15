@@ -16,8 +16,8 @@
  * under the License.
  */
 define(['require', 'app/tool-palette/tool', 'app/tool-palette/tool-view', 'app/tool-palette/tool-group',
-        'app/tool-palette/tool-group-view', 'app/tool-palette/tool-palette', 'app/tool-palette/drag-drop-manager'],
-    function (require, tool, toolView, toolGroup, toolGroupView, toolPaletteModel, toolPalette, DragDropManager) {
+        'app/tool-palette/tool-group-view', 'app/tool-palette/tool-palette'],
+    function (require, tool, toolView, toolGroup, toolGroupView, toolPaletteModel, toolPalette) {
         return  {
             Models: {
                 Tool: tool,
@@ -27,8 +27,7 @@ define(['require', 'app/tool-palette/tool', 'app/tool-palette/tool-view', 'app/t
                 ToolView: toolView,
                 ToolGroupView: toolGroupView,
                 ToolPalette: toolPalette
-            },
-            DragDropManager: DragDropManager
+            }
         }
     });
 
