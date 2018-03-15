@@ -283,12 +283,11 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             },
             showActiveConsole: function (activeConsole) {
                 activeConsole.show(true);
-                //TODO: check the usage of this
-                // _.each(this._consoles, function (console) {
-                //     if (console._type != "CONSOLE" && console._uniqueId != activeConsole._uniqueId) {
-                //         console.hide();
-                //     }
-                // });
+                _.each(this._consoles, function (console) {
+                    if (console._type !== "CONSOLE" && console._uniqueId !== activeConsole._uniqueId) {
+                        console.hide();
+                    }
+                });
             },
             hideConsoles: function () {
                 _.each(this._consoles, function (console) {

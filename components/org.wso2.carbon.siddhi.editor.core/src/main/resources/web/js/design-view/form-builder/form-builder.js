@@ -19,9 +19,9 @@
 define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream', 'rightStream', 'join'],
     function (require, log, $, _, jsPlumb, Stream, LeftStream, RightStream, Join) {
 
-        //common properties for the JSON editor
+        // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
-        //JSONEditor.defaults.options.iconlib = 'theme-wso2';
+        //JSONEditor.defaults.options.iconlib = 'bootstrap3';
         JSONEditor.defaults.options.disable_edit_json = true;
         JSONEditor.plugins.sceditor.emoticonsEnabled = true;
         JSONEditor.defaults.options.disable_collapse = true;
@@ -42,16 +42,17 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
          * @class AppData
          * @constructor
          * @class DesignView  Wraps the Ace editor for design view
+         * @param {Object} options Rendering options for the view
          */
         var FormBuilder = function (options) {
             this.appData = options.appData;
             this.dropElements = options.dropElements;
             this.application = options.application;
             this.consoleListManager = options.application.outputController;
-            //tODO: check whether application is exists.
+            this.gridContainer = $("#grid-container");
+            this.toolPaletteContainer = $("#tool-palette-container");
         };
 
-        //todo: when a element is deleted corresponding data should be removed from the appData.
         //TODO: input validation in forms
 
         /**
@@ -61,6 +62,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
         FormBuilder.prototype.createTabForForm = function () {
             var activeTab = this.application.tabController.getActiveTab();
             var siddhiAppName = "";
+
             if(activeTab.getTitle().lastIndexOf(".siddhi") !== -1){
                 siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
             } else{
@@ -68,7 +70,6 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             }
 
             var uniqueTabId = 'form-' + activeTab.cid;
-
             var consoleOptions = {};
             var options = {};
             _.set(options, '_type', "FORM");
@@ -77,6 +78,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             _.set(options, 'appName', siddhiAppName);
 
             var console = this.consoleListManager.getGlobalConsole();
+
             if(console === undefined){
                 var globalConsoleOptions = {};
                 var opts = {};
@@ -96,21 +98,19 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
         /**
          * @function generate the form to define the stream once it is dropped on the canvas
-         * @param i
+         * @param i id for the element
          * @returns user given stream name
          */
         FormBuilder.prototype.DefineStream = function (i) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
-
             var propertyDiv = $('<div id="property-header"><h3>Define Stream </h3></div>' +
                 '<div id="define-stream" class="define-stream"></div>');
             formContainer.append(propertyDiv);
-
             var streamElement = $("#define-stream")[0];
 
-            //generate the form to define a stream
+            // generate the form to define a stream
             var editor = new JSONEditor(streamElement, {
                 schema: {
                     type: "object",
@@ -155,7 +155,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             });
 
             formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
-            //'Submit' button action
+
+            // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
                 // add the new out stream to the stream array
@@ -167,18 +168,18 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 var stream = new Stream(streamOptions);
                 self.appData.AddStream(stream);
 
-                //close the form window
+                // close the form window
                 self.consoleListManager.removeConsole(formConsole);
 
-                $("#grid-container").removeClass("disabledbutton");
-                $("#tool-palette-container").removeClass("disabledbutton");
+                self.gridContainer.removeClass("disabledbutton");
+                self.toolPaletteContainer.removeClass("disabledbutton");
             });
             return editor.getValue().name;
         };
 
         /**
          * @function generate the property window for an existing stream
-         * @param element
+         * @param element selected element(stream)
          */
         FormBuilder.prototype.GeneratePropertiesFormForStreams = function (element) {
             var self = this;
@@ -186,15 +187,15 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             var formContainer = formConsole.getContentContainer();
 
             // The container and the tool palette are disabled to prevent the user from dropping any elements
-            $("#grid-container").addClass("disabledbutton");
-            $("#tool-palette-container").addClass("disabledbutton");
+            self.gridContainer.addClass("disabledbutton");
+            self.toolPaletteContainer.addClass("disabledbutton");
+
             var id = parseInt($(element).parent().attr('id'));
-            //retrieve the stream information from the collection
+            // retrieve the stream information from the collection
             var clickedElement = self.appData.getStream(id);
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
-                throw errorMessage;
             }
             var name = clickedElement.getDefine();
             var attributes = clickedElement.getAttributes();
@@ -244,37 +245,37 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 disable_array_delete_last_row: true,
                 startval: fillWith
             });
-            $(formContainer).append('<div id="form-submit"><button type="button" class="btn btn-default">Submit</button></div>' +
+            $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                'class="btn btn-default">Submit</button></div>' +
                 '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
-
                 // The container and the palette are disabled to prevent the user from dropping any elements
-                $("#grid-container").removeClass('disabledbutton');
-                $("#tool-palette-container").removeClass('disabledbutton');
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
 
                 var config = editor.getValue();
 
-                //update selected stream model
+                // update selected stream model
                 clickedElement.setDefine(config.name);
                 clickedElement.setAttributes(config.attributes);
 
                 var textNode = $(element).parent().find('.streamnamenode');
                 textNode.html(config.name);
 
-                //close the form window
+                // close the form window
                 self.consoleListManager.removeConsole(formConsole);
             });
 
-            //'Cancel' button action
+            // 'Cancel' button action
             var cancelButtonElement = $('#form-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
-                $("#grid-container").removeClass('disabledbutton');
-                $("#tool-palette-container").removeClass('disabledbutton');
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
 
-                //close the form window
+                // close the form window
                 self.consoleListManager.removeConsole(formConsole);
             });
         };
@@ -289,27 +290,26 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             var formContainer = formConsole.getContentContainer();
 
             // The container and the tool palette are disabled to prevent the user from dropping any elements
-            $("#grid-container").addClass('disabledbutton');
-            $("#tool-palette-container").addClass('disabledbutton');
+            self.gridContainer.addClass('disabledbutton');
+            self.toolPaletteContainer.addClass('disabledbutton');
+
             var id = parseInt($(element).parent().attr('id'));
             var clickedElement = self.appData.getQuery(id);
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
-                throw errorMessage;
             }
-            var queryType = $(element).parent().attr('class');
             var type= $(element).parent();
             if (!(clickedElement.getFrom())) {
                 alert('Connect an input stream');
-                $("#grid-container").removeClass('disabledbutton');
-                $("#tool-palette-container").removeClass('disabledbutton');
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
 
-                //close the form window
+                // close the form window
                 self.consoleListManager.removeConsole(formConsole);
             }
             else if (!(clickedElement.getInsertInto())) {
-                //retrieve the query information from the collection
+                // retrieve the query information from the collection
                 var name = clickedElement.getName();
                 var inStream = (self.appData.getStream(clickedElement.getFrom())).getDefine();
                 var filter1 = clickedElement.getFilter();
@@ -339,7 +339,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                         projection: ''
                     };
                 }
-                //generate the form for the query an output stream is not connected
+                // generate the form for the query an output stream is not connected
                 var editor = new JSONEditor(formContainer[0], {
                     schema: {
                         type: 'object',
@@ -429,24 +429,25 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     display_required_only: true,
                     no_additional_properties: true
                 });
-                //disable the uneditable fields
+                // disable the uneditable fields
                 editor.getEditor('root.from').disable();
 
-                $(formContainer).append('<div id="form-submit"><button type="button" class="btn btn-default">Submit</button></div>' +
+                $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                    'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
                 // 'Submit' button action
                 var submitButtonElement = $('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
 
-                    //close the form window
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
 
                     var config = editor.getValue();
 
-                    //change the query icon depending on the fields filled
+                    // change the query icon depending on the fields filled
                     if (config.window) {
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
@@ -457,7 +458,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.PASS_THROUGH+ ' jtk-draggable');
                     }
-                    //obtain values from the form and update the query model
+
+                    // obtain values from the form and update the query model
                     var config = editor.getValue();
                     clickedElement.setName(config.name);
                     clickedElement.setFilter(config.filter);
@@ -473,7 +475,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     clickedElement.setProjection(queryAttributes);
                     var textNode = $(element).parent().find('.queryNameNode');
                     textNode.html(config.name);
-                    //generate the stream defined as the output stream
+                    // generate the stream defined as the output stream
                     var position = $(element).parent().position();
                     //TODO: check whether it is needed to add a stream since there might be a stream with that name alredy existed
                     self.dropElements.dropStreamFromQuery(position, id, config.insertInto, streamAttributes);
@@ -482,13 +484,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 // 'Cancel' button action
                 var cancelButtonElement = $('#form-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
-                    //close the form window
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
                 });
             } else {
-                //retrieve the query information from the collection
+                // retrieve the query information from the collection
                 var name = clickedElement.getName();
                 var inStream = (self.appData.getStream(clickedElement.getFrom())).getDefine();
                 var outStream = (self.appData.getStream(clickedElement.getInsertInto())).getDefine();
@@ -498,7 +500,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 var outputType = clickedElement.getOutputType();
                 var attrString = [];
                 var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributes();
-                if (clickedElement.getProjection() === '') { //TODO: check this whether is should be undefined instead of ''
+                if (clickedElement.getProjection() === '') {
                     for (var i = 0; i < outStreamAttributes.length; i++) {
                         var attr = {select: '', newName: outStreamAttributes[i].attribute};
                         attrString.push(attr);
@@ -541,7 +543,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                         insertInto: outStream
                     };
                 }
-                //generate form for the queries where both input and output streams are defined
+                // generate form for the queries where both input and output streams are defined
                 var editor = new JSONEditor(formContainer[0], {
                     schema: {
                         type: 'object',
@@ -620,27 +622,28 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     no_additional_properties: true
                 });
 
-                //disable fields that can not be changed
+                // disable fields that can not be changed
                 editor.getEditor('root.from').disable();
                 editor.getEditor('root.insertInto').disable();
                 for (var i = 0; i < outStreamAttributes.length; i++) {
                     editor.getEditor('root.projection.' + i + '.newName').disable();
                 }
 
-                $(formContainer).append('<div id="form-submit"><button type="button" class="btn btn-default">Submit</button></div>' +
+                $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                    'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
                 // 'Submit' button action
                 var submitButtonElement = $('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
 
-                    //close the form window
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
                     var config = editor.getValue();
 
-                    //change the query icon depending on the fields(filter, window) filled
+                    // change the query icon depending on the fields(filter, window) filled
                     if (config.window) {
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
@@ -652,7 +655,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                         $(element).parent().addClass(constants.PASS_THROUGH + ' jtk-draggable');
                     }
 
-                    //update selected query model
+                    // update selected query model
                     clickedElement.setName(config.name);
                     clickedElement.setFilter(config.filter);
                     clickedElement.setWindow(config.window);
@@ -670,9 +673,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 // 'Cancel' button action
                 var cancelButtonElement = $('#form-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
-                    //close the form window
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
                 });
             }
@@ -680,7 +683,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
         /**
          * @function generate property window for state machine
-         * @param element
+         * @param element selected element(query)
          */
         FormBuilder.prototype.GeneratePropertiesFormForPattern = function (element) {
             var self = this;
@@ -688,26 +691,27 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             var formContainer = formConsole.getContentContainer();
 
             // The container and the tool palette are disabled to prevent the user from dropping any elements
-            $("#grid-container").addClass('disabledbutton');
-            $("#tool-palette-container").addClass('disabledbutton');
+            self.gridContainer.addClass('disabledbutton');
+            self.toolPaletteContainer.addClass('disabledbutton');
+
             var id = parseInt($(element).parent().attr('id'));
             var clickedElement = self.appData.getPatternQuery(id);
-            if (clickedElement.getFrom().length === 0) { //TODO: test === or ==
+            if (clickedElement.getFrom().length === 0) {
                 alert('Connect input streams');
-                $("#grid-container").removeClass('disabledbutton');
-                $("#tool-palette-container").removeClass('disabledbutton');
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
 
-                //close the form window
+                // close the form window
                 self.consoleListManager.removeConsole(formConsole);
-            } else if (clickedElement.getInsertInto() == '') {
+            } else if (clickedElement.getInsertInto() === '') {
                 alert('Connect an output stream');
-                $("#grid-container").removeClass('disabledbutton');
-                $("#tool-palette-container").removeClass('disabledbutton');
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
 
-                //close the form window
+                // close the form window
                 self.consoleListManager.removeConsole(formConsole);
             } else {
-                //retrieve the pattern information from the collection
+                // retrieve the pattern information from the collection
                 var streams = [];
                 var projections = [];
                 $.each(clickedElement.getFrom(), function (index, streamID) {
@@ -733,7 +737,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 $.each(clickedElement.getStates(), function (index, state) {
                     for (var event in state) {
                         if (state.hasOwnProperty(event)) {
-                            var restoredState = {stateID: event, stream: state[event].stream, filter: state[event].filter};
+                            var restoredState = { stateID: event, stream: state[event].stream,
+                                filter: state[event].filter};
                             states.push(restoredState);
                         }
                     }
@@ -891,27 +896,28 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
                 });
-                //disable fields that can not be changed
+                // disable fields that can not be changed
                 editor.getEditor('root.insertInto').disable();
 
                 for (var i = 0; i < outStreamAttributes.length; i++) {
                     editor.getEditor('root.projection.' + i + '.newName').disable();
                 }
-                $(formContainer).append('<div id="form-submit"><button type="button" class="btn btn-default">Submit</button></div>' +
+                $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                    'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
                 // 'Submit' button action
                 var submitButtonElement = $('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
 
-                    //close the form window
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
 
                     var config = editor.getValue();
 
-                    //update selected query model
+                    // update selected query model
                     clickedElement.setName(config.name);
                     clickedElement.setLogic(config.logic);
                     clickedElement.setFilter(config.filter);
@@ -942,9 +948,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 // 'Cancel' button action
                 var cancelButtonElement = $('#form-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
-                    //close the form window
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
                 });
             }
@@ -952,7 +958,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
         /**
          * @function generate property window for Join Query
-         * @param element
+         * @param element selected element(query)
          */
         FormBuilder.prototype.GeneratePropertiesFormForJoinQuery = function (element) {
             var self = this;
@@ -960,23 +966,25 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             var formContainer = formConsole.getContentContainer();
 
             // The container and the tool palette are disabled to prevent the user from dropping any elements
-            $("#grid-container").addClass('disabledbutton');
-            $("#tool-palette-container").addClass('disabledbutton');
+            self.gridContainer.addClass('disabledbutton');
+            self.toolPaletteContainer.addClass('disabledbutton');
+
             var id = parseInt($(element).parent().attr('id'));
             var clickedElement = self.appData.getJoinQuery(id);
-            if (!(clickedElement.getFrom()) || clickedElement.getFrom().length != 2) {
+            if (!(clickedElement.getFrom()) || clickedElement.getFrom().length !== 2) {
                 alert('Connect TWO input streams');
-                $("#grid-container").removeClass('disabledbutton');
-                $("#tool-palette-container").removeClass('disabledbutton');
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
 
-                //close the form window
+                // close the form window
                 self.consoleListManager.removeConsole(formConsole);
             }
             else if (!(clickedElement.getInsertInto())) {
                 alert('Connect an output stream');
-                $("#grid-container").removeClass('disabledbutton');
-                $("#tool-palette-container").removeClass('disabledbutton');
-                //close the form window
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                // close the form window
                 self.consoleListManager.removeConsole(formConsole);
             }
 
@@ -1161,20 +1169,21 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 }
                 editor.getEditor('root.insertInto').disable();
 
-                $(formContainer).append('<div id="form-submit"><button type="button" class="btn btn-default">Submit</button></div>' +
+                $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                    'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
                 // 'Submit' button action
                 var submitButtonElement = $('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
 
-                    //close the form window
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
 
                     var config = editor.getValue();
-                    //update selected query object
+                    // update selected query object
                     var leftStreamOptions = {};
                     _.set(leftStreamOptions, 'from', config.leftStream.from);
                     _.set(leftStreamOptions, 'filter', config.leftStream.filter);
@@ -1210,14 +1219,19 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 // 'Cancel' button action
                 var cancelButtonElement = $('#form-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
-                    //close the form window
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
+
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
                 });
             }
         };
 
+        /**
+         * @function generate property window for Partition
+         * @param element selected element(query)
+         */
         FormBuilder.prototype.GeneratePartitionKeyForm = function (element) {
             var self = this;
             var id =parseInt($(element.target).parent().attr('id'));
@@ -1235,11 +1249,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             });
             if(!(connected)){
                 alert('Connect a stream for partitioning');
-                $("#grid-container").removeClass('disabledbutton');
-                $("#tool-palette-container").removeClass('disabledbutton');
-
-                //close the form window
-                self.consoleListManager.removeConsole(formConsole);
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
             }
             else{
                 var fillWith= {};
@@ -1255,8 +1266,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                 var formConsole = this.createTabForForm();
                 var formContainer = formConsole.getContentContainer();
-                $("#container").addClass('disabledbutton');
-                $("#toolbox").addClass('disabledbutton');
+                self.gridContainer.addClass('disabledbutton');
+                self.toolPaletteContainer.addClass('disabledbutton');
 
                 var editor = new JSONEditor(formContainer[0], {
                     ajax: true,
@@ -1282,16 +1293,17 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     startval: fillWith,
                     disable_properties: true
                 });
-                $(formContainer).append('<div id="form-submit"><button type="button" class="btn btn-default">Submit</button></div>' +
+                $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                    'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
                 // 'Submit' button action
                 var submitButtonElement = $('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
 
-                    //close the form window
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
 
                     var config = editor.getValue();
@@ -1308,9 +1320,10 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 // 'Cancel' button action
                 var cancelButtonElement = $('#form-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    $("#grid-container").removeClass('disabledbutton');
-                    $("#tool-palette-container").removeClass('disabledbutton');
-                    //close the form window
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
+
+                    // close the form window
                     self.consoleListManager.removeConsole(formConsole);
                 });
             }

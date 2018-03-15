@@ -23,7 +23,6 @@ define(
          * @class ElementArray
          * @constructor
          * @class ElementArray  Creates an array for an element type
-         * @param {Object} options Rendering options for the view
          */
         var ElementArray = function () {
         };

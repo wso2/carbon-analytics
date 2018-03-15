@@ -15,8 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'appData', 'dagre',
-        'jquery_ui'],
+define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'appData', 'dagre'],
 
     function (require, log, $, _jsPlumb ,Backbone, _, DropElements, AppData, dagre) {
 
@@ -172,7 +171,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 });
 
                 // auto align the diagram when the button is clicked
-                $('#auto-align').click(function(){//TODO: check
+                $('#auto-align').click(function(){
                     autoAlign();
                 });
 
@@ -546,11 +545,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 var partition = self.appData.getPartition(partitionId);
                 var queries = partition.getQueries();
                 if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PASS_THROUGH)
-                    || $(event.el).hasClass(constants.WINDOW_QUERY)){
+                    || $(event.el).hasClass(constants.WINDOW_QUERY)) {
                     queries.push(self.appData.getQuery($(event.el).attr('id')));
                     partition.setQueries(queries);
                 }
-                else if($(event.el).hasClass(constants.JOIN)){
+                else if($(event.el).hasClass(constants.JOIN)) {
                     queries.push(self.appData.getJoinQuery($(event.el).attr('id')));
                     partition.setQueries(queries);
                 }
@@ -623,14 +622,16 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var newAgent = $('<div>').attr('id', self.newAgentId).addClass('streamdrop ');
 
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                // The container and the toolbox are disabled to prevent the user from dropping any elements before initializing a Stream Element
+                // The container and the toolbox are disabled to prevent the user from dropping any elements before
+                // initializing a Stream Element
                 self.canvas.addClass("disabledbutton");
                 $("#tool-palette-container").addClass("disabledbutton");
                 $("#output-console-activate-button").addClass("disabledbutton");
             }
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
-            self.dropElements.dropStream(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode, false, streamName);
+            self.dropElements.dropStream(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode,
+                false, streamName);
             self.finalElementCount = self.newAgentId;
             self.newAgentId++;    // Increment the Element ID for the next dropped Element
             self.dropElements.registerElementEventListeners(newAgent);
@@ -640,7 +641,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
             var newAgent = $('<div>').attr('id', self.newAgentId).addClass('wstreamdrop');
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropWindowStream(newAgent, self.newAgentId, mouseTop, mouseLeft ,"Window", isCodeToDesignMode);
+            self.dropElements.dropWindowStream(newAgent, self.newAgentId, mouseTop, mouseLeft ,"Window",
+                isCodeToDesignMode);
             self.finalElementCount = self.newAgentId;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
@@ -651,7 +653,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var newAgent = $('<div>').attr('id', self.newAgentId).addClass('squerydrop');
             var droptype = "squerydrop";
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query", isCodeToDesignMode);
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
+                isCodeToDesignMode);
             self.finalElementCount = self.newAgentId;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
@@ -662,7 +665,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var newAgent = $('<div>').attr('id', self.newAgentId).addClass('filterdrop ');
             var droptype = "filterdrop";
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query", isCodeToDesignMode);
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
+                isCodeToDesignMode);
             self.finalElementCount = self.newAgentId;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
@@ -673,7 +677,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var newAgent = $('<div>').attr('id', self.newAgentId).addClass('wquerydrop ');
             var droptype = "wquerydrop";
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query", isCodeToDesignMode);
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
+                isCodeToDesignMode);
             self.finalElementCount=self.newAgentId;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
@@ -684,7 +689,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var newAgent = $('<div>').attr('id', self.newAgentId).addClass('joquerydrop');
             var droptype = "joquerydrop";
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Join Query", isCodeToDesignMode);
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Join Query",
+                isCodeToDesignMode);
             self.finalElementCount = self.newAgentId;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
@@ -695,7 +701,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var newAgent = $('<div>').attr('id', self.newAgentId).addClass('stquerydrop');
             var droptype = "stquerydrop";
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Pattern Query", isCodeToDesignMode);
+            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Pattern Query",
+                isCodeToDesignMode);
             self.finalElementCount = self.newAgentId;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);

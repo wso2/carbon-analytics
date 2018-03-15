@@ -20,9 +20,9 @@ define(
     function () {
 
         /**
-         * @class On
+         * @class Join
          * @constructor
-         * @class On Creates an On section in join query
+         * @class Join Creates an Join section in join query
          * @param {Object} options Rendering options for the view
          */
         var Join = function (options) {

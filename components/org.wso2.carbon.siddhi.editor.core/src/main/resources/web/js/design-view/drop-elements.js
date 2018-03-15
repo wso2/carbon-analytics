@@ -38,17 +38,14 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @class DesignView  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view
          */
-        var dropElements = function (options) {
+        var DropElements = function (options) {
             var errorMessage = 'unable to find design view container';
             if (!_.has(options, 'container')) {
                 log.error(errorMessage);
-                throw errorMessage;
-                //TODO: handle all the log. Throw detailed messages.
             }
             var container = $(_.get(options, 'container'));
             if (!container.length > 0) {
                 log.error(errorMessage);
-                throw errorMessage;
             }
             this.appData = options.appData;
             this.container = options.container;
@@ -63,7 +60,18 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             this.formBuilder = new FormBuilder(formBuilderOptions);
         };
 
-        dropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode, isGenerateStreamFromQueryOutput, streamName) {
+        /**
+         * @function drop the stream element on the canvas
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
+         * @param isGenerateStreamFromQueryOutput whether this element is generated as a ourpur stream in a query
+         * @param streamName name of the stream
+         */
+        DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
+                                                      isGenerateStreamFromQueryOutput, streamName) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
@@ -87,13 +95,18 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             node.attr('class', "streamNameNode");
 
             /*
-             prop --> When clicked on this icon, a definition and related information of the Stream Element will be displayed as an alert message
-             showIcon --> An icon that elucidates whether the dropped stream element is an Import/Export/Defined stream (In this case: an Import arrow icon)
-             conIcon --> Clicking this icon is supposed to toggle between showing and hiding the "Connection Anchor Points" (Not implemented)
+             prop --> When clicked on this icon, a definition and related information of the Stream Element will
+             be displayed as an alert message
+             showIcon --> An icon that elucidates whether the dropped stream element is an Import/Export/Defined
+             stream (In this case: an Import arrow icon)
+             conIcon --> Clicking this icon is supposed to toggle between showing and hiding the
+             "Connection Anchor Points" (Not implemented)//TODO: implement this feature
             */
             var settingsIconId = ""+ i + "-dropStreamSettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">').append(prop);
+            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+                'class="element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
+                'class="element-close-icon collapse">').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -135,17 +148,18 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
         /**
          @function drop stream that is defined as the output stream in a query configuration
-         * @param position   position of selected query
-         * @param id    id of selected query
-         * @param outStream     name for new output stream
-         * @param streamAttributes      projections list for output stream
+         * @param position  position of selected query
+         * @param id  id of selected query
+         * @param outStream  name for new output stream
+         * @param streamAttributes  projections list for output stream
          */
-        dropElements.prototype.dropStreamFromQuery = function (position , id, outStream, streamAttributes) {
+        DropElements.prototype.dropStreamFromQuery = function (position , id, outStream, streamAttributes) {
             var self = this;
             var elementID = self.designGrid.getNewAgentId();
             var newAgent = $('<div>').attr('id', elementID).addClass('streamdrop');
 
-            // The container and the tool palette are disabled to prevent the user from dropping any elements before initializing a Stream Element
+            // The container and the tool palette are disabled to prevent the user from dropping any elements
+            // before initializing a Stream Element
             $("#grid-container").removeClass("disabledbutton");
             $("#tool-palette-container").removeClass("disabledbutton");
             $(self.container).append(newAgent);
@@ -178,15 +192,15 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
         /**
          * @function drop the query element on the canvas
-         * @param newAgent
-         * @param i
-         * @param droptype
-         * @param top
-         * @param left
-         * @param text
-         * @param isCodeToDesignMode //TODO: complete all javadoc comments
+         * @param newAgent new element
+         * @param i id of the element
+         * @param droptype type of the query
+         * @param top top position of the element
+         * @param left left position of the element
+         * @param text text to be displayed on the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
          */
-        dropElements.prototype.dropQuery = function (newAgent, i, droptype, top, left, text, isCodeToDesignMode) {
+        DropElements.prototype.dropQuery = function (newAgent, i, droptype, top, left, text, isCodeToDesignMode) {
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element everytime theuser changes it
@@ -294,13 +308,13 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
         /**
          * @function draw the simple query element ( passthrough, filter and window)
-         * @param newAgent
-         * @param i
-         * @param top
-         * @param left
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
          * @description allows single input stream and single output stream
          */
-        dropElements.prototype.dropSimpleQueryElement = function (newAgent, i, top, left) {
+        DropElements.prototype.dropSimpleQueryElement = function (newAgent, i, top, left) {
             var self = this;
             var finalElement =  newAgent;
             var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
@@ -336,14 +350,14 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
         /**
          * @function draw the pattern query element ( passthrough, filter and window)
-         * @param newAgent
-         * @param i
-         * @param top
-         * @param left
-         * @description allows mulitple input streams and single output stream
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
+         * @description allows multiple input streams and single output stream
          *
          */
-        dropElements.prototype.dropPatternQueryElement = function (newAgent, i, top, left) {
+        DropElements.prototype.dropPatternQueryElement = function (newAgent, i, top, left) {
             var self = this;
             var finalElement =  newAgent;
             var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
@@ -375,12 +389,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
         /**
          * @function draw the join query element on the canvas
-         * @param newAgent
-         * @param i
-         * @param top
-         * @param left
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
          */
-        dropElements.prototype.dropCompleteJoinQueryElement = function (newAgent, i, top, left) {
+        DropElements.prototype.dropCompleteJoinQueryElement = function (newAgent, i, top, left) {
             var self = this;
             var finalElement =  newAgent;
             var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
@@ -413,14 +427,14 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
         };
 
         /**
-         * @description draw the partition query on the canvas and add the event listeners for it
-         * @param newAgent
-         * @param i
-         * @param mouseTop
-         * @param mouseLeft
-         * @param isCodeToDesignMode
+         * @function draw the partition query on the canvas and add the event listeners for it
+         * @param newAgent new element
+         * @param i id of the element
+         * @param mouseTop top position of the element
+         * @param mouseLeft left position of the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
          */
-        dropElements.prototype.dropPartition = function (newAgent, i, mouseTop, mouseLeft, isCodeToDesignMode) {
+        DropElements.prototype.dropPartition = function (newAgent, i, mouseTop, mouseLeft, isCodeToDesignMode) {
             var self = this;
             var finalElement =  newAgent;
 
@@ -462,7 +476,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
             $(self.container).append(finalElement);
             _jsPlumb.addGroup({
-                el: $('#' + i),
+                el: $('#' + i)[0],
                 id: i,
                 droppable:true,
                 constrain:true,
@@ -470,7 +484,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 draggable:false
             });
 
-            if(isCodeToDesignMode) {
+            if(!isCodeToDesignMode) {
                 //add the new partition to the partition array
                 var partitionOptions = {};
                 _.set(partitionOptions, 'id', '');
@@ -484,14 +498,14 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
         /**
          * @function Drop a window stream on the canvas
-         * @param newAgent
-         * @param i
-         * @param topP
-         * @param left
-         * @param asName
+         * @param newAgent new element
+         * @param i id of the element
+         * @param topP top position of the element
+         * @param left left position of the element
+         * @param asName name of the window stream
          */
         // TODO: not updated (from earlier version)
-        dropElements.prototype.dropWindowStream = function (newAgent, i, topP, left, asName) {
+        DropElements.prototype.dropWindowStream = function (newAgent, i, topP, left, asName) {
             var self= this;
             /*
              The node hosts a text node where the Window's name, input by the user will be held.
@@ -543,7 +557,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @function Bind event listeners for the elements that are dropped.
          * @param newElement dropped element
          */
-        dropElements.prototype.registerElementEventListeners = function (newElement) {
+        DropElements.prototype.registerElementEventListeners = function (newElement) {
             var self = this;
             //register event listener to show configuration icons when mouse is over the element
             newElement.on( "mouseenter", function() {
@@ -584,5 +598,5 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             });
         };
 
-        return dropElements;
+        return DropElements;
     });
