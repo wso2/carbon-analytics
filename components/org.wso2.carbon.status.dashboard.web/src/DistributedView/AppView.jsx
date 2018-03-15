@@ -310,7 +310,6 @@ export default class AppView extends React.Component {
             </div>
         );
     }
-
 }
 
 

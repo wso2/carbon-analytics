@@ -1465,9 +1465,17 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 }
                                 int numberOfChildApp = appSummary.get(parentAppName).getChildApps() + 1;
                                 appSummary.get(parentAppName).setChildApps(numberOfChildApp);
-                                if (!appSummary.get(parentAppName).getUsedWorkerNode().contains(siddhiapp.getId())) {
-                                    appSummary.get(parentAppName).getUsedWorkerNode().add(siddhiapp.getId());
+                                // int deployedNodeCount = appSummary.get(parentAppName).getUsedWorkerNode().size();
+                                if (siddhiapp.getId() != null) {
+                                    if (!appSummary.get(parentAppName).getUsedWorkerNode()
+                                            .contains(siddhiapp.getId())) {
+                                        appSummary.get(parentAppName).getUsedWorkerNode().add(siddhiapp.getId());
+                                    }
+                                    logger.info("apping" + appSummary.get(parentAppName).getUsedWorkerNode());
+
                                 }
+
+
                             }
                             feign.Response resourceClusterWorkerDetails = WorkerServiceFactory.getWorkerHttpsClient
                                     (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword())
@@ -1482,6 +1490,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                         .put("numberOfGroups", Integer.toString(entry.getValue().getGroups().size()));
                                 parentAppDetail
                                         .put("numberOfChildApp", Integer.toString(entry.getValue().getChildApps()));
+                                logger.info("size" + entry.getValue().getUsedWorkerNode().size());
                                 parentAppDetail.put("usedWorkerNodes",
                                                     Integer.toString(entry.getValue().getUsedWorkerNode().size()));
                                 parentAppDetail.put("totalWorkerNodes", resourceClusterResponseBody);
@@ -1489,7 +1498,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             }
                             return Response.ok().entity(parentAppSummary).build();
                         } else {
-                            return Response.ok().entity("There is no siddhi app deployed in the manager node").build();
+                            String jsonErrorMessage = new Gson().toJson("There is no siddhi app deployed in the "
+                                                                                + "manager node");
+                            return Response.ok().entity(jsonErrorMessage).build();
                         }
                     } else if (managerResponse.status() == 401) {
                         String jsonString = new Gson().toJson(responseAppBody);

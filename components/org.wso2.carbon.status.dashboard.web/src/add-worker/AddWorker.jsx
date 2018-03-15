@@ -501,5 +501,4 @@ export default class AddWorker extends React.Component {
             );
         }
     }
-
 }
