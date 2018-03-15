@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require'],
-    function (require) {
+define(
+    function () {
 
     //TODO: remove unwanted requrirejs imports
         /**
