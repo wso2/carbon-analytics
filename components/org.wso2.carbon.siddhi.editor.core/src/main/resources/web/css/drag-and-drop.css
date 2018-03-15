@@ -30,6 +30,7 @@
     width: calc(100% - 75px);
     height: 100%;
     position: relative;
+    overflow: scroll; /* This should be applied to design-view-container once the two dedicated sour view/design view buttons are removed */
     background: linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
     linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
     linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
