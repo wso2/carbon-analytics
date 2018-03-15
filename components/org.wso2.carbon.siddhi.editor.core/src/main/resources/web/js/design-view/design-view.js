@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'app/tool-palette/tool-palette', 'designViewGrid'],
+define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid'],
     function (require, log, _, $, ToolPalette, DesignViewGrid) {
 
         /**

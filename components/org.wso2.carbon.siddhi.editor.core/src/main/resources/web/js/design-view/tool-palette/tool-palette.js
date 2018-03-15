@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'backbone', './tool', './tool-view'],
+define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palette/tool-view'],
     function (require, log, $, Backbone, Tool, ToolView) {
 
     var ToolPalette = Backbone.View.extend({

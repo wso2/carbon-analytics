@@ -15,9 +15,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'app/tool-palette/tool', 'app/tool-palette/tool-view', 'app/tool-palette/tool-group',
-        'app/tool-palette/tool-group-view', 'app/tool-palette/tool-palette'],
-    function (require, tool, toolView, toolGroup, toolGroupView, toolPaletteModel, toolPalette) {
+define(['require', 'tool_palette/tool', 'tool_palette/tool-view', 'tool_palette/tool-group',
+        'tool_palette/tool-group-view', 'tool_palette/tool-palette'],
+    function (require, tool, toolView, toolGroup, toolGroupView, toolPalette) {
         return  {
             Models: {
                 Tool: tool,
