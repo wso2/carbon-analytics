@@ -87,7 +87,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3', 'overl
                         nodeStyle: {
                             labelType: "html",
                             clusterLabelPos: "top",
-                            style: "fill: #e0e0d1"
+                            style: "fill: #434343"
                         },
                         cssClass: "partition"
                     },
@@ -202,6 +202,18 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3', 'overl
             }
 
             function createGraph() {
+                if (data.appName === null || data.appName === undefined || data.appName === "") {
+                    self.$siddhiAppName.html("SiddhiApp");
+                } else {
+                    self.$siddhiAppName.html(data.appName);
+                }
+
+                if (data.appDescription === null || data.appDescription === undefined || data.appDescription === "") {
+                    self.$siddhiAppDescription.html("Description of the plan");
+                } else {
+                    self.$siddhiAppDescription.html(data.appDescription);
+                }
+
                 var nodeOptions = self.renderOptions.nodeOptions;
                 var edgeOptions = self.renderOptions.edgeOptions;
 
@@ -316,18 +328,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3', 'overl
                         graph.setParent(child, group.id);
                     });
                 });
-
-                if (data.appName === null || data.appName === undefined || data.appName === "") {
-                    self.$siddhiAppName.html("SiddhiApp");
-                } else {
-                    self.$siddhiAppName.html(data.appName);
-                }
-
-                if (data.appDescription === null || data.appDescription === undefined || data.appDescription === "") {
-                    self.$siddhiAppDescription.html("Description of the plan");
-                } else {
-                    self.$siddhiAppDescription.html(data.appDescription);
-                }
 
                 var render = new dagreD3.render();
                 var graphId = "#" + self.$siddhiGraph.attr("id");
