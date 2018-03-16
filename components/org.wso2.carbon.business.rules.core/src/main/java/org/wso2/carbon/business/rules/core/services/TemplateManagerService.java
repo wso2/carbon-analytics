@@ -823,35 +823,27 @@ public class TemplateManagerService implements BusinessRulesService {
         } else {
             nodeList = getNodeListForBusinessRuleFromScratch(((BusinessRuleFromScratch) businessRule));
         }
-
         if (nodeList == null) {
             return TemplateManagerConstants.ERROR;
         }
-
         for (String nodeURL : nodeList) {
-            for (int i = 0; i < artifactCount; i++) {
-                String siddhiAppName = businessRule.getUuid() + "_" + i;
-                try {
-                    if (!isDeployedInNode(nodeURL, siddhiAppName)) {
-                        return TemplateManagerConstants.SAVED;
-                    }
-                } catch (SiddhiAppsApiHelperException e) {
-                    if (log.isDebugEnabled()) {
-                        log.error(String.format("Get status of the siddhi app %s failed.",
-                                removeCRLFCharacters(siddhiAppName)), e);
-                    }
-                    int queriedState = queryExecutor.executeRetrieveDeploymentStatus((businessRule.getUuid()));
-                    if (queriedState == TemplateManagerConstants.SAVED ||
-                            queriedState == TemplateManagerConstants.PARTIALLY_DEPLOYED ||
-                            queriedState == TemplateManagerConstants.PARTIALLY_UNDEPLOYED) {
+            if (businessRule instanceof BusinessRuleFromScratch) {
+                String siddhiAppName = businessRule.getUuid();
+                Integer queriedState = getSiddhiAppDeploymentState(businessRule.getUuid(), nodeURL, siddhiAppName);
+                if (queriedState != null) {
+                    return queriedState;
+                }
+            } else {
+                for (int i = 0; i < artifactCount; i++) {
+                    String siddhiAppName = businessRule.getUuid() + "_" + i;
+                    Integer queriedState = getSiddhiAppDeploymentState(businessRule.getUuid(), nodeURL, siddhiAppName);
+                    if (queriedState != null) {
                         return queriedState;
                     }
-                    return TemplateManagerConstants.DEPLOYMENT_FAILURE;
                 }
             }
             deployedNodesCount += 1;
         }
-
         if (deployedNodesCount == nodeList.size()) {
             return TemplateManagerConstants.DEPLOYED;
         } else if (deployedNodesCount == 0) {
@@ -859,6 +851,37 @@ public class TemplateManagerService implements BusinessRulesService {
         } else {
             return TemplateManagerConstants.PARTIALLY_DEPLOYED;
         }
+    }
+
+    /**
+     * Gets deployment state of the Siddhi app with the given name, which belongs to the business rule with the
+     * given UUID, under the given node
+     *
+     * @param businessRuleUUID                  UUID of the business rule
+     * @param nodeURL                           URL of the node in which, deployment is checked
+     * @param siddhiAppName                     Name of the Siddhi app, which should be checked for deployment status
+     * @return                                  Siddhi app's deployment status
+     * @throws BusinessRulesDatasourceException Exception in business rule data source
+     */
+    private Integer getSiddhiAppDeploymentState(String businessRuleUUID, String nodeURL, String siddhiAppName) throws BusinessRulesDatasourceException {
+        try {
+            if (!isDeployedInNode(nodeURL, siddhiAppName)) {
+                return TemplateManagerConstants.SAVED;
+            }
+        } catch (SiddhiAppsApiHelperException e) {
+            if (log.isDebugEnabled()) {
+                log.error(String.format("Get status of the siddhi app %s failed.",
+                        removeCRLFCharacters(siddhiAppName)), e);
+            }
+            int queriedState = queryExecutor.executeRetrieveDeploymentStatus(businessRuleUUID);
+            if (queriedState == TemplateManagerConstants.SAVED ||
+                    queriedState == TemplateManagerConstants.PARTIALLY_DEPLOYED ||
+                    queriedState == TemplateManagerConstants.PARTIALLY_UNDEPLOYED) {
+                return queriedState;
+            }
+            return TemplateManagerConstants.DEPLOYMENT_FAILURE;
+        }
+        return null;
     }
 
     /**
