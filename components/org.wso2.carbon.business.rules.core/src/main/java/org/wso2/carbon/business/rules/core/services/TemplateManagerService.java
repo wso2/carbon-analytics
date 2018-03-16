@@ -863,7 +863,8 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return                                  Siddhi app's deployment status
      * @throws BusinessRulesDatasourceException Exception in business rule data source
      */
-    private Integer getSiddhiAppDeploymentState(String businessRuleUUID, String nodeURL, String siddhiAppName) throws BusinessRulesDatasourceException {
+    private Integer getSiddhiAppDeploymentState(String businessRuleUUID, String nodeURL, String siddhiAppName)
+            throws BusinessRulesDatasourceException {
         try {
             if (!isDeployedInNode(nodeURL, siddhiAppName)) {
                 return TemplateManagerConstants.SAVED;
