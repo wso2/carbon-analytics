@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Component} from "react";
+import React, { Component } from "react";
 //App Components
 import VizG from 'react-vizgrammar';
 
@@ -35,19 +35,16 @@ export default class OverviewChart extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({data: nextProps.chartValue})
+        this.setState({ data: nextProps.chartValue })
     }
 
     render() {
         let configT = {
-            charts: [{type: 'arc', x: this.state.type, colorScale: [this.state.color, '#333333']}],
-            tooltip: {'enabled': false},
+            charts: [{ type: 'arc', x: this.state.type, colorScale: [this.state.color, '#333333'] }],
+            tooltip: { 'enabled': false },
             legend: false, percentage: true,
-            width: 300,
-            height: 300,
             labelColor: 'white',
-            innerRadius: 55,
-            labelFontSize:80,
+            labelFontSize: 90,
             style: {
                 fontSize: 12
             }
@@ -59,10 +56,7 @@ export default class OverviewChart extends Component {
         };
 
         return (
-            <div>
-                <VizG config={configT} metadata={metadata} data={[[this.state.data]]}/>
-            </div>
-
+            <VizG config={configT} metadata={metadata} data={[[this.state.data]]} width={600} height={600} />
         );
     }
 }
