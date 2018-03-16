@@ -828,8 +828,8 @@ public class TemplateManagerService implements BusinessRulesService {
         }
         for (String nodeURL : nodeList) {
             if (businessRule instanceof BusinessRuleFromScratch) {
-                String siddhiAppName = businessRule.getUuid();
-                Integer queriedState = getSiddhiAppDeploymentState(businessRule.getUuid(), nodeURL, siddhiAppName);
+                Integer queriedState = getSiddhiAppDeploymentState(businessRule.getUuid(), nodeURL,
+                        businessRule.getUuid());
                 if (queriedState != null) {
                     return queriedState;
                 }
