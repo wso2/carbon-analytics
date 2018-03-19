@@ -210,8 +210,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     return self._launcher;
                 },
 
-                isInSourceView: function(){
-                    return true;
+                isInSourceView: function () {
+                    return this._sourceView.isVisible();
                 }
 
             });

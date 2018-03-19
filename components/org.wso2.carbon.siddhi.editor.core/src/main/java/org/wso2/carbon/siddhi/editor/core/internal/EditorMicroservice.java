@@ -50,8 +50,6 @@ import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.EventFlow;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.SiddhiAppMap;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
@@ -59,7 +57,6 @@ import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
-import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 
 import java.io.File;
@@ -69,7 +66,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -91,7 +87,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -847,45 +842,6 @@ public class EditorMicroservice implements Microservice {
                                 .getSiddhiAppRuntimeHolder(siddhiAppName)
                                 .getStreamAttributes(streamName)
                 ).build();
-    }
-
-    /**
-     * Converts a given Siddhi App string to a specific JSON format for a graph that diagrammatically
-     * display's the Siddhi App to be generated in the Editor design view.
-     *
-     * @param siddhiAppBase64 The Siddhi App (encoded to Base64) to be converted to JSON
-     * @return The JSON result in a predefined format
-     */
-    @POST
-    @Path("/event-flow")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response constructEventFlowJsonString(String siddhiAppBase64) {
-        try {
-            String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
-
-            SiddhiAppMap siddhiAppMap = new SiddhiAppMap(siddhiAppString);
-            EventFlow eventFlow = new EventFlow(siddhiAppMap);
-
-            // The 'Access-Control-Allow-Origin' header must be set to '*' as this might be accessed
-            // by other domains in the future.
-            return Response.status(Response.Status.OK)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(eventFlow.getEventFlowJSON().toString())
-                    .build();
-        } catch (SiddhiAppCreationException e) {
-            log.error("Unable to generate graph view.", e);
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(e.getMessage())
-                    .build();
-        } catch (IllegalArgumentException e) {
-            log.error("Unable to construct event flow JSON string.", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(e.getMessage())
-                    .build();
-        }
     }
 
     /**

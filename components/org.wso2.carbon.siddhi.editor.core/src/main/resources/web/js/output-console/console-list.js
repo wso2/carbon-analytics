@@ -91,7 +91,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                     } else {
-                        activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
+                        //TODO: activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                     }
                 }
             },
@@ -113,7 +113,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                     } else {
-                        activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
+                        //TODO: activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                     }
                 }
             },

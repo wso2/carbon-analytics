@@ -42,7 +42,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                               if (self.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                                   self.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                               } else {
-                                  self.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
+                                  //TODO: self.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                               }
                           }
                     } );
