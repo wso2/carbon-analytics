@@ -31,10 +31,10 @@ public class SiddhiTopologyDataHolder {
 
     private String siddhiAppName;
     private String userDefinedSiddhiApp;
-    private Map<String, String> inMemoryMap;//InMemoryTables and Defined Windows using <StreamId,GroupName>
-    private Map<String, String> partitionKeyMap;//<streamID,PartitionKeyList>
-    private Map<String, List<String>> partitionGroupMap;//<streamID,GroupList>
-    private Map<String,String> partitionKeyGroupMap; //<PartitionKey+StreamID,GroupName>
+    private Map<String, String> inMemoryMap; //InMemoryTables and Defined Windows using <StreamId,GroupName>
+    private Map<String, String> partitionKeyMap; //<streamID,PartitionKeyList>
+    private Map<String, List<String>> partitionGroupMap; //<streamID,GroupList>
+    private Map<String, String> partitionKeyGroupMap; //<PartitionKey+StreamID,GroupName>
     private Map<String, SiddhiQueryGroup> siddhiQueryGroupMap;
 
     public SiddhiTopologyDataHolder(String siddhiAppName, String userDefinedSiddhiApp) {
@@ -47,15 +47,21 @@ public class SiddhiTopologyDataHolder {
         this.inMemoryMap = new HashMap<>();
     }
 
-    public Map<String, String> getPartitionKeyGroupMap() { return partitionKeyGroupMap; }
+    public Map<String, String> getPartitionKeyGroupMap() {
+
+        return partitionKeyGroupMap;
+    }
 
     public Map<String, String> getInMemoryMap() {
         return inMemoryMap;
     }
 
-    public String getSiddhiAppName() { return siddhiAppName; }
+    public String getSiddhiAppName() {
+        return siddhiAppName;
+    }
 
     public String getUserDefinedSiddhiApp() {
+
         return userDefinedSiddhiApp;
     }
 
@@ -67,8 +73,7 @@ public class SiddhiTopologyDataHolder {
         return partitionKeyMap;
     }
 
-    public Map<String,List<String>> getPartitionGroupMap() {
+    public Map<String, List<String>> getPartitionGroupMap() {
         return partitionGroupMap;
     }
-
 }

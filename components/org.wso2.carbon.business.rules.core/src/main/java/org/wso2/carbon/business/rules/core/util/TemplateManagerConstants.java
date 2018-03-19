@@ -62,6 +62,10 @@ public class TemplateManagerConstants {
     public static final int DEPLOYMENT_FAILURE = 4;
     public static final int ERROR = 5;
 
+    public static final int SIDDHI_APP_UNREACHABLE = -1;
+    public static final int SIDDHI_APP_NOT_DEPLOYED = 0;
+    public static final int SIDDHI_APP_DEPLOYED = 1;
+
     public static final int SUCCESSFULLY_DELETED = 6;
     public static final int SCRIPT_EXECUTION_ERROR = 7;
 

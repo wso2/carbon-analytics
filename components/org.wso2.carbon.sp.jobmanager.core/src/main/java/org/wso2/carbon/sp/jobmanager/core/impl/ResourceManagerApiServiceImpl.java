@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.sp.jobmanager.core.api.ApiResponseMessage;
-import org.wso2.carbon.sp.jobmanager.core.api.NotFoundException;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApiService;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.HeartbeatResponse;
@@ -40,17 +39,20 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
+/**
+ * API implementation for resource manager.
+ */
 public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
     private static final Logger LOG = Logger.getLogger(ResourceManagerApiServiceImpl.class);
 
     @Override
-    public Response getDeployment() throws NotFoundException {
+    public Response getDeployment() {
         // TODO: 10/31/17 To be implemented.
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "To be implement.")).build();
     }
 
     @Override
-    public Response updateHeartbeat(NodeConfig nodeConfig) throws NotFoundException {
+    public Response updateHeartbeat(NodeConfig nodeConfig) {
         if (ServiceDataHolder.getCoordinator() == null) { // When clustering is disabled
             ManagerNode leaderNode = ServiceDataHolder.getLeaderNode();
             if (leaderNode == null) {
@@ -63,7 +65,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                 String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
                 ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourcePool(groupId);
                 ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
-                        : new ResourcePool(groupId));
+                                                          : new ResourcePool(groupId));
                 ServiceDataHolder.getResourcePool().init();
                 LOG.info(ServiceDataHolder.getCurrentNode() + " is the leader of the resource pool.");
             }
@@ -71,9 +73,9 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             return Response
                     .status(Response.Status.NO_CONTENT)
                     .entity(new HeartbeatResponse()
-                            .connectedManagers(null)
-                            .joinedState(null)
-                            .leader(null))
+                                    .connectedManagers(null)
+                                    .joinedState(null)
+                                    .leader(null))
                     .build();
         }
         if (ServiceDataHolder.isLeader()) {
@@ -144,17 +146,17 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             return Response
                     .ok()
                     .entity(new HeartbeatResponse()
-                            .connectedManagers(connectedManagers)
-                            .joinedState(joinedState)
-                            .leader(leader))
+                                    .connectedManagers(connectedManagers)
+                                    .joinedState(joinedState)
+                                    .leader(leader))
                     .build();
         } else {
             return Response
                     .status(Response.Status.MOVED_PERMANENTLY)
                     .entity(new HeartbeatResponse()
-                            .connectedManagers(null)
-                            .joinedState(null)
-                            .leader(TypeConverter.convert(ServiceDataHolder.getLeaderNode())))
+                                    .connectedManagers(null)
+                                    .joinedState(null)
+                                    .leader(TypeConverter.convert(ServiceDataHolder.getLeaderNode())))
                     .build();
         }
     }

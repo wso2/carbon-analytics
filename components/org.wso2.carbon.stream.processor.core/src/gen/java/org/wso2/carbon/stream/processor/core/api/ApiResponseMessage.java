@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @javax.xml.bind.annotation.XmlRootElement
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-        date = "2017-03-15T08:56:59.657Z")
+                            date = "2017-03-15T08:56:59.657Z")
 public class ApiResponseMessage {
 
     public static final String CONFLICT = "conflict";

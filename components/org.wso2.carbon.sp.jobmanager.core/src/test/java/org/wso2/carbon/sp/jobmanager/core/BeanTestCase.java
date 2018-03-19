@@ -18,8 +18,8 @@ package org.wso2.carbon.sp.jobmanager.core;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.wso2.carbon.sp.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
-import org.wso2.carbon.sp.jobmanager.core.appCreator.DistributedSiddhiQuery;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.DeployableSiddhiQueryGroup;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.DistributedSiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig;
@@ -83,7 +83,8 @@ public class BeanTestCase {
         Assert.assertEquals(deploymentConfig.getType(), "distributed");
         Assert.assertEquals(deploymentConfig.getHttpInterface().getHost(), "localhost");
         Assert.assertEquals(deploymentConfig.getHttpInterface().getPort(), 9091);
-        Assert.assertEquals(deploymentConfig.getHttpInterface().toString(), "Interface { host: localhost, port: 9091 }");
+        Assert.assertEquals(deploymentConfig.getHttpInterface().toString(),
+                            "Interface { host: localhost, port: 9091 }");
 
         InterfaceConfig similarInterfaceConfig = new InterfaceConfig();
         similarInterfaceConfig.setHost("localhost");
@@ -191,7 +192,8 @@ public class BeanTestCase {
         interfaceConfig.setHost("localhost");
         interfaceConfig.setPort(9091);
         ResourceNode resourceNode = new ResourceNode("resource-1");
-        SiddhiAppHolder siddhiAppHolder = new SiddhiAppHolder("parentAppName", "group-1", "app-1",
+        SiddhiAppHolder siddhiAppHolder = new SiddhiAppHolder(
+                "parentAppName", "group-1", "app-1",
                 "@App:name('app-1')", resourceNode);
         Assert.assertEquals(siddhiAppHolder.getParentAppName(), "parentAppName");
         Assert.assertEquals(siddhiAppHolder.getGroupName(), "group-1");
@@ -213,10 +215,15 @@ public class BeanTestCase {
 
         Assert.assertFalse(siddhiAppHolder.equals(null));
         Assert.assertTrue(siddhiAppHolder.equals(siddhiAppHolder));
-        Assert.assertFalse(siddhiAppHolder.equals(new SiddhiAppHolder("parent2AppName", null, null, null, null)));
-        Assert.assertFalse(siddhiAppHolder.equals(new SiddhiAppHolder("parent2AppName", "group-2", null, null, null)));
-        Assert.assertFalse(siddhiAppHolder.equals(new SiddhiAppHolder("parent2AppName", "group-2", "app-2", null, null)));
-        Assert.assertTrue(siddhiAppHolder.equals(new SiddhiAppHolder("parent2AppName", "group-2", "app-2", "@App:name('app-2')", null)));
-
+        Assert.assertFalse(siddhiAppHolder.equals(new SiddhiAppHolder(
+                "parent2AppName", null, null, null, null)));
+        Assert.assertFalse(siddhiAppHolder.equals(
+                new SiddhiAppHolder("parent2AppName", "group-2", null, null,
+                                    null)));
+        Assert.assertFalse(siddhiAppHolder.equals(new SiddhiAppHolder(
+                "parent2AppName", "group-2", "app-2", null, null)));
+        Assert.assertTrue(siddhiAppHolder.equals(new SiddhiAppHolder(
+                "parent2AppName", "group-2", "app-2",
+                "@App:name('app-2')", null)));
     }
 }

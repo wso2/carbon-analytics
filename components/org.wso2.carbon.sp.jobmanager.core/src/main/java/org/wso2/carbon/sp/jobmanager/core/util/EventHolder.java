@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.sp.jobmanager.core.util;
 
+/**
+ * Details of Event Holder.
+ */
 public enum EventHolder {
     STREAM,
     INMEMORYTABLE,

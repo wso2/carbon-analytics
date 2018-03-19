@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.sp.jobmanager.core.appCreator;
+package org.wso2.carbon.sp.jobmanager.core.appcreator;
 
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
@@ -33,9 +33,9 @@ import org.wso2.carbon.sp.jobmanager.core.exception.ResourceManagerException;
  */
 class SafeZkClient {
 
+    private static final Logger log = Logger.getLogger(SafeZkClient.class);
     private ZkClient zkClient;
     private ZkUtils zkUtils;
-    private static final Logger log = Logger.getLogger(SafeZkClient.class);
 
     /**
      * Creates a new Zookeeper client for the specified server URL.

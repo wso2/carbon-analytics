@@ -50,6 +50,8 @@ import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.EventFlow;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.SiddhiAppMap;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
@@ -57,6 +59,7 @@ import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
+import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 
 import java.io.File;
@@ -66,6 +69,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -87,6 +91,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -386,7 +391,7 @@ public class EditorMicroservice implements Microservice {
             }
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            java.nio.file.Path filePath =  SecurityUtil.resolvePath(
+            java.nio.file.Path filePath = SecurityUtil.resolvePath(
                     Paths.get(location).toAbsolutePath(),
                     Paths.get(new String(base64ConfigName, Charset.defaultCharset())));
             Files.write(filePath, base64Config);
@@ -518,7 +523,7 @@ public class EditorMicroservice implements Microservice {
             errorMap.put("Error", "File access denied. You don't have enough permission to access");
             return Response.serverError().entity(errorMap)
                     .build();
-        }catch (IOException e) {
+        } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
@@ -530,7 +535,7 @@ public class EditorMicroservice implements Microservice {
     @DELETE
     @Path("/workspace/delete")
     @Produces("application/json")
-    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName,@QueryParam("relativePath") String
+    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName, @QueryParam("relativePath") String
             relativePath) {
         try {
             java.nio.file.Path location = SecurityUtil.
@@ -845,6 +850,45 @@ public class EditorMicroservice implements Microservice {
     }
 
     /**
+     * Converts a given Siddhi App string to a specific JSON format for a graph that diagrammatically
+     * display's the Siddhi App to be generated in the Editor design view.
+     *
+     * @param siddhiAppBase64 The Siddhi App (encoded to Base64) to be converted to JSON
+     * @return The JSON result in a predefined format
+     */
+    @POST
+    @Path("/event-flow")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response constructEventFlowJsonString(String siddhiAppBase64) {
+        try {
+            String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
+
+            SiddhiAppMap siddhiAppMap = new SiddhiAppMap(siddhiAppString);
+            EventFlow eventFlow = new EventFlow(siddhiAppMap);
+
+            // The 'Access-Control-Allow-Origin' header must be set to '*' as this might be accessed
+            // by other domains in the future.
+            return Response.status(Response.Status.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(eventFlow.getEventFlowJSON().toString())
+                    .build();
+        } catch (SiddhiAppCreationException e) {
+            log.error("Unable to generate graph view.", e);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            log.error("Unable to construct event flow JSON string.", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        }
+    }
+
+    /**
      * This is the activation method of EditorMicroservice. This will be called when its references are
      * satisfied.
      *
@@ -863,17 +907,6 @@ public class EditorMicroservice implements Microservice {
 
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new DebuggerEventStreamService(), null);
-    }
-
-    @POST
-    @Path("/event-flow")
-    public Response constructEventFlowJsonString(String siddhiAppString) {
-        String jsonString = "{}";
-
-
-
-        return Response.ok(jsonString, MediaType.APPLICATION_JSON)
-                .build();
     }
 
     /**

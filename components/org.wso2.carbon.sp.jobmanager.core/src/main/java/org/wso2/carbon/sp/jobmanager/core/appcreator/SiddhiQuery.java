@@ -16,8 +16,11 @@
  * under the License.
  */
 
-package org.wso2.carbon.sp.jobmanager.core.appCreator;
+package org.wso2.carbon.sp.jobmanager.core.appcreator;
 
+/**
+ * Gives details about siddhi application.
+ */
 public class SiddhiQuery {
     private String appName;
     private String app;

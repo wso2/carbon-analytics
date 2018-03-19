@@ -140,16 +140,17 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 this.listenTo(fileBrowser, 'selected', function (selectedLocation) {
                     var pathAttributes = selectedLocation.split(self.pathSeparator);
                     var fileName = _.last(pathAttributes);
+                    var sampleOpenButton = sampleFileOpen.find("button").filter("#openButton");
                     self._artifactName = pathAttributes[pathAttributes.length - 2];
 
                     if(selectedLocation && fileName.lastIndexOf(".siddhi") != -1){
                         location.val(fileName);
-                        $("#openButton").prop({
+                        sampleOpenButton.prop({
                             disabled: false
                         });
                     } else {
                         location.val('');
-                        $("#openButton").prop({
+                        sampleOpenButton.prop({
                             disabled: true
                         });
                     }

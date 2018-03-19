@@ -152,7 +152,7 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
         };
 
         SourceView.prototype.isVisible = function(){
-            return  $(this._container).is(':visible')
+            return  $("#" + this._container).is(':visible');
         };
 
         SourceView.prototype.format = function (doSilently) {

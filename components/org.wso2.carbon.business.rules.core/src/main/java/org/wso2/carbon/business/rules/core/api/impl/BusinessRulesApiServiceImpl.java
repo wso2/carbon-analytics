@@ -17,6 +17,9 @@
  */
 package org.wso2.carbon.business.rules.core.api.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
@@ -34,21 +37,18 @@ import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundExcept
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 import org.wso2.msf4j.Request;
+import sun.rmi.transport.ObjectTable;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.ws.rs.core.Response;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 /**
  * Implementation of business rules REST API
@@ -347,6 +347,49 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add("Loaded business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(businessRule);
             return Response.ok().entity(gson.toJson(responseData)).build();
+        } catch (TemplateManagerServiceException e) {
+            log.error(String.format("Failed to load business rule with uuid %s ",
+                    LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
+            responseData.add("Failed to load");
+            responseData.add("Failed to load business rule with uuid '" + businessRuleInstanceID + "'");
+            responseData.add(new String[]{});
+            return Response.serverError().entity(gson.toJson(responseData)).build();
+        }
+    }
+
+    @Override
+    public Response loadDeploymentInfo(Request request, String businessRuleInstanceID) throws NotFoundException {
+        if (!hasPermission(request, RequestMethod.LOAD_BUSINESS_RULE)) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        List<Object> responseData = new ArrayList<>();
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        try {
+            List<Map<String, Object>> deploymentInfo =
+                    templateManagerService.loadDeploymentInfo(businessRuleInstanceID);
+            if (deploymentInfo == null) {
+                String message = String.format("No deployed nodes found for business rule with uuid %s",
+                        LogEncoder.removeCRLFCharacters(businessRuleInstanceID));
+                log.error(message);
+                responseData.add("No Deployed Nodes Found");
+                responseData.add(message);
+                responseData.add(null);
+                return Response.serverError().entity(gson.toJson(responseData)).build();
+            }
+            responseData.add("Retreived Business Rule Deployment Information");
+            responseData.add("Retreived nodewise Siddhi App deployment information for '" +
+                    businessRuleInstanceID + "'");
+            responseData.add(deploymentInfo);
+            return Response.ok().entity(gson.toJson(responseData)).build();
+        } catch (BusinessRulesDatasourceException e) {
+            String message = String.format("Unable to find Siddhi apps from the business rule with uuid %s",
+                    LogEncoder.removeCRLFCharacters(businessRuleInstanceID));
+            log.error(message, e);
+            responseData.add("Unable to find Siddhi Apps");
+            responseData.add(message);
+            responseData.add(null);
+            return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
             log.error(String.format("Failed to load business rule with uuid %s ",
                     LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);

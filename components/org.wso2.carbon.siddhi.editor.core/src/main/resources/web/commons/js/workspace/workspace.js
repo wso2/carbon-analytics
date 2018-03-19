@@ -510,7 +510,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     this._exportFileDialog = new Dialogs.export_file_dialog(app);
                 }
                 this._exportFileDialog.render();
-                this._exportFileDialog.show();
             };
 
             this.handleExport = function(options) {

@@ -17,15 +17,16 @@
  */
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import IconButton from 'material-ui/IconButton';
 import RefreshIcon from 'material-ui-icons/Refresh';
 import EditIcon from 'material-ui-icons/Edit';
 import DeleteIcon from 'material-ui-icons/Delete';
-import { TableCell, TableRow } from 'material-ui/Table';
+import {TableCell, TableRow} from 'material-ui/Table';
 import Tooltip from 'material-ui/Tooltip';
 import VisibilityIcon from 'material-ui-icons/Visibility';
+import DnsIcon from 'material-ui-icons/Dns';
 // App Constants
 import BusinessRulesConstants from '../constants/BusinessRulesConstants';
 // CSS
@@ -117,6 +118,12 @@ class BusinessRule extends React.Component {
             // Manager permissions
             actionButtonsCell =
                 <TableCell>
+                    <Tooltip id="tooltip-right" title="Deployment Info" placement="right-end">
+                        <IconButton aria-label="View" onClick={() => this.props.showDeploymentInfo(this.props.uuid)}>
+                            <DnsIcon/>
+                        </IconButton>
+                    </Tooltip>
+                    &nbsp;
                     <Tooltip id="tooltip-right" title="View" placement="right-end">
                         <Link
                             to={appContext + '/businessRuleFrom' + (this.props.type.charAt(0).toUpperCase() +
@@ -156,6 +163,12 @@ class BusinessRule extends React.Component {
             // Viewer permissions only
             actionButtonsCell =
                 <TableCell>
+                    <Tooltip id="tooltip-right" title="Deployment Info" placement="right-end">
+                        <IconButton aria-label="View" onClick={() => this.props.showDeploymentInfo(this.props.uuid)}>
+                            <DnsIcon/>
+                        </IconButton>
+                    </Tooltip>
+                    &nbsp;
                     <Tooltip id="tooltip-right" title="View" placement="right-end">
                         <Link
                             to={appContext + '/businessRuleFrom' +
