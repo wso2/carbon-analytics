@@ -25,8 +25,9 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          * @class DesignView  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view
          * @param application Application data
+         * @param siddhiAppContent Siddhi application content
          */
-        var DesignView = function (options, application) {
+        var DesignView = function (options, application, siddhiAppContent) {
             var errorMessage1 = 'unable to find design view container in design-view.js';
             var errorMessage2 = 'unable to find application in design-view.js';
             if (!_.has(options, 'container')) {
@@ -44,6 +45,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             }
             this._$parent_el = container;
             this.options = options;
+            this.siddhiAppContent = siddhiAppContent;
             this.application = application;
         };
 
@@ -85,6 +87,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             }
             var designViewGridOpts = {};
             _.set(designViewGridOpts, 'container', designViewGridContainer);
+            _.set(designViewGridOpts, 'appData', this.siddhiAppContent);
             _.set(designViewGridOpts, 'application', this.application);
             var designViewGrid = new DesignViewGrid(designViewGridOpts);
             designViewGrid.render();

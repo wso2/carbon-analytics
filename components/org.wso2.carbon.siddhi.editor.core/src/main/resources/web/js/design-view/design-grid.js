@@ -15,9 +15,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'appData', 'dagre'],
+define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'dagre'],
 
-    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, AppData, dagre) {
+    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre) {
 
         var constants = {
             STREAM: 'streamdrop',
@@ -48,6 +48,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 throw errorMessage;
             }
             this.options = options;
+            this.appData = this.options.appData;
             this.container = this.options.container;
             this.application = this.options.application;
         };
@@ -59,7 +60,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             this.newAgentId = 1;
             // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
             this.finalElementCount = 0;
-            this.appData = new AppData();
             var dropElementsOpts = {};
             _.set(dropElementsOpts, 'container', self.container);
             _.set(dropElementsOpts, 'appData', self.appData);

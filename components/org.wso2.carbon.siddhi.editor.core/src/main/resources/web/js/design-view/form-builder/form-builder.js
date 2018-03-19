@@ -39,7 +39,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
         };
 
         /**
-         * @class AppData
+         * @class FormBuilder
          * @constructor
          * @class DesignView  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view

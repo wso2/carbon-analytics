@@ -17,10 +17,10 @@
  */
 
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager','launcher','app/debugger/debugger'],
+        'undo_manager','launcher','app/debugger/debugger', 'appData'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants,UndoManager,Launcher,
-        DebugManager) {
+        DebugManager, AppData) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -128,8 +128,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     var sourceViewBtn = this._$parent_el.find(_.get(this.options, 'toggle_controls.sourceIcon'));
                     var designViewBtn = this._$parent_el.find(_.get(this.options, 'toggle_controls.designIcon'));
-                    var applicationData = this.options.application;
-                    this.designView = new DesignView(this.options, applicationData);
+                    var application = this.options.application;
+                    this.siddhiAppContent = new AppData();
+                    this.designView = new DesignView(this.options, application, this.siddhiAppContent);
                     this.designView.render();
                     this.sourceContainer = sourceContainer;
                     this.designViewContainer = this.designView.getDesignViewContainer();
