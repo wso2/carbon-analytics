@@ -89,7 +89,7 @@ public class Constants {
             getDataDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator +
                     "local-shard-replica-config.conf";
     public static final String MY_NODEID_LOCATION = getDataDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) +
-            "my-node-id.dat";
+            File.separator + "my-node-id.dat";
     public static final String DEPRECATED_LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION =
             getConfDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator + "analytics" +
                     File.separator + "local-shard-allocation-config.conf";
