@@ -49,11 +49,12 @@ define(
          * @param {number} elementId id of the element to be removed.
          */
         ElementArray.prototype.removeElement = function (elementId) {
-            this.every(function(element){
+            var self = this;
+            self.every(function(element){
                 if (element.id === elementId) {
-                    var index = this.indexOf(element);
+                    var index = self.indexOf(element);
                     if (index > -1) {
-                        this.splice(index, 1);
+                        self.splice(index, 1);
                     }
                 }
             });

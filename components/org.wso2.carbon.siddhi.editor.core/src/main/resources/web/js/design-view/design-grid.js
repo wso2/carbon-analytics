@@ -73,7 +73,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             /**
              * @description jsPlumb function opened
              */
-
             _jsPlumb.ready(function() {
 
                 _jsPlumb.importDefaults({
@@ -98,8 +97,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     Connector: ["Bezier", {curviness: 50}]
                 });
                 _jsPlumb.setContainer($(self.container));
-
-
 
                 /**
                  * @function droppable method for the 'stream' & the 'query' objects
@@ -187,7 +184,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 var source = connection.sourceId;
                 var sourceId = parseInt(source.substr(0, source.indexOf('-')));
                 var sourceElement = $('#'+sourceId);
-
 
                 // avoid the expose of inner-streams outside the group
                 if( sourceElement.hasClass(constants.STREAM) && _jsPlumb.getGroupFor(sourceId) !== undefined ){
@@ -546,11 +542,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 var queries = partition.getQueries();
                 if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PASS_THROUGH)
                     || $(event.el).hasClass(constants.WINDOW_QUERY)) {
-                    queries.push(self.appData.getQuery($(event.el).attr('id')));
+                    queries.push(self.appData.getQuery(parseInt($(event.el).attr('id'))));
                     partition.setQueries(queries);
                 }
                 else if($(event.el).hasClass(constants.JOIN)) {
-                    queries.push(self.appData.getJoinQuery($(event.el).attr('id')));
+                    queries.push(self.appData.getJoinQuery(parseInt($(event.el).attr('id'))));
                     partition.setQueries(queries);
                 }
             });
@@ -632,7 +628,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the stream element. Inside this a it generates the stream definition form.
             self.dropElements.dropStream(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode,
                 false, streamName);
-            self.finalElementCount = self.newAgentId;
+            self.finalElementCount++;
             self.newAgentId++;    // Increment the Element ID for the next dropped Element
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -643,7 +639,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropWindowStream(newAgent, self.newAgentId, mouseTop, mouseLeft ,"Window",
                 isCodeToDesignMode);
-            self.finalElementCount = self.newAgentId;
+            self.finalElementCount++;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -655,7 +651,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
                 isCodeToDesignMode);
-            self.finalElementCount = self.newAgentId;
+            self.finalElementCount++;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -667,7 +663,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
                 isCodeToDesignMode);
-            self.finalElementCount = self.newAgentId;
+            self.finalElementCount++;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -679,7 +675,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
                 isCodeToDesignMode);
-            self.finalElementCount=self.newAgentId;
+            self.finalElementCount++;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -691,7 +687,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Join Query",
                 isCodeToDesignMode);
-            self.finalElementCount = self.newAgentId;
+            self.finalElementCount++;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -703,7 +699,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Pattern Query",
                 isCodeToDesignMode);
-            self.finalElementCount = self.newAgentId;
+            self.finalElementCount++;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -713,7 +709,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var newAgent = $('<div>').attr('id', self.newAgentId).addClass('partitiondrop');
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropPartition(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode);
-            self.finalElementCount = self.newAgentId;
+            self.finalElementCount++;
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };

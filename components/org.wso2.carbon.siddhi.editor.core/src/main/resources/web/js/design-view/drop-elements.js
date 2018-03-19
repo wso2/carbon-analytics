@@ -28,7 +28,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             JOIN : 'joquerydrop',
             WINDOW_QUERY : 'wquerydrop',
             PATTERN : 'stquerydrop',
-            WINDOW_STREAM :'',
+            WINDOW_STREAM :'', //TODO: implement this
             PARTITION :'partitiondrop'
         };
 
@@ -185,7 +185,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             var query = self.appData.getQuery(id);
             query.setInsertInto(elementID);
             // increment the variable newAgentId and the final element count
-            self.designGrid.setFinalElementCount(elementID);
+            var finalElementCount = self.designGrid.getFinalElementCount() + 1;
+            self.designGrid.setFinalElementCount(finalElementCount);
             self.designGrid.setNewAgentId(elementID+1);
             self.registerElementEventListeners(newAgent);
         };
@@ -488,8 +489,11 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 //add the new partition to the partition array
                 var partitionOptions = {};
                 _.set(partitionOptions, 'id', '');
-                _.set(partitionOptions, 'partition', '');
-                _.set(partitionOptions, 'queries', '');
+                _.set(partitionOptions, 'partition', {
+                    // this will contain json objects { stream : '', property :''}
+                    "with" :[]
+                });
+                _.set(partitionOptions, 'queries', []);
                 var newPartition = new Partition(partitionOptions);
                 newPartition.setId(i);
                 self.appData.AddPartition(newPartition);
@@ -577,24 +581,54 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
             //register event listener to remove the element when the close icon is clicked
             newElement.on('click', '.element-close-icon', function () {
-                //TODO: check these remove events
-                //TODO: update the final element count (check whether it is needed)
+                var elementId = parseInt(newElement[0].id);
+
+                if (newElement.hasClass('streamdrop')) {
+                    self.appData.streamList.removeElement(elementId);
+
+                } else if (newElement.hasClass('squerydrop')) {
+                    self.appData.queryList.removeElement(elementId);
+                    self.appData.passThroughList.removeElement(elementId);
+
+                } else if (newElement.hasClass('filterdrop')) {
+                    self.appData.queryList.removeElement(elementId);
+                    self.appData.filterList.removeElement(elementId);
+
+                } else if (newElement.hasClass('joquerydrop')) {
+                    self.appData.queryList.removeElement(elementId);
+                    self.appData.joinQueryList.removeElement(elementId);
+
+                } else if (newElement.hasClass('wquerydrop')) {
+                    self.appData.queryList.removeElement(elementId);
+                    self.appData.windowQueryList.removeElement(elementId);
+
+                } else if (newElement.hasClass('stquerydrop')) {
+                    self.appData.queryList.removeElement(elementId);
+                    self.appData.patternList.removeElement(elementId);
+
+                } else if (newElement.hasClass('partitiondrop')) {
+                    self.appData.partitionList.removeElement(elementId);
+
+                } else if (newElement.hasClass('windowStream')) {
+                    //TODO: implement this
+                }
                 if(_jsPlumb.getGroupFor(newElement)){
-                    var queries = self.appData.getPartition(_jsPlumb.getGroupFor(newElement)).getQueries();//TODO: check id[_jsPlumb.getGroupFor(newElement)] in here
+                    var queries = self.appData.getPartition(_jsPlumb.getGroupFor(newElement).id).getQueries();
                     var removedQueryIndex = null;
                     $.each( queries , function (index, query) {
-                        if(query.getId() === $(newElement).attr('id')){//TODO: check id in here
+                        if(query.getId() === parseInt($(newElement).attr('id'))){
                             removedQueryIndex = index;
                         }
                     });
                     queries.splice(removedQueryIndex,1);
-                    self.appData.getPartition(_jsPlumb.getGroupFor(newElement)).setQueries(queries);
+                    self.appData.getPartition(_jsPlumb.getGroupFor(newElement).id).setQueries(queries);
                     _jsPlumb.remove(newElement);
                     _jsPlumb.removeFromGroup(newElement);
-                }
-                else{
+                } else {
                     _jsPlumb.remove(newElement);
                 }
+                var finalElementCount = self.designGrid.getFinalElementCount() - 1;
+                self.designGrid.setFinalElementCount(finalElementCount);
             });
         };
 
