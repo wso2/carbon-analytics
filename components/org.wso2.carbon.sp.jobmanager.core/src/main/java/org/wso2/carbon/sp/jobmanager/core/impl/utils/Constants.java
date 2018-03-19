@@ -35,6 +35,14 @@ public class Constants {
     public static final String LONG_TYPE = "longType";
     public static final String FLOAT_TYPE = "floatType";
     public static final String BOOL_TYPE = "booleanType";
+    public static final String ACTIVE = "Active";
+    public static final String PASIVE = "pasive";
+    public static final String WAITING = "waiting";
+
+    public static final String KAFKA_SOURCE = "source";
+    public static final String KAFKA_SOURCE_TOPIC_LIST = "topic.list";
+    public static final String KAFKA_SINK = "sink";
+    public static final String KAFKA_SINK_TOPIC = "topic";
 
     private Constants() {
         //preventing initialization

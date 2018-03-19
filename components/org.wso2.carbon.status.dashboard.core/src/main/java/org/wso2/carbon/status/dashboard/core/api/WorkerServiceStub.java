@@ -90,4 +90,8 @@ public interface WorkerServiceStub {
     @RequestLine("GET /managers/siddhi-apps/{appName}")
     Response getChildAppDetails(@Param("appName") String appName);
 
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers/kafkaDetails/{appName}")
+    Response getKafkaDetails(@Param("appName") String appName);
+
 }

@@ -689,7 +689,6 @@ public class MonitoringRESTApi implements Microservice {
         return workersApi.getChildAppsDetails(id, appName, getUserName(request));
     }
 
-    //todo:testing
     @GET
     @Path("/manager/{id}/siddhi-apps/{appName}/child-apps/transport")
     @Produces({"application/json"})

@@ -35,7 +35,6 @@ import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
 import org.wso2.carbon.status.dashboard.core.api.MonitoringApiService;
 import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkerServiceFactory;
-import org.wso2.carbon.status.dashboard.core.bean.ChildApps;
 import org.wso2.carbon.status.dashboard.core.bean.ManagerClusterInfo;
 import org.wso2.carbon.status.dashboard.core.bean.ManagerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.ParentSiddhiApp;
@@ -69,7 +68,6 @@ import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1953,20 +1951,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 String managerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
                 try {
                     feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient
-                            (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword())
-                            .getChildAppDetails(appName);
+                            (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword()).getKafkaDetails
+                            (appName);
                     String responseBody = managerResponse.body().toString();
                     if (managerResponse.status() == 200) {
-                        List<ChildApps> childAppsList = gson.fromJson(responseBody, new TypeToken<List<ChildApps>>() {
-                        }
-                                .getType());
-                        if (!childAppsList.isEmpty()) {
-                            for (ChildApps child : childAppsList) {
-                                //  logger.info(Arrays.toString(child.getSiddhiApp().split(",")));
-                                logger.info(Arrays.toString(child.getSiddhiApp().split(",")));
-                            }
-                        }
-                        return Response.ok().entity(childAppsList).build();
+                        return Response.ok().entity(responseBody).build();
                     } else if (managerResponse.status() == 401) {
                         String jsonString = new Gson().toJson(responseBody);
                         return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();

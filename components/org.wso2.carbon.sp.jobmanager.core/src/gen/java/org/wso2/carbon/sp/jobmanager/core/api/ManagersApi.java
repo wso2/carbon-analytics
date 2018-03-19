@@ -215,4 +215,27 @@ public class ManagersApi implements Microservice {
             throws NotFoundException {
         return managersApi.getRolesByUsername(request, permissionSuffix);
     }
+
+    @GET
+    @Path("/kafkaDetails/{appName}")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get the details of child siddhi apps",
+                                         notes = "Retrieves the details of child siddhi apps with the specified "
+                                                 + "parent siddhi app name.",
+                                         response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Child app details fully retrieved.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The parent application is not found.",
+                                                response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpexted error occured.",
+                                                response = void.class)})
+    public Response getKafkaDetails(
+            @Context Request request,
+            @ApiParam(value = "name of the parent siddhi app.", required = true)
+            @PathParam("appName") String appName) throws NotFoundException {
+        return managersApi.getKafkaDetails(appName, request);
+    }
 }

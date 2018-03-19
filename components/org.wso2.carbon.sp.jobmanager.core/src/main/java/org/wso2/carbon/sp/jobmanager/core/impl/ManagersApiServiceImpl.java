@@ -46,6 +46,11 @@ import org.wso2.carbon.sp.jobmanager.core.model.ManagerDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppHolder;
 import org.wso2.msf4j.Request;
+import org.wso2.siddhi.query.api.SiddhiApp;
+import org.wso2.siddhi.query.api.annotation.Annotation;
+import org.wso2.siddhi.query.api.annotation.Element;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -148,7 +153,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     }
 
 
-
     /***
      * This method is to list down all the manager's details that are belongs to the same cluster
      * @return :Manager's host and the port
@@ -164,10 +168,10 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
                     if (clusterCoordinator.isLeaderNode()) {
                         managerDetails.setGroupId(nodeDetail.getGroupId());
-                        managerDetails.setHaStatus("Active");
+                        managerDetails.setHaStatus(Constants.ACTIVE);
                     } else {
                         managerDetails.setGroupId(nodeDetail.getGroupId());
-                        managerDetails.setHaStatus("pasive");
+                        managerDetails.setHaStatus(Constants.PASIVE);
                     }
                 }
             }
@@ -272,7 +276,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 appHolder.setAppName(siddhiAppHolder.getAppName());
                 appHolder.setGroupName(siddhiAppHolder.getGroupName());
                 appHolder.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
-                appHolder.setAppStatus("waiting");
+                appHolder.setAppStatus(Constants.WAITING);
                 appList.add(appHolder);
             }));
             return Response.ok().entity(appList).build();
@@ -292,11 +296,56 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 appHolder.setFailedPingAttempts(
                         Integer.toString(siddhiAppHolder.getDeployedNode().getFailedPingAttempts()));
                 appHolder.setLastPingTimestamp(Long.toString(siddhiAppHolder.getDeployedNode().getLastPingTimestamp()));
-                appHolder.setAppStatus("Active");
+                appHolder.setAppStatus(Constants.ACTIVE);
                 appList.add(appHolder);
             }));
             return Response.ok().entity(appList).build();
         }
+    }
+
+    /**
+     * TODO: GET KAFKA DETAILS
+     */
+
+    public Response getKafkaDetails(String appName) {
+        Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
+                .getSiddhiAppHoldersMap();
+        Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
+                .getAppsWaitingForDeploy();
+        List<SiddhiAppHolder> holder = waitingToDeploy.get(appName);
+        List<Map<String, String>> kafkaDetails = new ArrayList<>();
+
+        if (waitingToDeploy.containsKey(appName) || deployedSiddhiAppHolder.containsKey(appName)) {
+
+            holder.forEach((siddhiAppHolder -> {
+                Map<String, String> kafkaTransportDetails = new HashMap<>();
+                kafkaTransportDetails.put("appName", siddhiAppHolder.getAppName());
+                SiddhiAppDetails appHolder = new SiddhiAppDetails();
+                appHolder.setAppName(siddhiAppHolder.getAppName());
+                SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppHolder.getSiddhiApp());
+                for (Map.Entry<String, StreamDefinition> sourceStream : siddhiApp.getStreamDefinitionMap().entrySet()) {
+                    for (Annotation annotation : sourceStream.getValue().getAnnotations()) {
+                        if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SOURCE)) {
+                            for (Element ele : annotation.getElements()) {
+                                if (ele.getKey().equalsIgnoreCase(Constants.KAFKA_SOURCE_TOPIC_LIST)) {
+                                    kafkaTransportDetails.put(annotation.getName(), ele.getValue());
+                                }
+                            }
+
+                        } else if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SINK)) {
+                            for (Element element : annotation.getElements()) {
+                                if (element.getKey().equalsIgnoreCase(Constants.KAFKA_SINK_TOPIC)) {
+                                    kafkaTransportDetails.put(annotation.getName(), element.getValue());
+                                }
+                            }
+                        }
+                    }
+                }
+                kafkaDetails.add(kafkaTransportDetails);
+            }));
+
+        }
+        return Response.ok().entity(kafkaDetails).build();
     }
 
 
@@ -441,6 +490,20 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             return Response.ok()
                     .entity(isAuthorized)
                     .build();
+        }
+    }
+
+    @Override
+    public Response getKafkaDetails(String appName, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) ||
+                getPermissionProvider()
+                        .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
+                                                                            MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to get child app "
+                                                                             + "details").build();
+        } else {
+            return getKafkaDetails(appName);
         }
     }
 
