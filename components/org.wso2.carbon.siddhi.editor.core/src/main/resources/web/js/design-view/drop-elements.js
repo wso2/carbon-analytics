@@ -185,8 +185,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             var query = self.appData.getQuery(id);
             query.setInsertInto(elementID);
             // increment the variable newAgentId and the final element count
-            var finalElementCount = self.designGrid.getFinalElementCount() + 1;
-            self.designGrid.setFinalElementCount(finalElementCount);
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.designGrid.setNewAgentId(elementID+1);
             self.registerElementEventListeners(newAgent);
         };
@@ -627,8 +626,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 } else {
                     _jsPlumb.remove(newElement);
                 }
-                var finalElementCount = self.designGrid.getFinalElementCount() - 1;
-                self.designGrid.setFinalElementCount(finalElementCount);
+                self.appData.setFinalElementCount(self.appData.getFinalElementCount() - 1);
             });
         };
 

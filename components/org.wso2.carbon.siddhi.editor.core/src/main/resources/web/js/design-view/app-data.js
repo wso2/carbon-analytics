@@ -22,10 +22,10 @@ define(['require', 'elementArray'],
         /**
          * @class AppData
          * @constructor
-         * @class DesignView  Wraps the Ace editor for design view
+         * @class AppData  Holds the data for given Siddhi app
          */
         var AppData = function () {
-            //initiates the collections
+            // initiates the collections
             this.streamList = new ElementArray();
             this.filterList = new ElementArray();
             this.passThroughList = new ElementArray();
@@ -34,6 +34,8 @@ define(['require', 'elementArray'],
             this.patternList = new ElementArray();
             this.joinQueryList = new ElementArray();
             this.partitionList = new ElementArray();
+            // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
+            this.finalElementCount = 0;
 
         };
 
@@ -69,6 +71,10 @@ define(['require', 'elementArray'],
             this.partitionList.push(partition);
         };
 
+        AppData.prototype.setFinalElementCount = function (finalElementCount) {
+            this.finalElementCount = finalElementCount;
+        };
+
         AppData.prototype.getStream = function (streamId) {
             return this.streamList.getElement(streamId);
         };
@@ -99,6 +105,10 @@ define(['require', 'elementArray'],
 
         AppData.prototype.getPartition = function (partitionId) {
             return this.partitionList.getElement(partitionId);
+        };
+
+        AppData.prototype.getFinalElementCount = function () {
+            return this.finalElementCount;
         };
 
         return AppData;

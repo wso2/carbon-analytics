@@ -40,12 +40,10 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var errorMessage = 'unable to find design view grid container';
             if (!_.has(options, 'container')) {
                 log.error(errorMessage);
-                throw errorMessage;
             }
             var container = $(_.get(options, 'container'));
             if (!container.length > 0) {
                 log.error(errorMessage);
-                throw errorMessage;
             }
             this.options = options;
             this.appData = this.options.appData;
@@ -58,8 +56,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
             // newAgentId --> newAgent ID (Dropped Element ID)
             this.newAgentId = 1;
-            // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
-            this.finalElementCount = 0;
             var dropElementsOpts = {};
             _.set(dropElementsOpts, 'container', self.container);
             _.set(dropElementsOpts, 'appData', self.appData);
@@ -567,7 +563,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
         };
 
         DesignGrid.prototype.drawGraphFromAppData = function () {
-
+            //TODO:newAgentId should be considered
         };
 
         /**
@@ -644,7 +640,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the stream element. Inside this a it generates the stream definition form.
             self.dropElements.dropStream(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode,
                 false, streamName);
-            self.finalElementCount++;
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.newAgentId++;    // Increment the Element ID for the next dropped Element
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -655,7 +651,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropWindowStream(newAgent, self.newAgentId, mouseTop, mouseLeft ,"Window",
                 isCodeToDesignMode);
-            self.finalElementCount++;
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -667,7 +663,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
                 isCodeToDesignMode);
-            self.finalElementCount++;
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -679,7 +675,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
                 isCodeToDesignMode);
-            self.finalElementCount++;
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -691,7 +687,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
                 isCodeToDesignMode);
-            self.finalElementCount++;
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -703,7 +699,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Join Query",
                 isCodeToDesignMode);
-            self.finalElementCount++;
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -715,7 +711,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Pattern Query",
                 isCodeToDesignMode);
-            self.finalElementCount++;
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -725,7 +721,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var newAgent = $('<div>').attr('id', self.newAgentId).addClass('partitiondrop');
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropPartition(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode);
-            self.finalElementCount++;
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.newAgentId++;
             self.dropElements.registerElementEventListeners(newAgent);
         };
@@ -734,16 +730,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             return this.newAgentId;
         };
 
-        DesignGrid.prototype.getFinalElementCount = function () {
-            return this.finalElementCount;
-        };
-
         DesignGrid.prototype.setNewAgentId = function (newAgentId) {
             this.newAgentId = newAgentId;
-        };
-
-        DesignGrid.prototype.setFinalElementCount = function (finalElementCount) {
-            this.finalElementCount = finalElementCount;
         };
 
         return DesignGrid;
