@@ -52,6 +52,16 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3', 'overl
                         nodeStyle: defaultNodeStyle,
                         cssClass: "indicator stream-colour"
                     },
+                    source: {
+                      name: "source",
+                      nodeStyle: defaultNodeStyle,
+                      cssClass: "indicator source-colour"
+                    },
+                    sink: {
+                        name: "sink",
+                        nodeStyle: defaultNodeStyle,
+                        cssClass: "indicator sink-colour"
+                    },
                     table: {
                         name: "table",
                         nodeStyle: defaultNodeStyle,
@@ -235,6 +245,22 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'd3', 'dagre_d3', 'overl
                                 + "</div>";
                             // The _.clone() method must be used to avoid passing by reference.
                             nodeStyle = _.clone(nodeOptions.stream.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.source.name:
+                            html = "<div class='node-content' title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.source.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>"
+                                + "</div>";
+                            nodeStyle = _.clone(nodeOptions.source.nodeStyle);
+                            nodeStyle.label = html;
+                            break;
+                        case nodeOptions.sink.name:
+                            html = "<div class='node-content' title='" + node.description + "'>"
+                                + "<span class='" + nodeOptions.sink.cssClass + "'></span>"
+                                + "<span class='nodeLabel'>" + node.name + "</span>"
+                                + "</div>";
+                            nodeStyle = _.clone(nodeOptions.sink.nodeStyle);
                             nodeStyle.label = html;
                             break;
                         case nodeOptions.table.name:

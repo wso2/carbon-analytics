@@ -111,6 +111,14 @@
     background-color: #2196F3;
 }
 
+.source-colour {
+    background-color: yellow;
+}
+
+.sink-colour {
+    background-color: white;
+}
+
 .table-colour {
     background-color: #8BC34A;
 }

@@ -19,18 +19,12 @@
 package org.wso2.carbon.siddhi.editor.core.util.eventflow;
 
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.constants.SiddhiAnnotationType;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.AggregationInfo;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.FunctionInfo;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionInfo;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionTypeInfo;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.QueryInfo;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.StreamInfo;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TableInfo;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TriggerInfo;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.WindowInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.*;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
+import org.wso2.siddhi.core.stream.input.source.Source;
+import org.wso2.siddhi.core.stream.output.sink.Sink;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.SiddhiElement;
 import org.wso2.siddhi.query.api.annotation.Annotation;
@@ -51,10 +45,7 @@ import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 import org.wso2.siddhi.query.api.expression.AttributeFunction;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Obtains a Siddhi App as a string and parses it to a SiddhiApp object to identify map the data in it.
@@ -69,6 +60,8 @@ public class SiddhiAppMap {
     private String appDescription;
 
     private List<StreamInfo> streams = new ArrayList<>();
+    private List<SourceInfo> sources = new ArrayList<>();
+    private List<SinkInfo> sinks = new ArrayList<>();
     private List<TableInfo> tables = new ArrayList<>();
     private List<WindowInfo> windows = new ArrayList<>();
     private List<TriggerInfo> triggers = new ArrayList<>();
@@ -105,6 +98,8 @@ public class SiddhiAppMap {
         // as the latter is dependent on the former.
         loadTriggers();
         loadStreams();
+        loadSources();
+        loadSinks();
         loadTables();
         loadWindows();
         loadAggregations();
@@ -158,6 +153,42 @@ public class SiddhiAppMap {
                     throw new IllegalArgumentException("The partitioned inner stream definition map" +
                             " does not have an instance of class type 'StreamDefinition'");
                 }
+            }
+        }
+    }
+
+    /**
+     * Obtains information of all the Sources from the SiddhiAppRuntime object.
+     */
+    private void loadSources() {
+        for (List<Source> sourceList : siddhiAppRuntime.getSources()) {
+            for (Source source : sourceList) {
+                SourceInfo sourceInfo = new SourceInfo();
+                sourceInfo.setId(UUID.randomUUID().toString());
+                sourceInfo.setName(source.getType().toUpperCase());
+                sourceInfo.setDefinition("undefined");
+                sourceInfo.setType(source.getType());
+                sourceInfo.setStreamId(source.getStreamDefinition().getId());
+
+                sources.add(sourceInfo);
+            }
+        }
+    }
+
+    /**
+     * Obtains information of all the Sinks from the SiddhiAppRuntime object.
+     */
+    private void loadSinks() {
+        for (List<Sink> sinkList : siddhiAppRuntime.getSinks()) {
+            for (Sink sink : sinkList) {
+                SinkInfo sinkInfo = new SinkInfo();
+                sinkInfo.setId(UUID.randomUUID().toString());
+                sinkInfo.setName(sink.getType().toUpperCase());
+                sinkInfo.setDefinition("undefined");
+                sinkInfo.setType(sink.getType());
+                sinkInfo.setStreamId(sink.getStreamDefinition().getId());
+
+                sinks.add(sinkInfo);
             }
         }
     }
@@ -440,6 +471,14 @@ public class SiddhiAppMap {
 
     public List<StreamInfo> getStreams() {
         return streams;
+    }
+
+    public List<SourceInfo> getSources() {
+        return sources;
+    }
+
+    public List<SinkInfo> getSinks() {
+        return sinks;
     }
 
     public List<TableInfo> getTables() {
