@@ -247,8 +247,7 @@
         <!-- End: design view container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
-            <div class="btn  btn-primary toggle-to-source">Source View</div>
-            <div class="btn  btn-primary toggle-to-design">Design View</div>
+            <div class="btn toggle-view-button"><i class="fw fw-design-view"></i>&nbsp;&nbsp;Design View</div>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>
@@ -1467,8 +1466,7 @@
                             toggle_controls: {
                                 // relative selector within container for a tab
                                 container: '.toggle-controls-container',
-                                sourceIcon: '.toggle-to-source',
-                                designIcon: '.toggle-to-design'
+                                toggle_view: '.toggle-view-button'
                             },
                             notifications: {
                                 container: '#notification-container'

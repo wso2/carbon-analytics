@@ -126,8 +126,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     }
                     this._sourceView.editorResize();
 
-                    var sourceViewBtn = this._$parent_el.find(_.get(this.options, 'toggle_controls.sourceIcon'));
-                    var designViewBtn = this._$parent_el.find(_.get(this.options, 'toggle_controls.designIcon'));
                     var application = this.options.application;
                     this.siddhiAppContent = new AppData();
                     this.designView = new DesignView(this.options, application, this.siddhiAppContent);
@@ -135,26 +133,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     this.sourceContainer = sourceContainer;
                     this.designViewContainer = this.designView.getDesignViewContainer();
 
-                    sourceViewBtn.click(function () {
-                        if (self.getDesignContainer() !== undefined) {
-                            if (self.getDesignContainer().is(':visible')) {
-                                self.getDesignContainer().hide();
-                                self.getSourceContainer().show();
-                            } else {
-                                self.getSourceContainer().show();
-                            }
-                        }
-                    });
-
-                    designViewBtn.click(function () {
-                        if (self.getDesignContainer() !== undefined) {
-                            self.getDesignView().showToolPalette();
-                            if (self.getSourceContainer().is(':visible')) {
-                                self.getSourceContainer().hide();
-                                self.getDesignContainer().show();
-                            } else {
-                                self.getDesignContainer().show();
-                            }
+                    var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
+                    toggleViewButton.click(function () {
+                        if (self.getSourceContainer().is(':visible')) {
+                            self.getSourceContainer().hide();
+                            self.getDesignContainer().show();
+                            toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
+                        } else if (self.getDesignContainer().is(':visible')) {
+                            self.getDesignContainer().hide();
+                            self.getSourceContainer().show();
+                            self._sourceView.editorResize();
+                            toggleViewButton.html("<i class=\"fw fw-design-view\"></i>&nbsp;&nbsp;Design View");
                         }
                     });
                 },

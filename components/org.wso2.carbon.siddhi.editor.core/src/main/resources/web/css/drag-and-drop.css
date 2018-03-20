@@ -17,11 +17,30 @@
  */
 
 .source-view-enabled {
-    height: 90%;
+    height: 100%;
 }
 
 .design-view-container {
-    height: 90%;
+    height: 100%;
+}
+
+.toggle-controls-container {
+    position: absolute;
+    bottom: 2%;
+    right: 2%;
+    z-index: 1;
+}
+
+.toggle-view-button {
+    transition: 0.15s;
+    font-weight: bold;
+    color: white;
+    background-color: #f57e30;
+}
+
+.toggle-view-button:hover {
+    color: #333;
+    transition: 0.15s;
 }
 
 .grid-container {
