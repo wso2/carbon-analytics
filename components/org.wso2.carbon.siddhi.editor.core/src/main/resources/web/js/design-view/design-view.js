@@ -32,16 +32,13 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             var errorMessage2 = 'unable to find application in design-view.js';
             if (!_.has(options, 'container')) {
                 log.error(errorMessage1);
-                throw errorMessage1;
             }
             var container = $(_.get(options, 'container'));
             if (!container.length > 0) {
                 log.error(errorMessage1);
-                throw errorMessage1;
             }
             if (!_.has(options, 'application')) {
                 log.error(errorMessage2);
-                throw errorMessage2;
             }
             this._$parent_el = container;
             this.options = options;
@@ -50,29 +47,19 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         };
 
         DesignView.prototype.render = function () {
-            this.designViewContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
             var errMsg = '';
-            // check whether container element exists in dom
-            if (!this.designViewContainer.length > 0) {
-                errMsg = 'unable to find container for file composer with selector: '
-                    + _.get(this.options, 'design_view.container');
-                log.error(errMsg);
-                throw errMsg;
-            }
             var toolPaletteContainer = this._$parent_el.find(_.get(this.options, 'design_view.tool_palette.container'))
                 .get(0);
             if (toolPaletteContainer === undefined) {
                 errMsg = 'unable to find tool palette container with selector: '
                     + _.get(this.options, 'design_view.tool_palette.container');
                 log.error(errMsg);
-                throw errMsg;
             }
             var toolPaletteOpts = _.clone(_.get(this.options, 'design_view.tool_palette'));
             if (toolPaletteOpts === undefined) {
                 errMsg = 'unable to find tool palette with selector: '
                     + _.get(this.options, 'design_view.tool_palette');
                 log.error(errMsg);
-                throw errMsg;
             }
             toolPaletteOpts.container = toolPaletteContainer;
             this.toolPalette = new ToolPalette(toolPaletteOpts);
@@ -83,7 +70,6 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 errMsg = 'unable to find design view grid container with selector: '
                     + _.get(this.options, 'design_view.grid_container');
                 log.error(errMsg);
-                throw errMsg;
             }
             var designViewGridOpts = {};
             _.set(designViewGridOpts, 'container', designViewGridContainer);
@@ -91,14 +77,6 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             _.set(designViewGridOpts, 'application', this.application);
             var designViewGrid = new DesignViewGrid(designViewGridOpts);
             designViewGrid.render();
-        };
-
-        DesignView.prototype.getDesignViewContainer = function () {
-            if (this.designViewContainer !== undefined) {
-                return this.designViewContainer;
-            } else {
-                return undefined;
-            }
         };
 
         DesignView.prototype.showToolPalette = function () {

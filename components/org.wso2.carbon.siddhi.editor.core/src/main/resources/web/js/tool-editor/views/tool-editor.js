@@ -53,6 +53,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var canvasContainer = this._$parent_el.find(_.get(this.options, 'canvas.container'));
                     var previewContainer = this._$parent_el.find(_.get(this.options, 'preview.container'));
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
+                    var designContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
                     var tabContentContainer = $(_.get(this.options, 'tabs_container'));
 
@@ -60,6 +61,13 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         var errMsg = 'cannot find container to render svg';
                         log.error(errMsg);
                         throw errMsg;
+                    }
+
+                    // check whether design container element exists in dom
+                    if (!designContainer.length > 0) {
+                        errMsg = 'unable to find container for file composer with selector: '
+                            + _.get(this.options, 'design_view.container');
+                        log.error(errMsg);
                     }
 
                     //use this line to assign dynamic id for canvas and pass the canvas id to initialize jsplumb
@@ -126,39 +134,25 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     }
                     this._sourceView.editorResize();
 
-                    var application = this.options.application;
-                    this.siddhiAppContent = new AppData();
-                    this.designView = new DesignView(this.options, application, this.siddhiAppContent);
-                    this.designView.render();
-                    this.sourceContainer = sourceContainer;
-                    this.designViewContainer = this.designView.getDesignViewContainer();
-
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     toggleViewButton.click(function () {
-                        if (self.getSourceContainer().is(':visible')) {
-                            self.getSourceContainer().hide();
-                            self.getDesignContainer().show();
+                        if (sourceContainer.is(':visible')) {
+                            var application = self.options.application;
+                            self.siddhiAppContent = new AppData();
+                            var designView = new DesignView(self.options, application, self.siddhiAppContent);
+                            designView.render();
+                            sourceContainer.hide();
+                            designContainer.show();
                             toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
-                        } else if (self.getDesignContainer().is(':visible')) {
-                            self.getDesignContainer().hide();
-                            self.getSourceContainer().show();
+                            console.log(JSON.stringify(self.siddhiAppContent));
+                        } else if (designContainer.is(':visible')) {
+                            designContainer.hide();
+                            sourceContainer.show();
                             self._sourceView.editorResize();
                             toggleViewButton.html("<i class=\"fw fw-design-view\"></i>&nbsp;&nbsp;Design View");
+                            console.log(JSON.stringify(self.siddhiAppContent));
                         }
                     });
-                },
-
-                getSourceContainer: function () {
-                    var self = this;
-                    return self.sourceContainer;
-                },
-
-                getDesignContainer: function () {
-                    var self = this;
-                    return self.designView.getDesignViewContainer();
-                },
-                getDesignView: function () {
-                    return this.designView;
                 },
 
                 getContent: function () {
