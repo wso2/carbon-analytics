@@ -39,9 +39,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
         };
 
         /**
-         * @class FormBuilder
+         * @class FormBuilder Creates forms to collect data when a element is dropped on the canvas
          * @constructor
-         * @class DesignView  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view
          */
         var FormBuilder = function (options) {
@@ -190,7 +189,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             self.gridContainer.addClass("disabledbutton");
             self.toolPaletteContainer.addClass("disabledbutton");
 
-            var id = parseInt($(element).parent().attr('id'));
+            var id = $(element).parent().attr('id');
             // retrieve the stream information from the collection
             var clickedElement = self.appData.getStream(id);
             if(clickedElement === undefined) {
@@ -293,7 +292,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             self.gridContainer.addClass('disabledbutton');
             self.toolPaletteContainer.addClass('disabledbutton');
 
-            var id = parseInt($(element).parent().attr('id'));
+            var id = $(element).parent().attr('id');
             var clickedElement = self.appData.getQuery(id);
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
@@ -694,7 +693,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             self.gridContainer.addClass('disabledbutton');
             self.toolPaletteContainer.addClass('disabledbutton');
 
-            var id = parseInt($(element).parent().attr('id'));
+            var id = $(element).parent().attr('id');
             var clickedElement = self.appData.getPatternQuery(id);
             if (clickedElement.getFrom().length === 0) {
                 alert('Connect input streams');
@@ -969,7 +968,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             self.gridContainer.addClass('disabledbutton');
             self.toolPaletteContainer.addClass('disabledbutton');
 
-            var id = parseInt($(element).parent().attr('id'));
+            var id = $(element).parent().attr('id');
             var clickedElement = self.appData.getJoinQuery(id);
             if (!(clickedElement.getFrom()) || clickedElement.getFrom().length !== 2) {
                 alert('Connect TWO input streams');
@@ -1234,7 +1233,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
          */
         FormBuilder.prototype.GeneratePartitionKeyForm = function (element) {
             var self = this;
-            var id =parseInt($(element.target).parent().attr('id'));
+            var id = $(element.target).parent().attr('id');
             var partition = self.appData.getPartition(id);
             var connections = jsPlumb.getConnections(element);
             var connected= false;

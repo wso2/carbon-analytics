@@ -55,7 +55,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
 
             // newAgentId --> newAgent ID (Dropped Element ID)
-            this.newAgentId = 1;
+            this.newAgentId = "1";
             var dropElementsOpts = {};
             _.set(dropElementsOpts, 'container', self.container);
             _.set(dropElementsOpts, 'appData', self.appData);
@@ -173,11 +173,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 _jsPlumb.bind('beforeDrop', function (connection) {
                     var connectionValidity = true;
                     var target = connection.targetId;
-                    var targetId = parseInt(target.substr(0, target.indexOf('-')));
+                    var targetId = target.substr(0, target.indexOf('-'));
                     var targetElement = $('#' + targetId);
 
                     var source = connection.sourceId;
-                    var sourceId = parseInt(source.substr(0, source.indexOf('-')));
+                    var sourceId = source.substr(0, source.indexOf('-'));
                     var sourceElement = $('#' + sourceId);
 
                     // avoid the expose of inner-streams outside the group
@@ -222,11 +222,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             function updateModelOnConnectionAttach() { // Update the model when a connection is established and bind events for the connection
                 _jsPlumb.bind('connection', function (connection) {
                     var target = connection.targetId;
-                    var targetId = parseInt(target.substr(0, target.indexOf('-')));
+                    var targetId = target.substr(0, target.indexOf('-'));
                     var targetElement = $('#' + targetId);
 
                     var source = connection.sourceId;
-                    var sourceId = parseInt(source.substr(0, source.indexOf('-')));
+                    var sourceId = source.substr(0, source.indexOf('-'));
                     var sourceElement = $('#' + sourceId);
 
                     var model;
@@ -267,7 +267,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             var connectedQueries = _jsPlumb.getConnections({source: target});
                             $.each(connectedQueries, function (index, connectedQuery) {
                                 var query = connectedQuery.targetId;
-                                var queryID = parseInt(query.substr(0, query.indexOf('-')));
+                                var queryID = query.substr(0, query.indexOf('-'));
                                 var queryElement = $('#' + queryID);
                                 if (queryElement.hasClass(constants.PASS_THROUGH) || queryElement.hasClass(constants.FILTER)
                                     || queryElement.hasClass(constants.WINDOW_QUERY)) {
@@ -304,7 +304,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         var streamID = null;
                         $.each(connectedStreams, function (index, connectedStream) {
                             var stream = connectedStream.sourceId;
-                            streamID = parseInt(stream.substr(0, stream.indexOf('-')));
+                            streamID = stream.substr(0, stream.indexOf('-'));
                         });
                         if (streamID != null) {
                             if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
@@ -386,11 +386,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 _jsPlumb.bind('connectionDetached', function (connection) {
 
                     var target = connection.targetId;
-                    var targetId = parseInt(target.substr(0, target.indexOf('-')));
+                    var targetId = target.substr(0, target.indexOf('-'));
                     var targetElement = $('#' + targetId);
 
                     var source = connection.sourceId;
-                    var sourceId = parseInt(source.substr(0, source.indexOf('-')));
+                    var sourceId = source.substr(0, source.indexOf('-'));
                     var sourceElement = $('#' + sourceId);
 
                     var model;
@@ -438,7 +438,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 var connectedQueries = _jsPlumb.getConnections({source: target});
                                 $.each(connectedQueries, function (index, connectedQuery) {
                                     var query = connectedQuery.targetId;
-                                    var queryID = parseInt(query.substr(0, query.indexOf('-')));
+                                    var queryID = query.substr(0, query.indexOf('-'));
                                     var queryElement = $('#' + queryID);
                                     if (queryElement.hasClass(constants.PASS_THROUGH)
                                         || queryElement.hasClass(constants.FILTER)
@@ -477,7 +477,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         var streamID = null;
                         $.each(connectedStreams, function (index, connectedStream) {
                             var stream = connectedStream.sourceId;
-                            streamID = parseInt(stream.substr(0, stream.indexOf('-')));
+                            streamID = stream.substr(0, stream.indexOf('-'));
                         });
                         if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
                             || targetElement.hasClass(constants.WINDOW_QUERY)) {
@@ -536,16 +536,16 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
             function addMemberToPartitionGroup() {
                 _jsPlumb.bind('group:addMember', function (event) {
-                    var partitionId = parseInt($(event.group).attr('id'));
+                    var partitionId = $(event.group).attr('id');
                     var partition = self.appData.getPartition(partitionId);
                     var queries = partition.getQueries();
                     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PASS_THROUGH)
                         || $(event.el).hasClass(constants.WINDOW_QUERY)) {
-                        queries.push(self.appData.getQuery(parseInt($(event.el).attr('id'))));
+                        queries.push(self.appData.getQuery($(event.el).attr('id')));
                         partition.setQueries(queries);
                     }
                     else if ($(event.el).hasClass(constants.JOIN)) {
-                        queries.push(self.appData.getJoinQuery(parseInt($(event.el).attr('id'))));
+                        queries.push(self.appData.getJoinQuery($(event.el).attr('id')));
                         partition.setQueries(queries);
                     }
                 });
@@ -564,6 +564,12 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
         DesignGrid.prototype.drawGraphFromAppData = function () {
             //TODO:newAgentId should be considered
+        };
+
+        DesignGrid.prototype.generateNextId = function () {
+            // TODO: Not finalized
+            var currentId = parseInt(this.newAgentId) +1;
+            this.newAgentId = "" + currentId + "";
         };
 
         /**
@@ -599,8 +605,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 var connection = edges[i];
                 var target = connection.targetId;
                 var source = connection.sourceId;
-                var targetId= parseInt(target.substr(0, target.indexOf('-')));
-                var sourceId= parseInt(source.substr(0, source.indexOf('-')));
+                var targetId= target.substr(0, target.indexOf('-'));
+                var sourceId= source.substr(0, source.indexOf('-'));
                 g.setEdge(sourceId, targetId);
             }
             // calculate the layout (i.e. node positions)
@@ -627,7 +633,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
         DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamName) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('streamdrop ');
+            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('streamdrop');
 
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 // The container and the toolbox are disabled to prevent the user from dropping any elements before
@@ -641,7 +647,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.dropStream(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode,
                 false, streamName);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.newAgentId++;    // Increment the Element ID for the next dropped Element
+            self.generateNextId();    // Increment the Element ID for the next dropped Element
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
@@ -652,7 +658,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.dropWindowStream(newAgent, self.newAgentId, mouseTop, mouseLeft ,"Window",
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.newAgentId++;
+            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
@@ -664,7 +670,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.newAgentId++;
+            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
@@ -676,7 +682,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.newAgentId++;
+            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
@@ -688,7 +694,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.newAgentId++;
+            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
@@ -700,7 +706,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Join Query",
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.newAgentId++;
+            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
@@ -712,7 +718,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Pattern Query",
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.newAgentId++;
+            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
@@ -722,16 +728,12 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropPartition(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.newAgentId++;
+            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
         DesignGrid.prototype.getNewAgentId = function () {
             return this.newAgentId;
-        };
-
-        DesignGrid.prototype.setNewAgentId = function (newAgentId) {
-            this.newAgentId = newAgentId;
         };
 
         return DesignGrid;

@@ -186,7 +186,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             query.setInsertInto(elementID);
             // increment the variable newAgentId and the final element count
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.designGrid.setNewAgentId(elementID+1);
+            self.designGrid.generateNextId();
             self.registerElementEventListeners(newAgent);
         };
 
@@ -580,7 +580,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
             //register event listener to remove the element when the close icon is clicked
             newElement.on('click', '.element-close-icon', function () {
-                var elementId = parseInt(newElement[0].id);
+                var elementId = newElement[0].id;
 
                 if (newElement.hasClass('streamdrop')) {
                     self.appData.streamList.removeElement(elementId);
@@ -615,7 +615,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                     var queries = self.appData.getPartition(_jsPlumb.getGroupFor(newElement).id).getQueries();
                     var removedQueryIndex = null;
                     $.each( queries , function (index, query) {
-                        if(query.getId() === parseInt($(newElement).attr('id'))){
+                        if(query.getId() === $(newElement).attr('id')){
                             removedQueryIndex = index;
                         }
                     });
