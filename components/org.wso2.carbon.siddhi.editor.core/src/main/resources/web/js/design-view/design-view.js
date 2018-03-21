@@ -25,9 +25,8 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          * @class DesignView  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view
          * @param application Application data
-         * @param siddhiAppContent Siddhi application content
          */
-        var DesignView = function (options, application, siddhiAppContent) {
+        var DesignView = function (options, application) {
             var errorMessage1 = 'unable to find design view container in design-view.js';
             var errorMessage2 = 'unable to find application in design-view.js';
             if (!_.has(options, 'container')) {
@@ -42,11 +41,13 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             }
             this._$parent_el = container;
             this.options = options;
-            this.siddhiAppContent = siddhiAppContent;
             this.application = application;
         };
 
-        DesignView.prototype.render = function () {
+        /**
+         * @function Renders tool palette in the design container
+         */
+        DesignView.prototype.renderToolPalette = function () {
             var errMsg = '';
             var toolPaletteContainer = this._$parent_el.find(_.get(this.options, 'design_view.tool_palette.container'))
                 .get(0);
@@ -64,7 +65,15 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             toolPaletteOpts.container = toolPaletteContainer;
             this.toolPalette = new ToolPalette(toolPaletteOpts);
             this.toolPalette.render();
+        };
 
+        /**
+         * @function Renders design view in the design container
+         * @param siddhiAppContent Siddhi application content
+         */
+        DesignView.prototype.renderDesignGrid = function (siddhiAppContent) {
+            //TODO: initilise data.
+            var errMsg = '';
             var designViewGridContainer = this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
             if (!designViewGridContainer.length > 0) {
                 errMsg = 'unable to find design view grid container with selector: '
@@ -73,7 +82,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             }
             var designViewGridOpts = {};
             _.set(designViewGridOpts, 'container', designViewGridContainer);
-            _.set(designViewGridOpts, 'appData', this.siddhiAppContent);
+            _.set(designViewGridOpts, 'appData', siddhiAppContent);
             _.set(designViewGridOpts, 'application', this.application);
             var designViewGrid = new DesignViewGrid(designViewGridOpts);
             designViewGrid.render();

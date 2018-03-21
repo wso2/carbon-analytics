@@ -134,13 +134,52 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     }
                     this._sourceView.editorResize();
 
+                    var JSONString = "{" +
+                        "\"streamList\":{" +
+                        "\"0\":{ \"id\":1," +
+                        "\"define\":\"das\"," +
+                        "\"type\":\"define-stream\"," +
+                        "\"attributes\":[{\"attribute\":\"DA\",\"type\":\"string\"}]}," +
+                        "\"1\":{ \"id\":3," +
+                        "\"define\":\"asc\"," +
+                        "\"type\":\"define-stream\"," +
+                        "\"attributes\":[{\"attribute\":\"\",\"type\":\"string\"}]}," +
+                        "\"length\":2" +
+                        "}," +
+                        "\"filterList\":{}," +
+                        "\"passThroughList\":{}," +
+                        "\"windowQueryList\":{}," +
+                        "\"queryList\":{" +
+                        "\"0\":{ \"id\":2," +
+                        "\"name\":\"\"," +
+                        "\"from\":1," +
+                        "\"insertInto\":3," +
+                        "\"filter\":\"\"," +
+                        "\"postWindowFilter\":\"\"," +
+                        "\"window\":\"\"," +
+                        "\"outputType\":\"all events\"," +
+                        "\"projection\":[\"\"]}," +
+                        "\"length\":1" +
+                        "}," +
+                        "\"patternList\":{}," +
+                        "\"joinQueryList\":{}," +
+                        "\"partitionList\":{}," +
+                        "\"finalElementCount\":0"+
+                        "}";
+
+                    var JSONObject = JSON.parse(JSONString);
+                    console.log(JSONObject);
+
+                    var application = self.options.application;
+                    var designView = new DesignView(self.options, application);
+                    designView.renderToolPalette();
+
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
-                            var application = self.options.application;
                             self.siddhiAppContent = new AppData();
-                            var designView = new DesignView(self.options, application, self.siddhiAppContent);
-                            designView.render();
+                            //TODO: Iterate to the deepest element and get data and save data. EX: a stream should be saved with stream prototype.
+                            designView.renderDesignGrid(self.siddhiAppContent);
                             sourceContainer.hide();
                             designContainer.show();
                             toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
