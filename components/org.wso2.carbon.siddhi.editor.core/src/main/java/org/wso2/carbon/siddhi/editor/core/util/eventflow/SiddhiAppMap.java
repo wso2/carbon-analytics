@@ -24,6 +24,8 @@ import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.FunctionInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionTypeInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.QueryInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.SinkInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.SourceInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.StreamInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TableInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TriggerInfo;
@@ -68,14 +70,16 @@ public class SiddhiAppMap {
     private String appName;
     private String appDescription;
 
-    private List<StreamInfo> streams = new ArrayList<>();
-    private List<TableInfo> tables = new ArrayList<>();
-    private List<WindowInfo> windows = new ArrayList<>();
-    private List<TriggerInfo> triggers = new ArrayList<>();
     private List<AggregationInfo> aggregations = new ArrayList<>();
     private List<FunctionInfo> functions = new ArrayList<>();
-    private List<QueryInfo> queries = new ArrayList<>();
     private List<PartitionInfo> partitions = new ArrayList<>();
+    private List<QueryInfo> queries = new ArrayList<>();
+    private List<SinkInfo> sinks = new ArrayList<>();
+    private List<SourceInfo> sources = new ArrayList<>();
+    private List<StreamInfo> streams = new ArrayList<>();
+    private List<TableInfo> tables = new ArrayList<>();
+    private List<TriggerInfo> triggers = new ArrayList<>();
+    private List<WindowInfo> windows = new ArrayList<>();
 
     public SiddhiAppMap(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
@@ -90,7 +94,7 @@ public class SiddhiAppMap {
         try {
             // Create The SiddhiApp And SiddhiAppRuntime Objects For The Given Siddhi App String
             siddhiApp = SiddhiCompiler.parse(siddhiAppString);
-            siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiAppString);
+            siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
         } catch (Exception e) {
             // If an exception occurs while creating a SiddhiApp/SiddhiAppRuntime instance,
             // then the exception is converted to a SiddhiAppCreation exception.
@@ -140,16 +144,23 @@ public class SiddhiAppMap {
      */
     private void loadStreams() {
         for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
+            // Find and create SourceInfo And SinkInfo objects for all the sources and sinks in the
+            // given StreamDefinition
+            loadSourcesAndSinks(streamDefinition);
+            // Generate The StreamInfo instance from the StreamDefinition object
             StreamInfo streamInfo = generateStreamInfo(streamDefinition);
             if (streamInfo != null) {
                 streams.add(streamInfo);
             }
         }
 
+        // Obtain All The Inner Stream Information That Are Inside Partitions And Create StreamInfo instances for them
         for (Map<String, AbstractDefinition> map : siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
             for (AbstractDefinition abstractDefinition : map.values()) {
+                // AbstractDefinition should always be an instance of StreamDefinition In This Situation
                 if (abstractDefinition instanceof StreamDefinition) {
                     StreamDefinition streamDefinition = (StreamDefinition) abstractDefinition;
+                    // Generate The StreamInfo instance from the StreamDefinition object
                     StreamInfo streamInfo = generateStreamInfo(streamDefinition);
                     if (streamInfo != null) {
                         streams.add(streamInfo);
@@ -158,6 +169,37 @@ public class SiddhiAppMap {
                     throw new IllegalArgumentException("The partitioned inner stream definition map" +
                             " does not have an instance of class type 'StreamDefinition'");
                 }
+            }
+        }
+    }
+
+    /**
+     * Obtains the information of any source or sink annotations for a given StreamDefinition instance and creates the
+     * relative SourceInfo and SinkInfo objects from it.
+     *
+     * @param streamDefinition The stream for which the source and sink information are to be obtained from
+     */
+    private void loadSourcesAndSinks(StreamDefinition streamDefinition) {
+        List<Annotation> sourceAndSinkAnnotations = getSourceAndSinkAnnotations(streamDefinition);
+        for (Annotation annotation : sourceAndSinkAnnotations) {
+            if (annotation.getName().equalsIgnoreCase("source")) {
+                // Create SourceInfo If Annotation Name Is Source
+                SourceInfo sourceInfo = new SourceInfo();
+                sourceInfo.setId(UUID.randomUUID().toString());
+                sourceInfo.setName(annotation.getElement("type").toUpperCase());
+                sourceInfo.setDefinition(getDefinition(annotation));
+                sourceInfo.setStreamId(streamDefinition.getId());
+
+                sources.add(sourceInfo);
+            } else if (annotation.getName().equalsIgnoreCase("sink")) {
+                // Create SinkInfo If Annotation Name Is Sink
+                SinkInfo sinkInfo = new SinkInfo();
+                sinkInfo.setId(UUID.randomUUID().toString());
+                sinkInfo.setName(annotation.getElement("type").toUpperCase());
+                sinkInfo.setDefinition(getDefinition(annotation));
+                sinkInfo.setStreamId(streamDefinition.getId());
+
+                sinks.add(sinkInfo);
             }
         }
     }
@@ -241,14 +283,41 @@ public class SiddhiAppMap {
             }
             if (!isTriggerDefined) {
                 // Create Stream If The Trigger With The Same Name Is Not Defined
-                streamInfo = new StreamInfo(streamDefinition.getId(), streamDefinition.getId(),
-                        streamDefinition.toString().replaceAll("'", "\""));
+                streamInfo = createStreamInfoWithoutSourceAndSinkDefinitions(streamDefinition);
             }
         } else {
             // Create Stream If The App Does Not Have Any Triggers
-            streamInfo = new StreamInfo(streamDefinition.getId(), streamDefinition.getId(),
-                    streamDefinition.toString().replaceAll("'", "\""));
+            streamInfo = createStreamInfoWithoutSourceAndSinkDefinitions(streamDefinition);
         }
+
+        return streamInfo;
+    }
+
+    /**
+     * Creates an instance of StreamInfo but excludes the source and sink annotation definitions in the entire
+     * stream definition of the StreamInfo object.
+     *
+     * @param streamDefinition The StreamDefinition where the StreamInfo instance needs to be created from.
+     * @return The result StreamInfo object.
+     */
+    private StreamInfo createStreamInfoWithoutSourceAndSinkDefinitions(StreamDefinition streamDefinition) {
+        StreamInfo streamInfo = new StreamInfo();
+        streamInfo.setId(streamDefinition.getId());
+        streamInfo.setName(streamDefinition.getId());
+        // Get The Stream Definition Without The Source And Sink Annotation Definitions
+        String streamDefinitionTestStr = getDefinition(streamDefinition);
+        if (streamDefinitionTestStr.toLowerCase().contains("define stream")) {
+            // If The StreamDefinition Is A Defined Stream
+            List<Annotation> sourceAndSinkAnnotations = getSourceAndSinkAnnotations(streamDefinition);
+            for (Annotation annotation : sourceAndSinkAnnotations) {
+                String annotationStr = getDefinition(annotation);
+                streamDefinitionTestStr = streamDefinitionTestStr.replace(annotationStr, "");
+            }
+        } else {
+            // If The StreamDefinition Is An Undefined/Inner Stream
+            streamDefinitionTestStr = streamDefinition.toString().replaceAll("'", "\"");
+        }
+        streamInfo.setDefinition(streamDefinitionTestStr);
 
         return streamInfo;
     }
@@ -392,6 +461,22 @@ public class SiddhiAppMap {
     }
 
     /**
+     * Returns the list of annotations that are of type source and sink of a given stream.
+     *
+     * @param streamDefinition The stream instance of which the sources and sinks are to be identified from
+     * @return The list of annotations which are of type source and sink
+     */
+    private List<Annotation> getSourceAndSinkAnnotations(StreamDefinition streamDefinition) {
+        List<Annotation> sourceAndSinkAnnotations = new ArrayList<>();
+        for (Annotation annotation : streamDefinition.getAnnotations()) {
+            if (annotation.getName().equalsIgnoreCase("source") || annotation.getName().equalsIgnoreCase("sink")) {
+                sourceAndSinkAnnotations.add(annotation);
+            }
+        }
+        return sourceAndSinkAnnotations;
+    }
+
+    /**
      * Obtains the piece of the code from the siddhiAppString variable where the given SiddhiElement object is defined.
      *
      * @param siddhiElement The SiddhiElement object where the definition needs to be obtained from
@@ -440,6 +525,14 @@ public class SiddhiAppMap {
 
     public List<StreamInfo> getStreams() {
         return streams;
+    }
+
+    public List<SourceInfo> getSources() {
+        return sources;
+    }
+
+    public List<SinkInfo> getSinks() {
+        return sinks;
     }
 
     public List<TableInfo> getTables() {

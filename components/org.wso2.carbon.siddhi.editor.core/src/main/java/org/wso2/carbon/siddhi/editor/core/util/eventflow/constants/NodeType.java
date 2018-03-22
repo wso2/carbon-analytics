@@ -27,6 +27,8 @@ public enum NodeType {
     PARTITION("partition"),
     PARTITION_TYPE("partition-type"),
     QUERY("query"),
+    SINK("sink"),
+    SOURCE("source"),
     STREAM("stream"),
     TABLE("table"),
     TRIGGER("trigger"),

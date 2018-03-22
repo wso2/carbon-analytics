@@ -27,6 +27,8 @@ import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.FunctionInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.PartitionTypeInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.QueryInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.SinkInfo;
+import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.SourceInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.StreamInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TableInfo;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.info.TriggerInfo;
@@ -96,6 +98,16 @@ public class EventFlow {
             createNode(NodeType.STREAM, stream.getId(), stream.getName(), stream.getDefinition());
         }
 
+        // Create Source Nodes
+        for (SourceInfo source : siddhiAppMap.getSources()) {
+            createNode(NodeType.SOURCE, source.getId(), source.getName(), source.getDefinition());
+        }
+
+        // Create Sink Nodes
+        for (SinkInfo sink : siddhiAppMap.getSinks()) {
+            createNode(NodeType.SINK, sink.getId(), sink.getName(), sink.getDefinition());
+        }
+
         // Create Table Nodes
         for (TableInfo table : siddhiAppMap.getTables()) {
             createNode(NodeType.TABLE, table.getId(), table.getName(), table.getDefinition());
@@ -163,10 +175,30 @@ public class EventFlow {
      * and then add these JSONObjects to the edges JSONArray.
      */
     private void setEdges() {
+        setSourceEdges();
+        setSinkEdges();
         setAggregationEdges();
         setQueryEdges();
         setPartitionEdges();
         eventFlowJSON.put(EDGE, edges);
+    }
+
+    /**
+     * Creates all the edge JSONObjects for all the Sources in the SiddhhiAppMap object.
+     */
+    private void setSourceEdges() {
+        for (SourceInfo source : siddhiAppMap.getSources()) {
+            createEdge(EdgeType.DEFAULT, source.getId(), source.getStreamId());
+        }
+    }
+
+    /**
+     * Creates all the edge JSONObjects for all the Sinks in the SiddhiAppMap object.
+     */
+    private void setSinkEdges() {
+        for (SinkInfo sink : siddhiAppMap.getSinks()) {
+            createEdge(EdgeType.DEFAULT, sink.getStreamId(), sink.getId());
+        }
     }
 
     /**

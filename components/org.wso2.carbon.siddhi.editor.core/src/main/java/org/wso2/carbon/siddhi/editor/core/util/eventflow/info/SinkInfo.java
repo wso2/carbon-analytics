@@ -19,15 +19,27 @@
 package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
 
 /**
- * Defines a Siddhi Stream.
+ * Defines a Siddhi Sink Annotation
  */
-public class StreamInfo extends SiddhiElementInfo {
+public class SinkInfo extends SiddhiElementInfo {
 
-    public StreamInfo() {
+    private String type;
+    private String streamId;
+
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public StreamInfo(String id, String name, String definition) {
-        super(id, name, definition);
+    public void setStreamId(String streamId) {
+        this.streamId = streamId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getStreamId() {
+        return streamId;
     }
 
 }
