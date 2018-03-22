@@ -201,7 +201,6 @@ public class EventFlow {
         }
     }
 
-
     /**
      * Creates all the edge JSONObjects for all the aggregations in the SiddhiAppMap object.
      */

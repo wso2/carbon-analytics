@@ -35,7 +35,6 @@
     margin: 5px;
 }
 
-
 .siddhi-app-name {
     color: #fff;
     font-size: 1.8rem;
@@ -112,11 +111,11 @@
 }
 
 .source-colour {
-    background-color: yellow;
+    background-color: #30A6AB;
 }
 
 .sink-colour {
-    background-color: white;
+    background-color: #9C382F;
 }
 
 .table-colour {

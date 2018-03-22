@@ -58,14 +58,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
 /**
  * Obtains a Siddhi App as a string and parses it to a SiddhiApp object to identify map the data in it.
  */
 public class SiddhiAppMap {
 
-    // TODO: 3/22/18 Clean and comment all the code 
-    
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
     private SiddhiAppRuntime siddhiAppRuntime;
@@ -147,17 +144,23 @@ public class SiddhiAppMap {
      */
     private void loadStreams() {
         for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
+            // Find and create SourceInfo And SinkInfo objects for all the sources and sinks in the
+            // given StreamDefinition
             loadSourcesAndSinks(streamDefinition);
+            // Generate The StreamInfo instance from the StreamDefinition object
             StreamInfo streamInfo = generateStreamInfo(streamDefinition);
             if (streamInfo != null) {
                 streams.add(streamInfo);
             }
         }
 
+        // Obtain All The Inner Stream Information That Are Inside Partitions And Create StreamInfo instances for them
         for (Map<String, AbstractDefinition> map : siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
             for (AbstractDefinition abstractDefinition : map.values()) {
+                // AbstractDefinition should always be an instance of StreamDefinition In This Situation
                 if (abstractDefinition instanceof StreamDefinition) {
                     StreamDefinition streamDefinition = (StreamDefinition) abstractDefinition;
+                    // Generate The StreamInfo instance from the StreamDefinition object
                     StreamInfo streamInfo = generateStreamInfo(streamDefinition);
                     if (streamInfo != null) {
                         streams.add(streamInfo);
@@ -180,6 +183,7 @@ public class SiddhiAppMap {
         List<Annotation> sourceAndSinkAnnotations = getSourceAndSinkAnnotations(streamDefinition);
         for (Annotation annotation : sourceAndSinkAnnotations) {
             if (annotation.getName().equalsIgnoreCase("source")) {
+                // Create SourceInfo If Annotation Name Is Source
                 SourceInfo sourceInfo = new SourceInfo();
                 sourceInfo.setId(UUID.randomUUID().toString());
                 sourceInfo.setName(annotation.getElement("type").toUpperCase());
@@ -188,6 +192,7 @@ public class SiddhiAppMap {
 
                 sources.add(sourceInfo);
             } else if (annotation.getName().equalsIgnoreCase("sink")) {
+                // Create SinkInfo If Annotation Name Is Sink
                 SinkInfo sinkInfo = new SinkInfo();
                 sinkInfo.setId(UUID.randomUUID().toString());
                 sinkInfo.setName(annotation.getElement("type").toUpperCase());
@@ -299,14 +304,20 @@ public class SiddhiAppMap {
         StreamInfo streamInfo = new StreamInfo();
         streamInfo.setId(streamDefinition.getId());
         streamInfo.setName(streamDefinition.getId());
-
-        String streamDefinitionStr = getDefinition(streamDefinition);
-        List<Annotation> sourceAndSinkAnnotations = getSourceAndSinkAnnotations(streamDefinition);
-        for (Annotation annotation : sourceAndSinkAnnotations) {
-            String annotationStr = getDefinition(annotation);
-            streamDefinitionStr = streamDefinitionStr.replace(annotationStr, "");
+        // Get The Stream Definition Without The Source And Sink Annotation Definitions
+        String streamDefinitionTestStr = getDefinition(streamDefinition);
+        if (streamDefinitionTestStr.toLowerCase().contains("define stream")) {
+            // If The StreamDefinition Is A Defined Stream
+            List<Annotation> sourceAndSinkAnnotations = getSourceAndSinkAnnotations(streamDefinition);
+            for (Annotation annotation : sourceAndSinkAnnotations) {
+                String annotationStr = getDefinition(annotation);
+                streamDefinitionTestStr = streamDefinitionTestStr.replace(annotationStr, "");
+            }
+        } else {
+            // If The StreamDefinition Is An Undefined/Inner Stream
+            streamDefinitionTestStr = streamDefinition.toString().replaceAll("'", "\"");
         }
-        streamInfo.setDefinition(streamDefinitionStr);
+        streamInfo.setDefinition(streamDefinitionTestStr);
 
         return streamInfo;
     }
