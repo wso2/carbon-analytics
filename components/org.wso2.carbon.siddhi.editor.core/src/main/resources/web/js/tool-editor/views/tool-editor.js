@@ -177,19 +177,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
-                            self.siddhiAppContent = new AppData();
-                            //TODO: Iterate to the deepest element and get data and save data. EX: a stream should be saved with stream prototype.
-                            designView.renderDesignGrid(self.siddhiAppContent);
+                            designView.renderDesignGrid(JSONObject);
                             sourceContainer.hide();
                             designContainer.show();
                             toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
-                            console.log(JSON.stringify(self.siddhiAppContent));
+                            console.log(JSON.stringify(designView.getSiddhiAppContent()));
                         } else if (designContainer.is(':visible')) {
                             designContainer.hide();
                             sourceContainer.show();
                             self._sourceView.editorResize();
                             toggleViewButton.html("<i class=\"fw fw-design-view\"></i>&nbsp;&nbsp;Design View");
-                            console.log(JSON.stringify(self.siddhiAppContent));
+                            console.log(JSON.stringify(designView.getSiddhiAppContent()));
                         }
                     });
                 },

@@ -16,8 +16,11 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid'],
-    function (require, log, _, $, ToolPalette, DesignViewGrid) {
+define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid', 'appData', 'filterQuery',
+    'joinQuery', 'partition', 'passThroughQuery', 'patternQuery', 'query', 'stream', 'windowQuery', 'leftStream',
+    'rightStream', 'join'],
+    function (require, log, _, $, ToolPalette, DesignViewGrid, AppData, FilterQuery, JoinQuery, Partition,
+              PassThroughQuery, PatternQuery, Query, Stream, WindowQuery, LeftStream, RightStream, Join) {
 
         /**
          * @class DesignView
@@ -42,6 +45,47 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             this._$parent_el = container;
             this.options = options;
             this.application = application;
+        };
+
+        /**
+         * @function drop the query element on the canvas
+         */
+        DesignView.prototype.initialiseSiddhiAppData = function (siddhiAppContent) {
+            var self = this;
+            var appData = new AppData();
+
+            _.forEach(siddhiAppContent.streamList, function(stream){
+                appData.AddStream(new Stream(stream));
+            });
+            _.forEach(siddhiAppContent.filterList, function(filterQuery){
+                appData.AddFilterQuery(new FilterQuery(filterQuery));
+            });
+            _.forEach(siddhiAppContent.passThroughList, function(passThroughQuery){
+                appData.AddPassThroughQuery(new PassThroughQuery(passThroughQuery));
+            });
+            _.forEach(siddhiAppContent.windowQueryList, function(windowQuery){
+                appData.AddWindowQuery(new WindowQuery(windowQuery));
+            });
+            _.forEach(siddhiAppContent.queryList, function(query){
+                appData.AddQuery(new Query(query));
+            });
+            _.forEach(siddhiAppContent.patternList, function(patternQuery){
+                appData.AddPatternQuery(new PatternQuery(patternQuery));
+            });
+            _.forEach(siddhiAppContent.joinQueryList, function(joinQuery){
+                var joinQueryObject = new JoinQuery(joinQuery);
+                var leftStreamSubElement = new LeftStream(joinQuery.join.leftStream);
+                var rightStreamSubElement = new RightStream(joinQuery.join.rightStream);
+                var joinSubElement = new new Join(joinQuery.join);
+                joinSubElement.setLeftStream(leftStreamSubElement);
+                joinSubElement.setRightStream(rightStreamSubElement);
+                joinQueryObject.setJoin(joinSubElement);
+                appData.AddJoinQuery(new JoinQuery(joinQuery));
+            });
+            _.forEach(siddhiAppContent.partitionList, function(partition){
+                appData.AddPartition(new Partition(partition));
+            });
+            self.siddhiAppContent = appData;
         };
 
         /**
@@ -72,7 +116,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          * @param siddhiAppContent Siddhi application content
          */
         DesignView.prototype.renderDesignGrid = function (siddhiAppContent) {
-            //TODO: initilise data.
+            this.initialiseSiddhiAppData(siddhiAppContent);
             var errMsg = '';
             var designViewGridContainer = this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
             if (!designViewGridContainer.length > 0) {
@@ -80,12 +124,18 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                     + _.get(this.options, 'design_view.grid_container');
                 log.error(errMsg);
             }
+            // remove any child nodes from designViewGridContainer if exists
+            designViewGridContainer.empty();
             var designViewGridOpts = {};
             _.set(designViewGridOpts, 'container', designViewGridContainer);
-            _.set(designViewGridOpts, 'appData', siddhiAppContent);
+            _.set(designViewGridOpts, 'appData', this.siddhiAppContent);
             _.set(designViewGridOpts, 'application', this.application);
             var designViewGrid = new DesignViewGrid(designViewGridOpts);
             designViewGrid.render();
+        };
+
+        DesignView.prototype.getSiddhiAppContent = function () {
+            return this.siddhiAppContent;
         };
 
         DesignView.prototype.showToolPalette = function () {
