@@ -23,6 +23,9 @@ package org.wso2.carbon.siddhi.editor.core.util.eventflow.info;
  */
 public class StreamInfo extends SiddhiElementInfo {
 
+    public StreamInfo() {
+    }
+
     public StreamInfo(String id, String name, String definition) {
         super(id, name, definition);
     }
