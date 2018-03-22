@@ -175,7 +175,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             _.set(streamOptions, 'attributes', streamAttributes);
 
             var stream = new Stream(streamOptions);
-            self.appData.AddStream(stream);
+            self.appData.addStream(stream);
             // make the connection
             _jsPlumb.connect({
                 source: id+'-out',
@@ -228,7 +228,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
                     var newQuery = new Query(queryOptions);
                     newQuery.setId(i);
-                    self.appData.AddQuery(newQuery);
+                    self.appData.addQuery(newQuery); //TODO: why not adding to particular querylist? ex :passthrough to passthrough list
                 }
                 var settingsIconId = ""+ i + "-dropQuerySettingsId";
                 var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
@@ -255,7 +255,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
                     var newJoinQuery = new JoinQuery(joinQueryOptions);
                     newJoinQuery.setId(i);
-                    self.appData.AddJoinQuery(newJoinQuery);
+                    self.appData.addJoinQuery(newJoinQuery);
                 }
                 var settingsIconId = ""+ i + "-dropJoinQuerySettingsId";
                 var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
@@ -289,7 +289,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
                     var newPattern = new PatternQuery(patternQueryOptions);
                     newPattern.setId(i);
-                    self.appData.AddPatternQuery(newPattern);
+                    self.appData.addPatternQuery(newPattern);
                 }
                 var settingsIconId = ""+ i + "-dropPatternQuerySettingsId";
                 var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
@@ -495,7 +495,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 _.set(partitionOptions, 'queries', []);
                 var newPartition = new Partition(partitionOptions);
                 newPartition.setId(i);
-                self.appData.AddPartition(newPartition);
+                self.appData.addPartition(newPartition);
             }
         };
 
@@ -583,30 +583,30 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 var elementId = newElement[0].id;
 
                 if (newElement.hasClass('streamdrop')) {
-                    self.appData.streamList.removeElement(elementId);
+                    self.appData.removeStream(elementId);
 
                 } else if (newElement.hasClass('squerydrop')) {
-                    self.appData.queryList.removeElement(elementId);
-                    self.appData.passThroughList.removeElement(elementId);
+                    self.appData.removeQuery(elementId);
+                    self.appData.removePassThroughQuery(elementId);
 
                 } else if (newElement.hasClass('filterdrop')) {
-                    self.appData.queryList.removeElement(elementId);
-                    self.appData.filterList.removeElement(elementId);
+                    self.appData.removeQuery(elementId);
+                    self.appData.removeFilterQuery(elementId);
 
                 } else if (newElement.hasClass('joquerydrop')) {
-                    self.appData.queryList.removeElement(elementId);
-                    self.appData.joinQueryList.removeElement(elementId);
+                    self.appData.removeQuery(elementId);
+                    self.appData.removeJoinQuery(elementId);
 
                 } else if (newElement.hasClass('wquerydrop')) {
-                    self.appData.queryList.removeElement(elementId);
-                    self.appData.windowQueryList.removeElement(elementId);
+                    self.appData.removeQuery(elementId);
+                    self.appData.removeWindowQuery(elementId);
 
                 } else if (newElement.hasClass('stquerydrop')) {
-                    self.appData.queryList.removeElement(elementId);
-                    self.appData.patternList.removeElement(elementId);
+                    self.appData.removeQuery(elementId);
+                    self.appData.removePatternQuery(elementId);
 
                 } else if (newElement.hasClass('partitiondrop')) {
-                    self.appData.partitionList.removeElement(elementId);
+                    self.appData.removePartition(elementId);
 
                 } else if (newElement.hasClass('windowStream')) {
                     //TODO: implement this

@@ -55,22 +55,22 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             var appData = new AppData();
 
             _.forEach(siddhiAppContent.streamList, function(stream){
-                appData.AddStream(new Stream(stream));
+                appData.addStream(new Stream(stream));
             });
             _.forEach(siddhiAppContent.filterList, function(filterQuery){
-                appData.AddFilterQuery(new FilterQuery(filterQuery));
+                appData.addFilterQuery(new FilterQuery(filterQuery));
             });
             _.forEach(siddhiAppContent.passThroughList, function(passThroughQuery){
-                appData.AddPassThroughQuery(new PassThroughQuery(passThroughQuery));
+                appData.addPassThroughQuery(new PassThroughQuery(passThroughQuery));
             });
             _.forEach(siddhiAppContent.windowQueryList, function(windowQuery){
-                appData.AddWindowQuery(new WindowQuery(windowQuery));
+                appData.addWindowQuery(new WindowQuery(windowQuery));
             });
             _.forEach(siddhiAppContent.queryList, function(query){
-                appData.AddQuery(new Query(query));
+                appData.addQuery(new Query(query));
             });
             _.forEach(siddhiAppContent.patternList, function(patternQuery){
-                appData.AddPatternQuery(new PatternQuery(patternQuery));
+                appData.addPatternQuery(new PatternQuery(patternQuery));
             });
             _.forEach(siddhiAppContent.joinQueryList, function(joinQuery){
                 var joinQueryObject = new JoinQuery(joinQuery);
@@ -80,10 +80,10 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 joinSubElement.setLeftStream(leftStreamSubElement);
                 joinSubElement.setRightStream(rightStreamSubElement);
                 joinQueryObject.setJoin(joinSubElement);
-                appData.AddJoinQuery(new JoinQuery(joinQuery));
+                appData.addJoinQuery(new JoinQuery(joinQuery));
             });
             _.forEach(siddhiAppContent.partitionList, function(partition){
-                appData.AddPartition(new Partition(partition));
+                appData.addPartition(new Partition(partition));
             });
             self.siddhiAppContent = appData;
         };

@@ -34,41 +34,82 @@ define(['require', 'elementArray'],
             this.patternList = new ElementArray();
             this.joinQueryList = new ElementArray();
             this.partitionList = new ElementArray();
+            this.edgeList = new ElementArray();
             // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
             this.finalElementCount = 0;
 
         };
 
-        AppData.prototype.AddStream = function (stream) {
+        AppData.prototype.addStream = function (stream) {
             this.streamList.push(stream);
         };
 
-        AppData.prototype.AddFilterQuery = function (filterQuery) {
+        AppData.prototype.addFilterQuery = function (filterQuery) {
             this.filterList.push(filterQuery);
         };
 
-        AppData.prototype.AddPassThroughQuery = function (passThroughQuery) {
+        AppData.prototype.addPassThroughQuery = function (passThroughQuery) {
             this.passThroughList.push(passThroughQuery);
         };
 
-        AppData.prototype.AddWindowQuery = function (windowQuery) {
+        AppData.prototype.addWindowQuery = function (windowQuery) {
             this.windowQueryList.push(windowQuery);
         };
 
-        AppData.prototype.AddQuery = function (query) {
+        AppData.prototype.addQuery = function (query) {
             this.queryList.push(query);
         };
 
-        AppData.prototype.AddPatternQuery = function (patternQuery) {
+        AppData.prototype.addPatternQuery = function (patternQuery) {
             this.patternList.push(patternQuery);
         };
 
-        AppData.prototype.AddJoinQuery = function (joinQuery) {
+        AppData.prototype.addJoinQuery = function (joinQuery) {
             this.joinQueryList.push(joinQuery);
         };
 
-        AppData.prototype.AddPartition = function (partition) {
+        AppData.prototype.addPartition = function (partition) {
             this.partitionList.push(partition);
+        };
+
+        AppData.prototype.addEdge = function (edge) {
+            this.edgeList.push(edge);
+        };
+
+        AppData.prototype.removeStream = function (streamId) {
+            this.streamList.removeElement(streamId);
+        };
+
+        AppData.prototype.removeFilterQuery = function (filterQueryId) {
+            this.filterList.removeElement(filterQueryId);
+        };
+
+        AppData.prototype.removePassThroughQuery = function (passThroughQueryId) {
+            this.passThroughList.removeElement(passThroughQueryId);
+        };
+
+        AppData.prototype.removeWindowQuery = function (windowQueryId) {
+            this.windowQueryList.removeElement(windowQueryId);
+        };
+
+        AppData.prototype.removeQuery = function (queryId) {
+            this.queryList.removeElement(queryId);
+        };
+
+        AppData.prototype.removePatternQuery = function (patternQueryId) {
+            this.patternList.removeElement(patternQueryId);
+        };
+
+        AppData.prototype.removeJoinQuery = function (joinQueryId) {
+            this.joinQueryList.removeElement(joinQueryId);
+        };
+
+        AppData.prototype.removePartition = function (partitionId) {
+            this.partitionList.removeElement(partitionId);
+        };
+
+        AppData.prototype.removeEdge = function (edgeId) {
+            this.edgeList.removeElement(edgeId);
         };
 
         AppData.prototype.setFinalElementCount = function (finalElementCount) {

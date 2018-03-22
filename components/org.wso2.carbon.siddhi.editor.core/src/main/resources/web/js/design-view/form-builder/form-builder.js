@@ -165,7 +165,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 _.set(streamOptions, 'type', 'define-stream');
                 _.set(streamOptions, 'attributes', editor.getValue().attributes);
                 var stream = new Stream(streamOptions);
-                self.appData.AddStream(stream);
+                self.appData.addStream(stream);
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
