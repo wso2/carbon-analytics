@@ -136,11 +136,11 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     var JSONString = "{" +
                         "\"streamList\":{" +
-                        "\"0\":{ \"id\":1," +
+                        "\"0\":{ \"id\":\"1\"," +
                         "\"define\":\"das\"," +
                         "\"type\":\"define-stream\"," +
                         "\"attributes\":[{\"attribute\":\"DA\",\"type\":\"string\"}]}," +
-                        "\"1\":{ \"id\":3," +
+                        "\"1\":{ \"id\":\"3\"," +
                         "\"define\":\"asc\"," +
                         "\"type\":\"define-stream\"," +
                         "\"attributes\":[{\"attribute\":\"\",\"type\":\"string\"}]}," +
@@ -150,10 +150,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"passThroughList\":{}," +
                         "\"windowQueryList\":{}," +
                         "\"queryList\":{" +
-                        "\"0\":{ \"id\":2," +
+                        "\"0\":{ \"id\":\"2\"," +
                         "\"name\":\"\"," +
-                        "\"from\":1," +
-                        "\"insertInto\":3," +
+                        "\"from\":\"1\"," +
+                        "\"insertInto\":\"3\"," +
                         "\"filter\":\"\"," +
                         "\"postWindowFilter\":\"\"," +
                         "\"window\":\"\"," +
@@ -164,6 +164,19 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"patternList\":{}," +
                         "\"joinQueryList\":{}," +
                         "\"partitionList\":{}," +
+                        "\"edgeList\":{" +
+                        "\"0\":{ \"id\":\"2_1\"," +
+                        " \"parentId\":\"2\"," +
+                        " \"parentType\":\"query\"," +
+                        " \"childId\":\"1\"," +
+                        " \"childType\":\"stream\"}," +
+                        "\"1\":{ \"id\":\"3_2\"," +
+                        " \"parentId\":\"3\"," +
+                        " \"parentType\":\"stream\"," +
+                        " \"childId\":\"2\"," +
+                        " \"childType\":\"query\"}," +
+                        "\"length\":2" +
+                        "},"+
                         "\"finalElementCount\":0"+
                         "}";
 

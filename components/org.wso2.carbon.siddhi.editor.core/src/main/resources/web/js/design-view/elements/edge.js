@@ -28,7 +28,7 @@ define(
         var Edge = function (options) {
             /*
              Data storing structure as follows
-                id: '',
+                id: '',  ex: 'parentId_childId'
                 parentId: '',
                 parentType: '',
                 childId: '',

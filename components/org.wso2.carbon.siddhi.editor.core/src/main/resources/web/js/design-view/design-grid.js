@@ -15,9 +15,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'dagre'],
+define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'dagre', 'edge'],
 
-    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre) {
+    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre, Edge) {
 
         var constants = {
             STREAM: 'streamdrop',
@@ -169,7 +169,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 });
             });
 
-            function checkConnectionValidityBeforeElementDrop() { // check the validity of the connections and drop if invalid
+            // check the validity of the connections and drop if invalid
+            function checkConnectionValidityBeforeElementDrop() { //TODO: streams can be connected to streams?
                 _jsPlumb.bind('beforeDrop', function (connection) {
                     var connectionValidity = true;
                     var target = connection.targetId;
@@ -219,7 +220,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 });
             }
 
-            function updateModelOnConnectionAttach() { // Update the model when a connection is established and bind events for the connection
+            // Update the model when a connection is established and bind events for the connection
+            function updateModelOnConnectionAttach() {
                 _jsPlumb.bind('connection', function (connection) {
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
@@ -228,6 +230,17 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
                     var sourceElement = $('#' + sourceId);
+
+                    // create and add an ege to the edgeList
+                    var edgeOptions = {};
+                    var edgeId = ''+ targetId + '_' + sourceId + '';
+                    _.set(edgeOptions, 'id', edgeId);
+                    _.set(edgeOptions, 'parentId', targetId);
+                    _.set(edgeOptions, 'parentType', 'query');//TODO: correct this
+                    _.set(edgeOptions, 'childId', sourceId);
+                    _.set(edgeOptions, 'childType', 'stream');
+                    var edge = new Edge(edgeOptions);
+                    self.appData.addEdge(edge);
 
                     var model;
 
@@ -382,7 +395,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 });
             }
 
-            function updateModelOnConnectionDetach() { // Update the model when a connection is detached
+            // Update the model when a connection is detached
+            function updateModelOnConnectionDetach() {
                 _jsPlumb.bind('connectionDetached', function (connection) {
 
                     var target = connection.targetId;
@@ -392,6 +406,10 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
                     var sourceElement = $('#' + sourceId);
+
+                    // removing edge from the edgeList
+                    var edgeId = ''+ targetId + '_' + sourceId + '';
+                    self.appData.removeEdge(edgeId);
 
                     var model;
                     var streams;
@@ -563,7 +581,39 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
         };
 
         DesignGrid.prototype.drawGraphFromAppData = function () {
-            //TODO:newAgentId should be considered
+            var self = this;
+
+            _.forEach(self.appData.streamList, function(stream){
+                var mouseTop = 100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = 200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var streamId = stream.getId();
+                var streamName = stream.getDefine();
+                self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
+            });
+
+            _.forEach(self.appData.queryList, function(query){
+                var mouseTop = 300 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = 400 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var queryId = query.getId();
+                var queryName = query.getName();
+                self.handlePassThroughQuery(mouseTop, mouseLeft, true, queryId, queryName);
+                //TODO: correct query types saving style. ex: passthrough should be saved in passthroughList
+            });
+            _.forEach(self.appData.edgeList, function(edge){
+
+                var targetId = edge.getParentId();
+                var targetType = edge.getParentType();
+                var targetElement = $('#' + targetId);
+
+                var sourceId = edge.getChildId();
+                var sourceElement = $('#' + sourceId);
+                var sourceType = edge.getChildType();
+
+                _jsPlumb.connect({
+                    source: sourceId + "-out",
+                    target: targetId + "-in"
+                });
+            });
         };
 
         DesignGrid.prototype.generateNextId = function () {
@@ -631,23 +681,33 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // }
         };
 
-        DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamName) {
+        DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('streamdrop');
-
+            var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.newAgentId;
+                self.generateNextId();    // Increment the Element ID for the next dropped Element
                 // The container and the toolbox are disabled to prevent the user from dropping any elements before
                 // initializing a Stream Element
                 self.canvas.addClass("disabledbutton");
                 $("#tool-palette-container").addClass("disabledbutton");
                 $("#output-console-activate-button").addClass("disabledbutton");
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(streamId !== undefined) {
+                    elementId = streamId;
+                } else {
+                    console.log("streamId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
             }
+
+            var newAgent = $('<div>').attr('id', elementId).addClass('streamdrop');
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
-            self.dropElements.dropStream(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode,
+            self.dropElements.dropStream(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
                 false, streamName);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.generateNextId();    // Increment the Element ID for the next dropped Element
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
@@ -662,15 +722,35 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        DesignGrid.prototype.handlePassThroughQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+        DesignGrid.prototype.handlePassThroughQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, queryId,
+                                                                queryName) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('squerydrop');
-            var droptype = "squerydrop";
+            var elementId;
+            var passThroughQueryName;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.newAgentId;
+                passThroughQueryName = "Empty Query";
+                self.generateNextId();    // Increment the Element ID for the next dropped Element
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(queryId !== undefined) {
+                    elementId = queryId;
+                } else {
+                    console.log("queryId parameter is undefined");
+                }
+                if(queryName !== undefined) {
+                    passThroughQueryName = queryName;
+                } else {
+                    console.log("queryName parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            var newAgent = $('<div>').attr('id', elementId).addClass('squerydrop');
+            var dropType = "squerydrop";
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
+            self.dropElements.dropQuery(newAgent, elementId, dropType, mouseTop, mouseLeft, passThroughQueryName,
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 

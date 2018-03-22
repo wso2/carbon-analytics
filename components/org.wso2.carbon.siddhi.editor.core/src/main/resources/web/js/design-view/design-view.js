@@ -18,9 +18,9 @@
 
 define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid', 'appData', 'filterQuery',
     'joinQuery', 'partition', 'passThroughQuery', 'patternQuery', 'query', 'stream', 'windowQuery', 'leftStream',
-    'rightStream', 'join'],
+    'rightStream', 'join', 'edge'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, AppData, FilterQuery, JoinQuery, Partition,
-              PassThroughQuery, PatternQuery, Query, Stream, WindowQuery, LeftStream, RightStream, Join) {
+              PassThroughQuery, PatternQuery, Query, Stream, WindowQuery, LeftStream, RightStream, Join, Edge) {
 
         /**
          * @class DesignView
@@ -84,6 +84,9 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             });
             _.forEach(siddhiAppContent.partitionList, function(partition){
                 appData.addPartition(new Partition(partition));
+            });
+            _.forEach(siddhiAppContent.edgeList, function(edge){
+                appData.addEdge(new Edge(edge));
             });
             self.siddhiAppContent = appData;
         };

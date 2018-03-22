@@ -67,7 +67,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @param top top position of the element
          * @param left left position of the element
          * @param isCodeToDesignMode whether code to design mode is enable or not
-         * @param isGenerateStreamFromQueryOutput whether this element is generated as a ourpur stream in a query
+         * @param isGenerateStreamFromQueryOutput whether this element is generated as a output stream in a query
          * @param streamName name of the stream
          */
         DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
