@@ -1402,7 +1402,7 @@ public class TemplateManagerService implements BusinessRulesService {
             if (TemplateManagerConstants.ONE.equalsIgnoreCase(instanceLimit) && count >= 1) {
                 throw new TemplateInstanceCountViolationException("Rule Template '" +
                         (businessRuleFromTemplate.getRuleTemplateUUID() + "' can be instantiated " +
-                        "only once and has already been instantiated.");
+                        "only once and has already been instantiated."));
             }
         } else if (businessRule instanceof BusinessRuleFromScratch) {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
