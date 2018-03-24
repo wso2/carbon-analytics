@@ -35,6 +35,7 @@ import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.msf4j.MicroservicesRegistry;
+import org.apache.log4j.Logger;
 
 import java.net.URI;
 import java.nio.file.Path;
@@ -54,7 +55,7 @@ import com.google.gson.JsonObject;
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class BusinessRulesManagerTestCase {
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BusinessRulesManagerTestCase.class);
+    private static final Logger logger = Logger.getLogger(BusinessRulesManagerTestCase.class);
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
@@ -93,8 +94,7 @@ public class BusinessRulesManagerTestCase {
                         .versionAsInProject()),
 
                 carbonDistribution(Paths.get("target", "wso2das-" +
-                        System.getProperty("carbon.analytic.version")), "dashboard")/*,
-                CarbonDistributionOption.debug(5005)*/
+                        System.getProperty("carbon.analytic.version")), "dashboard")
         };
     }
 
