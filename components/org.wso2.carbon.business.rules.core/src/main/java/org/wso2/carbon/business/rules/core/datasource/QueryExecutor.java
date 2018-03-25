@@ -70,7 +70,8 @@ public class QueryExecutor {
             conn.commit();
             return result;
         } catch (SQLException e) {
-            throw new BusinessRulesDatasourceException("Inserting business rule with uuid '" + uuid + "' is failed. ", e);
+            throw new BusinessRulesDatasourceException("Inserting business rule with uuid '" +
+                    uuid + "' is failed. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -310,7 +311,8 @@ public class QueryExecutor {
             }
             return list;
         } catch (SQLException e) {
-            throw new BusinessRulesDatasourceException("Retrieving all the business rules from database is failed. ", e);
+            throw new BusinessRulesDatasourceException("Retrieving all the business rules from database " +
+                    "is failed. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -475,7 +477,8 @@ public class QueryExecutor {
         return preparedStatement;
     }
 
-    private PreparedStatement getStatementForDeletingBusinessRule(Connection conn, String businessRuleUUID) throws SQLException {
+    private PreparedStatement getStatementForDeletingBusinessRule(Connection conn, String businessRuleUUID)
+            throws SQLException {
         PreparedStatement preparedStatement = conn.prepareStatement(queryManager
                 .getQuery(DatasourceConstants.DELETE_BUSINESS_RULE));
         preparedStatement.setString(1, businessRuleUUID);
