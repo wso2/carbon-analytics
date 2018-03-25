@@ -7,6 +7,8 @@ public class ParentSummaryDetails {
     private List <String> groups = new ArrayList<>();
     private int childApps = 0;
     private List<String> usedWorkerNode = new ArrayList<>();
+    private List<String> deployedChildApps = new ArrayList<>();
+    private List<String> unDeployedChildApps = new ArrayList<>();
 
 
     public List<String> getGroups() {
@@ -31,5 +33,21 @@ public class ParentSummaryDetails {
 
     public void setUsedWorkerNode(List<String> usedWorkerNode) {
         this.usedWorkerNode = usedWorkerNode;
+    }
+
+    public List<String> getDeployedChildApps() {
+        return deployedChildApps;
+    }
+
+    public void setDeployedChildApps(List<String> deployedChildApps) {
+        this.deployedChildApps = deployedChildApps;
+    }
+
+    public List<String> getUnDeployedChildApps() {
+        return unDeployedChildApps;
+    }
+
+    public void setUnDeployedChildApps(List<String> unDeployedChildApps) {
+        this.unDeployedChildApps = unDeployedChildApps;
     }
 }
