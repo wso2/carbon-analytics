@@ -31,9 +31,13 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     this._options = options;
                     var self = this;
                     this._activateBtn.on('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
+                        if (self.activeConsole.options._type === "FORM") {
+                            $(self.activeConsole).trigger('close-button-in-form-clicked');
+                        } else {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
+                        }
                     });
                     this._clearConsoleBtn.on('click', function (e) {
                         e.preventDefault();

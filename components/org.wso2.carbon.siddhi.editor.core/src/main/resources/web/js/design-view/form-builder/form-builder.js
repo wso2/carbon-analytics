@@ -56,9 +56,12 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
         /**
          * @function generate a tab in the output console to view the form
+         * @param elementId id of the element which form is created for
+         * @param elementType type of the element
          * @returns newly created formConsole
          */
-        FormBuilder.prototype.createTabForForm = function () {
+        FormBuilder.prototype.createTabForForm = function (elementId, elementType) {
+            var self = this;
             var activeTab = this.application.tabController.getActiveTab();
             var siddhiAppName = "";
 
@@ -92,7 +95,20 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
             _.set(options, 'consoleObj', console);
             _.set(consoleOptions, 'consoleOptions', options);
-            return this.consoleListManager.newFormConsole(consoleOptions);
+            var formConsole = this.consoleListManager.newFormConsole(consoleOptions);
+            $(formConsole).on( "close-button-in-form-clicked", function() {
+                if(elementType === constants.STREAM) {
+                    if(self.appData.getStream(elementId) === undefined) {
+                        $("#"+elementId).remove();
+                    }//TODO: Add other types like tables, triggers etc
+                }
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+                $("#grid-container").removeClass("disabledbutton");
+                $("#tool-palette-container").removeClass("disabledbutton");
+            });
+            return formConsole;
         };
 
         /**
@@ -102,7 +118,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
          */
         FormBuilder.prototype.DefineStream = function (i) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(i, constants.STREAM);
             var formContainer = formConsole.getContentContainer();
             var propertyDiv = $('<div id="property-header"><h3>Define Stream </h3></div>' +
                 '<div id="define-stream" class="define-stream"></div>');
@@ -169,6 +185,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
 
                 self.gridContainer.removeClass("disabledbutton");
                 self.toolPaletteContainer.removeClass("disabledbutton");
@@ -266,6 +283,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
             });
 
             // 'Cancel' button action
@@ -276,6 +294,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
             });
         };
 
@@ -306,6 +325,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
             }
             else if (!(clickedElement.getInsertInto())) {
                 // retrieve the query information from the collection
@@ -443,6 +463,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
 
                     var config = editor.getValue();
 
@@ -487,6 +508,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     self.toolPaletteContainer.removeClass('disabledbutton');
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
                 });
             } else {
                 // retrieve the query information from the collection
@@ -640,6 +662,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
                     var config = editor.getValue();
 
                     // change the query icon depending on the fields(filter, window) filled
@@ -676,6 +699,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     self.toolPaletteContainer.removeClass('disabledbutton');
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
                 });
             }
         };
@@ -702,6 +726,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
             } else if (clickedElement.getInsertInto() === '') {
                 alert('Connect an output stream');
                 self.gridContainer.removeClass('disabledbutton');
@@ -709,6 +734,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
             } else {
                 // retrieve the pattern information from the collection
                 var streams = [];
@@ -913,6 +939,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
 
                     var config = editor.getValue();
 
@@ -951,6 +978,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     self.toolPaletteContainer.removeClass('disabledbutton');
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
                 });
             }
         };
@@ -977,6 +1005,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
             }
             else if (!(clickedElement.getInsertInto())) {
                 alert('Connect an output stream');
@@ -985,6 +1014,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
             }
 
             else {
@@ -1180,6 +1210,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
 
                     var config = editor.getValue();
                     // update selected query object
@@ -1223,6 +1254,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
                 });
             }
         };
@@ -1304,6 +1336,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
 
                     var config = editor.getValue();
                     $.each(partitionKeys, function ( index , key) {
@@ -1324,6 +1357,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
                 });
             }
         };
