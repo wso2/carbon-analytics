@@ -16,10 +16,10 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid', 'appData', 'filterQuery',
+define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid', 'appData', 'filterQuery',
     'joinQuery', 'partition', 'passThroughQuery', 'patternQuery', 'query', 'stream', 'windowQuery', 'leftStream',
     'rightStream', 'join', 'edge'],
-    function (require, log, _, $, ToolPalette, DesignViewGrid, AppData, FilterQuery, JoinQuery, Partition,
+    function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, FilterQuery, JoinQuery, Partition,
               PassThroughQuery, PatternQuery, Query, Stream, WindowQuery, LeftStream, RightStream, Join, Edge) {
 
         /**
@@ -120,17 +120,8 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          */
         DesignView.prototype.renderDesignGrid = function (siddhiAppContent) {
             this.initialiseSiddhiAppData(siddhiAppContent);
-            var errMsg = '';
-            var designViewGridContainer = this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
-            if (!designViewGridContainer.length > 0) {
-                errMsg = 'unable to find design view grid container with selector: '
-                    + _.get(this.options, 'design_view.grid_container');
-                log.error(errMsg);
-            }
-            // remove any child nodes from designViewGridContainer if exists
-            designViewGridContainer.empty();
             var designViewGridOpts = {};
-            _.set(designViewGridOpts, 'container', designViewGridContainer);
+            _.set(designViewGridOpts, 'container', this.designViewGridContainer);
             _.set(designViewGridOpts, 'appData', this.siddhiAppContent);
             _.set(designViewGridOpts, 'application', this.application);
             var designViewGrid = new DesignViewGrid(designViewGridOpts);
@@ -139,6 +130,20 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
 
         DesignView.prototype.getSiddhiAppContent = function () {
             return this.siddhiAppContent;
+        };
+
+        DesignView.prototype.emptyDesignViewGridContainer = function () {
+            var errMsg = '';
+            this.designViewGridContainer = this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
+            if (!this.designViewGridContainer.length > 0) {
+                errMsg = 'unable to find design view grid container with selector: '
+                    + _.get(this.options, 'design_view.grid_container');
+                log.error(errMsg);
+            }
+            // remove any child nodes from designViewGridContainer if exists
+            this.designViewGridContainer.empty();
+            // reset the jsPlumb common instance
+            _jsPlumb.reset();
         };
 
         DesignView.prototype.showToolPalette = function () {

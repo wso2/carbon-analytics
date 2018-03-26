@@ -79,7 +79,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
 
             hideConsoleComponents: function () {
                 var self = this;
-                var consoleHeaderContainer = self._$parent_el
+                var consoleHeaderContainer = self._$parent_el;
                 var serviceWrapper =  $('#service-tabs-wrapper');
                 consoleHeaderContainer.addClass('hide');
                 serviceWrapper.css('height', '100%');

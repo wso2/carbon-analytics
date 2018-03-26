@@ -148,6 +148,10 @@ define(['require', 'elementArray'],
             return this.partitionList.getElement(partitionId);
         };
 
+        AppData.prototype.getEdge = function (edgeId) {
+            return this.edgeList.getElement(edgeId);
+        };
+
         AppData.prototype.getFinalElementCount = function () {
             return this.finalElementCount;
         };

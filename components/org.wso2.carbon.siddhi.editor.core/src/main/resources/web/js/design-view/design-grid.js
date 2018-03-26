@@ -232,15 +232,23 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var sourceElement = $('#' + sourceId);
 
                     // create and add an ege to the edgeList
-                    var edgeOptions = {};
+
                     var edgeId = ''+ targetId + '_' + sourceId + '';
-                    _.set(edgeOptions, 'id', edgeId);
-                    _.set(edgeOptions, 'parentId', targetId);
-                    _.set(edgeOptions, 'parentType', 'query');//TODO: correct this
-                    _.set(edgeOptions, 'childId', sourceId);
-                    _.set(edgeOptions, 'childType', 'stream');
-                    var edge = new Edge(edgeOptions);
-                    self.appData.addEdge(edge);
+                    var edgeInTheEdgeList = self.appData.getEdge(edgeId);
+                    if(edgeInTheEdgeList !== undefined) {
+                        //TODO update the model. why?: query type can be changed even the connection  is same
+                        //edgeInTheEdgeList.setParentType('');
+                        //edgeInTheEdgeList.setChildType('');
+                    } else {
+                        var edgeOptions = {};
+                        _.set(edgeOptions, 'id', edgeId);
+                        _.set(edgeOptions, 'parentId', targetId);
+                        _.set(edgeOptions, 'parentType', 'query');//TODO: correct this
+                        _.set(edgeOptions, 'childId', sourceId);
+                        _.set(edgeOptions, 'childType', 'stream');
+                        var edge = new Edge(edgeOptions);
+                        self.appData.addEdge(edge);
+                    }
 
                     var model;
 
@@ -584,34 +592,30 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
 
             _.forEach(self.appData.streamList, function(stream){
-                var mouseTop = 100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = 200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+
                 var streamId = stream.getId();
                 var streamName = stream.getDefine();
+                var mouseTop = parseInt(streamId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = parseInt(streamId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
             });
 
             _.forEach(self.appData.queryList, function(query){
-                var mouseTop = 300 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = 400 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 var queryId = query.getId();
                 var queryName = query.getName();
+                var mouseTop = parseInt(queryId)*100  - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = parseInt(queryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handlePassThroughQuery(mouseTop, mouseLeft, true, queryId, queryName);
                 //TODO: correct query types saving style. ex: passthrough should be saved in passthroughList
             });
             _.forEach(self.appData.edgeList, function(edge){
 
                 var targetId = edge.getParentId();
-                var targetType = edge.getParentType();
-                var targetElement = $('#' + targetId);
-
                 var sourceId = edge.getChildId();
-                var sourceElement = $('#' + sourceId);
-                var sourceType = edge.getChildType();
 
                 _jsPlumb.connect({
-                    source: sourceId + "-out",
-                    target: targetId + "-in"
+                    source: sourceId+'-out',
+                    target: targetId+'-in'
                 });
             });
         };
@@ -686,7 +690,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.newAgentId;
-                self.generateNextId();    // Increment the Element ID for the next dropped Element
                 // The container and the toolbox are disabled to prevent the user from dropping any elements before
                 // initializing a Stream Element
                 self.canvas.addClass("disabledbutton");
@@ -701,7 +704,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-
+            // increment the Element ID for the next dropped Element
+            self.generateNextId();    //TODO: in code to design option we need to think of setting the next id after all the elements are dropped on the canvas
             var newAgent = $('<div>').attr('id', elementId).addClass('streamdrop');
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
@@ -730,7 +734,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.newAgentId;
                 passThroughQueryName = "Empty Query";
-                self.generateNextId();    // Increment the Element ID for the next dropped Element
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(queryId !== undefined) {
                     elementId = queryId;
@@ -745,6 +748,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
+            // increment the Element ID for the next dropped Element
+            self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass('squerydrop');
             var dropType = "squerydrop";
             // Drop the element instantly since its projections will be set only when the user requires it

@@ -17,10 +17,10 @@
  */
 
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager','launcher','app/debugger/debugger', 'appData'],
+        'undo_manager','launcher','app/debugger/debugger'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants,UndoManager,Launcher,
-        DebugManager, AppData) {
+        DebugManager) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -180,8 +180,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"finalElementCount\":0"+
                         "}";
 
-                    var JSONObject = JSON.parse(JSONString);
-                    console.log(JSONObject);
+                    this.JSONObject = JSON.parse(JSONString);
+                    console.log(this.JSONObject);
 
                     var application = self.options.application;
                     var designView = new DesignView(self.options, application);
@@ -190,12 +190,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
-                            designView.renderDesignGrid(JSONObject);
                             sourceContainer.hide();
+                            designView.emptyDesignViewGridContainer();
                             designContainer.show();
                             toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
+                            designView.renderDesignGrid(self.JSONObject);
                             console.log(JSON.stringify(designView.getSiddhiAppContent()));
+                            self.JSONObject = JSON.parse(JSON.stringify(designView.getSiddhiAppContent()));
                         } else if (designContainer.is(':visible')) {
+                            self.JSONObject = JSON.parse(JSON.stringify(designView.getSiddhiAppContent()));
                             designContainer.hide();
                             sourceContainer.show();
                             self._sourceView.editorResize();
