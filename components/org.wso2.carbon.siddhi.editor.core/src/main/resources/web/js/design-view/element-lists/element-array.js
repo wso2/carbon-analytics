@@ -60,6 +60,13 @@ define(
             });
         };
 
+        /**
+         * Removes all elements from the array.
+         */
+        ElementArray.prototype.removeAllElements = function () {
+            this.length = 0;
+        };
+
         return ElementArray;
 
     });
