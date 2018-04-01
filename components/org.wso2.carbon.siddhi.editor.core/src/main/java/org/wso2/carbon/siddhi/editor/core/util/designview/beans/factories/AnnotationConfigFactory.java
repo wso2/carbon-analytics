@@ -31,15 +31,33 @@ import java.util.Map;
  * Factory to create Siddhi Annotation config
  */
 public class AnnotationConfigFactory {
-    public AnnotationConfig getAnnotationConfig(String name, String value) {
-        return new ListAnnotationConfig(name, new ArrayList<>(Arrays.asList(value)));
-    }
-
+    /**
+     * Returns a ListAnnotationConfig with the given name and values
+     * @param name      Name of the annotation
+     * @param values    List of values, inside the annotation
+     * @return          ListAnnotationConfig, with given list's members
+     */
     public AnnotationConfig getAnnotationConfig(String name, List<String> values) {
         return new ListAnnotationConfig(name, values);
     }
 
+    /**
+     * Returns a MapAnnotationConfig with the given name and values
+     * @param name      Name of the annotation
+     * @param elements  Option Value pairs, inside the annotation
+     * @return          MapAnnotationConfig, with the given map's members
+     */
     public AnnotationConfig getAnnotationConfig(String name, Map<String, String> elements) {
         return new MapAnnotationConfig(name, elements);
+    }
+
+    /**
+     * Returns a ListAnnotationConfig with the given name and value. Single value is added as the only list member
+     * @param name      Name of the annotation
+     * @param value     Value inside the annotation
+     * @return          ListAnnotationConfig, with the given value as the only member of the list
+     */
+    public AnnotationConfig getAnnotationConfig(String name, String value) { // TODO: 4/1/18 Might have to remove
+        return new ListAnnotationConfig(name, new ArrayList<>(Arrays.asList(value)));
     }
 }
