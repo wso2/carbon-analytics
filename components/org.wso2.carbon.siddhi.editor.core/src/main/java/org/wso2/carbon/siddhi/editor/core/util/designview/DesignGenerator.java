@@ -256,12 +256,12 @@ public class DesignGenerator {
                 annotationElements.put(element.getKey(), element.getValue());
             }
         }
-        if (annotationElements.size() == 0 && annotationValues.size() == 0) {
-            // No elements inside the annotation. Consider as an empty ListAnnotation
+        if (annotationElements.isEmpty() && annotationValues.isEmpty()) {
+            // No elements inside the annotation. Consider as an empty ListAnnotationConfig
             return new ListAnnotationConfig(annotation.getName(), new ArrayList<>(0));
         }
         AnnotationConfigFactory annotationConfigFactory = new AnnotationConfigFactory();
-        if (annotationElements.size() == 0) {
+        if (annotationElements.isEmpty()) {
             return annotationConfigFactory.getAnnotationConfig(annotation.getName(), annotationValues);
         }
         return annotationConfigFactory.getAnnotationConfig(annotation.getName(), annotationElements);
