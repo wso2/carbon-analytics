@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-message-tracer-handler-feature</artifactId>
-        <version>1.3.26</version>
+        <version>1.3.27-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
