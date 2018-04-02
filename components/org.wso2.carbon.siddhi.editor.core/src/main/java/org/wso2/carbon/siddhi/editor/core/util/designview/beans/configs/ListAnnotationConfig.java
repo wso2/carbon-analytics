@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AnnotationConfigType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AnnotationConfigTypes;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class ListAnnotationConfig extends AnnotationConfig {
     private List<String> value;
 
     public ListAnnotationConfig(String name, List<String> value) {
-        super(name, AnnotationConfigType.LIST);
+        super(name, AnnotationConfigTypes.LIST);
         this.value = value;
     }
 

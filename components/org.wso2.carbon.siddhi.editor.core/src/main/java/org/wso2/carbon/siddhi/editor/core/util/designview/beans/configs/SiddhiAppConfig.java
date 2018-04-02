@@ -43,6 +43,7 @@ public class SiddhiAppConfig {
     private List<TableConfig> tableList;
     private List<TriggerConfig> triggerList;
     private List<WindowConfig> windowList;
+    private List<AggregationConfig> aggregationList;
     // TODO: 3/27/18 Other {Element}Lists
 
     // TODO: 3/28/18 For restricting unnecessary instantiation
@@ -102,6 +103,11 @@ public class SiddhiAppConfig {
         finalElementCount++;
     }
 
+    public void add(AggregationConfig aggregationConfig) {
+        aggregationList.add(aggregationConfig);
+        finalElementCount++;
+    }
+
     public int getFinalElementCount() {
         return finalElementCount;
     }
@@ -136,5 +142,9 @@ public class SiddhiAppConfig {
 
     public List<WindowConfig> getWindowList() {
         return windowList;
+    }
+
+    public List<AggregationConfig> getAggregationList() {
+        return aggregationList;
     }
 }

@@ -33,5 +33,11 @@ public class StoreConfig extends SiddhiElementConfig {
         this.options = options;
     }
 
-    // TODO: 3/29/18 complete
+    public String getType() {
+        return type;
+    }
+
+    public Map<String, String> getOptions() {
+        return options;
+    }
 }

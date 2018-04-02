@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AnnotationConfigType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AnnotationConfigTypes;
 
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public class MapAnnotationConfig extends AnnotationConfig {
     private Map<String, String> value;
 
     public MapAnnotationConfig(String name, Map<String, String> value) {
-        super(name, AnnotationConfigType.MAP);
+        super(name, AnnotationConfigTypes.MAP);
         this.value = value;
     }
 
