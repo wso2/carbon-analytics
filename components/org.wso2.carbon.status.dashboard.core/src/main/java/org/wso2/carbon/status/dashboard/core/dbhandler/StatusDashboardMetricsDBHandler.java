@@ -760,6 +760,16 @@ public class StatusDashboardMetricsDBHandler {
                 statement.setString(i, (String) parameters[i - 1]);
             } else if(parameters[i - 1] instanceof Long){
                 statement.setLong(i, (Long) parameters[i - 1]);
+            } else if(parameters[i - 1] instanceof Double){
+                statement.setDouble(i, (Double) parameters[i - 1]);
+            } else if(parameters[i - 1] instanceof Integer){
+                statement.setInt(i, (Integer) parameters[i - 1]);
+            } else if(parameters[i - 1] instanceof Float){
+                statement.setFloat(i, (Float) parameters[i - 1]);
+            } else if(parameters[i - 1] instanceof Boolean){
+                statement.setBoolean(i, (Boolean) parameters[i - 1]);
+            } else {
+                logger.error("Invalid Type of Object.");
             }
         }
     }
