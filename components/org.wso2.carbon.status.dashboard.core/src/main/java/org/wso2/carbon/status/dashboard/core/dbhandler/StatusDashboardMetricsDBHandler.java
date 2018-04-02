@@ -608,6 +608,7 @@ public class StatusDashboardMetricsDBHandler {
         try {
             stmt = conn.prepareStatement(query);
             for (int i = 1; i <= parameters.length; i++) {
+                //currently always the queries has two long values at the end and others are string values.
                 if(i <= parameters.length - 2){
                     stmt.setString(i, parameters[i - 1]);
                 } else{
@@ -664,6 +665,7 @@ public class StatusDashboardMetricsDBHandler {
         try {
             stmt = conn.prepareStatement(query);
             for (int i = 1; i <= parameters.length; i++) {
+                //currently always the queries has two long values at the end and others are string values.
                 if(i <= parameters.length - 2){
                     stmt.setString(i, parameters[i - 1]);
                 } else{
@@ -724,6 +726,7 @@ public class StatusDashboardMetricsDBHandler {
         try {
             stmt = conn.prepareStatement(query);
             for (int i = 1; i <= parameters.length; i++) {
+                //currently always the queries has two long values at the end and others are string values.
                 if(i <= parameters.length - 2){
                     stmt.setString(i, parameters[i - 1]);
                 } else{
