@@ -39,9 +39,6 @@ public class BusinessRulesQueryConfigs {
     private ArrayList<HashMap<String, ArrayList<String>>> deployment_configs;
     private HashMap<String, Object> roles;
 
-    public BusinessRulesQueryConfigs() {
-    }
-
     public ArrayList<Queries> getQueries() {
         return queries;
     }
