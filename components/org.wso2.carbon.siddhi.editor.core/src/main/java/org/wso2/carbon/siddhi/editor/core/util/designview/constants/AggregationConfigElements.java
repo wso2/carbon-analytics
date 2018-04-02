@@ -19,19 +19,17 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Has types of nodes in design view, which are Siddhi app elements
+ * Has elements of AggregationConfig
  */
-public class NodeType {
-    public static final String STREAM = "stream";
-    public static final String SOURCE = "source";
-    public static final String SINK = "sink";
-    public static final String TABLE = "table";
-    public static final String WINDOW = "window";
-    public static final String TRIGGER = "trigger";
+public class AggregationConfigElements {
+    public static final String SELECT_AGGREGATE_FUNCTION = "aggregateFunction";
+    public static final String SELECT_AGGREGATE_ATTRIBUTE = "attribute";
+    public static final String AGGREGATE_BY_TIME_STAMP = "timeStamp";
+    public static final String AGGREGATE_BY_TIME_PERIOD = "timePeriod";
 
     /**
      * Avoids instantiation
      */
-    private NodeType() {
+    private AggregationConfigElements() {
     }
 }

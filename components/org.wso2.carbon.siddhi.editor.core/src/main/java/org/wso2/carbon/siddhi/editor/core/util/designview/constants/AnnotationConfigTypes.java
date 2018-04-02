@@ -19,16 +19,15 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Has types of a Siddhi app annotation
+ * Has types of an AnnotationConfig
  */
-public class SiddhiAnnotationType {
-    public static final String NAME = "name";
-    public static final String DESCRIPTION = "description";
-    public static final String INFO = "info";
+public class AnnotationConfigTypes {
+    public static final String LIST = "list";
+    public static final String MAP = "map";
 
     /**
      * Avoids instantiation
      */
-    private SiddhiAnnotationType() {
+    private AnnotationConfigTypes() {
     }
 }
