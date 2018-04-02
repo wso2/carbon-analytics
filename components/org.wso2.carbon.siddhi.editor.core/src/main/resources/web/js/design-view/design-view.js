@@ -54,8 +54,25 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             var self = this;
             var appData = new AppData();
 
+            // adds annotations from a json object for an element object
+            function addAnnotationsForElement(element, newElementObject) {
+                _.forEach(element.annotationList, function(annotation){
+                    newElementObject.addAnnotation(annotation);
+                });
+            }
+
+            // adds attributes from a json object for an element object
+            function addAttributesForElement(element, newElementObject) {
+                _.forEach(element.attributeList, function(attribute){
+                    newElementObject.addAttribute(attribute);
+                });
+            }
+
             _.forEach(siddhiAppContent.streamList, function(stream){
-                appData.addStream(new Stream(stream));
+                var streamObject = new Stream(stream);
+                //addAnnotationsForElement(stream, streamObject);
+                addAttributesForElement(stream, streamObject);
+                appData.addStream(streamObject);
             });
             _.forEach(siddhiAppContent.filterList, function(filterQuery){
                 appData.addFilterQuery(new FilterQuery(filterQuery));
@@ -80,7 +97,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 joinSubElement.setLeftStream(leftStreamSubElement);
                 joinSubElement.setRightStream(rightStreamSubElement);
                 joinQueryObject.setJoin(joinSubElement);
-                appData.addJoinQuery(new JoinQuery(joinQuery));
+                appData.addJoinQuery(joinQueryObject);
             });
             _.forEach(siddhiAppContent.partitionList, function(partition){
                 appData.addPartition(new Partition(partition));

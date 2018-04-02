@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(
-    function () {
+define(['require', 'elementArray'],
+    function (require, ElementArray) {
 
         /**
          * @class Stream
@@ -29,51 +29,81 @@ define(
             /*
              Data storing structure as follows
                 id: '',
-                define: '',
-                type: '',
-                attributes: [
-                     {
-                        attribute:'',
-                        type: ''
-                     }
+                name: '',
+                isInnerStream: {boolean},
+                attributeList: [
+                    {
+                        name: ‘’,
+                        type: ‘’
+                    }
+                ],
+                annotationList: [
+                    {
+                        name: ‘’,
+                        type: ‘value’,
+                        value: [‘value1’,’value2’]
+                    },
+                    and|or
+                    {
+                        name: ‘’
+                        type: ‘keyValue’,
+                        value: {‘option’:’value’}
+                    }
                 ]
             */
             this.id = options.id;
-            this.define = options.define;
-            this.type = options.type;
-            this.attributes = options.attributes;
+            this.name = options.name;
+            this.isInnerStream = options.isInnerStream;
+            this.attributeList =  new ElementArray();
+            this.annotationList =  new ElementArray();
+        };
+
+        Stream.prototype.addAttribute = function (attribute) {
+            this.attributeList.push(attribute);
+        };
+
+        Stream.prototype.addAnnotation = function (annotation) {
+            this.annotationList.push(annotation);
         };
 
         Stream.prototype.getId = function () {
             return this.id;
         };
 
-        Stream.prototype.getDefine = function () {
-            return this.define;
+        Stream.prototype.getName = function () {
+            return this.name;
         };
 
-        Stream.prototype.getType = function () {
-            return this.type;
+        Stream.prototype.getIsInnerStream = function () {
+            return this.isInnerStream;
         };
 
-        Stream.prototype.getAttributes = function () {
-            return this.attributes;
+        Stream.prototype.getAttributeList = function () {
+            return this.attributeList;
+        };
+
+        Stream.prototype.getAnnotationList = function () {
+            return this.annotationList;
         };
 
         Stream.prototype.setId = function (id) {
             this.id = id;
         };
 
-        Stream.prototype.setDefine = function (define) {
-            this.define = define;
+        Stream.prototype.setName = function (name) {
+            this.define = name;
         };
 
-        Stream.prototype.setType = function (type) {
-            this.type = type;
+        Stream.prototype.setIsInnerStream = function (isInnerStream) {
+            this.isInnerStream = isInnerStream;
         };
 
-        Stream.prototype.setAttributes = function (attributes) {
-            this.attributes = attributes;
+        Stream.prototype.setAttributeList = function (attributeList) {
+            this.attributeList = attributeList;
+        };
+
+        Stream.prototype.setAnnotationList = function (annotationList) {
+            this.annotationList = annotationList;
         };
 
         return Stream;

@@ -155,27 +155,44 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          */
         DropElements.prototype.dropStreamFromQuery = function (position , id, outStream, streamAttributes) {
             var self = this;
-            var elementID = self.designGrid.getNewAgentId();
-            var newAgent = $('<div>').attr('id', elementID).addClass('streamdrop');
+            //TODO: send whether this should be an inner stream or not by checking query is inner
+            var isStreamNameUsed = false;
+            var elementID;
+            _.forEach(self.appData.streamList, function(stream){
+                if(stream.getName().toUpperCase() === outStream.toUpperCase()) {
+                    isStreamNameUsed = true;
+                    elementID = stream.getId();
+                }
+            });
+            if(!isStreamNameUsed) {
+                elementID = self.designGrid.getNewAgentId();
+                var newAgent = $('<div>').attr('id', elementID).addClass('streamdrop');
+                $(self.container).append(newAgent);
 
+                // drop the stream
+                self.dropStream(newAgent, elementID, position.top, position.left + 200, false, true, outStream);
+
+                // add the new out stream to the stream array
+                var streamOptions = {};
+                _.set(streamOptions, 'id', i);
+                _.set(streamOptions, 'name', outStream);
+                _.set(streamOptions, 'isInnerStream', false);
+                var stream = new Stream(streamOptions);
+                _.forEach(streamAttributes, function (attribute) {
+                    stream.addAttribute(attribute);
+                });
+                self.appData.addStream(stream);
+
+                // increment the variable newAgentId and the final element count
+                self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
+                self.designGrid.generateNextId();
+                self.registerElementEventListeners(newAgent);
+            }
             // The container and the tool palette are disabled to prevent the user from dropping any elements
             // before initializing a Stream Element
             $("#grid-container").removeClass("disabledbutton");
             $("#tool-palette-container").removeClass("disabledbutton");
-            $(self.container).append(newAgent);
 
-            // drop the stream
-            self.dropStream(newAgent, elementID, position.top, position.left + 200, false, true, outStream);
-
-            // add the new out stream to the stream array
-            var streamOptions = {};
-            _.set(streamOptions, 'id', elementID);
-            _.set(streamOptions, 'define', outStream);
-            _.set(streamOptions, 'type', 'define-stream');
-            _.set(streamOptions, 'attributes', streamAttributes);
-
-            var stream = new Stream(streamOptions);
-            self.appData.addStream(stream);
             // make the connection
             _jsPlumb.connect({
                 source: id+'-out',
@@ -184,10 +201,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             // update the query model with output stream
             var query = self.appData.getQuery(id);
             query.setInsertInto(elementID);
-            // increment the variable newAgentId and the final element count
-            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.designGrid.generateNextId();
-            self.registerElementEventListeners(newAgent);
         };
 
         /**

@@ -80,7 +80,6 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             _.set(options, 'appName', siddhiAppName);
 
             var console = this.consoleListManager.getGlobalConsole();
-
             if(console === undefined){
                 var globalConsoleOptions = {};
                 var opts = {};
@@ -133,19 +132,26 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     properties: {
                         name: {
                             type: "string",
-                            title: "Name"
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
                         },
                         attributes: {
+                            required: true,
+                            propertyOrder: 2,
                             type: "array",
                             format: "table",
                             title: "Attributes",
                             uniqueItems: true,
+                            minItems: 1,
                             items: {
                                 type: "object",
                                 title : 'Attribute',
                                 properties: {
                                     attribute: {
-                                        type: "string"
+                                        type: "string",
+                                        minLength: 1
                                     },
                                     type: {
                                         type: "string",
@@ -161,12 +167,47 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                                     }
                                 }
                             }
-                        }
+                        }//, TODO: Since annotations structure is not confirmed, commenting it.
+                        // annotations: {
+                        //     required: true,
+                        //     propertyOrder: 3,
+                        //     type: 'object',
+                        //     title: 'Annotations',          //@Async(buffer.size='64')
+                        //     properties: {                 //@info(name='HelloWorldQuery')
+                        //         Async: {
+                        //             type: 'object',
+                        //             title: 'Async',
+                        //             annotationType: 'map',
+                        //             properties: {
+                        //                 prop1: {
+                        //                     title: 'buffer.size',
+                        //                     type: "integer",
+                        //                     required: true
+                        //                 }
+                        //             },
+                        //             propertyOrder: 1
+                        //         }, //TODO: start here
+                        //         Info: {
+                        //             type: 'object',
+                        //             title: 'Info',
+                        //             annotationType: 'map',
+                        //             properties: {
+                        //                 prop1: {
+                        //                     title: 'name',
+                        //                     type: "string",
+                        //                     required: true
+                        //                 }
+                        //             },
+                        //             propertyOrder: 2
+                        //         }
+                        //     }
+                        // }
                     }
                 },
-                disable_properties: true,
                 disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true
+                disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true
             });
 
             formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
@@ -174,21 +215,33 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                // add the new out stream to the stream array
-                var streamOptions = {};
-                _.set(streamOptions, 'id', i);
-                _.set(streamOptions, 'define', editor.getValue().name);
-                _.set(streamOptions, 'type', 'define-stream');
-                _.set(streamOptions, 'attributes', editor.getValue().attributes);
-                var stream = new Stream(streamOptions);
-                self.appData.addStream(stream);
+                var isStreamNameUsed = false;
+                _.forEach(self.appData.streamList, function(stream){
+                    if(stream.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
+                        isStreamNameUsed = true;
+                    }
+                });
+                if(isStreamNameUsed) {
+                    alert("Stream name \"" + editor.getValue().name + "\" is already used.");
+                } else {
+                    // add the new out stream to the stream array
+                    var streamOptions = {};
+                    _.set(streamOptions, 'id', i);
+                    _.set(streamOptions, 'name', editor.getValue().name);
+                    _.set(streamOptions, 'isInnerStream', false);
+                    var stream = new Stream(streamOptions);
+                    _.forEach(editor.getValue().attributes, function (attribute) {
+                        stream.addAttribute(attribute);
+                    });
+                    self.appData.addStream(stream);
 
-                // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                    // close the form window
+                    self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
 
-                self.gridContainer.removeClass("disabledbutton");
-                self.toolPaletteContainer.removeClass("disabledbutton");
+                    self.gridContainer.removeClass("disabledbutton");
+                    self.toolPaletteContainer.removeClass("disabledbutton");
+                }
             });
             return editor.getValue().name;
         };
@@ -213,8 +266,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
             }
-            var name = clickedElement.getDefine();
-            var attributes = clickedElement.getAttributes();
+            var name = clickedElement.getName();
+            var attributes = clickedElement.getAttributeList();
             var fillWith = {
                 name : name,
                 attributes : attributes
@@ -226,18 +279,26 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     properties: {
                         name: {
                             type: "string",
-                            title: "Name"
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
                         },
                         attributes: {
+                            required: true,
+                            propertyOrder: 2,
                             type: "array",
                             format: "table",
                             title: "Attributes",
                             uniqueItems: true,
+                            minItems: 1,
                             items: {
                                 type: "object",
+                                title : 'Attribute',
                                 properties: {
                                     attribute: {
-                                        type: "string"
+                                        type: "string",
+                                        minLength: 1
                                     },
                                     type: {
                                         type: "string",
@@ -275,8 +336,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 var config = editor.getValue();
 
                 // update selected stream model
-                clickedElement.setDefine(config.name);
-                clickedElement.setAttributes(config.attributes);
+                clickedElement.setName(config.name);
+                // removing all elements from attribute list
+                clickedElement.getAttributeList().removeAllElements();
+                // adding new attributes to the attribute list
+                _.forEach(config.attributes, function(attribute){
+                    clickedElement.addAttribute(attribute);
+                });
 
                 var textNode = $(element).parent().find('.streamnamenode');
                 textNode.html(config.name);
@@ -330,7 +396,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             else if (!(clickedElement.getInsertInto())) {
                 // retrieve the query information from the collection
                 var name = clickedElement.getName();
-                var inStream = (self.appData.getStream(clickedElement.getFrom())).getDefine();
+                var inStream = (self.appData.getStream(clickedElement.getFrom())).getName();
                 var filter1 = clickedElement.getFilter();
                 var window = clickedElement.getWindow();
                 var filter2 = clickedElement.getPostWindowFilter();
@@ -497,7 +563,6 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                     textNode.html(config.name);
                     // generate the stream defined as the output stream
                     var position = $(element).parent().position();
-                    //TODO: check whether it is needed to add a stream since there might be a stream with that name alredy existed
                     self.dropElements.dropStreamFromQuery(position, id, config.insertInto, streamAttributes);
                 });
 
@@ -513,14 +578,14 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             } else {
                 // retrieve the query information from the collection
                 var name = clickedElement.getName();
-                var inStream = (self.appData.getStream(clickedElement.getFrom())).getDefine();
-                var outStream = (self.appData.getStream(clickedElement.getInsertInto())).getDefine();
+                var inStream = (self.appData.getStream(clickedElement.getFrom())).getName();
+                var outStream = (self.appData.getStream(clickedElement.getInsertInto())).getName();
                 var filter1 = clickedElement.getFilter();
                 var window = clickedElement.getWindow();
                 var filter2 = clickedElement.getPostWindowFilter();
                 var outputType = clickedElement.getOutputType();
                 var attrString = [];
-                var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributes();
+                var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
                 if (clickedElement.getProjection() === '') {
                     for (var i = 0; i < outStreamAttributes.length; i++) {
                         var attr = {select: '', newName: outStreamAttributes[i].attribute};
@@ -740,11 +805,11 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 var streams = [];
                 var projections = [];
                 $.each(clickedElement.getFrom(), function (index, streamID) {
-                    streams.push((self.appData.getStream(streamID)).getDefine());
+                    streams.push((self.appData.getStream(streamID)).getName());
                 });
 
-                var insertInto = self.appData.getStream(clickedElement.getInsertInto()).getDefine();
-                var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributes();
+                var insertInto = self.appData.getStream(clickedElement.getInsertInto()).getName();
+                var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
                 if (clickedElement.getProjection() === '') {
                     for (var i = 0; i < outStreamAttributes.length; i++) {
                         var attr = {select: '', newName: outStreamAttributes[i].attribute};
@@ -1020,11 +1085,11 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             else {
                 var streams = [];
                 $.each(clickedElement.getFrom(), function (index, streamID) {
-                    streams.push((self.appData.getStream(streamID)).getDefine());
+                    streams.push((self.appData.getStream(streamID)).getName());
                 });
                 var projections = [];
-                var insertInto = self.appData.getStream(clickedElement.getInsertInto()).getDefine();
-                var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributes();
+                var insertInto = self.appData.getStream(clickedElement.getInsertInto()).getName();
+                var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
                 if (!(clickedElement.getProjection())) {
                     for (var i = 0; i < outStreamAttributes.length; i++) {
                         var attr = {select: '', newName: outStreamAttributes[i].attribute};
@@ -1289,7 +1354,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                 $.each(partitionKeys, function ( index , key) {
                     if( key.stream == connectedStream){
                         fillWith ={
-                            stream : (self.appData.getStream(connectedStream)).getDefine(),
+                            stream : (self.appData.getStream(connectedStream)).getName(),
                             property : key.property
                         }
                     }
@@ -1311,7 +1376,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
                                 title: 'Stream',
                                 required: true,
                                 propertyOrder: 1,
-                                template: (self.appData.getStream(connectedStream)).getDefine()
+                                template: (self.appData.getStream(connectedStream)).getName()
                             },
                             property: {
                                 type: 'string',

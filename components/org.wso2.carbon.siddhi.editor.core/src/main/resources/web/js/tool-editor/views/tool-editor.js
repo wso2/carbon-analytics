@@ -137,12 +137,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var JSONString = "{" +
                         "\"streamList\":{" +
                         "\"0\":{ \"id\":\"1\"," +
-                        "\"define\":\"das\"," +
-                        "\"type\":\"define-stream\"," +
+                        "\"name\":\"das\"," +
                         "\"attributes\":[{\"attribute\":\"DA\",\"type\":\"string\"}]}," +
                         "\"1\":{ \"id\":\"3\"," +
-                        "\"define\":\"asc\"," +
-                        "\"type\":\"define-stream\"," +
+                        "\"name\":\"asc\"," +
                         "\"attributes\":[{\"attribute\":\"\",\"type\":\"string\"}]}," +
                         "\"length\":2" +
                         "}," +

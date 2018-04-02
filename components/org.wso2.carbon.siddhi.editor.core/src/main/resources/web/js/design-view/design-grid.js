@@ -222,6 +222,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
             // Update the model when a connection is established and bind events for the connection
             function updateModelOnConnectionAttach() {
+                //TODO: whenever a annotation is changed, delete the entire annotation and save on it
                 _jsPlumb.bind('connection', function (connection) {
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
@@ -560,19 +561,40 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 });
             }
 
-            function addMemberToPartitionGroup() {
+            function addMemberToPartitionGroup(self) {
                 _jsPlumb.bind('group:addMember', function (event) {
-                    var partitionId = $(event.group).attr('id');
-                    var partition = self.appData.getPartition(partitionId);
-                    var queries = partition.getQueries();
-                    if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PASS_THROUGH)
-                        || $(event.el).hasClass(constants.WINDOW_QUERY)) {
-                        queries.push(self.appData.getQuery($(event.el).attr('id')));
-                        partition.setQueries(queries);
-                    }
-                    else if ($(event.el).hasClass(constants.JOIN)) {
-                        queries.push(self.appData.getJoinQuery($(event.el).attr('id')));
-                        partition.setQueries(queries);
+                    if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PASS_THROUGH)
+                        || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
+                        || $(event.el).hasClass(constants.STREAM)) {
+
+                        var connections = _jsPlumb.getConnections(event.el);
+                        //TODO: insert into can be connected to a outside(not inner) stream as well
+                        if($(event.el).hasClass(constants.STREAM)) {
+
+                        }
+                        var detachedElement = $(event.el).detach();
+                        $(detachedElement).insertBefore($(event.group)[0].getEl());
+                        self.autoAlignElements();
+                        alert("bc");//TODO: add a proper error message and add align
+                        // TODO: stand alone inner stream form should not be displayed
+                        var partitionId = $(event.group).attr('id');
+                        var partition = self.appData.getPartition(partitionId);
+                        var queries = partition.getQueries();
+                        if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PASS_THROUGH)
+                            || $(event.el).hasClass(constants.WINDOW_QUERY)) {
+                            queries.push(self.appData.getQuery($(event.el).attr('id')));
+                            //TODO: set isInner flag true
+                            partition.setQueries(queries);
+                        }
+                        else if ($(event.el).hasClass(constants.JOIN)) {
+                            queries.push(self.appData.getJoinQuery($(event.el).attr('id')));
+                            partition.setQueries(queries);
+                        }
+                    } else {
+                        alert("Invalid element type dropped into partition!");
+                        var detachedElement = $(event.el).detach();
+                        $(detachedElement).insertBefore($(event.group)[0].getEl());
+                        self.autoAlignElements();
                     }
                 });
             }
@@ -583,7 +605,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
             updateModelOnConnectionDetach();
 
-            addMemberToPartitionGroup();
+            addMemberToPartitionGroup(self);
 
             self.drawGraphFromAppData();
         };
@@ -594,7 +616,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             _.forEach(self.appData.streamList, function(stream){
 
                 var streamId = stream.getId();
-                var streamName = stream.getDefine();
+                var streamName = stream.getName();
                 var mouseTop = parseInt(streamId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = parseInt(streamId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
@@ -815,6 +837,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
+            //TODO: connection points should be able to remove( close icon). Then update on connection detach.
         };
 
         DesignGrid.prototype.getNewAgentId = function () {
