@@ -48,6 +48,12 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/stream.png"
                 },
                 {
+                    id : "table",
+                    className : "table",
+                    title : "Table",
+                    icon : "/editor/images/table.png"
+                },
+                {
                     id : "window-stream",
                     className : "window-stream",
                     title : "window",

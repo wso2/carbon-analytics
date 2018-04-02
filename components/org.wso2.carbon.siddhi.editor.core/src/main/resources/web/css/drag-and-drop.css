@@ -70,7 +70,10 @@
 }
 
 .streamdrop{
-    background-image: url("../images/stream.png") ;
+    background-image: url("../images/stream.png");
+}
+.tabledrop{
+    background-image: url("../images/table.png");
 }
 .wstreamdrop {
     background-image: url("../images/windowStream.png");
@@ -100,7 +103,7 @@
     Dropped Elements corresponding to their toolbox elements
 */
 
-.streamdrop, .wstreamdrop ,.squerydrop, .filterdrop, .wquerydrop, .joquerydrop, .stquerydrop {
+.streamdrop, .tabledrop, .wstreamdrop, .squerydrop, .filterdrop, .wquerydrop, .joquerydrop, .stquerydrop {
     border-radius: 0.5em;
     opacity: 0.8;
     width: 60px;
@@ -250,13 +253,13 @@ td {
     -webkit-background-clip: text;
 }
 
-.connectorInStream{
+.connectorInStream, .connectorInTable{
     float: left;
     margin-top: -33%;
     margin-left: -13px;
 }
 
-.connectorOutStream{
+.connectorOutStream, .connectorOutTable{
     float: right;
     margin-top: -33%;
     margin-right: -13px;
@@ -289,7 +292,7 @@ td {
     margin-right: -10%;
 }
 
-.streamNameNode , .queryNameNode , .windowNameNode, .partitionNameNode{
+.tableNameNode, .streamNameNode , .queryNameNode , .windowNameNode, .partitionNameNode{
     float:right;
     width:inherit;
     height:inherit;

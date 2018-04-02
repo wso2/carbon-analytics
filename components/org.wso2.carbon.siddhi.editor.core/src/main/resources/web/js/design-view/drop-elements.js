@@ -17,12 +17,13 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQuery', 'partition', 'passThroughQuery',
-    'patternQuery', 'query', 'stream', 'windowQuery', 'formBuilder'],
+    'patternQuery', 'query', 'stream', 'table', 'windowQuery', 'formBuilder'],
     function (require, log, _, $, _jsPlumb, FilterQuery, JoinQuery, Partition, PassThroughQuery, PatternQuery, Query,
-              Stream, WindowQuery, FormBuilder) {
+              Stream, Table, WindowQuery, FormBuilder) {
 
         var constants = {
             STREAM: 'streamdrop',
+            TABLE: 'tabledrop',
             PASS_THROUGH : 'squerydrop',
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
@@ -201,6 +202,82 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             // update the query model with output stream
             var query = self.appData.getQuery(id);
             query.setInsertInto(elementID);
+        };
+
+        /**
+         * @function drop the table element on the canvas
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
+         * @param tableName name of the table
+         */
+        DropElements.prototype.dropTable = function (newAgent, i, top, left, isCodeToDesignMode, tableName) {
+            /*
+             The node hosts a text node where the Table's name input by the user will be held.
+             Rather than simply having a `newAgent.text(tableName)` statement, as the text function tends to
+             reposition the other appended elements with the length of the Table name input by the user.
+            */
+
+            var self= this;
+            var name;
+            if(isCodeToDesignMode) {
+                name = tableName;
+            } else {
+               name = self.formBuilder.DefineTable(i);
+            }
+            var node = $('<div>' + name + '</div>');
+            newAgent.append(node);
+            node.attr('id', i+"-nodeInitial");
+            node.attr('class', "tableNameNode");
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the Table Element will
+             be displayed as an alert message
+            */
+            var settingsIconId = ""+ i + "-dropTableSettingsId";
+            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+                'class="element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
+                'class="element-close-icon collapse">').append(prop);
+
+            var settingsIconElement = $('#'+settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForTables(this);
+            });
+
+            var finalElement = newAgent;
+
+            /*
+             connection --> The connection anchor point is appended to the element
+             */
+            var connection1 = $('<div class="connectorInTable">').attr('id', i+"-in" ).addClass('connection');
+            var connection2 = $('<div class="connectorOutTable">').attr('id', i+"-out" ).addClass('connection');
+
+
+            finalElement.append(connection1);
+            finalElement.append(connection2);
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            _jsPlumb.draggable(finalElement, {
+                containment: 'grid-container'
+            });
+            _jsPlumb.makeTarget(connection1, {
+                deleteEndpointsOnDetach:true,
+                anchor: 'Left'
+            });
+
+            _jsPlumb.makeSource(connection2, {
+                deleteEndpointsOnDetach : true,
+                anchor : 'Right'
+            });
         };
 
         /**

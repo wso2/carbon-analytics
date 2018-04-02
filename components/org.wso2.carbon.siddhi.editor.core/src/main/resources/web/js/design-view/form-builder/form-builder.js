@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream', 'rightStream', 'join'],
-    function (require, log, $, _, jsPlumb, Stream, LeftStream, RightStream, Join) {
+define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'leftStream', 'rightStream', 'join'],
+    function (require, log, $, _, jsPlumb, Stream, Table, LeftStream, RightStream, Join) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -29,6 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
 
         var constants = {
             STREAM: 'streamdrop',
+            TABLE: 'tabledrop',
             PASS_THROUGH : 'squerydrop',
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
@@ -98,6 +99,11 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             $(formConsole).on( "close-button-in-form-clicked", function() {
                 if(elementType === constants.STREAM) {
                     if(self.appData.getStream(elementId) === undefined) {
+                        $("#"+elementId).remove();
+                    }//TODO: Add other types like tables, triggers etc
+                }
+                if(elementType === constants.TABLE) {
+                    if(self.appData.getTable(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }//TODO: Add other types like tables, triggers etc
                 }
@@ -365,6 +371,226 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
         };
 
         /**
+         * @function generate the form to define the table once it is dropped on the canvas
+         * @param i id for the element
+         * @returns user given table name
+         */
+        FormBuilder.prototype.DefineTable = function (i) {
+            var self = this;
+            var formConsole = this.createTabForForm(i, constants.TABLE);
+            var formContainer = formConsole.getContentContainer();
+            var propertyDiv = $('<div id="property-header"><h3>Define Table </h3></div>' +
+                '<div id="define-table" class="define-table"></div>');
+            formContainer.append(propertyDiv);
+            var tableElement = $("#define-table")[0];
+
+            // generate the form to define a table
+            var editor = new JSONEditor(tableElement, {
+                schema: {
+                    type: "object",
+                    title: "Table",
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
+                        },
+                        attributes: {
+                            required: true,
+                            propertyOrder: 2,
+                            type: "array",
+                            format: "table",
+                            title: "Attributes",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : 'Attribute',
+                                properties: {
+                                    attribute: {
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    type: {
+                                        type: "string",
+                                        enum: [
+                                            "string",
+                                            "int",
+                                            "long",
+                                            "float",
+                                            "double",
+                                            "boolean"
+                                        ],
+                                        default: "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true
+            });
+
+            formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
+
+            // 'Submit' button action
+            var submitButtonElement = $('#submit')[0];
+            submitButtonElement.addEventListener('click', function () {
+                var isTableNameUsed = false;
+                _.forEach(self.appData.tableList, function(table){
+                    if(table.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
+                        isTableNameUsed = true;
+                    }
+                });
+                if(isTableNameUsed) {
+                    alert("Table name \"" + editor.getValue().name + "\" is already used.");
+                } else {
+                    // add the new out table to the table array
+                    var tableOptions = {};
+                    _.set(tableOptions, 'id', i);
+                    _.set(tableOptions, 'name', editor.getValue().name);
+                    _.set(tableOptions, 'store', '');
+                    var table = new Table(tableOptions);
+                    _.forEach(editor.getValue().attributes, function (attribute) {
+                        table.addAttribute(attribute);
+                    });
+                    self.appData.addTable(table);
+
+                    // close the form window
+                    self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
+
+                    self.gridContainer.removeClass("disabledbutton");
+                    self.toolPaletteContainer.removeClass("disabledbutton");
+                }
+            });
+            return editor.getValue().name;
+        };
+
+        /**
+         * @function generate the property window for an existing table
+         * @param element selected element(table)
+         */
+        FormBuilder.prototype.GeneratePropertiesFormForTables = function (element) {
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            // The container and the tool palette are disabled to prevent the user from dropping any elements
+            self.gridContainer.addClass("disabledbutton");
+            self.toolPaletteContainer.addClass("disabledbutton");
+
+            var id = $(element).parent().attr('id');
+            // retrieve the table information from the collection
+            var clickedElement = self.appData.getTable(id);
+            if(clickedElement === undefined) {
+                var errorMessage = 'unable to find clicked element';
+                log.error(errorMessage);
+            }
+            var name = clickedElement.getName();
+            var attributes = clickedElement.getAttributeList();
+            var fillWith = {
+                name : name,
+                attributes : attributes
+            };
+            var editor = new JSONEditor(formContainer[0], {
+                schema: {
+                    type: "object",
+                    title: "Table",
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
+                        },
+                        attributes: {
+                            required: true,
+                            propertyOrder: 2,
+                            type: "array",
+                            format: "table",
+                            title: "Attributes",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : 'Attribute',
+                                properties: {
+                                    attribute: {
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    type: {
+                                        type: "string",
+                                        enum: [
+                                            "string",
+                                            "int",
+                                            "long",
+                                            "float",
+                                            "double",
+                                            "boolean"
+                                        ],
+                                        default: "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                disable_properties: true,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                startval: fillWith
+            });
+            $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                'class="btn btn-default">Submit</button></div>' +
+                '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+
+            // 'Submit' button action
+            var submitButtonElement = $('#form-submit')[0];
+            submitButtonElement.addEventListener('click', function () {
+                // The container and the palette are disabled to prevent the user from dropping any elements
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                var config = editor.getValue();
+
+                // update selected table model
+                clickedElement.setName(config.name);
+                // removing all elements from attribute list
+                clickedElement.getAttributeList().removeAllElements();
+                // adding new attributes to the attribute list
+                _.forEach(config.attributes, function(attribute){
+                    clickedElement.addAttribute(attribute);
+                });
+
+                var textNode = $(element).parent().find('.tablenamenode');
+                textNode.html(config.name);
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            });
+
+            // 'Cancel' button action
+            var cancelButtonElement = $('#form-cancel')[0];
+            cancelButtonElement.addEventListener('click', function () {
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            });
+        };
+
+        /**
          * @function generate the property window for the simple queries ( passthrough, filter and window)
          * @param element selected element(query)
          */
@@ -385,7 +611,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'leftStream',
             }
             var type= $(element).parent();
             if (!(clickedElement.getFrom())) {
-                alert('Connect an input stream');
+                alert('Connect an input stream'); //TODO: check here table also? Restructure all the forms according to this.
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
 

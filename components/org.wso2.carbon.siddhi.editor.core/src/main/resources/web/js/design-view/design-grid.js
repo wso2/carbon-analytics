@@ -21,6 +21,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
         var constants = {
             STREAM: 'streamdrop',
+            TABLE: 'tabledrop',
             PASS_THROUGH : 'squerydrop',
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
@@ -99,7 +100,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                  */
                 self.canvas.droppable
                 ({
-                    accept: '.stream, .window-stream, .pass-through, .filter-query, .join-query, .window-query, ' +
+                    accept: '.stream, .table, .window-stream, .pass-through, .filter-query, .join-query, .window-query, ' +
                     '.pattern, .partition',
                     containment: 'grid-container',
 
@@ -124,6 +125,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         // If the dropped Element is a Stream then->
                         if ($(droppedElement).hasClass('stream')) {
                             self.handleStream(mouseTop, mouseLeft, false);
+                        }
+
+                        // If the dropped Element is a Table then->
+                        if ($(droppedElement).hasClass('table')) {
+                            self.handleTable(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Window(not window query) then->
@@ -203,7 +209,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     else if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)
                         || targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.JOIN)) {
-                        if (!(sourceElement.hasClass(constants.STREAM))) {
+                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE))) {
                             connectionValidity = false;
                             alert("Invalid Connection");
                         }
@@ -211,7 +217,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     else if (sourceElement.hasClass(constants.PASS_THROUGH) || sourceElement.hasClass(constants.FILTER)
                         || sourceElement.hasClass(constants.WINDOW_QUERY)
                         || sourceElement.hasClass(constants.PATTERN) || sourceElement.hasClass(constants.JOIN)) {
-                        if (!(targetElement.hasClass(constants.STREAM))) {
+                        if (!(targetElement.hasClass(constants.STREAM))) { //TODO: can a output of a query connected to a table
                             connectionValidity = false;
                             alert("Invalid Connection");
                         }
@@ -727,12 +733,41 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             // increment the Element ID for the next dropped Element
-            self.generateNextId();    //TODO: in code to design option we need to think of setting the next id after all the elements are dropped on the canvas
+            self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass('streamdrop');
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
             self.dropElements.dropStream(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
                 false, streamName);
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handleTable = function (mouseTop, mouseLeft, isCodeToDesignMode, tableId, tableName) {
+            var self = this;
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.newAgentId;
+                // The container and the toolbox are disabled to prevent the user from dropping any elements before
+                // initializing a Table Element
+                self.canvas.addClass("disabledbutton");
+                $("#tool-palette-container").addClass("disabledbutton");
+                $("#output-console-activate-button").addClass("disabledbutton");
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(tableId !== undefined) {
+                    elementId = tableId;
+                } else {
+                    console.log("tableId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            // increment the Element ID for the next dropped Element
+            self.generateNextId();
+            var newAgent = $('<div>').attr('id', elementId).addClass('tabledrop');
+            self.canvas.append(newAgent);
+            // Drop the Table element. Inside this a it generates the table definition form.
+            self.dropElements.dropTable(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, tableName);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
         };
