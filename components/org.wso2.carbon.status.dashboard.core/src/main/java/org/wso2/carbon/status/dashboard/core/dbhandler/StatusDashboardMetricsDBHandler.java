@@ -520,8 +520,8 @@ public class StatusDashboardMetricsDBHandler {
                 QUESTION_MARK).replace(PLACEHOLDER_NAME, QUESTION_MARK)
                 .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                 .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK);
-        String[] parameters = new String[]{workerId, Long.toString(currentTime - timeInterval),
-                Long.toString(currentTime), metricTypeName};
+        String[] parameters = new String[]{workerId, metricTypeName, Long.toString(currentTime - timeInterval),
+                Long.toString(currentTime)};
         return selectGauge(resolvedQuery, false, parameters);
     }
 
@@ -543,8 +543,8 @@ public class StatusDashboardMetricsDBHandler {
                 .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                 .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
                 .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
-        String[] parameters = new String[]{workerId, Long.toString(currentTime - timeInterval),
-                Long.toString(currentTime), metricTypeName};
+        String[] parameters = new String[]{workerId, metricTypeName, Long.toString(currentTime - timeInterval),
+                Long.toString(currentTime)};
         return selectGauge(resolvedQuery, true, parameters);
     }
 
@@ -608,7 +608,11 @@ public class StatusDashboardMetricsDBHandler {
         try {
             stmt = conn.prepareStatement(query);
             for (int i = 1; i <= parameters.length; i++) {
-                stmt.setString(i, parameters[i - 1]);
+                if(i <= parameters.length - 2){
+                    stmt.setString(i, parameters[i - 1]);
+                } else{
+                    stmt.setLong(i, Long.parseLong(parameters[i - 1]));
+                }
             }
             rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
@@ -660,7 +664,11 @@ public class StatusDashboardMetricsDBHandler {
         try {
             stmt = conn.prepareStatement(query);
             for (int i = 1; i <= parameters.length; i++) {
-                stmt.setString(i, parameters[i - 1]);
+                if(i <= parameters.length - 2){
+                    stmt.setString(i, parameters[i - 1]);
+                } else{
+                    stmt.setLong(i, Long.parseLong(parameters[i - 1]));
+                }
             }
             rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
@@ -716,7 +724,11 @@ public class StatusDashboardMetricsDBHandler {
         try {
             stmt = conn.prepareStatement(query);
             for (int i = 1; i <= parameters.length; i++) {
-                stmt.setString(i, parameters[i - 1]);
+                if(i <= parameters.length - 2){
+                    stmt.setString(i, parameters[i - 1]);
+                } else{
+                    stmt.setLong(i, Long.parseLong(parameters[i - 1]));
+                }
             }
             rs = DBHandler.getInstance().select(stmt);
             String timestampCol = "TIMESTAMP";
