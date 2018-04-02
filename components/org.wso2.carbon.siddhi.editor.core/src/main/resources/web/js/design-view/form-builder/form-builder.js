@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'leftStream', 'rightStream', 'join'],
-    function (require, log, $, _, jsPlumb, Stream, Table, LeftStream, RightStream, Join) {
+define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'window', 'leftStream', 'rightStream', 'join'],
+    function (require, log, $, _, jsPlumb, Stream, Table, Window, LeftStream, RightStream, Join) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -35,7 +35,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'lef
             JOIN : 'joquerydrop',
             WINDOW_QUERY : 'wquerydrop',
             PATTERN : 'stquerydrop',
-            WINDOW_STREAM :'',
+            WINDOW:'windowdrop',
             PARTITION :'partitiondrop'
         };
 
@@ -571,6 +571,321 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'lef
                 });
 
                 var textNode = $(element).parent().find('.tablenamenode');
+                textNode.html(config.name);
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            });
+
+            // 'Cancel' button action
+            var cancelButtonElement = $('#form-cancel')[0];
+            cancelButtonElement.addEventListener('click', function () {
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            });
+        };
+
+        /**
+         * @function generate the form to define the window once it is dropped on the canvas
+         * @param i id for the element
+         * @returns user given window name
+         */
+        FormBuilder.prototype.DefineWindow = function (i) {
+            var self = this;
+            var formConsole = this.createTabForForm(i, constants.WINDOW);
+            var formContainer = formConsole.getContentContainer();
+            var propertyDiv = $('<div id="property-header"><h3>Define Window </h3></div>' +
+                '<div id="define-window" class="define-window"></div>');
+            formContainer.append(propertyDiv);
+            var windowElement = $("#define-window")[0];
+
+            // generate the form to define a window
+            var editor = new JSONEditor(windowElement, {
+                schema: {
+                    type: "object",
+                    title: "Window",
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
+                        },
+                        attributes: {
+                            required: true,
+                            propertyOrder: 2,
+                            type: "array",
+                            format: "table",
+                            title: "Attributes",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : 'Attribute',
+                                properties: {
+                                    attribute: {
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    type: {
+                                        type: "string",
+                                        enum: [
+                                            "string",
+                                            "int",
+                                            "long",
+                                            "float",
+                                            "double",
+                                            "boolean"
+                                        ],
+                                        default: "string"
+                                    }
+                                }
+                            }
+                        },
+                        functionName: {
+                            type: "string",
+                            title: "Function Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 3
+                        },
+                        parameters: {
+                            required: true,
+                            propertyOrder: 4,
+                            type: "array",
+                            format: "table",
+                            title: "Parameters",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : 'Parameter',
+                                properties: {
+                                    parameter: {
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
+                        outputEventType: {
+                            type: "string",
+                            title: "Output Event Type",
+                            propertyOrder: 5,
+                            enum: [
+                                "current",
+                                "expired",
+                                "all"
+                            ],
+                            default: "current"
+                        }
+                    }
+                },
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true
+            });
+
+            formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
+
+            // 'Submit' button action
+            var submitButtonElement = $('#submit')[0];
+            submitButtonElement.addEventListener('click', function () {
+                var isWindowNameUsed = false;
+                _.forEach(self.appData.windowList, function(window){
+                    if(window.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
+                        isWindowNameUsed = true;
+                    }
+                });
+                if(isWindowNameUsed) {
+                    alert("Window name \"" + editor.getValue().name + "\" is already used.");
+                } else {
+                    // add the new out window to the window array
+                    var windowOptions = {};
+                    _.set(windowOptions, 'id', i);
+                    _.set(windowOptions, 'name', editor.getValue().name);
+                    _.set(windowOptions, 'function', editor.getValue().functionName);
+                    _.set(windowOptions, 'parameters', editor.getValue().parameters);
+                    if (editor.getValue().outputEventType !== undefined) {
+                        _.set(windowOptions, 'outputEventType', editor.getValue().outputEventType);
+                    } else {
+                        _.set(windowOptions, 'outputEventType', '');
+                    }
+                    var window = new Window(windowOptions);
+                    _.forEach(editor.getValue().attributes, function (attribute) {
+                        window.addAttribute(attribute);
+                    });
+                    self.appData.addWindow(window);
+
+                    // close the form window
+                    self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
+
+                    self.gridContainer.removeClass("disabledbutton");
+                    self.toolPaletteContainer.removeClass("disabledbutton");
+                }
+            });
+            return editor.getValue().name;
+        };
+
+        /**
+         * @function generate the property window for an existing window
+         * @param element selected element(window)
+         */
+        FormBuilder.prototype.GeneratePropertiesFormForWindows = function (element) {
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            // The container and the tool palette are disabled to prevent the user from dropping any elements
+            self.gridContainer.addClass("disabledbutton");
+            self.toolPaletteContainer.addClass("disabledbutton");
+
+            var id = $(element).parent().attr('id');
+            // retrieve the window information from the collection
+            var clickedElement = self.appData.getWindow(id);
+            if(clickedElement === undefined) {
+                var errorMessage = 'unable to find clicked element';
+                log.error(errorMessage);
+            }
+            var name = clickedElement.getName();
+            var attributes = clickedElement.getAttributeList();
+            var functionName = clickedElement.getFunction();
+            var parameters = clickedElement.getParameters();
+            var outputEventType = clickedElement.getOutputEventType();
+            var fillWith = {
+                name : name,
+                attributes : attributes,
+                functionName : functionName,
+                parameters : parameters,
+                outputEventType : outputEventType
+            };
+            var editor = new JSONEditor(formContainer[0], {
+                schema: {
+                    type: "object",
+                    title: "Window",
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
+                        },
+                        attributes: {
+                            required: true,
+                            propertyOrder: 2,
+                            type: "array",
+                            format: "table",
+                            title: "Attributes",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : 'Attribute',
+                                properties: {
+                                    attribute: {
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    type: {
+                                        type: "string",
+                                        enum: [
+                                            "string",
+                                            "int",
+                                            "long",
+                                            "float",
+                                            "double",
+                                            "boolean"
+                                        ],
+                                        default: "string"
+                                    }
+                                }
+                            }
+                        },
+                        functionName: {
+                            type: "string",
+                            title: "Function Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 3
+                        },
+                        parameters: {
+                            required: true,
+                            propertyOrder: 4,
+                            type: "array",
+                            format: "table",
+                            title: "Parameters",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : 'Parameter',
+                                properties: {
+                                    parameter: {
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
+                        outputEventType: {
+                            type: "string",
+                            title: "Output Event Type",
+                            propertyOrder: 5,
+                            enum: [
+                                "current",
+                                "expired",
+                                "all"
+                            ],
+                            default: "current"
+                        }
+                    }
+                },
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true,
+                startval: fillWith
+            });
+            $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                'class="btn btn-default">Submit</button></div>' +
+                '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+
+            // 'Submit' button action
+            var submitButtonElement = $('#form-submit')[0];
+            submitButtonElement.addEventListener('click', function () {
+                // The container and the palette are disabled to prevent the user from dropping any elements
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                var config = editor.getValue();
+
+                // update selected window model
+                clickedElement.setName(config.name);
+                clickedElement.setFunction(config.function);
+                clickedElement.setParameters(config.parameters);
+                clickedElement.setOutputEventType(config.outputEventType);
+                if (config.outputEventType !== undefined) {
+                    clickedElement.setOutputEventType(config.outputEventType);
+                } else {
+                    clickedElement.setOutputEventType('');
+                }
+                // removing all elements from attribute list
+                clickedElement.getAttributeList().removeAllElements();
+                // adding new attributes to the attribute list
+                _.forEach(config.attributes, function(attribute){
+                    clickedElement.addAttribute(attribute);
+                });
+
+                var textNode = $(element).parent().find('.windownamenode');
                 textNode.html(config.name);
 
                 // close the form window

@@ -27,7 +27,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             JOIN : 'joquerydrop',
             WINDOW_QUERY : 'wquerydrop',
             PATTERN : 'stquerydrop',
-            WINDOW_STREAM :'',
+            WINDOW :'windowdrop',
             PARTITION :'partitiondrop'
         };
 
@@ -100,7 +100,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                  */
                 self.canvas.droppable
                 ({
-                    accept: '.stream, .table, .window-stream, .pass-through, .filter-query, .join-query, .window-query, ' +
+                    accept: '.stream, .table, .window, .pass-through, .filter-query, .join-query, .window-query, ' +
                     '.pattern, .partition',
                     containment: 'grid-container',
 
@@ -133,8 +133,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
 
                         // If the dropped Element is a Window(not window query) then->
-                        else if ($(droppedElement).hasClass('window-stream')) {
-                            self.handleWindowStream(mouseTop, mouseLeft, false);
+                        else if ($(droppedElement).hasClass('window')) {
+                            self.handleWindow(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Pass through Query then->
@@ -628,6 +628,24 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
             });
 
+            _.forEach(self.appData.tableList, function(table){
+
+                var tableId = table.getId();
+                var tableName = table.getName();
+                var mouseTop = parseInt(tableId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = parseInt(tableId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handleTable(mouseTop, mouseLeft, true, tableId, tableName);
+            });
+
+            _.forEach(self.appData.windowList, function(window){
+
+                var windowId = window.getId();
+                var windowName = window.getName();
+                var mouseTop = parseInt(windowId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = parseInt(windowId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handleWindow(mouseTop, mouseLeft, true, windowId, windowName);
+            });
+
             _.forEach(self.appData.queryList, function(query){
                 var queryId = query.getId();
                 var queryName = query.getName();
@@ -772,14 +790,32 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        DesignGrid.prototype.handleWindowStream = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+        DesignGrid.prototype.handleWindow = function (mouseTop, mouseLeft, isCodeToDesignMode, windowId, windowName) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('wstreamdrop');
-            // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropWindowStream(newAgent, self.newAgentId, mouseTop, mouseLeft ,"Window",
-                isCodeToDesignMode);
-            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.newAgentId;
+                // The container and the toolbox are disabled to prevent the user from dropping any elements before
+                // initializing a Table Element
+                self.canvas.addClass("disabledbutton");
+                $("#tool-palette-container").addClass("disabledbutton");
+                $("#output-console-activate-button").addClass("disabledbutton");
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(windowId !== undefined) {
+                    elementId = windowId;
+                } else {
+                    console.log("windowId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            // increment the Element ID for the next dropped Element
             self.generateNextId();
+            var newAgent = $('<div>').attr('id', elementId).addClass('windowdrop');
+            self.canvas.append(newAgent);
+            // Drop the Table element. Inside this a it generates the table definition form.
+            self.dropElements.dropWindow(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, windowName);
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
         };
 

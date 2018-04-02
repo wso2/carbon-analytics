@@ -28,6 +28,7 @@ define(['require', 'elementArray'],
             // initiates the collections
             this.streamList = new ElementArray();
             this.tableList = new ElementArray();
+            this.windowList = new ElementArray();
             this.filterList = new ElementArray();
             this.passThroughList = new ElementArray();
             this.windowQueryList = new ElementArray();
@@ -47,6 +48,10 @@ define(['require', 'elementArray'],
 
         AppData.prototype.addTable = function (table) {
             this.tableList.push(table);
+        };
+
+        AppData.prototype.addWindow = function (window) {
+            this.windowList.push(window);
         };
 
         AppData.prototype.addFilterQuery = function (filterQuery) {
@@ -85,8 +90,12 @@ define(['require', 'elementArray'],
             this.streamList.removeElement(streamId);
         };
 
-        AppData.prototype.removeTable = function (Table) {
-            this.tableList.removeElement(Table);
+        AppData.prototype.removeTable = function (TableId) {
+            this.tableList.removeElement(TableId);
+        };
+
+        AppData.prototype.removeWindow = function (WindowId) {
+            this.windowList.removeElement(WindowId);
         };
 
         AppData.prototype.removeFilterQuery = function (filterQueryId) {
@@ -131,6 +140,10 @@ define(['require', 'elementArray'],
 
         AppData.prototype.getTable = function (tableId) {
             return this.tableList.getElement(tableId);
+        };
+
+        AppData.prototype.getWindow = function (windowId) {
+            return this.windowList.getElement(windowId);
         };
 
         AppData.prototype.getFilterQuery = function (filterQueryId) {

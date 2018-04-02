@@ -54,10 +54,10 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/table.png"
                 },
                 {
-                    id : "window-stream",
-                    className : "window-stream",
-                    title : "window",
-                    icon : "/editor/images/windowStream.png"
+                    id : "window",
+                    className : "window",
+                    title : "Window",
+                    icon : "/editor/images/window.png"
                 },
                 {
                     id : "pass-through",

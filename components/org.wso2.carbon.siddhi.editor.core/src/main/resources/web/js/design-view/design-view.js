@@ -16,11 +16,11 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid', 'appData', 'filterQuery',
-    'joinQuery', 'partition', 'passThroughQuery', 'patternQuery', 'query', 'stream', 'table', 'windowQuery', 'leftStream',
-    'rightStream', 'join', 'edge'],
+define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid', 'appData',
+        'filterQuery', 'joinQuery', 'partition', 'passThroughQuery', 'patternQuery', 'query', 'stream', 'table',
+        'window','windowQuery', 'leftStream', 'rightStream', 'join', 'edge'],
     function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, FilterQuery, JoinQuery, Partition,
-              PassThroughQuery, PatternQuery, Query, Stream, Table, WindowQuery, LeftStream, RightStream, Join, Edge) {
+              PassThroughQuery, PatternQuery, Query, Stream, Table, Window, WindowQuery, LeftStream, RightStream, Join, Edge) {
 
         /**
          * @class DesignView
@@ -79,6 +79,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 //addAnnotationsForElement(table, tableObject);
                 addAttributesForElement(table, tableObject);
                 appData.addTable(tableObject);
+            });
+            _.forEach(siddhiAppContent.windowList, function(window){
+                var windowObject = new Window(window);
+                //addAnnotationsForElement(window, windowObject);
+                addAttributesForElement(window, windowObject);
+                appData.addWindow(windowObject);
             });
             _.forEach(siddhiAppContent.filterList, function(filterQuery){
                 appData.addFilterQuery(new FilterQuery(filterQuery));

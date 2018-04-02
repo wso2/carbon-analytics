@@ -29,7 +29,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
             JOIN : 'joquerydrop',
             WINDOW_QUERY : 'wquerydrop',
             PATTERN : 'stquerydrop',
-            WINDOW_STREAM :'', //TODO: implement this
+            WINDOW:'windowdrop',
             PARTITION :'partitiondrop'
         };
 
@@ -254,6 +254,82 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
              */
             var connection1 = $('<div class="connectorInTable">').attr('id', i+"-in" ).addClass('connection');
             var connection2 = $('<div class="connectorOutTable">').attr('id', i+"-out" ).addClass('connection');
+
+
+            finalElement.append(connection1);
+            finalElement.append(connection2);
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            _jsPlumb.draggable(finalElement, {
+                containment: 'grid-container'
+            });
+            _jsPlumb.makeTarget(connection1, {
+                deleteEndpointsOnDetach:true,
+                anchor: 'Left'
+            });
+
+            _jsPlumb.makeSource(connection2, {
+                deleteEndpointsOnDetach : true,
+                anchor : 'Right'
+            });
+        };
+
+        /**
+         * @function drop the window element on the canvas
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
+         * @param windowName name of the table
+         */
+        DropElements.prototype.dropWindow = function (newAgent, i, top, left, isCodeToDesignMode, windowName) {
+            /*
+             The node hosts a text node where the Window's name input by the user will be held.
+             Rather than simply having a `newAgent.text(windowName)` statement, as the text function tends to
+             reposition the other appended elements with the length of the Window name input by the user.
+            */
+
+            var self= this;
+            var name;
+            if(isCodeToDesignMode) {
+                name = windowName;
+            } else {
+                name = self.formBuilder.DefineWindow(i);
+            }
+            var node = $('<div>' + name + '</div>');
+            newAgent.append(node);
+            node.attr('id', i+"-nodeInitial");
+            node.attr('class', "windowNameNode");
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the Window Element will
+             be displayed as an alert message
+            */
+            var settingsIconId = ""+ i + "-dropWindowSettingsId";
+            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+                'class="element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
+                'class="element-close-icon collapse">').append(prop);
+
+            var settingsIconElement = $('#'+settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForWindows(this);
+            });
+
+            var finalElement = newAgent;
+
+            /*
+             connection --> The connection anchor point is appended to the element
+             */
+            var connection1 = $('<div class="connectorInWindow">').attr('id', i+"-in" ).addClass('connection');
+            var connection2 = $('<div class="connectorOutWindow">').attr('id', i+"-out" ).addClass('connection');
 
 
             finalElement.append(connection1);
@@ -590,63 +666,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
         };
 
         /**
-         * @function Drop a window stream on the canvas
-         * @param newAgent new element
-         * @param i id of the element
-         * @param topP top position of the element
-         * @param left left position of the element
-         * @param asName name of the window stream
-         */
-        // TODO: not updated (from earlier version)
-        DropElements.prototype.dropWindowStream = function (newAgent, i, topP, left, asName) {
-            var self= this;
-            /*
-             The node hosts a text node where the Window's name, input by the user will be held.
-             Rather than simply having a `newAgent.text(windowName)` statement, as the text function tends to
-             reposition the other appended elements with the length of the Stream name input by the user.
-            */
-
-            //Initially the asName will be "Window" as the has not yet initialized the window
-
-            var windowNode = $('<div>' + asName + '</div>');
-            newAgent.append(windowNode);
-            windowNode.attr('id', i+"-windowNode");
-            windowNode.attr('class', "windowNameNode");
-//TODO: onclick
-            var prop = $('<img src="/editor/images/settings.png" class="element-prop-icon collapse" onclick="">')
-                .attr('id', (i+('-prop')));
-            newAgent.append(windowNode).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
-            var finalElement =  newAgent;
-
-            var connectionIn = $('<div class="connectorInWindow">').attr('id', i + '-in').addClass('connection');
-            var connectionOut = $('<div class="connectorOutWindow">').attr('id', i + '-out').addClass('connection');
-
-            finalElement.css({
-                'top': topP,
-                'left': left
-            });
-
-            finalElement.append(connectionIn);
-            finalElement.append(connectionOut);
-
-            $(self.container).append(finalElement);
-
-            _jsPlumb.draggable(finalElement, {
-                containment: 'parent'
-            });
-
-            _jsPlumb.makeTarget(connectionIn, {
-                anchor: 'Continuous',
-                maxConnections:1
-            });
-
-            _jsPlumb.makeSource(connectionOut, {
-                anchor: 'Continuous'
-            });
-        };
-
-        /**
          * @function Bind event listeners for the elements that are dropped.
          * @param newElement dropped element
          */
@@ -675,6 +694,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 if (newElement.hasClass('streamdrop')) {
                     self.appData.removeStream(elementId);
 
+                } else if (newElement.hasClass('tabledrop')) {
+                    self.appData.removeTable(elementId);
+
+                } else if (newElement.hasClass('windowdrop')) {
+                    self.appData.removeWindow(elementId);
+
                 } else if (newElement.hasClass('squerydrop')) {
                     self.appData.removeQuery(elementId);
                     self.appData.removePassThroughQuery(elementId);
@@ -698,8 +723,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
                 } else if (newElement.hasClass('partitiondrop')) {
                     self.appData.removePartition(elementId);
 
-                } else if (newElement.hasClass('windowStream')) {
-                    //TODO: implement this
                 }
                 if(_jsPlumb.getGroupFor(newElement)){
                     var queries = self.appData.getPartition(_jsPlumb.getGroupFor(newElement).id).getQueries();
