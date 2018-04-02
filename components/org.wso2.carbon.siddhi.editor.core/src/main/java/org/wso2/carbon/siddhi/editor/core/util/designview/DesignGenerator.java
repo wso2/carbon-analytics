@@ -21,8 +21,12 @@ package org.wso2.carbon.siddhi.editor.core.util.designview;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.*;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.AggregateByConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.SelectConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.select.AggregateConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.factories.AnnotationConfigFactory;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AggregationConfigElements;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGenerationHelper;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -33,7 +37,12 @@ import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.definition.*;
+import org.wso2.siddhi.query.api.execution.query.selection.BasicSelector;
+import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
+import org.wso2.siddhi.query.api.expression.AttributeFunction;
 import org.wso2.siddhi.query.api.expression.Expression;
+import org.wso2.siddhi.query.api.expression.Variable;
+import org.wso2.siddhi.query.api.expression.constant.TimeConstant;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
 import java.util.ArrayList;
@@ -83,9 +92,9 @@ public class DesignGenerator {
      */
     private void loadAppNameAndDescription() {
         for (Annotation annotation : siddhiApp.getAnnotations()) {
-            if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.NAME)) {
+            if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationTypes.NAME)) {
                 siddhiAppConfig.setAppName(annotation.getElements().get(0).getValue());
-            } else if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationType.DESCRIPTION)) {
+            } else if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationTypes.DESCRIPTION)) {
                 siddhiAppConfig.setAppDescription(annotation.getElements().get(0).getValue());
             }
         }
@@ -164,12 +173,16 @@ public class DesignGenerator {
      */
     private void loadTables() {
         for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
+            List<AnnotationConfig> annotationConfigs = new ArrayList<>();
+            for (Annotation annotation : tableDefinition.getAnnotations()) {
+                annotationConfigs.add(generateStreamOrTableAnnotationConfig(annotation));
+            }
             siddhiAppConfig.add(new TableConfig(
                     tableDefinition.getId(),
                     tableDefinition.getId(),
                     generateAttributeConfigs(tableDefinition.getAttributeList()),
-                    null,
-                    null)); // TODO: 3/29/18 store & annotationList
+                    null, // TODO: 3/29/18 store
+                    annotationConfigs));
         }
     }
 
@@ -181,22 +194,87 @@ public class DesignGenerator {
         for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
             List<String> parameters = new ArrayList<>();
             for (Expression expression : windowDefinition.getWindow().getParameters()) {
-                parameters.add(null);
-            } // TODO: 3/29/18 Add parameters
+                if (expression instanceof TimeConstant) {
+                    parameters.add(((TimeConstant) expression).getValue().toString());
+                } else {
+                    // TODO: 4/2/18 Find examples and add
+                }
+            }
             siddhiAppConfig.add(new WindowConfig(
                     windowDefinition.getId(),
                     windowDefinition.getId(),
                     generateAttributeConfigs(windowDefinition.getAttributeList()),
                     windowDefinition.getWindow().getName(),
-                    null,
+                    parameters,
                     windowDefinition.getOutputEventType().name(),
-                    null)); // TODO: 3/29/18 parameters & annotationList
+                    null)); // TODO: 3/29/18 add annotationList after finding example
         }
     }
 
     private void loadAggregations() {
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
-            // TODO: 3/28/18 implement
+            List<SelectConfig> selectConfigs = new ArrayList<>();
+            List<String> groupBy = new ArrayList<>();
+
+            if (aggregationDefinition.getSelector() instanceof BasicSelector) {
+                BasicSelector selector = (BasicSelector) aggregationDefinition.getSelector();
+
+                // Populate 'select' list
+                for (OutputAttribute outputAttribute : selector.getSelectionList()) {
+                    if (outputAttribute.getExpression() instanceof AttributeFunction) {
+                        // Attribute is a Function
+                        AttributeFunction attributeFunction = (AttributeFunction) (outputAttribute.getExpression());
+
+                        if (attributeFunction.getParameters()[0] instanceof Variable) {
+                            Variable attribute = (Variable)attributeFunction.getParameters()[0];
+                            selectConfigs.add(new SelectConfig(
+                                    outputAttribute.getRename(),
+                                    new AggregateConfig(attributeFunction.getName(), attribute.getAttributeName())));
+                        } else {
+                            throw new IllegalArgumentException(
+                                    "Parameter of the AttributeFunction is of unknown class");
+                        }
+                    } else if (outputAttribute.getExpression() instanceof Variable) {
+                        // Attribute is a Variable
+                        selectConfigs.add(
+                                new SelectConfig(
+                                        ((Variable) (outputAttribute.getExpression())).getAttributeName(),
+                                        new AggregateConfig()));
+                    } else {
+                        throw new IllegalArgumentException("Expression of the OutputAttribute is of unknown class");
+                    }
+                }
+
+                // Populate 'groupBy' list
+                for (Variable variable : selector.getGroupByList()) {
+                    groupBy.add(variable.getAttributeName());
+                }
+            } else {
+                throw new IllegalArgumentException("Selector of AggregationDefinition is not of class BasicSelector");
+            }
+
+            // TODO: 4/2/18 sec...year after finalizing config
+            // aggregationDefinition.getTimePeriod().operator &
+            // aggregationDefinition.getTimePeriod().durations
+
+            AggregateByConfig aggregateBy = new AggregateByConfig(
+                    aggregationDefinition.getAggregateAttribute().getAttributeName(),
+                    null);
+
+            List<AnnotationConfig> annotationConfigs = new ArrayList<>();
+            for (Annotation annotation : aggregationDefinition.getAnnotations()) {
+                annotationConfigs.add(generateStreamOrTableAnnotationConfig(annotation));
+            }
+
+            siddhiAppConfig.add(new AggregationConfig(
+                    aggregationDefinition.getId(),
+                    aggregationDefinition.getId(),
+                    aggregationDefinition.getBasicSingleInputStream().getStreamId(),
+                    selectConfigs,
+                    groupBy,
+                    aggregateBy,
+                    null,
+                    annotationConfigs));
         }
     }
 
@@ -233,7 +311,7 @@ public class DesignGenerator {
         }
         List<AnnotationConfig> annotationConfigs = new ArrayList<>();
         for (Annotation annotation : streamDefinition.getAnnotations()) {
-            annotationConfigs.add(generateStreamAnnotationConfig(annotation));
+            annotationConfigs.add(generateStreamOrTableAnnotationConfig(annotation));
         }
         return new StreamConfig(streamDefinition.getId(),
                 streamDefinition.getId(),
@@ -245,8 +323,8 @@ public class DesignGenerator {
     /**
      * Gets the AnnotationConfig of the given Annotation, that belongs to a stream
      * @param annotation    Siddhi Annotation, that belongs to a stream
-     */
-    private AnnotationConfig generateStreamAnnotationConfig(Annotation annotation) {
+     */ // TODO: 4/2/18 Find a good name for the method
+    private AnnotationConfig generateStreamOrTableAnnotationConfig(Annotation annotation) {
         Map<String, String> annotationElements = new HashMap<>();
         List<String> annotationValues = new ArrayList<>();
         for (Element element : annotation.getElements()) {
