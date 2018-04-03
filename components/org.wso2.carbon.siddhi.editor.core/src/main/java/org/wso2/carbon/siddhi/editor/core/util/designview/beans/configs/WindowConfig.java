@@ -18,10 +18,12 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.AnnotationConfig;
+
 import java.util.List;
 
 /**
- * Represents configuration of a Siddhi Window, for design view
+ * Represents configuration of a Siddhi Defined Window, for design view
  */
 public class WindowConfig extends SiddhiElementConfig {
     private String name;
@@ -46,5 +48,28 @@ public class WindowConfig extends SiddhiElementConfig {
         this.outputEventType = outputEventType;
         this.annotationList = annotationList;
     }
-    // TODO: 3/29/18 complete
+
+    public String getName() {
+        return name;
+    }
+
+    public List<AttributeConfig> getAttributeList() {
+        return attributeList;
+    }
+
+    public String getFunction() {
+        return function;
+    }
+
+    public List<String> getParameters() {
+        return parameters;
+    }
+
+    public String getOutputEventType() {
+        return outputEventType;
+    }
+
+    public List<AnnotationConfig> getAnnotationList() {
+        return annotationList;
+    }
 }

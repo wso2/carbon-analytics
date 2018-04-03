@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.AggregationConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 
