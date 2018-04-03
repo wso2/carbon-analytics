@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig;
 
 /**
- * Represents a Siddhi annotation, whose content is one of the following forms, for the design view:
+ * Represents a Siddhi annotation, whose content is one of the following forms:
  * - @element(value1, value2) - List
  * - @element(option1=value1, option2=value2) - Map
  */

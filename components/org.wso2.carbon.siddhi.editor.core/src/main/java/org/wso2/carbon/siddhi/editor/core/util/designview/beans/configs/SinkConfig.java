@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 import java.util.Map;
 
 /**
- * Represents a Siddhi Sink, for design view
+ * Represents a Siddhi Sink
  */
 public class SinkConfig extends SiddhiElementConfig {
     private String type;

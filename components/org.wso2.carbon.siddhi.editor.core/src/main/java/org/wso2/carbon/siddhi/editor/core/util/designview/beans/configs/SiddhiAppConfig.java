@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Contains elements of a Siddhi app, for the design view
+ * Contains elements of a Siddhi app
  */
 public class SiddhiAppConfig {
     private int finalElementCount;

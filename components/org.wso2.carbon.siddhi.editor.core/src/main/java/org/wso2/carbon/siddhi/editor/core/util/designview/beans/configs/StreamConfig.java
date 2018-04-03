@@ -23,7 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotati
 import java.util.List;
 
 /**
- * Represents configuration of a Siddhi Stream, for design view
+ * Represents configuration of a Siddhi Stream
  */
 public class StreamConfig extends SiddhiElementConfig {
     private String name;

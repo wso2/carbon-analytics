@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.select;
 
 /**
- * Represents an 'aggregate' element inside 'select' of Siddhi Aggregation, for design view
+ * Represents an 'aggregate' element inside 'select' of Siddhi Aggregation
  */
 public class AggregateConfig {
     private String aggregateFunction;

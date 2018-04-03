@@ -23,7 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotati
 import java.util.Map;
 
 /**
- * Represents a Siddhi Map, for design view
+ * Represents a Siddhi Map
  */
 public class MapConfig {
     private String type;

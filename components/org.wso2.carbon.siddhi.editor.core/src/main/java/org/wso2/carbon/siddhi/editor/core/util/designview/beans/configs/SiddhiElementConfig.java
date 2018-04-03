@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
 /**
- * Represents a Siddhi Element, in the design view
+ * Represents a Siddhi Element
  */
 public abstract class SiddhiElementConfig {
     private String id;

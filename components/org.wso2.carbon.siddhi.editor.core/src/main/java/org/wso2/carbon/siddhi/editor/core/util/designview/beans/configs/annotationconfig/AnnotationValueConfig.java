@@ -24,7 +24,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotat
  */
 public class AnnotationValueConfig {
     private String value;
-    private boolean isString; // TODO: 4/3/18 {Just Future use ? put just true : implement some logic to calculate this}
+    private boolean isString;
 
     public AnnotationValueConfig(String value, boolean isString) {
         this.value = value;

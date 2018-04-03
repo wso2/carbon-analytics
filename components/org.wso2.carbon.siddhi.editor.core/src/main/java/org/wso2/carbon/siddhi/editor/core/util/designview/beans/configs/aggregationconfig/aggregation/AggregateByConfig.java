@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggrega
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.aggregateby.TimePeriodConfig;
 
 /**
- * Represents an 'aggregateBy' element inside Siddhi Aggregation, for design view
+ * Represents an 'aggregateBy' element inside Siddhi Aggregation
  */
 public class AggregateByConfig {
     private String attribute;

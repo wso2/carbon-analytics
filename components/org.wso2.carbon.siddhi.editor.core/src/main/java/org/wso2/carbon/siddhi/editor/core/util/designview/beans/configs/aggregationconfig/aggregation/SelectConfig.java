@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggrega
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.select.AggregateConfig;
 
 /**
- * Represents a 'select' element inside Siddhi Aggregation, for design view
+ * Represents a 'select' element inside Siddhi Aggregation
  */
 public class SelectConfig {
     private String name;

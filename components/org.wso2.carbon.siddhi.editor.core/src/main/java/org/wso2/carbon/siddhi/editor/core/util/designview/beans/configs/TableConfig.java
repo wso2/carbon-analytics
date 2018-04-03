@@ -23,7 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotati
 import java.util.List;
 
 /**
- * Represents configuration of a Siddhi Table, for design view
+ * Represents configuration of a Siddhi Table
  */
 public class TableConfig extends SiddhiElementConfig {
     private String name;

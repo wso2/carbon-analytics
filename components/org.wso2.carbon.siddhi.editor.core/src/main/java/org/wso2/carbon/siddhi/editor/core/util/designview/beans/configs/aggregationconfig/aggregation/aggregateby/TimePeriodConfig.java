@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.aggregateby;
 
 /**
- * Represents a 'timePeriod' element inside 'aggregateBy' of Siddhi Aggregation, for design view
+ * Represents a 'timePeriod' element inside 'aggregateBy' of Siddhi Aggregation
  */
 public class TimePeriodConfig {
     private String minValue;

@@ -23,7 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AnnotationCo
 import java.util.List;
 
 /**
- * Represents a Siddhi annotation, whose content is in the following form, for the design view:
+ * Represents a Siddhi annotation, whose content is in the following form:
  * - @element(value1, value2)
  */
 public class ListAnnotationConfig extends AnnotationConfig {

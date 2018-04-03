@@ -23,7 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AnnotationCo
 import java.util.Map;
 
 /**
- * Represents a Siddhi annotation, whose content is in the following form, for the design view:
+ * Represents a Siddhi annotation, whose content is in the following form:
  * - @element(option1=value1, option2=value2)
  */
 public class MapAnnotationConfig extends AnnotationConfig {

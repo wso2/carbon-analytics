@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 import java.util.Map;
 
 /**
- * Represents configuration of 'Store' annotation in a Siddhi Table, for design view
+ * Represents configuration of 'Store' annotation in a Siddhi Table
  */
 public class StoreConfig extends SiddhiElementConfig {
     private String type;

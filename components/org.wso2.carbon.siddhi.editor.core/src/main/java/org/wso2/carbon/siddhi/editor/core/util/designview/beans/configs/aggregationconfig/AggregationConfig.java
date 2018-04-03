@@ -27,7 +27,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregat
 import java.util.List;
 
 /**
- * Represents a Siddhi Aggregation, for design view
+ * Represents a Siddhi Aggregation
  */
 public class AggregationConfig extends SiddhiElementConfig {
     private String name;

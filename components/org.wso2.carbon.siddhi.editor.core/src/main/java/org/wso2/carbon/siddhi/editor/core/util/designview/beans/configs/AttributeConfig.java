@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
 /**
- * Represents a Siddhi Attribute, for design view
+ * Represents a Siddhi Attribute
  */
 public class AttributeConfig {
     private String name;
