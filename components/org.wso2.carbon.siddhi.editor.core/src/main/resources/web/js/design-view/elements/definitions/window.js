@@ -103,7 +103,7 @@ define(['require', 'elementArray'],
         };
 
         Window.prototype.setName = function (name) {
-            this.define = name;
+            this.name = name;
         };
 
         Window.prototype.setAttributeList = function (attributeList) {

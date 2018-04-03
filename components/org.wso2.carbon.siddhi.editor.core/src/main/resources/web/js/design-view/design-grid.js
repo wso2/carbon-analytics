@@ -22,12 +22,13 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
         var constants = {
             STREAM: 'streamdrop',
             TABLE: 'tabledrop',
+            WINDOW :'windowdrop',
+            TRIGGER :'triggerdrop',
             PASS_THROUGH : 'squerydrop',
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
             WINDOW_QUERY : 'wquerydrop',
             PATTERN : 'stquerydrop',
-            WINDOW :'windowdrop',
             PARTITION :'partitiondrop'
         };
 
@@ -100,8 +101,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                  */
                 self.canvas.droppable
                 ({
-                    accept: '.stream, .table, .window, .pass-through, .filter-query, .join-query, .window-query, ' +
-                    '.pattern, .partition',
+                    accept: '.stream, .table, .window, .trigger, .pass-through, .filter-query, .join-query, ' +
+                    '.window-query, .pattern, .partition',
                     containment: 'grid-container',
 
                     /**
@@ -135,6 +136,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         // If the dropped Element is a Window(not window query) then->
                         else if ($(droppedElement).hasClass('window')) {
                             self.handleWindow(mouseTop, mouseLeft, false);
+                        }
+
+                        // If the dropped Element is a Trigger then->
+                        else if ($(droppedElement).hasClass('trigger')) {
+                            self.handleTrigger(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Pass through Query then->
@@ -646,6 +652,15 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 self.handleWindow(mouseTop, mouseLeft, true, windowId, windowName);
             });
 
+            _.forEach(self.appData.triggerList, function(trigger){
+
+                var triggerId = trigger.getId();
+                var triggerName = trigger.getName();
+                var mouseTop = parseInt(triggerId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = parseInt(triggerId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handleTrigger(mouseTop, mouseLeft, true, triggerId, triggerName);
+            });
+
             _.forEach(self.appData.queryList, function(query){
                 var queryId = query.getId();
                 var queryName = query.getName();
@@ -815,6 +830,35 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.canvas.append(newAgent);
             // Drop the Table element. Inside this a it generates the table definition form.
             self.dropElements.dropWindow(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, windowName);
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handleTrigger = function (mouseTop, mouseLeft, isCodeToDesignMode, triggerId, triggerName) {
+            var self = this;
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.newAgentId;
+                // The container and the toolbox are disabled to prevent the user from dropping any elements before
+                // initializing a Trigger Element
+                self.canvas.addClass("disabledbutton");
+                $("#tool-palette-container").addClass("disabledbutton");
+                $("#output-console-activate-button").addClass("disabledbutton");
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(triggerId !== undefined) {
+                    elementId = triggerId;
+                } else {
+                    console.log("triggerId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            // increment the Element ID for the next dropped Element
+            self.generateNextId();
+            var newAgent = $('<div>').attr('id', elementId).addClass('triggerdrop');
+            self.canvas.append(newAgent);
+            // Drop the Trigger element. Inside this a it generates the trigger definition form.
+            self.dropElements.dropTrigger(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, triggerName);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
         };

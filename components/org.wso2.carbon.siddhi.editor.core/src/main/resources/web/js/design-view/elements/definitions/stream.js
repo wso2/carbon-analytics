@@ -91,7 +91,7 @@ define(['require', 'elementArray'],
         };
 
         Stream.prototype.setName = function (name) {
-            this.define = name;
+            this.name = name;
         };
 
         Stream.prototype.setIsInnerStream = function (isInnerStream) {

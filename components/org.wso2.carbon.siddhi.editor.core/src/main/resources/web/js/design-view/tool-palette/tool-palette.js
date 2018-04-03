@@ -60,6 +60,12 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/window.png"
                 },
                 {
+                    id : "trigger",
+                    className : "trigger",
+                    title : "Trigger",
+                    icon : "/editor/images/trigger.png"
+                },
+                {
                     id : "pass-through",
                     className : "pass-through",
                     title : "Pass Through",

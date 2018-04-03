@@ -18,9 +18,10 @@
 
 define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid', 'appData',
         'filterQuery', 'joinQuery', 'partition', 'passThroughQuery', 'patternQuery', 'query', 'stream', 'table',
-        'window','windowQuery', 'leftStream', 'rightStream', 'join', 'edge'],
+        'window', 'trigger', 'windowQuery', 'leftStream', 'rightStream', 'join', 'edge'],
     function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, FilterQuery, JoinQuery, Partition,
-              PassThroughQuery, PatternQuery, Query, Stream, Table, Window, WindowQuery, LeftStream, RightStream, Join, Edge) {
+              PassThroughQuery, PatternQuery, Query, Stream, Table, Window, Trigger, WindowQuery, LeftStream,
+              RightStream, Join, Edge) {
 
         /**
          * @class DesignView
@@ -48,7 +49,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
         };
 
         /**
-         * @function drop the query element on the canvas
+         * @function Initializes the AppData object with th provided configuration
+         * @param siddhiAppContent siddhi application details as a json
          */
         DesignView.prototype.initialiseSiddhiAppData = function (siddhiAppContent) {
             var self = this;
@@ -60,7 +62,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                     newElementObject.addAnnotation(annotation);
                 });
             }
-
             // adds attributes from a json object for an element object
             function addAttributesForElement(element, newElementObject) {
                 _.forEach(element.attributeList, function(attribute){
@@ -85,6 +86,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 //addAnnotationsForElement(window, windowObject);
                 addAttributesForElement(window, windowObject);
                 appData.addWindow(windowObject);
+            });
+            _.forEach(siddhiAppContent.triggerList, function(trigger){
+                var triggerObject = new Trigger(trigger);
+                //addAnnotationsForElement(trigger, triggerObject);
+                addAttributesForElement(trigger, triggerObject);
+                appData.addTrigger(triggerObject);
             });
             _.forEach(siddhiAppContent.filterList, function(filterQuery){
                 appData.addFilterQuery(new FilterQuery(filterQuery));

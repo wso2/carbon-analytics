@@ -20,23 +20,17 @@ define(['require', 'elementArray'],
     function (require, ElementArray) {
 
         /**
-         * @class Table
+         * @class Trigger
          * @constructor
-         * @class Table  Creates a Table
+         * @class Trigger  Creates a Trigger
          * @param {Object} options Rendering options for the view
          */
-        var Table = function (options) {
+        var Trigger = function (options) {
             /*
              Data storing structure as follows
-                id: '',
-                name: '',
-                attributeList: [
-                    {
-                        name: ‘’,
-                        type: ‘’
-                    }
-                ],
-                store: {},
+                id*: '',
+                name*: '',
+                at*: ‘{every|start|cron-expression}’
                 annotationList: [
                     {
                         name: ‘’,
@@ -53,59 +47,46 @@ define(['require', 'elementArray'],
             */
             this.id = options.id;
             this.name = options.name;
-            this.store = options.store;
-            this.attributeList =  new ElementArray();
+            this.at = options.at;
             this.annotationList =  new ElementArray();
         };
 
-        Table.prototype.addAttribute = function (attribute) {
-            this.attributeList.push(attribute);
-        };
-
-        Table.prototype.addAnnotation = function (annotation) {
+        Trigger.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
         };
 
-        Table.prototype.getId = function () {
+        Trigger.prototype.getId = function () {
             return this.id;
         };
 
-        Table.prototype.getName = function () {
+        Trigger.prototype.getName = function () {
             return this.name;
         };
 
-        Table.prototype.getStore = function () {
-            return this.store;
+        Trigger.prototype.getAt = function () {
+            return this.at;
         };
 
-        Table.prototype.getAttributeList = function () {
-            return this.attributeList;
-        };
-
-        Table.prototype.getAnnotationList = function () {
+        Trigger.prototype.getAnnotationList = function () {
             return this.annotationList;
         };
 
-        Table.prototype.setId = function (id) {
+        Trigger.prototype.setId = function (id) {
             this.id = id;
         };
 
-        Table.prototype.setName = function (name) {
+        Trigger.prototype.setName = function (name) {
             this.name = name;
         };
 
-        Table.prototype.setStore = function (store) {
-            this.store = store;
+        Trigger.prototype.setAt = function (at) {
+            this.at = at;
         };
 
-        Table.prototype.setAttributeList = function (attributeList) {
-            this.attributeList = attributeList;
-        };
-
-        Table.prototype.setAnnotationList = function (annotationList) {
+        Trigger.prototype.setAnnotationList = function (annotationList) {
             this.annotationList = annotationList;
         };
 
-        return Table;
+        return Trigger;
 
     });

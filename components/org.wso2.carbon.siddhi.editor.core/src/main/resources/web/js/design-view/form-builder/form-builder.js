@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'window', 'leftStream', 'rightStream', 'join'],
-    function (require, log, $, _, jsPlumb, Stream, Table, Window, LeftStream, RightStream, Join) {
+define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'window', 'trigger', 'leftStream',
+        'rightStream', 'join'],
+    function (require, log, $, _, jsPlumb, Stream, Table, Window, Trigger, LeftStream, RightStream, Join) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -30,12 +31,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         var constants = {
             STREAM: 'streamdrop',
             TABLE: 'tabledrop',
+            WINDOW:'windowdrop',
+            TRIGGER:'triggerdrop',
             PASS_THROUGH : 'squerydrop',
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
             WINDOW_QUERY : 'wquerydrop',
             PATTERN : 'stquerydrop',
-            WINDOW:'windowdrop',
             PARTITION :'partitiondrop'
         };
 
@@ -105,7 +107,17 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 if(elementType === constants.TABLE) {
                     if(self.appData.getTable(elementId) === undefined) {
                         $("#"+elementId).remove();
-                    }//TODO: Add other types like tables, triggers etc
+                    }
+                }
+                if(elementType === constants.WINDOW) {
+                    if(self.appData.getWindow(elementId) === undefined) {
+                        $("#"+elementId).remove();
+                    }
+                }
+                if(elementType === constants.TRIGGER) {
+                    if(self.appData.getTrigger(elementId) === undefined) {
+                        $("#"+elementId).remove();
+                    }
                 }
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
@@ -886,6 +898,170 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 });
 
                 var textNode = $(element).parent().find('.windownamenode');
+                textNode.html(config.name);
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            });
+
+            // 'Cancel' button action
+            var cancelButtonElement = $('#form-cancel')[0];
+            cancelButtonElement.addEventListener('click', function () {
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            });
+        };
+
+        /**
+         * @function generate the form to define the trigger once it is dropped on the canvas
+         * @param i id for the element
+         * @returns user given trigger name
+         */
+        FormBuilder.prototype.DefineTrigger = function (i) {
+            var self = this;
+            var formConsole = this.createTabForForm(i, constants.TRIGGER);
+            var formContainer = formConsole.getContentContainer();
+            var propertyDiv = $('<div id="property-header"><h3>Define Trigger </h3></div>' +
+                '<div id="define-trigger" class="define-trigger"></div>');
+            formContainer.append(propertyDiv);
+            var triggerElement = $("#define-trigger")[0];
+
+            // generate the form to define a trigger
+            var editor = new JSONEditor(triggerElement, {
+                schema: {
+                    type: "object",
+                    title: "Trigger",
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
+                        },
+                        at: {
+                            type: "string",
+                            title: "At",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 2
+                        }
+                    }
+                },
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true
+            });
+
+            formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
+
+            // 'Submit' button action
+            var submitButtonElement = $('#submit')[0];
+            submitButtonElement.addEventListener('click', function () {
+                var isTriggerNameUsed = false;
+                _.forEach(self.appData.triggerList, function(trigger){
+                    if(trigger.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
+                        isTriggerNameUsed = true;
+                    }
+                });
+                if(isTriggerNameUsed) {
+                    alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
+                } else {
+                    // add the new out trigger to the trigger array
+                    var triggerOptions = {};
+                    _.set(triggerOptions, 'id', i);
+                    _.set(triggerOptions, 'name', editor.getValue().name);
+                    _.set(triggerOptions, 'at', editor.getValue().at);
+                    var trigger = new Trigger(triggerOptions);
+                    self.appData.addTrigger(trigger);
+
+                    // close the form window
+                    self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
+
+                    self.gridContainer.removeClass("disabledbutton");
+                    self.toolPaletteContainer.removeClass("disabledbutton");
+                }
+            });
+            return editor.getValue().name;
+        };
+
+        /**
+         * @function generate the property window for an existing trigger
+         * @param element selected element(trigger)
+         */
+        FormBuilder.prototype.GeneratePropertiesFormForTriggers = function (element) {
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            // The container and the tool palette are disabled to prevent the user from dropping any elements
+            self.gridContainer.addClass("disabledbutton");
+            self.toolPaletteContainer.addClass("disabledbutton");
+
+            var id = $(element).parent().attr('id');
+            // retrieve the trigger information from the collection
+            var clickedElement = self.appData.getTrigger(id);
+            if(clickedElement === undefined) {
+                var errorMessage = 'unable to find clicked element';
+                log.error(errorMessage);
+            }
+            var name = clickedElement.getName();
+            var at = clickedElement.getAt();
+            var fillWith = {
+                name : name,
+                at : at
+            };
+            var editor = new JSONEditor(formContainer[0], {
+                schema: {
+                    type: "object",
+                    title: "Trigger",
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
+                        },
+                        at: {
+                            type: "string",
+                            title: "At",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 2
+                        }
+                    }
+                },
+                disable_properties: true,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                startval: fillWith
+            });
+            $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                'class="btn btn-default">Submit</button></div>' +
+                '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+
+            // 'Submit' button action
+            var submitButtonElement = $('#form-submit')[0];
+            submitButtonElement.addEventListener('click', function () {
+                // The container and the palette are disabled to prevent the user from dropping any elements
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                var config = editor.getValue();
+
+                // update selected trigger model
+                clickedElement.setName(config.name);
+                clickedElement.setAt(config.at);
+
+                var textNode = $(element).parent().find('.triggernamenode');
                 textNode.html(config.name);
 
                 // close the form window
