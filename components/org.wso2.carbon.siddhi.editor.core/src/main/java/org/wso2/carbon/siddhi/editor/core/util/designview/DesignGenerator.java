@@ -28,6 +28,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregat
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.AnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.AnnotationValueConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.ListAnnotationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sinkconfig.SinkConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sourceconfig.SourceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.factories.AnnotationConfigFactory;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGenerationHelper;
@@ -157,7 +159,11 @@ public class DesignGenerator {
     private void loadSources() {
         for (List<Source> source : siddhiAppRuntime.getSources()) {
             // source.get(0); // this is a source config
-            siddhiAppConfig.add(new SourceConfig(null, null, null, null)); // TODO: 3/28/18 new SourceConfig()
+            siddhiAppConfig.add(new SourceConfig(
+                    null,
+                    null,
+                    null,
+                    null)); // TODO: 3/28/18 new SourceConfig()
         }
     }
 
