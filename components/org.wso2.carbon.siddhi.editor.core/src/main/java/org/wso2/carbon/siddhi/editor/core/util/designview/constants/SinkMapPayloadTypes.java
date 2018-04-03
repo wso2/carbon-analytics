@@ -16,24 +16,18 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
-
-import java.util.Map;
+package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Represents a Siddhi Source
+ * Has types of 'payload' in 'map' of a Siddhi Sink
  */
-public class SourceConfig extends SiddhiElementConfig {
-    private String type;
-    private Map<String, String> options;
-    private MapConfig map;
+public class SinkMapPayloadTypes {
+    public static final String MAP = "map";
+    public static final String SINGLE = "single";
 
-    public SourceConfig(String id, String type, Map<String, String> options, MapConfig map) {
-        super(id);
-        this.type = type;
-        this.options = options;
-        this.map = map;
+    /**
+     * Avoids Instantiation
+     */
+    private SinkMapPayloadTypes() {
     }
-
-    // TODO: 3/29/18 complete
 }

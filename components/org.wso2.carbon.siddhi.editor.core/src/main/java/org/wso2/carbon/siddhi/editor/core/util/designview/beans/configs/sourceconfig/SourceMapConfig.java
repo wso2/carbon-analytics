@@ -16,24 +16,35 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sourceconfig;
+
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sourceconfig.map.SourceMapAttributeConfig;
 
 import java.util.Map;
 
 /**
- * Represents a Siddhi Sink
+ * Represents Map element of a Siddhi Source
  */
-public class SinkConfig extends SiddhiElementConfig {
+public class SourceMapConfig {
     private String type;
     private Map<String, String> options;
-    private MapConfig map;
+    private SourceMapAttributeConfig attributes;
 
-    public SinkConfig(String id, String type, Map<String, String> options, MapConfig map) {
-        super(id);
+    public SourceMapConfig(String type, Map<String, String> options, SourceMapAttributeConfig attributes) {
         this.type = type;
         this.options = options;
-        this.map = map;
+        this.attributes = attributes;
     }
 
-    // TODO: 3/29/18 complete
+    public String getType() {
+        return type;
+    }
+
+    public Map<String, String> getOptions() {
+        return options;
+    }
+
+    public SourceMapAttributeConfig getAttributes() {
+        return attributes;
+    }
 }
