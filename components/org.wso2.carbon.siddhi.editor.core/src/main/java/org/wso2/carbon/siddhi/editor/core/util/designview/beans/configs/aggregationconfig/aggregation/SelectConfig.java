@@ -16,27 +16,27 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation;
+
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.select.AggregateConfig;
 
 /**
- * Represents a Siddhi annotation, whose content is one of the following forms, for the design view:
- * - @element('value1', 'value2') - List
- * - @element(option1='value1', option2='value2') - Map
+ * Represents a 'select' element inside Siddhi Aggregation, for design view
  */
-public abstract class AnnotationConfig {
+public class SelectConfig {
     private String name;
-    private String type;
+    private AggregateConfig aggregate;
 
-    public AnnotationConfig(String name, String type) {
+    public SelectConfig(String name, AggregateConfig aggregate) {
         this.name = name;
-        this.type = type;
+        this.aggregate = aggregate;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getType() {
-        return type;
+    public AggregateConfig getAggregate() {
+        return aggregate;
     }
 }

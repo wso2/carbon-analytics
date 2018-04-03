@@ -16,10 +16,13 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.AggregateByConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.SelectConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.AnnotationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiElementConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.StoreConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.AggregateByConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.SelectConfig;
 
 import java.util.List;
 

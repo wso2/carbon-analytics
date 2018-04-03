@@ -16,28 +16,25 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.select;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.aggregateby;
 
 /**
- * Represents an 'aggregate' element inside 'select' of Siddhi Aggregation, for design view
+ * Represents a 'timePeriod' element inside 'aggregateBy' of Siddhi Aggregation, for design view
  */
-public class AggregateConfig {
-    private String aggregateFunction;
-    private String attribute;
+public class TimePeriodConfig {
+    private String minValue;
+    private String maxValue;
 
-    public AggregateConfig() {
+    public TimePeriodConfig(String minValue, String maxValue) {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
     }
 
-    public AggregateConfig(String aggregateFunction, String attribute) {
-        this.aggregateFunction = aggregateFunction;
-        this.attribute = attribute;
+    public String getMinValue() {
+        return minValue;
     }
 
-    public String getAggregateFunction() {
-        return aggregateFunction;
-    }
-
-    public String getAttribute() {
-        return attribute;
+    public String getMaxValue() {
+        return maxValue;
     }
 }

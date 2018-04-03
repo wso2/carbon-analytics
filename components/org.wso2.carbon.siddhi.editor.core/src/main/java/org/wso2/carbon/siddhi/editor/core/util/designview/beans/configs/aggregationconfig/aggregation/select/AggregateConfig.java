@@ -16,25 +16,28 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.select;
 
 /**
- * Represents an 'aggregateBy' element inside Siddhi Aggregation, for design view
+ * Represents an 'aggregate' element inside 'select' of Siddhi Aggregation, for design view
  */
-public class AggregateByConfig {
-    private String timeStamp;
-    private String timePeriod;
+public class AggregateConfig {
+    private String aggregateFunction;
+    private String attribute;
 
-    public AggregateByConfig(String timeStamp, String timePeriod) {
-        this.timeStamp = timeStamp;
-        this.timePeriod = timePeriod;
+    public AggregateConfig() {
     }
 
-    public String getTimeStamp() {
-        return timeStamp;
+    public AggregateConfig(String aggregateFunction, String attribute) {
+        this.aggregateFunction = aggregateFunction;
+        this.attribute = attribute;
     }
 
-    public String getTimePeriod() {
-        return timePeriod;
+    public String getAggregateFunction() {
+        return aggregateFunction;
+    }
+
+    public String getAttribute() {
+        return attribute;
     }
 }

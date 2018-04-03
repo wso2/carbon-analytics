@@ -16,27 +16,26 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation;
-
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.select.AggregateConfig;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig;
 
 /**
- * Represents a 'select' element inside Siddhi Aggregation, for design view
+ * Represents a value of Siddhi annotation.
+ * This is either treated as a string (surrounded with quotes), or not
  */
-public class SelectConfig {
-    private String name;
-    private AggregateConfig aggregate;
+public class AnnotationValueConfig {
+    private String value;
+    private boolean isString; // TODO: 4/3/18 {Just Future use ? put just true : implement some logic to calculate this}
 
-    public SelectConfig(String name, AggregateConfig aggregate) {
-        this.name = name;
-        this.aggregate = aggregate;
+    public AnnotationValueConfig(String value, boolean isString) {
+        this.value = value;
+        this.isString = isString;
     }
 
-    public String getName() {
-        return name;
+    public String getValue() {
+        return value;
     }
 
-    public AggregateConfig getAggregate() {
-        return aggregate;
+    public boolean isString() {
+        return isString;
     }
 }

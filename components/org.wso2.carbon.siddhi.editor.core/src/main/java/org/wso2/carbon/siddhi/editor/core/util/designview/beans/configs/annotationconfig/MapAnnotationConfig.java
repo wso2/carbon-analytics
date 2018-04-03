@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AnnotationConfigTypes;
 
@@ -24,17 +24,17 @@ import java.util.Map;
 
 /**
  * Represents a Siddhi annotation, whose content is in the following form, for the design view:
- * - @element(option1='value1',option2='value2')
+ * - @element(option1=value1, option2=value2)
  */
 public class MapAnnotationConfig extends AnnotationConfig {
-    private Map<String, String> value;
+    private Map<String, AnnotationValueConfig> value;
 
-    public MapAnnotationConfig(String name, Map<String, String> value) {
-        super(name, AnnotationConfigTypes.MAP);
+    public MapAnnotationConfig(String name, Map<String, AnnotationValueConfig> value) {
+        super(name, AnnotationConfigTypes.LIST);
         this.value = value;
     }
 
-    public Map<String, String> getValue() {
+    public Map<String, AnnotationValueConfig> getValue() {
         return value;
     }
 }
