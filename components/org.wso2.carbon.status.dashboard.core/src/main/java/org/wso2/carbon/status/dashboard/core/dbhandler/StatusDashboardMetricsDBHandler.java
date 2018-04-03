@@ -755,22 +755,24 @@ public class StatusDashboardMetricsDBHandler {
     }
 
     private void setDynamicValuesToStatement(PreparedStatement statement,Object[] parameters) throws SQLException {
-        for (int i = 1; i <= parameters.length; i++) {
-            if(parameters[i - 1] instanceof String){
-                statement.setString(i, (String) parameters[i - 1]);
-            } else if(parameters[i - 1] instanceof Long){
-                statement.setLong(i, (Long) parameters[i - 1]);
-            } else if(parameters[i - 1] instanceof Double){
-                statement.setDouble(i, (Double) parameters[i - 1]);
-            } else if(parameters[i - 1] instanceof Integer){
-                statement.setInt(i, (Integer) parameters[i - 1]);
-            } else if(parameters[i - 1] instanceof Float){
-                statement.setFloat(i, (Float) parameters[i - 1]);
-            } else if(parameters[i - 1] instanceof Boolean){
-                statement.setBoolean(i, (Boolean) parameters[i - 1]);
+        int counter = 1;
+        for (Object parameter : parameters){
+            if(parameter instanceof String){
+                statement.setString(counter, (String) parameter);
+            } else if(parameter instanceof Long){
+                statement.setLong(counter, (Long) parameter);
+            } else if(parameter instanceof Double){
+                statement.setDouble(counter, (Double) parameter);
+            } else if(parameter instanceof Integer){
+                statement.setInt(counter, (Integer) parameter);
+            } else if(parameter instanceof Float){
+                statement.setFloat(counter, (Float) parameter);
+            } else if(parameter instanceof Boolean){
+                statement.setBoolean(counter, (Boolean) parameter);
             } else {
-                logger.error("Invalid Type of Object.");
+                logger.error("Invalid Type of Object.Found " + parameters.getClass());
             }
+            counter ++;
         }
     }
 }
