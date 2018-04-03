@@ -770,7 +770,7 @@ public class StatusDashboardMetricsDBHandler {
             } else if(parameter instanceof Boolean){
                 statement.setBoolean(counter, (Boolean) parameter);
             } else {
-                logger.error("Invalid Type of Object.Found " + parameters.getClass());
+                logger.error("Invalid Type of Object.Found " + parameter.getClass());
             }
             counter ++;
         }
