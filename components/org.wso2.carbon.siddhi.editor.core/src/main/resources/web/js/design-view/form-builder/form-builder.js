@@ -679,7 +679,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 type: "object",
                                 title : 'Parameter',
                                 properties: {
-                                    parameter: {
+                                    parameterValue: {
                                         type: "string",
                                         minLength: 1
                                     }
@@ -724,7 +724,11 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                     _.set(windowOptions, 'id', i);
                     _.set(windowOptions, 'name', editor.getValue().name);
                     _.set(windowOptions, 'function', editor.getValue().functionName);
-                    _.set(windowOptions, 'parameters', editor.getValue().parameters);
+                    var parameters = [];
+                    _.forEach(editor.getValue().parameters, function (parameter) {
+                        parameters.push(parameter.parameterValue);
+                    });
+                    _.set(windowOptions, 'parameters', parameters);
                     if (editor.getValue().outputEventType !== undefined) {
                         _.set(windowOptions, 'outputEventType', editor.getValue().outputEventType);
                     } else {
@@ -770,7 +774,16 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
             var name = clickedElement.getName();
             var attributes = clickedElement.getAttributeList();
             var functionName = clickedElement.getFunction();
-            var parameters = clickedElement.getParameters();
+            var savedParameterValues = clickedElement.getParameters();
+
+            var parameters = [];
+            _.forEach(savedParameterValues, function (savedParameterValue) {
+                var parameterObject = {
+                    parameterValue: savedParameterValue
+                };
+                parameters.push(parameterObject);
+            });
+
             var outputEventType = clickedElement.getOutputEventType();
             var fillWith = {
                 name : name,
@@ -841,7 +854,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 type: "object",
                                 title : 'Parameter',
                                 properties: {
-                                    parameter: {
+                                    parameterValue: {
                                         type: "string",
                                         minLength: 1
                                     }
@@ -883,7 +896,11 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 // update selected window model
                 clickedElement.setName(config.name);
                 clickedElement.setFunction(config.function);
-                clickedElement.setParameters(config.parameters);
+                var parameters = [];
+                _.forEach(config.parameters, function (parameter) {
+                    parameters.push(parameter.parameterValue);
+                });
+                clickedElement.setParameters(parameters);
                 clickedElement.setOutputEventType(config.outputEventType);
                 if (config.outputEventType !== undefined) {
                     clickedElement.setOutputEventType(config.outputEventType);
