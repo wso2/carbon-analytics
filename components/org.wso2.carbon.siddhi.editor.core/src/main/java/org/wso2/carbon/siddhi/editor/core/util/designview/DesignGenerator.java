@@ -21,11 +21,14 @@ package org.wso2.carbon.siddhi.editor.core.util.designview;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.*;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.AggregateByConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.SelectConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sub.aggregation.select.AggregateConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.AggregationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.AggregateByConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.SelectConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.aggregation.select.AggregateConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.AnnotationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.AnnotationValueConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.ListAnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.factories.AnnotationConfigFactory;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AggregationConfigElements;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGenerationHelper;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -325,13 +328,16 @@ public class DesignGenerator {
      * @param annotation    Siddhi Annotation, that belongs to a stream
      */ // TODO: 4/2/18 Find a good name for the method
     private AnnotationConfig generateStreamOrTableAnnotationConfig(Annotation annotation) {
-        Map<String, String> annotationElements = new HashMap<>();
-        List<String> annotationValues = new ArrayList<>();
+        Map<String, AnnotationValueConfig> annotationElements = new HashMap<>();
+        List<AnnotationValueConfig> annotationValues = new ArrayList<>();
         for (Element element : annotation.getElements()) {
             if (null == element.getKey()) {
-                annotationValues.add(element.getValue());
+                annotationValues.add(
+                        new AnnotationValueConfig(element.getValue(), DesignGenerationHelper.isStringValue(element)));
             } else {
-                annotationElements.put(element.getKey(), element.getValue());
+                annotationElements.put(
+                        element.getKey(),
+                        new AnnotationValueConfig(element.getValue(), DesignGenerationHelper.isStringValue(element)));
             }
         }
         if (annotationElements.isEmpty() && annotationValues.isEmpty()) {

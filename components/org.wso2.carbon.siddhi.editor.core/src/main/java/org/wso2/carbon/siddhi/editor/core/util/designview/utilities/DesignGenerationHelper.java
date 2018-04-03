@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
+import org.wso2.siddhi.query.api.annotation.Element;
+
 /**
  * Has helper methods for Code to Design generation
  */
@@ -37,5 +39,15 @@ public class DesignGenerationHelper {
      */
     public static String generateEdgeID(String parentID, String childID) {
         return String.format("%s_%s", parentID, childID);
+    }
+
+    /**
+     * Returns whether the given value should be treated as a string (should be wrapped within quotes) or not
+     * @param element   Element, whose value is checked
+     * @return          true - when the value should be treated a string. Otherwise, false
+     */
+    public static boolean isStringValue(Element element) {
+        // TODO: 4/3/18 Implement if a case occurs. Keep for now
+        return true;
     }
 }

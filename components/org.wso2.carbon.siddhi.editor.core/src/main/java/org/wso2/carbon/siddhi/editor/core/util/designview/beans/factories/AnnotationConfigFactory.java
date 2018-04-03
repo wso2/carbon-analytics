@@ -18,46 +18,49 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.factories;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.AnnotationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.ListAnnotationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.MapAnnotationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.AnnotationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.AnnotationValueConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.ListAnnotationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.annotationconfig.MapAnnotationConfig;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Factory to create Siddhi Annotation config
+ * Factory to create Siddhi AnnotationConfig
  */
 public class AnnotationConfigFactory {
     /**
-     * Returns a ListAnnotationConfig with the given name and values
+     * Returns a ListAnnotationConfig with the given name and list of valueConfigs
      * @param name      Name of the annotation
-     * @param values    List of values, inside the annotation
+     * @param values    List of values, of the annotation
      * @return          ListAnnotationConfig, with given list's members
      */
-    public AnnotationConfig getAnnotationConfig(String name, List<String> values) {
+    public AnnotationConfig getAnnotationConfig(String name, List<AnnotationValueConfig> values) {
         return new ListAnnotationConfig(name, values);
     }
 
     /**
-     * Returns a MapAnnotationConfig with the given name and values
+     * Returns a MapAnnotationConfig with the given name and map of valueConfigs
      * @param name      Name of the annotation
-     * @param elements  Option Value pairs, inside the annotation
+     * @param elements  Option Value pairs, of the annotation
      * @return          MapAnnotationConfig, with the given map's members
      */
-    public AnnotationConfig getAnnotationConfig(String name, Map<String, String> elements) {
+    public AnnotationConfig getAnnotationConfig(String name, Map<String, AnnotationValueConfig> elements) {
         return new MapAnnotationConfig(name, elements);
     }
 
     /**
-     * Returns a ListAnnotationConfig with the given name and value. Single value is added as the only list member
+     * Returns a ListAnnotationConfig with the given name and valueConfig.
+     * Single valueConfig will be the only member in the list.
      * @param name      Name of the annotation
-     * @param value     Value inside the annotation
+     * @param value     Value of the annotation
      * @return          ListAnnotationConfig, with the given value as the only member of the list
      */
-    public AnnotationConfig getAnnotationConfig(String name, String value) { // TODO: 4/1/18 Might have to remove
-        return new ListAnnotationConfig(name, new ArrayList<>(Arrays.asList(value)));
+    public AnnotationConfig getAnnotationConfig(String name, AnnotationValueConfig value) {
+        List<AnnotationValueConfig> valueConfig = new ArrayList<>(1);
+        valueConfig.add(value);
+        return new ListAnnotationConfig(name, new ArrayList<>(valueConfig));
     }
 }
