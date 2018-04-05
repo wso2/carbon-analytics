@@ -20,10 +20,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
     function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre, Edge) {
 
         var constants = {
-            STREAM: 'streamdrop',
-            TABLE: 'tabledrop',
+            STREAM : 'streamdrop',
+            TABLE : 'tabledrop',
             WINDOW :'windowdrop',
             TRIGGER :'triggerdrop',
+            AGGREGATION : 'aggregationdrop',
             PASS_THROUGH : 'squerydrop',
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
@@ -101,7 +102,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                  */
                 self.canvas.droppable
                 ({
-                    accept: '.stream, .table, .window, .trigger, .pass-through, .filter-query, .join-query, ' +
+                    accept: '.stream, .table, .window, .trigger, .aggregation, .pass-through, .filter-query, .join-query, ' +
                     '.window-query, .pattern, .partition',
                     containment: 'grid-container',
 
@@ -141,6 +142,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         // If the dropped Element is a Trigger then->
                         else if ($(droppedElement).hasClass('trigger')) {
                             self.handleTrigger(mouseTop, mouseLeft, false);
+                        }
+
+                        // If the dropped Element is a Aggregation then->
+                        else if ($(droppedElement).hasClass('aggregation')) {
+                            self.handleAggregation(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Pass through Query then->
@@ -661,6 +667,15 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 self.handleTrigger(mouseTop, mouseLeft, true, triggerId, triggerName);
             });
 
+            _.forEach(self.appData.aggregationList, function(aggregation){
+
+                var aggregationId = aggregation.getId();
+                var aggregationName = aggregation.getName();
+                var mouseTop = parseInt(aggregationId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = parseInt(aggregationId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handleAggregation(mouseTop, mouseLeft, true, aggregationId, aggregationName);
+            });
+
             _.forEach(self.appData.queryList, function(query){
                 var queryId = query.getId();
                 var queryName = query.getName();
@@ -862,6 +877,37 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
         };
+
+        //TODO: Reduce code duplication. Handle definitions in a one method.
+        DesignGrid.prototype.handleAggregation = function (mouseTop, mouseLeft, isCodeToDesignMode, aggregationId, aggregationName) {
+            var self = this;
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.newAgentId;
+                // The container and the toolbox are disabled to prevent the user from dropping any elements before
+                // initializing a Aggregation Element
+                self.canvas.addClass("disabledbutton");
+                $("#tool-palette-container").addClass("disabledbutton");
+                $("#output-console-activate-button").addClass("disabledbutton");
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(aggregationId !== undefined) {
+                    elementId = aggregationId;
+                } else {
+                    console.log("aggregationId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            // increment the Element ID for the next dropped Element
+            self.generateNextId();
+            var newAgent = $('<div>').attr('id', elementId).addClass('aggregationdrop');
+            self.canvas.append(newAgent);
+            // Drop the Aggregation element. Inside this a it generates the aggregation definition form.
+            self.dropElements.dropAggregation(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, aggregationName);
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
 
         DesignGrid.prototype.handlePassThroughQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, queryId,
                                                                 queryName) {

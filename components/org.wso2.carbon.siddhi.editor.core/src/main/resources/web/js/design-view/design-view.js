@@ -18,10 +18,11 @@
 
 define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid', 'appData',
         'filterQuery', 'joinQuery', 'partition', 'passThroughQuery', 'patternQuery', 'query', 'stream', 'table',
-        'window', 'trigger', 'windowQuery', 'leftStream', 'rightStream', 'join', 'edge'],
+        'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowQuery', 'leftStream', 'rightStream',
+        'join', 'edge'],
     function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, FilterQuery, JoinQuery, Partition,
-              PassThroughQuery, PatternQuery, Query, Stream, Table, Window, Trigger, WindowQuery, LeftStream,
-              RightStream, Join, Edge) {
+              PassThroughQuery, PatternQuery, Query, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
+              WindowQuery, LeftStream, RightStream, Join, Edge) {
 
         /**
          * @class DesignView
@@ -92,6 +93,13 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 //addAnnotationsForElement(trigger, triggerObject);
                 addAttributesForElement(trigger, triggerObject);
                 appData.addTrigger(triggerObject);
+            });
+            _.forEach(siddhiAppContent.aggregationList, function(aggregation){
+                var aggregationObject = new Aggregation(aggregation);
+                //addAnnotationsForElement(aggregation, aggregationObject);
+                var aggregateByTimePeriodSubElement = new AggregateByTimePeriod(aggregation.aggregateByTimePeriod);
+                aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriodSubElement);
+                appData.addAggregation(aggregationObject);
             });
             _.forEach(siddhiAppContent.filterList, function(filterQuery){
                 appData.addFilterQuery(new FilterQuery(filterQuery));

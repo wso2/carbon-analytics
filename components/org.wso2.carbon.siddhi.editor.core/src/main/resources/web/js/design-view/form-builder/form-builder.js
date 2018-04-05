@@ -16,9 +16,10 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'window', 'trigger', 'leftStream',
-        'rightStream', 'join'],
-    function (require, log, $, _, jsPlumb, Stream, Table, Window, Trigger, LeftStream, RightStream, Join) {
+define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'window', 'trigger', 'aggregation',
+        'aggregateByTimePeriod', 'querySelect', 'leftStream', 'rightStream', 'join'],
+    function (require, log, $, _, jsPlumb, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
+              QuerySelect, LeftStream, RightStream, Join) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -29,10 +30,11 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         JSONEditor.plugins.selectize.enable = true;
 
         var constants = {
-            STREAM: 'streamdrop',
-            TABLE: 'tabledrop',
-            WINDOW:'windowdrop',
-            TRIGGER:'triggerdrop',
+            STREAM : 'streamdrop',
+            TABLE : 'tabledrop',
+            WINDOW :'windowdrop',
+            TRIGGER :'triggerdrop',
+            AGGREGATION : 'aggregationdrop',
             PASS_THROUGH : 'squerydrop',
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
@@ -102,7 +104,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 if(elementType === constants.STREAM) {
                     if(self.appData.getStream(elementId) === undefined) {
                         $("#"+elementId).remove();
-                    }//TODO: Add other types like tables, triggers etc
+                    }
                 }
                 if(elementType === constants.TABLE) {
                     if(self.appData.getTable(elementId) === undefined) {
@@ -119,6 +121,11 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                         $("#"+elementId).remove();
                     }
                 }
+                if(elementType === constants.AGGREGATION) {
+                    if(self.appData.getAggregation(elementId) === undefined) {
+                        $("#"+elementId).remove();
+                    }
+                } //TODO: Add other types like pattern, filter
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
@@ -1093,6 +1100,488 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 self.toolPaletteContainer.removeClass('disabledbutton');
 
                 // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            });
+        };
+
+        /**
+         * @function generate the form to define the aggregation once it is dropped on the canvas
+         * @param i id for the element
+         * @returns user given aggregation name
+         */
+        FormBuilder.prototype.DefineAggregation = function (i) {
+            var self = this;
+            var formConsole = this.createTabForForm(i, constants.AGGREGATION);
+            var formContainer = formConsole.getContentContainer();
+            var propertyDiv = $('<div id="property-header"><h3>Define Aggregation </h3></div>' +
+                '<div id="define-aggregation" class="define-aggregation"></div>');
+            formContainer.append(propertyDiv);
+            var aggregationElement = $("#define-aggregation")[0];
+
+            // generate the form to define a aggregation
+            var editor = new JSONEditor(aggregationElement, {
+                schema: {
+                    type: "object",
+                    title: "Aggregation",
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
+                        },
+                        from: {
+                            type: "string",
+                            title: "From",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 2
+                        },
+                        select: {
+                            title: "Select",
+                            required: true,
+                            propertyOrder: 4,
+                            oneOf: [
+                                {
+                                    $ref: "#/definitions/userDefined",
+                                    title: "User-Defined"
+                                },
+                                {
+                                    $ref: "#/definitions/all",
+                                    title: "All"
+                                }
+                                ]
+                        },
+                        groupBy: {
+                            required: true,
+                            propertyOrder: 5,
+                            type: "array",
+                            format: "table",
+                            title: "Group By Attributes",
+                            uniqueItems: true,
+                            items: {
+                                type: "object",
+                                title : 'Attribute',
+                                properties: {
+                                    attribute: {
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        },
+                        aggregateByAttribute: {
+                            required: true,
+                            type: "string",
+                            title: "Aggregate by Attribute",
+                            minLength: 1,
+                            propertyOrder: 6
+                        },
+                        aggregateByTimePeriod: {
+                            type: "object",
+                            title: "Aggregate by Time Period",
+                            required: true,
+                            propertyOrder: 7,
+                            properties: {
+                                minValue: {
+                                    type: "string",
+                                    title: "Starting Time Value",
+                                    required: true,
+                                    enum: [
+                                        "seconds",
+                                        "minutes",
+                                        "hours",
+                                        "days",
+                                        "weeks",
+                                        "months",
+                                        "years"
+                                    ],
+                                    default: "seconds"
+                                },
+                                maxValue: {
+                                    type: "string",
+                                    title: "Ending Time Value",
+                                    required: true,
+                                    enum: [
+                                        "",
+                                        "seconds",
+                                        "minutes",
+                                        "hours",
+                                        "days",
+                                        "weeks",
+                                        "months",
+                                        "years"
+                                    ],
+                                    default: ""
+                                }
+                            }
+
+                        }
+                    },
+                    definitions: {
+                        userDefined: {
+                            required: true,
+                            type: "array",
+                            format: "table",
+                            title: "User Defined",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                title: "Value Set",
+                                type: "object",
+                                properties: {
+                                    expression: {
+                                        title: "Expression",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    as: {
+                                        title: "As",
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        },
+                        all: {
+                            type: "string",
+                            title: "All",
+                            enum: [
+                                "*"
+                            ],
+                            default: "*"
+                        }
+                    }
+                },
+                disable_properties: false,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true
+            });
+
+            formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
+
+            // 'Submit' button action
+            var submitButtonElement = $('#submit')[0];
+            submitButtonElement.addEventListener('click', function () {
+                var isAggregationNameUsed = false;
+                _.forEach(self.appData.aggregationList, function(aggregation){
+                    if(aggregation.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
+                        isAggregationNameUsed = true;
+                    }
+                });
+                if(isAggregationNameUsed) {
+                    alert("Aggregation name \"" + editor.getValue().name + "\" is already used.");
+                    return;
+                }
+                // add the new aggregation to the aggregation array
+                var aggregationOptions = {};
+                _.set(aggregationOptions, 'id', i);
+                _.set(aggregationOptions, 'name', editor.getValue().name);
+                _.set(aggregationOptions, 'from', editor.getValue().from);
+                _.set(aggregationOptions, 'aggregateByAttribute', editor.getValue().aggregateByAttribute);
+
+                var selectAttributeOptions = {};
+                if (editor.getValue().select instanceof Array) {
+                    _.set(selectAttributeOptions, 'type', 'user-defined');
+                    _.set(selectAttributeOptions, 'value', editor.getValue().select);
+                } else if (editor.getValue().select === "*") {
+                    _.set(selectAttributeOptions, 'type', 'all');
+                    _.set(selectAttributeOptions, 'value', editor.getValue().select);
+                } else {
+                    console.log("Value other than \"user-defined\" and \"all\" received!");
+                }
+                var selectObject = new QuerySelect(selectAttributeOptions);
+                _.set(aggregationOptions, 'select', selectObject);
+
+                if (editor.getValue().groupBy !== undefined) {
+                    var groupByAttributes = [];
+                    _.forEach(editor.getValue().groupBy, function (groupByAttribute) {
+                        groupByAttributes.push(groupByAttribute.attribute);
+                    });
+                    _.set(aggregationOptions, 'groupBy', groupByAttributes);
+                } else {
+                    _.set(aggregationOptions, 'groupBy', '');
+                }
+
+                var aggregateByTimePeriod = new AggregateByTimePeriod(editor.getValue().aggregateByTimePeriod);
+                if (editor.getValue().aggregateByTimePeriod === undefined) {
+                    aggregateByTimePeriod.setMaxValue('');
+                }
+                _.set(aggregationOptions, 'aggregateByTimePeriod', aggregateByTimePeriod);
+
+                var aggregation = new Aggregation(aggregationOptions);
+                self.appData.addAggregation(aggregation);
+
+                // close the form aggregation
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+
+                self.gridContainer.removeClass("disabledbutton");
+                self.toolPaletteContainer.removeClass("disabledbutton");
+
+            });
+            return editor.getValue().name;
+        };
+
+        /**
+         * @function generate the property aggregation for an existing aggregation
+         * @param element selected element(aggregation)
+         */
+        FormBuilder.prototype.GeneratePropertiesFormForAggregations = function (element) {
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            // The container and the tool palette are disabled to prevent the user from dropping any elements
+            self.gridContainer.addClass("disabledbutton");
+            self.toolPaletteContainer.addClass("disabledbutton");
+
+            var id = $(element).parent().attr('id');
+            // retrieve the aggregation information from the collection
+            var clickedElement = self.appData.getAggregation(id);
+            if(clickedElement === undefined) {
+                var errorMessage = 'unable to find clicked element';
+                log.error(errorMessage);
+            }
+            var name = clickedElement.getName();
+            var from = clickedElement.getFrom();
+            var select = clickedElement.getSelect().value;
+            var savedGroupByAttributes = clickedElement.getGroupBy();
+            var aggregateByAttribute = clickedElement.getAggregateByAttribute();
+            var aggregateByTimePeriod = clickedElement.getAggregateByTimePeriod();
+
+            var groupBy = [];
+            _.forEach(savedGroupByAttributes, function (savedGroupByAttribute) {
+                var groupByAttributeObject = {
+                    attribute: savedGroupByAttribute
+                };
+                groupBy.push(groupByAttributeObject);
+            });
+
+            var fillWith = {
+                name : name,
+                from : from,
+                select : select,
+                groupBy : groupBy,
+                aggregateByAttribute : aggregateByAttribute,
+                aggregateByTimePeriod : aggregateByTimePeriod
+            };
+            // generate the form to define a aggregation
+            var editor = new JSONEditor(formContainer[0], {
+                schema: {
+                    type: "object",
+                    title: "Aggregation",
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 1
+                        },
+                        from: {
+                            type: "string",
+                            title: "From",
+                            minLength: 1,
+                            required: true,
+                            propertyOrder: 2
+                        },
+                        select: {
+                            title: "Select",
+                            required: true,
+                            propertyOrder: 4,
+                            oneOf: [
+                                {
+                                    $ref: "#/definitions/userDefined",
+                                    title: "User-Defined"
+                                },
+                                {
+                                    $ref: "#/definitions/all",
+                                    title: "All"
+                                }
+                            ]
+                        },
+                        groupBy: {
+                            required: true,
+                            propertyOrder: 5,
+                            type: "array",
+                            format: "table",
+                            title: "Group By Attributes",
+                            uniqueItems: true,
+                            items: {
+                                type: "object",
+                                title : 'Attribute',
+                                properties: {
+                                    attribute: {
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        },
+                        aggregateByAttribute: {
+                            required: true,
+                            type: "string",
+                            title: "Aggregate by Attribute",
+                            minLength: 1,
+                            propertyOrder: 6
+                        },
+                        aggregateByTimePeriod: {
+                            type: "object",
+                            title: "Aggregate by Time Period",
+                            required: true,
+                            propertyOrder: 7,
+                            properties: {
+                                minValue: {
+                                    type: "string",
+                                    title: "Starting Time Value",
+                                    required: true,
+                                    enum: [
+                                        "seconds",
+                                        "minutes",
+                                        "hours",
+                                        "days",
+                                        "weeks",
+                                        "months",
+                                        "years"
+                                    ],
+                                    default: "seconds"
+                                },
+                                maxValue: {
+                                    type: "string",
+                                    title: "Ending Time Value",
+                                    required: true,
+                                    enum: [
+                                        "",
+                                        "seconds",
+                                        "minutes",
+                                        "hours",
+                                        "days",
+                                        "weeks",
+                                        "months",
+                                        "years"
+                                    ],
+                                    default: ""
+                                }
+                            }
+
+                        }
+                    },
+                    definitions: {
+                        userDefined: {
+                            required: true,
+                            type: "array",
+                            format: "table",
+                            title: "User Defined",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                title: "Value Set",
+                                type: "object",
+                                properties: {
+                                    expression: {
+                                        title: "Expression",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    as: {
+                                        title: "As",
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        },
+                        all: {
+                            type: "string",
+                            title: "All",
+                            enum: [
+                                "*"
+                            ],
+                            default: "*"
+                        }
+                    }
+                },
+                startval: fillWith,
+                disable_properties: false,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true
+            });
+            $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                'class="btn btn-default">Submit</button></div>' +
+                '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+
+            // 'Submit' button action
+            var submitButtonElement = $('#form-submit')[0];
+            submitButtonElement.addEventListener('click', function () {
+                //TODO: when the name is saved check whether this name is same as the previously saved name. If not, then only check whether it is unique.
+                // var isAggregationNameUsed = false;
+                // _.forEach(self.appData.aggregationList, function(aggregation){
+                //     if(aggregation.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
+                //         isAggregationNameUsed = true;
+                //     }
+                // });
+                // if(isAggregationNameUsed) {
+                //     alert("Aggregation name \"" + editor.getValue().name + "\" is already used.");
+                //     return;
+                // }
+                // The container and the palette are disabled to prevent the user from dropping any elements
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                var config = editor.getValue();
+
+                // update selected aggregation model
+                clickedElement.setName(config.name);
+                clickedElement.setFrom(config.from);
+                clickedElement.setAggregateByAttribute(config.aggregateByAttribute);
+
+                var selectAttributeOptions = {};
+                if (config.select instanceof Array) {
+                    _.set(selectAttributeOptions, 'type', 'user-defined');
+                    _.set(selectAttributeOptions, 'value', editor.getValue().select);
+                } else if (config.select === "*") {
+                    _.set(selectAttributeOptions, 'type', 'all');
+                    _.set(selectAttributeOptions, 'value', editor.getValue().select);
+                } else {
+                    console.log("Value other than \"user-defined\" and \"all\" received!");
+                }
+                var selectObject = new QuerySelect(selectAttributeOptions);
+                clickedElement.setSelect(selectObject);
+
+                if (config.groupBy !== undefined) {
+                    var groupByAttributes = [];
+                    _.forEach(config.groupBy, function (groupByAttribute) {
+                        groupByAttributes.push(groupByAttribute.attribute);
+                    });
+                    clickedElement.setGroupBy(groupByAttributes);
+                } else {
+                    clickedElement.setGroupBy('');
+                }
+
+                var aggregateByTimePeriod = new AggregateByTimePeriod(config.aggregateByTimePeriod);
+                if (config.aggregateByTimePeriod === undefined) {
+                    aggregateByTimePeriod.setMaxValue('');
+                }
+                clickedElement.setAggregateByTimePeriod(aggregateByTimePeriod);
+
+                var textNode = $(element).parent().find('.aggregationnamenode');
+                textNode.html(config.name);
+
+                // close the form aggregation
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            });
+
+            // 'Cancel' button action
+            var cancelButtonElement = $('#form-cancel')[0];
+            cancelButtonElement.addEventListener('click', function () {
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                // close the form aggregation
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
             });

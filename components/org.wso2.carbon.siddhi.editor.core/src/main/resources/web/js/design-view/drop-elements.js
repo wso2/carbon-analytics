@@ -22,10 +22,11 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
               Stream, WindowQuery, FormBuilder) {
 
         var constants = {
-            STREAM: 'streamdrop',
-            TABLE: 'tabledrop',
-            WINDOW:'windowdrop',
-            TRIGGER:'triggerdrop',
+            STREAM : 'streamdrop',
+            TABLE : 'tabledrop',
+            WINDOW :'windowdrop',
+            TRIGGER :'triggerdrop',
+            AGGREGATION : 'aggregationdrop',
             PASS_THROUGH : 'squerydrop',
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
@@ -434,6 +435,82 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
         };
 
         /**
+         * @function drop the aggregation element on the canvas
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
+         * @param aggregationName name of the aggregation
+         */
+        DropElements.prototype.dropAggregation = function (newAgent, i, top, left, isCodeToDesignMode, aggregationName) {
+            /*
+             The node hosts a text node where the Aggregation's name input by the user will be held.
+             Rather than simply having a `newAgent.text(aggregationName)` statement, as the text function tends to
+             reposition the other appended elements with the length of the Aggregation name input by the user.
+            */
+
+            var self= this;
+            var name;
+            if(isCodeToDesignMode) {
+                name = aggregationName;
+            } else {
+                name = self.formBuilder.DefineAggregation(i);
+            }
+            var node = $('<div>' + name + '</div>');
+            newAgent.append(node);
+            node.attr('id', i+"-nodeInitial");
+            node.attr('class', "aggregationNameNode");
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the Aggregation Element will
+             be displayed as an alert message
+            */
+            var settingsIconId = ""+ i + "-dropAggregationSettingsId";
+            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+                'class="element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
+                'class="element-close-icon collapse">').append(prop);
+
+            var settingsIconElement = $('#'+settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForAggregations(this);
+            });
+
+            var finalElement = newAgent;
+
+            /*
+             connection --> The connection anchor point is appended to the element
+             */
+            var connection1 = $('<div class="connectorInAggregation">').attr('id', i+"-in" ).addClass('connection');
+            var connection2 = $('<div class="connectorOutAggregation">').attr('id', i+"-out" ).addClass('connection');
+
+
+            finalElement.append(connection1);
+            finalElement.append(connection2);
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            _jsPlumb.draggable(finalElement, {
+                containment: 'grid-container'
+            });
+            _jsPlumb.makeTarget(connection1, {
+                deleteEndpointsOnDetach:true,
+                anchor: 'Left'
+            });
+
+            _jsPlumb.makeSource(connection2, {
+                deleteEndpointsOnDetach : true,
+                anchor : 'Right'
+            });
+        };
+
+        /**
          * @function drop the query element on the canvas
          * @param newAgent new element
          * @param i id of the element
@@ -779,6 +856,9 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
 
                 } else if (newElement.hasClass('triggerdrop')) {
                     self.appData.removeTrigger(elementId);
+
+                } else if (newElement.hasClass('aggregationdrop')) {
+                    self.appData.removeAggregation(elementId);
 
                 } else if (newElement.hasClass('squerydrop')) {
                     self.appData.removeQuery(elementId);

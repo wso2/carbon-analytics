@@ -30,6 +30,7 @@ define(['require', 'elementArray'],
             this.tableList = new ElementArray();
             this.windowList = new ElementArray();
             this.triggerList = new ElementArray();
+            this.aggregationList = new ElementArray();
             this.filterList = new ElementArray();
             this.passThroughList = new ElementArray();
             this.windowQueryList = new ElementArray();
@@ -57,6 +58,10 @@ define(['require', 'elementArray'],
 
         AppData.prototype.addTrigger = function (trigger) {
             this.triggerList.push(trigger);
+        };
+
+        AppData.prototype.addAggregation = function (aggregation) {
+            this.aggregationList.push(aggregation);
         };
 
         AppData.prototype.addFilterQuery = function (filterQuery) {
@@ -105,6 +110,10 @@ define(['require', 'elementArray'],
 
         AppData.prototype.removeTrigger = function (triggerId) {
             this.triggerList.removeElement(triggerId);
+        };
+
+        AppData.prototype.removeAggregation = function (aggregationId) {
+            this.aggregationList.removeElement(aggregationId);
         };
 
         AppData.prototype.removeFilterQuery = function (filterQueryId) {
@@ -157,6 +166,10 @@ define(['require', 'elementArray'],
 
         AppData.prototype.getTrigger = function (triggerId) {
             return this.triggerList.getElement(triggerId);
+        };
+
+        AppData.prototype.getAggregation = function (aggregationId) {
+            return this.aggregationList.getElement(aggregationId);
         };
 
         AppData.prototype.getFilterQuery = function (filterQueryId) {

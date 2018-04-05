@@ -66,6 +66,12 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/trigger.png"
                 },
                 {
+                    id : "aggregation",
+                    className : "aggregation",
+                    title : "Aggregation",
+                    icon : "/editor/images/aggregation.png"
+                },
+                {
                     id : "pass-through",
                     className : "pass-through",
                     title : "Pass Through",

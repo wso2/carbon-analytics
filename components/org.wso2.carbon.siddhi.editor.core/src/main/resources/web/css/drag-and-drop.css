@@ -85,6 +85,10 @@
     background-image: url("../images/trigger.png");
 }
 
+.aggregationdrop {
+    background-image: url("../images/aggregation.png");
+}
+
 .squerydrop {
     background-image: url("../images/passthrough.png");
 }
@@ -109,7 +113,7 @@
     Dropped Elements corresponding to their toolbox elements
 */
 
-.streamdrop, .tabledrop, .windowdrop, .triggerdrop, .squerydrop, .filterdrop, .wquerydrop, .joquerydrop, .stquerydrop {
+.streamdrop, .tabledrop, .windowdrop, .triggerdrop, .aggregationdrop, .squerydrop, .filterdrop, .wquerydrop, .joquerydrop, .stquerydrop {
     border-radius: 0.5em;
     opacity: 0.8;
     width: 60px;
@@ -259,13 +263,13 @@ td {
     -webkit-background-clip: text;
 }
 
-.connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger{
+.connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation{
     float: left;
     margin-top: -33%;
     margin-left: -13px;
 }
 
-.connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger{
+.connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation{
     float: right;
     margin-top: -33%;
     margin-right: -13px;
@@ -298,7 +302,7 @@ td {
     margin-right: -10%;
 }
 
-.triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode , .queryNameNode , .partitionNameNode{
+.aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode , .queryNameNode , .partitionNameNode{
     float:right;
     width:inherit;
     height:inherit;
