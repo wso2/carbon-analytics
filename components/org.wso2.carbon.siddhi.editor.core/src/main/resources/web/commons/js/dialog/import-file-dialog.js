@@ -73,7 +73,63 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         })(reader);
 
                         reader.readAsText(file);
+                        importConfiguration();
                     }
+
+                    function isJsonString(str) {
+                        try {
+                            JSON.parse(str);
+                        } catch (e) {
+                            return false;
+                        }
+                        return true;
+                    }
+
+                    function importConfiguration() {
+
+                        var workspaceServiceURL = app.config.services.workspace.endpoint;
+                        var importServiceURL = workspaceServiceURL + "/write";
+                        var config = fileContent;
+                        var configName = fileName;
+
+                        var payload = "configName=" + btoa("workspace" + self.app
+                            .getPathSeperator() + configName) + "&config=" + (btoa(config));
+
+                        $.ajax({
+                            url: importServiceURL,
+                            type: "POST",
+                            data: payload,
+                            contentType: "text/plain; charset=utf-8",
+                            async: false,
+                            success: function (data, textStatus, xhr) {
+                                if (xhr.status == 200) {
+
+                                    var file = new File({
+                                        name: configName,
+                                        content: config,
+                                        isPersisted: true,
+                                        isDirty: false
+                                    });
+                                    app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
+                                } else {
+                                    // openFileWizardError.text(data.Error);
+                                    // openFileWizardError.show();
+                                }
+                            },
+                            error: function (res, errorCode, error) {
+                                var msg = _.isString(error) ? error : res.statusText;
+                                if(isJsonString(res.responseText)){
+                                    var resObj = JSON.parse(res.responseText);
+                                    if(_.has(resObj, 'Error')){
+                                        msg = _.get(resObj, 'Error');
+                                    }
+                                }
+                                // openFileWizardError.text(msg);
+                                // openFileWizardError.show();
+                            }
+                        });
+                    };
+
                 },
             });
 
