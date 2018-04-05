@@ -88,7 +88,11 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 }
                 var activeTab = self.options.application.tabController.activeTab;
                 if (activeTab !== undefined && activeTab.getTitle() != "welcome-page") {
-                    activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                    if (activeTab.getSiddhiFileEditor().isInSourceView()) {
+                        activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                    } else {
+                        activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
+                    }
                 }
             },
 
@@ -106,7 +110,11 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 });
                 var activeTab = self.options.application.tabController.activeTab;
                 if (activeTab.getTitle() != "welcome-page") {
-                    activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                    if (activeTab.getSiddhiFileEditor().isInSourceView()) {
+                        activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                    } else {
+                        activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
+                    }
                 }
             },
 

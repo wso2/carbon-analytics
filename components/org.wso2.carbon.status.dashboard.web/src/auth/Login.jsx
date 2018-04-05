@@ -135,6 +135,7 @@ export default class Login extends Component {
                             //style={textField}
                             fullWidth
                             floatingLabelText={"Username"}
+                            autoComplete="off"
                             value={this.state.username}
                             onChange={(e) => {
                                 this.setState({
@@ -147,6 +148,7 @@ export default class Login extends Component {
                         <TextField
                             fullWidth
                             type="password"
+                            autoComplete="off"
                             floatingLabelText={"Password"}
                             floatingLabelFocusStyle={{color: '#f17b31'}}
                             underlineFocusStyle={{borderColor: '#f17b31'}}
@@ -188,7 +190,7 @@ export default class Login extends Component {
                                 You can refer our&nbsp;
                                 <a
                                     style={styles.cookiePolicyAnchor}
-                                    href="/privacy-policy/cookie-policy"
+                                    href="/policies/cookie-policy"
                                     target="_blank"
                                 >
                                     Cookie Policy
@@ -201,7 +203,7 @@ export default class Login extends Component {
                                 By signing in, you agree to our&nbsp;
                                 <a
                                     style={styles.cookiePolicyAnchor}
-                                    href="/privacy-policy/privacy-policy"
+                                    href="/policies/privacy-policy"
                                     target="_blank">
                                     Privacy Policy
                                 </a>.

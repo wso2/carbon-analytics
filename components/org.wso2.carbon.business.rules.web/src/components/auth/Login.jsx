@@ -143,6 +143,7 @@ export default class Login extends React.Component {
                             id="username"
                             label="Username"
                             margin="normal"
+                            autoComplete="off"
                             value={this.state.username}
                             onChange={(e) => {
                                 this.setState({
@@ -158,6 +159,7 @@ export default class Login extends React.Component {
                             id="password"
                             label="Password"
                             margin="normal"
+                            autoComplete="off"
                             value={this.state.password}
                             onChange={(e) => {
                                 this.setState({
@@ -202,7 +204,7 @@ export default class Login extends React.Component {
                                 You can refer our&nbsp;
                                 <a
                                     style={styles.cookiePolicyAnchor}
-                                    href="/privacy-policy/cookie-policy"
+                                    href="/policies/cookie-policy"
                                     target="_blank"
                                 >
                                     Cookie Policy
@@ -215,7 +217,7 @@ export default class Login extends React.Component {
                                 By signing in, you agree to our&nbsp;
                                 <a
                                     style={styles.cookiePolicyAnchor}
-                                    href="/privacy-policy/privacy-policy"
+                                    href="/policies/privacy-policy"
                                     target="_blank">
                                     Privacy Policy
                                 </a>.

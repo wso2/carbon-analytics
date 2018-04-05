@@ -37,6 +37,10 @@
     <link rel="stylesheet" type="text/css" href="/editor/css/debugger.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/console.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/welcome-screen.css"/>
+    <!-- CSS For The Design View -->
+    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/overlay_scroll/css/OverlayScrollbars.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/css/event-flow.css"/>
+
     <title>Stream Processor Studio</title>
 </head>
 
@@ -218,21 +222,84 @@
         <div class="canvas-container">
         </div>
         <!-- End: Canvas Container -->
-        <!-- Start: Preview Container -->
+        <!-- Start: Source Container -->
         <div id="siddhi-editor" class="source-container">
         </div>
-        <!-- End Preview Container -->
+        <!-- End Source Container -->
+        <!-- Start Design Container -->
+        <div class="design-container" style="display: none;">
+            <div class="loading-screen">
+                <i class="fw fw-wso2-logo fw-pulse fw-2x"></i>
+            </div>
+            <div class="design-container-data clearfix">
+                <ul class="legend">
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour stream-colour"></span>
+                        <span class="legend-text">Stream</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour source-colour"></span>
+                        <span class="legend-text">Source</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour sink-colour"></span>
+                        <span class="legend-text">Sink</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour table-colour"></span>
+                        <span class="legend-text">Table</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour window-colour"></span>
+                        <span class="legend-text">Window</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour trigger-colour"></span>
+                        <span class="legend-text">Trigger</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour aggregation-colour"></span>
+                        <span class="legend-text">Aggregation</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour function-colour"></span>
+                        <span class="legend-text">Function</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour query-colour"></span>
+                        <span class="legend-text">Query</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour partition-type-colour"></span>
+                        <span class="legend-text">Partition</span>
+                    </li>
+                </ul>
+                <div class="siddhi-app-name"></div>
+                <div class="siddhi-app-description"></div>
+            </div>
+            <div class="graph-container">
+                <svg class="siddhi-graph" id="siddhi-graph">
+                    <g></g>
+                </svg>
+            </div>
+        </div>
+        <!-- End Design Container -->
         <!-- Start: Preview Container -->
         <div class="preview-container">
         </div>
         <!-- End Preview Container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
+            <div class="btn toggle-view-button">
+                <i class="fw fw-design-view"></i>
+                <span class="toggle-button-text">Design View</span>
+            </div>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>
     <!-- End: Tab -->
 </div>
+
 <!-- End: Template for service tab -->
 <div class="hidden">
     <div class="siddhi-app-list">
@@ -1085,6 +1152,9 @@
             nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
             theme_wso2: "commons/lib/theme-wso2-2.0.0/js/theme-wso2.min",
             ace: "commons/lib/ace-editor",
+            d3: "commons/lib/dagre-d3/d3.v3.min",
+            dagre_d3: "commons/lib/dagre-d3/dagre-d3.min",
+            overlay_scroller: "commons/lib/overlay_scroll/js/jquery.overlayScrollbars.min",
             //beautify: "commons/lib/beautify",
             ///////////////////////
             // custom modules ////
@@ -1117,7 +1187,8 @@
             output_console_list: "js/output-console/console-list",
             console: "js/output-console/console",
             service_console: "js/output-console/service-console-manager",
-            debugger_console: "js/debugger/debugger"
+            debugger_console: "js/debugger/debugger",
+            event_flow: "js/event-flow/event-flow"
         },
         map: {
             "*": {
@@ -1418,6 +1489,10 @@
                                 // relative selector within container for a tab
                                 container: '.source-container'
                             },
+                            design: {
+                                // relative selector within container for a tab
+                                container: '.design-container'
+                            },
                             debug: {
                                 // relative selector within container for a tab
                                 container: '.debug-container'
@@ -1425,8 +1500,7 @@
                             toggle_controls: {
                                 // relative selector within container for a tab
                                 container: '.toggle-controls-container',
-                                sourceIcon: '.toggle-to-source',
-                                designIcon: '.toggle-to-design'
+                                toggle_view: '.toggle-view-button'
                             },
                             notifications: {
                                 container: '#notification-container'

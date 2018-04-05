@@ -69,7 +69,11 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                                 serviceWrapper.resizable( "destroy" );
                             }
                             if(activeTab._title != "welcome-page"){
-                                activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                                if (activeTab.getSiddhiFileEditor().isInSourceView()) {
+                                    activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                                } else {
+                                    activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
+                                }
                             }
                         } else {
                             this._activateBtn.parent('li').addClass('active');

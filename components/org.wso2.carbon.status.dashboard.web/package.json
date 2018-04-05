@@ -9,7 +9,7 @@
     "dev": "webpack-dev-server --hot --inline --progress --history-api-fallback",
     "lint": "eslint . --ext .jsx --ext .js",
     "build": "webpack -p",
-    "dev_wp": "webpack -d -w"
+    "dev_wp": "webpack -d -w --progress"
   },
   "repository": {
     "type": "git",
@@ -39,7 +39,7 @@
     "react-syntax-highlighter": "^5.8.0",
     "react-table": "^6.6.0",
     "react-tooltip": "^3.3.0",
-    "react-vizgrammar": "^0.6.9",
+    "react-vizgrammar": "^0.6.20",
     "rimraf": "^2.6.2",
     "style-loader": "^0.18.2",
     "topojson-client": "^3.0.0",

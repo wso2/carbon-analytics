@@ -229,7 +229,7 @@ export default class WorkerSpecificCharts extends React.Component {
                 </div>
                 <Link key="cpu" to={window.contextPath + '/worker/history/' + this.state.workerId }>
                     <div style={{backgroundColor: '#131313', paddingTop: 18, height: 370}}>
-                        <div style={{backgroundColor: '#131313', height: 200, width: 500}}>
+                        <div style={{backgroundColor: '#131313', height: 200, width: '100%'}}>
                         <VizG
                             data={data}
                             metadata={metadata} config={config}
@@ -349,7 +349,7 @@ export default class WorkerSpecificCharts extends React.Component {
                 </div>
                 <Link key="memory" to={window.contextPath + '/worker/history/' + this.state.workerId }>
                     <div style={{backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
-                        <div style={{backgroundColor: '#131313', height: 200, width: 500}}>
+                        <div style={{backgroundColor: '#131313', height: 200, width: '100%'}}>
                         <VizG
                             data={data}
                             metadata={metadata} config={config}
@@ -391,7 +391,7 @@ export default class WorkerSpecificCharts extends React.Component {
                 <Link key="loadAverage"
                       to={window.contextPath +'/worker/history/' + this.state.workerId}>
                     <div style={{backgroundColor: '#131313', paddingTop: 10, height: '370px'}}>
-                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: 550}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: '100%'}}>
                         <VizG data={this.state.loadAvg}
                               metadata={loadMetadata}
                               config={loadLineChartConfig}
@@ -434,7 +434,7 @@ export default class WorkerSpecificCharts extends React.Component {
                 </div>
                 <Link key="throughput" to={window.contextPath + '/worker/history/' + this.state.workerId }>
                     <div style={{backgroundColor: '#131313', paddingTop: 10, height: '370px'}}>
-                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: 550}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: '100%'}}>
                         <VizG data={this.state.throughputAll}
                               metadata={tpMetadata}
                               config={tpLineChartConfig}
