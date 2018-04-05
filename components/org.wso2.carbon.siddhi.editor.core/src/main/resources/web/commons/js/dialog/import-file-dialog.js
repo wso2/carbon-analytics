@@ -45,7 +45,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                     var fileName;
                     var notification_container = this.notification_container;
 
-
                     var ImportLink = document.createElement("input");
                     ImportLink.type = "file";
                     ImportLink.name = "File";
@@ -66,14 +65,53 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         var reader = new FileReader();
 
                         fileName = file.name;
+
+                        var existsResponse = existFileInPath({
+                            configName: fileName
+                        });
+
+                        if (existsResponse.error === undefined) {
+                            if (existsResponse.exists) {
+                                alertError("A file already exist in workspace with selected name.");
+                                return;
+                            } else {
+                                reader.readAsText(file);
+                                importConfiguration();
+                            }
+                        } else {
+                            alertError("Error in reading the file.");
+                        }
+
                         reader.onload = (function (reader) {
                             return function () {
                                 fileContent = reader.result;
                             }
                         })(reader);
+                    }
 
-                        reader.readAsText(file);
-                        importConfiguration();
+                    function existFileInPath(options) {
+                        var client = self.app.workspaceManager.getServiceClient();
+                        var data = {};
+                        var workspaceServiceURL = app.config.services.workspace.endpoint;
+                        var saveServiceURL = workspaceServiceURL + "/exists/workspace";
+                        var payload = "configName=" + btoa("workspace" + app
+                            .getPathSeperator() + options.configName);
+
+                        $.ajax({
+                            type: "POST",
+                            contentType: "text/plain; charset=utf-8",
+                            url: saveServiceURL,
+                            data: payload,
+                            async: false,
+                            success: function (response) {
+                                data = response;
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                                data = client.getErrorFromResponse(xhr, textStatus, errorThrown);
+                                log.error(data.message);
+                            }
+                        });
+                        return data;
                     }
 
                     function isJsonString(str) {
@@ -110,25 +148,63 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                                         isPersisted: true,
                                         isDirty: false
                                     });
-                                    app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
+                                    app.commandManager.dispatch("create-new-tab", {
+                                        tabOptions: {
+                                            file: file
+                                        }
+                                    });
+                                    alertSuccess();
                                 } else {
-                                    // openFileWizardError.text(data.Error);
-                                    // openFileWizardError.show();
+                                    alertError(data.Error);
                                 }
                             },
                             error: function (res, errorCode, error) {
                                 var msg = _.isString(error) ? error : res.statusText;
-                                if(isJsonString(res.responseText)){
+                                if (isJsonString(res.responseText)) {
                                     var resObj = JSON.parse(res.responseText);
-                                    if(_.has(resObj, 'Error')){
+                                    if (_.has(resObj, 'Error')) {
                                         msg = _.get(resObj, 'Error');
                                     }
                                 }
-                                // openFileWizardError.text(msg);
-                                // openFileWizardError.show();
+                                alertError(msg);
                             }
                         });
-                    };
+                    }
+
+                    var successNotification = $(
+                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' " +
+                        "id='success-alert'><span class='notification'>" +
+                        "Siddhi file is successfully imported to workspace." +
+                        "</span>" +
+                        "</div>");
+
+                    function alertSuccess() {
+                        $(notification_container).append(successNotification);
+                        successNotification.fadeTo(2000, 200).slideUp(1000, function () {
+                            successNotification.slideUp(1000);
+                        });
+                    }
+
+                    function alertError(errorMessage) {
+                        var errorNotification = getErrorNotification(errorMessage);
+                        $(notification_container).append(errorNotification);
+                        errorNotification.fadeTo(2000, 200).slideUp(1000, function () {
+                            errorNotification.slideUp(1000);
+                        });
+                    }
+
+                    function getErrorNotification(detailedErrorMsg) {
+                        var errorMsg = "Error while importing file";
+                        if (!_.isEmpty(detailedErrorMsg)) {
+                            errorMsg = (detailedErrorMsg);
+                        }
+                        return $(
+                            "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger'" +
+                            " id='error-alert'>" + "<span class='notification'>" +
+                            errorMsg +
+                            "</span>" +
+                            "</div>");
+                    }
 
                 },
             });
