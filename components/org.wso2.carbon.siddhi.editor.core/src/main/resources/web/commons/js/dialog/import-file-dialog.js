@@ -41,7 +41,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
 
                     var self = this;
                     var app = this.app;
-                    var fileContent;
                     var fileName;
                     var notification_container = this.notification_container;
 
@@ -49,11 +48,11 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                     ImportLink.type = "file";
                     ImportLink.name = "File";
                     ImportLink.accept = ".siddhi";
+                    ImportLink.click();
                     ImportLink.onchange = handleFiles;
                     ImportLink.onclick = destroyClickedElement;
                     ImportLink.style.display = "none";
                     document.body.appendChild(ImportLink);
-                    ImportLink.click();
 
                     function destroyClickedElement(event) {
                         document.body.removeChild(event.target);
@@ -76,7 +75,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                                 return;
                             } else {
                                 reader.readAsText(file);
-                                importConfiguration();
                             }
                         } else {
                             alertError("Error in reading the file.");
@@ -84,7 +82,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
 
                         reader.onload = (function (reader) {
                             return function () {
-                                fileContent = reader.result;
+                                var fileContent = reader.result;
+                                importConfiguration(fileContent);
                             }
                         })(reader);
                     }
@@ -123,8 +122,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         return true;
                     }
 
-                    function importConfiguration() {
-
+                    function importConfiguration(fileContent) {
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var importServiceURL = workspaceServiceURL + "/write";
                         var config = fileContent;
