@@ -17,10 +17,10 @@
  */
 
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager','launcher','app/debugger/debugger'],
+        'undo_manager', 'launcher', 'app/debugger/debugger'],
 
-    function (require, $, Backbone, _, log, DesignView, SourceView, constants,UndoManager,Launcher,
-        DebugManager) {
+    function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
+              DebugManager) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -89,9 +89,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     /* Start Debug Related Stuff */
                     var debugConfOpts = {
-                        debugger_instance : self._sourceView.getDebugger(),
-                        editorInstance : self._sourceView.getEditor(),
-                        option : self.options.application.config.debugger_instance
+                        debugger_instance: self._sourceView.getDebugger(),
+                        editorInstance: self._sourceView.getEditor(),
+                        option: self.options.application.config.debugger_instance
 
                     };
 
@@ -103,18 +103,18 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     tabContentContainer.removeClass('tab-content-default');
 
                     this._sourceView.on('modified', function (changeEvent) {
-                        if(self.getUndoManager().hasUndo()){
+                        if (self.getUndoManager().hasUndo()) {
                             // clear undo stack from design view
-                            if(!self.getUndoManager().getOperationFactory()
-                                    .isSourceModifiedOperation(self.getUndoManager().undoStackTop())){
+                            if (!self.getUndoManager().getOperationFactory()
+                                .isSourceModifiedOperation(self.getUndoManager().undoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }
 
-                        if(self.getUndoManager().hasRedo()){
+                        if (self.getUndoManager().hasRedo()) {
                             // clear redo stack from design view
-                            if(!self.getUndoManager().getOperationFactory()
-                                    .isSourceModifiedOperation(self.getUndoManager().redoStackTop())){
+                            if (!self.getUndoManager().getOperationFactory()
+                                .isSourceModifiedOperation(self.getUndoManager().redoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }
@@ -174,8 +174,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         " \"childId\":\"2\"," +
                         " \"childType\":\"query\"}," +
                         "\"length\":2" +
-                        "},"+
-                        "\"finalElementCount\":0"+
+                        "}," +
+                        "\"finalElementCount\":0" +
                         "}";
 
                     this.JSONObject = JSON.parse(JSONString);
@@ -191,7 +191,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             sourceContainer.hide();
                             designView.emptyDesignViewGridContainer();
                             designContainer.show();
-                            toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
+                            toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
+                                "<span class=\"toggle-button-text\">Source View</span>");
                             designView.renderDesignGrid(self.JSONObject);
                             console.log(JSON.stringify(designView.getSiddhiAppContent()));
                             self.JSONObject = JSON.parse(JSON.stringify(designView.getSiddhiAppContent()));
@@ -200,7 +201,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             designContainer.hide();
                             sourceContainer.show();
                             self._sourceView.editorResize();
-                            toggleViewButton.html("<i class=\"fw fw-design-view\"></i>&nbsp;&nbsp;Design View");
+                            toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
+                                "<span class=\"toggle-button-text\">Design View</span>");
                             console.log(JSON.stringify(designView.getSiddhiAppContent()));
                         }
                     });
