@@ -17,10 +17,10 @@
  */
 
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager','launcher','app/debugger/debugger'],
+        'undo_manager', 'launcher', 'app/debugger/debugger'],
 
-    function (require, $, Backbone, _, log, DesignView, SourceView, constants,UndoManager,Launcher,
-        DebugManager) {
+    function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
+              DebugManager) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -89,9 +89,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     /* Start Debug Related Stuff */
                     var debugConfOpts = {
-                        debugger_instance : self._sourceView.getDebugger(),
-                        editorInstance : self._sourceView.getEditor(),
-                        option : self.options.application.config.debugger_instance
+                        debugger_instance: self._sourceView.getDebugger(),
+                        editorInstance: self._sourceView.getEditor(),
+                        option: self.options.application.config.debugger_instance
 
                     };
 
@@ -103,18 +103,18 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     tabContentContainer.removeClass('tab-content-default');
 
                     this._sourceView.on('modified', function (changeEvent) {
-                        if(self.getUndoManager().hasUndo()){
+                        if (self.getUndoManager().hasUndo()) {
                             // clear undo stack from design view
-                            if(!self.getUndoManager().getOperationFactory()
-                                    .isSourceModifiedOperation(self.getUndoManager().undoStackTop())){
+                            if (!self.getUndoManager().getOperationFactory()
+                                .isSourceModifiedOperation(self.getUndoManager().undoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }
 
-                        if(self.getUndoManager().hasRedo()){
+                        if (self.getUndoManager().hasRedo()) {
                             // clear redo stack from design view
-                            if(!self.getUndoManager().getOperationFactory()
-                                    .isSourceModifiedOperation(self.getUndoManager().redoStackTop())){
+                            if (!self.getUndoManager().getOperationFactory()
+                                .isSourceModifiedOperation(self.getUndoManager().redoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }
@@ -174,8 +174,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         " \"childId\":\"2\"," +
                         " \"childType\":\"query\"}," +
                         "\"length\":2" +
-                        "},"+
-                        "\"finalElementCount\":0"+
+                        "}," +
+                        "\"finalElementCount\":0" +
                         "}";
 
                     this.JSONObject = JSON.parse(JSONString);

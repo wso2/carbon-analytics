@@ -73,11 +73,11 @@
     background-color: #fff;
 }
 
-.streamdrop{
+.streamdrop {
     background-image: url("../images/stream.png");
 }
 
-.tabledrop{
+.tabledrop {
     background-image: url("../images/table.png");
 }
 
@@ -161,13 +161,13 @@
     box-sizing: border-box;
 }
 
-.connectorInStream{
+.connectorInStream {
     float: left;
     margin-top: -33%;
     margin-left: -13px;
 }
 
-.connectorOutStream{
+.connectorOutStream {
     float: right;
     margin-top: -33%;
     margin-right: -13px;
@@ -180,11 +180,12 @@
     padding: 10px;
     cursor: move;
 }
+
 .connection {
     -moz-border-radius: 50px;
     -webkit-border-radius: 50px;
     border-radius: 50px;
-    font-size:10px;
+    font-size: 10px;
     text-align: center;
     cursor: pointer;
     width: 10px;
@@ -194,6 +195,7 @@
     border: 1px solid darkblue;
     background-color: darkblue;
 }
+
 .property {
     float: left;
     margin-top: 10px;
@@ -207,31 +209,32 @@
 /*
 *Styles for the configuration icons
 */
-.element-prop-icon , .element-conn-icon , .element-close-icon{
-    float:right;
-    width:26px;
-    height:26px;
+.element-prop-icon, .element-conn-icon, .element-close-icon {
+    float: right;
+    width: 26px;
+    height: 26px;
     background-color: transparent;
     border: 1px solid transparent;
-    margin-top:-65px;
-    cursor:pointer;
+    margin-top: -65px;
+    cursor: pointer;
     color: red;
     border-radius: 40px;
 }
 
-.element-prop-icon{
-    margin-right:25px;
-}
-.element-conn-icon{
-    margin-right:50px;
-}
-.element-close-icon{
-    margin-right:0;
+.element-prop-icon {
+    margin-right: 25px;
 }
 
+.element-conn-icon {
+    margin-right: 50px;
+}
+
+.element-close-icon {
+    margin-right: 0;
+}
 
 input {
-.form-control input-md;
+. form-control input-md;
     font-family: inherit;
     font-size: inherit;
     color: inherit;
@@ -239,7 +242,8 @@ input {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.disabledbutton{
+
+.disabledbutton {
     pointer-events: none;
     opacity: 0.4;
 }
@@ -252,46 +256,47 @@ td {
     padding: 5px;
     border: 1px solid transparent;
 }
-.queryDiv{
+
+.queryDiv {
     margin: 20px 0 20px 0;
     width: 600px;
     box-shadow: 3px 4px 5px 6px #707070;
 }
 
-.simpleQueryLabel, .windowStreamLabel{
+.simpleQueryLabel, .windowStreamLabel {
     background-color: #565656;
     text-align: center;
-    margin:20px 0 20px 0;
+    margin: 20px 0 20px 0;
     color: transparent;
-    text-shadow: 0 2px 3px rgba(255,255,255,0.3);
+    text-shadow: 0 2px 3px rgba(255, 255, 255, 0.3);
     -webkit-background-clip: text;
 }
 
-.connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation{
+.connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation {
     float: left;
     margin-top: -33%;
     margin-left: -13px;
 }
 
-.connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation{
+.connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation {
     float: right;
     margin-top: -33%;
     margin-right: -13px;
 }
 
-.connectorInWindow, .connectorIn{
+.connectorInWindow, .connectorIn {
     float: left;
     margin-top: -37%;
     margin-left: -13px;
 }
 
-.connectorOutWindow, .connectorOut{
+.connectorOutWindow, .connectorOut {
     float: right;
     margin-top: -37%;
     margin-right: -13px;
 }
 
-.connectorInPart{
+.connectorInPart {
     margin-left: -5px;
     margin-top: 20px;
     width: 15px;
@@ -300,41 +305,41 @@ td {
     background-color: darkblue;
 }
 
-.connectorStream{
+.connectorStream {
     float: right;
     margin-top: 25%;
     margin-right: -10%;
 }
 
-.aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode , .queryNameNode , .partitionNameNode{
-    float:right;
-    width:inherit;
-    height:inherit;
+.aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode, .partitionNameNode {
+    float: right;
+    width: inherit;
+    height: inherit;
     background-color: transparent;
     border: 1px solid transparent;
-    margin-top:-10px;
-    margin-right:-3px;
-    font-weight:bolder;
+    margin-top: -10px;
+    margin-right: -3px;
+    font-weight: bolder;
 }
 
 /* Window Stream */
 
-.checkboxStyleWindow{
-    float:right;
-    width:20px;
-    height:20px;
+.checkboxStyleWindow {
+    float: right;
+    width: 20px;
+    height: 20px;
     background-color: transparent;
     border: 1px solid transparent;
-    margin-top:-82px;
-    margin-right:0;
-    cursor:pointer;
+    margin-top: -82px;
+    margin-right: 0;
+    cursor: pointer;
     color: red;
     border-radius: 40px;
     padding-left: 10px;
     padding-top: 4px;
 }
 
-.disabledbutton{
+.disabledbutton {
     pointer-events: none;
     opacity: 0.4;
 }
