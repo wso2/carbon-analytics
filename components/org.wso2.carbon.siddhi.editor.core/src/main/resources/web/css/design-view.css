@@ -43,6 +43,10 @@
     transition: 0.15s;
 }
 
+.toggle-button-text {
+    padding-left: 5px;
+}
+
 .grid-container {
     /* Temp */
     float: left;

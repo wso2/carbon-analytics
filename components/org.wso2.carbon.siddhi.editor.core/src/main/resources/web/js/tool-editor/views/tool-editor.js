@@ -191,7 +191,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             sourceContainer.hide();
                             designView.emptyDesignViewGridContainer();
                             designContainer.show();
-                            toggleViewButton.html("<i class=\"fw fw-code\"></i>&nbsp;&nbsp;Source View");
+                            toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
+                                "<span class=\"toggle-button-text\">Source View</span>");
                             designView.renderDesignGrid(self.JSONObject);
                             console.log(JSON.stringify(designView.getSiddhiAppContent()));
                             self.JSONObject = JSON.parse(JSON.stringify(designView.getSiddhiAppContent()));
@@ -200,7 +201,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             designContainer.hide();
                             sourceContainer.show();
                             self._sourceView.editorResize();
-                            toggleViewButton.html("<i class=\"fw fw-design-view\"></i>&nbsp;&nbsp;Design View");
+                            toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
+                                "<span class=\"toggle-button-text\">Design View</span>");
                             console.log(JSON.stringify(designView.getSiddhiAppContent()));
                         }
                     });
