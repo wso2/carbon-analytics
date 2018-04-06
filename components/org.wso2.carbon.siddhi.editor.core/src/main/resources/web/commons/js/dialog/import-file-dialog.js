@@ -38,12 +38,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                 },
 
                 render: function () {
-
                     var self = this;
                     var app = this.app;
                     var fileName;
                     var notification_container = this.notification_container;
-
                     var ImportLink = document.createElement("input");
                     ImportLink.type = "file";
                     ImportLink.name = "File";
@@ -139,7 +137,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                             async: false,
                             success: function (data, textStatus, xhr) {
                                 if (xhr.status == 200) {
-
                                     var file = new File({
                                         name: configName,
                                         content: config,
