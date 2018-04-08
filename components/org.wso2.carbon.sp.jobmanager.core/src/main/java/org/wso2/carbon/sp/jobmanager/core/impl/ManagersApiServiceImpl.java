@@ -19,6 +19,9 @@
 
 package org.wso2.carbon.sp.jobmanager.core.impl;
 
+//import com.google.common.collect.ArrayListMultimap;
+//import com.google.common.collect.ListMultimap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.Activate;
@@ -34,6 +37,7 @@ import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.sp.jobmanager.core.api.ApiResponseMessage;
 import org.wso2.carbon.sp.jobmanager.core.api.ManagersApiService;
 import org.wso2.carbon.sp.jobmanager.core.api.NotFoundException;
+import org.wso2.carbon.sp.jobmanager.core.bean.KafkaTransportDetails;
 import org.wso2.carbon.sp.jobmanager.core.bean.ManagerConfigurationDetails;
 import org.wso2.carbon.sp.jobmanager.core.dbhandler.StatusDashboardManagerDBHandler;
 import org.wso2.carbon.sp.jobmanager.core.exception.RDBMSTableException;
@@ -62,7 +66,7 @@ import javax.ws.rs.core.Response;
  * Distributed Siddhi Service Implementataion Class
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2018-01-29T08:19:07.148Z")
+        date = "2018-01-29T08:19:07.148Z")
 @Component(service = ManagersApiService.class, immediate = true)
 
 public class ManagersApiServiceImpl extends ManagersApiService {
@@ -128,7 +132,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         } else {
             logger.error("There is no manager node specified:" + manager.toString());
             return Response.status(Response.Status.BAD_REQUEST).entity("There is no manager nodes. Please add a "
-                                                                               + "manager: " + manager.toString())
+                    + "manager: " + manager.toString())
                     .build();
         }
     }
@@ -222,6 +226,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                         appHolder.setLastPingTimestamp(Long.toString(obj.getDeployedNode().getLastPingTimestamp()));
                     }
                     appList.add(appHolder);
+                    // new BufferedInputStream(appList);
                 }
             }
             return Response.ok().entity(appList).build();
@@ -312,40 +317,59 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 .getSiddhiAppHoldersMap();
         Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
                 .getAppsWaitingForDeploy();
-        List<SiddhiAppHolder> holder = waitingToDeploy.get(appName);
-        List<Map<String, String>> kafkaDetails = new ArrayList<>();
+        Map<String, List<SiddhiAppHolder>> totalApps = new HashMap<>();
+        totalApps.putAll(deployedSiddhiAppHolder);
+        totalApps.putAll(waitingToDeploy);
 
-        if (waitingToDeploy.containsKey(appName) || deployedSiddhiAppHolder.containsKey(appName)) {
+        if (totalApps.containsKey(appName)) {
+            List<SiddhiAppHolder> holder = totalApps.get(appName);
+            List<KafkaTransportDetails> kafkaDetails = new ArrayList<>();
+            // Map<String, KafkaTransportDetails> kafkaDetails = new HashMap<>();
 
             holder.forEach((siddhiAppHolder -> {
                 Map<String, String> kafkaTransportDetails = new HashMap<>();
-                kafkaTransportDetails.put("appName", siddhiAppHolder.getAppName());
+                KafkaTransportDetails kafkaTransport = new KafkaTransportDetails();
+                List<String> sourceList = new ArrayList<>();
+                List<String> sinkList = new ArrayList<>();
+                kafkaTransport.setAppName(siddhiAppHolder.getAppName());
+                kafkaTransport.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
+
+                //KafkaTransportDetails.put("appName", siddhiAppHolder.getAppName());
                 SiddhiAppDetails appHolder = new SiddhiAppDetails();
                 appHolder.setAppName(siddhiAppHolder.getAppName());
                 SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppHolder.getSiddhiApp());
                 for (Map.Entry<String, StreamDefinition> sourceStream : siddhiApp.getStreamDefinitionMap().entrySet()) {
                     for (Annotation annotation : sourceStream.getValue().getAnnotations()) {
                         if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SOURCE)) {
-                            for (Element ele : annotation.getElements()) {
-                                if (ele.getKey().equalsIgnoreCase(Constants.KAFKA_SOURCE_TOPIC_LIST)) {
-                                    kafkaTransportDetails.put(annotation.getName(), ele.getValue());
+                            for (Element sourceElement : annotation.getElements()) {
+                                if (sourceElement.getKey().equalsIgnoreCase(Constants.KAFKA_SOURCE_TOPIC_LIST)) {
+                                    sourceList.add(sourceElement.getValue());
+                                    kafkaTransportDetails.put(annotation.getName(), sourceElement.getValue());
                                 }
                             }
 
                         } else if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SINK)) {
-                            for (Element element : annotation.getElements()) {
-                                if (element.getKey().equalsIgnoreCase(Constants.KAFKA_SINK_TOPIC)) {
-                                    kafkaTransportDetails.put(annotation.getName(), element.getValue());
+                            for (Element sinkElement : annotation.getElements()) {
+                                if (sinkElement.getKey().equalsIgnoreCase(Constants.KAFKA_SINK_TOPIC)) {
+                                    sinkList.add(sinkElement.getValue());
+                                    kafkaTransportDetails.put(annotation.getName(), sinkElement.getValue());
                                 }
                             }
                         }
                     }
                 }
-                kafkaDetails.add(kafkaTransportDetails);
+                kafkaTransport.setSourceList(sourceList);
+                kafkaTransport.setSinkList(sinkList);
+                kafkaDetails.add(kafkaTransport);
             }));
+            return Response.ok().entity(kafkaDetails).build();
 
+        } else {
+            return Response.status(Response.Status.NO_CONTENT).entity(
+                    new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no siddhi app  in the manager "
+                            + "node")).build();
         }
-        return Response.ok().entity(kafkaDetails).build();
+
     }
 
 
@@ -383,7 +407,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(Constants.PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
             return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to delete manager "
-                                                                             + "node").build();
+                    + "node").build();
         } else {
             return deleteManager(managerId);
         }
@@ -402,7 +426,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
-                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.FORBIDDEN).entity(
                     "Insufficient permissions to get the manager's details").build();
         } else {
@@ -424,9 +448,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
-                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to get the "
-                                                                             + "details of the Siddhi Apps").build();
+                    + "details of the Siddhi Apps").build();
         } else {
             return getSiddhiAppDetails();
         }
@@ -446,9 +470,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
-                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to get the "
-                                                                             + "execution plan").build();
+                    + "execution plan").build();
         } else {
             return getSiddhiAppExecutionPlan(appName);
         }
@@ -469,9 +493,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
-                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to get child app "
-                                                                             + "details").build();
+                    + "details").build();
         } else {
             return getChildSiddhiApps(appName);
         }
@@ -499,9 +523,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) ||
                 getPermissionProvider()
                         .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
-                                                                            MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+                                MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to get child app "
-                                                                             + "details").build();
+                    + "details").build();
         } else {
             return getKafkaDetails(appName);
         }

@@ -29,6 +29,7 @@ import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -632,7 +633,7 @@ public class MonitoringRESTApi implements Microservice {
                                                 response = void.class)})
     public Response getSiddhiApps(@Context Request request,
                                   @ApiParam(value = "ID of the worker.", required = true) @PathParam("id")
-                                          String id) throws NotFoundException {
+                                          String id) throws NotFoundException,IOException {
         return workersApi.getSiddhiApps(id, getUserName(request));
     }
 
@@ -685,7 +686,7 @@ public class MonitoringRESTApi implements Microservice {
             @ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
             , @ApiParam(value = "Name of the siddhi app.", required = true) @PathParam("appName") String appName
                                        )
-            throws NotFoundException {
+            throws NotFoundException,IOException {
         return workersApi.getChildAppsDetails(id, appName, getUserName(request));
     }
 
@@ -706,7 +707,7 @@ public class MonitoringRESTApi implements Microservice {
             @ApiParam(value = "ID of the manager.", required = true) @PathParam("id") String id
             , @ApiParam(value = "Name of the siddhi app.", required = true) @PathParam("appName") String appName
                                                 )
-            throws NotFoundException {
+            throws NotFoundException, IOException {
         return workersApi.getChildAppsTransportDetails(id, appName, getUserName(request));
     }
 

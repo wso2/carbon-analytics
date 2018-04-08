@@ -21,6 +21,7 @@ package org.wso2.carbon.status.dashboard.core.api;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import javax.ws.rs.core.Response;
 
@@ -70,16 +71,16 @@ public abstract class MonitoringApiService {
 
     public abstract Response getManagerHADetails(String id, String username) throws NotFoundException;
 
-    public abstract Response getSiddhiApps(String id,String username) throws NotFoundException;
+    public abstract Response getSiddhiApps(String id,String username) throws NotFoundException, IOException;
 
     public abstract Response getManagers(String username) throws NotFoundException, SQLException;
 
     public abstract Response getManagerSiddhiAppTextView(String id, String appName,
                                                          String username) throws NotFoundException;
 
-    public abstract Response getChildAppsDetails(String id, String appName, String username) throws NotFoundException;
+    public abstract Response getChildAppsDetails(String id, String appName, String username) throws NotFoundException, IOException;
 
     public abstract Response getChildAppsTransportDetails(String id, String appName,
-                                                          String username) throws NotFoundException;
+                                                          String username) throws NotFoundException, IOException;
 
 }

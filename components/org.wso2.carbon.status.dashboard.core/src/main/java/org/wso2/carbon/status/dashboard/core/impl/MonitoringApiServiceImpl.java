@@ -67,6 +67,10 @@ import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1427,111 +1431,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         }
     }
 
-    /**
-     * parentSiddhiAppName :list
-     * for each parentApp : no of groups : int, no of child apps :int
-     * no of used worker nodes
-     * no of nodes in the cluster
-     */
-    @Override
-    public Response getSiddhiApps(String managerId, String username) throws NotFoundException {
-        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
-                VIWER_PERMISSION_STRING));
-        if (isAuthorized) {
-            String[] hostPort = managerId.split(Constants.WORKER_KEY_GENERATOR);
-            if (hostPort.length == 2) {
-                String managerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
-                try {
-                    feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient
-                            (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword()).getSiddhiApps();
-                    String responseAppBody = managerResponse.body().toString();
-                    if (managerResponse.status() == 200) {
-                        List<ParentSiddhiApp> totalApps = gson.fromJson(responseAppBody,
-                                new TypeToken<List<ParentSiddhiApp>>() {
-                                }.getType());
-                        if (!totalApps.isEmpty()) {
-                            Map<String, ParentSummaryDetails> appSummary = new HashMap<>();
-
-                            for (ParentSiddhiApp siddhiapp : totalApps) {
-                                String parentAppName = siddhiapp.getParentAppName();
-
-                                if (!(appSummary.containsKey(parentAppName))) {
-                                    appSummary.put(siddhiapp.getParentAppName(), new ParentSummaryDetails());
-                                }
-                                if (!(appSummary.get(parentAppName).getGroups().contains(siddhiapp.getGroupName()))) {
-                                    appSummary.get(parentAppName).getGroups().add(siddhiapp.getGroupName());
-                                }
-                                int numberOfChildApp = appSummary.get(parentAppName).getChildApps() + 1;
-                                appSummary.get(parentAppName).setChildApps(numberOfChildApp);
-                                // int deployedNodeCount = appSummary.get(parentAppName).getUsedWorkerNode().size();
-                                if (siddhiapp.getId() != null) {
-                                    if (!appSummary.get(parentAppName).getUsedWorkerNode().contains(siddhiapp.getId())) {
-                                        appSummary.get(parentAppName).getUsedWorkerNode().add(siddhiapp.getId());
-                                    }
-                                    //logger.info("apping" + appSummary.get(parentAppName).getUsedWorkerNode());
-
-                                }
-                                if(!appSummary.get(parentAppName).getUsedWorkerNode().contains(siddhiapp.getId())){
-                                    appSummary.get(parentAppName).getUnDeployedChildApps().add(siddhiapp.getId());
-                                }else {
-                                    appSummary.get(parentAppName).getDeployedChildApps().add(siddhiapp.getId());
-                                }
-
-
-                            }
-                            feign.Response resourceClusterWorkerDetails = WorkerServiceFactory.getWorkerHttpsClient
-                                    (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword())
-                                    .getResourceClusterWorkers();
-                            String resourceClusterResponseBody = resourceClusterWorkerDetails.body().toString();
-                            List<Map<String, String>> parentAppSummary = new ArrayList<>();
-                            for (Map.Entry<String, ParentSummaryDetails> entry : appSummary.entrySet()) {
-                                Map<String, String> parentAppDetail = new HashMap<>();
-                                parentAppDetail.put("parentAppName", entry.getKey());
-                                parentAppDetail.put("managerId", managerId);
-                                parentAppDetail
-                                        .put("numberOfGroups", Integer.toString(entry.getValue().getGroups().size()));
-                                parentAppDetail
-                                        .put("numberOfChildApp", Integer.toString(entry.getValue().getChildApps()));
-                                logger.info("size" + entry.getValue().getUsedWorkerNode().size());
-                                parentAppDetail.put("usedWorkerNodes",
-                                        Integer.toString(entry.getValue().getUsedWorkerNode().size()));
-                                parentAppDetail.put("deployedChildApps",Integer.toString(entry.getValue().getDeployedChildApps().size()));
-                                parentAppDetail.put("undeployedChildApps",Integer.toString(entry.getValue().getUnDeployedChildApps().size()));
-                                parentAppDetail.put("totalWorkerNodes", resourceClusterResponseBody);
-                                parentAppSummary.add(parentAppDetail);
-                            }
-                            return Response.ok().entity(parentAppSummary).build();
-                        } else {
-                            String jsonErrorMessage = new Gson().toJson("There is no siddhi app deployed in the "
-                                    + "manager node");
-                            return Response.ok().entity(jsonErrorMessage).build();
-                        }
-                    } else if (managerResponse.status() == 401) {
-                        String jsonString = new Gson().toJson(responseAppBody);
-                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
-                    } else if (managerResponse.status() == 204) {
-                        return Response.status(Response.Status.NO_CONTENT).build();
-
-                    } else {
-                        return Response.status(Response.Status.NOT_FOUND).entity(responseAppBody).build();
-                    }
-
-                } catch (feign.RetryableException e) {
-                    String jsonString = new Gson()
-                            .toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
-                                    e.getMessage()));
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
-                }
-            } else {
-                logger.error("Inproper format of manager ID" + managerId);
-                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of managerId " + managerId)
-                        .build();
-            }
-        } else {
-            logger.error("Unauthorized to perform get siddhi app details for user : " + username);
-            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
-        }
-    }
 
 
     /**
@@ -1907,8 +1806,112 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     }
 
+    /**
+     * parentSiddhiAppName :list
+     * for each parentApp : no of groups : int, no of child apps :int
+     * no of used worker nodes
+     * no of nodes in the cluster
+     */
     @Override
-    public Response getChildAppsDetails(String managerId, String appName, String username) {
+    public Response getSiddhiApps(String managerId, String username) throws NotFoundException, IOException {
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                VIWER_PERMISSION_STRING));
+        if (isAuthorized) {
+            String[] hostPort = managerId.split(Constants.WORKER_KEY_GENERATOR);
+            if (hostPort.length == 2) {
+                String managerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
+                try {
+                    feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient
+                            (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword()).getSiddhiApps();
+                    if (managerResponse.status() == 200) {
+                        Reader reader = managerResponse.body().asReader();
+                        List<ParentSiddhiApp> totalApps = gson.fromJson(reader,
+                                new TypeToken<List<ParentSiddhiApp>>() {
+                                }.getType());
+                        if (!totalApps.isEmpty()) {
+                            Map<String, ParentSummaryDetails> appSummary = new HashMap<>();
+
+                            for (ParentSiddhiApp siddhiapp : totalApps) {
+                                String parentAppName = siddhiapp.getParentAppName();
+
+                                if (!(appSummary.containsKey(parentAppName))) {
+                                    appSummary.put(siddhiapp.getParentAppName(), new ParentSummaryDetails());
+                                }
+                                if (!(appSummary.get(parentAppName).getGroups().contains(siddhiapp.getGroupName()))) {
+                                    appSummary.get(parentAppName).getGroups().add(siddhiapp.getGroupName());
+                                }
+                                int numberOfChildApp = appSummary.get(parentAppName).getChildApps() + 1;
+                                appSummary.get(parentAppName).setChildApps(numberOfChildApp);
+                                if (siddhiapp.getId() != null) {
+                                    if (!appSummary.get(parentAppName).getUsedWorkerNode().contains(siddhiapp.getId())) {
+                                        appSummary.get(parentAppName).getUsedWorkerNode().add(siddhiapp.getId());
+                                    }
+                                }
+                                if(!appSummary.get(parentAppName).getUsedWorkerNode().contains(siddhiapp.getId())){
+                                    appSummary.get(parentAppName).getUnDeployedChildApps().add(siddhiapp.getId());
+                                }else {
+                                    appSummary.get(parentAppName).getDeployedChildApps().add(siddhiapp.getId());
+                                }
+
+
+                            }
+                            feign.Response resourceClusterWorkerDetails = WorkerServiceFactory.getWorkerHttpsClient
+                                    (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword())
+                                    .getResourceClusterWorkers();
+                            String resourceClusterResponseBody = resourceClusterWorkerDetails.body().toString();
+                            List<Map<String, String>> parentAppSummary = new ArrayList<>();
+                            for (Map.Entry<String, ParentSummaryDetails> entry : appSummary.entrySet()) {
+                                Map<String, String> parentAppDetail = new HashMap<>();
+                                parentAppDetail.put("parentAppName", entry.getKey());
+                                parentAppDetail.put("managerId", managerId);
+                                parentAppDetail
+                                        .put("numberOfGroups", Integer.toString(entry.getValue().getGroups().size()));
+                                parentAppDetail
+                                        .put("numberOfChildApp", Integer.toString(entry.getValue().getChildApps()));
+                                logger.info("size" + entry.getValue().getUsedWorkerNode().size());
+                                parentAppDetail.put("usedWorkerNodes",
+                                        Integer.toString(entry.getValue().getUsedWorkerNode().size()));
+                                parentAppDetail.put("deployedChildApps",Integer.toString(entry.getValue().getDeployedChildApps().size()));
+                                parentAppDetail.put("undeployedChildApps",Integer.toString(entry.getValue().getUnDeployedChildApps().size()));
+                                parentAppDetail.put("totalWorkerNodes", resourceClusterResponseBody);
+                                parentAppSummary.add(parentAppDetail);
+                            }
+                            return Response.ok().entity(parentAppSummary).build();
+                        } else {
+                            String jsonErrorMessage = new Gson().toJson("There is no siddhi app deployed in the "
+                                    + "manager node");
+                            return Response.ok().entity(jsonErrorMessage).build();
+                        }
+                    } else if (managerResponse.status() == 401) {
+                        String jsonString = new Gson().toJson(managerResponse.body().toString());
+                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
+                    } else if (managerResponse.status() == 204) {
+                        return Response.status(Response.Status.NO_CONTENT).build();
+
+                    } else {
+                        return Response.status(Response.Status.NOT_FOUND).build();
+                    }
+
+                } catch (feign.RetryableException e) {
+                    String jsonString = new Gson()
+                            .toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
+                                    e.getMessage()));
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                }
+            } else {
+                logger.error("Inproper format of manager ID" + managerId);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of managerId " + managerId)
+                        .build();
+            }
+        } else {
+            logger.error("Unauthorized to perform get siddhi app details for user : " + username);
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
+        }
+    }
+
+
+    @Override
+    public Response getChildAppsDetails(String managerId, String appName, String username) throws NotFoundException, IOException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1919,14 +1922,15 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient
                             (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword()).getChildAppDetails
                             (appName);
-                    String responseBody = managerResponse.body().toString();
+                   // String responseBody = managerResponse.body().toString();
                     if (managerResponse.status() == 200) {
-                        return Response.ok().entity(responseBody).build();
+                        InputStream reader = managerResponse.body().asInputStream();
+                        return Response.ok().entity(reader).build();
                     } else if (managerResponse.status() == 401) {
-                        String jsonString = new Gson().toJson(responseBody);
+                        String jsonString = new Gson().toJson(managerResponse.body().toString());
                         return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
                     } else {
-                        return Response.status(Response.Status.NOT_FOUND).entity(responseBody).build();
+                        return Response.status(Response.Status.NOT_FOUND).entity(managerResponse.body().toString()).build();
                     }
                 } catch (feign.RetryableException e) {
                     String errString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
@@ -1947,7 +1951,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     //TODO:FOR TESTING
 
     @Override
-    public Response getChildAppsTransportDetails(String managerId, String appName, String username) {
+    public Response getChildAppsTransportDetails(String managerId, String appName, String username) throws IOException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants
                 .PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
@@ -1961,7 +1965,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             (appName);
                     String responseBody = managerResponse.body().toString();
                     if (managerResponse.status() == 200) {
-                        return Response.ok().entity(responseBody).build();
+                        InputStream reader = managerResponse.body().asInputStream();
+                        return Response.ok().entity(reader).build();
+
+                       // return Response.ok().entity(responseBody).build();
                     } else if (managerResponse.status() == 401) {
                         String jsonString = new Gson().toJson(responseBody);
                         return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
