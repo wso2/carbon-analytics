@@ -32,9 +32,9 @@ import WorkerHistoryMore from "../worker-history-more/WorkerHistoryMore";
 import WorkerSpecific from "../worker/WorkerSpecific";
 import Error404 from "../error-pages/Error404";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import DistributedViewAppThumbnail from "../DistributedView/DistributedViewAppThumbnail";
-import DistributedOverview from "../DistributedView/DistributedViewOverview";
-import AppView from "../DistributedView/AppView";
+import DistributedViewAppThumbnail from "../distributedView/DistributedViewAppThumbnail";
+import DistributedOverview from "../distributedView/DistributedViewOverview";
+import AppView from "../distributedView/AppView";
 /**
  * App context.
  */

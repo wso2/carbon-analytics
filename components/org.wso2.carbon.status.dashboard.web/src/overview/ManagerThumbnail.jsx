@@ -20,20 +20,20 @@
 import React from "react";
 import {Link} from "react-router-dom";
 //Material UI
-import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar} from "material-ui";
+import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar, Toggle} from "material-ui";
 import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
 import Delete from "material-ui/svg-icons/action/delete";
 import TrendDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
 import TrendUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import { HttpStatus } from '../utils/Constants';
+import {HttpStatus} from '../utils/Constants';
 import OverviewChart from "./OverviewChart";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import Clock from "./Clock";
 
-const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex:1}};
+const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex: 1}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
@@ -57,6 +57,7 @@ export default class ManagerThumbnail extends React.Component {
         this.showError = this.showError.bind(this);
         this.showMessage = this.showMessage.bind(this);
     }
+
     componentWillMount() {
         let that = this;
         AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
@@ -66,6 +67,7 @@ export default class ManagerThumbnail extends React.Component {
                 });
             });
     }
+
     showError(message) {
         this.setState({
             messageStyle: errorMessageStyle,
@@ -84,7 +86,7 @@ export default class ManagerThumbnail extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({worker: nextProps.worker})
-        console.log("props"+nextProps);
+        console.log("props" + nextProps);
     }
 
     deleteManager() {
@@ -105,6 +107,7 @@ export default class ManagerThumbnail extends React.Component {
             });
 
     }
+
     renderTime(lastUpdate) {
         if (lastUpdate === "#") {
             return (
@@ -116,6 +119,7 @@ export default class ManagerThumbnail extends React.Component {
             )
         }
     }
+
     /**
      * Method which render delete worker button if permission is granted
      * @param workersList
@@ -124,25 +128,26 @@ export default class ManagerThumbnail extends React.Component {
     renderDeleteManager() {
         if (this.state.hasPermission) {
             return (
-                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Manager" style={{zIndex:1}}
+                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Manager" style={{zIndex: 1}}
                             tooltipPosition="bottom-center" onClick={() => {
                     this.setState({open: true})
                 }}><Delete color="grey"/></IconButton>
             )
         } else {
             return (
-                <IconButton iconStyle={{width: 20, height: 20,display:'none'}} tooltip="Delete Worker"
+                <IconButton iconStyle={{width: 20, height: 20, display: 'none'}} tooltip="Delete Worker"
                             tooltipPosition="bottom-center" onClick={() => {
                 }}><Delete color="grey"/></IconButton>
             )
         }
     }
+
     renderGridTile() {
         let gridTiles, lastUpdated, color, haStatus;
         //console.log("id"+this.props.worker);
         //never reached workers
         if (this.props.worker.clusterInfo.groupId === " ") {
-            if(this.props.worker.statusMessage == null) {
+            if (this.props.worker.statusMessage == null) {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={180} style={styles.gridList}>
                         <h2 style={{textAlign: 'center', color: 'white', padding: 50}}>Manager is not reachable!</h2>
@@ -155,7 +160,7 @@ export default class ManagerThumbnail extends React.Component {
                     <GridList cols={1} cellHeight={180} style={styles.gridList}>
                         <h2 style={{textAlign: 'center', color: 'white', padding: 15}}>Manager is not reachable!
                             <br/>
-                            <text style={{textAlign: 'center',fontSize:12, color: 'white'}}>
+                            <text style={{textAlign: 'center', fontSize: 12, color: 'white'}}>
                                 {this.props.worker.statusMessage}
                             </text>
                         </h2>
@@ -168,26 +173,26 @@ export default class ManagerThumbnail extends React.Component {
         } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>
                 {/*<Link style={{textDecoration: 'none'}}*/}
-                      {/*to={window.contextPath + '/worker/' + this.props.worker.workerId}>*/}
-                    <GridList cols={2} cellHeight={180} style={styles.gridList}>
-                        <GridTile>
-                            <h4 style={{
-                                textAlign: 'center',
-                                color: 'white',
-                                padding: 50
-                            }}>{this.props.worker.statusMessage}</h4>
-                        </GridTile>
-                        {/*<GridTile title="Siddhi Apps" titlePosition="bottom"*/}
-                                  {/*titleStyle={{fontSize: 10, textAlign: 'center'}}>*/}
-                            {/*<div className="grid-tile-h1" style={{marginTop: 50}}><h1*/}
-                                {/*className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>*/}
-                                {/*<h1 style={{display: 'inline'}}> |</h1>*/}
-                                {/*<h1 className="inactive-apps">*/}
-                                    {/*{this.props.worker.serverDetails.siddhiApps.inactive}*/}
-                                {/*</h1>*/}
-                            {/*</div>*/}
-                        {/*</GridTile>*/}
-                    </GridList>
+                {/*to={window.contextPath + '/worker/' + this.props.worker.workerId}>*/}
+                <GridList cols={2} cellHeight={180} style={styles.gridList}>
+                    <GridTile>
+                        <h4 style={{
+                            textAlign: 'center',
+                            color: 'white',
+                            padding: 50
+                        }}>{this.props.worker.statusMessage}</h4>
+                    </GridTile>
+                    {/*<GridTile title="Siddhi Apps" titlePosition="bottom"*/}
+                    {/*titleStyle={{fontSize: 10, textAlign: 'center'}}>*/}
+                    {/*<div className="grid-tile-h1" style={{marginTop: 50}}><h1*/}
+                    {/*className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>*/}
+                    {/*<h1 style={{display: 'inline'}}> |</h1>*/}
+                    {/*<h1 className="inactive-apps">*/}
+                    {/*{this.props.worker.serverDetails.siddhiApps.inactive}*/}
+                    {/*</h1>*/}
+                    {/*</div>*/}
+                    {/*</GridTile>*/}
+                </GridList>
             </div>;
             lastUpdated = "#";
             if (this.props.worker.clusterInfo.groupId === "Non Clusters") {
@@ -204,6 +209,7 @@ export default class ManagerThumbnail extends React.Component {
                     } else if (this.props.worker.clusterInfo.haStatus === "Pasive") {
                         color = 'grey';
                         haStatus = 'Pasive'
+
                     }
                 } else {
                     color = 'red'
@@ -249,10 +255,10 @@ export default class ManagerThumbnail extends React.Component {
                 JSON.stringify(this.props.worker.serverDetails.workerMetrics.systemCPU * 100));
             localStorage.setItem(constants.load, this.props.worker.serverDetails.workerMetrics.loadAverage);
 
-            if(this.props.worker.serverDetails.osName === "windows"){
+            if (this.props.worker.serverDetails.osName === "windows") {
                 loadAvg = <h4>N/A in Windows</h4>;
                 loadTrendImg = <div/>;
-            }else{
+            } else {
                 loadAvg = <h1>{this.props.worker.serverDetails.workerMetrics.loadAverage}</h1>;
                 loadTrendImg = loadTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
                     <TrendDown style={{color: 'green'}}/>
@@ -261,7 +267,7 @@ export default class ManagerThumbnail extends React.Component {
                 gridTiles =
                     <div>
                         <Link style={{textDecoration: 'none'}}
-                              to={window.contextPath +"/"+this.props.worker.workerId+"/siddhi-apps"} >
+                              to={window.contextPath + "/" + this.props.worker.workerId + "/siddhi-apps"}>
                             <GridList cols={4} cellHeight={180} style={styles.gridList}>
                                 <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                     <div><OverviewChart
@@ -300,45 +306,44 @@ export default class ManagerThumbnail extends React.Component {
                             </GridList>
                         </Link>
                     </div>;
-            }else{
+            } else {
                 gridTiles =
-                    <div>
-                              to={window.contextPath +"/"+this.props.worker.workerId+"/siddhi-apps"} >
-                            <GridList cols={4} cellHeight={180} style={styles.gridList}>
-                                <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
-                                    <div><OverviewChart
-                                        chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}
-                                        color="#19cdd7"/></div>
-                                    <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
-                                        {cpuTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
-                                            <TrendDown style={{color: 'green'}}/>}</div>
-                                </GridTile>
+                    <div style={{cursor: 'not-allowed'}}>
+                        <GridList cols={4} cellHeight={180} style={styles.gridList}>
+                            <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                <div><OverviewChart
+                                    chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}
+                                    color="#19cdd7"/></div>
+                                <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
+                                    {cpuTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                                        <TrendDown style={{color: 'green'}}/>}</div>
+                            </GridTile>
 
-                                <GridTile title="Memory Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
-                                    <div><OverviewChart
-                                        chartValue={this.state.worker.serverDetails.workerMetrics.memoryUsage * 100}
-                                        color="#f17b31"/></div>
-                                    <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
-                                        {memoryTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
-                                            <TrendDown style={{color: 'green'}}/>}</div>
-                                </GridTile>
+                            <GridTile title="Memory Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                <div><OverviewChart
+                                    chartValue={this.state.worker.serverDetails.workerMetrics.memoryUsage * 100}
+                                    color="#f17b31"/></div>
+                                <div style={{display: 'inline', float: 'right', marginTop: '15%', marginRight: 0}}>
+                                    {memoryTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                                        <TrendDown style={{color: 'green'}}/>}</div>
+                            </GridTile>
 
-                                <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
-                                    <div className="grid-tile-h1" style={{marginTop: 50}}>
-                                        {loadAvg}</div>
-                                    <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
-                                        {loadTrendImg}</div>
-                                </GridTile>
-                                <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10}}>
-                                    <div className="grid-tile-h1" style={{marginTop: 50}}>
-                                        <h4 style={{
-                                            textAlign: 'center',
-                                            color: 'white',
-                                            padding: 20
-                                        }}>Siddhi Apps are disabled</h4>
-                                    </div>
-                                </GridTile>
-                            </GridList>
+                            <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                <div className="grid-tile-h1" style={{marginTop: 50}}>
+                                    {loadAvg}</div>
+                                <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
+                                    {loadTrendImg}</div>
+                            </GridTile>
+                            <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10}}>
+                                <div className="grid-tile-h1" style={{marginTop: 50}}>
+                                    <h4 style={{
+                                        textAlign: 'center',
+                                        color: 'white',
+                                        padding: 20
+                                    }}>Siddhi Apps are disabled</h4>
+                                </div>
+                            </GridTile>
+                        </GridList>
                     </div>;
             }
 

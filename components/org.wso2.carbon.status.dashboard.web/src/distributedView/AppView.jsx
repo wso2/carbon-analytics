@@ -20,6 +20,9 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import SyntaxHighlighter from "react-syntax-highlighter";
+import dagre from 'dagre';
+import d3 from 'd3'
+import dagreD3 from 'dagre-d3'
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import Header from "../common/Header";
@@ -40,16 +43,19 @@ import {
 //import DashboardUtils from "../utils/DashboardUtils";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
-import { Redirect } from 'react-router-dom';
+import {Redirect} from 'react-router-dom';
 import Error403 from "../error-pages/Error403";
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import {HttpStatus} from "../utils/Constants";
+import KafkaFlow from "./KafkaFlow";
+
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
     gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
 };
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
+
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 const codeViewStyle = {
     "hljs": {
@@ -114,24 +120,25 @@ export default class AppView extends React.Component {
         //this.handleToggle = this.handleToggle.bind(this);
         this.showMessage = this.showMessage.bind(this);
         this.showError = this.showError.bind(this);
+     //   this.renderChart = this.renderChart.bind(this);
     }
 
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().SDID)
+        AuthenticationAPI.isUserAuthorized('metrics.manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasManagerPermission: response.data
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null){
-                if(error.response.status === 401){
+            if (error.response != null) {
+                if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
                         sessionInvalid: true
                     })
-                } else if(error.response.status === 403){
+                } else if (error.response.status === 403) {
                     message = "User Have No Manager Permission to view this page.";
                     this.setState({
                         hasManagerPermission: false
@@ -144,14 +151,14 @@ export default class AppView extends React.Component {
                 })
             }
         });
-        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().SDID)
+        AuthenticationAPI.isUserAuthorized('viewer', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasViewerPermission: response.data
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
@@ -171,15 +178,15 @@ export default class AppView extends React.Component {
             }
         });
 
-        StatusDashboardAPIS.getSiddhiAppTextView(this.props.match.params.id,this.props.match.params.appName)
-            .then((response) =>{
-                if(response.status==HttpStatus.OK){
-                    console.log("response is"+response.data);
-                   that.setState({
-                       appText:response.data
-                   }) ;
+        StatusDashboardAPIS.getSiddhiAppTextView(this.props.match.params.id, this.props.match.params.appName)
+            .then((response) => {
+                if (response.status == HttpStatus.OK) {
+                    console.log("response is" + response.data);
+                    that.setState({
+                        appText: response.data
+                    });
 
-                   console.log("apptext is"+this.state.appText);
+                    console.log("apptext is" + this.state.appText);
                 }
             }).catch((error) => {
             if (error.response != null) {
@@ -205,6 +212,8 @@ export default class AppView extends React.Component {
             // console.log("ClusterList"+this.state.clustersList.toString());
         });
     }
+
+
 
     showError(message) {
         this.setState({
@@ -263,11 +272,11 @@ export default class AppView extends React.Component {
                     <div className="navigation-bar">
                         <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                   icon={<HomeButton color="black"/>}/></Link>
-                        <Link to={window.contextPath+"/" + this.props.match.params.id+"/"+"siddhi-apps" }>
+                        <Link to={window.contextPath + "/" + this.props.match.params.id + "/" + "siddhi-apps"}>
                             <FlatButton label={this.props.match.params.id + " >"}/></Link>
                         {/*TODO: NEED TO CHANGE THIS ACCORDING TO DESIGN*/}
                         {/*<Link to={window.contextPath + '/worker/' + this.props.match.params.id }>*/}
-                            {/*<FlatButton label={this.state.workerID + " >"}/></Link>*/}
+                        {/*<FlatButton label={this.state.workerID + " >"}/></Link>*/}
                         <RaisedButton label={this.props.match.params.appName} disabled disabledLabelColor='white'
                                       disabledBackgroundColor='#f17b31'/>
                     </div>
@@ -277,8 +286,8 @@ export default class AppView extends React.Component {
                     </div>
                 </div>
 
-                <div style={{padding: 10, paddingLeft: 40, width: '90%', height:'50%', backgroundColor: "#222222"}}>
-                    <Card style={{backgroundColor: "#282828", height:'50%'}}>
+                <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '50%', backgroundColor: "#222222"}}>
+                    <Card style={{backgroundColor: "#282828", height: '50%'}}>
                         <CardHeader title="Code View" subtitle={this.props.match.params.appName}
                                     titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
                         />
@@ -287,14 +296,60 @@ export default class AppView extends React.Component {
                         <CardText>
                             <SyntaxHighlighter language='sql'
                                                style={codeViewStyle}>{this.state.appText}</SyntaxHighlighter>
-                            {console.log("exection"+this.state.appText)}
+                        </CardText>
+                    </Card>
+                </div>
+                <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '100%', backgroundColor: "#222222"}}>
+                    <Card style={{backgroundColor: "#282828", height: '100%'}}>
+                        <CardHeader title="Kakfa Detail Diagram"
+                                    titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
+                        />
+
+                    <Divider/>
+
+                        <CardText>
+                            <ul className='legend' style={{color: '#fff',
+                                fontSize: 14,
+                                textAlign: 'left',
+                                float: 'right',
+                                width: '100%',
+                                maxWidth: 250,
+                                height:30,
+                                padding: 10,
+                                background: '#333'}}>
+                                    <li className='legend-key' style={{paddingRight:5,paddingLeft:5,paddingTop:0,paddingBottom:0,height:30,display: 'inline-block'}}>
+                                        <span className='legend-color' style={{ width: 15,
+                                            height: 15,
+                                            float: 'left',
+                                            margin: 5,
+                                            backgroundColor:'blue'}}ChildApps></span>
+                                        <span className='legend-text' style={{ lineHeight: 2,
+                                            fontSize: 12}}> Child Apps</span>
+
+                                    </li>
+                                    <li className='legend-key' style={{paddingRight:5,paddingLeft:5,paddingTop:0,paddingBottom:0,
+                                        display: 'inline-block',height:30}}>
+                                         <span className='legend-color' style={{ width: 15,
+                                            height: 15,
+                                            float: 'left',
+                                            margin: 5,
+                                            backgroundColor:'red'}}></span>
+
+                                        <span className='legend-text' style={{ lineHeight: 2,
+                                            fontSize: 12}}> Kafka-Topics</span>
+
+                                    </li>
+
+
+                            </ul>
+                            <KafkaFlow id={this.props.match.params.id} appName={this.props.match.params.appName} />
                         </CardText>
                     </Card>
                 </div>
                 <div style={{width: '90%', marginLeft: 40}}>
                     <h3 style={{color: 'white'}}> Child App Details</h3>
 
-                        <ParentAppTable id={this.props.match.params.id} appName={this.props.match.params.appName}/>
+                    <ParentAppTable id={this.props.match.params.id} appName={this.props.match.params.appName}/>
 
                 </div>
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}

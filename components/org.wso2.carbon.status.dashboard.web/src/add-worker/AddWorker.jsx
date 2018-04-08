@@ -19,6 +19,7 @@
 
 import React from "react";
 import {Link, Redirect} from "react-router-dom";
+//import { HashLink } from 'react-router-hash-link';
 // App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import {HttpStatus} from "../utils/Constants";
@@ -40,6 +41,7 @@ const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 const buttonStyle = {marginLeft: 10, width: '30%', fontSize: '8px'};
+const popupButtonStyle = {marginLeft: 25,width: '30%', fontSize: '8px'};
 const textField = {width: 650};
 
 /**
@@ -205,10 +207,10 @@ export default class AddWorker extends React.Component {
                             that._showError("Error while testing the connection!! ");
                         });
                     } else {
-                        that._showError("Something went wrong please check");
+                        that._showError("Unreachable Node. Try Again !");
                     }
                 } else {
-                    that._showError("Unreachable Node. Try Again ! ")
+                    that._showError("Something went wrong please check ")
                 }
             }).catch((error) => {
             if (error.response != null) {
@@ -273,9 +275,13 @@ export default class AddWorker extends React.Component {
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
                     that._showMessage("Worker '" + nodeID + "' is added successfully !");
+                    {/*<Link to={window.contextPath+'#hash'}*/}
+                    {/*scroll={el => el.scrollIntoView({ behavior: 'instant', block: 'end' })}/>*/}
                     setTimeout(function () {
-                        window.location.href = window.contextPath;
+                        window.location.href = window.contextPath+'#hash';
+                        scroll(e1 => e1.scrollIntoView({behavior:'instant',block:'end'}))
                     }, 1000)
+
 
                 } else {
                     that._showError("Error while adding worker '" + nodeID + "' . Try Again !");
@@ -322,7 +328,10 @@ export default class AddWorker extends React.Component {
                         // window.location.href = window.contextPath;
                         // <Redirect to={{pathname: `${window.contextPath}/siddhi-apps`}}/>
                         //  window.location.href = window.contextPath +"/"+nodeID+"/siddhi-apps";
-                        window.location.href = window.contextPath;
+
+                        //window.location.href = window.contextPath+'#hash';
+                        window.location.href = window.contextPath+'#hash';
+                        scroll(e1 => e1.scrollIntoView({behavior:'instant',block:'end'}))
                     }, 1000)
                 } else {
                     that._showError("Error while adding manager " + nodeID + " .Try Again !");
@@ -380,7 +389,7 @@ export default class AddWorker extends React.Component {
                 <FlatButton
                     label="Worker"
                     backgroundColor='#f17b31'
-                    style={buttonStyle}
+                    style={popupButtonStyle}
                     onClick={() => {
                         let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
                         this._addWorker(nodeID);
@@ -390,12 +399,22 @@ export default class AddWorker extends React.Component {
                 <FlatButton
                     label="Manager"
                     backgroundColor='#f17b31'
-                    style={buttonStyle}
+                    style={popupButtonStyle}
                     onClick={() => {
                         let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
                         this._addManager(nodeID);
                     }}
-                />
+                />,
+
+                <FlatButton
+                label="Cancel"
+                //backgroundColor='#f17b31'
+                style={popupButtonStyle}
+                onClick={() => {
+                this.setState({open:false,openAdd:false})
+            }}
+            />
+
             ];
             return (
                 <div>
@@ -410,13 +429,14 @@ export default class AddWorker extends React.Component {
                     </Dialog>
 
                     <Dialog
+                        title="Unreachable Node"
                         actions={nodeButtons}
                         modal={false}
                         open={this.state.open}
                         onRequestClose={() => {
                             this.setState({open: false, openAdd: false});
                         }}>
-                        Node details you entered is currently unreachable. Please chose the run time environment
+                        Node details you entered is currently unreachable. Please choose the run time environment.
                     </Dialog>
 
                     <Header/>

@@ -172,4 +172,8 @@ export default class StatusDashboardAPIS {
     static deleteManagerById(managerId){
         return StatusDashboardAPIS.getHTTPClient().delete('/manager/'+managerId)
     }
+
+    static getKafkaDetails(managerId,appName){
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/'+managerId+'/siddhi-apps/'+appName+'/child-apps/'+'transport')
+    }
 }

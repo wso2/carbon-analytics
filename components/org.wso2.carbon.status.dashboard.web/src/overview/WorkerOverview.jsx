@@ -28,6 +28,7 @@ import {
     TableRowColumn,
     Toggle
 } from "material-ui";
+import ScrollableAnchor from 'react-scrollable-anchor'
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -172,26 +173,26 @@ export default class WorkerOverview extends React.Component {
                 }
 
             }).catch((error)=>{
-                if(error.response != null){
-                    if(error.response.status ===401){
-                        this.setState({
-                            isApiCalled:true,
-                            sessionInvalid:true,
-                            statusMessage:"Authentication failed. Please login again."
-                        })
-                    } else if(error.response.status === 403){
-                        this.setState({
-                            isApiCalled:true,
-                            statusMessage:"User Have No Permission to view this page."
-                        })
-                    }else {
-                        this.state({
-                            isError:true,
-                            isApiCalled:true,
-                            statusMessage:"Unknown error occurred! : "+JSON.stringify(error.response.data)
-                        });
-                    }
+            if(error.response != null){
+                if(error.response.status ===401){
+                    this.setState({
+                        isApiCalled:true,
+                        sessionInvalid:true,
+                        statusMessage:"Authentication failed. Please login again."
+                    })
+                } else if(error.response.status === 403){
+                    this.setState({
+                        isApiCalled:true,
+                        statusMessage:"User Have No Permission to view this page."
+                    })
+                }else {
+                    this.state({
+                        isError:true,
+                        isApiCalled:true,
+                        statusMessage:"Unknown error occurred! : "+JSON.stringify(error.response.data)
+                    });
                 }
+            }
         });
     }
 
@@ -343,6 +344,7 @@ export default class WorkerOverview extends React.Component {
     /**
      * Method which render workers
      * @param workersList
+     * @param managerList
      * @returns {XML}
      */
     renderWorkers(workersList,managerList) {
@@ -403,6 +405,7 @@ export default class WorkerOverview extends React.Component {
                         </div>
                     </div>
                     {Object.keys(workersList).map((id, workerList) => {
+
                         {
                             console.log("id is" + id)
                         }
@@ -424,11 +427,11 @@ export default class WorkerOverview extends React.Component {
                             </div>
                         )
                     })}
+                    <h3 style={styles.h3}>Distributed Deployments</h3>
 
                     {Object.keys(managerList).map((id, workerList) => {
                         return (
                             <div>
-                                <h3 style={styles.h3}>Distributed Set</h3>
                                 <h3 style={styles.h3}>{id}</h3>
                                 <Divider inset={true} style={{width: '90%'}}/>
                                 <div style={styles.root}>
@@ -524,7 +527,7 @@ export default class WorkerOverview extends React.Component {
                                         {managerList[id].map((worker) => {
                                             return (
                                                 <ManagerThumbnail worker={worker}
-                                                                 currentTime={new Date().getTime()}/>
+                                                                  currentTime={new Date().getTime()}/>
 
                                             )
                                         })}
@@ -558,21 +561,21 @@ export default class WorkerOverview extends React.Component {
             return <Error500 message={this.state.statusMessage}/>;
         }
         if (!this.state.sessionInvalid) {
-        return (
-            <div style={styles.background}>
-                <Header/>
-                <div className="navigation-bar">
-                    <FlatButton label="Overview" icon={<HomeButton color="black"/>}/>
+            return (
+                <div style={styles.background}>
+                    <Header/>
+                    <div className="navigation-bar">
+                        <FlatButton label="Overview" icon={<HomeButton color="black"/>}/>
+                    </div>
+                    {this.renderWorkers(this.state.clustersList,this.state.managerClusterList)}
                 </div>
-                {this.renderWorkers(this.state.clustersList,this.state.managerClusterList)}
-            </div>
-        );
-    } else {
+            );
+        } else {
             return (
                 <Redirect to={{ pathname: `${window.contextPath}/logout` }} />
             );
-            }
-     }
+        }
+    }
 
     static hasNodes(clusters) {
         for (let prop in clusters) {
@@ -583,5 +586,3 @@ export default class WorkerOverview extends React.Component {
         return false;
     }
 }
-
-
