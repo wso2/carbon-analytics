@@ -125,7 +125,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                     if(self.appData.getAggregation(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
-                } //TODO: Add other types like pattern, filter
+                }
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
@@ -1139,20 +1139,27 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                             required: true,
                             propertyOrder: 2
                         },
-                        select: {
-                            title: "Select",
+                        querySelect: {
+                            propertyOrder: 3,
                             required: true,
-                            propertyOrder: 4,
-                            oneOf: [
-                                {
-                                    $ref: "#/definitions/userDefined",
-                                    title: "User-Defined"
-                                },
-                                {
-                                    $ref: "#/definitions/all",
-                                    title: "All"
+                            type: "object",
+                            title: "Query Select",
+                            properties: {
+                                select: {
+                                    title: "Query Select Type",
+                                    required: true,
+                                    oneOf: [
+                                        {
+                                            $ref: "#/definitions/userDefined",
+                                            title: "User-Defined"
+                                        },
+                                        {
+                                            $ref: "#/definitions/all",
+                                            title: "All"
+                                        }
+                                    ]
                                 }
-                                ]
+                            }
                         },
                         groupBy: {
                             required: true,
@@ -1246,10 +1253,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                         all: {
                             type: "string",
                             title: "All",
-                            enum: [
-                                "*"
-                            ],
-                            default: "*"
+                            template: '*'
                         }
                     }
                 },
@@ -1283,12 +1287,12 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 _.set(aggregationOptions, 'aggregateByAttribute', editor.getValue().aggregateByAttribute);
 
                 var selectAttributeOptions = {};
-                if (editor.getValue().select instanceof Array) {
+                if (editor.getValue().querySelect.select instanceof Array) {
                     _.set(selectAttributeOptions, 'type', 'user-defined');
-                    _.set(selectAttributeOptions, 'value', editor.getValue().select);
-                } else if (editor.getValue().select === "*") {
+                    _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
+                } else if (editor.getValue().querySelect.select === "*") {
                     _.set(selectAttributeOptions, 'type', 'all');
-                    _.set(selectAttributeOptions, 'value', editor.getValue().select);
+                    _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
                 } else {
                     console.log("Value other than \"user-defined\" and \"all\" received!");
                 }
@@ -1363,7 +1367,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
             var fillWith = {
                 name : name,
                 from : from,
-                select : select,
+                querySelect : {
+                    select: select
+                },
                 groupBy : groupBy,
                 aggregateByAttribute : aggregateByAttribute,
                 aggregateByTimePeriod : aggregateByTimePeriod
@@ -1388,20 +1394,27 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                             required: true,
                             propertyOrder: 2
                         },
-                        select: {
-                            title: "Select",
+                        querySelect: {
+                            propertyOrder: 3,
                             required: true,
-                            propertyOrder: 4,
-                            oneOf: [
-                                {
-                                    $ref: "#/definitions/userDefined",
-                                    title: "User-Defined"
-                                },
-                                {
-                                    $ref: "#/definitions/all",
-                                    title: "All"
+                            type: "object",
+                            title: "Query Select",
+                            properties: {
+                                select: {
+                                    title: "Query Select Type",
+                                    required: true,
+                                    oneOf: [
+                                        {
+                                            $ref: "#/definitions/userDefined",
+                                            title: "User-Defined"
+                                        },
+                                        {
+                                            $ref: "#/definitions/all",
+                                            title: "All"
+                                        }
+                                    ]
                                 }
-                            ]
+                            }
                         },
                         groupBy: {
                             required: true,
@@ -1495,10 +1508,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                         all: {
                             type: "string",
                             title: "All",
-                            enum: [
-                                "*"
-                            ],
-                            default: "*"
+                            template: '*'
                         }
                     }
                 },
@@ -1539,12 +1549,12 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 clickedElement.setAggregateByAttribute(config.aggregateByAttribute);
 
                 var selectAttributeOptions = {};
-                if (config.select instanceof Array) {
+                if (config.querySelect.select instanceof Array) {
                     _.set(selectAttributeOptions, 'type', 'user-defined');
-                    _.set(selectAttributeOptions, 'value', editor.getValue().select);
-                } else if (config.select === "*") {
+                    _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
+                } else if (config.querySelect.select === "*") {
                     _.set(selectAttributeOptions, 'type', 'all');
-                    _.set(selectAttributeOptions, 'value', editor.getValue().select);
+                    _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
                 } else {
                     console.log("Value other than \"user-defined\" and \"all\" received!");
                 }
