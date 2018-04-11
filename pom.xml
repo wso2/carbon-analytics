@@ -1376,7 +1376,7 @@
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <compress.lzf.version>1.0.0</compress.lzf.version>
         <jetty.version>8.1.14.v20131031</jetty.version>
-        <netty.version>3.9.0.Final</netty.version>
+        <netty.version>3.9.5.Final</netty.version>
         <protobuf.version>2.5.0-spark</protobuf.version>
         <uncommons.math.orbit.version>1.2.2.wso2v1</uncommons.math.orbit.version>
         <chill.orbit.version>0.5.0.wso2v1</chill.orbit.version>
