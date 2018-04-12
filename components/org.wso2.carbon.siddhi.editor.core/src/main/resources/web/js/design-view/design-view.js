@@ -17,12 +17,16 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid', 'appData',
-        'filterQuery', 'joinQuery', 'partition', 'passThroughQuery', 'patternQuery', 'query', 'stream', 'table',
-        'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowQuery', 'leftStream', 'rightStream',
-        'join', 'edge'],
+        'filterQuery', 'joinQuery', 'partition', 'passThroughQuery', 'query', 'stream', 'table',
+        'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'patternQueryInput',
+        'patternQueryInputCounting', 'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd',
+        'windowQuery', 'leftStream', 'rightStream', 'join', 'edge', 'querySelect', 'queryOutput', 'queryOutputInsert',
+        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
     function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, FilterQuery, JoinQuery, Partition,
-              PassThroughQuery, PatternQuery, Query, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
-              WindowQuery, LeftStream, RightStream, Join, Edge) {
+              PassThroughQuery, Query, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
+              PatternQueryInput,PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
+              PatternQueryInputNotAnd, WindowQuery, LeftStream, RightStream, Join, Edge, QuerySelect, QueryOutput,
+              QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
 
         /**
          * @class DesignView
@@ -70,6 +74,32 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 });
             }
 
+            // sets the query select(and aggregation definition select) part in a query
+            function setSelectForQuery(query, querySelect) {
+                var querySelectObject = new QuerySelect(querySelect);
+                query.setSelect(querySelectObject);
+            }
+
+            // sets the query output attribute in a query
+            function setQueryOutputForQuery(query, queryOutput) {
+                var queryOutputObject = new QueryOutput(queryOutput);
+                var queryOutputType = queryOutput.type;
+                var output;
+                if(queryOutputType === "insert") {
+                    output = new QueryOutputInsert(queryOutput.output);
+                } else if (queryOutputType === "delete") {
+                    output = new QueryOutputDelete(queryOutput.output);
+                } else if (queryOutputType === "update") {
+                    output = new QueryOutputUpdate(queryOutput.output);
+                } else if (queryOutputType === "update-or-insert-into") {
+                    output = new QueryOutputUpdateOrInsertInto(queryOutput.output);
+                } else {
+                    console.log("Invalid query output type received!");
+                }
+                queryOutputObject.setOutput(output);
+                query.setQueryOutput(queryOutputObject);
+            }
+
             _.forEach(siddhiAppContent.streamList, function(stream){
                 var streamObject = new Stream(stream);
                 //addAnnotationsForElement(stream, streamObject);
@@ -97,6 +127,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             _.forEach(siddhiAppContent.aggregationList, function(aggregation){
                 var aggregationObject = new Aggregation(aggregation);
                 //addAnnotationsForElement(aggregation, aggregationObject);
+                setSelectForQuery(aggregationObject, aggregation.select);
                 var aggregateByTimePeriodSubElement = new AggregateByTimePeriod(aggregation.aggregateByTimePeriod);
                 aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriodSubElement);
                 appData.addAggregation(aggregationObject);
@@ -113,8 +144,29 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             _.forEach(siddhiAppContent.queryList, function(query){
                 appData.addQuery(new Query(query));
             });
-            _.forEach(siddhiAppContent.patternList, function(patternQuery){
-                appData.addPatternQuery(new PatternQuery(patternQuery));
+            _.forEach(siddhiAppContent.patternQueryList, function(patternQuery){
+                var patternQueryObject = new Query(patternQuery);
+                var patternQueryInput = new PatternQueryInput();
+                _.forEach(patternQuery.queryInput.eventList, function(event){
+                    var eventType = event.type;
+                    var patternQueryEventObject;
+                    if(eventType === "counting") {
+                        patternQueryEventObject = new PatternQueryInputCounting(event);
+                    } else if (eventType === "andor") {
+                        patternQueryEventObject = new PatternQueryInputAndOr(event);
+                    } else if (eventType === "notfor") {
+                        patternQueryEventObject = new PatternQueryInputNotFor(event);
+                    } else if (eventType === "notand") {
+                        patternQueryEventObject = new PatternQueryInputNotAnd(event);
+                    } else {
+                        console.log("Invalid event type received for pattern query input event");
+                    }
+                    patternQueryInput.addEvent(patternQueryEventObject);
+                });
+                patternQueryObject.setQueryInput(patternQueryInput);
+                setSelectForQuery(patternQueryObject, patternQuery.select);
+                setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
+                appData.addPatternQuery(patternQueryObject);
             });
             _.forEach(siddhiAppContent.joinQueryList, function(joinQuery){
                 var joinQueryObject = new JoinQuery(joinQuery);

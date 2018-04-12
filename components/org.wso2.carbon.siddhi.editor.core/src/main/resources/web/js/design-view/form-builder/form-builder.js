@@ -17,9 +17,13 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'window', 'trigger', 'aggregation',
-        'aggregateByTimePeriod', 'querySelect', 'leftStream', 'rightStream', 'join'],
+        'aggregateByTimePeriod', 'querySelect', 'leftStream', 'rightStream', 'join', 'patternQueryInputCounting',
+        'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'queryOutputInsert',
+        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
     function (require, log, $, _, jsPlumb, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
-              QuerySelect, LeftStream, RightStream, Join) {
+              QuerySelect, LeftStream, RightStream, Join , PatternQueryInputCounting, PatternQueryInputAndOr,
+              PatternQueryInputNotFor, PatternQueryInputNotAnd, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
+              QueryOutputUpdateOrInsertInto) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -39,7 +43,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
             WINDOW_QUERY : 'wquerydrop',
-            PATTERN : 'stquerydrop',
+            PATTERN : 'patternQueryDrop',
             PARTITION :'partitiondrop'
         };
 
@@ -2006,7 +2010,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
          * @function generate property window for state machine
          * @param element selected element(query)
          */
-        FormBuilder.prototype.GeneratePropertiesFormForPattern = function (element) {
+        FormBuilder.prototype.GeneratePropertiesFormForPatternQueries = function (element) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
@@ -2017,7 +2021,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
 
             var id = $(element).parent().attr('id');
             var clickedElement = self.appData.getPatternQuery(id);
-            if (clickedElement.getFrom().length === 0) {
+            if (clickedElement.getQueryInput() === ''
+                || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
                 alert('Connect input streams');
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
@@ -2025,7 +2030,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
-            } else if (clickedElement.getInsertInto() === '') {
+            } else if (clickedElement.getQueryOutput() === '' || clickedElement.getQueryOutput().getTarget() === '') {
                 alert('Connect an output stream');
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
@@ -2034,181 +2039,676 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
             } else {
-                // retrieve the pattern information from the collection
-                var streams = [];
-                var projections = [];
-                $.each(clickedElement.getFrom(), function (index, streamID) {
-                    streams.push((self.appData.getStream(streamID)).getName());
+
+                var savedQueryInputEventList = clickedElement.getQueryInput().getEventList();
+                var inputStreams = clickedElement.getQueryInput().getConnectedElementNameList();
+                var queryInput1 = [];
+                var queryInput2 = {};
+                var inputEvent;
+                _.forEach(savedQueryInputEventList, function (queryInputEvent) {
+                    var inputEventType = queryInputEvent.getType();
+                    if (inputEventType === "counting") {
+                        inputEvent = {
+                            inputType:"Counting Pattern Event",
+                            forEvery: queryInputEvent.getForEvery(),
+                            eventReference: queryInputEvent.getEventReference(),
+                            streamName: queryInputEvent.getStreamName(),
+                            filter: queryInputEvent.getFilter(),
+                            minCount: queryInputEvent.getMinCount(),
+                            maxCount: queryInputEvent.getMaxCount(),
+                            within: queryInputEvent.getWithin()
+                        };
+                        queryInput1.push(inputEvent);
+                    } else if (inputEventType === "andor") {
+                        inputEvent = {
+                            inputType:"And Or Event",
+                            forEvery: queryInputEvent.getForEvery(),
+                            leftEventReference:queryInputEvent.getLeftEventReference(),
+                            leftStreamName: queryInputEvent.getLeftStreamName(),
+                            leftFilter: queryInputEvent.getLeftFilter(),
+                            connectedWith: (queryInputEvent.getConnectedWith() === '')?
+                                'and' : queryInputEvent.getConnectedWith(),
+                            rightEventReference: queryInputEvent.getRightEventReference(),
+                            rightStreamName: queryInputEvent.getRightStreamName(),
+                            rightFilter: queryInputEvent.getRightFilter(),
+                            within: queryInputEvent.getWithin()
+                        };
+                        queryInput1.push(inputEvent);
+                    } else if (inputEventType === "notfor") {
+                        inputEvent = {
+                            inputType:"Not For Event",
+                            forEvery: queryInputEvent.getForEvery(),
+                            streamName: queryInputEvent.getStreamName(),
+                            filter: queryInputEvent.getFilter(),
+                            forDuration: queryInputEvent.getForDuration()
+                        };
+                        queryInput2 = inputEvent;
+                    } else if (inputEventType === "notand") {
+                        inputEvent = {
+                            inputType:"Not And Event",
+                            forEvery: queryInputEvent.getForEvery(),
+                            leftStreamName: queryInputEvent.getLeftStreamName(),
+                            leftFilter: queryInputEvent.getLeftFilter(),
+                            rightEventReference: queryInputEvent.getRightEventReference(),
+                            rightStreamName: queryInputEvent.getRightStreamName(),
+                            rightFilter: queryInputEvent.getRightFilter(),
+                            within: queryInputEvent.getWithin()
+                        };
+                        queryInput2 = inputEvent;
+                    }
                 });
 
-                var insertInto = self.appData.getStream(clickedElement.getInsertInto()).getName();
-                var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
-                if (clickedElement.getProjection() === '') {
-                    for (var i = 0; i < outStreamAttributes.length; i++) {
-                        var attr = {select: '', newName: outStreamAttributes[i].attribute};
-                        projections.push(attr);
-                    }
-                }
-                else {
-                    var selectedAttributes = clickedElement.getProjection();
-                    for (var i = 0; i < outStreamAttributes.length; i++) {
-                        var attr = {select: selectedAttributes[i], newName: outStreamAttributes[i].attribute};
-                        projections.push(attr);
-                    }
-                }
-                var states = [];
-                $.each(clickedElement.getStates(), function (index, state) {
-                    for (var event in state) {
-                        if (state.hasOwnProperty(event)) {
-                            var restoredState = { stateID: event, stream: state[event].stream,
-                                filter: state[event].filter};
-                            states.push(restoredState);
-                        }
-                    }
+                var select = clickedElement.getSelect().value;
+                var savedGroupByAttributes = clickedElement.getGroupBy();
+                var having = clickedElement.getHaving();
+                var outputRateLimit = clickedElement.getOutputRateLimit();
+
+                var groupBy = [];
+                _.forEach(savedGroupByAttributes, function (savedGroupByAttribute) {
+                    var groupByAttributeObject = {
+                        attribute: savedGroupByAttribute
+                    };
+                    groupBy.push(groupByAttributeObject);
                 });
+
+                var possibleGroupByAttributes = [];
+                _.forEach(inputStreams, function (inputStreamName) {
+                    _.forEach(self.appData.streamList, function (stream) {
+                        if (stream.getName() === inputStreamName) {
+                            _.forEach(stream.getAttributeList(), function (attribute) {
+                                possibleGroupByAttributes.push(attribute.attribute);
+                            });
+                        }
+                    });
+                });
+
+                var savedQueryOutput = clickedElement.getQueryOutput();
+                var savedQueryOutputTarget = savedQueryOutput.getTarget();
+                var savedQueryOutputType = savedQueryOutput.getType();
+                var output = savedQueryOutput.getOutput();
+                var queryOutput;
+                if (savedQueryOutputTarget !== undefined && savedQueryOutputType!== undefined && output!== undefined) {
+                    if (savedQueryOutputType === "insert") {
+                        queryOutput = {
+                            output : {
+                                outputType: "Insert",
+                                insertTarget: savedQueryOutputTarget,
+                                eventType: (output.getEventType() === '')?'all':output.getEventType()
+                            }
+                        };
+                    } else if (savedQueryOutputType === "delete") {
+                        queryOutput = {
+                            output : {
+                                outputType : "Delete",
+                                deleteTarget: savedQueryOutputTarget,
+                                forEventType : (output.getForEventType() === '')?'all':output.getForEventType(),
+                                on : output.getOn()
+                            }
+                        };
+
+                    } else if (savedQueryOutputType === "update") {
+                        queryOutput = {
+                            output : {
+                                outputType : "Update",
+                                updateTarget: savedQueryOutputTarget,
+                                forEventType : (output.getForEventType() === '')?'all':output.getForEventType(),
+                                set: output.getSet(),
+                                on : output.getOn()
+                            }
+                        };
+                    } else if (savedQueryOutputType === "update-or-insert-into") {
+                        queryOutput = {
+                            output: {
+                                outputType: "Update or Insert Into",
+                                updateOrInsertIntoTarget: savedQueryOutputTarget,
+                                forEventType: (output.getForEventType() === '')?'all':output.getForEventType(),
+                                set: output.getSet(),
+                                on: output.getOn()
+                            }
+                        };
+                    }
+                }
 
                 var fillWith = {
-                    name: clickedElement.getName(),
-                    states: states,
-                    logic: clickedElement.getLogic(),
-                    outputType: clickedElement.getOutputType(),
-                    projection: projections
+                    queryInput : {
+                        queryInput1: queryInput1,
+                        queryInput2: queryInput2
+                    },
+                    querySelect : {
+                        select : select
+                    },
+                    groupBy : groupBy,
+                    having : having,
+                    outputRateLimit : outputRateLimit,
+                    queryOutput: queryOutput
                 };
-                if (clickedElement.getFilter()) {
-                    fillWith.filter = clickedElement.getFilter();
-                }
-                if (clickedElement.getWindow()) {
-                    fillWith.window = clickedElement.getWindow();
-                }
-                if (clickedElement.getPostWindowFilter()) {
-                    fillWith.postWindowFilter = clickedElement.getPostWindowFilter();
-                }
-                if (clickedElement.getHaving()) {
-                    fillWith.having = clickedElement.getHaving();
-                }
-                if (clickedElement.getGroupBy()) {
-                    fillWith.groupBy = clickedElement.getGroupBy();
-                }
+
+                //TODO: check whether the left and right stream both are same in some occasions
                 var editor = new JSONEditor(formContainer[0], {
-                    ajax: true,
                     schema: {
-                        type: 'object',
-                        title: 'Query',
+                        type: "object",
+                        title: "Pattern Query",
                         properties: {
-                            name: {
-                                type: 'string',
-                                title: 'Name',
+                            queryInput: {
+                                propertyOrder: 1,
+                                type: "object",
+                                title: "Query Input",
                                 required: true,
-                                propertyOrder: 1
-                            },
-                            states: {
-                                type: 'array',
-                                title: 'State',
-                                format: 'tabs',
-                                uniqueItems: true,
-                                required: true,
-                                propertyOrder: 2,
-                                items: {
-                                    type: 'object',
-                                    title: 'state',
-                                    headerTemplate: "State" + "{{i1}}",
-                                    options: {
-                                        disable_properties: true
-                                    },
-                                    properties: {
-                                        stateID: {
-                                            type: 'string',
-                                            title: 'State ID',
-                                            required: true,
-                                            propertyOrder: 1
-                                        },
-                                        stream: {
-                                            type: 'string',
-                                            title: 'Stream',
-                                            enum: streams,
-                                            required: true,
-                                            propertyOrder: 2
-                                        },
-                                        filter: {
-                                            type: 'string',
-                                            title: 'Filter',
-                                            required: true,
-                                            propertyOrder: 3
+                                properties: {
+                                    queryInput1: {
+                                        title: "Query Input Type - Normal Types",
+                                        type: "array",
+                                        format: "array",
+                                        items: {
+                                            title: "Normal Query Input Type",
+                                            oneOf: [
+                                                {
+                                                    $ref: "#/definitions/queryInputCountingType",
+                                                    title: "Counting Pattern Type"
+                                                },
+                                                {
+                                                    $ref: "#/definitions/queryInputAndOrType",
+                                                    title: "Logical Pattern(And Or) Type"
+                                                }
+                                            ]
                                         }
+                                    },
+                                    queryInput2: {
+                                        type: "object",
+                                        title: "Query Input Type - Negation Events",
+                                        oneOf: [
+                                            {
+                                                $ref: "#/definitions/queryInputNotAndType",
+                                                title: "Logical Pattern(Not And) Type"
+                                            },
+                                            {
+                                                $ref: "#/definitions/queryInputNotForType",
+                                                title: "Logical Pattern(Not For) Type"
+                                            }
+                                        ]
                                     }
                                 }
                             },
-                            logic: {
-                                type: 'string',
-                                title: 'Logic',
+                            querySelect: {
+                                propertyOrder: 3,
                                 required: true,
-                                propertyOrder: 3
-                            },
-                            filter: {
-                                type: 'string',
-                                title: 'Filter',
-                                propertyOrder: 4
-                            },
-                            window: {
-                                type: 'string',
-                                title: 'Window',
-                                propertyOrder: 5
-                            },
-                            postWindowFilter: {
-                                type: 'string',
-                                title: 'Post Window Filter',
-                                propertyOrder: 6
-                            },
-                            having: {
-                                type: 'string',
-                                title: 'Having',
-                                propertyOrder: 7
+                                type: "object",
+                                title: "Query Select",
+                                properties: {
+                                    select: {
+                                        title: "Query Select Type",
+                                        required: true,
+                                        oneOf: [
+                                            {
+                                                $ref: "#/definitions/querySelectUserDefined",
+                                                title: "User-Defined"
+                                            },
+                                            {
+                                                $ref: "#/definitions/querySelectAll",
+                                                title: "All"
+                                            }
+                                        ]
+                                    }
+                                }
                             },
                             groupBy: {
-                                type: 'string',
-                                title: 'Group By',
-                                propertyOrder: 8
-                            },
-                            projection: {
-                                type: 'array',
-                                title: 'Projection',
-                                format: 'table',
-                                required: true,
-                                propertyOrder: 9,
-                                options: {
-                                    disable_array_add: true,
-                                    disable_array_delete: true
-                                },
+                                propertyOrder: 4,
+                                type: "array",
+                                format: "table",
+                                title: "Group By Attributes",
+                                uniqueItems: true,
                                 items: {
-                                    type: 'object',
-                                    title: 'Attribute',
+                                    type: "object",
+                                    title : 'Attribute',
                                     properties: {
-                                        select: {
+                                        attribute: {
                                             type: 'string',
-                                            title: 'select'
-                                        },
-                                        newName: {
-                                            type: 'string',
-                                            title: 'as'
+                                            title: 'Attribute Name',
+                                            enum: possibleGroupByAttributes,
+                                            default: ""
                                         }
                                     }
                                 }
                             },
-                            outputType: {
-                                type: 'string',
-                                title: 'Output Type',
-                                enum: ['all events', 'current events', 'expired events'],
-                                default: 'all events',
-                                required: true,
-                                propertyOrder: 10
+                            having: {
+                                propertyOrder: 5,
+                                title: "Having",
+                                type: "string",
+                                minLength: 1
                             },
-                            insertInto: {
-                                type: 'string',
-                                title: 'Insert Into',
-                                template: insertInto,
+                            outputRateLimit: {
+                                propertyOrder: 6,
+                                title: "Output Rate Limit",
+                                type: "string",
+                                minLength: 1
+                            },
+                            queryOutput: {
+                                propertyOrder: 7,
                                 required: true,
-                                propertyOrder: 11
+                                type: "object",
+                                title: "Query Output Type",
+                                properties: {
+                                    output: {
+                                        title: "Query Output Type",
+                                        required: true,
+                                        oneOf: [
+                                            {
+                                                $ref: "#/definitions/queryOutputInsertType",
+                                                title: "Insert Type"
+                                            },
+                                            {
+                                                $ref: "#/definitions/queryOutputDeleteType",
+                                                title: "Delete Type"
+                                            },
+                                            {
+                                                $ref: "#/definitions/queryOutputUpdateType",
+                                                title: "Update Type"
+                                            },
+                                            {
+                                                $ref: "#/definitions/queryOutputUpdateOrInsertIntoType",
+                                                title: "Update Or Insert Into Type"
+                                            }
+                                        ]
+                                    }
+                                }
                             }
+                        },
+                        definitions: {
+                            queryInputCountingType: {
+                                title: "Counting Pattern Event",
+                                type: "object",
+                                properties: {
+                                    inputType: {
+                                        required: true,
+                                        title: "Input Type",
+                                        type: "string",
+                                        template: "Counting Pattern Event"
+                                    },
+                                    forEvery: {
+                                        required: true,
+                                        title: "For Every",
+                                        type: "boolean",
+                                        enum: [true, false],
+                                        default: false
+                                    },
+                                    eventReference: {
+                                        title: "Event Reference",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    streamName: {
+                                        type: 'string',
+                                        title: 'Stream Name',
+                                        enum: inputStreams,
+                                        required: true
+                                    },
+                                    filter: {
+                                        title: "Filter",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    minCount: {
+                                        title: "Min Count",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    maxCount: {
+                                        title: "Max Count",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    within: {
+                                        title: "Within",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+
+                            },
+                            queryInputAndOrType: {
+                                title: "And Or Event",
+                                type: "object",
+                                properties: {
+                                    inputType: {
+                                        required: true,
+                                        title: "Input Type",
+                                        type: "string",
+                                        template: "Logical And Or Event"
+                                    },
+                                    forEvery: {
+                                        required: true,
+                                        title: "For Every",
+                                        type: "boolean",
+                                        enum: [true, false],
+                                        default: false
+                                    },
+                                    leftEventReference: {
+                                        title: "Left Stream Event Reference",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    leftStreamName: {
+                                        type: 'string',
+                                        title: 'Left Stream Name',
+                                        enum: inputStreams,
+                                        required: true
+                                    },
+                                    leftFilter: {
+                                        title: "Left Stream Filter",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    connectedWith: {
+                                        title: "Connected With",
+                                        type: "string",
+                                        enum: ['and', 'or'],
+                                        default: 'and'
+                                    },
+                                    rightEventReference: {
+                                        title: "Right Stream Event Reference",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    rightStreamName: {
+                                        type: 'string',
+                                        title: 'Right Stream Name',
+                                        enum: inputStreams,
+                                        required: true
+                                    },
+                                    rightFilter: {
+                                        title: "Right Stream Filter",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    within: {
+                                        title: "Within",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            },
+                            queryInputNotForType: {
+                                title: "Not For Event",
+                                type: "object",
+                                properties: {
+                                    inputType: {
+                                        required: true,
+                                        title: "Input Type",
+                                        type: "string",
+                                        template: "Logical Not For Event"
+                                    },
+                                    forEvery: {
+                                        required: true,
+                                        title: "For Every",
+                                        type: "boolean",
+                                        enum: [true, false],
+                                        default: false
+                                    },
+                                    streamName: {
+                                        type: 'string',
+                                        title: 'Stream Name',
+                                        enum: inputStreams,
+                                        required: true
+                                    },
+                                    filter: {
+                                        title: "Filter",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    forDuration: {
+                                        required: true,
+                                        title: "Duration",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            },
+                            queryInputNotAndType: {
+                                title: "Not And Event",
+                                type: "object",
+                                properties: {
+                                    inputType: {
+                                        required: true,
+                                        title: "Input Type",
+                                        type: "string",
+                                        template: "Logical Not And Event"
+                                    },
+                                    forEvery: {
+                                        required: true,
+                                        title: "For Every",
+                                        type: "boolean",
+                                        enum: [true, false],
+                                        default: false
+                                    },
+                                    leftStreamName: {
+                                        type: 'string',
+                                        title: 'Left Stream Name',
+                                        enum: inputStreams,
+                                        required: true
+                                    },
+                                    leftFilter: {
+                                        title: "Left Stream Filter",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    rightEventReference: {
+                                        title: "Right Stream Event Reference",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    rightStreamName: {
+                                        type: 'string',
+                                        title: 'Right Stream Name',
+                                        enum: inputStreams,
+                                        required: true
+                                    },
+                                    rightFilter: {
+                                        title: "Right Stream Filter",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    within: {
+                                        title: "Within",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            },
+                            querySelectUserDefined: {
+                                required: true,
+                                type: "array",
+                                format: "table",
+                                title: "User Defined",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    title: "Value Set",
+                                    type: "object",
+                                    properties: {
+                                        expression: {
+                                            title: "Expression",
+                                            type: "string",
+                                            minLength: 1
+                                        },
+                                        as: {
+                                            title: "As",
+                                            type: "string"
+                                        }
+                                    }
+                                }
+                            },
+                            querySelectAll: {
+                                type: "string",
+                                title: "All",
+                                template: '*'
+                            },
+                            queryOutputInsertType: {
+                                required: true,
+                                title: "Insert",
+                                type: "object",
+                                properties: {
+                                    outputType: {
+                                        required: true,
+                                        title: "Output Type",
+                                        type: "string",
+                                        template: "Insert"
+                                    },
+                                    eventType: {
+                                        required: true,
+                                        title: "For Every",
+                                        type: "string",
+                                        enum: ['current', 'expired', 'all'],
+                                        default: 'all'
+                                    },
+                                    insertTarget: {
+                                        type: 'string',
+                                        title: 'Insert Into',
+                                        template: savedQueryOutputTarget,
+                                        required: true
+                                    }
+                                }
+                            },
+                            queryOutputDeleteType: {
+                                required: true,
+                                title: "Delete",
+                                type: "object",
+                                properties: {
+                                    outputType: {
+                                        required: true,
+                                        title: "Output Type",
+                                        type: "string",
+                                        template: "Delete"
+                                    },
+                                    deleteTarget: {
+                                        type: 'string',
+                                        title: 'Delete From',
+                                        template: savedQueryOutputTarget,
+                                        required: true
+                                    },
+                                    forEventType: {
+                                        title: "For Every",
+                                        type: "string",
+                                        enum: ['current', 'expired', 'all'],
+                                        default: 'all'
+                                    },
+                                    on: {
+                                        type: 'string',
+                                        title: 'On',
+                                        minLength: 1,
+                                        required: true
+                                    }
+                                }
+                            },
+                            queryOutputUpdateType: {
+                                required: true,
+                                title: "Update",
+                                type: "object",
+                                properties: {
+                                    outputType: {
+                                        required: true,
+                                        title: "Output Type",
+                                        type: "string",
+                                        template: "Update"
+                                    },
+                                    updateTarget: {
+                                        type: 'string',
+                                        title: 'Update From',
+                                        template: savedQueryOutputTarget,
+                                        required: true
+                                    },
+                                    forEventType: {
+                                        title: "For Every",
+                                        type: "string",
+                                        enum: ['current', 'expired', 'all'],
+                                        default: 'all'
+                                    },
+                                    set: {
+                                        required: true,
+                                        type: "array",
+                                        format: "table",
+                                        title: "Set",
+                                        uniqueItems: true,
+                                        items: {
+                                            type: "object",
+                                            title: 'Set Condition',
+                                            properties: {
+                                                attribute: {
+                                                    type: "string",
+                                                    title: 'Attribute',
+                                                    minLength: 1
+                                                },
+                                                value: {
+                                                    type: "string",
+                                                    title: 'Value',
+                                                    minLength: 1
+                                                }
+                                            }
+                                        }
+                                    },
+                                    on: {
+                                        type: 'string',
+                                        title: 'On',
+                                        minLength: 1,
+                                        required: true
+                                    }
+                                }
+                            },
+                            queryOutputUpdateOrInsertIntoType: {
+                                required: true,
+                                title: "Update or Insert Into",
+                                type: "object",
+                                properties: {
+                                    outputType: {
+                                        required: true,
+                                        title: "Output Type",
+                                        type: "string",
+                                        template: "Update or Insert Into"
+                                    },
+                                    updateOrInsertIntoTarget: {
+                                        type: 'string',
+                                        title: 'Update or Insert Into',
+                                        template: savedQueryOutputTarget,
+                                        required: true
+                                    },
+                                    forEventType: {
+                                        title: "For Every",
+                                        type: "string",
+                                        enum: ['current', 'expired', 'all'],
+                                        default: 'all'
+                                    },
+                                    set: {
+                                        required: true,
+                                        type: "array",
+                                        format: "table",
+                                        title: "Set",
+                                        uniqueItems: true,
+                                        items: {
+                                            type: "object",
+                                            title: 'Set Condition',
+                                            properties: {
+                                                attribute: {
+                                                    type: "string",
+                                                    title: 'Attribute',
+                                                    minLength: 1
+                                                },
+                                                value: {
+                                                    type: "string",
+                                                    title: 'Value',
+                                                    minLength: 1
+                                                }
+                                            }
+                                        }
+                                    },
+                                    on: {
+                                        type: 'string',
+                                        title: 'On',
+                                        minLength: 1,
+                                        required: true
+                                    }
+                                }
+
+                            }
+
                         }
                     },
                     startval: fillWith,
@@ -2219,12 +2719,6 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
                 });
-                // disable fields that can not be changed
-                editor.getEditor('root.insertInto').disable();
-
-                for (var i = 0; i < outStreamAttributes.length; i++) {
-                    editor.getEditor('root.projection.' + i + '.newName').disable();
-                }
                 $(formContainer).append('<div id="form-submit"><button type="button" ' +
                     'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
@@ -2240,33 +2734,148 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                     self.consoleListManager.hideAllConsoles();
 
                     var config = editor.getValue();
+                    var patternQueryInput = clickedElement.getQueryInput();
+                    var newEventObject;
+                    patternQueryInput.getEventList().removeAllElements();
+                    if (config.queryInput.queryInput1 !== undefined) {
+                        _.forEach(config.queryInput.queryInput1, function (queryInputEvent) {
+                            if (queryInputEvent.inputType === "Counting Pattern Event") {
+                                newEventObject = new PatternQueryInputCounting(queryInputEvent);
+                                if (queryInputEvent.eventReference === undefined) {
+                                    newEventObject.setEventReference('');
+                                }
+                                if (queryInputEvent.filter === undefined) {
+                                    newEventObject.setFilter('');
+                                }
+                                if (queryInputEvent.minCount === undefined) {
+                                    newEventObject.setMinCount('');
+                                }
+                                if (queryInputEvent.maxCount === undefined) {
+                                    newEventObject.setMaxCount('');
+                                }
+                                if (queryInputEvent.within === undefined) {
+                                    newEventObject.setWithin('');
+                                }
+                            } else if (queryInputEvent.inputType === "Logical And Or Event") {
+                                newEventObject = new PatternQueryInputAndOr(queryInputEvent);
+                                if (queryInputEvent.leftEventReference === undefined) {
+                                    newEventObject.setLeftEventReference('');
+                                }
+                                if (queryInputEvent.leftFilter === undefined) {
+                                    newEventObject.setLeftFilter('');
+                                }
+                                if (queryInputEvent.rightEventReference === undefined) {
+                                    newEventObject.setRightEventReference('');
+                                }
+                                if (queryInputEvent.rightFilter === undefined) {
+                                    newEventObject.setRightFilter('');
+                                }
+                                if (queryInputEvent.within === undefined) {
+                                    newEventObject.setWithin('');
+                                }
+                            } else {
+                                console.log("Invalid input event type for pattern query received!")
+                            }
+                            patternQueryInput.addEvent(newEventObject);
+                        });
+                    }
 
-                    // update selected query model
-                    clickedElement.setName(config.name);
-                    clickedElement.setLogic(config.logic);
-                    clickedElement.setFilter(config.filter);
-                    clickedElement.setWindow(config.window);
-                    clickedElement.setPostWindowFilter(config.postWindowFilter);
-                    clickedElement.setHaving(config.having);
-                    clickedElement.setGroupBy(config.groupBy);
-                    var states = [];
-                    $.each(config.states, function (index, state) {
-                        var stateID = state.stateID;
-                        var stream = state.stream;
-                        var filter = state.filter;
-                        var stateObject = {};
-                        stateObject[stateID] = {stream: stream, filter: filter};
-                        states.push(stateObject);
-                    });
-                    clickedElement.setStates(states);
-                    var projections = [];
-                    $.each(config.projection, function (index, attribute) {
-                        projections.push(attribute.select);
-                    });
-                    clickedElement.setProjection(projections);
-                    clickedElement.setOutputType(config.outputType);
-                    var textNode = $(element).parent().find('.queryNameNode');
-                    textNode.html(config.name);
+                    if (config.queryInput.queryInput2 !== undefined
+                        && config.queryInput.queryInput2.inputType !== undefined) {
+                        if (config.queryInput.queryInput2.inputType === "Logical Not For Event") {
+                            newEventObject = new PatternQueryInputNotFor(config.queryInput.queryInput2);
+                            if (config.queryInput.queryInput2.filter === undefined) {
+                                newEventObject.setFilter('');
+                            }
+                        } else if (config.queryInput.queryInput2.inputType === "Logical Not And Event") {
+                            newEventObject = new PatternQueryInputNotAnd(config.queryInput.queryInput2);
+                            if (config.queryInput.queryInput2.leftFilter === undefined) {
+                                newEventObject.setLeftFilter('');
+                            }
+                            if (config.queryInput.queryInput2.rightEventReference === undefined) {
+                                newEventObject.setRightEventReference('');
+                            }
+                            if (config.queryInput.queryInput2.rightFilter === undefined) {
+                                newEventObject.setRightFilter('');
+                            }
+                            if (config.queryInput.queryInput2.within === undefined) {
+                                newEventObject.setWithin('');
+                            }
+                        } else {
+                            console.log("Invalid input event type for pattern query received!")
+                        }
+                        patternQueryInput.addEvent(newEventObject);
+                    }
+
+                    var selectAttributeOptions = {};
+                    if (config.querySelect.select instanceof Array) {
+                        _.set(selectAttributeOptions, 'type', 'user-defined');
+                        _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
+                    } else if (config.querySelect.select === "*") {
+                        _.set(selectAttributeOptions, 'type', 'all');
+                        _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
+                    } else {
+                        console.log("Value other than \"user-defined\" and \"all\" received!");
+                    }
+                    var selectObject = new QuerySelect(selectAttributeOptions);
+                    clickedElement.setSelect(selectObject);
+
+                    if (config.groupBy !== undefined) {
+                        var groupByAttributes = [];
+                        _.forEach(config.groupBy, function (groupByAttribute) {
+                            groupByAttributes.push(groupByAttribute.attribute);
+                        });
+                        clickedElement.setGroupBy(groupByAttributes);
+                    } else {
+                        clickedElement.setGroupBy('');
+                    }
+
+                    if (config.having !== undefined) {
+                        clickedElement.setHaving(config.having);
+                    } else {
+                        clickedElement.setHaving('');
+                    }
+
+                    if (config.outputRateLimit !== undefined) {
+                        clickedElement.setOutputRateLimit(config.outputRateLimit);
+                    } else {
+                        clickedElement.setOutputRateLimit('');
+                    }
+
+                    var patternQueryOutput = clickedElement.getQueryOutput();
+                    var outputObject;
+                    var outputType;
+                    if (config.queryOutput.output !== undefined) {
+                        if (config.queryOutput.output.outputType === "Insert") {
+                            outputType = "insert";
+                            outputObject = new QueryOutputInsert(config.queryOutput.output);
+                            if (config.queryOutput.output.eventType === undefined) {
+                                outputObject.setEventType('');
+                            }
+                        } else if (config.queryOutput.output.outputType === "Delete") {
+                            outputType = "delete";
+                            outputObject = new QueryOutputDelete(config.queryOutput.output);
+                            if (config.queryOutput.output.forEventType === undefined) {
+                                outputObject.setForEventType('');
+                            }
+                        } else if (config.queryOutput.output.outputType === "Update") {
+                            outputType = "update";
+                            outputObject = new QueryOutputUpdate(config.queryOutput.output);
+                            if (config.queryOutput.output.forEventType === undefined) {
+                                outputObject.setForEventType('');
+                            }
+                        } else if (config.queryOutput.output.outputType === "Update or Insert Into") {
+                            outputType = "update-or-insert-into";
+                            outputObject = new QueryOutputUpdateOrInsertInto(config.queryOutput.output);
+                            if (config.queryOutput.output.forEventType === undefined) {
+                                outputObject.setForEventType('');
+                            }
+                        } else {
+                            console.log("Invalid output type for pattern query received!")
+                        }
+                        patternQueryOutput.setOutput(outputObject);
+                        patternQueryOutput.setType(outputType);
+                    }
                 });
 
                 // 'Cancel' button action

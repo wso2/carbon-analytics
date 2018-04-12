@@ -35,7 +35,7 @@ define(['require', 'elementArray'],
             this.passThroughList = new ElementArray();
             this.windowQueryList = new ElementArray();
             this.queryList = new ElementArray();
-            this.patternList = new ElementArray();
+            this.patternQueryList = new ElementArray();
             this.joinQueryList = new ElementArray();
             this.partitionList = new ElementArray();
             this.edgeList = new ElementArray();
@@ -81,7 +81,7 @@ define(['require', 'elementArray'],
         };
 
         AppData.prototype.addPatternQuery = function (patternQuery) {
-            this.patternList.push(patternQuery);
+            this.patternQueryList.push(patternQuery);
         };
 
         AppData.prototype.addJoinQuery = function (joinQuery) {
@@ -133,7 +133,7 @@ define(['require', 'elementArray'],
         };
 
         AppData.prototype.removePatternQuery = function (patternQueryId) {
-            this.patternList.removeElement(patternQueryId);
+            this.patternQueryList.removeElement(patternQueryId);
         };
 
         AppData.prototype.removeJoinQuery = function (joinQueryId) {
@@ -189,7 +189,7 @@ define(['require', 'elementArray'],
         };
 
         AppData.prototype.getPatternQuery = function (patternQueryId) {
-            return this.patternList.getElement(patternQueryId);
+            return this.patternQueryList.getElement(patternQueryId);
         };
 
         AppData.prototype.getJoinQuery = function (joinQueryId) {

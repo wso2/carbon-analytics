@@ -159,7 +159,13 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"projection\":[\"\"]}," +
                         "\"length\":1" +
                         "}," +
-                        "\"patternList\":{}," +
+                        "\"patternQueryList\":{" +
+                        "\"0\":{\"id\":\"4\"," +
+                        "\"queryInput\":{" +
+                        "\"type\":\"pattern\"," +
+                        "\"connectedElementNameList\":[\"asc\"]," +
+                        "\"eventList\":{\"0\":{\"type\":\"andor\",\"forEvery\":true,\"leftEventReference\":\"12\",\"leftStreamName\":\"asc\",\"leftFilter\":\"11\",\"connectedWith\":\"and\",\"rightEventReference\":\"13\",\"rightStreamName\":\"asc\",\"rightFilter\":\"14\",\"within\":\"15\"},\"1\":{\"type\":\"notfor\",\"forEvery\":true,\"streamName\":\"asc\",\"filter\":\"321\",\"forDuration\":\"123\"},\"length\":2}},\"select\":{\"type\":\"user-defined\",\"value\":[{\"expression\":\"ewq\",\"as\":\"ewq\"}]},\"groupBy\":[],\"having\":\"eq\",\"outputRateLimit\":\"ewq\",\"queryOutput\":{\"type\":\"delete\",\"output\":{\"forEventType\":\"all\",\"on\":\"w\"},\"target\":\"asc\"},\"annotationList\":{}}," +
+                        "\"length\":1},"+
                         "\"joinQueryList\":{}," +
                         "\"partitionList\":{}," +
                         "\"edgeList\":{" +
@@ -173,7 +179,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         " \"parentType\":\"stream\"," +
                         " \"childId\":\"2\"," +
                         " \"childType\":\"query\"}," +
-                        "\"length\":2" +
+                        "\"2\":{ \"id\":\"4_3\"," +
+                        "\"parentId\":\"4\"," +
+                        "\"parentType\":\"query\"," +
+                        "\"childId\":\"3\"," +
+                        "\"childType\":\"stream\"}," +
+                        "\"3\":{ \"id\":\"3_4\"," +
+                        "\"parentId\":\"3\"," +
+                        "\"parentType\":\"query\"," +
+                        "\"childId\":\"4\"," +
+                        "\"childType\":\"stream\"}," +
+                        "\"length\":4"+
                         "}," +
                         "\"finalElementCount\":0" +
                         "}";

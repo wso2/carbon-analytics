@@ -109,15 +109,16 @@
     background-image: url("../images/join.png");
 }
 
-.stquerydrop {
-    background-image: url("../images/pattern.png");
+.patternQueryDrop {
+    background-image: url("../images/patternQuery.png");
 }
 
 /*
     Dropped Elements corresponding to their toolbox elements
 */
 
-.streamdrop, .tabledrop, .windowdrop, .triggerdrop, .aggregationdrop, .squerydrop, .filterdrop, .wquerydrop, .joquerydrop, .stquerydrop {
+.streamdrop, .tabledrop, .windowdrop, .triggerdrop, .aggregationdrop, .squerydrop, .filterdrop, .wquerydrop,
+.joquerydrop, .patternQueryDrop {
     border-radius: 0.5em;
     opacity: 0.8;
     width: 60px;
@@ -272,25 +273,27 @@ td {
     -webkit-background-clip: text;
 }
 
-.connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation {
+.connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation,
+.connectorInPatternQuery {
     float: left;
     margin-top: -33%;
     margin-left: -13px;
 }
 
-.connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation {
+.connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation,
+.connectorOutPatternQuery {
     float: right;
     margin-top: -33%;
     margin-right: -13px;
 }
 
-.connectorInWindow, .connectorIn {
+.connectorIn {
     float: left;
     margin-top: -37%;
     margin-left: -13px;
 }
 
-.connectorOutWindow, .connectorOut {
+.connectorOut {
     float: right;
     margin-top: -37%;
     margin-right: -13px;
@@ -311,7 +314,8 @@ td {
     margin-right: -10%;
 }
 
-.aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode, .partitionNameNode {
+.aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
+.partitionNameNode, .patternQueryNameNode {
     float: right;
     width: inherit;
     height: inherit;

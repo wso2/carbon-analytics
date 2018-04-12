@@ -96,16 +96,16 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/join.png"
                 },
                 {
-                    id : "pattern",
-                    className : "pattern",
-                    title : "Pattern",
-                    icon : "/editor/images/pattern.png"
+                    id : "pattern-query",
+                    className : "pattern-query",
+                    title : "Pattern Query",
+                    icon : "/editor/images/patternQuery.png"
                 },
                 {
                     id : "partition",
                     className : "partition",
                     title : "Partition",
-                    icon : "/editor/images/pattern.png"
+                    icon : "/editor/images/patternQuery.png"
                 }
             ];
 

@@ -15,9 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'dagre', 'edge'],
+define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'dagre', 'edge', 'patternQueryInput'
+        , 'queryOutput'],
 
-    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre, Edge) {
+    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre, Edge, PatternQueryInput, QueryOutput) {
 
         var constants = {
             STREAM : 'streamdrop',
@@ -29,7 +30,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             FILTER : 'filterdrop',
             JOIN : 'joquerydrop',
             WINDOW_QUERY : 'wquerydrop',
-            PATTERN : 'stquerydrop',
+            PATTERN : 'patternQueryDrop',
             PARTITION :'partitiondrop'
         };
 
@@ -66,7 +67,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             _.set(dropElementsOpts, 'designGrid', self);
             this.dropElements = new DropElements(dropElementsOpts);
             this.canvas = $(self.container);
-            //TODO: if close button in output console is clicked disabled containers should active
             //TODO: once an element is dropped source view/ design view buttons should be disabled
 
             /**
@@ -102,8 +102,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                  */
                 self.canvas.droppable
                 ({
-                    accept: '.stream, .table, .window, .trigger, .aggregation, .pass-through, .filter-query, .join-query, ' +
-                    '.window-query, .pattern, .partition',
+                    accept: '.stream, .table, .window, .trigger, .aggregation, .pass-through, .filter-query, ' +
+                    '.join-query, .window-query, .pattern-query, .partition',
                     containment: 'grid-container',
 
                     /**
@@ -169,9 +169,9 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             self.handleJoinQuery(mouseTop, mouseLeft, false);
                         }
 
-                        // If the dropped Element is a State machine Query(Pattern and Sequence) then->
-                        else if($(droppedElement).hasClass('pattern')) {
-                            self.handlePatternQuery(mouseTop, mouseLeft, false);
+                        // If the dropped Element is a Pattern Query then->
+                        else if($(droppedElement).hasClass('pattern-query')) {
+                            self.handlePatternQuery(mouseTop, mouseLeft, false, undefined, "Pattern Query");
                         }
 
                         // If the dropped Element is a Partition then->
@@ -218,9 +218,14 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             alert("Invalid Connection: Connect to a partition query");
                         }
                     }
+                    else if (targetElement.hasClass(constants.PATTERN)) {
+                        if(!(sourceElement.hasClass(constants.STREAM))) {
+                            connectionValidity = false;
+                            alert("Invalid Connection");
+                        }
+                    }
                     else if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
-                        || targetElement.hasClass(constants.WINDOW_QUERY)
-                        || targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.JOIN)) {
+                        || targetElement.hasClass(constants.WINDOW_QUERY) || targetElement.hasClass(constants.JOIN)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE))) {
                             connectionValidity = false;
                             alert("Invalid Connection");
@@ -277,16 +282,16 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             model = self.appData.getQuery(targetId);
                             model.setFrom(sourceId);
                         }
-
                         else if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.appData.getPatternQuery(targetId);
-                            var streams = model.getFrom();
-                            if (streams === undefined || streams === "") {
-                                streams = [sourceId];
+                            var connectedStreamName = self.appData.getStream(sourceId).getName();
+                            if (model.getQueryInput() === '') {
+                                var patternQueryInputObject = new PatternQueryInput();
+                                patternQueryInputObject.addConnectedElementName(connectedStreamName);
+                                model.setQueryInput(patternQueryInputObject);
                             } else {
-                                streams.push(sourceId);
+                                model.getQueryInput().addConnectedElementName(connectedStreamName);
                             }
-                            model.setFrom(streams);
                         }
                         else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.appData.getJoinQuery(targetId);
@@ -383,7 +388,17 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                         else if (sourceElement.hasClass(constants.PATTERN)) {
                             model = self.appData.getPatternQuery(sourceId);
-                            model.setInsertInto(targetId);
+                            var connectedStreamName = self.appData.getStream(targetId).getName();
+                            if (model.getQueryOutput() === '') {
+                                var queryOutputOptions = {};
+                                _.set(queryOutputOptions, 'type', '');
+                                _.set(queryOutputOptions, 'output', '');
+                                _.set(queryOutputOptions, 'target', connectedStreamName);
+                                var patternQueryOutputObject = new QueryOutput(queryOutputOptions);
+                                model.setQueryOutput(patternQueryOutputObject);
+                            } else {
+                                model.getQueryOutput().setTarget(connectedStreamName);
+                            }
                         }
                         else if (sourceElement.hasClass(constants.JOIN)) {
                             model = self.appData.getJoinQuery(sourceId);
@@ -459,12 +474,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                         else if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.appData.getPatternQuery(targetId);
-                            if (model !== undefined) {
-                                streams = model.getFrom();
-                                var removedStream = streams.indexOf(sourceId);
-                                streams.splice(removedStream, 1);
-                                model.setFrom(streams);
-                            }
+                            var disconnectedStreamName = self.appData.getStream(sourceId).getName();
+                            model.getQueryInput().removeConnectedElementName(disconnectedStreamName);
                         }
                         else if (targetElement.hasClass(constants.PARTITION)) {
                             model = self.appData.getPartition(targetId);
@@ -567,15 +578,10 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             }
                         }
                         else if (sourceElement.hasClass(constants.PATTERN)) {
-                            if (targetElement.hasClass(constants.STREAM)) {
-                                model = self.appData.getPatternQuery(sourceId);
-                                if (model !== undefined) {
-                                    model.setInsertInto('');
-                                }
-                            }
+                            model = self.appData.getPatternQuery(sourceId);
+                            model.getQueryOutput().setTarget('');
                         }
                     }
-
                 });
             }
 
@@ -676,12 +682,20 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 self.handleAggregation(mouseTop, mouseLeft, true, aggregationId, aggregationName);
             });
 
+            _.forEach(self.appData.patternQueryList, function(patternQuery){
+
+                var patternQueryId = patternQuery.getId();
+                var patternQueryName = "Pattern Query";
+                var mouseTop = parseInt(patternQueryId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = parseInt(patternQueryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryId, patternQueryName);
+            });
+
             _.forEach(self.appData.queryList, function(query){
                 var queryId = query.getId();
-                var queryName = query.getName();
                 var mouseTop = parseInt(queryId)*100  - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = parseInt(queryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
-                self.handlePassThroughQuery(mouseTop, mouseLeft, true, queryId, queryName);
+                self.handlePassThroughQuery(mouseTop, mouseLeft, true, queryId);
                 //TODO: correct query types saving style. ex: passthrough should be saved in passthroughList
             });
             _.forEach(self.appData.edgeList, function(edge){
@@ -826,7 +840,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.newAgentId;
                 // The container and the toolbox are disabled to prevent the user from dropping any elements before
-                // initializing a Table Element
+                // initializing a window Element
                 self.canvas.addClass("disabledbutton");
                 $("#tool-palette-container").addClass("disabledbutton");
                 $("#output-console-activate-button").addClass("disabledbutton");
@@ -909,8 +923,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
         };
 
 
-        DesignGrid.prototype.handlePassThroughQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, queryId,
-                                                                queryName) {
+        DesignGrid.prototype.handlePassThroughQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, queryId) {
             var self = this;
             var elementId;
             var passThroughQueryName;
@@ -923,11 +936,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 } else {
                     console.log("queryId parameter is undefined");
                 }
-                if(queryName !== undefined) {
-                    passThroughQueryName = queryName;
-                } else {
-                    console.log("queryName parameter is undefined");
-                }
+                passThroughQueryName = "Empty Query";
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
@@ -978,15 +987,28 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        DesignGrid.prototype.handlePatternQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+        DesignGrid.prototype.handlePatternQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, patternQueryId,
+                                                            patternQueryName) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('stquerydrop');
-            var droptype = "stquerydrop";
-            // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Pattern Query",
-                isCodeToDesignMode);
-            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.newAgentId;
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(patternQueryId !== undefined) {
+                    elementId = patternQueryId;
+                } else {
+                    console.log("patternQueryId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            // increment the Element ID for the next dropped Element
             self.generateNextId();
+            var newAgent = $('<div>').attr('id', elementId).addClass('patternQueryDrop');
+            self.canvas.append(newAgent);
+            // Drop the Table element. Inside this a it generates the table definition form.
+            self.dropElements.dropPatternQuery(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, patternQueryName);
+            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
