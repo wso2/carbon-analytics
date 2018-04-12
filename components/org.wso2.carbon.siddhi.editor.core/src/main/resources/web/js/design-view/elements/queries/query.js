@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(
-    function () {
+define(['require', 'elementArray'],
+    function (require, ElementArray) {
 
         /**
          * @class Query
@@ -29,97 +29,91 @@ define(
             /*
              Data storing structure as follows.
 
-                "id": '',
-                "name": '',
-                "from": '',
-                "insert-into": '',
-                "filter": '',
-                "post-window-query": '',
-                "window": '',
-                "output-type": '',
-                "projection": []
+                id*: '',
+                queryInput*: {Query Input JSON},
+                select*: {Query Select JSON},
+                groupBy: ['value1',...],
+                having: '',
+                outputRateLimit: ''
+                queryOutput*: {Query Output JSON},
+                annotationList: {Annotation JSON Array}
             */
             this.id = options.id;
-            this.name = options.name;
-            this.from = options.from;
-            this.insertInto = options.insertInto;
-            this.filter = options.filter;
-            this.postWindowFilter = options.postWindowFilter;
-            this.window = options.window;
-            this.outputType = options.outputType;
-            this.projection = options.projection;
+            this.queryInput = options.queryInput;
+            this.select = options.select;
+            this.groupBy = options.groupBy;
+            this.having = options.having;
+            this.outputRateLimit = options.outputRateLimit;
+            this.queryOutput = options.queryOutput;
+            this.annotationList =  new ElementArray();
+        };
+
+        Query.prototype.addAnnotation = function (annotation) {
+            this.annotationList.push(annotation);
         };
 
         Query.prototype.getId = function () {
             return this.id;
         };
 
-        Query.prototype.getName = function () {
-            return this.name;
+        Query.prototype.getQueryInput = function () {
+            return this.queryInput;
         };
 
-        Query.prototype.getFrom = function () {
-            return this.from;
+        Query.prototype.getSelect = function () {
+            return this.select;
         };
 
-        Query.prototype.getInsertInto = function () {
-            return this.insertInto;
+        Query.prototype.getGroupBy = function () {
+            return this.groupBy;
         };
 
-        Query.prototype.getFilter = function () {
-            return this.filter;
+        Query.prototype.getHaving = function () {
+            return this.having;
         };
 
-        Query.prototype.getPostWindowFilter = function () {
-            return this.postWindowFilter;
+        Query.prototype.getOutputRateLimit = function () {
+            return this.outputRateLimit;
         };
 
-        Query.prototype.getWindow = function () {
-            return this.window;
+        Query.prototype.getQueryOutput = function () {
+            return this.queryOutput;
         };
 
-        Query.prototype.getOutputType = function () {
-            return this.outputType;
-        };
-
-        Query.prototype.getProjection = function () {
-            return this.projection;
+        Query.prototype.getAnnotationList = function () {
+            return this.annotationList;
         };
 
         Query.prototype.setId = function (id) {
             this.id = id;
         };
 
-        Query.prototype.setName = function (name) {
-            this.name = name;
+        Query.prototype.setQueryInput = function (queryInput) {
+            this.queryInput = queryInput;
         };
 
-        Query.prototype.setFrom = function (from) {
-            this.from = from;
+        Query.prototype.setSelect = function (select) {
+            this.select = select;
         };
 
-        Query.prototype.setInsertInto = function (insertInto) {
-            this.insertInto = insertInto;
+        Query.prototype.setGroupBy = function (groupBy) {
+            this.groupBy = groupBy;
         };
 
-        Query.prototype.setFilter = function (filter) {
-            this.filter = filter;
+        Query.prototype.setHaving = function (having) {
+            this.having = having;
         };
 
-        Query.prototype.setPostWindowFilter = function (postWindowFilter) {
-            this.postWindowFilter = postWindowFilter;
+        Query.prototype.setOutputRateLimit = function (outputRateLimit) {
+            this.outputRateLimit = outputRateLimit;
         };
 
-        Query.prototype.setWindow = function (window) {
-            this.window = window;
+        Query.prototype.setQueryOutput = function (queryOutput) {
+            this.queryOutput = queryOutput;
         };
 
-        Query.prototype.setOutputType = function (outputType) {
-            this.outputType = outputType;
-        };
-
-        Query.prototype.setProjection = function (projection) {
-            this.projection = projection;
+        Query.prototype.setAnnotationList = function (annotationList) {
+            this.annotationList = annotationList;
         };
 
         return Query;
