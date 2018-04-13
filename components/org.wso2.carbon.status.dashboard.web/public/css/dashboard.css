@@ -185,18 +185,20 @@ body {
     stroke: #bbb;
     fill: #333;
     stroke-width: 2px;
-    height: 30px;
+    height: 60px;
 }
 
 .node-content {height: 50px;
     line-height: 30px;
+    /*width: 400px;*/
 }
 
 .indicator {
-    height: 30px;
+    height: 58px;
     width: 15px;
     float: left;
-    margin: 1px 10px 1px 1px;
+    /*margin: 1px 40px 1px 1px;*/
+    margin: 1px 20px 1px 1px;
     background-color: blue
 }
 
@@ -206,6 +208,14 @@ body {
     margin-right: 10px;
     font-weight: 500;
     display: inline-block;
+}
+
+.hostPort {
+    font-size: 1em;
+    color: #696969;
+    /*margin-right: -300px;*/
+    font-weight: 400;
+    display: block;
 }
 
 .nodes .label {
@@ -220,11 +230,9 @@ body {
 }
 
 .topic-indicator {
-    height: 30px;
+    height: 60px;
     width: 15px;
     float: left;
-    margin: 1px 10px 1px 1px;
+    margin: 1px 40px 1px 1px;
     background-color: red
 }
-
-

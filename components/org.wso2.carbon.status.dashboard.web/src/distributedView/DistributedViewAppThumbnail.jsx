@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -103,7 +103,7 @@ export default class DistributedViewAppThumbnail extends React.Component {
                                 <h1 className="deployed-apps-details">{this.props.distributedApp.numberOfGroups}</h1>
                             </div>
                             <ToolTip id='groups' aria-haspopup='true' role='example'>
-                                <p>Indicates no of groups inside parent siddhi application</p>
+                                <p>Indicates number of groups in the parent siddhi application</p>
                             </ToolTip>
 
                         </GridTile>
@@ -116,10 +116,10 @@ export default class DistributedViewAppThumbnail extends React.Component {
                                 </h1>
                             </div>
                             <ToolTip id='deployedChildApps' aria-haspopup='true' role='example'>
-                            <p>Indicates deployed child apps count</p>
+                            <p>Indicates number of deployed child apps</p>
                             </ToolTip>
                             <ToolTip id='undeployedchildapps' aria-haspopup='true' role='example'>
-                                <p>Indicates un-deployed child apps count</p>
+                                <p>Indicates number of un-deployed child apps</p>
                             </ToolTip>
                         </GridTile>
                         <GridTile title="Worker Nodes" titlePosition="bottom" titleStyle={{fontSize: 10}} style={{marginLeft: '30%'}}>
@@ -131,11 +131,11 @@ export default class DistributedViewAppThumbnail extends React.Component {
                                 </h1>
                             </div>
                             <ToolTip id='usedWorkerNodes' aria-haspopup='true' role='example'>
-                                <p>Indicates how many worker nodes used for the <br/> particular parent siddhi
+                                <p>Indicates number of worker nodes used in the <br/> particular parent siddhi
                                     applications deployment</p>
                             </ToolTip>
                             <ToolTip id='totalWorkerNodes' aria-haspopup='true' role='example'>
-                                <p>Indicates total number of worker nodes inside resource cluster</p>
+                                <p>Indicates total number of worker nodes in the resource cluster</p>
                             </ToolTip>
                         </GridTile>
 
@@ -172,10 +172,6 @@ export default class DistributedViewAppThumbnail extends React.Component {
             color = 'red';
             appStatus = 'Not-Deployed'
         }
-
-
-        // lastUpdate = "N/A";
-        // color = 'red';
 
         return [gridTiles, color, appStatus];
     }

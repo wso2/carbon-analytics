@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -20,15 +20,12 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import dagre from 'dagre';
-import d3 from 'd3'
-import dagreD3 from 'dagre-d3'
+
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import Header from "../common/Header";
 import ParentAppTable from "./ParentAppTable";
 //Material UI
-import {GridList, GridTile} from "material-ui/GridList";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {
     Card,
@@ -37,7 +34,6 @@ import {
     Dialog,
     Divider,
     FlatButton,
-    Toggle,
     Snackbar, RaisedButton
 } from "material-ui";
 //import DashboardUtils from "../utils/DashboardUtils";
@@ -45,7 +41,6 @@ import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import {Redirect} from 'react-router-dom';
 import Error403 from "../error-pages/Error403";
-import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import {HttpStatus} from "../utils/Constants";
 import KafkaFlow from "./KafkaFlow";
 
@@ -209,7 +204,6 @@ export default class AppView extends React.Component {
                     });
                 }
             }
-            // console.log("ClusterList"+this.state.clustersList.toString());
         });
     }
 
@@ -301,7 +295,7 @@ export default class AppView extends React.Component {
                 </div>
                 <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '100%', backgroundColor: "#222222"}}>
                     <Card style={{backgroundColor: "#282828", height: '100%'}}>
-                        <CardHeader title="Kakfa Detail Diagram"
+                        <CardHeader title="Distributed Siddhi App Deployment"
                                     titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
                         />
 

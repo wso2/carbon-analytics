@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -18,30 +18,15 @@
  */
 
 import React from "react";
-import {Link} from "react-router-dom";
-//App Components
-import DashboardUtils from "../utils/DashboardUtils";
-import VizG from "react-vizgrammar";
+
 //Material UI
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui/Table";
 import Pagination from "material-ui-pagination";
 import Circle from "material-ui/svg-icons/av/fiber-manual-record";
 import {TableFooter} from "material-ui/Table/index";
-import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import {HttpStatus} from "../utils/Constants";
 
 const dataConstants = {PAGE_LENGTH: 5};
-const metadata = {names: ['Time', 'value'], types: ['linear', 'linear']};
-const sparkLineConfig = {
-    x: 'Time',
-    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:0.1}],
-    width: 100,
-    height: 40,
-    strokeWidth:1,
-    fillOpacity:0.1,
-    append: false,
-};
 
 let currentPage = 1;
 
@@ -66,8 +51,6 @@ export default class ParentAppTable  extends React.Component {
         console.log(this.state.workerId,this.state.appName);
         StatusDashboardAPIS.getChildAppDetails(this.state.workerId,this.state.appName)
             .then((response) =>{
-                   // console.log("appname is"+this.state.appName);
-                    console.log("ressy"+response.data);
                     that.loadData(currentPage,response.data)
             });
     }
@@ -98,14 +81,17 @@ export default class ParentAppTable  extends React.Component {
             appsList: response,
             totalSize: response.length
         });
-        {console.log("appLisr"+this.state.appsList)}
-
-
     }
 
     renderRow(row) {
         let isInactive = (row.appStatus === "waiting");
+       // let app = entry.siddhiApp.replace(/\'|\"/g,'').replace(/>/g,'\>');
+        let appName=row.groupName.replace(row.appName,"");
+        console.log("appi"+appName);
+
+
         return (
+
             <TableRow >
                 <TableRowColumn>
                     <div style={{height: 24, color: 'white'}}>
@@ -139,15 +125,12 @@ export default class ParentAppTable  extends React.Component {
                         </div>
 
                     ) : (
-
                         <div style={{height: 24, color: 'white'}}>
                             {row.host+":"+row.port}
                         </div>
 
                     )}
-
                     </TableRowColumn>
-
             </TableRow>
         );
     }
@@ -165,7 +148,7 @@ export default class ParentAppTable  extends React.Component {
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>App Status</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Deployed Worker Node</h3>
+                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Worker Node</h3>
                             </TableHeaderColumn>
                         </TableRow>
                     </TableHeader>

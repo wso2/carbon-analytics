@@ -1,7 +1,25 @@
+/*
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+
 import React from 'react';
 import * as d3 from "d3";
 import * as dagreD3 from 'dagre-d3';
-import {Link} from "react-router-dom";
 
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import {HttpStatus} from "../utils/Constants";
@@ -32,18 +50,37 @@ export default class KafkaFlow extends React.Component {
                     g.graph().rankDir = "LR";
 
                     this.state.kafkaData.map((entry) => {
-                        var html;
-                        var sourceHtml;
-                        var sinkHtml;
+                        let html;
+                        let sourceHtml;
+                        let sinkHtml;
 
-                        var app = entry.siddhiApp.replace(/\'|\"/g,'').replace(/>/g,'\>');
+                        let app = entry.siddhiApp.replace(/\'|\"/g,'').replace(/>/g,'\>');
 
-                        var wordLength;
+                        let wordLength;
+                        let isInactive = (entry.deployedHost === undefined && entry.deployedPort === undefined);
+                        {isInactive ? (
 
-                          html=  "<div id='container' class='node-content' title='"+ app +"'>"
-                            +"<span class='indicator '></span>"
-                            + "<span id='myTextInput' class='nodeLabel'>" + entry.appName + "</span>"
-                            + "</div>";
+                            html=  "<div id='container' class='node-content' title='"+ app +"'>"
+                                +"<span class='indicator '></span>"
+                                + "<span id='myTextInput' class='nodeLabel'>" + entry.appName  + "</span>"
+
+                                +"<span id='hostPort' class='hostPort' title='Deployed Node'>"+"Un-Deployed Node"+"</span> "
+
+                                + "</div>"
+
+                        ) : (
+
+                            html=  "<div id='container' class='node-content' title='"+ app +"'>"
+                                +"<span class='indicator '></span>"
+                                + "<span id='myTextInput' class='nodeLabel'>" + entry.appName  + "</span>"
+
+                                +"<span id='hostPort' class='hostPort' title='Deployed Node'>"+ entry.deployedHost+" : "+entry.deployedPort+"</span> "
+
+                                + "</div>"
+
+                        )}
+
+
 
                         g.setNode(entry.appName, {labelType: "html", label: html,paddingBottom:0,paddingTop:0,paddingLeft:0,paddingRight:130,rx: 0, ry: 0});
                         wordLength = entry.appName.length;
@@ -53,11 +90,11 @@ export default class KafkaFlow extends React.Component {
                             sourceHtml =
                                 "<div id='container' class='node-content'>"
                                 +"<span class='topic-indicator '></span>"
-                                + "<span id='myTextInput' class='nodeLabel'>" + source + "</span>"
+                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + source + "</span>"
                                 + "</div>";
 
                             console.log("sources" + source);
-                             g.setNode(source, {labelType: "html", label: sourceHtml,paddingBottom:0,paddingTop:0,paddingLeft:0,paddingRight:150,rx: 0, ry: 0},{labelStyle:"width:300"});
+                            g.setNode(source, {labelType: "html", label: sourceHtml,paddingBottom:0,paddingTop:0,paddingLeft:0,paddingRight:150,rx: 0, ry: 0},{labelStyle:"width:300"});
 
                         });
 
@@ -105,17 +142,12 @@ export default class KafkaFlow extends React.Component {
                         });
                         svg.call(zoom);
 
-                       svg.attr("height", g.graph().height + 40).attr('width', g.graph().width + 40);
+                        svg.attr("height", g.graph().height + 40).attr('width', g.graph().width + 40);
                         // Center the graph
-                        let initialScale = 0.85;
+                        let initialScale = 0.95;
                         svg.call(zoom.transform, d3.zoomIdentity.translate((svg.attr("width") - g.graph().width * initialScale) / 2, 10).scale(initialScale));
                         svg.classed("nodeTree", true);
                         render(inner, g);
-
-                        // // Center the graph
-                        // let initialScale = 0.95;
-                        // svg.call(zoom.transform, d3.zoomIdentity.translate((svg.attr("width") - g.graph().width * initialScale) / 2, 10).scale(initialScale));
-                        // svg.classed("nodeTree", true);
                     });
                 }
             }).catch((error) => {
@@ -142,7 +174,6 @@ export default class KafkaFlow extends React.Component {
         });
     }
 
-
     render() {
         return (
             <svg
@@ -155,7 +186,6 @@ export default class KafkaFlow extends React.Component {
                     display: 'inline-block',
                     position: 'relative',
                     width: '100%',
-                    // paddingRight: '10%',
                     verticalAlign: 'middle',
                     overflow: 'scroll'
                 }}
@@ -169,7 +199,7 @@ export default class KafkaFlow extends React.Component {
                     this.nodeTreeGroup = r;
                 }}
                    style={{
-                      // display: 'inline-block',
+                       // display: 'inline-block',
                        position: 'relative',
                        top: '10',
                        left: '0'

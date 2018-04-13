@@ -28,7 +28,7 @@ import {
     TableRowColumn,
     Toggle
 } from "material-ui";
-import ScrollableAnchor from 'react-scrollable-anchor'
+
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -128,7 +128,6 @@ export default class WorkerOverview extends React.Component {
         this.setState({currentTime: new Date().getTime()});
         StatusDashboardOverViewAPI.getWorkersList()
             .then((response) => {
-                {console.log("worker api"+response.data)}
                 this.setState({
                     clustersList: response.data,
                     isApiCalled: true,
@@ -162,7 +161,6 @@ export default class WorkerOverview extends React.Component {
         StatusDashboardOverViewAPI.getManagerList()
             .then((response) =>{
                 if(response.status===HttpStatus.OK){
-                    console.log("list"+response.data);
                     this.setState({
                         managerClusterList: response.data,
                         isApiCalled: true,
@@ -387,7 +385,6 @@ export default class WorkerOverview extends React.Component {
                 );
             }
         }else if(this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList)) && (WorkerOverview.hasNodes(this.state.managerClusterList)))){
-            {console.log("we have both")}
             return(
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
@@ -407,7 +404,6 @@ export default class WorkerOverview extends React.Component {
                     {Object.keys(workersList).map((id, workerList) => {
 
                         {
-                            console.log("id is" + id)
                         }
                         return (
                             <div>
@@ -451,8 +447,6 @@ export default class WorkerOverview extends React.Component {
                 </div>
             );
         } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList))) && (!WorkerOverview.hasNodes(this.state.managerClusterList))) {
-            console.log("we have only workers");
-            //console.log("manager list"+this.state.managerClusterList);
             return (
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
@@ -472,7 +466,7 @@ export default class WorkerOverview extends React.Component {
 
                     {Object.keys(workersList).map((id, workerList) => {
                         {
-                            console.log("id is" + id)
+
                         }
                         return (
                             <div>
@@ -496,7 +490,6 @@ export default class WorkerOverview extends React.Component {
             );
 
         }else if(this.state.isApiCalled && (WorkerOverview.hasNodes(this.state.managerClusterList)) && (!WorkerOverview.hasNodes(this.state.clustersList))) {
-            {console.log("we have only manager")}
             return (
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
@@ -516,7 +509,6 @@ export default class WorkerOverview extends React.Component {
 
                     {Object.keys(managerList).map((id, workerList) => {
                         {
-                            console.log("id is" + id)
                         }
                         return (
                             <div>

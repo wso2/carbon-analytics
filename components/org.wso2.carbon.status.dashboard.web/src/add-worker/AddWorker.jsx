@@ -125,53 +125,60 @@ export default class AddWorker extends React.Component {
         let that = this;
         let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
         console.log(this.refs.host.input.value, this.refs.port.input.value);
-        StatusDashboardAPIS.getRuntimeEnv(nodeID)
-            .then((response) => {
-                if (response.status = HttpStatus.OK) {
-                    console.log(response.data);
-                    if (response.data === "manager") {
-                        console.log("Hi am manager");
-                        that._addManager(nodeID);
-                    } else if (response.data === "worker") {
-                        console.log("Hi am worker");
-                        that._addWorker(nodeID);
-                    } else {
-                        this.handlePopupOpen();
-                        console.log("am here");
-                    }
-                } else {
 
-                    that._showError("Error while connecting with the node" + nodeID);
+
+        if(this.refs.port.input.value >0 && this.refs.port.input.value <= 65535) {
+
+            StatusDashboardAPIS.getRuntimeEnv(nodeID)
+                .then((response) => {
+                    if (response.status = HttpStatus.OK) {
+                        console.log(response.data);
+                        if (response.data === "manager") {
+                            console.log("Hi am manager");
+                            that._addManager(nodeID);
+                        } else if (response.data === "worker") {
+                            console.log("Hi am worker");
+                            that._addWorker(nodeID);
+                        } else {
+                            this.handlePopupOpen();
+                            console.log("am here");
+                        }
+                    } else {
+
+                        that._showError("Error while connecting with the node" + nodeID);
+                    }
+                }).catch((error) => {
+                if (error.response != null) {
+                    if (error.response.status === 401) {
+                        this.setState({
+                            isApiCalled: true,
+                            sessionInvalid: true,
+                            statusMessage: "Authentication fail. Please login again."
+                        })
+                    } else if (error.response.status === 403) {
+                        this.setState({
+                            isApiCalled: true,
+                            hasPermission: false,
+                            statusMessage: "User Have No Permission to view this"
+                        })
+                    } else if (error.response.status === 500) {
+                        this.setState({
+                            isApiCalled: true,
+                            hasPermission: false,
+                            statusMessage: "Unreachable node. Try again !"
+                        })
+                    } else {
+                        this.setState({
+                            isApiCalled: true,
+                            statusMessage: "Unknown error occurred!"
+                        })
+                    }
                 }
-            }).catch((error) => {
-            if (error.response != null) {
-                if (error.response.status === 401) {
-                    this.setState({
-                        isApiCalled: true,
-                        sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again."
-                    })
-                } else if (error.response.status === 403) {
-                    this.setState({
-                        isApiCalled: true,
-                        hasPermission: false,
-                        statusMessage: "User Have No Permission to view this"
-                    })
-                } else if (error.response.status === 500) {
-                    this.setState({
-                        isApiCalled: true,
-                        hasPermission: false,
-                        statusMessage: "Unreachable node. Try again !"
-                    })
-                } else {
-                    this.setState({
-                        isApiCalled: true,
-                        statusMessage: "Unknown error occurred!"
-                    })
-                }
-            }
-            that._showError(that.state.statusMessage);
-        });
+                that._showError(that.state.statusMessage);
+            });
+        }else {
+            that._showError("In valid port number. Try again ");
+        }
     }
 
     /**
