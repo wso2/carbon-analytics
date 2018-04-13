@@ -279,7 +279,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 SiddhiAppDetails appHolder = new SiddhiAppDetails();
                 appHolder.setParentAppName(siddhiAppHolder.getParentAppName());
                 appHolder.setAppName(siddhiAppHolder.getAppName());
-                appHolder.setGroupName(siddhiAppHolder.getGroupName());
+                String groupName = siddhiAppHolder.getGroupName().replace(
+                        siddhiAppHolder.getParentAppName() + "-", " ");
+                appHolder.setGroupName(groupName);
                 appHolder.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
                 appHolder.setAppStatus(Constants.WAITING);
                 appList.add(appHolder);
@@ -292,7 +294,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 SiddhiAppDetails appHolder = new SiddhiAppDetails();
                 appHolder.setParentAppName(siddhiAppHolder.getParentAppName());
                 appHolder.setAppName(siddhiAppHolder.getAppName());
-                appHolder.setGroupName(siddhiAppHolder.getGroupName());
+                String groupName = siddhiAppHolder.getGroupName().replace(
+                        siddhiAppHolder.getParentAppName() + "-", " ");
+                appHolder.setGroupName(groupName);
                 appHolder.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
                 appHolder.setId(siddhiAppHolder.getDeployedNode().getId());
                 appHolder.setState(siddhiAppHolder.getDeployedNode().getState());
@@ -317,12 +321,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 .getSiddhiAppHoldersMap();
         Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
                 .getAppsWaitingForDeploy();
-        Map<String, List<SiddhiAppHolder>> totalApps = new HashMap<>();
-        totalApps.putAll(deployedSiddhiAppHolder);
-        totalApps.putAll(waitingToDeploy);
 
-        if (totalApps.containsKey(appName)) {
-            List<SiddhiAppHolder> holder = totalApps.get(appName);
+        if (waitingToDeploy.containsKey(appName)) {
+            List<SiddhiAppHolder> holder = waitingToDeploy.get(appName);
             List<KafkaTransportDetails> kafkaDetails = new ArrayList<>();
             // Map<String, KafkaTransportDetails> kafkaDetails = new HashMap<>();
 
@@ -364,10 +365,59 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             }));
             return Response.ok().entity(kafkaDetails).build();
 
+        } else if (deployedSiddhiAppHolder.containsKey(appName)) {
+            List<SiddhiAppHolder> holder = deployedSiddhiAppHolder.get(appName);
+            List<KafkaTransportDetails> kafkaDetails = new ArrayList<>();
+            holder.forEach((siddhiAppHolder -> {
+                Map<String, String> kafkaTransportDetails = new HashMap<>();
+                KafkaTransportDetails kafkaTransport = new KafkaTransportDetails();
+                List<String> sourceList = new ArrayList<>();
+                List<String> sinkList = new ArrayList<>();
+                kafkaTransport.setAppName(siddhiAppHolder.getAppName());
+                kafkaTransport.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
+
+                if (deployedSiddhiAppHolder.containsKey(appName)) {
+                    kafkaTransport.setDeployedHost(siddhiAppHolder.getDeployedNode().getHttpInterface().getHost());
+                    kafkaTransport.setDeployedPort(Integer.toString(siddhiAppHolder.getDeployedNode()
+                            .getHttpInterface().getPort()));
+                }
+
+                //KafkaTransportDetails.put("appName", siddhiAppHolder.getAppName());
+                SiddhiAppDetails appHolder = new SiddhiAppDetails();
+                appHolder.setAppName(siddhiAppHolder.getAppName());
+                SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppHolder.getSiddhiApp());
+                for (Map.Entry<String, StreamDefinition> sourceStream : siddhiApp.getStreamDefinitionMap().entrySet()) {
+                    for (Annotation annotation : sourceStream.getValue().getAnnotations()) {
+                        if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SOURCE)) {
+                            for (Element sourceElement : annotation.getElements()) {
+                                if (sourceElement.getKey().equalsIgnoreCase(Constants.KAFKA_SOURCE_TOPIC_LIST)) {
+                                    sourceList.add(sourceElement.getValue());
+                                    kafkaTransportDetails.put(annotation.getName(), sourceElement.getValue());
+                                }
+                            }
+
+                        } else if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SINK)) {
+                            for (Element sinkElement : annotation.getElements()) {
+                                if (sinkElement.getKey().equalsIgnoreCase(Constants.KAFKA_SINK_TOPIC)) {
+                                    sinkList.add(sinkElement.getValue());
+                                    kafkaTransportDetails.put(annotation.getName(), sinkElement.getValue());
+                                }
+                            }
+                        }
+                    }
+                }
+                kafkaTransport.setSourceList(sourceList);
+                kafkaTransport.setSinkList(sinkList);
+                kafkaDetails.add(kafkaTransport);
+            }));
+            return Response.ok().entity(kafkaDetails).build();
+
+
         } else {
             return Response.status(Response.Status.NO_CONTENT).entity(
                     new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no siddhi app  in the manager "
                             + "node")).build();
+
         }
 
     }

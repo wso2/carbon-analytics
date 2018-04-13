@@ -8,6 +8,8 @@ import java.util.List;
 public class KafkaTransportDetails {
     private String appName;
     private String siddhiApp;
+    private String deployedHost;
+    private String deployedPort;
     private List<String> sourceList;
     private List<String> sinkList;
 
@@ -41,5 +43,21 @@ public class KafkaTransportDetails {
 
     public void setSinkList(List<String> sinkList) {
         this.sinkList = sinkList;
+    }
+
+    public String getDeployedHost() {
+        return deployedHost;
+    }
+
+    public void setDeployedHost(String deployedHost) {
+        this.deployedHost = deployedHost;
+    }
+
+    public String getDeployedPort() {
+        return deployedPort;
+    }
+
+    public void setDeployedPort(String deployedPort) {
+        this.deployedPort = deployedPort;
     }
 }
