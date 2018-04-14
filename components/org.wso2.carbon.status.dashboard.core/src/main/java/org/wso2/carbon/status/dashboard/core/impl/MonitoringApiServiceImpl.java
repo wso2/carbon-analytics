@@ -23,31 +23,14 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.*;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
 import org.wso2.carbon.status.dashboard.core.api.MonitoringApiService;
 import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkerServiceFactory;
-import org.wso2.carbon.status.dashboard.core.bean.ManagerClusterInfo;
-import org.wso2.carbon.status.dashboard.core.bean.ManagerMetricsSnapshot;
-import org.wso2.carbon.status.dashboard.core.bean.ParentSiddhiApp;
-import org.wso2.carbon.status.dashboard.core.bean.ParentSummaryDetails;
-import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppMetricsHistory;
-import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppStatus;
-import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppsData;
-import org.wso2.carbon.status.dashboard.core.bean.WorkerConfigurationDetails;
-import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
-import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsHistory;
-import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsSnapshot;
-import org.wso2.carbon.status.dashboard.core.bean.WorkerMoreMetricsHistory;
-import org.wso2.carbon.status.dashboard.core.bean.WorkerResponce;
+import org.wso2.carbon.status.dashboard.core.bean.*;
 import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
@@ -58,28 +41,18 @@ import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 import org.wso2.carbon.status.dashboard.core.internal.WorkerStateHolder;
 import org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent;
 import org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent;
-import org.wso2.carbon.status.dashboard.core.model.DashboardConfig;
-import org.wso2.carbon.status.dashboard.core.model.DistributedServerDetails;
-import org.wso2.carbon.status.dashboard.core.model.ManagerOverView;
-import org.wso2.carbon.status.dashboard.core.model.ServerDetails;
-import org.wso2.carbon.status.dashboard.core.model.ServerHADetails;
-import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
-import org.wso2.carbon.status.dashboard.core.model.Worker;
-import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
+import org.wso2.carbon.status.dashboard.core.model.*;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.PROTOCOL;
-import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_COMMITTED;
-import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_INIT;
+import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.*;
 
 /**
  * This API implement for handling the stream processor worker hadling such asadding , deleating, editing, fletching
@@ -1924,7 +1897,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     feign.Response haDetails = WorkerServiceFactory.getWorkerHttpsClient
                                             (PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getManagerDetails();
                                     String haResponseBody = haDetails.body().toString();
-
                                     ManagerClusterInfo clusterInfo = gson.fromJson(haResponseBody, ManagerClusterInfo.class);
                                     managerOverView.setServerDetails(serverDetails);
                                     managerOverView.setClusterInfo(clusterInfo);
@@ -2030,11 +2002,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             if (hostPort.length == 2) {
                 String workerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
                 try {
-                    feign.Response siddhiAppResponce = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
-                                    workerURIBody,
-                            this.getUsername(),
-                            this.getPassword())
-                            .getRunTime();
+                    feign.Response siddhiAppResponce = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURIBody,
+                            this.getUsername(), this.getPassword()).getRunTime();
                     String responseAppBody = siddhiAppResponce.toString();
                     if (siddhiAppResponce.status() == 200) {
                         logger.info(siddhiAppResponce.body().toString());
@@ -2135,7 +2104,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     } else {
                         return Response.status(Response.Status.NOT_FOUND).entity(responseBody).build();
                     }
-
                 } catch (feign.RetryableException ex) {
                     String jsonString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
                             .SERVER_CONNECTION_ERROR,
@@ -2182,7 +2150,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
                             for (ParentSiddhiApp siddhiapp : totalApps) {
                                 String parentAppName = siddhiapp.getParentAppName();
-
                                 if (!(appSummary.containsKey(parentAppName))) {
                                     appSummary.put(siddhiapp.getParentAppName(), new ParentSummaryDetails());
                                 }

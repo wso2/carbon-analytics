@@ -34,28 +34,16 @@ import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
 import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS_PRIMARYKEY;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SQL_WHERE;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.String_TEMPLATE;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.TUPLES_SEPARATOR;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.WHITESPACE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.*;
 
 
 /**
- * This class represents key database operations related to worker data.
+ * This class represents key database operations related to node data.
  */
 public class StatusDashboardWorkerDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardWorkerDBHandler.class);
@@ -309,18 +297,16 @@ public class StatusDashboardWorkerDBHandler {
         }
     }
 
-
-    //TODO: NEWLY ADDED
     /**
      * Method which is used to insert the manager configuration details to database.
      *
-     * @param workerConfigurationDetails workerConfiguration object
+     * @param managerConfigurationDetails managerConfiguration object
      * @return isSuccess
      */
-    public boolean insertManagerConfiguration(WorkerConfigurationDetails workerConfigurationDetails) throws
+    public boolean insertManagerConfiguration(WorkerConfigurationDetails managerConfigurationDetails) throws
                                                                                                RDBMSTableException {
         String columnNames = WorkerConfigurationDetails.getManagerColumnLabeles();
-        Object[] records = workerConfigurationDetails.toArray();
+        Object[] records = managerConfigurationDetails.toArray();
         try {
             return this.insert(columnNames, records, MANAGER_CONFIG_TABLE);
         } catch (RDBMSTableException e) {
@@ -331,7 +317,7 @@ public class StatusDashboardWorkerDBHandler {
 
 
     /**
-     * Insert worker data worker db.
+     * Insert manager data manager db.
      *
      * @param columnNames column labels needed to get
      * @param records     objects needed to insert.
@@ -601,7 +587,6 @@ public class StatusDashboardWorkerDBHandler {
                                                                               attributesTypes.get(Constants.MANAGERID),
                                                                               statusDashboardQueryManager));
                 workerConfigurationDetails.add(row);
-
             }
             stmt.close();
             rs.close();

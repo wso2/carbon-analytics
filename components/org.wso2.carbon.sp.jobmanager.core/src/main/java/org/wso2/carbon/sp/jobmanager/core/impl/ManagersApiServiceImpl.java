@@ -24,12 +24,7 @@ package org.wso2.carbon.sp.jobmanager.core.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.*;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
@@ -56,11 +51,11 @@ import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.Response;
 
 /**
  * Distributed Siddhi Service Implementataion Class
@@ -313,7 +308,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     }
 
     /**
-     * TODO: GET KAFKA DETAILS
+     * This method returns the kafka topic details of each child app.
+     * @param appName
+     * @return
      */
 
     public Response getKafkaDetails(String appName) {
@@ -325,8 +322,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         if (waitingToDeploy.containsKey(appName)) {
             List<SiddhiAppHolder> holder = waitingToDeploy.get(appName);
             List<KafkaTransportDetails> kafkaDetails = new ArrayList<>();
-            // Map<String, KafkaTransportDetails> kafkaDetails = new HashMap<>();
-
             holder.forEach((siddhiAppHolder -> {
                 Map<String, String> kafkaTransportDetails = new HashMap<>();
                 KafkaTransportDetails kafkaTransport = new KafkaTransportDetails();
@@ -335,7 +330,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 kafkaTransport.setAppName(siddhiAppHolder.getAppName());
                 kafkaTransport.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
 
-                //KafkaTransportDetails.put("appName", siddhiAppHolder.getAppName());
                 SiddhiAppDetails appHolder = new SiddhiAppDetails();
                 appHolder.setAppName(siddhiAppHolder.getAppName());
                 SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppHolder.getSiddhiApp());
@@ -348,7 +342,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                                     kafkaTransportDetails.put(annotation.getName(), sourceElement.getValue());
                                 }
                             }
-
                         } else if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SINK)) {
                             for (Element sinkElement : annotation.getElements()) {
                                 if (sinkElement.getKey().equalsIgnoreCase(Constants.KAFKA_SINK_TOPIC)) {
@@ -364,7 +357,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 kafkaDetails.add(kafkaTransport);
             }));
             return Response.ok().entity(kafkaDetails).build();
-
         } else if (deployedSiddhiAppHolder.containsKey(appName)) {
             List<SiddhiAppHolder> holder = deployedSiddhiAppHolder.get(appName);
             List<KafkaTransportDetails> kafkaDetails = new ArrayList<>();
@@ -382,7 +374,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                             .getHttpInterface().getPort()));
                 }
 
-                //KafkaTransportDetails.put("appName", siddhiAppHolder.getAppName());
                 SiddhiAppDetails appHolder = new SiddhiAppDetails();
                 appHolder.setAppName(siddhiAppHolder.getAppName());
                 SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppHolder.getSiddhiApp());
@@ -395,7 +386,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                                     kafkaTransportDetails.put(annotation.getName(), sourceElement.getValue());
                                 }
                             }
-
                         } else if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SINK)) {
                             for (Element sinkElement : annotation.getElements()) {
                                 if (sinkElement.getKey().equalsIgnoreCase(Constants.KAFKA_SINK_TOPIC)) {
@@ -411,15 +401,11 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 kafkaDetails.add(kafkaTransport);
             }));
             return Response.ok().entity(kafkaDetails).build();
-
-
         } else {
             return Response.status(Response.Status.NO_CONTENT).entity(
                     new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no siddhi app  in the manager "
                             + "node")).build();
-
         }
-
     }
 
 

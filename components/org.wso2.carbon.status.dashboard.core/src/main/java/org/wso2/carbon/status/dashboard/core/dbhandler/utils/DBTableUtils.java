@@ -23,22 +23,13 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.QueryManager;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_Q;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SEPARATOR;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SQL_WHERE;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.WHITESPACE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.*;
 
 
 /**
@@ -80,7 +71,6 @@ public class DBTableUtils {
         attributesWorkerDetailsTable.put("REPOLOCATION", stringType);
         attributesWorkerDetailsTable.put("SERVERSTARTTIME", stringType);
 
-        //TODO:NEWLY ADDED
         Map<String,String>attributeManagerConfigTable = new LinkedHashMap<>();
         attributeManagerConfigTable.put(Constants.MANAGERID,stringType);
         attributeManagerConfigTable.put(Constants.HOST,stringType);
@@ -88,7 +78,7 @@ public class DBTableUtils {
 
         attributesTypeMaps.put("WORKERS_CONFIGURATION", attributesWorkerConfigTable);
         attributesTypeMaps.put("WORKERS_DETAILS", attributesWorkerDetailsTable);
-        //todo: newly added
+
         attributesTypeMaps.put("MANAGER_CONFIGURATION",attributeManagerConfigTable);
         return attributesTypeMaps;
     }
