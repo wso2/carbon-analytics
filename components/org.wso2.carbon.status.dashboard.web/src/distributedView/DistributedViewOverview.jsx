@@ -117,10 +117,8 @@ export default class DistributedOverview extends React.Component {
         });
 
         this.setState({currentTime: new Date().getTime()});
-        //console.log("Id is"+this.props.match.params.id);
         StatusDashboardAPIS.getManagerSiddhiApps(this.props.match.params.id)
             .then((response) => {
-                //console.log("id"+this.props.match.params.id);
                 if (response.status = HttpStatus.OK) {
                     this.setState({
                         clustersList: response.data,
@@ -194,7 +192,6 @@ export default class DistributedOverview extends React.Component {
      * @returns {XML}
      */
     renderWorkers(appList) {
-        console.log("cluster" + this.state.clustersList);
         if (this.state.isApiCalled && !DistributedOverview.hasApps(this.state.clustersList)) {
             if (this.state.hasViewPermission) {
                 return (
@@ -236,9 +233,6 @@ export default class DistributedOverview extends React.Component {
             }
             //deleted one condition
         } else if (this.state.isApiCalled && DistributedOverview.hasApps(this.state.clustersList)) {
-            console.log("Am going through");
-            console.log("app list" + appList);
-            //console.log(this.state.clustersList.toString());
             return <div style={styles.background}>
                 <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
 

@@ -86,7 +86,6 @@ export default class ManagerThumbnail extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({worker: nextProps.worker})
-        console.log("props" + nextProps);
     }
 
     deleteManager() {
@@ -295,10 +294,10 @@ export default class ManagerThumbnail extends React.Component {
                                 {/*Active Nodes display the siddhi detils*/}
                                 <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                     <div className="grid-tile-h1" style={{marginTop: 50}}><h1
-                                        className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
+                                        className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
                                         <h1 style={{display: 'inline'}}> |</h1>
                                         <h1 className="inactive-apps">
-                                            {this.props.worker.serverDetails.siddhiApps.inactive}
+                                            {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
                                         </h1>
                                     </div>
                                 </GridTile>

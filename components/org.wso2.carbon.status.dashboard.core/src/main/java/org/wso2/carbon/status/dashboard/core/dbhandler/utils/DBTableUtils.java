@@ -1,20 +1,20 @@
 /*
-*  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.status.dashboard.core.dbhandler.utils;
 
 import org.slf4j.Logger;
@@ -46,9 +46,53 @@ public class DBTableUtils {
         return instance;
     }
 
+    //this return minutes
+    public static long getAggregation(long interval) {
+        if (interval <= 3600000) { //less than 6 hours
+            return interval / 60000;
+        } else if (interval > 3600000 && interval <= 21600000) { //6 hours
+            return 5; // 5 mins
+        } else if (interval > 21600000 && interval <= 86400000) { //24 hours
+            return 60; // 1hour
+        } else if (interval > 86400000 && interval <= 604800000) { // 1week
+            return 360;  // 6 hours
+        } else {
+            return 1440; // 1day
+        }
+    }
+
+    public Map<String, String> loadMetricsTypeSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("memory", "METRIC_GAUGE");
+        attributeSelection.put("throughput", "METRIC_METER");
+        attributeSelection.put("latency", "METRIC_TIMER");
+        attributeSelection.put("events", "METRIC_HISTOGRAM");
+        return attributeSelection;
+    }
+
+    public Map<String, String> loadMetricsUnitsSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("memory", "(bytes)");
+        attributeSelection.put("throughput", "(events/second)");
+        attributeSelection.put("latency", "(milliseconds)");
+        attributeSelection.put("events", "events");
+        return attributeSelection;
+    }
+
+    public Map<String, String> loadWorkerConfigTableTuples(QueryManager statusDashboardQueryManager) {
+        String intType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
+        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put(Constants.WORKERID, stringType);
+        attributeSelection.put(Constants.HOST, stringType);
+        attributeSelection.put(Constants.PORT, intType);
+        return attributeSelection;
+    }
+
     public Map<String, Map<String, String>> loadWorkerAttributeTypeMap(QueryManager statusDashboardQueryManager) {
         String integerType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
         String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
+
         Map<String, Map<String, String>> attributesTypeMaps = new HashMap<>();
         Map<String, String> attributesWorkerConfigTable = new LinkedHashMap<>();
         attributesWorkerConfigTable.put(Constants.WORKERID, stringType);
@@ -71,55 +115,18 @@ public class DBTableUtils {
         attributesWorkerDetailsTable.put("REPOLOCATION", stringType);
         attributesWorkerDetailsTable.put("SERVERSTARTTIME", stringType);
 
-        Map<String,String>attributeManagerConfigTable = new LinkedHashMap<>();
-        attributeManagerConfigTable.put(Constants.MANAGERID,stringType);
-        attributeManagerConfigTable.put(Constants.HOST,stringType);
-        attributeManagerConfigTable.put(Constants.PORT,integerType);
+        Map<String, String> attributeManagerConfigTable = new LinkedHashMap<>();
+        attributeManagerConfigTable.put(Constants.MANAGERID, stringType);
+        attributeManagerConfigTable.put(Constants.HOST, stringType);
+        attributeManagerConfigTable.put(Constants.PORT, integerType);
 
         attributesTypeMaps.put("WORKERS_CONFIGURATION", attributesWorkerConfigTable);
         attributesTypeMaps.put("WORKERS_DETAILS", attributesWorkerDetailsTable);
 
-        attributesTypeMaps.put("MANAGER_CONFIGURATION",attributeManagerConfigTable);
+        attributesTypeMaps.put("MANAGER_CONFIGURATION", attributeManagerConfigTable);
         return attributesTypeMaps;
     }
 
-    public Map<String, String> loadMetricsTypeSelection() {
-        Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put("memory", "METRIC_GAUGE");
-        attributeSelection.put("throughput", "METRIC_METER");
-        attributeSelection.put("latency", "METRIC_TIMER");
-        attributeSelection.put("events", "METRIC_HISTOGRAM");
-        return attributeSelection;
-    }
-
-    public Map<String, String> loadMetricsUnitsSelection() {
-        Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put("memory", "(bytes)");
-        attributeSelection.put("throughput", "(events/second)");
-        attributeSelection.put("latency", "(milliseconds)");
-        attributeSelection.put("events", "events");
-        return attributeSelection;
-    }
-    public Map<String, String> loadWorkerConfigTableTuples(QueryManager statusDashboardQueryManager) {
-        String intType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
-        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
-        Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put(Constants.WORKERID, stringType);
-        attributeSelection.put(Constants.HOST, stringType);
-        attributeSelection.put(Constants.PORT, intType);
-        return attributeSelection;
-    }
-
-    //TODO: NEWLY ADDED
-    public Map<String, String> loadManagerConfigTableTuples(QueryManager statusDashboardQueryManager){
-        String intType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
-        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
-        Map<String,String> managerAttributeSelection = new HashMap<>();
-        managerAttributeSelection.put(Constants.MANAGERID,stringType);
-        managerAttributeSelection.put(Constants.HOST,stringType);
-        managerAttributeSelection.put(Constants.PORT,intType);
-        return managerAttributeSelection;
-    }
     public Map<String, String> loadWorkerGeneralTableTuples(QueryManager statusDashboardQueryManager) {
         String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
         Map<String, String> attributeSelection = new HashMap<>();
@@ -161,6 +168,7 @@ public class DBTableUtils {
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
     }
+
     public Map<String, String> loadAggRowMetricsAllValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("METRIC_COUNTER", "AGG_TIMESTAMP,COUNT");
@@ -187,6 +195,7 @@ public class DBTableUtils {
                 " AVG(M15_RATE) as M15_RATE");
         return attributeSelection;
     }
+
     public Map<String, Map<String, String>> loadMetricsAttributeTypeMap(QueryManager statusDashboardQueryManager) {
         String doubleType = statusDashboardQueryManager.getQuery(Constants.DOUBLE_TYPE);
         String longType = statusDashboardQueryManager.getQuery(Constants.LONG_TYPE);
@@ -267,19 +276,15 @@ public class DBTableUtils {
         return attributesTypeMaps;
     }
 
-    //this return minutes
-    public static long getAggregation(long interval) {
-        if (interval <= 3600000) { //less than 6 hours
-            return interval / 60000;
-        } else if (interval > 3600000 && interval <= 21600000) {//6 hours
-            return 5; // 5 mins
-        } else if (interval > 21600000 && interval <= 86400000) {//24 hours
-            return 60; // 1hour
-        } else if (interval > 86400000 && interval <= 604800000) { // 1week
-            return 360;  // 6 hours
-        } else {
-            return 1440; // 1day
-        }
+    //TODO: NEWLY ADDED
+    public Map<String, String> loadManagerConfigTableTuples(QueryManager statusDashboardQueryManager) {
+        String intType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
+        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
+        Map<String, String> managerAttributeSelection = new HashMap<>();
+        managerAttributeSelection.put(Constants.MANAGERID, stringType);
+        managerAttributeSelection.put(Constants.HOST, stringType);
+        managerAttributeSelection.put(Constants.PORT, intType);
+        return managerAttributeSelection;
     }
 
     /**
@@ -303,13 +308,13 @@ public class DBTableUtils {
      * @throws SQLException if there are issues when the element is being set.
      */
     private PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt, int ordinal, String type,
-                                                                 Object value,QueryManager statusDashboardQueryManager) throws SQLException {
+                                                                 Object value, QueryManager statusDashboardQueryManager) throws SQLException {
         String doubleType = statusDashboardQueryManager.getQuery(Constants.DOUBLE_TYPE);
-        String longType =  statusDashboardQueryManager.getQuery(Constants.LONG_TYPE);
-        String stringType =  statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
-        String integerType =  statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
-        String floatType =  statusDashboardQueryManager.getQuery(Constants.FLOAT_TYPE);
-        String booleanType =  statusDashboardQueryManager.getQuery(Constants.BOOL_TYPE);
+        String longType = statusDashboardQueryManager.getQuery(Constants.LONG_TYPE);
+        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
+        String integerType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
+        String floatType = statusDashboardQueryManager.getQuery(Constants.FLOAT_TYPE);
+        String booleanType = statusDashboardQueryManager.getQuery(Constants.BOOL_TYPE);
         if (doubleType.equalsIgnoreCase(type)) {
             stmt.setDouble(ordinal, (Double) value);
         } else if (stringType.equalsIgnoreCase(type)) {
@@ -362,7 +367,7 @@ public class DBTableUtils {
      * @param stmt   the statement to which the values should be set.
      */
     public PreparedStatement populateInsertStatement(Object[] record, PreparedStatement stmt, Map<String, String>
-            attributesTypeMap,QueryManager statusDashboardQueryManager) {
+            attributesTypeMap, QueryManager statusDashboardQueryManager) {
         Set<Map.Entry<String, String>> attributeEntries = attributesTypeMap.entrySet();
         PreparedStatement populatedStatement = stmt;
         int possition = 0;
@@ -370,7 +375,7 @@ public class DBTableUtils {
             Object value = record[possition];
             try {
                 populatedStatement = instance.populateStatementWithSingleElement(stmt, possition + 1,
-                        attributeEntry.getValue(), value,statusDashboardQueryManager);
+                        attributeEntry.getValue(), value, statusDashboardQueryManager);
             } catch (SQLException e) {
                 throw new RDBMSTableException("Dropping event since value for Attribute name " +
                         attributeEntry.getKey() + "cannot be set: " + e.getMessage(), e);
@@ -388,8 +393,9 @@ public class DBTableUtils {
      * @return result
      * @throws SQLException
      */
-    public Object fetchData(ResultSet rs, String attributeName, String attributeType, QueryManager metricsQueryManager) throws SQLException {
-        String doubleType =  metricsQueryManager.getQuery(Constants.DOUBLE_TYPE);
+    public Object fetchData(ResultSet rs, String attributeName, String attributeType, QueryManager metricsQueryManager)
+            throws SQLException {
+        String doubleType = metricsQueryManager.getQuery(Constants.DOUBLE_TYPE);
         String longType = metricsQueryManager.getQuery(Constants.LONG_TYPE);
         String stringType = metricsQueryManager.getQuery(Constants.STRING_TYPE);
         String integerType = metricsQueryManager.getQuery(Constants.INTEGER_TYPE);
@@ -408,7 +414,7 @@ public class DBTableUtils {
         } else if (booleanType.equalsIgnoreCase(attributeType)) {
             return rs.getBoolean(attributeName);
         } else {
-            logger.error("Invalid Type of Object " + attributeName + ":"+ attributeType);
+            logger.error("Invalid Type of Object " + attributeName + ":" + attributeType);
         }
         return null;
     }

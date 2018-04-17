@@ -76,21 +76,12 @@ export default class DistributedViewAppThumbnail extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log("property" + nextProps);
         this.setState({distributedApp: nextProps.distributedApp});
-        console.log("props" + nextProps);
     }
 
 
     renderGridTile() {
         let gridTiles, color, appStatus;
-        // if(this.props.worker.ParentAppName != null){
-        console.log("AM passing here");
-        console.log(this.props.distributedApp);
-        console.log("data" + this.props.distributedApp.parentAppName);
-
-
-        // if(this.props.distributedApp.parentAppName != null){
         gridTiles =
             <div>
                 <Link style={{textDecoration: 'none'}}
@@ -111,8 +102,8 @@ export default class DistributedViewAppThumbnail extends React.Component {
                             <div className="grid-tile-h1" style={{marginTop: '50%'}}><h1
                                 className="active-apps" data-tip data-for='deployedChildApps'>{this.props.distributedApp.deployedChildApps}</h1>
                                 <h1 style={{display: 'inline'}}> | </h1>
-                                <h1 className="inactive-apps" data-tip data-for='undeployedchildapps'>
-                                    {this.props.distributedApp.undeployedChildApps}
+                                <h1 className="inactive-apps" data-tip data-for='notDeployedChildApps'>
+                                    {this.props.distributedApp.notDeployedChildApps}
                                 </h1>
                             </div>
                             <ToolTip id='deployedChildApps' aria-haspopup='true' role='example'>

@@ -112,10 +112,9 @@ export default class AppView extends React.Component {
             hasViewerPermission: true,
             sessionInvalid: false
         };
-        //this.handleToggle = this.handleToggle.bind(this);
+
         this.showMessage = this.showMessage.bind(this);
         this.showError = this.showError.bind(this);
-     //   this.renderChart = this.renderChart.bind(this);
     }
 
     componentWillMount() {
@@ -176,12 +175,9 @@ export default class AppView extends React.Component {
         StatusDashboardAPIS.getSiddhiAppTextView(this.props.match.params.id, this.props.match.params.appName)
             .then((response) => {
                 if (response.status == HttpStatus.OK) {
-                    console.log("response is" + response.data);
                     that.setState({
                         appText: response.data
                     });
-
-                    console.log("apptext is" + this.state.appText);
                 }
             }).catch((error) => {
             if (error.response != null) {
@@ -206,7 +202,6 @@ export default class AppView extends React.Component {
             }
         });
     }
-
 
 
     showError(message) {
@@ -240,11 +235,9 @@ export default class AppView extends React.Component {
                 label="Yes"
                 backgroundColor='#f17b31'
                 onClick={this.handleToggle}
-                //disabled={!this.state.hasManagerPermission}
             />,
             <FlatButton
                 label="No"
-                //disabled={!this.state.hasManagerPermission}
                 onClick={() => {
                     this.setState({open: false})
                 }}
@@ -268,9 +261,6 @@ export default class AppView extends React.Component {
                                                                   icon={<HomeButton color="black"/>}/></Link>
                         <Link to={window.contextPath + "/" + this.props.match.params.id + "/" + "siddhi-apps"}>
                             <FlatButton label={this.props.match.params.id + " >"}/></Link>
-                        {/*TODO: NEED TO CHANGE THIS ACCORDING TO DESIGN*/}
-                        {/*<Link to={window.contextPath + '/worker/' + this.props.match.params.id }>*/}
-                        {/*<FlatButton label={this.state.workerID + " >"}/></Link>*/}
                         <RaisedButton label={this.props.match.params.appName} disabled disabledLabelColor='white'
                                       disabledBackgroundColor='#f17b31'/>
                     </div>

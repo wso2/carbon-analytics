@@ -19,33 +19,30 @@
 package org.wso2.carbon.status.dashboard.core.model;
 
 /**
- *
+ * This class holds the details of number of active and inactive app count.
  */
-public class SiddhiApps {
-    private int active =0;
-    private int inactive =0;
+public class SiddhiAppStatus {
+    private int activeAppCount = 0;
+    private int inactiveAppCount = 0;
 
-    public SiddhiApps() {
+    public SiddhiAppStatus(int activeAppCount, int inactiveAppCount) {
+        this.activeAppCount = activeAppCount;
+        this.inactiveAppCount = inactiveAppCount;
     }
 
-    public SiddhiApps(int active, int inactive) {
-        this.active = active;
-        this.inactive = inactive;
+    public int getActiveAppCount() {
+        return activeAppCount;
     }
 
-    public int getActive() {
-        return active;
+    public void setActiveAppCount(int activeAppCount) {
+        this.activeAppCount = activeAppCount;
     }
 
-    public void setActive(int active) {
-        this.active = active;
+    public int getInactiveAppCount() {
+        return inactiveAppCount;
     }
 
-    public int getInactive() {
-        return inactive;
-    }
-
-    public void setInactive(int inactive) {
-        this.inactive = inactive;
+    public void setInactiveAppCount(int inactiveAppCount) {
+        this.inactiveAppCount = inactiveAppCount;
     }
 }

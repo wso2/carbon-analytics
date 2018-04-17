@@ -29,19 +29,11 @@ import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.sql.SQLException;
 
 
 @RequestInterceptor(AuthenticationInterceptor.class)
@@ -50,16 +42,12 @@ import javax.ws.rs.core.Response;
                             date = "2017-09-11T07:55:11.886Z")
 public class MonitoringRESTApi implements Microservice {
     private static final Log logger = LogFactory.getLog(MonitoringRESTApi.class);
-    //todo: NEED TO DISCUSS WHETHER WE CAN CHANGE THIS CONTEXT TO "/apis/nodes"
-    //todo:just apis = DAMITH AYYA TOLD
     public static final String API_CONTEXT_PATH = "/apis/workers";
 
     private final MonitoringApiService workersApi;
-
     public MonitoringRESTApi(MonitoringApiService dashboardDataProvider) {
         this.workersApi = dashboardDataProvider;
     }
-
 
     /**
      * This API is responsible for adding the new worker to the status dashboard.
@@ -90,10 +78,6 @@ public class MonitoringRESTApi implements Microservice {
             throws NotFoundException {
         return workersApi.addWorker(worker, getUserName(request));
     }
-
-    /**
-     * TODO: NEWLY ADDED
-     */
 
     @POST
     @Path("/manager")
@@ -217,7 +201,6 @@ public class MonitoringRESTApi implements Microservice {
         return workersApi.deleteWorker(id, getUserName(request));
     }
 
-    //TODO:NEWLY ADDED
     @DELETE
     @Path("/manager/{id}")
 
@@ -637,8 +620,6 @@ public class MonitoringRESTApi implements Microservice {
         return workersApi.getSiddhiApps(id, getUserName(request));
     }
 
-    //todo: newly added
-
     /**
      * Get text view of the siddhi app.
      *
@@ -710,11 +691,6 @@ public class MonitoringRESTApi implements Microservice {
             throws NotFoundException, IOException {
         return workersApi.getChildAppsTransportDetails(id, appName, getUserName(request));
     }
-
-
-
-    //todo: newly added
-
 
     private static String getUserName(Request request) {
         return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();

@@ -6,6 +6,7 @@ import java.util.List;
 public class ParentSummaryDetails {
     private List <String> groups = new ArrayList<>();
     private int childApps = 0;
+    // TODO: 4/17/18 initialize as null 
     private List<String> usedWorkerNode = new ArrayList<>();
     private List<String> deployedChildApps = new ArrayList<>();
     private List<String> unDeployedChildApps = new ArrayList<>();

@@ -48,7 +48,6 @@ export default class ParentAppTable  extends React.Component {
 
     componentWillMount() {
         let that = this;
-        console.log(this.state.workerId,this.state.appName);
         StatusDashboardAPIS.getChildAppDetails(this.state.workerId,this.state.appName)
             .then((response) =>{
                     that.loadData(currentPage,response.data)
@@ -87,8 +86,6 @@ export default class ParentAppTable  extends React.Component {
         let isInactive = (row.appStatus === "waiting");
        // let app = entry.siddhiApp.replace(/\'|\"/g,'').replace(/>/g,'\>');
         let appName=row.groupName.replace(row.appName,"");
-        console.log("appi"+appName);
-
 
         return (
 

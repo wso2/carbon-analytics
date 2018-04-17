@@ -41,7 +41,7 @@ const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 const buttonStyle = {marginLeft: 10, width: '30%', fontSize: '8px'};
-const popupButtonStyle = {marginLeft: 25,width: '30%', fontSize: '8px'};
+const popupButtonStyle = {marginLeft: 25, width: '30%', fontSize: '8px'};
 const textField = {width: 650};
 
 /**
@@ -127,21 +127,20 @@ export default class AddWorker extends React.Component {
         console.log(this.refs.host.input.value, this.refs.port.input.value);
 
 
-        if(this.refs.port.input.value >0 && this.refs.port.input.value <= 65535) {
-
+        if (this.refs.port.input.value > 0 && this.refs.port.input.value <= 65535) {
             StatusDashboardAPIS.getRuntimeEnv(nodeID)
                 .then((response) => {
                     if (response.status = HttpStatus.OK) {
                         console.log(response.data);
                         if (response.data === "manager") {
-                            console.log("Hi am manager");
+                           // console.log("Hi am manager");
                             that._addManager(nodeID);
                         } else if (response.data === "worker") {
-                            console.log("Hi am worker");
+                           // console.log("Hi am worker");
                             that._addWorker(nodeID);
                         } else {
                             this.handlePopupOpen();
-                            console.log("am here");
+                            //console.log("am here");
                         }
                     } else {
 
@@ -176,7 +175,7 @@ export default class AddWorker extends React.Component {
                 }
                 that._showError(that.state.statusMessage);
             });
-        }else {
+        } else {
             that._showError("In valid port number. Try again ");
         }
     }
@@ -270,7 +269,7 @@ export default class AddWorker extends React.Component {
     }
 
 
-    _addWorker(nodeID){
+    _addWorker(nodeID) {
         let node = JSON.stringify({
             host: this.refs.host.input.value,
             port: this.refs.port.input.value,
@@ -282,11 +281,13 @@ export default class AddWorker extends React.Component {
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
                     that._showMessage("Worker '" + nodeID + "' is added successfully !");
-                    {/*<Link to={window.contextPath+'#hash'}*/}
-                    {/*scroll={el => el.scrollIntoView({ behavior: 'instant', block: 'end' })}/>*/}
+                    {/*<Link to={window.contextPath+'#hash'}*/
+                    }
+                    {/*scroll={el => el.scrollIntoView({ behavior: 'instant', block: 'end' })}/>*/
+                    }
                     setTimeout(function () {
-                        window.location.href = window.contextPath+'#hash';
-                        scroll(e1 => e1.scrollIntoView({behavior:'instant',block:'end'}))
+                        window.location.href = window.contextPath + '#hash';
+                        scroll(e1 => e1.scrollIntoView({behavior: 'instant', block: 'end'}))
                     }, 1000)
 
 
@@ -318,7 +319,7 @@ export default class AddWorker extends React.Component {
         });
     }
 
-    _addManager(nodeID){
+    _addManager(nodeID) {
         let node = JSON.stringify({
             host: this.refs.host.input.value,
             port: this.refs.port.input.value,
@@ -337,8 +338,8 @@ export default class AddWorker extends React.Component {
                         //  window.location.href = window.contextPath +"/"+nodeID+"/siddhi-apps";
 
                         //window.location.href = window.contextPath+'#hash';
-                        window.location.href = window.contextPath+'#hash';
-                        scroll(e1 => e1.scrollIntoView({behavior:'instant',block:'end'}))
+                        window.location.href = window.contextPath + '#hash';
+                        scroll(e1 => e1.scrollIntoView({behavior: 'instant', block: 'end'}))
                     }, 1000)
                 } else {
                     that._showError("Error while adding manager " + nodeID + " .Try Again !");
@@ -414,13 +415,13 @@ export default class AddWorker extends React.Component {
                 />,
 
                 <FlatButton
-                label="Cancel"
-                //backgroundColor='#f17b31'
-                style={popupButtonStyle}
-                onClick={() => {
-                this.setState({open:false,openAdd:false})
-            }}
-            />
+                    label="Cancel"
+                    //backgroundColor='#f17b31'
+                    style={popupButtonStyle}
+                    onClick={() => {
+                        this.setState({open: false, openAdd: false})
+                    }}
+                />
 
             ];
             return (

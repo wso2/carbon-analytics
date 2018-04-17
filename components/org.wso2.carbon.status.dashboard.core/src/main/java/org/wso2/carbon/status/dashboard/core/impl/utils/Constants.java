@@ -88,8 +88,6 @@ public class Constants {
     public static final String NEVER_REACHED = "Never Reached";
     public static final int DEFAULT_TIME_INTERVAL_MILLIS = 300000;
 
-
-    //todo: newly added
     public static final String MANAGERID = "MANAGERID";
     public static final String WORKERID = "WORKERID";
     public static final String HOST = "HOST";

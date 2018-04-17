@@ -19,9 +19,6 @@
 
 package org.wso2.carbon.sp.jobmanager.core.impl;
 
-//import com.google.common.collect.ArrayListMultimap;
-//import com.google.common.collect.ListMultimap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.*;
@@ -116,9 +113,8 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     new ManagerConfigurationDetails(managerId, manager.getHost(), Integer.valueOf(manager.getPort()));
             try {
                 managerDashboard.insertManagerConfiguration(managerConfigurationDetails);
-                return Response.ok().entity(
-                        new ApiResponseMessage(ApiResponseMessage.OK, "managerId " + "\n" + managerId + "\n" +
-                                "successfully " + " added")).build();
+                return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
+                        "managerId " + "\n" + managerId + "\n" + "successfully " + " added")).build();
             } catch (RDBMSTableException e) {
                 logger.error("Error occured while inserting the Manager due to " + e.getMessage(), e);
                 return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error "
@@ -142,8 +138,8 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         try {
             managerDashboard.deleteManagerConfiguration(managerId);
             return Response.ok()
-                    .entity(new ApiResponseMessage(ApiResponseMessage.OK, managerId + " Successfully deleted"))
-                    .build();
+                    .entity(new ApiResponseMessage(ApiResponseMessage.OK,
+                            managerId + " Successfully deleted")).build();
         } catch (RDBMSTableException ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
                     new ApiResponseMessage(ApiResponseMessage.ERROR, "Error occured while deleting the "
@@ -158,18 +154,16 @@ public class ManagersApiServiceImpl extends ManagersApiService {
      */
 
     public Response getManagerDetails() {
-        //List<ManagerDetails> connectedManagers = new ArrayList<>();
         ClusterCoordinator clusterCoordinator = ServiceDataHolder.getCoordinator();
         ManagerDetails managerDetails = new ManagerDetails();
         if (clusterCoordinator != null) {
             for (NodeDetail nodeDetail : clusterCoordinator.getAllNodeDetails()) {
                 if (nodeDetail.getPropertiesMap() != null) {
                     Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
+                    managerDetails.setGroupId(nodeDetail.getGroupId());
                     if (clusterCoordinator.isLeaderNode()) {
-                        managerDetails.setGroupId(nodeDetail.getGroupId());
                         managerDetails.setHaStatus(Constants.ACTIVE);
                     } else {
-                        managerDetails.setGroupId(nodeDetail.getGroupId());
                         managerDetails.setHaStatus(Constants.PASIVE);
                     }
                 }
@@ -196,32 +190,31 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
         if (deployedSiddhiAppHolder.isEmpty() && waitingToDeploy.isEmpty()) {
             logger.info("There is no siddhi apps");
-            return Response.status(Response.Status.NO_CONTENT).entity(
-                    new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no siddhi app  in the manager "
-                            + "node")).build();
+            return Response.ok().entity("There is no siddhi app  in the manager node").build();
         } else {
             Map<String, List<SiddhiAppHolder>> siddhapps = new HashMap<>();
             siddhapps.putAll(deployedSiddhiAppHolder);
             siddhapps.putAll(waitingToDeploy);
             List<SiddhiAppDetails> appList = new ArrayList<>();
             for (Map.Entry<String, List<SiddhiAppHolder>> en : siddhapps.entrySet()) {
-                for (SiddhiAppHolder obj : en.getValue()) {
+                for (SiddhiAppHolder childApp : en.getValue()) {
                     SiddhiAppDetails appHolder = new SiddhiAppDetails();
-                    appHolder.setParentAppName(obj.getParentAppName());
-                    appHolder.setAppName(obj.getAppName());
-                    appHolder.setGroupName(obj.getGroupName());
-                    appHolder.setSiddhiApp(obj.getSiddhiApp());
-                    if (obj.getDeployedNode() != null) {
-                        appHolder.setId(obj.getDeployedNode().getId());
-                        appHolder.setState(obj.getDeployedNode().getState());
-                        appHolder.setHost(obj.getDeployedNode().getHttpInterface().getHost());
-                        appHolder.setPort(Integer.toString(obj.getDeployedNode().getHttpInterface().getPort()));
-                        appHolder
-                                .setFailedPingAttempts(Integer.toString(obj.getDeployedNode().getFailedPingAttempts()));
-                        appHolder.setLastPingTimestamp(Long.toString(obj.getDeployedNode().getLastPingTimestamp()));
+                    appHolder.setParentAppName(childApp.getParentAppName());
+                    appHolder.setAppName(childApp.getAppName());
+                    appHolder.setGroupName(childApp.getGroupName());
+                    appHolder.setSiddhiApp(childApp.getSiddhiApp());
+
+                    if (childApp.getDeployedNode() != null) {
+                        appHolder.setId(childApp.getDeployedNode().getId());
+                        appHolder.setState(childApp.getDeployedNode().getState());
+                        appHolder.setHost(childApp.getDeployedNode().getHttpInterface().getHost());
+                        appHolder.setPort(Integer.toString(childApp.getDeployedNode().getHttpInterface().getPort()));
+                        appHolder.setFailedPingAttempts(Integer.toString(childApp.getDeployedNode()
+                                .getFailedPingAttempts()));
+                        appHolder.setLastPingTimestamp(Long.toString(childApp.getDeployedNode()
+                                .getLastPingTimestamp()));
                     }
                     appList.add(appHolder);
-                    // new BufferedInputStream(appList);
                 }
             }
             return Response.ok().entity(appList).build();
@@ -235,22 +228,14 @@ public class ManagersApiServiceImpl extends ManagersApiService {
      * @param appName
      * @return
      */
-
-    public Response getSiddhiAppExecutionPlan(String appName) {
-        Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
-                .getSiddhiAppHoldersMap();
-        Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
-                .getAppsWaitingForDeploy();
-        Map<String, List<SiddhiAppHolder>> siddhapps = new HashMap<>();
-        siddhapps.putAll(deployedSiddhiAppHolder);
-        siddhapps.putAll(waitingToDeploy);
-        if (siddhapps.containsKey(appName)) {
+    public Response getSiddhiAppTextView(String appName) {
+        if (ServiceDataHolder.getUserDefinedSiddhiApp(appName) != null) {
             String definedApp = ServiceDataHolder.getUserDefinedSiddhiApp(appName);
             return Response.ok().entity(definedApp).build();
         } else {
             return Response.status(Response.Status.NO_CONTENT).entity(
-                    new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no such siddhi application deployed "
-                            + "in the manager node")).build();
+                    new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no such siddhi application " +
+                            "deployed in the manager node")).build();
         }
     }
 
@@ -309,6 +294,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
     /**
      * This method returns the kafka topic details of each child app.
+     *
      * @param appName
      * @return
      */
@@ -502,7 +488,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
      */
 
     @Override
-    public Response getSiddhiAppExecution(String appName, Request request) {
+    public Response getSiddhiAppTextView(String appName, Request request) {
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
@@ -510,7 +496,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to get the "
                     + "execution plan").build();
         } else {
-            return getSiddhiAppExecutionPlan(appName);
+            return getSiddhiAppTextView(appName);
         }
     }
 

@@ -18,18 +18,18 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean;
 
-import org.wso2.carbon.status.dashboard.core.model.DistributedServerDetails;
+import org.wso2.carbon.status.dashboard.core.model.ManagerDetails;
 
 /**
  * Bean class for keeping the snapshot of manager status .
  */
 
 public class ManagerMetricsSnapshot {
-    private DistributedServerDetails serverDetails = new DistributedServerDetails();
+    private ManagerDetails serverDetails = new ManagerDetails();
     private ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
     private Long timeStamp;
 
-    public ManagerMetricsSnapshot(DistributedServerDetails workerMetrics, Long timeStamp) {
+    public ManagerMetricsSnapshot(ManagerDetails workerMetrics, Long timeStamp) {
         this.serverDetails = workerMetrics;
         this.timeStamp = timeStamp;
     }
@@ -39,13 +39,13 @@ public class ManagerMetricsSnapshot {
 
     }
 
-    public DistributedServerDetails getServerDetails() {
+    public ManagerDetails getServerDetails() {
         return serverDetails;
     }
 
     public ManagerClusterInfo getClusterInfo(){return clusterInfo;}
 
-    public void setServerDetails(DistributedServerDetails serverDetails) {
+    public void setServerDetails(ManagerDetails serverDetails) {
         this.serverDetails = serverDetails;
     }
 

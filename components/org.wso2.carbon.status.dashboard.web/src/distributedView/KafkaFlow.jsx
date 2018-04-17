@@ -64,7 +64,7 @@ export default class KafkaFlow extends React.Component {
                                 +"<span class='indicator '></span>"
                                 + "<span id='myTextInput' class='nodeLabel'>" + entry.appName  + "</span>"
 
-                                +"<span id='hostPort' class='hostPort' title='Deployed Node'>"+"Un-Deployed Node"+"</span> "
+                                +"<span id='hostPort' class='hostPort' title='Deployed Node'>"+"Un-Deployed App"+"</span> "
 
                                 + "</div>"
 
@@ -92,8 +92,6 @@ export default class KafkaFlow extends React.Component {
                                 +"<span class='topic-indicator '></span>"
                                 + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + source + "</span>"
                                 + "</div>";
-
-                            console.log("sources" + source);
                             g.setNode(source, {labelType: "html", label: sourceHtml,paddingBottom:0,paddingTop:0,paddingLeft:0,paddingRight:150,rx: 0, ry: 0},{labelStyle:"width:300"});
 
                         });

@@ -24,7 +24,9 @@ import java.util.List;
 
 /**
  * WorkerConfigurationDetails bean class.
+ *
  */
+// TODO: 4/17/18 change the class name
 public class WorkerConfigurationDetails {
 
     private String workerId;

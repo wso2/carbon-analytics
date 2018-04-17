@@ -31,9 +31,10 @@ import org.wso2.carbon.status.dashboard.core.api.MonitoringApiService;
 import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkerServiceFactory;
 import org.wso2.carbon.status.dashboard.core.bean.*;
+import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppStatus;
 import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
+import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
-import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
 import org.wso2.carbon.status.dashboard.core.internal.ApiResponseMessageWithCode;
@@ -47,12 +48,14 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.*;
+
 
 /**
  * This API implement for handling the stream processor worker hadling such asadding , deleating, editing, fletching
@@ -64,7 +67,7 @@ import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.*;
         immediate = true)
 public class MonitoringApiServiceImpl extends MonitoringApiService {
 
-    private static StatusDashboardWorkerDBHandler dashboardStore;
+    private static StatusDashboardDBHandler dashboardStore;
     private static StatusDashboardMetricsDBHandler metricStore;
     private static final int MAX_SIDDHI_APPS_PER_PAGE = 100;
     private static final Log logger = LogFactory.getLog(MonitoringApiService.class);
@@ -85,19 +88,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         dashboardConfigurations = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs();
     }
 
-    /**
-     * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the activate method
-     */
-    @Activate
-    protected void start() {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) Status Dashboard MonitoringApiServiceImpl API");
-        }
-        dashboardStore = new StatusDashboardWorkerDBHandler();
-        metricStore = new StatusDashboardMetricsDBHandler();
+    public static StatusDashboardDBHandler getDashboardStore() { //todo: remove static
+        return dashboardStore;
     }
 
     /**
@@ -115,79 +107,18 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     }
 
     /**
-     * Add a new worker.
+     * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
      *
-     * @param worker Worker object that's needed to be added.
-     * @return Response whether the worker is sucessfully added or not.
-     * @throws NotFoundException
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
      */
-    @Override
-    public Response addWorker(Worker worker, String username) throws NotFoundException {
+    @Activate
+    protected void start() {
 
-        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
-                MANAGER_PERMISSION_STRING));
-        if (isAuthorized) {
-            if (worker.getHost() != null) {
-                String workerID = generateWorkerKey(worker.getHost(), String.valueOf(worker.getPort()));
-                WorkerConfigurationDetails workerConfigData = new WorkerConfigurationDetails(workerID, worker.getHost(),
-                        Integer.valueOf(
-                                worker.getPort()));
-                StatusDashboardWorkerDBHandler workerDBHandler = dashboardStore;
-                try {
-                    workerDBHandler.insertWorkerConfiguration(workerConfigData);
-                } catch (RDBMSTableException e) {
-                    logger.error("Error occured while inserting the Worker due to " + e.getMessage(), e);
-                    return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                            "Error occured while inserting the "
-                                    + "Worker due to "
-                                    + e.getMessage())).build();
-                }
-                //This part to be sucess is optional at this level
-                String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
-                        String.valueOf(worker.getPort())),
-                        workerID);
-                if (!response.contains("Unnable to reach worker.")) {
-                    WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
-                            WorkerGeneralDetails.class);
-                    workerGeneralDetails.setWorkerId(workerID);
-                    try {
-                        workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
-                    } catch (RDBMSTableException e) {
-                        logger.warn("Worker " + removeCRLFCharacters(workerID) +
-                                " currently not active. Retry to reach " + "later");
-                    }
-                    workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
-                    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: "
-                            + workerID + "sucessfully added.")).build();
-                } else if (response.contains("Unnable to reach worker.")) {
-                    //shold able to add a worker so the responce is ok
-                    return Response.status(Response.Status.OK).entity(new ApiResponseMessage
-                            (ApiResponseMessage.OK, "Worker id: "
-                                    + workerID
-                                    + "sucessfully added. But "
-                                    + "worker not reachable."))
-                            .build();
-                } else {
-                    //if the respnce is null but should able to add a worker
-                    return Response.status(Response.Status.OK).entity(new ApiResponseMessage
-                            (ApiResponseMessage.OK, "Worker id: "
-                                    + workerID + (
-                                    "sucessfully added. But unknown"
-                                            + " error has occured "
-                                            + "while "
-                                            + "trying to reach "
-                                            +
-                                            "worker"))).build();
-                }
-            } else {
-                logger.error("Invalid data :" + worker.toString());
-                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data :" + worker.toString())
-                        .build();
-            }
-        } else {
-            logger.error("Unauthorized to perform add worker for user : " + username);
-            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) Status Dashboard MonitoringApiServiceImpl API");
         }
+        dashboardStore = new StatusDashboardDBHandler();
+        metricStore = new StatusDashboardMetricsDBHandler();
     }
 
 
@@ -1783,6 +1714,82 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
 
     /**
+     * Add a new worker.
+     *
+     * @param worker Worker object that's needed to be added.
+     * @return Response whether the worker is sucessfully added or not.
+     * @throws NotFoundException
+     */
+    @Override
+    public Response addWorker(Worker worker, String username) throws NotFoundException {
+
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                MANAGER_PERMISSION_STRING));
+        if (isAuthorized) {
+            if (worker.getHost() != null) {
+                String workerID = generateWorkerKey(worker.getHost(), String.valueOf(worker.getPort()));
+                WorkerConfigurationDetails workerConfigData = new WorkerConfigurationDetails(workerID, worker.getHost(),
+                        Integer.valueOf(
+                                worker.getPort()));
+                StatusDashboardDBHandler workerDBHandler = dashboardStore;
+                try {
+                    workerDBHandler.insertWorkerConfiguration(workerConfigData);
+                } catch (RDBMSTableException e) {
+                    logger.error("Error occured while inserting the Worker due to " + e.getMessage(), e);
+                    return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                            "Error occured while inserting the "
+                                    + "Worker due to "
+                                    + e.getMessage())).build();
+                }
+                //This part to be sucess is optional at this level
+                String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
+                        String.valueOf(worker.getPort())),
+                        workerID);
+                if (!response.contains("Unnable to reach worker.")) {
+                    WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
+                            WorkerGeneralDetails.class);
+                    workerGeneralDetails.setWorkerId(workerID);
+                    try {
+                        workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
+                    } catch (RDBMSTableException e) {
+                        logger.warn("Worker " + removeCRLFCharacters(workerID) +
+                                " currently not active. Retry to reach " + "later");
+                    }
+                    workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
+                    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: "
+                            + workerID + "sucessfully added.")).build();
+                } else if (response.contains("Unnable to reach worker.")) {
+                    //shold able to add a worker so the responce is ok
+                    return Response.status(Response.Status.OK).entity(new ApiResponseMessage
+                            (ApiResponseMessage.OK, "Worker id: "
+                                    + workerID
+                                    + "sucessfully added. But "
+                                    + "worker not reachable."))
+                            .build();
+                } else {
+                    //if the respnce is null but should able to add a worker
+                    return Response.status(Response.Status.OK).entity(new ApiResponseMessage
+                            (ApiResponseMessage.OK, "Worker id: "
+                                    + workerID + (
+                                    "sucessfully added. But unknown"
+                                            + " error has occured "
+                                            + "while "
+                                            + "trying to reach "
+                                            +
+                                            "worker"))).build();
+                }
+            } else {
+                logger.error("Invalid data :" + worker.toString());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data :" + worker.toString())
+                        .build();
+            }
+        } else {
+            logger.error("Unauthorized to perform add worker for user : " + username);
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
+        }
+    }
+
+    /**
      * Add a new manager.
      * @param manager Manager object that's needed to be added.
      * @return Response whether the worker is sucessfully added or not.
@@ -1793,27 +1800,26 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
-            if (manager.getHost() != null) {
+            if (manager.getHost() != null && manager.getPort() != 0) {
                 String managerId = manager.getHost() + Constants.WORKER_KEY_GENERATOR + String.valueOf(manager.getPort());
                 WorkerConfigurationDetails managerConfigurationDetails =
                         new WorkerConfigurationDetails(managerId, manager.getHost(), Integer.valueOf(manager.getPort()));
                 try {
                     dashboardStore.insertManagerConfiguration(managerConfigurationDetails);
-                    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "managerId " + "\n" + managerId + "\n" +
-                            "successfully " + " added")).build();
+                    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
+                            "managerId " + "\n" + managerId + "\n" + "successfully " + " added")).build();
                 } catch (RDBMSTableException e) {
-                    logger.error("Error occured while inserting the Manager due to " + e.getMessage(), e);
+                    logger.error("Error occurred while inserting the Manager due to " + e.getMessage(), e);
                     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error "
                             + "occured while inserting the Manager due to " + e.getMessage())).build();
                 }
             } else {
                 logger.error("There is no manager node specified:" + manager.toString());
-                return Response.status(Response.Status.BAD_REQUEST).entity("There is no manager nodes. Please add a "
-                        + "manager: " + manager.toString())
+                return Response.status(Response.Status.BAD_REQUEST).entity("There is no manager node specified. Please add vaild host name and port" + manager.toString())
                         .build();
             }
         } else {
-            logger.error("Unauthorized to perform add worker for user : " + username);
+            logger.error("Unauthorized to perform add manager for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1832,9 +1838,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         if (isAuthorized) {
             try {
                 dashboardStore.deleteManagerConfiguration(id);
-                return Response.ok()
-                        .entity(new ApiResponseMessage(ApiResponseMessage.OK, id + " Successfully deleted"))
-                        .build();
+                return Response.ok().entity(
+                        new ApiResponseMessage(ApiResponseMessage.OK, id + " Successfully deleted")).build();
             } catch (RDBMSTableException ex) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
                         new ApiResponseMessage(ApiResponseMessage.ERROR, "Error occured while deleting the "
@@ -1854,73 +1859,76 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
 
     @Override
-    public Response getManagers(String username) throws NotFoundException {
+    public Response getManagers(String username) throws NotFoundException, SQLException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
             Map<String, List<ManagerOverView>> groupedManagers = new HashMap<>();
-            List<WorkerConfigurationDetails> workerList = dashboardStore.selectAllManagers();
-            if (!workerList.isEmpty()) {
-                logger.info(workerList.toString());
-                workerList.parallelStream().forEach(manager -> {
+            List<WorkerConfigurationDetails> managerList = dashboardStore.getAllManagerConfigDetails();
+            if (!managerList.isEmpty()) {
+                logger.info(managerList.toString());
+                managerList.parallelStream().forEach(manager -> {
+                    // TODO: 4/17/18 get the WorkerServiceFactory out
                             try {
                                 ManagerOverView managerOverView = new ManagerOverView();
-                                feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager
-                                        .getPort())), getUsername(), getPassword()).getWorker();
+                                feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                                        generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getWorker();
                                 if ((managerResponse != null) && (managerResponse.status() == 200)) {
                                     Long timeInMillis = System.currentTimeMillis();
                                     String responseBody = managerResponse.body().toString();
-                                    DistributedServerDetails serverDetails = gson.fromJson(responseBody, DistributedServerDetails.class);
+                                    ManagerDetails serverDetails = gson.fromJson(responseBody, ManagerDetails.class);
                                     String message = serverDetails.getMessage();
                                     if (message == null || message.isEmpty()) {
                                         managerOverView.setStatusMessage("Success");
                                     } else {
                                         managerOverView.setStatusMessage(message);
                                     }
-                                    feign.Response activeSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
-                                            PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getSiddhiApps(true);
+                                    feign.Response activeSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                                            generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getSiddhiApps(true);
                                     String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
                                     List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody, new TypeToken<List<String>>() {
                                     }.getType());
-                                    feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
-                                            PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getSiddhiApps(false);
+                                    feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                                            generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getSiddhiApps(false);
                                     String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
                                     List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody, new TypeToken<List<String>>() {
                                     }.getType());
                                     serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
-                                    //TODO:COMMENTED METRICS
                                     ManagerMetricsSnapshot snapshot = new ManagerMetricsSnapshot(serverDetails, timeInMillis);
                                     WorkerStateHolder.addManagerMetrics(manager.getWorkerId(), snapshot);
                                     managerOverView.setLastUpdate(timeInMillis);
                                     managerOverView.setWorkerId(manager.getWorkerId());
 
-                                    feign.Response haDetails = WorkerServiceFactory.getWorkerHttpsClient
-                                            (PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getManagerDetails();
+                                    feign.Response haDetails = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                                            generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getManagerDetails();
                                     String haResponseBody = haDetails.body().toString();
                                     ManagerClusterInfo clusterInfo = gson.fromJson(haResponseBody, ManagerClusterInfo.class);
                                     managerOverView.setServerDetails(serverDetails);
                                     managerOverView.setClusterInfo(clusterInfo);
 
-                                    //grouping the clusters of the workers
+                                    //grouping the clusters of the managers
                                     List nonClusterList = groupedManagers.get(Constants.NON_CLUSTERS_ID);
                                     String clusterID = clusterInfo.getGroupId();
                                     List existing = groupedManagers.get(clusterID);
+                                    // TODO: 4/17/18 check for the empty string //td\\\\\
+
+                                    // TODO: 4/17/18 simplify the the if statements
                                     if (clusterInfo.getGroupId() == null && (nonClusterList == null)) {
-                                        List<ManagerOverView> workers = new ArrayList<>();
-                                        workers.add(managerOverView);
-                                        groupedManagers.put(Constants.NON_CLUSTERS_ID, workers);
+                                        List<ManagerOverView> managers = new ArrayList<>();
+                                        managers.add(managerOverView);
+                                        groupedManagers.put(Constants.NON_CLUSTERS_ID, managers);
                                     } else if (clusterID == null && (nonClusterList != null)) {
                                         nonClusterList.add(managerOverView);
                                     } else if (clusterID != null && (existing == null)) {
-                                        List<ManagerOverView> workers = new ArrayList<>();
-                                        workers.add(managerOverView);
-                                        groupedManagers.put(clusterID, workers);
+                                        List<ManagerOverView> managers = new ArrayList<>();
+                                        managers.add(managerOverView);
+                                        groupedManagers.put(clusterID, managers);
                                     } else if (clusterID != null && (existing != null)) {
                                         existing.add(managerOverView);
                                     }
                                 } else {
                                     managerOverView.setWorkerId(manager.getWorkerId());
-                                    DistributedServerDetails serverDetails = new DistributedServerDetails();
+                                    ManagerDetails serverDetails = new ManagerDetails();
                                     ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
                                     serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
                                     managerOverView.setStatusMessage(getErrorMessage(managerResponse.status()));
@@ -1929,9 +1937,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     managerOverView.setLastUpdate((long) 0);
                                     //grouping the never reached
                                     if (groupedManagers.get(Constants.NEVER_REACHED) == null) {
-                                        List<ManagerOverView> workers = new ArrayList<>();
-                                        workers.add(managerOverView);
-                                        groupedManagers.put(Constants.NEVER_REACHED, workers);
+                                        List<ManagerOverView> managers = new ArrayList<>();
+                                        managers.add(managerOverView);
+                                        groupedManagers.put(Constants.NEVER_REACHED, managers);
                                     } else {
                                         List existing = groupedManagers.get(Constants.NEVER_REACHED);
                                         existing.add(managerOverView);
@@ -1941,35 +1949,36 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 ManagerMetricsSnapshot lastSnapshot = WorkerStateHolder.getManagerMetrics(manager.getWorkerId());
                                 if (lastSnapshot != null) {
                                     lastSnapshot.updateRunningStatus(Constants.NOT_REACHABLE_ID);
-                                    ManagerOverView workerOverview = new ManagerOverView();
-                                    workerOverview.setLastUpdate(lastSnapshot.getTimeStamp());
-                                    workerOverview.setWorkerId(manager.getWorkerId());
-                                    workerOverview.setServerDetails(lastSnapshot.getServerDetails());
-                                    workerOverview.setClusterInfo(lastSnapshot.getClusterInfo());
+                                    ManagerOverView managerOverView = new ManagerOverView();
+                                    managerOverView.setLastUpdate(lastSnapshot.getTimeStamp());
+                                    managerOverView.setWorkerId(manager.getWorkerId());
+                                    managerOverView.setServerDetails(lastSnapshot.getServerDetails());
+                                    managerOverView.setClusterInfo(lastSnapshot.getClusterInfo());
                                     if (groupedManagers.get(lastSnapshot.getClusterInfo().getGroupId()) != null) {
-                                        groupedManagers.get(lastSnapshot.getClusterInfo().getGroupId()).add(workerOverview);
+                                        groupedManagers.get(lastSnapshot.getClusterInfo().getGroupId()).add(managerOverView);
                                     } else {
-                                        List<ManagerOverView> workers = new ArrayList<>();
-                                        workers.add(workerOverview);
-                                        groupedManagers.put(lastSnapshot.getClusterInfo().getGroupId(), workers);
+                                        List<ManagerOverView> managers = new ArrayList<>();
+                                        managers.add(managerOverView);
+                                        groupedManagers.put(lastSnapshot.getClusterInfo().getGroupId(), managers);
                                     }
                                 } else {
-                                    ManagerOverView workerOverview = new ManagerOverView();
-                                    workerOverview.setWorkerId(manager.getWorkerId());
-                                    DistributedServerDetails serverDetails = new DistributedServerDetails();
+                                    //todo change this to top
+                                    ManagerOverView managerOverView = new ManagerOverView();
+                                    managerOverView.setWorkerId(manager.getWorkerId());
+                                    ManagerDetails serverDetails = new ManagerDetails();
                                     ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
                                     serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
-                                    workerOverview.setServerDetails(serverDetails);
-                                    workerOverview.setClusterInfo(clusterInfo);
-                                    workerOverview.setLastUpdate((long) 0);
+                                    managerOverView.setServerDetails(serverDetails);
+                                    managerOverView.setClusterInfo(clusterInfo);
+                                    managerOverView.setLastUpdate((long) 0);
                                     //grouping the never reached
                                     if (groupedManagers.get(Constants.NEVER_REACHED) == null) {
-                                        List<ManagerOverView> workers = new ArrayList<>();
-                                        workers.add(workerOverview);
-                                        groupedManagers.put(Constants.NEVER_REACHED, workers);
+                                        List<ManagerOverView> managers = new ArrayList<>();
+                                        managers.add(managerOverView);
+                                        groupedManagers.put(Constants.NEVER_REACHED, managers);
                                     } else {
                                         List existing = groupedManagers.get(Constants.NEVER_REACHED);
-                                        existing.add(workerOverview);
+                                        existing.add(managerOverView);
                                     }
                                 }
                             }
@@ -1982,48 +1991,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN)
                     .entity("Unauthorized for user : " + username).build();
-        }
-    }
-
-    /***
-     * Return the run time environment of the node
-     * @param username
-     * @return the runtime environmet
-     * @throws NotFoundException
-     */
-
-    @Override
-    public Response getRuntimeEnv(String id, String username) throws NotFoundException {
-
-        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
-                VIWER_PERMISSION_STRING));
-        if (isAuthorized) {
-            String[] hostPort = id.split(Constants.WORKER_KEY_GENERATOR);
-            if (hostPort.length == 2) {
-                String workerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
-                try {
-                    feign.Response siddhiAppResponce = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURIBody,
-                            this.getUsername(), this.getPassword()).getRunTime();
-                    String responseAppBody = siddhiAppResponce.toString();
-                    if (siddhiAppResponce.status() == 200) {
-                        logger.info(siddhiAppResponce.body().toString());
-                        return Response.ok().entity(siddhiAppResponce.body().toString()).build();
-                    } else if (siddhiAppResponce.status() == 401) {
-                        String jsonString = new Gson().toJson(responseAppBody);
-                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
-                    } else {
-                        return Response.status(Response.Status.NOT_FOUND).entity(responseAppBody).build();
-                    }
-                } catch (feign.RetryableException e) {
-                    String jsonString = new Gson().toJson(Constants.NOT_REACHABLE_ID);
-                    return Response.ok().entity(jsonString).build();
-                }
-            }
-            logger.error("Inproper format of worker ID:" + id);
-            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + id).build();
-        } else {
-            logger.error("Unauthorized to perform get siddhi app details for user : " + username);
-            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -2071,7 +2038,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
 
     /**
      * Reurns the text view of the parent siddhi application
@@ -2121,6 +2087,48 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         }
     }
 
+    /***
+     * Return the run time environment of the node
+     * @param username
+     * @return the runtime environmet
+     * @throws NotFoundException
+     */
+
+    @Override
+    public Response getRuntimeEnv(String managerId, String username) throws NotFoundException {
+
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                VIWER_PERMISSION_STRING));
+        if (isAuthorized) {
+            String[] hostPort = managerId.split(Constants.WORKER_KEY_GENERATOR);
+            if (hostPort.length == 2) {
+                String workerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
+                try {
+                    feign.Response siddhiAppResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                            workerURIBody, this.getUsername(), this.getPassword()).getRunTime();
+                    String responseAppBody = siddhiAppResponse.toString();
+                    if (siddhiAppResponse.status() == 200) {
+                        //logger.info(siddhiAppResponce.body().toString());
+                        return Response.ok().entity(siddhiAppResponse.body().toString()).build();
+                    } else if (siddhiAppResponse.status() == 401) {
+                        String jsonString = new Gson().toJson(responseAppBody);
+                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
+                    } else {
+                        return Response.status(Response.Status.NOT_FOUND).entity(responseAppBody).build();
+                    }
+                } catch (feign.RetryableException e) {
+                    String jsonString = new Gson().toJson(Constants.NOT_REACHABLE_ID);
+                    return Response.ok().entity(jsonString).build();
+                }
+            }
+            logger.error("Inproper format of worker ID:" + managerId);
+            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + managerId).build();
+        } else {
+            logger.error("Unauthorized to perform get siddhi app details for user : " + username);
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
+        }
+    }
+
     /**
      * Returns the summary details of deployed parent siddhi application.
      * @param managerId : Id of the manager node
@@ -2153,20 +2161,22 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 if (!(appSummary.containsKey(parentAppName))) {
                                     appSummary.put(siddhiapp.getParentAppName(), new ParentSummaryDetails());
                                 }
-                                if (!(appSummary.get(parentAppName).getGroups().contains(siddhiapp.getGroupName()))) {
-                                    appSummary.get(parentAppName).getGroups().add(siddhiapp.getGroupName());
+
+                                ParentSummaryDetails existingParentAppName = appSummary.get(parentAppName);
+                                if (!(existingParentAppName.getGroups().contains(siddhiapp.getGroupName()))) {
+                                    existingParentAppName.getGroups().add(siddhiapp.getGroupName());
                                 }
-                                int numberOfChildApp = appSummary.get(parentAppName).getChildApps() + 1;
-                                appSummary.get(parentAppName).setChildApps(numberOfChildApp);
+                                int numberOfChildApp = existingParentAppName.getChildApps() + 1;
+                                existingParentAppName.setChildApps(numberOfChildApp);
                                 if (siddhiapp.getId() != null) {
-                                    if (!appSummary.get(parentAppName).getUsedWorkerNode().contains(siddhiapp.getId())) {
-                                        appSummary.get(parentAppName).getUsedWorkerNode().add(siddhiapp.getId());
+                                    if (!existingParentAppName.getUsedWorkerNode().contains(siddhiapp.getId())) {
+                                        existingParentAppName.getUsedWorkerNode().add(siddhiapp.getId());
                                     }
                                 }
-                                if(!appSummary.get(parentAppName).getUsedWorkerNode().contains(siddhiapp.getId())){
-                                    appSummary.get(parentAppName).getUnDeployedChildApps().add(siddhiapp.getId());
+                                if (!existingParentAppName.getUsedWorkerNode().contains(siddhiapp.getId())) {
+                                    existingParentAppName.getUnDeployedChildApps().add(siddhiapp.getId());
                                 }else {
-                                    appSummary.get(parentAppName).getDeployedChildApps().add(siddhiapp.getId());
+                                    existingParentAppName.getDeployedChildApps().add(siddhiapp.getId());
                                 }
                             }
                             feign.Response resourceClusterWorkerDetails = WorkerServiceFactory.getWorkerHttpsClient
@@ -2182,11 +2192,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                         .put("numberOfGroups", Integer.toString(entry.getValue().getGroups().size()));
                                 parentAppDetail
                                         .put("numberOfChildApp", Integer.toString(entry.getValue().getChildApps()));
-                                logger.info("size" + entry.getValue().getUsedWorkerNode().size());
                                 parentAppDetail.put("usedWorkerNodes",
                                         Integer.toString(entry.getValue().getUsedWorkerNode().size()));
                                 parentAppDetail.put("deployedChildApps",Integer.toString(entry.getValue().getDeployedChildApps().size()));
-                                parentAppDetail.put("undeployedChildApps",Integer.toString(entry.getValue().getUnDeployedChildApps().size()));
+                                parentAppDetail.put("notDeployedChildApps", Integer.toString(entry.getValue().getUnDeployedChildApps().size()));
                                 parentAppDetail.put("totalWorkerNodes", resourceClusterResponseBody);
                                 parentAppSummary.add(parentAppDetail);
                             }
@@ -2205,65 +2214,18 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         return Response.status(Response.Status.NOT_FOUND).build();
                     }
                 } catch (feign.RetryableException e) {
-                    String jsonString = new Gson()
-                            .toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
-                                    e.getMessage()));
+                    String jsonString = new Gson().toJson(new ApiResponseMessageWithCode(
+                            ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR, e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                 }
             } else {
-                logger.error("Inproper format of manager ID" + managerId);
-                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of managerId " + managerId)
+                logger.error("Improper format of manager ID" + managerId);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Improper format of managerId " + managerId)
                         .build();
             }
         } else {
             logger.error("Unauthorized to perform get siddhi app details for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
-        }
-    }
-
-    /**
-     * Returns the child siddhi application details of the specific parent siddhi application
-     * @param managerId : Id of the manager node
-     * @param appName : Parent siddhi application name
-     * @param username
-     * @return child app details
-     * @throws NotFoundException
-     * @throws IOException
-     */
-    @Override
-    public Response getChildAppsDetails(String managerId, String appName, String username) throws NotFoundException, IOException {
-        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
-                VIWER_PERMISSION_STRING));
-        if (isAuthorized) {
-            String[] hostPort = managerId.split(Constants.WORKER_KEY_GENERATOR);
-            if (hostPort.length == 2) {
-                String managerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
-                try {
-                    feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient
-                            (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword()).getChildAppDetails
-                            (appName);
-                    if (managerResponse.status() == 200) {
-                        InputStream reader = managerResponse.body().asInputStream();
-                        return Response.ok().entity(reader).build();
-                    } else if (managerResponse.status() == 401) {
-                        String jsonString = new Gson().toJson(managerResponse.body().toString());
-                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
-                    } else {
-                        return Response.status(Response.Status.NOT_FOUND).entity(managerResponse.body().toString()).build();
-                    }
-                } catch (feign.RetryableException e) {
-                    String errString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
-                            .SERVER_CONNECTION_ERROR,
-                            e.getMessage()));
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
-
-                }
-            } else {
-                return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
-                        + "" + managerId).build();
-            }
-        } else {
-            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized user : " + username).build();
         }
     }
 
@@ -2312,10 +2274,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized user : " + username).build();
         }
     }
-
-
-
-
 
     /**
      * Get worker asscess username.
@@ -2371,8 +2329,50 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         return millisVal;
     }
 
-    public static StatusDashboardWorkerDBHandler getDashboardStore() { //todo: remove static
-        return dashboardStore;
+    /**
+     * Returns the child siddhi application details of the specific parent siddhi application
+     *
+     * @param managerId : Id of the manager node
+     * @param appName   : Parent siddhi application name
+     * @param username
+     * @return child app details
+     * @throws NotFoundException
+     * @throws IOException
+     */
+    @Override
+    public Response getChildAppsDetails(String managerId, String appName, String username) throws NotFoundException, IOException {
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                VIWER_PERMISSION_STRING));
+        if (isAuthorized) {
+            String[] hostPort = managerId.split(Constants.WORKER_KEY_GENERATOR);
+            if (hostPort.length == 2) {
+                String managerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
+                try {
+                    feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient
+                            (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword()).getChildAppDetails
+                            (appName);
+                    if (managerResponse.status() == 200) {
+                        InputStream reader = managerResponse.body().asInputStream();
+                        return Response.ok().entity(reader).build();
+                    } else if (managerResponse.status() == 401) {
+                        String jsonString = new Gson().toJson(managerResponse.body().toString());
+                        return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
+                    } else {
+                        return Response.status(Response.Status.NOT_FOUND).entity(managerResponse.body().toString()).build();
+                    }
+                } catch (feign.RetryableException e) {
+                    String errString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
+                            .SERVER_CONNECTION_ERROR, e.getMessage()));
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
+
+                }
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
+                        + " " + managerId).build();
+            }
+        } else {
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized user : " + username).build();
+        }
     }
 
     public static StatusDashboardMetricsDBHandler getMetricStore() {

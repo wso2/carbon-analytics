@@ -59,7 +59,7 @@ public class RunTimeApiServiceImpl extends RunTimeApiService {
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.FILE_PROCESSING_ERROR,
-                                                               "something went wrong please check")).build();
+                                "wso2.runtime is not found")).build();
             }
         }
     }

@@ -30,7 +30,7 @@ import java.sql.SQLException;
 
 
 /**
- * This class represents key database operations related to worker data.
+ * This class represents key database operations related to node data.
  */
 
 public class DBHandler {
@@ -67,7 +67,7 @@ public class DBHandler {
 
 
     /**
-     * Insert worker data worker db.
+     * Insert node data node db.
      *
      * @return isSuccess
      */
@@ -76,7 +76,7 @@ public class DBHandler {
             stmt.execute();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error while inserting worker." , e);
+            throw new RDBMSTableException("Error while inserting node.", e);
         } finally {
             try {
                 stmt.close();
@@ -88,7 +88,7 @@ public class DBHandler {
     }
 
     /**
-     * Delete workers data to worker db.
+     * Delete nodes data to node db.
      *
      * @return isSuccess.
      */
@@ -98,22 +98,25 @@ public class DBHandler {
             stmt.close();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException(" Error while processing the dDELETE operation.", e);
+            throw new RDBMSTableException(" Error while processing the delete operation.", e);
         }
     }
 
     /**
-     * Select worker from the worker DB.
+     * Select node from the node DB.
      *
      * @return list of object.
      */
+
+    // TODO: 4/17/18  stmt.getMetaData().getTableName() CHECK THIS to get the table name
 
     ResultSet select(PreparedStatement stmt) {
         ResultSet rs;
         try {
             rs = stmt.executeQuery();
+
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table.'", e);
+            throw new RDBMSTableException("Error retrieving records from table", e);
         }
         return rs;
     }
@@ -124,7 +127,7 @@ public class DBHandler {
      * @param ps
      * @throws RDBMSTableException
      */
-    public void createTable( Connection conn,PreparedStatement ps) throws RDBMSTableException {
+    public void createTable(Connection conn, PreparedStatement ps) throws RDBMSTableException {
         try {
             ps.executeUpdate();
             conn.commit();

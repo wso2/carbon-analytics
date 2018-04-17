@@ -18,8 +18,12 @@
  */
 package org.wso2.carbon.status.dashboard.core.model;
 
-public class DistributedServerDetails {
-    private SiddhiApps siddhiApps;
+/**
+ * Manager Deails bean class.
+ */
+
+public class ManagerDetails {
+    private SiddhiAppStatus siddhiAppStatus;
     private WorkerMetrics workerMetrics;
     private boolean isStatsEnabled;
     private String lastSyncTime;
@@ -28,7 +32,7 @@ public class DistributedServerDetails {
     private String runningStatus;
     private String message;
 
-    public DistributedServerDetails() {
+    public ManagerDetails() {
     }
 
     public WorkerMetrics getWorkerMetrics() {
@@ -39,12 +43,12 @@ public class DistributedServerDetails {
         this.workerMetrics = workerMetrics;
     }
 
-    public SiddhiApps getSiddhiApps() {
-        return siddhiApps;
+    public SiddhiAppStatus getSiddhiApps() {
+        return siddhiAppStatus;
     }
 
     public void setSiddhiApps(int active, int inactive) {
-        this.siddhiApps = new SiddhiApps(active, inactive);
+        this.siddhiAppStatus = new SiddhiAppStatus(active, inactive);
     }
 
     public boolean isStatEnabled() {
@@ -67,6 +71,10 @@ public class DistributedServerDetails {
         return runningStatus;
     }
 
+    public void setRunningStatus(String runningStatus) {
+        this.runningStatus = runningStatus;
+    }
+
     public String getLastSnapshotTime() {
         return lastSnapshotTime;
     }
@@ -81,10 +89,6 @@ public class DistributedServerDetails {
 
     public void setOsName(String osName) {
         this.osName = osName;
-    }
-
-    public void setRunningStatus(String runningStatus) {
-        this.runningStatus = runningStatus;
     }
 
     public String getMessage() {

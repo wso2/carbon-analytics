@@ -27,63 +27,11 @@ import java.util.Objects;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-02-05T14:14:09.496Z")
 public class ManagerDetails {
-//    @JsonProperty("host")
-//    private String host = null;
-//
-//    @JsonProperty("port")
-//    private Integer port = null;
-
     @JsonProperty("haStatus")
     private String haStatus = null;
 
     @JsonProperty("groupId")
     private String groupId = null;
-
-//    @JsonProperty("nodeId")
-//    private String nodeId = null;
-//
-//    public ManagerDetails host(String host) {
-//        this.host = host;
-//        return this;
-//    }
-
-//    /**
-//     * Get host
-//     *
-//     * @return host
-//     **/
-//    @ApiModelProperty(required = true, value = "")
-//    public String getHost() {
-//        return host;
-//    }
-//
-//    public void setHost(String host) {
-//        this.host = host;
-//    }
-//
-//    public ManagerDetails port(Integer port) {
-//        this.port = port;
-//        return this;
-//    }
-
-//    /**
-//     * Get port
-//     *
-//     * @return port
-//     **/
-//    @ApiModelProperty(required = true, value = "")
-//    public Integer getPort() {
-//        return port;
-//    }
-//
-//    public void setPort(Integer port) {
-//        this.port = port;
-//    }
-//
-//    public ManagerDetails haStatus(String haStatus) {
-//        this.haStatus = haStatus;
-//        return this;
-//    }
 
     /**
      * Get haStatus
@@ -99,8 +47,6 @@ public class ManagerDetails {
         this.haStatus = haStatus;
     }
 
-
-    //todo:for testing
     public ManagerDetails groupId(String groupId) {
         this.groupId = groupId;
         return this;
@@ -113,19 +59,6 @@ public class ManagerDetails {
     public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
-
-//    public ManagerDetails nodeId(String nodeId){
-//        this.nodeId=nodeId;
-//        return this;
-//    }
-//
-//    public String getNodeId() {
-//        return nodeId;
-//    }
-//
-//    public void setNodeId(String nodeId) {
-//        this.nodeId = nodeId;
-//    }
 
     @ApiModelProperty(required = true, value = "")
 

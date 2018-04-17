@@ -27,12 +27,12 @@ public class ManagerOverView {
     private String workerId;
     private Long lastUpdate;
     private String statusMessage;
-    private DistributedServerDetails serverDetails;
+    private ManagerDetails serverDetails;
     private ManagerClusterInfo clusterInfo;
 
 
     public ManagerOverView() {
-        serverDetails = new DistributedServerDetails();
+        serverDetails = new ManagerDetails();
         clusterInfo = new ManagerClusterInfo();
     }
 
@@ -60,11 +60,11 @@ public class ManagerOverView {
         this.lastUpdate = lastUpdate;
     }
 
-    public DistributedServerDetails getServerDetails() {
+    public ManagerDetails getServerDetails() {
         return serverDetails;
     }
 
-    public void setServerDetails(DistributedServerDetails serverDetails) {
+    public void setServerDetails(ManagerDetails serverDetails) {
         this.serverDetails = serverDetails;
     }
 

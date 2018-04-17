@@ -31,14 +31,7 @@ import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -162,11 +155,11 @@ public class ManagersApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
-    public Response getSiddhiAppExecution(
+    public Response getSiddhiAppTextView(
             @Context Request request,
             @ApiParam(value = "name of the parent siddhi app.", required = true)
             @PathParam("appName") String appName) throws NotFoundException {
-        return managersApi.getSiddhiAppExecution(appName, request);
+        return managersApi.getSiddhiAppTextView(appName, request);
     }
 
     @GET

@@ -167,7 +167,7 @@ export default class WorkerOverview extends React.Component {
                         statusMessage:!WorkerOverview.hasNodes(this.state.managerClusterList)?"Currently there are no nodes to display" :''
                     });
                 }else {
-                    console.log("manager connection failed");
+                    console.log("manager connection failed")
                 }
 
             }).catch((error)=>{

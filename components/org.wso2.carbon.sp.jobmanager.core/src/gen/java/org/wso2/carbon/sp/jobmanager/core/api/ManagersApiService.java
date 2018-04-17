@@ -41,7 +41,7 @@ public abstract class ManagersApiService {
 
     public abstract Response getSiddhiApps(Request request) throws NotFoundException;
 
-    public abstract Response getSiddhiAppExecution(String appName, Request request) throws NotFoundException;
+    public abstract Response getSiddhiAppTextView(String appName, Request request) throws NotFoundException;
 
     public abstract Response getRolesByUsername(Request request, String permisstionString);
 

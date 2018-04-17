@@ -17,10 +17,13 @@
  *
  */
 package org.wso2.carbon.status.dashboard.core.bean;
+// TODO: 4/17/18 add class comment
 
 public class ManagerClusterInfo {
+    // TODO: 4/17/18 remove host and port 
     private String host;
     private String port;
+    // TODO: 4/17/18  
     private String groupId =" ";
     private String nodeId;
     private String haStatus;

@@ -65,7 +65,7 @@ public interface WorkerServiceStub {
     @RequestLine("POST /login")
     Response testConnection();
 
-    //TODO:NEWLY ADDED
+    //APIS related to distributed view
     @Headers("Content-Type: application/json")
     @RequestLine("GET /runTime")
     Response getRunTime();
