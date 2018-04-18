@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,19 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
-
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+package org.wso2.carbon.siddhi.editor.core.util.designview.constants.regexpatterns;
 
 /**
- * Singleton instance of DesignGenerator
+ * Has Regex pattern string constants, related to Code to Design
  */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
+public class CodeToDesignRegexPatterns {
+    public static final String SOURCE_ANNOTATION_CONTENT = "@source\\s*\\(\\s*(.+)\\s*\\)[^.]";
+    public static final String SOURCE_SINK_MAP_ANNOTATION_CONTENT = "@map\\s*\\(\\s*(.+)\\s*\\)";
+    public static final String MAP_TYPE = "type\\s*=\\'\\s*(.+)\\s*\\'\\s*[,)]";
 
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
-    }
-
-    private DesignGeneratorSingleton() {
+    /**
+     * Avoids Instantiation
+     */
+    private CodeToDesignRegexPatterns() {
     }
 }

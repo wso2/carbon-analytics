@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,10 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
-
-/**
- * Singleton instance of DesignGenerator
- */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
-
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
-    }
-
-    private DesignGeneratorSingleton() {
-    }
+// TODO: 4/5/18 class comment
+public class PartitionWithTypes {
+    public static final String VALUE = "value";
+    public static final String RANGE = "range";
 }

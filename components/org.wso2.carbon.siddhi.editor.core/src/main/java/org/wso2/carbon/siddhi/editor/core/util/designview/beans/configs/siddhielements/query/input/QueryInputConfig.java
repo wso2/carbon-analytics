@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,19 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
-
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input;
 
 /**
- * Singleton instance of DesignGenerator
+ * Represents the 'input' part of a Siddhi Query
  */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
+public abstract class QueryInputConfig {
+    private String type;
 
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public QueryInputConfig(String type) {
+        this.type = type;
     }
 
-    private DesignGeneratorSingleton() {
+    public String getType() {
+        return type;
     }
 }

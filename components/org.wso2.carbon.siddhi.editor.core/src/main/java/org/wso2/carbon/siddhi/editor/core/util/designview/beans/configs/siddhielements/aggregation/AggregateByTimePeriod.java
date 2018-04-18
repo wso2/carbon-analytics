@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,25 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
-
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation;
 
 /**
- * Singleton instance of DesignGenerator
+ * Represents an 'aggregateByTimePeriod' element inside Siddhi Aggregation
  */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
+public class AggregateByTimePeriod {
+    private String minValue;
+    private String maxValue;
 
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public AggregateByTimePeriod(String minValue, String maxValue) {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
     }
 
-    private DesignGeneratorSingleton() {
+    public String getMinValue() {
+        return minValue;
+    }
+
+    public String getMaxValue() {
+        return maxValue;
     }
 }

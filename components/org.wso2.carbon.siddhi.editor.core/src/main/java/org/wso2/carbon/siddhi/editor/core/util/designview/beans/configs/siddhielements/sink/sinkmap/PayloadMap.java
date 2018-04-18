@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,24 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.sinkmap;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SinkMapPayloadTypes;
+
+import java.util.Map;
 
 /**
- * Singleton instance of DesignGenerator
+ * Represents a map type 'payload' element inside Map, of a Siddhi Source
  */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
+public class PayloadMap extends SinkMapPayload {
+    private Map<String, String> value;
 
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public PayloadMap(Map<String, String> value) {
+        super(SinkMapPayloadTypes.MAP);
+        this.value = value;
     }
 
-    private DesignGeneratorSingleton() {
+    public Map<String, String> getValue() {
+        return value;
     }
 }

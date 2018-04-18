@@ -18,9 +18,14 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.aggregationconfig.AggregationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sinkconfig.SinkConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.sourceconfig.SourceConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.SinkConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +45,7 @@ public class SiddhiAppConfig {
 //    private List<> aggregations;
 //    private List<> functions;
 //    private List<> partitions;
-//    private List<> queries;
+    private List<QueryConfig> queryList;
     private List<SinkConfig> sinkList;
     private List<SourceConfig> sourceList;
     private List<StreamConfig> streamList;
@@ -60,13 +65,14 @@ public class SiddhiAppConfig {
 //        aggregations = new ArrayList<>();
 //        functions = new ArrayList<>();
 //        partitions = new ArrayList<>();
-//        queries = new ArrayList<>();
+        queryList = new ArrayList<>();
         sinkList = new ArrayList<>();
         sourceList = new ArrayList<>();
         streamList = new ArrayList<>();
         tableList = new ArrayList<>();
         triggerList = new ArrayList<>();
         windowList = new ArrayList<>();
+        aggregationList = new ArrayList<>();
     }
 
     public void setAppName(String appName) {
@@ -112,6 +118,11 @@ public class SiddhiAppConfig {
         finalElementCount++;
     }
 
+    public void add(QueryConfig queryConfig) {
+        queryList.add(queryConfig);
+        finalElementCount++;
+    }
+
     public int getFinalElementCount() {
         return finalElementCount;
     }
@@ -150,5 +161,9 @@ public class SiddhiAppConfig {
 
     public List<AggregationConfig> getAggregationList() {
         return aggregationList;
+    }
+
+    public List<QueryConfig> getQueryList() {
+        return queryList;
     }
 }

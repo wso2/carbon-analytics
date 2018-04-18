@@ -16,22 +16,26 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans;
+package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.factories;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.sinkmap.SinkMapPayload;
 
 import java.util.List;
+import java.util.Map;
 
 /**
- * Represents the visual structure of a Siddhi app, for the design view
+ * Factory to create SinkMapPayload of a Siddhi sink's map
  */
-public class EventFlow {
-    private SiddhiAppConfig siddhiAppConfig;
-    private List<Edge> edgeList;
+public class SinkMapPayloadConfigFactory {
+    public SinkMapPayload getMapAttributeConfig(List<String> values) {
+        return null; // TODO: 4/3/18 implement
+    }
 
-    public EventFlow(SiddhiAppConfig siddhiAppConfig, List<Edge> edgeList) {
-        this.siddhiAppConfig = siddhiAppConfig;
-        this.edgeList = edgeList;
+    public SinkMapPayload getMapAttributeConfig(Map<String, String> elements) {
+        return null; // TODO: 4/3/18 implement
+    }
+
+    public SinkMapPayload getMapAttributeConfig(String value) {
+        return null; // TODO: 4/3/18 implement
     }
 }

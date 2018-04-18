@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,17 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.countingsequence;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+// TODO: 4/4/18 class comment
+public abstract class CountingSequenceConfig {
+    private String type;
 
-/**
- * Singleton instance of DesignGenerator
- */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
-
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public CountingSequenceConfig(String type) {
+        this.type = type;
     }
 
-    private DesignGeneratorSingleton() {
+    public String getType() {
+        return type;
     }
 }

@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,25 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+import java.util.List;
 
-/**
- * Singleton instance of DesignGenerator
- */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
+// TODO: 4/4/18 class comment
+public class PartitionMembers {
+    private List<String> queryIds;
+    private List<String> innerStreamIds;
 
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public PartitionMembers(List<String> queryIds, List<String> innerStreamIds) {
+        this.queryIds = queryIds;
+        this.innerStreamIds = innerStreamIds;
     }
 
-    private DesignGeneratorSingleton() {
+    public List<String> getQueryIds() {
+        return queryIds;
+    }
+
+    public List<String> getInnerStreamIds() {
+        return innerStreamIds;
     }
 }

@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,22 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 
-/**
- * Singleton instance of DesignGenerator
- */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
+import java.util.List;
 
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+// TODO: 4/5/18 class comment
+public class UserDefinedSelectionConfig extends AttributesSelectionConfig {
+    private List<SelectedAttribute> value;
+
+    public UserDefinedSelectionConfig(List<SelectedAttribute> value) {
+        super(AttributeSelection.TYPE_USER_DEFINED);
+        this.value = value;
     }
 
-    private DesignGeneratorSingleton() {
+    public List<SelectedAttribute> getValue() {
+        return value;
     }
 }

@@ -19,6 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.singletons.DesignGeneratorSingleton;
 
 /**

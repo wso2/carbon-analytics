@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,24 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.sourcemap;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SourceMapAttributeTypes;
+
+import java.util.Map;
 
 /**
- * Singleton instance of DesignGenerator
- */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
+ * Represents a map type 'attribute' element inside Map, of a Siddhi Source
+ */ // TODO: 4/3/18 give the format properly
+public class AttributeMap extends SourceMapAttribute {
+    private Map<String, String> value;
 
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public AttributeMap(Map<String, String> value) {
+        super(SourceMapAttributeTypes.MAP);
+        this.value = value;
     }
 
-    private DesignGeneratorSingleton() {
+    public Map<String, String> getValue() {
+        return value;
     }
 }

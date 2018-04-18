@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,25 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AnnotationConfigTypes;
+
+import java.util.List;
 
 /**
- * Singleton instance of DesignGenerator
+ * Represents a Siddhi annotation, whose content is in the following form:
+ * - @element(value1, value2)
  */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
+public class ListAnnotationConfig extends AnnotationConfig {
+    private List<AnnotationValue> value;
 
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public ListAnnotationConfig(String name, List<AnnotationValue> value) {
+        super(name, AnnotationConfigTypes.LIST);
+        this.value = value;
     }
 
-    private DesignGeneratorSingleton() {
+    public List<AnnotationValue> getValue() {
+        return value;
     }
 }

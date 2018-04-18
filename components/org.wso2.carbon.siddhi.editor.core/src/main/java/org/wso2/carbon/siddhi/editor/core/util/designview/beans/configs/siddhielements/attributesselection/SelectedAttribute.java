@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+// TODO: 4/5/18 class comment. Denotes the alias selection of a variable. This can be either fn(var) or var
+public class SelectedAttribute {
+    private String expression;
+    private String as;
 
-/**
- * Singleton instance of DesignGenerator
- */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
-
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public SelectedAttribute(String expression, String as) {
+        this.expression = expression;
+        this.as = as;
     }
 
-    private DesignGeneratorSingleton() {
+    public String getExpression() {
+        return expression;
+    }
+
+    public String getAs() {
+        return as;
     }
 }

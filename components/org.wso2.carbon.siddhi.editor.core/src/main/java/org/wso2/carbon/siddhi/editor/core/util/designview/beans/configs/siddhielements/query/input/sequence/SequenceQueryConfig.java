@@ -16,22 +16,25 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
 
 import java.util.List;
 
 /**
- * Represents the visual structure of a Siddhi app, for the design view
+ * Represents a Sequence QueryInputConfig, for Siddhi Query
  */
-public class EventFlow {
-    private SiddhiAppConfig siddhiAppConfig;
-    private List<Edge> edgeList;
+public class SequenceQueryConfig extends QueryInputConfig {
+    List<SequenceQueryEventConfig> events;
 
-    public EventFlow(SiddhiAppConfig siddhiAppConfig, List<Edge> edgeList) {
-        this.siddhiAppConfig = siddhiAppConfig;
-        this.edgeList = edgeList;
+    public SequenceQueryConfig(List<SequenceQueryEventConfig> events) {
+        super(QueryInputTypes.SEQUENCE);
+        this.events = events;
+    }
+
+    public List<SequenceQueryEventConfig> getEvents() {
+        return events;
     }
 }

@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.setattributeconfig;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+// TODO: 4/5/18 class comment
+public class SetAttributeConfig {
+    private String attribute;
+    private String value;
 
-/**
- * Singleton instance of DesignGenerator
- */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
-
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public SetAttributeConfig(String attribute, String value) {
+        this.attribute = attribute;
+        this.value = value;
     }
 
-    private DesignGeneratorSingleton() {
+    public String getAttribute() {
+        return attribute;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

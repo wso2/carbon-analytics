@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
 
 /**
- * Singleton instance of DesignGenerator
+ * Represents a Join QueryInputConfig, for Siddhi Query
  */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
+public abstract class JoinQueryConfig extends QueryInputConfig {
+    private String joinWith;
 
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
+    public JoinQueryConfig(String joinWith) {
+        super(QueryInputTypes.JOIN);
+        this.joinWith = joinWith;
     }
 
-    private DesignGeneratorSingleton() {
+    public String getJoinWith() {
+        return joinWith;
     }
 }

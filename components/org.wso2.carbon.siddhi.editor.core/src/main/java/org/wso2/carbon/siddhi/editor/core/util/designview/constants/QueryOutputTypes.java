@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,20 +16,18 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.singletons;
+package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+// TODO: 4/5/18 class comment
+public class QueryOutputTypes { // TODO: 4/5/18 not 'Types' only actually
+    // Query Output types
+    public static final String INSERT = "insert";
+    public static final String DELETE = "delete";
+    public static final String UPDATE = "update";
+    public static final String UPDATE_OR_INSERT_INTO = "update-or-insert-into";
 
-/**
- * Singleton instance of DesignGenerator
- */
-public class DesignGeneratorSingleton {
-    private static DesignGenerator designGeneratorInstance = new DesignGenerator();
-
-    public static DesignGenerator getInstance() {
-        return designGeneratorInstance;
-    }
-
-    private DesignGeneratorSingleton() {
-    }
+    // Query Output Event types
+    public static final String CURRENT_EVENTS = "current";
+    public static final String EXPIRED_EVENTS = "expired";
+    public static final String ALL_EVENTS = "all";
 }
