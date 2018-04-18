@@ -50,7 +50,6 @@ import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -137,9 +136,8 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     public Response deleteManager(String managerId) {
         try {
             managerDashboard.deleteManagerConfiguration(managerId);
-            return Response.ok()
-                    .entity(new ApiResponseMessage(ApiResponseMessage.OK,
-                            managerId + " Successfully deleted")).build();
+            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
+                    managerId + " Successfully deleted")).build();
         } catch (RDBMSTableException ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
                     new ApiResponseMessage(ApiResponseMessage.ERROR, "Error occured while deleting the "
@@ -192,11 +190,18 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             logger.info("There is no siddhi apps");
             return Response.ok().entity("There is no siddhi app  in the manager node").build();
         } else {
-            Map<String, List<SiddhiAppHolder>> siddhapps = new HashMap<>();
-            siddhapps.putAll(deployedSiddhiAppHolder);
-            siddhapps.putAll(waitingToDeploy);
             List<SiddhiAppDetails> appList = new ArrayList<>();
-            for (Map.Entry<String, List<SiddhiAppHolder>> en : siddhapps.entrySet()) {
+            for (Map.Entry<String, List<SiddhiAppHolder>> en : waitingToDeploy.entrySet()) {
+                for (SiddhiAppHolder childApp : en.getValue()) {
+                    SiddhiAppDetails appHolder = new SiddhiAppDetails();
+                    appHolder.setParentAppName(childApp.getParentAppName());
+                    appHolder.setAppName(childApp.getAppName());
+                    appHolder.setGroupName(childApp.getGroupName());
+                    appHolder.setSiddhiApp(childApp.getSiddhiApp());
+                    appList.add(appHolder);
+                }
+            }
+            for (Map.Entry<String, List<SiddhiAppHolder>> en : deployedSiddhiAppHolder.entrySet()) {
                 for (SiddhiAppHolder childApp : en.getValue()) {
                     SiddhiAppDetails appHolder = new SiddhiAppDetails();
                     appHolder.setParentAppName(childApp.getParentAppName());
@@ -208,7 +213,8 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                         appHolder.setId(childApp.getDeployedNode().getId());
                         appHolder.setState(childApp.getDeployedNode().getState());
                         appHolder.setHost(childApp.getDeployedNode().getHttpInterface().getHost());
-                        appHolder.setPort(Integer.toString(childApp.getDeployedNode().getHttpInterface().getPort()));
+                        appHolder.setPort(Integer.toString(childApp.getDeployedNode()
+                                .getHttpInterface().getPort()));
                         appHolder.setFailedPingAttempts(Integer.toString(childApp.getDeployedNode()
                                 .getFailedPingAttempts()));
                         appHolder.setLastPingTimestamp(Long.toString(childApp.getDeployedNode()
@@ -217,9 +223,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     appList.add(appHolder);
                 }
             }
+
             return Response.ok().entity(appList).build();
         }
-
     }
 
     /**
@@ -309,82 +315,23 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             List<SiddhiAppHolder> holder = waitingToDeploy.get(appName);
             List<KafkaTransportDetails> kafkaDetails = new ArrayList<>();
             holder.forEach((siddhiAppHolder -> {
-                Map<String, String> kafkaTransportDetails = new HashMap<>();
                 KafkaTransportDetails kafkaTransport = new KafkaTransportDetails();
-                List<String> sourceList = new ArrayList<>();
-                List<String> sinkList = new ArrayList<>();
                 kafkaTransport.setAppName(siddhiAppHolder.getAppName());
                 kafkaTransport.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
-
-                SiddhiAppDetails appHolder = new SiddhiAppDetails();
-                appHolder.setAppName(siddhiAppHolder.getAppName());
-                SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppHolder.getSiddhiApp());
-                for (Map.Entry<String, StreamDefinition> sourceStream : siddhiApp.getStreamDefinitionMap().entrySet()) {
-                    for (Annotation annotation : sourceStream.getValue().getAnnotations()) {
-                        if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SOURCE)) {
-                            for (Element sourceElement : annotation.getElements()) {
-                                if (sourceElement.getKey().equalsIgnoreCase(Constants.KAFKA_SOURCE_TOPIC_LIST)) {
-                                    sourceList.add(sourceElement.getValue());
-                                    kafkaTransportDetails.put(annotation.getName(), sourceElement.getValue());
-                                }
-                            }
-                        } else if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SINK)) {
-                            for (Element sinkElement : annotation.getElements()) {
-                                if (sinkElement.getKey().equalsIgnoreCase(Constants.KAFKA_SINK_TOPIC)) {
-                                    sinkList.add(sinkElement.getValue());
-                                    kafkaTransportDetails.put(annotation.getName(), sinkElement.getValue());
-                                }
-                            }
-                        }
-                    }
-                }
-                kafkaTransport.setSourceList(sourceList);
-                kafkaTransport.setSinkList(sinkList);
-                kafkaDetails.add(kafkaTransport);
+                getSourceSinkDetails(siddhiAppHolder, kafkaTransport, kafkaDetails);
             }));
             return Response.ok().entity(kafkaDetails).build();
         } else if (deployedSiddhiAppHolder.containsKey(appName)) {
             List<SiddhiAppHolder> holder = deployedSiddhiAppHolder.get(appName);
             List<KafkaTransportDetails> kafkaDetails = new ArrayList<>();
             holder.forEach((siddhiAppHolder -> {
-                Map<String, String> kafkaTransportDetails = new HashMap<>();
                 KafkaTransportDetails kafkaTransport = new KafkaTransportDetails();
-                List<String> sourceList = new ArrayList<>();
-                List<String> sinkList = new ArrayList<>();
                 kafkaTransport.setAppName(siddhiAppHolder.getAppName());
                 kafkaTransport.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
-
-                if (deployedSiddhiAppHolder.containsKey(appName)) {
-                    kafkaTransport.setDeployedHost(siddhiAppHolder.getDeployedNode().getHttpInterface().getHost());
-                    kafkaTransport.setDeployedPort(Integer.toString(siddhiAppHolder.getDeployedNode()
-                            .getHttpInterface().getPort()));
-                }
-
-                SiddhiAppDetails appHolder = new SiddhiAppDetails();
-                appHolder.setAppName(siddhiAppHolder.getAppName());
-                SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppHolder.getSiddhiApp());
-                for (Map.Entry<String, StreamDefinition> sourceStream : siddhiApp.getStreamDefinitionMap().entrySet()) {
-                    for (Annotation annotation : sourceStream.getValue().getAnnotations()) {
-                        if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SOURCE)) {
-                            for (Element sourceElement : annotation.getElements()) {
-                                if (sourceElement.getKey().equalsIgnoreCase(Constants.KAFKA_SOURCE_TOPIC_LIST)) {
-                                    sourceList.add(sourceElement.getValue());
-                                    kafkaTransportDetails.put(annotation.getName(), sourceElement.getValue());
-                                }
-                            }
-                        } else if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SINK)) {
-                            for (Element sinkElement : annotation.getElements()) {
-                                if (sinkElement.getKey().equalsIgnoreCase(Constants.KAFKA_SINK_TOPIC)) {
-                                    sinkList.add(sinkElement.getValue());
-                                    kafkaTransportDetails.put(annotation.getName(), sinkElement.getValue());
-                                }
-                            }
-                        }
-                    }
-                }
-                kafkaTransport.setSourceList(sourceList);
-                kafkaTransport.setSinkList(sinkList);
-                kafkaDetails.add(kafkaTransport);
+                kafkaTransport.setDeployedHost(siddhiAppHolder.getDeployedNode().getHttpInterface().getHost());
+                kafkaTransport.setDeployedPort(Integer.toString(siddhiAppHolder.getDeployedNode()
+                        .getHttpInterface().getPort()));
+                getSourceSinkDetails(siddhiAppHolder, kafkaTransport, kafkaDetails);
             }));
             return Response.ok().entity(kafkaDetails).build();
         } else {
@@ -392,6 +339,43 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no siddhi app  in the manager "
                             + "node")).build();
         }
+    }
+
+    /**
+     * This method helps to get the kafka sink source details
+     *
+     * @param siddhiAppHolder
+     * @param kafkaTransport
+     * @param kafkaDetails
+     * @return
+     */
+
+    private List getSourceSinkDetails(SiddhiAppHolder siddhiAppHolder, KafkaTransportDetails kafkaTransport,
+                                      List<KafkaTransportDetails> kafkaDetails) {
+        List<String> sourceList = new ArrayList<>();
+        List<String> sinkList = new ArrayList<>();
+        SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppHolder.getSiddhiApp());
+        for (Map.Entry<String, StreamDefinition> sourceStream : siddhiApp.getStreamDefinitionMap().entrySet()) {
+            for (Annotation annotation : sourceStream.getValue().getAnnotations()) {
+                if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SOURCE)) {
+                    for (Element sourceElement : annotation.getElements()) {
+                        if (sourceElement.getKey().equalsIgnoreCase(Constants.KAFKA_SOURCE_TOPIC_LIST)) {
+                            sourceList.add(sourceElement.getValue());
+                        }
+                    }
+                } else if (annotation.getName().equalsIgnoreCase(Constants.KAFKA_SINK)) {
+                    for (Element sinkElement : annotation.getElements()) {
+                        if (sinkElement.getKey().equalsIgnoreCase(Constants.KAFKA_SINK_TOPIC)) {
+                            sinkList.add(sinkElement.getValue());
+                        }
+                    }
+                }
+            }
+        }
+        kafkaTransport.setSourceList(sourceList);
+        kafkaTransport.setSinkList(sinkList);
+        kafkaDetails.add(kafkaTransport);
+        return kafkaDetails;
     }
 
 

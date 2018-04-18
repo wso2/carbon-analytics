@@ -27,14 +27,14 @@ import java.util.Objects;
  * Worker bean class.
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
-public class Worker {
+public class Node {
   @JsonProperty("host")
   private String host = null;
 
   @JsonProperty("port")
   private int port = 9090;
 
-  public Worker host(String host) {
+    public Node host(String host) {
     this.host = host;
     return this;
   }
@@ -52,7 +52,7 @@ public class Worker {
     this.host = host;
   }
 
-  public Worker port(int port) {
+    public Node port(int port) {
     this.port = port;
     return this;
   }
@@ -78,7 +78,7 @@ public class Worker {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Worker worker = (Worker) o;
+      Node worker = (Node) o;
     return Objects.equals(this.host, worker.host) &&
         Objects.equals(this.port, worker.port);
   }

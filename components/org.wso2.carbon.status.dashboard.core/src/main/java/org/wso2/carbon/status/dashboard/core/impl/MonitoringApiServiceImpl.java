@@ -57,6 +57,7 @@ import java.util.Map;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.*;
 
 
+
 /**
  * This API implement for handling the stream processor worker hadling such asadding , deleating, editing, fletching
  * data from DB and API connection handling.
@@ -83,7 +84,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             Constants.PERMISSION_SUFFIX_VIEWER;
 
     public MonitoringApiServiceImpl() {
-
         permissionProvider = MonitoringDataHolder.getInstance().getPermissionProvider();
         dashboardConfigurations = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs();
     }
@@ -100,7 +100,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Deactivate
     protected void stop() {
-
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) Status Dashboard MonitoringApiServiceImpl API");
         }
@@ -113,14 +112,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Activate
     protected void start() {
-
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) Status Dashboard MonitoringApiServiceImpl API");
         }
         dashboardStore = new StatusDashboardDBHandler();
         metricStore = new StatusDashboardMetricsDBHandler();
     }
-
 
 
     /**
@@ -132,19 +129,18 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getAllWorkers(String username) throws NotFoundException {
-
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
             Map<String, List<WorkerOverview>> groupedWorkers = new HashMap<>();
-            List<WorkerConfigurationDetails> workerList = dashboardStore.selectAllWorkers();
+            List<NodeConfigurationDetails> workerList = dashboardStore.selectAllWorkers();
             if (!workerList.isEmpty()) {
                 workerList.parallelStream().forEach(worker -> {
                     try {
                         WorkerOverview workerOverview = new WorkerOverview();
                         feign.Response workerResponse = WorkerServiceFactory
-                                        .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(worker.getHost(),
-                                                String.valueOf(worker.getPort())), getUsername(), getPassword()).getWorker();
+                                .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(worker.getHost(),
+                                        String.valueOf(worker.getPort())), getUsername(), getPassword()).getWorker();
                         if ((workerResponse != null) && (workerResponse.status() == 200)) {
                             Long timeInMillis = System.currentTimeMillis();
                             String responseBody = workerResponse.body().toString();
@@ -157,16 +153,16 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             }
                             feign.Response activeSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
                                     PROTOCOL + generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort())), getUsername(), getPassword())
-                                                    .getSiddhiApps(true);
+                                    .getSiddhiApps(true);
                             String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
                             List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody, new TypeToken<List<String>>() {
-                                                    }.getType());
+                            }.getType());
                             feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
                                     PROTOCOL + generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort())),
-                                                            getUsername(), getPassword()).getSiddhiApps(false);
+                                    getUsername(), getPassword()).getSiddhiApps(false);
                             String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
                             List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody, new TypeToken<List<String>>() {
-                                                    }.getType());
+                            }.getType());
                             serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
                             WorkerMetricsSnapshot snapshot = new WorkerMetricsSnapshot(serverDetails, timeInMillis);
                             WorkerStateHolder.addMetrics(worker.getWorkerId(), snapshot);
@@ -182,7 +178,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 workers.add(workerOverview);
                                 groupedWorkers.put(Constants.NON_CLUSTERS_ID, workers);
                             } else if (clusterID == null && (nonClusterList != null)) {
-                                        nonClusterList.add(workerOverview);
+                                nonClusterList.add(workerOverview);
                             } else if (clusterID != null && (existing == null)) {
                                 List<WorkerOverview> workers = new ArrayList<>();
                                 workers.add(workerOverview);
@@ -204,7 +200,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 groupedWorkers.put(Constants.NEVER_REACHED, workers);
                             } else {
                                 List existing = groupedWorkers.get(Constants.NEVER_REACHED);
-                                        existing.add(workerOverview);
+                                existing.add(workerOverview);
                             }
                         }
                     } catch (feign.RetryableException e) {
@@ -250,6 +246,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     .entity("Unauthorized for user : " + username).build();
         }
     }
+
     private String getErrorMessage(int errorCode) {
 
         if (errorCode == 401) {
@@ -269,7 +266,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @throws NotFoundException
      */
     public Response populateWorkerGeneralDetails(String id, String userName) throws NotFoundException {
-
         boolean isAuthorized = permissionProvider.hasPermission(userName, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -795,8 +791,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                         .currentTimeMillis());
                         List<List<Object>> workerMemoryTotal = metricStore.selectWorkerAggregatedMetrics(carbonId,
                                 timeInterval,
-                                Constants
-                                        .HEAP_MEMORY_MAX,
+                                Constants.HEAP_MEMORY_MAX,
                                 System
                                         .currentTimeMillis());
                         List<List<Object>> workerSystemCUP = metricStore.selectWorkerAggregatedMetrics(carbonId,
@@ -1051,7 +1046,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     }
 
 
-
     /**
      * Get siddhi app metrics histrory such as memory,throughput and latency.
      *
@@ -1065,7 +1059,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     @Override
     public Response getAppHistory(String workerId, String appName, String period, String type, String username)
             throws NotFoundException {
-
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1132,7 +1125,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getSiddhiAppDetails(String id, String appName, String username) throws NotFoundException {
-
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1176,7 +1168,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return response from the worker.
      */
     private String getWorkerGeneralDetails(String workerURI, String workerId) {
-
         try {
             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURI,
                     this.getUsername(),
@@ -1275,17 +1266,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     public Response getRolesByUsername(String username, String permissionSuffix) {
 
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
-                Constants.PERMISSION_APP_NAME
-                        + "."
-                        + permissionSuffix));
+                Constants.PERMISSION_APP_NAME + "." + permissionSuffix));
         if (isAuthorized) {
-            return Response.ok()
-                    .entity(isAuthorized)
-                    .build();
+            return Response.ok().entity(isAuthorized).build();
         } else {
-            return Response.ok()
-                    .entity(isAuthorized)
-                    .build();
+            return Response.ok().entity(isAuthorized).build();
         }
     }
 
@@ -1346,7 +1331,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
 
 
     /**
@@ -1412,9 +1396,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 String uri = generateURLHostPort(hostPort[0], hostPort[1]);
                 try {
                     feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
-                            getUsername(),
-                            getPassword())
-                            .getWorker();
+                            getUsername(), getPassword()).getWorker();
                     String responseBody = workerResponse.body().toString();
                     status = workerResponse.status();
                     try {
@@ -1614,8 +1596,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
-            WorkerConfigurationDetails workerConfig = dashboardStore.selectWorkerConfigurationDetails(id);
-            Worker worker = new Worker();
+            NodeConfigurationDetails workerConfig = dashboardStore.selectWorkerConfigurationDetails(id);
+            Node worker = new Node();
             if (workerConfig != null) {
                 worker.setHost(workerConfig.getHost());
                 worker.setPort(workerConfig.getPort());
@@ -1649,9 +1631,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 String uri = generateURLHostPort(hostPort[0], hostPort[1]);
                 try {
                     feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
-                            getUsername(),
-                            getPassword())
-                            .getWorker();
+                            getUsername(), getPassword()).getWorker();
                     status = workerResponse.status();
                     if (status == 200) {
                         workerResponce.setCode(200);
@@ -1721,16 +1701,15 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @throws NotFoundException
      */
     @Override
-    public Response addWorker(Worker worker, String username) throws NotFoundException {
+    public Response addWorker(Node worker, String username) throws NotFoundException {
 
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
             if (worker.getHost() != null) {
                 String workerID = generateWorkerKey(worker.getHost(), String.valueOf(worker.getPort()));
-                WorkerConfigurationDetails workerConfigData = new WorkerConfigurationDetails(workerID, worker.getHost(),
-                        Integer.valueOf(
-                                worker.getPort()));
+                NodeConfigurationDetails workerConfigData = new NodeConfigurationDetails(workerID, worker.getHost(),
+                        Integer.valueOf(worker.getPort()));
                 StatusDashboardDBHandler workerDBHandler = dashboardStore;
                 try {
                     workerDBHandler.insertWorkerConfiguration(workerConfigData);
@@ -1791,19 +1770,20 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Add a new manager.
+     *
      * @param manager Manager object that's needed to be added.
      * @return Response whether the worker is sucessfully added or not.
      * @throws NotFoundException
      */
     @Override
-    public Response addManager(Worker manager, String username) throws NotFoundException {
+    public Response addManager(Node manager, String username) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
             if (manager.getHost() != null && manager.getPort() != 0) {
                 String managerId = manager.getHost() + Constants.WORKER_KEY_GENERATOR + String.valueOf(manager.getPort());
-                WorkerConfigurationDetails managerConfigurationDetails =
-                        new WorkerConfigurationDetails(managerId, manager.getHost(), Integer.valueOf(manager.getPort()));
+                NodeConfigurationDetails managerConfigurationDetails =
+                        new NodeConfigurationDetails(managerId, manager.getHost(), Integer.valueOf(manager.getPort()));
                 try {
                     dashboardStore.insertManagerConfiguration(managerConfigurationDetails);
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
@@ -1826,6 +1806,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Delete an existing manager Node.
+     *
      * @param id worker Id
      * @return Response whether the worker is sucessfully deleted or not.
      * @throws NotFoundException
@@ -1854,6 +1835,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     /**
      * Return all realtime statistics of the managers.If manager is not currently reachable then send the last
      * persistant state of that manager.
+     *
      * @return Realtime data and status of workers.
      * @throws NotFoundException
      */
@@ -1864,126 +1846,123 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
             Map<String, List<ManagerOverView>> groupedManagers = new HashMap<>();
-            List<WorkerConfigurationDetails> managerList = dashboardStore.getAllManagerConfigDetails();
+            List<NodeConfigurationDetails> managerList = dashboardStore.getAllManagerConfigDetails();
             if (!managerList.isEmpty()) {
                 logger.info(managerList.toString());
                 managerList.parallelStream().forEach(manager -> {
-                    // TODO: 4/17/18 get the WorkerServiceFactory out
-                            try {
-                                ManagerOverView managerOverView = new ManagerOverView();
-                                feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
-                                        generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getWorker();
-                                if ((managerResponse != null) && (managerResponse.status() == 200)) {
-                                    Long timeInMillis = System.currentTimeMillis();
-                                    String responseBody = managerResponse.body().toString();
-                                    ManagerDetails serverDetails = gson.fromJson(responseBody, ManagerDetails.class);
-                                    String message = serverDetails.getMessage();
-                                    if (message == null || message.isEmpty()) {
-                                        managerOverView.setStatusMessage("Success");
-                                    } else {
-                                        managerOverView.setStatusMessage(message);
-                                    }
-                                    feign.Response activeSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
-                                            generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getSiddhiApps(true);
-                                    String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
-                                    List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody, new TypeToken<List<String>>() {
+                    try {
+                        ManagerOverView managerOverView = new ManagerOverView();
+                        feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                                        generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())),
+                                getUsername(), getPassword()).getWorker();
+
+                        if ((managerResponse != null) && (managerResponse.status() == 200)) {
+                            Long timeInMillis = System.currentTimeMillis();
+                            String responseBody = managerResponse.body().toString();
+                            ManagerDetails serverDetails = gson.fromJson(responseBody, ManagerDetails.class);
+                            String message = serverDetails.getMessage();
+                            if (message == null || message.isEmpty()) {
+                                managerOverView.setStatusMessage("Success");
+                            } else {
+                                managerOverView.setStatusMessage(message);
+                            }
+                            feign.Response activeSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
+                                    PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getSiddhiApps(true);
+                            String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
+                            List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody, new TypeToken<List<String>>() {
                                     }.getType());
-                                    feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                            feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
                                             generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getSiddhiApps(false);
-                                    String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
-                                    List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody, new TypeToken<List<String>>() {
+                            String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
+                            List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody, new TypeToken<List<String>>() {
                                     }.getType());
-                                    serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
-                                    ManagerMetricsSnapshot snapshot = new ManagerMetricsSnapshot(serverDetails, timeInMillis);
-                                    WorkerStateHolder.addManagerMetrics(manager.getWorkerId(), snapshot);
-                                    managerOverView.setLastUpdate(timeInMillis);
-                                    managerOverView.setWorkerId(manager.getWorkerId());
+                            serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
+                            ManagerMetricsSnapshot snapshot = new ManagerMetricsSnapshot(serverDetails, timeInMillis);
+                            WorkerStateHolder.addManagerMetrics(manager.getWorkerId(), snapshot);
+                            managerOverView.setLastUpdate(timeInMillis);
+                            managerOverView.setWorkerId(manager.getWorkerId());
 
-                                    feign.Response haDetails = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                            feign.Response haDetails = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
                                             generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getManagerDetails();
-                                    String haResponseBody = haDetails.body().toString();
-                                    ManagerClusterInfo clusterInfo = gson.fromJson(haResponseBody, ManagerClusterInfo.class);
-                                    managerOverView.setServerDetails(serverDetails);
-                                    managerOverView.setClusterInfo(clusterInfo);
+                            String haResponseBody = haDetails.body().toString();
+                            ManagerClusterInfo clusterInfo = gson.fromJson(haResponseBody, ManagerClusterInfo.class);
+                            managerOverView.setServerDetails(serverDetails);
+                            managerOverView.setClusterInfo(clusterInfo);
 
-                                    //grouping the clusters of the managers
-                                    List nonClusterList = groupedManagers.get(Constants.NON_CLUSTERS_ID);
-                                    String clusterID = clusterInfo.getGroupId();
-                                    List existing = groupedManagers.get(clusterID);
-                                    // TODO: 4/17/18 check for the empty string //td\\\\\
+                            //grouping the clusters of the managers
+                            List nonClusterList = groupedManagers.get(Constants.NON_CLUSTERS_ID);
+                            String clusterID = clusterInfo.getGroupId();
+                            List existingGroupList = groupedManagers.get(clusterID);
+                            if (nonClusterList == null) {
+                                nonClusterList = new ArrayList<>();
+                            }
+                            if (existingGroupList == null) {
+                                existingGroupList = new ArrayList<>();
+                            }
+                            if (clusterInfo.getGroupId().equals(" ") || clusterID.equals(" ")) {
+                                nonClusterList.add(managerOverView);
+                                groupedManagers.put(Constants.NON_CLUSTERS_ID, nonClusterList);
+                            } else if (clusterID.equals(" ")) {
+                                existingGroupList.add(managerOverView);
+                                groupedManagers.put(clusterID, existingGroupList);
+                            }
 
-                                    // TODO: 4/17/18 simplify the the if statements
-                                    if (clusterInfo.getGroupId() == null && (nonClusterList == null)) {
-                                        List<ManagerOverView> managers = new ArrayList<>();
-                                        managers.add(managerOverView);
-                                        groupedManagers.put(Constants.NON_CLUSTERS_ID, managers);
-                                    } else if (clusterID == null && (nonClusterList != null)) {
-                                        nonClusterList.add(managerOverView);
-                                    } else if (clusterID != null && (existing == null)) {
-                                        List<ManagerOverView> managers = new ArrayList<>();
-                                        managers.add(managerOverView);
-                                        groupedManagers.put(clusterID, managers);
-                                    } else if (clusterID != null && (existing != null)) {
-                                        existing.add(managerOverView);
-                                    }
-                                } else {
-                                    managerOverView.setWorkerId(manager.getWorkerId());
-                                    ManagerDetails serverDetails = new ManagerDetails();
-                                    ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
-                                    serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
-                                    managerOverView.setStatusMessage(getErrorMessage(managerResponse.status()));
-                                    managerOverView.setServerDetails(serverDetails);
-                                    managerOverView.setClusterInfo(clusterInfo);
-                                    managerOverView.setLastUpdate((long) 0);
-                                    //grouping the never reached
-                                    if (groupedManagers.get(Constants.NEVER_REACHED) == null) {
-                                        List<ManagerOverView> managers = new ArrayList<>();
-                                        managers.add(managerOverView);
-                                        groupedManagers.put(Constants.NEVER_REACHED, managers);
-                                    } else {
-                                        List existing = groupedManagers.get(Constants.NEVER_REACHED);
-                                        existing.add(managerOverView);
-                                    }
-                                }
-                            } catch (feign.RetryableException e) {
-                                ManagerMetricsSnapshot lastSnapshot = WorkerStateHolder.getManagerMetrics(manager.getWorkerId());
-                                if (lastSnapshot != null) {
-                                    lastSnapshot.updateRunningStatus(Constants.NOT_REACHABLE_ID);
-                                    ManagerOverView managerOverView = new ManagerOverView();
-                                    managerOverView.setLastUpdate(lastSnapshot.getTimeStamp());
-                                    managerOverView.setWorkerId(manager.getWorkerId());
-                                    managerOverView.setServerDetails(lastSnapshot.getServerDetails());
-                                    managerOverView.setClusterInfo(lastSnapshot.getClusterInfo());
-                                    if (groupedManagers.get(lastSnapshot.getClusterInfo().getGroupId()) != null) {
-                                        groupedManagers.get(lastSnapshot.getClusterInfo().getGroupId()).add(managerOverView);
-                                    } else {
-                                        List<ManagerOverView> managers = new ArrayList<>();
-                                        managers.add(managerOverView);
-                                        groupedManagers.put(lastSnapshot.getClusterInfo().getGroupId(), managers);
-                                    }
-                                } else {
-                                    //todo change this to top
-                                    ManagerOverView managerOverView = new ManagerOverView();
-                                    managerOverView.setWorkerId(manager.getWorkerId());
-                                    ManagerDetails serverDetails = new ManagerDetails();
-                                    ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
-                                    serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
-                                    managerOverView.setServerDetails(serverDetails);
-                                    managerOverView.setClusterInfo(clusterInfo);
-                                    managerOverView.setLastUpdate((long) 0);
-                                    //grouping the never reached
-                                    if (groupedManagers.get(Constants.NEVER_REACHED) == null) {
-                                        List<ManagerOverView> managers = new ArrayList<>();
-                                        managers.add(managerOverView);
-                                        groupedManagers.put(Constants.NEVER_REACHED, managers);
-                                    } else {
-                                        List existing = groupedManagers.get(Constants.NEVER_REACHED);
-                                        existing.add(managerOverView);
-                                    }
-                                }
+                        } else {
+                            managerOverView.setWorkerId(manager.getWorkerId());
+                            ManagerDetails serverDetails = new ManagerDetails();
+                            ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
+                            serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
+                            managerOverView.setStatusMessage(getErrorMessage(managerResponse.status()));
+                            managerOverView.setServerDetails(serverDetails);
+                            managerOverView.setClusterInfo(clusterInfo);
+                            managerOverView.setLastUpdate((long) 0);
+                            //grouping the never reached
+                            if (groupedManagers.get(Constants.NEVER_REACHED) == null) {
+                                List<ManagerOverView> managers = new ArrayList<>();
+                                managers.add(managerOverView);
+                                groupedManagers.put(Constants.NEVER_REACHED, managers);
+                            } else {
+                                List existing = groupedManagers.get(Constants.NEVER_REACHED);
+                                existing.add(managerOverView);
                             }
                         }
-                );
+                    } catch (feign.RetryableException e) {
+                        ManagerMetricsSnapshot lastSnapshot = WorkerStateHolder.getManagerMetrics(manager.getWorkerId());
+                        if (lastSnapshot != null) {
+                            lastSnapshot.updateRunningStatus(Constants.NOT_REACHABLE_ID);
+                            ManagerOverView managerOverView = new ManagerOverView();
+                            managerOverView.setLastUpdate(lastSnapshot.getTimeStamp());
+                            managerOverView.setWorkerId(manager.getWorkerId());
+                            managerOverView.setServerDetails(lastSnapshot.getServerDetails());
+                            managerOverView.setClusterInfo(lastSnapshot.getClusterInfo());
+                            if (groupedManagers.get(lastSnapshot.getClusterInfo().getGroupId()) != null) {
+                                groupedManagers.get(lastSnapshot.getClusterInfo().getGroupId()).add(managerOverView);
+                            } else {
+                                List<ManagerOverView> managers = new ArrayList<>();
+                                managers.add(managerOverView);
+                                groupedManagers.put(lastSnapshot.getClusterInfo().getGroupId(), managers);
+                            }
+                        } else {
+                            ManagerOverView managerOverView = new ManagerOverView();
+                            managerOverView.setWorkerId(manager.getWorkerId());
+                            ManagerDetails serverDetails = new ManagerDetails();
+                            ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
+                            serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
+                            managerOverView.setServerDetails(serverDetails);
+                            managerOverView.setClusterInfo(clusterInfo);
+                            managerOverView.setLastUpdate((long) 0);
+                            //grouping the never reached
+                            if (groupedManagers.get(Constants.NEVER_REACHED) == null) {
+                                List<ManagerOverView> managers = new ArrayList<>();
+                                managers.add(managerOverView);
+                                groupedManagers.put(Constants.NEVER_REACHED, managers);
+                            } else {
+                                List existing = groupedManagers.get(Constants.NEVER_REACHED);
+                                existing.add(managerOverView);
+                            }
+                        }
+                    }
+                });
             }
             String jsonString = new Gson().toJson(groupedManagers);
             return Response.ok().entity(jsonString).build();
@@ -1996,6 +1975,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Returns HA Details of manager nodes. whether active or pasive
+     *
      * @param managerId : Id of the manager node
      * @param username
      * @return
@@ -2041,8 +2021,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Reurns the text view of the parent siddhi application
+     *
      * @param managerId :  Id of the manager node
-     * @param appName : parent siddhi app name
+     * @param appName   : parent siddhi app name
      * @param username
      * @return
      * @throws NotFoundException
@@ -2131,6 +2112,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Returns the summary details of deployed parent siddhi application.
+     *
      * @param managerId : Id of the manager node
      * @param username
      * @return
@@ -2163,9 +2145,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 }
 
                                 ParentSummaryDetails existingParentAppName = appSummary.get(parentAppName);
-                                if (!(existingParentAppName.getGroups().contains(siddhiapp.getGroupName()))) {
-                                    existingParentAppName.getGroups().add(siddhiapp.getGroupName());
+                                if (existingParentAppName.getGroups() != null) {
+                                    if (!(existingParentAppName.getGroups().contains(siddhiapp.getGroupName()))) {
+                                        existingParentAppName.getGroups().add(siddhiapp.getGroupName());
+                                    }
                                 }
+
                                 int numberOfChildApp = existingParentAppName.getChildApps() + 1;
                                 existingParentAppName.setChildApps(numberOfChildApp);
                                 if (siddhiapp.getId() != null) {
@@ -2175,7 +2160,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 }
                                 if (!existingParentAppName.getUsedWorkerNode().contains(siddhiapp.getId())) {
                                     existingParentAppName.getUnDeployedChildApps().add(siddhiapp.getId());
-                                }else {
+                                } else {
                                     existingParentAppName.getDeployedChildApps().add(siddhiapp.getId());
                                 }
                             }
@@ -2194,7 +2179,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                         .put("numberOfChildApp", Integer.toString(entry.getValue().getChildApps()));
                                 parentAppDetail.put("usedWorkerNodes",
                                         Integer.toString(entry.getValue().getUsedWorkerNode().size()));
-                                parentAppDetail.put("deployedChildApps",Integer.toString(entry.getValue().getDeployedChildApps().size()));
+                                parentAppDetail.put("deployedChildApps", Integer.toString(entry.getValue().getDeployedChildApps().size()));
                                 parentAppDetail.put("notDeployedChildApps", Integer.toString(entry.getValue().getUnDeployedChildApps().size()));
                                 parentAppDetail.put("totalWorkerNodes", resourceClusterResponseBody);
                                 parentAppSummary.add(parentAppDetail);
@@ -2231,8 +2216,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Returns kafka topic details of each child apps
+     *
      * @param managerId : id of the manager Node
-     * @param appName : parent siddhi application
+     * @param appName   : parent siddhi application
      * @param username
      * @throws IOException
      */
@@ -2262,8 +2248,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     }
                 } catch (feign.RetryableException ex) {
                     String errString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
-                            .SERVER_CONNECTION_ERROR,
-                            ex.getMessage()));
+                            .SERVER_CONNECTION_ERROR, ex.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
                 }
             } else {

@@ -108,8 +108,6 @@ public class DBHandler {
      * @return list of object.
      */
 
-    // TODO: 4/17/18  stmt.getMetaData().getTableName() CHECK THIS to get the table name
-
     ResultSet select(PreparedStatement stmt) {
         ResultSet rs;
         try {

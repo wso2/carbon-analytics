@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
-import org.wso2.carbon.status.dashboard.core.bean.WorkerConfigurationDetails;
+import org.wso2.carbon.status.dashboard.core.bean.NodeConfigurationDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.DBTableUtils;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
@@ -262,13 +262,13 @@ public class StatusDashboardDBHandler {
 
     /**
      * Method which is used to insert the worker configuration details to database.
-     *
-     * @param workerConfigurationDetails workerConfiguration object
+     * @param workerConfigurationDetails
      * @return isSuccess
+     * @throws RDBMSTableException
      */
-    public boolean insertWorkerConfiguration(WorkerConfigurationDetails workerConfigurationDetails)
+    public boolean insertWorkerConfiguration(NodeConfigurationDetails workerConfigurationDetails)
             throws RDBMSTableException {
-        String columnNames = WorkerConfigurationDetails.getColumnLabeles();
+        String columnNames = NodeConfigurationDetails.getColumnLabeles();
         Object[] records = workerConfigurationDetails.toArray();
         try {
             return this.insert(columnNames, records, WORKER_CONFIG_TABLE);
@@ -300,9 +300,9 @@ public class StatusDashboardDBHandler {
      * @param managerConfigurationDetails managerConfiguration object
      * @return isSuccess
      */
-    public boolean insertManagerConfiguration(WorkerConfigurationDetails managerConfigurationDetails) throws
+    public boolean insertManagerConfiguration(NodeConfigurationDetails managerConfigurationDetails) throws
             RDBMSTableException {
-        String columnNames = WorkerConfigurationDetails.getManagerColumnLabeles();
+        String columnNames = NodeConfigurationDetails.getManagerColumnLabeles();
         Object[] records = managerConfigurationDetails.toArray();
         try {
             return this.insert(columnNames, records, MANAGER_CONFIG_TABLE);
@@ -445,12 +445,12 @@ public class StatusDashboardDBHandler {
      * @param workerId condition of the selection.
      * @return list of object.
      */
-    public WorkerConfigurationDetails selectWorkerConfigurationDetails(String workerId) {
-        String columnNames = WorkerConfigurationDetails.getColumnLabeles();
+    public NodeConfigurationDetails selectWorkerConfigurationDetails(String workerId) {
+        String columnNames = NodeConfigurationDetails.getColumnLabeles();
         List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_CONFIG_TABLE,
                 new String[]{workerId});
         if (!row.isEmpty()) {
-            WorkerConfigurationDetails details = new WorkerConfigurationDetails();
+            NodeConfigurationDetails details = new NodeConfigurationDetails();
             try {
                 details.setArrayList(row);
             } catch (StatusDashboardValidationException e) {
@@ -519,19 +519,19 @@ public class StatusDashboardDBHandler {
      *
      * @return list of object.
      */
-    public List<WorkerConfigurationDetails> selectAllWorkers() {
+    public List<NodeConfigurationDetails> selectAllWorkers() {
         String resolvedSelectQuery = resolveTableName(this.selectQuery, WORKER_CONFIG_TABLE);
         Map<String, String> attributesTypes = workerAttributeTypeMap.get(WORKER_CONFIG_TABLE);
         Connection conn = this.getConnection();
-        WorkerConfigurationDetails row;
-        List<WorkerConfigurationDetails> workerConfigurationDetails = new ArrayList<>();
+        NodeConfigurationDetails row;
+        List<NodeConfigurationDetails> workerConfigurationDetails = new ArrayList<>();
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, WHITESPACE +
-                    WorkerConfigurationDetails.getColumnLabeles()).replace(PLACEHOLDER_CONDITION, ""));
+                    NodeConfigurationDetails.getColumnLabeles()).replace(PLACEHOLDER_CONDITION, ""));
             ResultSet rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
-                row = new WorkerConfigurationDetails();
+                row = new NodeConfigurationDetails();
                 row.setPort((Integer) DBTableUtils.getInstance().fetchData(rs, "PORT", attributesTypes.get
                         ("PORT"), statusDashboardQueryManager));
                 row.setHost((String) DBTableUtils.getInstance().fetchData(rs, "HOST", attributesTypes.get
@@ -562,19 +562,19 @@ public class StatusDashboardDBHandler {
     /**
      * select managers in the database.
      */
-    public List<WorkerConfigurationDetails> getAllManagerConfigDetails() {
+    public List<NodeConfigurationDetails> getAllManagerConfigDetails() {
         String resolvedSelectQuery = resolveTableName(this.selectQuery, MANAGER_CONFIG_TABLE);
         Map<String, String> attributesTypes = workerAttributeTypeMap.get(MANAGER_CONFIG_TABLE);
         Connection conn = this.getConnection();
-        WorkerConfigurationDetails row;
-        List<WorkerConfigurationDetails> workerConfigurationDetails = new ArrayList<>();
+        NodeConfigurationDetails row;
+        List<NodeConfigurationDetails> workerConfigurationDetails = new ArrayList<>();
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, WHITESPACE +
-                    WorkerConfigurationDetails.getManagerColumnLabeles()).replace(PLACEHOLDER_CONDITION, ""));
+                    NodeConfigurationDetails.getManagerColumnLabeles()).replace(PLACEHOLDER_CONDITION, ""));
             ResultSet rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
-                row = new WorkerConfigurationDetails();
+                row = new NodeConfigurationDetails();
                 row.setPort((Integer) DBTableUtils.getInstance().fetchData(rs, "PORT", attributesTypes.get
                         (Constants.PORT), statusDashboardQueryManager));
                 row.setHost((String) DBTableUtils.getInstance().fetchData(rs, "HOST", attributesTypes.get

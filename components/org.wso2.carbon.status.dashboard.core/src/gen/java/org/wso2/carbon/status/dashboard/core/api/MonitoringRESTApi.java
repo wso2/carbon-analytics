@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
+import org.wso2.carbon.status.dashboard.core.model.Node;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
-import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
@@ -73,7 +73,7 @@ public class MonitoringRESTApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
     public Response addWorker(@Context Request request,
-                              @ApiParam(value = "Worker object that needs to be added.", required = true) Worker worker
+                              @ApiParam(value = "Worker object that needs to be added.", required = true) Node worker
                              )
             throws NotFoundException {
         return workersApi.addWorker(worker, getUserName(request));
@@ -97,7 +97,7 @@ public class MonitoringRESTApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                                                 response = void.class)})
     public Response addManager(@Context Request request,
-                               @ApiParam(value = "Manager object need to be added.", required = true) Worker manager
+                               @ApiParam(value = "Manager object need to be added.", required = true) Node manager
                               ) throws NotFoundException {
         return workersApi.addManager(manager, getUserName(request));
     }

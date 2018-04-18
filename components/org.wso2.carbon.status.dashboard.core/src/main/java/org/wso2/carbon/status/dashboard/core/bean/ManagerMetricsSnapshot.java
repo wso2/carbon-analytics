@@ -43,13 +43,17 @@ public class ManagerMetricsSnapshot {
         return serverDetails;
     }
 
-    public ManagerClusterInfo getClusterInfo(){return clusterInfo;}
+    public ManagerClusterInfo getClusterInfo() {
+        return clusterInfo;
+    }
 
     public void setServerDetails(ManagerDetails serverDetails) {
         this.serverDetails = serverDetails;
     }
 
-    public void setClusterInfo(ManagerClusterInfo clusterInfo){this.clusterInfo=clusterInfo;}
+    public void setClusterInfo(ManagerClusterInfo clusterInfo) {
+        this.clusterInfo = clusterInfo;
+    }
 
     public Long getTimeStamp() {
         return timeStamp;

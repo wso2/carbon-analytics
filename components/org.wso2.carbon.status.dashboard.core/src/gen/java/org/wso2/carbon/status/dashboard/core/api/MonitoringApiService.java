@@ -18,18 +18,18 @@
  */
 package org.wso2.carbon.status.dashboard.core.api;
 
+import org.wso2.carbon.status.dashboard.core.model.Node;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
-import org.wso2.carbon.status.dashboard.core.model.Worker;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.ws.rs.core.Response;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
 public abstract class MonitoringApiService {
-    public abstract Response addWorker(Worker worker,String username) throws NotFoundException;
+    public abstract Response addWorker(Node worker, String username) throws NotFoundException;
 
-    public abstract Response addManager(Worker manager, String username) throws NotFoundException;
+    public abstract Response addManager(Node manager, String username) throws NotFoundException;
 
     public abstract Response deleteWorker(String id,String username) throws NotFoundException, SQLException;
 

@@ -26,21 +26,20 @@ import java.util.List;
  * WorkerConfigurationDetails bean class.
  *
  */
-// TODO: 4/17/18 change the class name
-public class WorkerConfigurationDetails {
+public class NodeConfigurationDetails {
 
     private String workerId;
     private String host;
     private int port;
 
 
-    public WorkerConfigurationDetails(String workerId, String host, int port) {
+    public NodeConfigurationDetails(String workerId, String host, int port) {
         this.workerId = workerId;
         this.host = host;
         this.port = port;
     }
 
-    public WorkerConfigurationDetails() {
+    public NodeConfigurationDetails() {
     }
 
     public String getWorkerId() {

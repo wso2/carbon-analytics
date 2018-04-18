@@ -276,7 +276,6 @@ public class DBTableUtils {
         return attributesTypeMaps;
     }
 
-    //TODO: NEWLY ADDED
     public Map<String, String> loadManagerConfigTableTuples(QueryManager statusDashboardQueryManager) {
         String intType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
         String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);

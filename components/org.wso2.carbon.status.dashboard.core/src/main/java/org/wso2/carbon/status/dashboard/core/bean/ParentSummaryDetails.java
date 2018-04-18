@@ -3,10 +3,12 @@ package org.wso2.carbon.status.dashboard.core.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class contains the summary details of each parent siddhi application.
+ */
 public class ParentSummaryDetails {
-    private List <String> groups = new ArrayList<>();
+    private List<String> groups = new ArrayList<>();
     private int childApps = 0;
-    // TODO: 4/17/18 initialize as null 
     private List<String> usedWorkerNode = new ArrayList<>();
     private List<String> deployedChildApps = new ArrayList<>();
     private List<String> unDeployedChildApps = new ArrayList<>();
