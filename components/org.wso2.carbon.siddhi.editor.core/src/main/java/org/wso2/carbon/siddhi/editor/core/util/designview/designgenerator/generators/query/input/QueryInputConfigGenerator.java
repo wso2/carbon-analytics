@@ -40,7 +40,7 @@ public class QueryInputConfigGenerator {
      * @param siddhiApp             Compiled Siddhi application
      * @return                      QueryInputConfig object
      */
-    public QueryInputConfig generateQueryInput(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
+    public QueryInputConfig generateQueryInputConfig(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
         String queryInputType = getQueryInputType(query);
         if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW_FILTER_PROJECTION.toString())) {
             return new WindowFilterProjectionConfigGenerator(query, siddhiAppString)

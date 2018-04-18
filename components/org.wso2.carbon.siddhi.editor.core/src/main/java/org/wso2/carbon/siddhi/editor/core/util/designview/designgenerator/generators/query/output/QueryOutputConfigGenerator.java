@@ -18,10 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.output;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.DeleteOutputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.InsertOutputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.UpdateOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.setattributeconfig.SetAttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.SiddhiApp;
@@ -37,20 +34,26 @@ import java.util.List;
 public class QueryOutputConfigGenerator {
     private Query query;
     private String siddhiAppString;
-    private SiddhiApp siddhiApp;
 
-    public QueryOutputConfigGenerator(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
+    public QueryOutputConfigGenerator(Query query, String siddhiAppString) {
         this.query = query;
         this.siddhiAppString = siddhiAppString;
-        this.siddhiApp = siddhiApp;
     }
 
     // TODO: 4/17/18 comment
-    public QueryOutputConfig generateQueryOutput() {
-        String t = "";
-//        return generateInsertOutputConfig((InsertIntoStream)(query.getOutputStream()));
-//        return generateDeleteOutputConfig((DeleteStream)(query.getOutputStream()));
-        return generateUpdateOutputConfig((UpdateStream) (query.getOutputStream()));
+    public QueryOutputConfig generateQueryOutputConfig(Query query, String siddhiAppString) {
+        OutputStream queryOutputStream = query.getOutputStream();
+        if (queryOutputStream instanceof InsertIntoStream) {
+            return generateInsertOutputConfig((InsertIntoStream)(query.getOutputStream()));
+        } else if (queryOutputStream instanceof DeleteStream) {
+            return generateDeleteOutputConfig((DeleteStream)(query.getOutputStream()), siddhiAppString);
+        } else if (queryOutputStream instanceof UpdateStream) {
+            return generateUpdateOutputConfig((UpdateStream) (query.getOutputStream()), siddhiAppString);
+        } else if (queryOutputStream instanceof UpdateOrInsertStream) {
+            return generateUpdateOrInsertIntoOutputConfig(
+                    (UpdateOrInsertStream) (query.getOutputStream()), siddhiAppString);
+        }
+        throw new IllegalArgumentException("Unknown type of Query Output Stream for generating Query Output Config");
     }
 
     private QueryOutputConfig generateInsertOutputConfig(InsertIntoStream insertIntoStream) {
@@ -60,7 +63,7 @@ public class QueryOutputConfigGenerator {
                 insertIntoStream.getId());
     }
 
-    private QueryOutputConfig generateDeleteOutputConfig(DeleteStream deleteStream) {
+    private QueryOutputConfig generateDeleteOutputConfig(DeleteStream deleteStream, String siddhiAppString) {
         return new QueryOutputConfig(
                 QueryOutputType.DELETE.toString(),
                 new DeleteOutputConfig(
@@ -69,30 +72,45 @@ public class QueryOutputConfigGenerator {
                 deleteStream.getId());
     }
 
-    private QueryOutputConfig generateUpdateOutputConfig(UpdateStream updateStream) {
+    private QueryOutputConfig generateUpdateOutputConfig(UpdateStream updateStream, String siddhiAppString) {
+        return new QueryOutputConfig(
+                QueryOutputType.UPDATE.toString(),
+                new UpdateOutputConfig(
+                        updateStream.getOutputEventType().name(),
+                        generateSetAttributeConfigsList(
+                                updateStream.getUpdateSet().getSetAttributeList(), siddhiAppString),
+                        ConfigBuildingUtilities.getDefinition(updateStream.getOnUpdateExpression(), siddhiAppString)),
+                updateStream.getId());
+    }
+
+    private QueryOutputConfig generateUpdateOrInsertIntoOutputConfig(UpdateOrInsertStream updateOrInsertStream,
+                                                                     String siddhiAppString) {
+        return new QueryOutputConfig(
+                QueryOutputType.UPDATE_OR_INSERT_INTO.toString(),
+                new UpdateOrInsertIntoOutputConfig(
+                        updateOrInsertStream.getOutputEventType().name(),
+                        generateSetAttributeConfigsList(
+                                updateOrInsertStream.getUpdateSet().getSetAttributeList(), siddhiAppString),
+                        ConfigBuildingUtilities.getDefinition(
+                                updateOrInsertStream.getOnUpdateExpression(), siddhiAppString)),
+                updateOrInsertStream.getId());
+    }
+
+    private List<SetAttributeConfig> generateSetAttributeConfigsList(List<UpdateSet.SetAttribute> setAttributes,
+                                                                     String siddhiAppString) {
         List<SetAttributeConfig> setAttributeConfigs = new ArrayList<>();
-        for (UpdateSet.SetAttribute setAttribute : updateStream.getUpdateSet().getSetAttributeList()) {
+        for (UpdateSet.SetAttribute setAttribute : setAttributes) {
             // Attribute name and value
             String attributeName = setAttribute.getTableVariable().getAttributeName();
             if (setAttribute.getTableVariable().getStreamId() != null) {
                 attributeName = setAttribute.getTableVariable().getStreamId() + "." + attributeName;
             }
-            String attributeValue = ConfigBuildingUtilities.getDefinition(
-                    ((UpdateSet.SetAttribute) setAttribute).getAssignmentExpression(), siddhiAppString);
+            String attributeValue =
+                    ConfigBuildingUtilities.getDefinition(setAttribute.getAssignmentExpression(), siddhiAppString);
 
-            setAttributeConfigs.add(new SetAttributeConfig(
-                    attributeName,
-                    attributeValue));
+            setAttributeConfigs.add(new SetAttributeConfig(attributeName, attributeValue));
         }
-
-        return new QueryOutputConfig(
-                QueryOutputType.UPDATE.toString(),
-                new UpdateOutputConfig(
-                        updateStream.getOutputEventType().name(),
-                        setAttributeConfigs,
-                        ConfigBuildingUtilities.getDefinition(updateStream.getOnUpdateExpression(), siddhiAppString)),
-                updateStream.getId());
-        // TODO: 4/17/18 continue implementation
+        return setAttributeConfigs;
     }
 
     /**

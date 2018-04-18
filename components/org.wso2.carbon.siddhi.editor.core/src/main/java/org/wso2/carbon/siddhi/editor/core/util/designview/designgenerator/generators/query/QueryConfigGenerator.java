@@ -40,22 +40,22 @@ public class QueryConfigGenerator {
         this.siddhiApp = siddhiApp;
     }
 
-    public QueryConfig buildQueryConfig(Query query) {
-        // Generate input part
+    public QueryConfig generateQueryConfig(Query query) {
+        // Generate Query Input
         QueryInputConfigGenerator queryInputConfigGenerator = new QueryInputConfigGenerator();
         QueryInputConfig queryInputConfig =
-                queryInputConfigGenerator.generateQueryInput(query, siddhiAppString, siddhiApp);
+                queryInputConfigGenerator.generateQueryInputConfig(query, siddhiAppString, siddhiApp);
 
-        // Generate select part
+        // Generate Query Select
         SelectedAttributesConfigGenerator selectedAttributesConfigGenerator = new SelectedAttributesConfigGenerator();
         AttributesSelectionConfig querySelectConfig =
                 selectedAttributesConfigGenerator
                         .generateSelectedAttributesConfig(query.getSelector().getSelectionList());
 
-        // Generate output part
-        QueryOutputConfigGenerator queryOutputConfigGenerator =
-                new QueryOutputConfigGenerator(query, siddhiAppString, siddhiApp);
-        QueryOutputConfig queryOutputConfig = queryOutputConfigGenerator.generateQueryOutput();
+        // Generate Query Output
+        QueryOutputConfigGenerator queryOutputConfigGenerator = new QueryOutputConfigGenerator(query, siddhiAppString);
+        QueryOutputConfig queryOutputConfig =
+                queryOutputConfigGenerator.generateQueryOutputConfig(query, siddhiAppString);
 
         // TODO: 4/8/18 implement
         return null;

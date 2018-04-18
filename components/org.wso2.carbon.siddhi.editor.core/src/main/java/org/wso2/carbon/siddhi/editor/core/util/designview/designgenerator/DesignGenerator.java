@@ -311,7 +311,7 @@ public class DesignGenerator {
      */
     private void addQueryConfig(Query query) {
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
-        QueryConfig queryConfig = queryConfigGenerator.buildQueryConfig(query);
+        QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig(query);
         siddhiAppConfig.add(queryConfig);
     }
 
