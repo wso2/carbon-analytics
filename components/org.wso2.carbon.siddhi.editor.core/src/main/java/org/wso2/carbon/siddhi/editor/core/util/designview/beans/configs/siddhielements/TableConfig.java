@@ -43,5 +43,35 @@ public class TableConfig extends SiddhiElementConfig {
         this.annotationList = annotationList;
     }
 
-    // TODO: 3/29/18 complete
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<AttributeConfig> getAttributeList() {
+        return attributeList;
+    }
+
+    public void setAttributeList(List<AttributeConfig> attributeList) {
+        this.attributeList = attributeList;
+    }
+
+    public StoreConfig getStore() {
+        return store;
+    }
+
+    public void setStore(StoreConfig store) {
+        this.store = store;
+    }
+
+    public List<AnnotationConfig> getAnnotationList() {
+        return annotationList;
+    }
+
+    public void setAnnotationList(List<AnnotationConfig> annotationList) {
+        this.annotationList = annotationList;
+    }
 }
