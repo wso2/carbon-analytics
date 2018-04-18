@@ -34,4 +34,20 @@ public class EventFlow {
         this.siddhiAppConfig = siddhiAppConfig;
         this.edgeList = edgeList;
     }
+
+    public SiddhiAppConfig getSiddhiAppConfig() {
+        return siddhiAppConfig;
+    }
+
+    public void setSiddhiAppConfig(SiddhiAppConfig siddhiAppConfig) {
+        this.siddhiAppConfig = siddhiAppConfig;
+    }
+
+    public List<Edge> getEdgeList() {
+        return edgeList;
+    }
+
+    public void setEdgeList(List<Edge> edgeList) {
+        this.edgeList = edgeList;
+    }
 }
