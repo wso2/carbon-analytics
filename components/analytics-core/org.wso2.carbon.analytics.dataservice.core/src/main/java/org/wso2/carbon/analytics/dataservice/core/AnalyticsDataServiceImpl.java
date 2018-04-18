@@ -1055,20 +1055,65 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         /* this is done to make sure, raw record data as well as the index data are also deleted,
          * even if the table is not indexed now, it could have been indexed earlier, so delete operation
          * must be done in the indexer as well */
-        while (true) {
-            List<Record> recordBatch = AnalyticsDataServiceUtils.listRecords(this, this.get(tenantId, tableName, 1,
-                    null, timeFrom, timeTo, 0, DELETE_BATCH_SIZE));
-            if (recordBatch.size() == 0) {
+        AnalyticsIndexedTableStore.IndexedTableId indexedTableId =
+                new AnalyticsIndexedTableStore.IndexedTableId(tenantId, tableName);
+        AnalyticsIndexedTableStore.IndexedTableId[] indexedTableIds = this.indexedTableStore.getAllIndexedTables();
+        boolean isTableIndexed = false;
+        for (AnalyticsIndexedTableStore.IndexedTableId indexedTableId1 : indexedTableIds) {
+            if (indexedTableId.equals(indexedTableId1)) {
+                isTableIndexed = true;
                 break;
             }
-            this.delete(tenantId, tableName, this.getRecordIdsBatch(recordBatch));
+        }
+        long numberOfRecordsDelete = 0;
+        long startedTime = System.currentTimeMillis();
+        long intialsStartTime = startedTime;
+        if (isTableIndexed) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Purging an indexed " + tableName + " table.");
+            }
+            while (true) {
+                List<SearchResultEntry> searchResultEntries = this.getIndexer().search(tenantId, tableName,
+                        "_timestamp : [" + timeFrom + " TO " + timeTo + "}", 0, 10000,
+                        new ArrayList<SortByField>(0));
+                numberOfRecordsDelete += searchResultEntries.size();
+                if (searchResultEntries.size() == 0) {
+                    break;
+                }
+                this.delete(tenantId, tableName, this.getRecordIdsBatch(searchResultEntries));
+                if (logger.isDebugEnabled()) {
+                    if (0 == numberOfRecordsDelete % 100000) {
+                        logger.debug("Total No of records deleted: " + numberOfRecordsDelete);
+                        logger.debug("Time(seconds) taken to delete current batch of 100000: " +
+                                (System.currentTimeMillis() - startedTime) / 1000);
+                        startedTime = System.currentTimeMillis();
+                    }
+                }
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Purging ended for indexed data. time taken in millies" +
+                        (System.currentTimeMillis() - intialsStartTime));
+                logger.debug("No of indexed records deleted: " + numberOfRecordsDelete);
+            }
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Started purging " + tableName + " table data through database query.");
+        }
+        String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
+        if (arsName == null) {
+            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
+        }
+        this.getAnalyticsRecordStore(arsName).delete(tenantId, tableName, timeFrom, timeTo);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Time(seconds) taken to purge the table: " + tableName + " through database query." +
+                    (System.currentTimeMillis() - intialsStartTime) / 1000);
         }
     }
-    
-    private List<String> getRecordIdsBatch(List<Record> recordsBatch) throws AnalyticsException {
-        List<String> result = new ArrayList<>(recordsBatch.size());
-        for (Record record : recordsBatch) {
-            result.add(record.getId());
+
+    private List<String> getRecordIdsBatch(List<SearchResultEntry> searchResultEntries) throws AnalyticsException {
+        List<String> result = new ArrayList<>(searchResultEntries.size());
+        for (SearchResultEntry searchResultEntry : searchResultEntries) {
+            result.add(searchResultEntry.getId());
         }
         return result;
     }
