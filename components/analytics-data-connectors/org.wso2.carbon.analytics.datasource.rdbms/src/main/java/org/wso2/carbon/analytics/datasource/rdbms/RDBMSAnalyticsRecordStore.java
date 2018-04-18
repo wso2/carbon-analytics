@@ -583,16 +583,20 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
         /* do nothing */
     }
 
-    private void delete(Connection conn, int tenantId, String tableName, 
-            List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
+    private void delete(Connection conn, int tenantId, String tableName,
+                        List<String> ids) throws AnalyticsException, AnalyticsTableNotAvailableException {
         String sql = this.generateRecordDeletionRecordsWithIdsQuery(tenantId, tableName, ids.size());
-        PreparedStatement stmt = null;
+        Statement stmt = null;
         try {
-            stmt = conn.prepareStatement(sql);
-            for (int i = 0; i < ids.size(); i++) {
-                stmt.setString(i + 1, ids.get(i));
+            stmt = conn.createStatement();
+            StringBuilder idString = new StringBuilder();
+            for (String id : ids) {
+                idString.append("'").append(id).append("',");
             }
-            stmt.executeUpdate();
+            idString.deleteCharAt(idString.lastIndexOf(","));
+            String tmpSql = idString.toString();
+            sql = sql.replace("{{RECORD_IDS}}", tmpSql);
+            stmt.executeUpdate(sql);
         } catch (SQLException e) {
             if (!this.tableExists(conn, tenantId, tableName)) {
                 throw new AnalyticsTableNotAvailableException(tenantId, tableName);
@@ -670,7 +674,6 @@ public class RDBMSAnalyticsRecordStore implements AnalyticsRecordStore {
     private String generateRecordDeletionRecordsWithIdsQuery(int tenantId, String tableName, int recordCount) {
         String query = this.getQueryConfiguration().getRecordDeletionWithIdsQuery();
         query = this.translateQueryWithTableInfo(query, tenantId, tableName);
-        query = this.translateQueryWithRecordIdsInfo(query, recordCount);
         return query;
     }
     
