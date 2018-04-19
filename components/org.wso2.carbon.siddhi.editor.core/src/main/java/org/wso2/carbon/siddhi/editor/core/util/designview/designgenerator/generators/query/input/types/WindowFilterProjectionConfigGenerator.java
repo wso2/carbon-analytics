@@ -26,6 +26,7 @@ import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Window;
 import org.wso2.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
+import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
 import org.wso2.siddhi.query.api.expression.Expression;
 
@@ -36,40 +37,38 @@ import java.util.List;
  * Generator to create a QueryInputConfig of type WindowFilterProjection
  */
 public class WindowFilterProjectionConfigGenerator {
-    private Query query;
     private String siddhiAppString;
 
-    public WindowFilterProjectionConfigGenerator(Query query, String siddhiAppString) {
-        this.query = query;
+    public WindowFilterProjectionConfigGenerator(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
     }
 
     /**
      * Gets a WindowFilterProjectionQueryConfig object, from the given Siddhi Query object
-     * @param query     Siddhi Query object
-     * @return          WindowFilterProjectionQueryConfig object
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @return                      WindowFilterProjectionQueryConfig object
      */
-    public WindowFilterProjectionQueryConfig getWindowFilterProjectionQueryConfig(Query query) {
-        switch (getType(query)) {
+    public WindowFilterProjectionQueryConfig getWindowFilterProjectionQueryConfig(InputStream queryInputStream) {
+        switch (getType(queryInputStream)) {
             case PROJECTION:
-                return generateProjectionQueryInput();
+                return generateProjectionQueryInput(queryInputStream);
             case FILTER:
-                return generateFilterQueryInput();
+                return generateFilterQueryInput(queryInputStream);
             case WINDOW:
-                return generateWindowQueryInput();
+                return generateWindowQueryInput(queryInputStream);
             default:
-                throw new IllegalArgumentException("Unknown type: " + getType(query) +
+                throw new IllegalArgumentException("Unknown type: " + getType(queryInputStream) +
                         " for generating Window-Filter-Projection Query Config");
         }
     }
 
     /**
      * Returns the type of WindowFilterProjection Config to generate, from the given Siddhi Query object
-     * @param query     Siddhi Query object
-     * @return          Type of WindowFilterProjection Query to generate
+     * @param queryInputStream     Siddhi Query InputStream object
+     * @return                     Type of WindowFilterProjection Query to generate
      */
-    private WindowFilterProjectionQueryType getType(Query query) {
-        List<StreamHandler> streamHandlers = ((SingleInputStream)(query.getInputStream())).getStreamHandlers();
+    private WindowFilterProjectionQueryType getType(InputStream queryInputStream) {
+        List<StreamHandler> streamHandlers = ((SingleInputStream) queryInputStream).getStreamHandlers();
         if (streamHandlers.isEmpty()) {
             return WindowFilterProjectionQueryType.PROJECTION;
         } else {
@@ -84,36 +83,47 @@ public class WindowFilterProjectionConfigGenerator {
 
     /**
      * Generates a QueryInputConfig of type Projection, with the given Siddhi Query
-     * @return      WindowFilterProjectionQueryConfig object, with the configuration of a Projection query
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @return                      WindowFilterProjectionQueryConfig object,
+     *                              with the configuration of a Projection query
      */
-    private WindowFilterProjectionQueryConfig generateProjectionQueryInput() {
-        return new WindowFilterProjectionQueryConfig(query.getInputStream().getUniqueStreamIds().get(0), "", null);
+    private WindowFilterProjectionQueryConfig generateProjectionQueryInput(InputStream queryInputStream) {
+        return new WindowFilterProjectionQueryConfig(
+                WindowFilterProjectionQueryType.PROJECTION.toString(),
+                queryInputStream.getUniqueStreamIds().get(0),
+                "",
+                null);
     }
 
     /**
      * Generates a QueryInputConfig of type Filter, with the given Siddhi Query
-     * @return      WindowFilterProjectionQueryConfig object, with the configuration of a Filter query
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @return                      WindowFilterProjectionQueryConfig object, with the configuration of a Filter query
      */
-    private WindowFilterProjectionQueryConfig generateFilterQueryInput() {
-        String from = query.getInputStream().getUniqueStreamIds().get(0);
+    private WindowFilterProjectionQueryConfig generateFilterQueryInput(InputStream queryInputStream) {
+        String from = queryInputStream.getUniqueStreamIds().get(0);
         // Filter query will have just one StreamHandler, that's the Filter
-        Filter filter = (Filter) ((BasicSingleInputStream) (query.getInputStream())).getStreamHandlers().get(0);
+        Filter filter = (Filter) ((BasicSingleInputStream) queryInputStream).getStreamHandlers().get(0);
         String filterDefinition = ConfigBuildingUtilities.getDefinition(filter, siddhiAppString);
         return new WindowFilterProjectionQueryConfig(
-                from, filterDefinition.substring(1, filterDefinition.length() - 1).trim(), null);
+                WindowFilterProjectionQueryType.FILTER.toString(),
+                from,
+                filterDefinition.substring(1, filterDefinition.length() - 1).trim(),
+                null);
     }
 
     /**
      * Generates a QueryInputConfig of type Window, with the given Siddhi Query
-     * @return      WindowFilterProjectionQueryConfig object, with the configuration of a Window query
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @return                      WindowFilterProjectionQueryConfig object, with the configuration of a Window query
      */
-    private WindowFilterProjectionQueryConfig generateWindowQueryInput() {
+    private WindowFilterProjectionQueryConfig generateWindowQueryInput(InputStream queryInputStream) {
         String mainFilter = null;
         String windowFilter = null;
         String function = null;
         List<String> parameters = new ArrayList<>();
 
-        for (StreamHandler streamHandler : ((SingleInputStream)(query.getInputStream())).getStreamHandlers()) {
+        for (StreamHandler streamHandler : ((SingleInputStream) queryInputStream).getStreamHandlers()) {
             if (streamHandler instanceof Filter) {
                 String definition;
                 // First Filter will be Query's, and the next one will be window's
@@ -133,7 +143,8 @@ public class WindowFilterProjectionConfigGenerator {
         }
 
         return new WindowFilterProjectionQueryConfig(
-                query.getInputStream().getUniqueStreamIds().get(0),
+                WindowFilterProjectionQueryType.WINDOW.toString(),
+                queryInputStream.getUniqueStreamIds().get(0),
                 mainFilter,
                 new QueryWindowConfig(function, parameters, windowFilter));
     }
