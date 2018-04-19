@@ -29,7 +29,7 @@ define(
             /*
              Data storing structure as follows.
                 type*: 'andor',
-                forEvery*: 'true|false',
+                forEvery*: true|false,
                 leftEventReference: '',
                 leftStreamName*: '',
                 leftFilter: ''

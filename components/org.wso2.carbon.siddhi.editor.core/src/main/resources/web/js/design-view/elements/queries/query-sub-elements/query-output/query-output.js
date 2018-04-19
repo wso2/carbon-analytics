@@ -28,7 +28,7 @@ define(
         var QueryOutput = function (options) {
             /*
              Data storing structure as follows
-                type*: 'insert|delete|update|update-or-insert-into',
+                type*: 'insert|delete|update|update_or_insert_into',
                 output*: {INSERT JSON|DELETE JSON|UPDATE JSON|UPDATE-OR-INSERT JSON},
                 target*: ''
             */

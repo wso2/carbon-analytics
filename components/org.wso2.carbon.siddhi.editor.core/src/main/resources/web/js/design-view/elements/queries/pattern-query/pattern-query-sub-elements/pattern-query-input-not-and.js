@@ -29,7 +29,7 @@ define(
             /*
              Data storing structure as follows.
                 type*: 'notand',
-                forEvery*: 'true|false',
+                forEvery*: true|false,
                 leftStreamName*: '',
                 leftFilter: ''
                 rightEventReference: '',

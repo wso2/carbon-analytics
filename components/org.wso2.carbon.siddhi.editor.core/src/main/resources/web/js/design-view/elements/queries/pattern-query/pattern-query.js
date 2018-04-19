@@ -38,7 +38,7 @@ define(['require', 'elementArray'],
                     ]
                 },
                 select*: {
-                    type*: 'user-defined',
+                    type*: 'user_defined',
                     value*: [
                         {
                             expression*: '',
@@ -82,7 +82,7 @@ define(['require', 'elementArray'],
                     }
                     << or >>
                     {
-                        type*: 'update-or-insert-into',
+                        type*: 'update_or_insert_into',
                         target*: '',
                         forEventType: 'current|expired|all',
                         set*: [

@@ -28,7 +28,7 @@ define(
         var QuerySelect = function (options) {
             /*
              Data storing structure as follows
-                type*: 'user-defined',
+                type*: 'user_defined',
                 value*: [
                     {
                         expression*: '',

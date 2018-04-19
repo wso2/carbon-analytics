@@ -33,7 +33,7 @@ define(['require', 'elementArray'],
                 from*: ‘’,
                 select*: [
                     {
-                        type*: 'user-defined',
+                        type*: 'user_defined',
                         value*: [
                             {
                                 expression*: '',

@@ -29,7 +29,7 @@ define(
             /*
              Data storing structure as follows.
                 type*: 'counting',
-                forEvery*: 'true|false',
+                forEvery*: true|false,
                 eventReference: '',
                 streamName*: '',
                 filter: '',

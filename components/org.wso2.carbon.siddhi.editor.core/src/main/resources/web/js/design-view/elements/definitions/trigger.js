@@ -30,7 +30,7 @@ define(['require', 'elementArray'],
              Data storing structure as follows
                 id*: '',
                 name*: '',
-                at*: ‘{every|start|cron-expression}’
+                at*: ‘’
                 annotationList: [
                     {
                         name: ‘’,

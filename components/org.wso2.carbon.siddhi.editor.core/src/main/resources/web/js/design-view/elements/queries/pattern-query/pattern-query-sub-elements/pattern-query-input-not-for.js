@@ -29,7 +29,7 @@ define(
             /*
              Data storing structure as follows.
                 type*: 'notfor',
-                forEvery*: 'true|false',
+                forEvery*: true|false,
                 streamName*: '',
                 filter: '',
                 forDuration*: ''

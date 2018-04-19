@@ -1292,13 +1292,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
 
                 var selectAttributeOptions = {};
                 if (editor.getValue().querySelect.select instanceof Array) {
-                    _.set(selectAttributeOptions, 'type', 'user-defined');
+                    _.set(selectAttributeOptions, 'type', 'user_defined');
                     _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
                 } else if (editor.getValue().querySelect.select === "*") {
                     _.set(selectAttributeOptions, 'type', 'all');
                     _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
                 } else {
-                    console.log("Value other than \"user-defined\" and \"all\" received!");
+                    console.log("Value other than \"user_defined\" and \"all\" received!");
                 }
                 var selectObject = new QuerySelect(selectAttributeOptions);
                 _.set(aggregationOptions, 'select', selectObject);
@@ -1554,13 +1554,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
 
                 var selectAttributeOptions = {};
                 if (config.querySelect.select instanceof Array) {
-                    _.set(selectAttributeOptions, 'type', 'user-defined');
+                    _.set(selectAttributeOptions, 'type', 'user_defined');
                     _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
                 } else if (config.querySelect.select === "*") {
                     _.set(selectAttributeOptions, 'type', 'all');
                     _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
                 } else {
-                    console.log("Value other than \"user-defined\" and \"all\" received!");
+                    console.log("Value other than \"user_defined\" and \"all\" received!");
                 }
                 var selectObject = new QuerySelect(selectAttributeOptions);
                 clickedElement.setSelect(selectObject);
@@ -2156,7 +2156,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 on : output.getOn()
                             }
                         };
-                    } else if (savedQueryOutputType === "update-or-insert-into") {
+                    } else if (savedQueryOutputType === "update_or_insert_into") {
                         queryOutput = {
                             output: {
                                 outputType: "Update or Insert Into",
@@ -2809,13 +2809,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
 
                     var selectAttributeOptions = {};
                     if (config.querySelect.select instanceof Array) {
-                        _.set(selectAttributeOptions, 'type', 'user-defined');
+                        _.set(selectAttributeOptions, 'type', 'user_defined');
                         _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
                     } else if (config.querySelect.select === "*") {
                         _.set(selectAttributeOptions, 'type', 'all');
                         _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
                     } else {
-                        console.log("Value other than \"user-defined\" and \"all\" received!");
+                        console.log("Value other than \"user_defined\" and \"all\" received!");
                     }
                     var selectObject = new QuerySelect(selectAttributeOptions);
                     clickedElement.setSelect(selectObject);
@@ -2865,7 +2865,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 outputObject.setForEventType('');
                             }
                         } else if (config.queryOutput.output.outputType === "Update or Insert Into") {
-                            outputType = "update-or-insert-into";
+                            outputType = "update_or_insert_into";
                             outputObject = new QueryOutputUpdateOrInsertInto(config.queryOutput.output);
                             if (config.queryOutput.output.forEventType === undefined) {
                                 outputObject.setForEventType('');

@@ -91,7 +91,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                     output = new QueryOutputDelete(queryOutput.output);
                 } else if (queryOutputType === "update") {
                     output = new QueryOutputUpdate(queryOutput.output);
-                } else if (queryOutputType === "update-or-insert-into") {
+                } else if (queryOutputType === "update_or_insert_into") {
                     output = new QueryOutputUpdateOrInsertInto(queryOutput.output);
                 } else {
                     console.log("Invalid query output type received!");
