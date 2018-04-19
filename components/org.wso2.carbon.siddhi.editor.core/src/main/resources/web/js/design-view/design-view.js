@@ -17,15 +17,13 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid', 'appData',
-        'filterQuery', 'joinQuery', 'partition', 'passThroughQuery', 'query', 'stream', 'table',
-        'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'patternQueryInput',
-        'patternQueryInputCounting', 'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd',
-        'windowQuery', 'leftStream', 'rightStream', 'join', 'edge', 'querySelect', 'queryOutput', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
-    function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, FilterQuery, JoinQuery, Partition,
-              PassThroughQuery, Query, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
-              PatternQueryInput,PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
-              PatternQueryInputNotAnd, WindowQuery, LeftStream, RightStream, Join, Edge, QuerySelect, QueryOutput,
+        'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation', 'aggregateByTimePeriod',
+        'patternQueryInput', 'patternQueryInputCounting', 'patternQueryInputAndOr', 'patternQueryInputNotFor',
+        'patternQueryInputNotAnd', 'edge', 'querySelect', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete',
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
+    function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, Partition, Query, Stream, Table,
+              Window, Trigger, Aggregation, AggregateByTimePeriod, PatternQueryInput,PatternQueryInputCounting,
+              PatternQueryInputAndOr, PatternQueryInputNotFor, PatternQueryInputNotAnd, Edge, QuerySelect, QueryOutput,
               QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
 
         /**
@@ -132,18 +130,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriodSubElement);
                 appData.addAggregation(aggregationObject);
             });
-            _.forEach(siddhiAppContent.filterList, function(filterQuery){
-                appData.addFilterQuery(new FilterQuery(filterQuery));
-            });
-            _.forEach(siddhiAppContent.passThroughList, function(passThroughQuery){
-                appData.addPassThroughQuery(new PassThroughQuery(passThroughQuery));
-            });
-            _.forEach(siddhiAppContent.windowQueryList, function(windowQuery){
-                appData.addWindowQuery(new WindowQuery(windowQuery));
-            });
-            _.forEach(siddhiAppContent.queryList, function(query){
-                appData.addQuery(new Query(query));
-            });
             _.forEach(siddhiAppContent.patternQueryList, function(patternQuery){
                 var patternQueryObject = new Query(patternQuery);
                 var patternQueryInput = new PatternQueryInput();
@@ -168,16 +154,16 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
                 appData.addPatternQuery(patternQueryObject);
             });
-            _.forEach(siddhiAppContent.joinQueryList, function(joinQuery){
-                var joinQueryObject = new JoinQuery(joinQuery);
-                var leftStreamSubElement = new LeftStream(joinQuery.join.leftStream);
-                var rightStreamSubElement = new RightStream(joinQuery.join.rightStream);
-                var joinSubElement = new new Join(joinQuery.join);
-                joinSubElement.setLeftStream(leftStreamSubElement);
-                joinSubElement.setRightStream(rightStreamSubElement);
-                joinQueryObject.setJoin(joinSubElement);
-                appData.addJoinQuery(joinQueryObject);
-            });
+            // _.forEach(siddhiAppContent.joinQueryList, function(joinQuery){
+            //     var joinQueryObject = new JoinQuery(joinQuery);
+            //     var leftStreamSubElement = new LeftStream(joinQuery.join.leftStream);
+            //     var rightStreamSubElement = new RightStream(joinQuery.join.rightStream);
+            //     var joinSubElement = new new Join(joinQuery.join);
+            //     joinSubElement.setLeftStream(leftStreamSubElement);
+            //     joinSubElement.setRightStream(rightStreamSubElement);
+            //     joinQueryObject.setJoin(joinSubElement);
+            //     appData.addJoinQuery(joinQueryObject);
+            // });
             _.forEach(siddhiAppContent.partitionList, function(partition){
                 appData.addPartition(new Partition(partition));
             });

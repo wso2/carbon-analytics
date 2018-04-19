@@ -144,9 +144,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"attributes\":[{\"attribute\":\"\",\"type\":\"string\"}]}," +
                         "\"length\":2" +
                         "}," +
-                        "\"filterList\":{}," +
-                        "\"passThroughList\":{}," +
-                        "\"windowQueryList\":{}," +
                         "\"queryList\":{" +
                         "\"0\":{ \"id\":\"2\"," +
                         "\"name\":\"\"," +

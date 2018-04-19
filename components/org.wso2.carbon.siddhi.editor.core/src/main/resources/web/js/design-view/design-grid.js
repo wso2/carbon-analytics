@@ -691,13 +691,13 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryId, patternQueryName);
             });
 
-            _.forEach(self.appData.queryList, function(query){
-                var queryId = query.getId();
-                var mouseTop = parseInt(queryId)*100  - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = parseInt(queryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
-                self.handlePassThroughQuery(mouseTop, mouseLeft, true, queryId);
-                //TODO: correct query types saving style. ex: passthrough should be saved in passthroughList
-            });
+            // _.forEach(self.appData.queryList, function(query){
+            //     var queryId = query.getId();
+            //     var mouseTop = parseInt(queryId)*100  - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+            //     var mouseLeft = parseInt(queryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+            //     self.handlePassThroughQuery(mouseTop, mouseLeft, true, queryId);
+            //     //TODO: correct query types saving style. ex: passthrough should be saved in passthroughList
+            // });
             _.forEach(self.appData.edgeList, function(edge){
 
                 var targetId = edge.getParentId();
@@ -735,7 +735,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.WINDOW_QUERY));
             Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.JOIN));
             Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.PATTERN));
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.WINDOW_STREAM));
+            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.WINDOW));
             Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.PARTITION));
 
             // var nodes = $(".ui-draggable");

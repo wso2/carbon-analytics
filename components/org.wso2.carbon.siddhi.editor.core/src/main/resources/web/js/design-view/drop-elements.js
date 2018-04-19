@@ -16,10 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQuery', 'partition', 'passThroughQuery',
-        'query', 'stream', 'windowQuery', 'formBuilder'],
-    function (require, log, _, $, _jsPlumb, FilterQuery, JoinQuery, Partition, PassThroughQuery, Query, Stream,
-              WindowQuery, FormBuilder) {
+define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 'formBuilder'],
+    function (require, log, _, $, _jsPlumb, Partition, Stream, FormBuilder) {
 
         var constants = {
             STREAM : 'streamdrop',
@@ -521,66 +519,66 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @param isCodeToDesignMode whether code to design mode is enable or not
          */
         DropElements.prototype.dropQuery = function (newAgent, i, droptype, top, left, text, isCodeToDesignMode) {
-            /*
-             A text node division will be appended to the newAgent element so that the element name can be changed in
-             the text node and doesn't need to be appended to the newAgent Element everytime theuser changes it
-            */
-            var self= this;
-            //TODO : check text node division. we might need to add a new div to handle this.
-            var node = $('<div>' + text + '</div>');
-            newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
-            node.attr('class', "queryNameNode");
-
-            if(droptype === constants.PASS_THROUGH || droptype === constants.WINDOW_QUERY || droptype === constants.FILTER){
-                if(!isCodeToDesignMode) {
-                    //add the new query to the query array
-                    var queryOptions = {};
-                    _.set(queryOptions, 'id', '');
-
-                    var newQuery = new Query(queryOptions);
-                    newQuery.setId(i);
-                    self.appData.addQuery(newQuery); //TODO: why not adding to particular querylist? ex :passthrough to passthrough list
-                }
-                var settingsIconId = ""+ i + "-dropQuerySettingsId";
-                var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                    'class="element-prop-icon collapse">');
-                newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
-                    .append(propertiesIcon);
-                self.dropSimpleQueryElement(newAgent, i, top, left);
-                var settingsIconElement = $('#'+settingsIconId)[0];
-                settingsIconElement.addEventListener('click', function () {
-                    self.formBuilder.GeneratePropertiesFormForQueries(this);
-                });
-            }
-
-            else if(droptype === constants.JOIN) {
-                if(!isCodeToDesignMode) {
-                    //add the new join query to the join query array
-                    var joinQueryOptions = {};
-                    _.set(joinQueryOptions, 'id', '');
-                    _.set(joinQueryOptions, 'join', '');
-                    _.set(joinQueryOptions, 'projection', '');
-                    _.set(joinQueryOptions, 'outputType', '');
-                    _.set(joinQueryOptions, 'insertInto', '');
-                    _.set(joinQueryOptions, 'from', '');
-
-                    var newJoinQuery = new JoinQuery(joinQueryOptions);
-                    newJoinQuery.setId(i);
-                    self.appData.addJoinQuery(newJoinQuery);
-                }
-                var settingsIconId = ""+ i + "-dropJoinQuerySettingsId";
-                var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                    'class="element-prop-icon collapse">');
-                newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
-                    .append(propertiesIcon);
-                self.dropCompleteJoinQueryElement(newAgent , i, top, left);
-
-                var settingsIconElement = $('#'+settingsIconId)[0];
-                settingsIconElement.addEventListener('click', function () {
-                    self.formBuilder.GeneratePropertiesFormForJoinQuery(this);
-                });
-            }
+            // /*
+            //  A text node division will be appended to the newAgent element so that the element name can be changed in
+            //  the text node and doesn't need to be appended to the newAgent Element everytime theuser changes it
+            // */
+            // var self= this;
+            // //TODO : check text node division. we might need to add a new div to handle this.
+            // var node = $('<div>' + text + '</div>');
+            // newAgent.append(node);
+            // node.attr('id', i+"-nodeInitial");
+            // node.attr('class', "queryNameNode");
+            //
+            // if(droptype === constants.PASS_THROUGH || droptype === constants.WINDOW_QUERY || droptype === constants.FILTER){
+            //     if(!isCodeToDesignMode) {
+            //         //add the new query to the query array
+            //         var queryOptions = {};
+            //         _.set(queryOptions, 'id', '');
+            //
+            //         var newQuery = new Query(queryOptions);
+            //         newQuery.setId(i);
+            //         self.appData.addQuery(newQuery); //TODO: why not adding to particular querylist? ex :passthrough to passthrough list
+            //     }
+            //     var settingsIconId = ""+ i + "-dropQuerySettingsId";
+            //     var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+            //         'class="element-prop-icon collapse">');
+            //     newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
+            //         .append(propertiesIcon);
+            //     self.dropSimpleQueryElement(newAgent, i, top, left);
+            //     var settingsIconElement = $('#'+settingsIconId)[0];
+            //     settingsIconElement.addEventListener('click', function () {
+            //         self.formBuilder.GeneratePropertiesFormForQueries(this);
+            //     });
+            // }
+            //
+            // else if(droptype === constants.JOIN) {
+            //     if(!isCodeToDesignMode) {
+            //         //add the new join query to the join query array
+            //         var joinQueryOptions = {};
+            //         _.set(joinQueryOptions, 'id', '');
+            //         _.set(joinQueryOptions, 'join', '');
+            //         _.set(joinQueryOptions, 'projection', '');
+            //         _.set(joinQueryOptions, 'outputType', '');
+            //         _.set(joinQueryOptions, 'insertInto', '');
+            //         _.set(joinQueryOptions, 'from', '');
+            //
+            //         var newJoinQuery = new JoinQuery(joinQueryOptions);
+            //         newJoinQuery.setId(i);
+            //         self.appData.addJoinQuery(newJoinQuery);
+            //     }
+            //     var settingsIconId = ""+ i + "-dropJoinQuerySettingsId";
+            //     var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+            //         'class="element-prop-icon collapse">');
+            //     newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
+            //         .append(propertiesIcon);
+            //     self.dropCompleteJoinQueryElement(newAgent , i, top, left);
+            //
+            //     var settingsIconElement = $('#'+settingsIconId)[0];
+            //     settingsIconElement.addEventListener('click', function () {
+            //         self.formBuilder.GeneratePropertiesFormForJoinQuery(this);
+            //     });
+            // }
         };
 
         /**
@@ -592,37 +590,37 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @description allows single input stream and single output stream
          */
         DropElements.prototype.dropSimpleQueryElement = function (newAgent, i, top, left) {
-            var self = this;
-            var finalElement =  newAgent;
-            var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
-            var connectionOut = $('<div class="connectorOut">').attr('id', i + '-out').addClass('connection');
-
-            finalElement.css({
-                'top': top,
-                'left': left
-            });
-
-            finalElement.append(connectionIn);
-            finalElement.append(connectionOut);
-
-            $(self.container).append(finalElement);
-
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
-            });
-
-            _jsPlumb.makeTarget(connectionIn, {
-                anchor: 'Left',
-                maxConnections : 1,
-                deleteEndpointsOnDetach:true
-            });
-
-            _jsPlumb.makeSource(connectionOut, {
-                anchor: 'Right',
-                uniqueEndpoint: true,
-                maxConnections : 1,
-                deleteEndpointsOnDetach:true
-            });
+            // var self = this;
+            // var finalElement =  newAgent;
+            // var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
+            // var connectionOut = $('<div class="connectorOut">').attr('id', i + '-out').addClass('connection');
+            //
+            // finalElement.css({
+            //     'top': top,
+            //     'left': left
+            // });
+            //
+            // finalElement.append(connectionIn);
+            // finalElement.append(connectionOut);
+            //
+            // $(self.container).append(finalElement);
+            //
+            // _jsPlumb.draggable(finalElement, {
+            //     containment: 'grid-container'
+            // });
+            //
+            // _jsPlumb.makeTarget(connectionIn, {
+            //     anchor: 'Left',
+            //     maxConnections : 1,
+            //     deleteEndpointsOnDetach:true
+            // });
+            //
+            // _jsPlumb.makeSource(connectionOut, {
+            //     anchor: 'Right',
+            //     uniqueEndpoint: true,
+            //     maxConnections : 1,
+            //     deleteEndpointsOnDetach:true
+            // });
         };
 
         /**
@@ -717,35 +715,35 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'filterQuery', 'joinQue
          * @param left left position of the element
          */
         DropElements.prototype.dropCompleteJoinQueryElement = function (newAgent, i, top, left) {
-            var self = this;
-            var finalElement =  newAgent;
-            var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
-            var connectionOut = $('<div class="connectorOut">').attr('id', i + '-out').addClass('connection');
-
-            finalElement.css({
-                'top': top,
-                'left': left
-            });
-
-            finalElement.append(connectionIn);
-            finalElement.append(connectionOut);
-
-            $(self.container).append(finalElement);
-
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
-            });
-
-            _jsPlumb.makeTarget(connectionIn, {
-                anchor: 'Left',
-                maxConnections:2
-            });
-
-            _jsPlumb.makeSource(connectionOut, {
-                anchor: 'Right',
-                uniqueEndpoint: true,
-                maxConnections: 1
-            });
+            // var self = this;
+            // var finalElement =  newAgent;
+            // var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
+            // var connectionOut = $('<div class="connectorOut">').attr('id', i + '-out').addClass('connection');
+            //
+            // finalElement.css({
+            //     'top': top,
+            //     'left': left
+            // });
+            //
+            // finalElement.append(connectionIn);
+            // finalElement.append(connectionOut);
+            //
+            // $(self.container).append(finalElement);
+            //
+            // _jsPlumb.draggable(finalElement, {
+            //     containment: 'grid-container'
+            // });
+            //
+            // _jsPlumb.makeTarget(connectionIn, {
+            //     anchor: 'Left',
+            //     maxConnections:2
+            // });
+            //
+            // _jsPlumb.makeSource(connectionOut, {
+            //     anchor: 'Right',
+            //     uniqueEndpoint: true,
+            //     maxConnections: 1
+            // });
         };
 
         /**

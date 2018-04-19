@@ -17,12 +17,12 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'window', 'trigger', 'aggregation',
-        'aggregateByTimePeriod', 'querySelect', 'leftStream', 'rightStream', 'join', 'patternQueryInputCounting',
-        'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
+        'aggregateByTimePeriod', 'querySelect', 'patternQueryInputCounting', 'patternQueryInputAndOr',
+        'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'queryOutputInsert', 'queryOutputDelete',
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
     function (require, log, $, _, jsPlumb, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
-              QuerySelect, LeftStream, RightStream, Join , PatternQueryInputCounting, PatternQueryInputAndOr,
-              PatternQueryInputNotFor, PatternQueryInputNotAnd, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
+              QuerySelect, PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
+              PatternQueryInputNotAnd, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto) {
 
         // common properties for the JSON editor
@@ -1606,404 +1606,404 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
          * @param element selected element(query)
          */
         FormBuilder.prototype.GeneratePropertiesFormForQueries = function (element) {
-            var self = this;
-            var formConsole = this.createTabForForm();
-            var formContainer = formConsole.getContentContainer();
-
-            // The container and the tool palette are disabled to prevent the user from dropping any elements
-            self.gridContainer.addClass('disabledbutton');
-            self.toolPaletteContainer.addClass('disabledbutton');
-
-            var id = $(element).parent().attr('id');
-            var clickedElement = self.appData.getQuery(id);
-            if(clickedElement === undefined) {
-                var errorMessage = 'unable to find clicked element';
-                log.error(errorMessage);
-            }
-            var type= $(element).parent();
-            if (!(clickedElement.getFrom())) {
-                alert('Connect an input stream'); //TODO: check here table also? Restructure all the forms according to this.
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
-
-                // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
-            }
-            else if (!(clickedElement.getInsertInto())) {
-                // retrieve the query information from the collection
-                var name = clickedElement.getName();
-                var inStream = (self.appData.getStream(clickedElement.getFrom())).getName();
-                var filter1 = clickedElement.getFilter();
-                var window = clickedElement.getWindow();
-                var filter2 = clickedElement.getPostWindowFilter();
-                var fillWith;
-                if (type.hasClass(constants.PASS_THROUGH)) {
-                    fillWith = {
-                        name: name,
-                        from: inStream,
-                        projection: ''
-                    };
-                } else if (type.hasClass(constants.FILTER)) {
-                    fillWith = {
-                        name: name,
-                        from: inStream,
-                        filter: filter1,
-                        projection: ''
-                    };
-                } else if (type.hasClass(constants.WINDOW_QUERY)) {
-                    fillWith = {
-                        name: name,
-                        from: inStream,
-                        filter: filter1,
-                        window: window,
-                        postWindowFilter: filter2,
-                        projection: ''
-                    };
-                }
-                // generate the form for the query an output stream is not connected
-                var editor = new JSONEditor(formContainer[0], {
-                    schema: {
-                        type: 'object',
-                        title: 'Query',
-                        properties: {
-                            name: {
-                                type: 'string',
-                                title: 'Name',
-                                required: true,
-                                propertyOrder: 1
-                            },
-                            from: {
-                                type: 'string',
-                                title: 'From',
-                                required: true,
-                                propertyOrder: 2
-                            },
-                            filter: {
-                                type: 'string',
-                                title: 'Filter',
-                                propertyOrder: 3
-                            },
-                            window: {
-                                type: 'string',
-                                title: 'Window',
-                                propertyOrder: 4
-                            },
-                            postWindowFilter: {
-                                type: 'string',
-                                title: 'Post Window Filter',
-                                propertyOrder: 5
-                            },
-                            outputType: {
-                                type: 'string',
-                                title: 'Output Type',
-                                enum : ['all events' , 'current events' , 'expired events'],
-                                default: 'all events',
-                                propertyOrder: 6,
-                                required: true
-                            },
-                            insertInto: {
-                                type: 'string',
-                                title: 'Output Stream',
-                                propertyOrder: 7,
-                                required: true
-                            },
-                            projection: {
-                                type: 'array',
-                                title: 'Attributes',
-                                format: 'table',
-                                required: true,
-                                propertyOrder: 8,
-                                uniqueItems: true,
-                                items: {
-                                    type: 'object',
-                                    title : 'Attribute',
-                                    properties: {
-                                        select: {
-                                            type: 'string',
-                                            title: 'select'
-                                        },
-                                        newName: {
-                                            type: 'string',
-                                            title: 'as'
-                                        },
-                                        type: {
-                                            type: "string",
-                                            enum: [
-                                                "string",
-                                                "int",
-                                                "long",
-                                                "float",
-                                                "double",
-                                                "boolean"
-                                            ],
-                                            default: "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    startval: fillWith,
-                    disable_array_add: false,
-                    disable_array_delete: false,
-                    disable_array_reorder: true,
-                    display_required_only: true,
-                    no_additional_properties: true
-                });
-                // disable the uneditable fields
-                editor.getEditor('root.from').disable();
-
-                $(formContainer).append('<div id="form-submit"><button type="button" ' +
-                    'class="btn btn-default">Submit</button></div>' +
-                    '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
-
-                // 'Submit' button action
-                var submitButtonElement = $('#form-submit')[0];
-                submitButtonElement.addEventListener('click', function () {
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-
-                    var config = editor.getValue();
-
-                    // change the query icon depending on the fields filled
-                    if (config.window) {
-                        $(element).parent().removeClass();
-                        $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
-                    } else if (config.filter || config.postWindowFilter) {
-                        $(element).parent().removeClass();
-                        $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
-                    } else if (!(config.filter || config.postWindowFilter || config.window )) {
-                        $(element).parent().removeClass();
-                        $(element).parent().addClass(constants.PASS_THROUGH+ ' jtk-draggable');
-                    }
-
-                    // obtain values from the form and update the query model
-                    var config = editor.getValue();
-                    clickedElement.setName(config.name);
-                    clickedElement.setFilter(config.filter);
-                    clickedElement.setWindow(config.window);
-                    clickedElement.setPostWindowFilter(config.postWindowFilter);
-                    clickedElement.setOutputType(config.outputType);
-                    var streamAttributes = [];
-                    var queryAttributes = [];
-                    $.each( config.projection, function(key, value ) {
-                        streamAttributes.push({ attribute : value.newName , type : value.type});
-                        queryAttributes.push(value.select);
-                    });
-                    clickedElement.setProjection(queryAttributes);
-                    var textNode = $(element).parent().find('.queryNameNode');
-                    textNode.html(config.name);
-                    // generate the stream defined as the output stream
-                    var position = $(element).parent().position();
-                    self.dropElements.dropStreamFromQuery(position, id, config.insertInto, streamAttributes);
-                });
-
-                // 'Cancel' button action
-                var cancelButtonElement = $('#form-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-                });
-            } else {
-                // retrieve the query information from the collection
-                var name = clickedElement.getName();
-                var inStream = (self.appData.getStream(clickedElement.getFrom())).getName();
-                var outStream = (self.appData.getStream(clickedElement.getInsertInto())).getName();
-                var filter1 = clickedElement.getFilter();
-                var window = clickedElement.getWindow();
-                var filter2 = clickedElement.getPostWindowFilter();
-                var outputType = clickedElement.getOutputType();
-                var attrString = [];
-                var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
-                if (clickedElement.getProjection() === '') {
-                    for (var i = 0; i < outStreamAttributes.length; i++) {
-                        var attr = {select: '', newName: outStreamAttributes[i].attribute};
-                        attrString.push(attr);
-                    }
-                } else {
-                    var selectedAttributes = clickedElement.getProjection();
-                    for (var i = 0; i < outStreamAttributes.length; i++) {
-                        var attr = {select: selectedAttributes[i], newName: outStreamAttributes[i].attribute};
-                        attrString.push(attr);
-                    }
-                }
-
-                var fillWith;
-                if (type.hasClass(constants.PASS_THROUGH)) {
-                    fillWith = {
-                        name: name,
-                        from: inStream,
-                        projection: attrString,
-                        outputType :outputType,
-                        insertInto: outStream
-                    };
-                } else if (type.hasClass(constants.FILTER)) {
-                    fillWith = {
-                        name: name,
-                        from: inStream,
-                        filter: filter1,
-                        projection: attrString,
-                        outputType :outputType,
-                        insertInto: outStream
-                    };
-                } else if (type.hasClass(constants.WINDOW_QUERY)) {
-                    fillWith = {
-                        name: name,
-                        from: inStream,
-                        filter : filter1,
-                        window: window,
-                        pstWindowFilter : filter2,
-                        projection: attrString,
-                        outputType :outputType,
-                        insertInto: outStream
-                    };
-                }
-                // generate form for the queries where both input and output streams are defined
-                var editor = new JSONEditor(formContainer[0], {
-                    schema: {
-                        type: 'object',
-                        title: 'Query',
-                        properties: {
-                            name: {
-                                type: 'string',
-                                title: 'Name',
-                                required: true,
-                                propertyOrder: 1
-                            },
-                            from: {
-                                type: 'string',
-                                title: 'From',
-                                template: inStream,
-                                required: true,
-                                propertyOrder: 2
-                            },
-                            filter: {
-                                type: 'string',
-                                title: 'Filter',
-                                propertyOrder: 3
-                            },
-                            window: {
-                                type: 'string',
-                                title: 'Window',
-                                propertyOrder: 4
-                            },
-                            postWindowQuery: {
-                                type: 'string',
-                                title: 'Post Window Filter',
-                                propertyOrder: 5
-                            },
-                            projection: {
-                                type: 'array',
-                                title: 'Attributes',
-                                format: 'table',
-                                required: true,
-                                propertyOrder: 6,
-                                items: {
-                                    type: 'object',
-                                    title : 'Attribute',
-                                    properties: {
-                                        select: {
-                                            type: 'string',
-                                            title: 'select'
-                                        },
-                                        newName: {
-                                            type: 'string',
-                                            title: 'as'
-                                        }
-                                    }
-                                }
-                            },
-                            outputType: {
-                                type: 'string',
-                                title: 'Output Type',
-                                enum : ['all events' , 'current events' , 'expired events'],
-                                default: 'all events',
-                                required : true,
-                                propertyOrder: 7
-                            },
-                            insertInto: {
-                                type: 'string',
-                                template: outStream,
-                                required: true,
-                                propertyOrder: 8
-                            }
-                        }
-                    },
-                    startval: fillWith,
-                    disable_array_add: true,
-                    disable_array_delete: true,
-                    disable_array_reorder: true,
-                    display_required_only: true,
-                    no_additional_properties: true
-                });
-
-                // disable fields that can not be changed
-                editor.getEditor('root.from').disable();
-                editor.getEditor('root.insertInto').disable();
-                for (var i = 0; i < outStreamAttributes.length; i++) {
-                    editor.getEditor('root.projection.' + i + '.newName').disable();
-                }
-
-                $(formContainer).append('<div id="form-submit"><button type="button" ' +
-                    'class="btn btn-default">Submit</button></div>' +
-                    '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
-
-                // 'Submit' button action
-                var submitButtonElement = $('#form-submit')[0];
-                submitButtonElement.addEventListener('click', function () {
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-                    var config = editor.getValue();
-
-                    // change the query icon depending on the fields(filter, window) filled
-                    if (config.window) {
-                        $(element).parent().removeClass();
-                        $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
-                    } else if (config.filter || config.postWindowFilter) {
-                        $(element).parent().removeClass();
-                        $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
-                    } else if (!(config.filter || config.postWindowFilter || config.window )) {
-                        $(element).parent().removeClass();
-                        $(element).parent().addClass(constants.PASS_THROUGH + ' jtk-draggable');
-                    }
-
-                    // update selected query model
-                    clickedElement.setName(config.name);
-                    clickedElement.setFilter(config.filter);
-                    clickedElement.setWindow(config.window);
-                    clickedElement.setPostWindowFilter(config.postWindowFilter);
-                    var projections = [];
-                    $.each(config.projection, function (index, attribute) {
-                        projections.push(attribute.select);
-                    });
-                    clickedElement.setProjection(projections);
-                    clickedElement.setOutputType(config.outputType);
-                    var textNode = $(element).parent().find('.queryNameNode');
-                    textNode.html(config.name);
-                });
-
-                // 'Cancel' button action
-                var cancelButtonElement = $('#form-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-                });
-            }
+        //     var self = this;
+        //     var formConsole = this.createTabForForm();
+        //     var formContainer = formConsole.getContentContainer();
+        //
+        //     // The container and the tool palette are disabled to prevent the user from dropping any elements
+        //     self.gridContainer.addClass('disabledbutton');
+        //     self.toolPaletteContainer.addClass('disabledbutton');
+        //
+        //     var id = $(element).parent().attr('id');
+        //     var clickedElement = self.appData.getQuery(id);
+        //     if(clickedElement === undefined) {
+        //         var errorMessage = 'unable to find clicked element';
+        //         log.error(errorMessage);
+        //     }
+        //     var type= $(element).parent();
+        //     if (!(clickedElement.getFrom())) {
+        //         alert('Connect an input stream'); //TODO: check here table also? Restructure all the forms according to this.
+        //         self.gridContainer.removeClass('disabledbutton');
+        //         self.toolPaletteContainer.removeClass('disabledbutton');
+        //
+        //         // close the form window
+        //         self.consoleListManager.removeConsole(formConsole);
+        //         self.consoleListManager.hideAllConsoles();
+        //     }
+        //     else if (!(clickedElement.getInsertInto())) {
+        //         // retrieve the query information from the collection
+        //         var name = clickedElement.getName();
+        //         var inStream = (self.appData.getStream(clickedElement.getFrom())).getName();
+        //         var filter1 = clickedElement.getFilter();
+        //         var window = clickedElement.getWindow();
+        //         var filter2 = clickedElement.getPostWindowFilter();
+        //         var fillWith;
+        //         if (type.hasClass(constants.PASS_THROUGH)) {
+        //             fillWith = {
+        //                 name: name,
+        //                 from: inStream,
+        //                 projection: ''
+        //             };
+        //         } else if (type.hasClass(constants.FILTER)) {
+        //             fillWith = {
+        //                 name: name,
+        //                 from: inStream,
+        //                 filter: filter1,
+        //                 projection: ''
+        //             };
+        //         } else if (type.hasClass(constants.WINDOW_QUERY)) {
+        //             fillWith = {
+        //                 name: name,
+        //                 from: inStream,
+        //                 filter: filter1,
+        //                 window: window,
+        //                 postWindowFilter: filter2,
+        //                 projection: ''
+        //             };
+        //         }
+        //         // generate the form for the query an output stream is not connected
+        //         var editor = new JSONEditor(formContainer[0], {
+        //             schema: {
+        //                 type: 'object',
+        //                 title: 'Query',
+        //                 properties: {
+        //                     name: {
+        //                         type: 'string',
+        //                         title: 'Name',
+        //                         required: true,
+        //                         propertyOrder: 1
+        //                     },
+        //                     from: {
+        //                         type: 'string',
+        //                         title: 'From',
+        //                         required: true,
+        //                         propertyOrder: 2
+        //                     },
+        //                     filter: {
+        //                         type: 'string',
+        //                         title: 'Filter',
+        //                         propertyOrder: 3
+        //                     },
+        //                     window: {
+        //                         type: 'string',
+        //                         title: 'Window',
+        //                         propertyOrder: 4
+        //                     },
+        //                     postWindowFilter: {
+        //                         type: 'string',
+        //                         title: 'Post Window Filter',
+        //                         propertyOrder: 5
+        //                     },
+        //                     outputType: {
+        //                         type: 'string',
+        //                         title: 'Output Type',
+        //                         enum : ['all events' , 'current events' , 'expired events'],
+        //                         default: 'all events',
+        //                         propertyOrder: 6,
+        //                         required: true
+        //                     },
+        //                     insertInto: {
+        //                         type: 'string',
+        //                         title: 'Output Stream',
+        //                         propertyOrder: 7,
+        //                         required: true
+        //                     },
+        //                     projection: {
+        //                         type: 'array',
+        //                         title: 'Attributes',
+        //                         format: 'table',
+        //                         required: true,
+        //                         propertyOrder: 8,
+        //                         uniqueItems: true,
+        //                         items: {
+        //                             type: 'object',
+        //                             title : 'Attribute',
+        //                             properties: {
+        //                                 select: {
+        //                                     type: 'string',
+        //                                     title: 'select'
+        //                                 },
+        //                                 newName: {
+        //                                     type: 'string',
+        //                                     title: 'as'
+        //                                 },
+        //                                 type: {
+        //                                     type: "string",
+        //                                     enum: [
+        //                                         "string",
+        //                                         "int",
+        //                                         "long",
+        //                                         "float",
+        //                                         "double",
+        //                                         "boolean"
+        //                                     ],
+        //                                     default: "string"
+        //                                 }
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             startval: fillWith,
+        //             disable_array_add: false,
+        //             disable_array_delete: false,
+        //             disable_array_reorder: true,
+        //             display_required_only: true,
+        //             no_additional_properties: true
+        //         });
+        //         // disable the uneditable fields
+        //         editor.getEditor('root.from').disable();
+        //
+        //         $(formContainer).append('<div id="form-submit"><button type="button" ' +
+        //             'class="btn btn-default">Submit</button></div>' +
+        //             '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+        //
+        //         // 'Submit' button action
+        //         var submitButtonElement = $('#form-submit')[0];
+        //         submitButtonElement.addEventListener('click', function () {
+        //             self.gridContainer.removeClass('disabledbutton');
+        //             self.toolPaletteContainer.removeClass('disabledbutton');
+        //
+        //             // close the form window
+        //             self.consoleListManager.removeConsole(formConsole);
+        //             self.consoleListManager.hideAllConsoles();
+        //
+        //             var config = editor.getValue();
+        //
+        //             // change the query icon depending on the fields filled
+        //             if (config.window) {
+        //                 $(element).parent().removeClass();
+        //                 $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
+        //             } else if (config.filter || config.postWindowFilter) {
+        //                 $(element).parent().removeClass();
+        //                 $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
+        //             } else if (!(config.filter || config.postWindowFilter || config.window )) {
+        //                 $(element).parent().removeClass();
+        //                 $(element).parent().addClass(constants.PASS_THROUGH+ ' jtk-draggable');
+        //             }
+        //
+        //             // obtain values from the form and update the query model
+        //             var config = editor.getValue();
+        //             clickedElement.setName(config.name);
+        //             clickedElement.setFilter(config.filter);
+        //             clickedElement.setWindow(config.window);
+        //             clickedElement.setPostWindowFilter(config.postWindowFilter);
+        //             clickedElement.setOutputType(config.outputType);
+        //             var streamAttributes = [];
+        //             var queryAttributes = [];
+        //             $.each( config.projection, function(key, value ) {
+        //                 streamAttributes.push({ attribute : value.newName , type : value.type});
+        //                 queryAttributes.push(value.select);
+        //             });
+        //             clickedElement.setProjection(queryAttributes);
+        //             var textNode = $(element).parent().find('.queryNameNode');
+        //             textNode.html(config.name);
+        //             // generate the stream defined as the output stream
+        //             var position = $(element).parent().position();
+        //             self.dropElements.dropStreamFromQuery(position, id, config.insertInto, streamAttributes);
+        //         });
+        //
+        //         // 'Cancel' button action
+        //         var cancelButtonElement = $('#form-cancel')[0];
+        //         cancelButtonElement.addEventListener('click', function () {
+        //             self.gridContainer.removeClass('disabledbutton');
+        //             self.toolPaletteContainer.removeClass('disabledbutton');
+        //             // close the form window
+        //             self.consoleListManager.removeConsole(formConsole);
+        //             self.consoleListManager.hideAllConsoles();
+        //         });
+        //     } else {
+        //         // retrieve the query information from the collection
+        //         var name = clickedElement.getName();
+        //         var inStream = (self.appData.getStream(clickedElement.getFrom())).getName();
+        //         var outStream = (self.appData.getStream(clickedElement.getInsertInto())).getName();
+        //         var filter1 = clickedElement.getFilter();
+        //         var window = clickedElement.getWindow();
+        //         var filter2 = clickedElement.getPostWindowFilter();
+        //         var outputType = clickedElement.getOutputType();
+        //         var attrString = [];
+        //         var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
+        //         if (clickedElement.getProjection() === '') {
+        //             for (var i = 0; i < outStreamAttributes.length; i++) {
+        //                 var attr = {select: '', newName: outStreamAttributes[i].attribute};
+        //                 attrString.push(attr);
+        //             }
+        //         } else {
+        //             var selectedAttributes = clickedElement.getProjection();
+        //             for (var i = 0; i < outStreamAttributes.length; i++) {
+        //                 var attr = {select: selectedAttributes[i], newName: outStreamAttributes[i].attribute};
+        //                 attrString.push(attr);
+        //             }
+        //         }
+        //
+        //         var fillWith;
+        //         if (type.hasClass(constants.PASS_THROUGH)) {
+        //             fillWith = {
+        //                 name: name,
+        //                 from: inStream,
+        //                 projection: attrString,
+        //                 outputType :outputType,
+        //                 insertInto: outStream
+        //             };
+        //         } else if (type.hasClass(constants.FILTER)) {
+        //             fillWith = {
+        //                 name: name,
+        //                 from: inStream,
+        //                 filter: filter1,
+        //                 projection: attrString,
+        //                 outputType :outputType,
+        //                 insertInto: outStream
+        //             };
+        //         } else if (type.hasClass(constants.WINDOW_QUERY)) {
+        //             fillWith = {
+        //                 name: name,
+        //                 from: inStream,
+        //                 filter : filter1,
+        //                 window: window,
+        //                 pstWindowFilter : filter2,
+        //                 projection: attrString,
+        //                 outputType :outputType,
+        //                 insertInto: outStream
+        //             };
+        //         }
+        //         // generate form for the queries where both input and output streams are defined
+        //         var editor = new JSONEditor(formContainer[0], {
+        //             schema: {
+        //                 type: 'object',
+        //                 title: 'Query',
+        //                 properties: {
+        //                     name: {
+        //                         type: 'string',
+        //                         title: 'Name',
+        //                         required: true,
+        //                         propertyOrder: 1
+        //                     },
+        //                     from: {
+        //                         type: 'string',
+        //                         title: 'From',
+        //                         template: inStream,
+        //                         required: true,
+        //                         propertyOrder: 2
+        //                     },
+        //                     filter: {
+        //                         type: 'string',
+        //                         title: 'Filter',
+        //                         propertyOrder: 3
+        //                     },
+        //                     window: {
+        //                         type: 'string',
+        //                         title: 'Window',
+        //                         propertyOrder: 4
+        //                     },
+        //                     postWindowQuery: {
+        //                         type: 'string',
+        //                         title: 'Post Window Filter',
+        //                         propertyOrder: 5
+        //                     },
+        //                     projection: {
+        //                         type: 'array',
+        //                         title: 'Attributes',
+        //                         format: 'table',
+        //                         required: true,
+        //                         propertyOrder: 6,
+        //                         items: {
+        //                             type: 'object',
+        //                             title : 'Attribute',
+        //                             properties: {
+        //                                 select: {
+        //                                     type: 'string',
+        //                                     title: 'select'
+        //                                 },
+        //                                 newName: {
+        //                                     type: 'string',
+        //                                     title: 'as'
+        //                                 }
+        //                             }
+        //                         }
+        //                     },
+        //                     outputType: {
+        //                         type: 'string',
+        //                         title: 'Output Type',
+        //                         enum : ['all events' , 'current events' , 'expired events'],
+        //                         default: 'all events',
+        //                         required : true,
+        //                         propertyOrder: 7
+        //                     },
+        //                     insertInto: {
+        //                         type: 'string',
+        //                         template: outStream,
+        //                         required: true,
+        //                         propertyOrder: 8
+        //                     }
+        //                 }
+        //             },
+        //             startval: fillWith,
+        //             disable_array_add: true,
+        //             disable_array_delete: true,
+        //             disable_array_reorder: true,
+        //             display_required_only: true,
+        //             no_additional_properties: true
+        //         });
+        //
+        //         // disable fields that can not be changed
+        //         editor.getEditor('root.from').disable();
+        //         editor.getEditor('root.insertInto').disable();
+        //         for (var i = 0; i < outStreamAttributes.length; i++) {
+        //             editor.getEditor('root.projection.' + i + '.newName').disable();
+        //         }
+        //
+        //         $(formContainer).append('<div id="form-submit"><button type="button" ' +
+        //             'class="btn btn-default">Submit</button></div>' +
+        //             '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+        //
+        //         // 'Submit' button action
+        //         var submitButtonElement = $('#form-submit')[0];
+        //         submitButtonElement.addEventListener('click', function () {
+        //             self.gridContainer.removeClass('disabledbutton');
+        //             self.toolPaletteContainer.removeClass('disabledbutton');
+        //
+        //             // close the form window
+        //             self.consoleListManager.removeConsole(formConsole);
+        //             self.consoleListManager.hideAllConsoles();
+        //             var config = editor.getValue();
+        //
+        //             // change the query icon depending on the fields(filter, window) filled
+        //             if (config.window) {
+        //                 $(element).parent().removeClass();
+        //                 $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
+        //             } else if (config.filter || config.postWindowFilter) {
+        //                 $(element).parent().removeClass();
+        //                 $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
+        //             } else if (!(config.filter || config.postWindowFilter || config.window )) {
+        //                 $(element).parent().removeClass();
+        //                 $(element).parent().addClass(constants.PASS_THROUGH + ' jtk-draggable');
+        //             }
+        //
+        //             // update selected query model
+        //             clickedElement.setName(config.name);
+        //             clickedElement.setFilter(config.filter);
+        //             clickedElement.setWindow(config.window);
+        //             clickedElement.setPostWindowFilter(config.postWindowFilter);
+        //             var projections = [];
+        //             $.each(config.projection, function (index, attribute) {
+        //                 projections.push(attribute.select);
+        //             });
+        //             clickedElement.setProjection(projections);
+        //             clickedElement.setOutputType(config.outputType);
+        //             var textNode = $(element).parent().find('.queryNameNode');
+        //             textNode.html(config.name);
+        //         });
+        //
+        //         // 'Cancel' button action
+        //         var cancelButtonElement = $('#form-cancel')[0];
+        //         cancelButtonElement.addEventListener('click', function () {
+        //             self.gridContainer.removeClass('disabledbutton');
+        //             self.toolPaletteContainer.removeClass('disabledbutton');
+        //             // close the form window
+        //             self.consoleListManager.removeConsole(formConsole);
+        //             self.consoleListManager.hideAllConsoles();
+        //         });
+        //     }
         };
 
         /**
@@ -2895,275 +2895,275 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
          * @param element selected element(query)
          */
         FormBuilder.prototype.GeneratePropertiesFormForJoinQuery = function (element) {
-            var self = this;
-            var formConsole = this.createTabForForm();
-            var formContainer = formConsole.getContentContainer();
-
-            // The container and the tool palette are disabled to prevent the user from dropping any elements
-            self.gridContainer.addClass('disabledbutton');
-            self.toolPaletteContainer.addClass('disabledbutton');
-
-            var id = $(element).parent().attr('id');
-            var clickedElement = self.appData.getJoinQuery(id);
-            if (!(clickedElement.getFrom()) || clickedElement.getFrom().length !== 2) {
-                alert('Connect TWO input streams');
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
-
-                // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
-            }
-            else if (!(clickedElement.getInsertInto())) {
-                alert('Connect an output stream');
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
-
-                // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
-            }
-
-            else {
-                var streams = [];
-                $.each(clickedElement.getFrom(), function (index, streamID) {
-                    streams.push((self.appData.getStream(streamID)).getName());
-                });
-                var projections = [];
-                var insertInto = self.appData.getStream(clickedElement.getInsertInto()).getName();
-                var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
-                if (!(clickedElement.getProjection())) {
-                    for (var i = 0; i < outStreamAttributes.length; i++) {
-                        var attr = {select: '', newName: outStreamAttributes[i].attribute};
-                        projections.push(attr);
-                    }
-                }
-                else {
-                    var selectedAttributes = clickedElement.getProjection();
-                    for (var i = 0; i < outStreamAttributes.length; i++) {
-                        var attr = {select: selectedAttributes[i], newName: outStreamAttributes[i].attribute};
-                        projections.push(attr);
-                    }
-                }
-                var fillWith = {
-                    projection: projections,
-                    outputType: clickedElement.getOutputType(),
-                    insertInto: insertInto
-                };
-
-                if (clickedElement.getJoin()) {
-                    fillWith.type = clickedElement.getJoin().getType();
-                    fillWith.leftStream = clickedElement.getJoin().getLeftStream();
-                    fillWith.rightStream = clickedElement.getJoin().getRightStream();
-                    fillWith.on = clickedElement.getJoin().getOn();
-                }
-                var editor = new JSONEditor(formContainer[0], {
-                    ajax: true,
-                    schema: {
-                        type: 'object',
-                        title: 'Query',
-                        properties: {
-                            type: {
-                                type: 'string',
-                                title: 'Type',
-                                required: true,
-                                propertyOrder: 1
-                            },
-                            leftStream: {
-                                type: 'object',
-                                title: 'Left Stream',
-                                required: true,
-                                propertyOrder: 2,
-                                options: {
-                                    disable_collapse: false,
-                                    disable_properties: true,
-                                    collapsed: true
-                                },
-                                properties: {
-                                    from: {
-                                        type: 'string',
-                                        title: 'From',
-                                        enum: streams,
-                                        required: true
-                                    },
-                                    filter: {
-                                        type: 'string',
-                                        title: 'Filter',
-                                        required: true
-                                    },
-                                    window: {
-                                        type: 'string',
-                                        title: 'Window',
-                                        required: true
-                                    },
-                                    postWindowFilter: {
-                                        type: 'string',
-                                        title: 'Post Window Filter',
-                                        required: true
-                                    },
-                                    as: {
-                                        type: 'string',
-                                        title: 'As',
-                                        required: true
-                                    }
-                                }
-                            },
-                            rightStream: {
-                                type: 'object',
-                                title: 'Right Stream',
-                                required: true,
-                                propertyOrder: 3,
-                                options: {
-                                    disable_collapse: false,
-                                    disable_properties: true,
-                                    collapsed: true
-                                },
-                                properties: {
-                                    from: {
-                                        type: 'string',
-                                        title: 'From',
-                                        enum: streams,
-                                        required: true
-                                    },
-                                    filter: {
-                                        type: 'string',
-                                        title: 'Filter',
-                                        required: true
-                                    },
-                                    window: {
-                                        type: 'string',
-                                        title: 'Window',
-                                        required: true
-                                    },
-                                    postWindowFilter: {
-                                        type: 'string',
-                                        title: 'Post Window Filter',
-                                        required: true
-                                    },
-                                    as: {
-                                        type: 'string',
-                                        title: 'As',
-                                        required: true
-                                    }
-                                }
-                            },
-                            on: {
-                                type: 'string',
-                                title: 'On',
-                                required: true,
-                                propertyOrder: 4
-                            },
-                            projection: {
-                                type: 'array',
-                                title: 'Projection',
-                                format: 'table',
-                                required: true,
-                                propertyOrder: 5,
-                                options: {
-                                    disable_array_add: true,
-                                    disable_array_delete: true,
-                                    disable_array_reorder: true
-                                },
-                                items: {
-                                    type: 'object',
-                                    title: 'Attribute',
-                                    properties: {
-                                        select: {
-                                            type: 'string',
-                                            title: 'select'
-                                        },
-                                        newName: {
-                                            type: 'string',
-                                            title: 'as'
-                                        }
-                                    }
-                                }
-                            },
-                            outputType: {
-                                type: 'string',
-                                title: 'Output Type',
-                                enum: ['all events', 'current events', 'expired events'],
-                                default: 'all events',
-                                required: true,
-                                propertyOrder: 6
-                            },
-                            insertInto: {
-                                type: 'string',
-                                title: 'Insert Into',
-                                template: insertInto,
-                                required: true,
-                                propertyOrder: 7
-                            }
-                        }
-                    },
-                    startval: fillWith,
-                    no_additional_properties: true,
-                    disable_properties: true
-                });
-                for (var i = 0; i < outStreamAttributes.length; i++) {
-                    editor.getEditor('root.projection.' + i + '.newName').disable();
-                }
-                editor.getEditor('root.insertInto').disable();
-
-                $(formContainer).append('<div id="form-submit"><button type="button" ' +
-                    'class="btn btn-default">Submit</button></div>' +
-                    '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
-
-                // 'Submit' button action
-                var submitButtonElement = $('#form-submit')[0];
-                submitButtonElement.addEventListener('click', function () {
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-
-                    var config = editor.getValue();
-                    // update selected query object
-                    var leftStreamOptions = {};
-                    _.set(leftStreamOptions, 'from', config.leftStream.from);
-                    _.set(leftStreamOptions, 'filter', config.leftStream.filter);
-                    _.set(leftStreamOptions, 'window', config.leftStream.window);
-                    _.set(leftStreamOptions, 'postWindowFilter', config.leftStream.postWindowFilter);
-                    _.set(leftStreamOptions, 'as', config.leftStream.as);
-                    var leftStream = new LeftStream(leftStreamOptions);
-
-                    var rightStreamOptions = {};
-                    _.set(leftStreamOptions, 'from', config.rightStream.from);
-                    _.set(leftStreamOptions, 'filter', config.rightStream.filter);
-                    _.set(leftStreamOptions, 'window', config.rightStream.window);
-                    _.set(leftStreamOptions, 'postWindowFilter', config.rightStream.postWindowFilter);
-                    _.set(leftStreamOptions, 'as', config.rightStream.as);
-                    var rightStream = new RightStream(rightStreamOptions);
-
-                    var joinOptions = {};
-                    _.set(joinOptions, 'type', config.type);
-                    _.set(joinOptions, 'left-stream', leftStream);
-                    _.set(joinOptions, 'right-stream', rightStream);
-                    _.set(joinOptions, 'on', config.on);
-                    var join =new Join(joinOptions);
-
-                    clickedElement.setJoin(join);
-                    var projections = [];
-                    $.each(config.projection, function (index, attribute) {
-                        projections.push(attribute.select);
-                    });
-                    clickedElement.setProjection(projections);
-                    clickedElement.setOutputType(config.outputType);
-                });
-
-                // 'Cancel' button action
-                var cancelButtonElement = $('#form-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-                });
-            }
+        //     var self = this;
+        //     var formConsole = this.createTabForForm();
+        //     var formContainer = formConsole.getContentContainer();
+        //
+        //     // The container and the tool palette are disabled to prevent the user from dropping any elements
+        //     self.gridContainer.addClass('disabledbutton');
+        //     self.toolPaletteContainer.addClass('disabledbutton');
+        //
+        //     var id = $(element).parent().attr('id');
+        //     var clickedElement = self.appData.getJoinQuery(id);
+        //     if (!(clickedElement.getFrom()) || clickedElement.getFrom().length !== 2) {
+        //         alert('Connect TWO input streams');
+        //         self.gridContainer.removeClass('disabledbutton');
+        //         self.toolPaletteContainer.removeClass('disabledbutton');
+        //
+        //         // close the form window
+        //         self.consoleListManager.removeConsole(formConsole);
+        //         self.consoleListManager.hideAllConsoles();
+        //     }
+        //     else if (!(clickedElement.getInsertInto())) {
+        //         alert('Connect an output stream');
+        //         self.gridContainer.removeClass('disabledbutton');
+        //         self.toolPaletteContainer.removeClass('disabledbutton');
+        //
+        //         // close the form window
+        //         self.consoleListManager.removeConsole(formConsole);
+        //         self.consoleListManager.hideAllConsoles();
+        //     }
+        //
+        //     else {
+        //         var streams = [];
+        //         $.each(clickedElement.getFrom(), function (index, streamID) {
+        //             streams.push((self.appData.getStream(streamID)).getName());
+        //         });
+        //         var projections = [];
+        //         var insertInto = self.appData.getStream(clickedElement.getInsertInto()).getName();
+        //         var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
+        //         if (!(clickedElement.getProjection())) {
+        //             for (var i = 0; i < outStreamAttributes.length; i++) {
+        //                 var attr = {select: '', newName: outStreamAttributes[i].attribute};
+        //                 projections.push(attr);
+        //             }
+        //         }
+        //         else {
+        //             var selectedAttributes = clickedElement.getProjection();
+        //             for (var i = 0; i < outStreamAttributes.length; i++) {
+        //                 var attr = {select: selectedAttributes[i], newName: outStreamAttributes[i].attribute};
+        //                 projections.push(attr);
+        //             }
+        //         }
+        //         var fillWith = {
+        //             projection: projections,
+        //             outputType: clickedElement.getOutputType(),
+        //             insertInto: insertInto
+        //         };
+        //
+        //         if (clickedElement.getJoin()) {
+        //             fillWith.type = clickedElement.getJoin().getType();
+        //             fillWith.leftStream = clickedElement.getJoin().getLeftStream();
+        //             fillWith.rightStream = clickedElement.getJoin().getRightStream();
+        //             fillWith.on = clickedElement.getJoin().getOn();
+        //         }
+        //         var editor = new JSONEditor(formContainer[0], {
+        //             ajax: true,
+        //             schema: {
+        //                 type: 'object',
+        //                 title: 'Query',
+        //                 properties: {
+        //                     type: {
+        //                         type: 'string',
+        //                         title: 'Type',
+        //                         required: true,
+        //                         propertyOrder: 1
+        //                     },
+        //                     leftStream: {
+        //                         type: 'object',
+        //                         title: 'Left Stream',
+        //                         required: true,
+        //                         propertyOrder: 2,
+        //                         options: {
+        //                             disable_collapse: false,
+        //                             disable_properties: true,
+        //                             collapsed: true
+        //                         },
+        //                         properties: {
+        //                             from: {
+        //                                 type: 'string',
+        //                                 title: 'From',
+        //                                 enum: streams,
+        //                                 required: true
+        //                             },
+        //                             filter: {
+        //                                 type: 'string',
+        //                                 title: 'Filter',
+        //                                 required: true
+        //                             },
+        //                             window: {
+        //                                 type: 'string',
+        //                                 title: 'Window',
+        //                                 required: true
+        //                             },
+        //                             postWindowFilter: {
+        //                                 type: 'string',
+        //                                 title: 'Post Window Filter',
+        //                                 required: true
+        //                             },
+        //                             as: {
+        //                                 type: 'string',
+        //                                 title: 'As',
+        //                                 required: true
+        //                             }
+        //                         }
+        //                     },
+        //                     rightStream: {
+        //                         type: 'object',
+        //                         title: 'Right Stream',
+        //                         required: true,
+        //                         propertyOrder: 3,
+        //                         options: {
+        //                             disable_collapse: false,
+        //                             disable_properties: true,
+        //                             collapsed: true
+        //                         },
+        //                         properties: {
+        //                             from: {
+        //                                 type: 'string',
+        //                                 title: 'From',
+        //                                 enum: streams,
+        //                                 required: true
+        //                             },
+        //                             filter: {
+        //                                 type: 'string',
+        //                                 title: 'Filter',
+        //                                 required: true
+        //                             },
+        //                             window: {
+        //                                 type: 'string',
+        //                                 title: 'Window',
+        //                                 required: true
+        //                             },
+        //                             postWindowFilter: {
+        //                                 type: 'string',
+        //                                 title: 'Post Window Filter',
+        //                                 required: true
+        //                             },
+        //                             as: {
+        //                                 type: 'string',
+        //                                 title: 'As',
+        //                                 required: true
+        //                             }
+        //                         }
+        //                     },
+        //                     on: {
+        //                         type: 'string',
+        //                         title: 'On',
+        //                         required: true,
+        //                         propertyOrder: 4
+        //                     },
+        //                     projection: {
+        //                         type: 'array',
+        //                         title: 'Projection',
+        //                         format: 'table',
+        //                         required: true,
+        //                         propertyOrder: 5,
+        //                         options: {
+        //                             disable_array_add: true,
+        //                             disable_array_delete: true,
+        //                             disable_array_reorder: true
+        //                         },
+        //                         items: {
+        //                             type: 'object',
+        //                             title: 'Attribute',
+        //                             properties: {
+        //                                 select: {
+        //                                     type: 'string',
+        //                                     title: 'select'
+        //                                 },
+        //                                 newName: {
+        //                                     type: 'string',
+        //                                     title: 'as'
+        //                                 }
+        //                             }
+        //                         }
+        //                     },
+        //                     outputType: {
+        //                         type: 'string',
+        //                         title: 'Output Type',
+        //                         enum: ['all events', 'current events', 'expired events'],
+        //                         default: 'all events',
+        //                         required: true,
+        //                         propertyOrder: 6
+        //                     },
+        //                     insertInto: {
+        //                         type: 'string',
+        //                         title: 'Insert Into',
+        //                         template: insertInto,
+        //                         required: true,
+        //                         propertyOrder: 7
+        //                     }
+        //                 }
+        //             },
+        //             startval: fillWith,
+        //             no_additional_properties: true,
+        //             disable_properties: true
+        //         });
+        //         for (var i = 0; i < outStreamAttributes.length; i++) {
+        //             editor.getEditor('root.projection.' + i + '.newName').disable();
+        //         }
+        //         editor.getEditor('root.insertInto').disable();
+        //
+        //         $(formContainer).append('<div id="form-submit"><button type="button" ' +
+        //             'class="btn btn-default">Submit</button></div>' +
+        //             '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+        //
+        //         // 'Submit' button action
+        //         var submitButtonElement = $('#form-submit')[0];
+        //         submitButtonElement.addEventListener('click', function () {
+        //             self.gridContainer.removeClass('disabledbutton');
+        //             self.toolPaletteContainer.removeClass('disabledbutton');
+        //
+        //             // close the form window
+        //             self.consoleListManager.removeConsole(formConsole);
+        //             self.consoleListManager.hideAllConsoles();
+        //
+        //             var config = editor.getValue();
+        //             // update selected query object
+        //             var leftStreamOptions = {};
+        //             _.set(leftStreamOptions, 'from', config.leftStream.from);
+        //             _.set(leftStreamOptions, 'filter', config.leftStream.filter);
+        //             _.set(leftStreamOptions, 'window', config.leftStream.window);
+        //             _.set(leftStreamOptions, 'postWindowFilter', config.leftStream.postWindowFilter);
+        //             _.set(leftStreamOptions, 'as', config.leftStream.as);
+        //             var leftStream = new LeftStream(leftStreamOptions);
+        //
+        //             var rightStreamOptions = {};
+        //             _.set(leftStreamOptions, 'from', config.rightStream.from);
+        //             _.set(leftStreamOptions, 'filter', config.rightStream.filter);
+        //             _.set(leftStreamOptions, 'window', config.rightStream.window);
+        //             _.set(leftStreamOptions, 'postWindowFilter', config.rightStream.postWindowFilter);
+        //             _.set(leftStreamOptions, 'as', config.rightStream.as);
+        //             var rightStream = new RightStream(rightStreamOptions);
+        //
+        //             var joinOptions = {};
+        //             _.set(joinOptions, 'type', config.type);
+        //             _.set(joinOptions, 'left-stream', leftStream);
+        //             _.set(joinOptions, 'right-stream', rightStream);
+        //             _.set(joinOptions, 'on', config.on);
+        //             var join =new Join(joinOptions);
+        //
+        //             clickedElement.setJoin(join);
+        //             var projections = [];
+        //             $.each(config.projection, function (index, attribute) {
+        //                 projections.push(attribute.select);
+        //             });
+        //             clickedElement.setProjection(projections);
+        //             clickedElement.setOutputType(config.outputType);
+        //         });
+        //
+        //         // 'Cancel' button action
+        //         var cancelButtonElement = $('#form-cancel')[0];
+        //         cancelButtonElement.addEventListener('click', function () {
+        //             self.gridContainer.removeClass('disabledbutton');
+        //             self.toolPaletteContainer.removeClass('disabledbutton');
+        //
+        //             // close the form window
+        //             self.consoleListManager.removeConsole(formConsole);
+        //             self.consoleListManager.hideAllConsoles();
+        //         });
+        //     }
         };
 
         /**

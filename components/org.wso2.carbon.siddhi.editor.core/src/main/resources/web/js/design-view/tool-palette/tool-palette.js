@@ -96,8 +96,8 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/join.png"
                 },
                 {
-                    id : "pattern-query",
-                    className : "pattern-query",
+                    id : "pattern-query-input",
+                    className : "pattern-query-input",
                     title : "Pattern Query",
                     icon : "/editor/images/patternQuery.png"
                 },
