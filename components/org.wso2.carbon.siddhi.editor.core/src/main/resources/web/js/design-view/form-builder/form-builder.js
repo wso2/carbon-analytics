@@ -39,10 +39,10 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
             WINDOW :'windowdrop',
             TRIGGER :'triggerdrop',
             AGGREGATION : 'aggregationdrop',
-            PASS_THROUGH : 'squerydrop',
-            FILTER : 'filterdrop',
+            PROJECTION : 'projectionQueryDrop',
+            FILTER : 'filterQueryDrop',
             JOIN : 'joquerydrop',
-            WINDOW_QUERY : 'wquerydrop',
+            WINDOW_QUERY : 'windowQueryDrop',
             PATTERN : 'patternQueryDrop',
             PARTITION :'partitiondrop'
         };
@@ -763,7 +763,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         };
 
         /**
-         * @function generate the property window for an existing window
+         * @function generate the form for an existing window
          * @param element selected element(window)
          */
         FormBuilder.prototype.GeneratePropertiesFormForWindows = function (element) {
@@ -1021,7 +1021,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         };
 
         /**
-         * @function generate the property window for an existing trigger
+         * @function generate the form window for an existing trigger
          * @param element selected element(trigger)
          */
         FormBuilder.prototype.GeneratePropertiesFormForTriggers = function (element) {
@@ -1334,7 +1334,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         };
 
         /**
-         * @function generate the property aggregation for an existing aggregation
+         * @function generate the form for an existing aggregation
          * @param element selected element(aggregation)
          */
         FormBuilder.prototype.GeneratePropertiesFormForAggregations = function (element) {
@@ -1602,10 +1602,10 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         };
 
         /**
-         * @function generate the property window for the simple queries ( passthrough, filter and window)
+         * @function generate the form for the simple queries ( passthrough, filter and window)
          * @param element selected element(query)
          */
-        FormBuilder.prototype.GeneratePropertiesFormForQueries = function (element) {
+        FormBuilder.prototype.GeneratePropertiesFormForWindowFilterProjectionQueries = function (element) {
         //     var self = this;
         //     var formConsole = this.createTabForForm();
         //     var formContainer = formConsole.getContentContainer();
@@ -1638,7 +1638,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         //         var window = clickedElement.getWindow();
         //         var filter2 = clickedElement.getPostWindowFilter();
         //         var fillWith;
-        //         if (type.hasClass(constants.PASS_THROUGH)) {
+        //         if (type.hasClass(constants.PROJECTION)) {
         //             fillWith = {
         //                 name: name,
         //                 from: inStream,
@@ -1779,7 +1779,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         //                 $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
         //             } else if (!(config.filter || config.postWindowFilter || config.window )) {
         //                 $(element).parent().removeClass();
-        //                 $(element).parent().addClass(constants.PASS_THROUGH+ ' jtk-draggable');
+        //                 $(element).parent().addClass(constants.PROJECTION+ ' jtk-draggable');
         //             }
         //
         //             // obtain values from the form and update the query model
@@ -1837,7 +1837,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         //         }
         //
         //         var fillWith;
-        //         if (type.hasClass(constants.PASS_THROUGH)) {
+        //         if (type.hasClass(constants.PROJECTION)) {
         //             fillWith = {
         //                 name: name,
         //                 from: inStream,
@@ -1976,7 +1976,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         //                 $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
         //             } else if (!(config.filter || config.postWindowFilter || config.window )) {
         //                 $(element).parent().removeClass();
-        //                 $(element).parent().addClass(constants.PASS_THROUGH + ' jtk-draggable');
+        //                 $(element).parent().addClass(constants.PROJECTION + ' jtk-draggable');
         //             }
         //
         //             // update selected query model
@@ -2007,7 +2007,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         };
 
         /**
-         * @function generate property window for state machine
+         * @function generate form for state machine
          * @param element selected element(query)
          */
         FormBuilder.prototype.GeneratePropertiesFormForPatternQueries = function (element) {
@@ -2891,7 +2891,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         };
 
         /**
-         * @function generate property window for Join Query
+         * @function generate form for Join Query
          * @param element selected element(query)
          */
         FormBuilder.prototype.GeneratePropertiesFormForJoinQuery = function (element) {
@@ -3167,7 +3167,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
         };
 
         /**
-         * @function generate property window for Partition
+         * @function generate form for Partition
          * @param element selected element(query)
          */
         FormBuilder.prototype.GeneratePartitionKeyForm = function (element) {

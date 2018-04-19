@@ -18,13 +18,14 @@
 
 define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid', 'appData',
         'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation', 'aggregateByTimePeriod',
-        'patternQueryInput', 'patternQueryInputCounting', 'patternQueryInputAndOr', 'patternQueryInputNotFor',
-        'patternQueryInputNotAnd', 'edge', 'querySelect', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
+        'windowFilterProjectionQueryInput', 'queryWindow', 'patternQueryInput', 'patternQueryInputCounting',
+        'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'edge', 'querySelect',
+        'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
     function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, Partition, Query, Stream, Table,
-              Window, Trigger, Aggregation, AggregateByTimePeriod, PatternQueryInput,PatternQueryInputCounting,
-              PatternQueryInputAndOr, PatternQueryInputNotFor, PatternQueryInputNotAnd, Edge, QuerySelect, QueryOutput,
-              QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
+              Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindow,
+              PatternQueryInput, PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
+              PatternQueryInputNotAnd, Edge, QuerySelect, QueryOutput, QueryOutputInsert, QueryOutputDelete,
+              QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
 
         /**
          * @class DesignView
@@ -153,6 +154,18 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 setSelectForQuery(patternQueryObject, patternQuery.select);
                 setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
                 appData.addPatternQuery(patternQueryObject);
+            });
+            _.forEach(siddhiAppContent.windowFilterProjectionQueryList, function(windowFilterProjectionQuery){
+                var queryObject = new Query(windowFilterProjectionQuery);
+                var windowFilterProjectionQueryInput = new WindowFilterProjectionQueryInput();
+                if (windowFilterProjectionQuery.window !== undefined && windowFilterProjectionQuery.window !== '') {
+                    var queryWindowObject = new QueryWindow(windowFilterProjectionQuery.window);
+                    windowFilterProjectionQueryInput.setWindow(queryWindowObject);
+                }
+                queryObject.setQueryInput(windowFilterProjectionQueryInput);
+                setSelectForQuery(queryObject, windowFilterProjectionQuery.select);
+                setQueryOutputForQuery(queryObject, windowFilterProjectionQuery.queryOutput);
+                appData.addWindowFilterProjectionQuery(queryObject);
             });
             // _.forEach(siddhiAppContent.joinQueryList, function(joinQuery){
             //     var joinQueryObject = new JoinQuery(joinQuery);

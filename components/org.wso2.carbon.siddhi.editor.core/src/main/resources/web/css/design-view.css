@@ -93,15 +93,15 @@
     background-image: url("../images/aggregation.png");
 }
 
-.squerydrop {
+.projectionQueryDrop {
     background-image: url("../images/passthrough.png");
 }
 
-.filterdrop {
+.filterQueryDrop {
     background-image: url("../images/filter.png");
 }
 
-.wquerydrop {
+.windowQueryDrop {
     background-image: url("../images/windowQuery.png");
 }
 
@@ -117,7 +117,7 @@
     Dropped Elements corresponding to their toolbox elements
 */
 
-.streamdrop, .tabledrop, .windowdrop, .triggerdrop, .aggregationdrop, .squerydrop, .filterdrop, .wquerydrop,
+.streamdrop, .tabledrop, .windowdrop, .triggerdrop, .aggregationdrop, .projectionQueryDrop, .filterQueryDrop, .windowQueryDrop,
 .joquerydrop, .patternQueryDrop {
     border-radius: 0.5em;
     opacity: 0.8;

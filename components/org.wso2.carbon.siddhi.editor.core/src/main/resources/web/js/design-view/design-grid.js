@@ -26,10 +26,10 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             WINDOW :'windowdrop',
             TRIGGER :'triggerdrop',
             AGGREGATION : 'aggregationdrop',
-            PASS_THROUGH : 'squerydrop',
-            FILTER : 'filterdrop',
+            PROJECTION : 'projectionQueryDrop',
+            FILTER : 'filterQueryDrop',
             JOIN : 'joquerydrop',
-            WINDOW_QUERY : 'wquerydrop',
+            WINDOW_QUERY : 'windowQueryDrop',
             PATTERN : 'patternQueryDrop',
             PARTITION :'partitiondrop'
         };
@@ -102,7 +102,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                  */
                 self.canvas.droppable
                 ({
-                    accept: '.stream, .table, .window, .trigger, .aggregation, .pass-through, .filter-query, ' +
+                    accept: '.stream, .table, .window, .trigger, .aggregation, .projection-query, .filter-query, ' +
                     '.join-query, .window-query, .pattern-query, .partition',
                     containment: 'grid-container',
 
@@ -149,19 +149,19 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             self.handleAggregation(mouseTop, mouseLeft, false);
                         }
 
-                        // If the dropped Element is a Pass through Query then->
-                        else if ($(droppedElement).hasClass('pass-through')) {
-                            self.handlePassThroughQuery(mouseTop, mouseLeft, false);
+                        // If the dropped Element is a Projection Query then->
+                        else if ($(droppedElement).hasClass('projection-query')) {
+                            self.handleWindowFilterProjectionQuery(constants.PROJECTION, mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Filter query then->
                         else if ($(droppedElement).hasClass('filter-query')) {
-                            self.handleFilterQuery(mouseTop, mouseLeft, false);
+                            self.handleWindowFilterProjectionQuery(constants.FILTER, mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Window Query then->
                         else if ($(droppedElement).hasClass('window-query')) {
-                            self.handleWindowQuery(mouseTop, mouseLeft, false);
+                            self.handleWindowFilterProjectionQuery(constants.WINDOW_QUERY, mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Join Query then->
@@ -224,14 +224,14 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             alert("Invalid Connection");
                         }
                     }
-                    else if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
+                    else if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY) || targetElement.hasClass(constants.JOIN)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE))) {
                             connectionValidity = false;
                             alert("Invalid Connection");
                         }
                     }
-                    else if (sourceElement.hasClass(constants.PASS_THROUGH) || sourceElement.hasClass(constants.FILTER)
+                    else if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                         || sourceElement.hasClass(constants.WINDOW_QUERY)
                         || sourceElement.hasClass(constants.PATTERN) || sourceElement.hasClass(constants.JOIN)) {
                         if (!(targetElement.hasClass(constants.STREAM))) { //TODO: can a output of a query connected to a table
@@ -277,7 +277,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var model;
 
                     if (sourceElement.hasClass(constants.STREAM)) {
-                        if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
+                        if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                             || targetElement.hasClass(constants.WINDOW_QUERY)) {
                             model = self.appData.getQuery(targetId);
                             model.setFrom(sourceId);
@@ -314,7 +314,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 var query = connectedQuery.targetId;
                                 var queryID = query.substr(0, query.indexOf('-'));
                                 var queryElement = $('#' + queryID);
-                                if (queryElement.hasClass(constants.PASS_THROUGH) || queryElement.hasClass(constants.FILTER)
+                                if (queryElement.hasClass(constants.PROJECTION) || queryElement.hasClass(constants.FILTER)
                                     || queryElement.hasClass(constants.WINDOW_QUERY)) {
                                     model = self.appData.getQuery(queryID);
                                     model.setFrom(sourceId);
@@ -352,7 +352,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             streamID = stream.substr(0, stream.indexOf('-'));
                         });
                         if (streamID != null) {
-                            if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
+                            if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                                 || targetElement.hasClass(constants.WINDOW_QUERY)) {
                                 model = self.appData.getQuery(targetId);
                                 model.setFrom(streamID);
@@ -381,7 +381,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     }
 
                     else if (targetElement.hasClass(constants.STREAM)) {
-                        if (sourceElement.hasClass(constants.PASS_THROUGH) || sourceElement.hasClass(constants.FILTER)
+                        if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                             || sourceElement.hasClass(constants.WINDOW_QUERY)) {
                             model = self.appData.getQuery(sourceId);
                             model.setInsertInto(targetId);
@@ -456,7 +456,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var model;
                     var streams;
                     if (sourceElement.hasClass(constants.STREAM)) {
-                        if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
+                        if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                             || targetElement.hasClass(constants.WINDOW_QUERY)) {
                             model = self.appData.getQuery(targetId);
                             if (model !== undefined) {
@@ -496,7 +496,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                     var query = connectedQuery.targetId;
                                     var queryID = query.substr(0, query.indexOf('-'));
                                     var queryElement = $('#' + queryID);
-                                    if (queryElement.hasClass(constants.PASS_THROUGH)
+                                    if (queryElement.hasClass(constants.PROJECTION)
                                         || queryElement.hasClass(constants.FILTER)
                                         || queryElement.hasClass(constants.WINDOW_QUERY)) {
                                         model = self.appData.getQuery(queryID);
@@ -535,7 +535,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             var stream = connectedStream.sourceId;
                             streamID = stream.substr(0, stream.indexOf('-'));
                         });
-                        if (targetElement.hasClass(constants.PASS_THROUGH) || targetElement.hasClass(constants.FILTER)
+                        if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                             || targetElement.hasClass(constants.WINDOW_QUERY)) {
                             model = self.appData.getQuery(targetId);
                             if (model !== undefined) {
@@ -562,7 +562,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                     }
                     if (targetElement.hasClass(constants.STREAM)) {
-                        if (sourceElement.hasClass(constants.PASS_THROUGH) || sourceElement.hasClass(constants.FILTER)
+                        if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                             || sourceElement.hasClass(constants.WINDOW_QUERY)) {
                             model = self.appData.getQuery(sourceId);
                             if (model !== undefined) {
@@ -587,7 +587,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
             function addMemberToPartitionGroup(self) {
                 _jsPlumb.bind('group:addMember', function (event) {
-                    if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PASS_THROUGH)
+                    if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                         || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
                         || $(event.el).hasClass(constants.STREAM)) {
 
@@ -604,7 +604,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         var partitionId = $(event.group).attr('id');
                         var partition = self.appData.getPartition(partitionId);
                         var queries = partition.getQueries();
-                        if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PASS_THROUGH)
+                        if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                             || $(event.el).hasClass(constants.WINDOW_QUERY)) {
                             queries.push(self.appData.getQuery($(event.el).attr('id')));
                             //TODO: set isInner flag true
@@ -691,13 +691,24 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryId, patternQueryName);
             });
 
-            // _.forEach(self.appData.queryList, function(query){
-            //     var queryId = query.getId();
-            //     var mouseTop = parseInt(queryId)*100  - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-            //     var mouseLeft = parseInt(queryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
-            //     self.handlePassThroughQuery(mouseTop, mouseLeft, true, queryId);
-            //     //TODO: correct query types saving style. ex: passthrough should be saved in passthroughList
-            // });
+            _.forEach(self.appData.windowFilterProjectionQueryList, function(windowFilterProjectionQuery){
+                var queryId = windowFilterProjectionQuery.getId();
+                var querySubType = windowFilterProjectionQuery.getSubType();
+
+                var queryType;
+                if (querySubType === 'projection') {
+                    queryType = constants.PROJECTION;
+                } else if (querySubType === 'filter') {
+                    queryType = constants.FILTER;
+                } else if (querySubType === 'window') {
+                    queryType = constants.WINDOW_QUERY;
+                }
+
+                var mouseTop = parseInt(queryId)*100  - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = parseInt(queryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryId);
+            });
+
             _.forEach(self.appData.edgeList, function(edge){
 
                 var targetId = edge.getParentId();
@@ -730,7 +741,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             });
             var nodes =[];
             Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.STREAM));
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.PASS_THROUGH));
+            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.PROJECTION));
             Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.FILTER));
             Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.WINDOW_QUERY));
             Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.JOIN));
@@ -923,55 +934,31 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
         };
 
 
-        DesignGrid.prototype.handlePassThroughQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, queryId) {
+        DesignGrid.prototype.handleWindowFilterProjectionQuery = function (type, mouseTop, mouseLeft,
+                                                                           isCodeToDesignMode, queryId) {
             var self = this;
             var elementId;
-            var passThroughQueryName;
+            var queryName;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.newAgentId;
-                passThroughQueryName = "Empty Query";
+                queryName = "Empty Query";
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(queryId !== undefined) {
                     elementId = queryId;
                 } else {
                     console.log("queryId parameter is undefined");
                 }
-                passThroughQueryName = "Empty Query";
+                queryName = "Empty Query";
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             // increment the Element ID for the next dropped Element
             self.generateNextId();
-            var newAgent = $('<div>').attr('id', elementId).addClass('squerydrop');
-            var dropType = "squerydrop";
+            var newAgent = $('<div>').attr('id', elementId).addClass(type);
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, elementId, dropType, mouseTop, mouseLeft, passThroughQueryName,
+            self.dropElements.dropWindowFilterProjectionQuery(newAgent, elementId, type, mouseTop, mouseLeft, queryName,
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.dropElements.registerElementEventListeners(newAgent);
-        };
-
-        DesignGrid.prototype.handleFilterQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
-            var self =this;
-            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('filterdrop ');
-            var droptype = "filterdrop";
-            // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
-                isCodeToDesignMode);
-            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.generateNextId();
-            self.dropElements.registerElementEventListeners(newAgent);
-        };
-
-        DesignGrid.prototype.handleWindowQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
-            var self = this;
-            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('wquerydrop ');
-            var droptype = "wquerydrop";
-            // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Empty Query",
-                isCodeToDesignMode);
-            self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 

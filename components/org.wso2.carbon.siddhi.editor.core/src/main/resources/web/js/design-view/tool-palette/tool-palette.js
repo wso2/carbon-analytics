@@ -72,8 +72,8 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/aggregation.png"
                 },
                 {
-                    id : "pass-through",
-                    className : "pass-through",
+                    id : "projection-query",
+                    className : "projection-query",
                     title : "Pass Through",
                     icon : "/editor/images/passthrough.png"
                 },

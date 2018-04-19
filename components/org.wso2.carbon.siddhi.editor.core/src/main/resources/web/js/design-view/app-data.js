@@ -31,10 +31,7 @@ define(['require', 'elementArray'],
             this.windowList = new ElementArray();
             this.triggerList = new ElementArray();
             this.aggregationList = new ElementArray();
-            this.filterList = new ElementArray();
-            this.passThroughList = new ElementArray();
-            this.windowQueryList = new ElementArray();
-            this.queryList = new ElementArray();
+            this.windowFilterProjectionQueryList = new ElementArray();
             this.patternQueryList = new ElementArray();
             this.joinQueryList = new ElementArray();
             this.partitionList = new ElementArray();
@@ -64,20 +61,8 @@ define(['require', 'elementArray'],
             this.aggregationList.push(aggregation);
         };
 
-        AppData.prototype.addFilterQuery = function (filterQuery) {
-            this.filterList.push(filterQuery);
-        };
-
-        AppData.prototype.addPassThroughQuery = function (passThroughQuery) {
-            this.passThroughList.push(passThroughQuery);
-        };
-
-        AppData.prototype.addWindowQuery = function (windowQuery) {
-            this.windowQueryList.push(windowQuery);
-        };
-
-        AppData.prototype.addQuery = function (query) {
-            this.queryList.push(query);
+        AppData.prototype.addWindowFilterProjectionQuery = function (windowFilterProjectionQuery) {
+            this.windowFilterProjectionQueryList.push(windowFilterProjectionQuery);
         };
 
         AppData.prototype.addPatternQuery = function (patternQuery) {
@@ -116,20 +101,8 @@ define(['require', 'elementArray'],
             this.aggregationList.removeElement(aggregationId);
         };
 
-        AppData.prototype.removeFilterQuery = function (filterQueryId) {
-            this.filterList.removeElement(filterQueryId);
-        };
-
-        AppData.prototype.removePassThroughQuery = function (passThroughQueryId) {
-            this.passThroughList.removeElement(passThroughQueryId);
-        };
-
-        AppData.prototype.removeWindowQuery = function (windowQueryId) {
-            this.windowQueryList.removeElement(windowQueryId);
-        };
-
-        AppData.prototype.removeQuery = function (queryId) {
-            this.queryList.removeElement(queryId);
+        AppData.prototype.removeWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
+            this.windowFilterProjectionQueryList.removeElement(windowFilterProjectionQueryId);
         };
 
         AppData.prototype.removePatternQuery = function (patternQueryId) {
@@ -172,20 +145,8 @@ define(['require', 'elementArray'],
             return this.aggregationList.getElement(aggregationId);
         };
 
-        AppData.prototype.getFilterQuery = function (filterQueryId) {
-            return this.filterList.getElement(filterQueryId);
-        };
-
-        AppData.prototype.getPassThroughQuery = function (passThroughQueryId) {
-            return this.passThroughList.getElement(passThroughQueryId);
-        };
-
-        AppData.prototype.getWindowQuery = function (windowQueryId) {
-            return this.windowQueryList.getElement(windowQueryId);
-        };
-
-        AppData.prototype.getQuery = function (queryId) {
-            return this.queryList.getElement(queryId);
+        AppData.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
+            return this.windowFilterProjectionQueryList.getElement(windowFilterProjectionQueryId);
         };
 
         AppData.prototype.getPatternQuery = function (patternQueryId) {
