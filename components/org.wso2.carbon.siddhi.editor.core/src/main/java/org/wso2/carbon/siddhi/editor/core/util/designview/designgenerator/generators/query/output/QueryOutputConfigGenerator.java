@@ -32,26 +32,17 @@ import java.util.List;
  * Generator to create the output part of a Query Config
  */
 public class QueryOutputConfigGenerator {
-    private Query query;
-    private String siddhiAppString;
-
-    public QueryOutputConfigGenerator(Query query, String siddhiAppString) {
-        this.query = query;
-        this.siddhiAppString = siddhiAppString;
-    }
-
     // TODO: 4/17/18 comment
-    public QueryOutputConfig generateQueryOutputConfig(Query query, String siddhiAppString) {
-        OutputStream queryOutputStream = query.getOutputStream();
+    public QueryOutputConfig generateQueryOutputConfig(OutputStream queryOutputStream, String siddhiAppString) {
         if (queryOutputStream instanceof InsertIntoStream) {
-            return generateInsertOutputConfig((InsertIntoStream)(query.getOutputStream()));
+            return generateInsertOutputConfig((InsertIntoStream) queryOutputStream);
         } else if (queryOutputStream instanceof DeleteStream) {
-            return generateDeleteOutputConfig((DeleteStream)(query.getOutputStream()), siddhiAppString);
+            return generateDeleteOutputConfig((DeleteStream) queryOutputStream, siddhiAppString);
         } else if (queryOutputStream instanceof UpdateStream) {
-            return generateUpdateOutputConfig((UpdateStream) (query.getOutputStream()), siddhiAppString);
+            return generateUpdateOutputConfig((UpdateStream) queryOutputStream, siddhiAppString);
         } else if (queryOutputStream instanceof UpdateOrInsertStream) {
             return generateUpdateOrInsertIntoOutputConfig(
-                    (UpdateOrInsertStream) (query.getOutputStream()), siddhiAppString);
+                    (UpdateOrInsertStream) queryOutputStream, siddhiAppString);
         }
         throw new IllegalArgumentException("Unknown type of Query Output Stream for generating Query Output Config");
     }

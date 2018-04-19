@@ -25,8 +25,15 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.attributesselection.SelectedAttributesConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.QueryInputConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.output.QueryOutputConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.SiddhiApp;
+import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.execution.query.Query;
+import org.wso2.siddhi.query.api.expression.Variable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Generator to create a Siddhi Query config
@@ -44,7 +51,7 @@ public class QueryConfigGenerator {
         // Generate Query Input
         QueryInputConfigGenerator queryInputConfigGenerator = new QueryInputConfigGenerator();
         QueryInputConfig queryInputConfig =
-                queryInputConfigGenerator.generateQueryInputConfig(query, siddhiAppString, siddhiApp);
+                queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream(), siddhiAppString, siddhiApp);
 
         // Generate Query Select
         SelectedAttributesConfigGenerator selectedAttributesConfigGenerator = new SelectedAttributesConfigGenerator();
@@ -53,11 +60,50 @@ public class QueryConfigGenerator {
                         .generateSelectedAttributesConfig(query.getSelector().getSelectionList());
 
         // Generate Query Output
-        QueryOutputConfigGenerator queryOutputConfigGenerator = new QueryOutputConfigGenerator(query, siddhiAppString);
+        QueryOutputConfigGenerator queryOutputConfigGenerator = new QueryOutputConfigGenerator();
         QueryOutputConfig queryOutputConfig =
-                queryOutputConfigGenerator.generateQueryOutputConfig(query, siddhiAppString);
+                queryOutputConfigGenerator.generateQueryOutputConfig(query.getOutputStream(), siddhiAppString);
 
-        // TODO: 4/8/18 implement
-        return null;
+        // Set the Name & Id of the Query
+        String queryId = null;
+        for (Annotation annotation : query.getAnnotations()) {
+            if (annotation.getName().equalsIgnoreCase(SiddhiQueryAnnotation.INFO.toString())) {
+                queryId = annotation.getElement(SiddhiQueryAnnotation.NAME.toString());
+                break;
+            }
+        }
+
+        // Set UUID if no name has been given for the query
+        if (queryId == null) {
+            queryId = UUID.randomUUID().toString();
+        }
+
+        // Group By
+        List<String> groupBy = new ArrayList<>();
+        for (Variable variable : query.getSelector().getGroupByList()) {
+            groupBy.add(variable.getAttributeName());
+        }
+
+        // Having
+        String having = "";
+        if (query.getSelector().getHavingExpression() != null) {
+            having = ConfigBuildingUtilities.getDefinition(query.getSelector().getHavingExpression(), siddhiAppString);
+        }
+
+        return new QueryConfig(
+                queryId,
+                queryInputConfig,
+                querySelectConfig,
+                groupBy,
+                having,
+                null,
+                queryOutputConfig,
+                null);
+    }
+
+    private enum SiddhiQueryAnnotation {
+        INFO,
+        NAME,
+        DESCRIPTION
     }
 }

@@ -29,6 +29,7 @@ import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.state.*;
 import org.wso2.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
+import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
 
 import java.util.ArrayList;
@@ -38,22 +39,21 @@ import java.util.List;
  * Generator for Pattern Query Config
  */
 public class PatternConfigGenerator {
-    private Query query;
     private String siddhiAppString;
 
     private List<PatternQueryEventConfig> events = new ArrayList<>();
 
-    public PatternConfigGenerator(Query query, String siddhiAppString) {
-        this.query = query;
+    public PatternConfigGenerator(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
     }
 
     /**
      * Gets a PatternQueryConfig object, from the Query object
-     * @return      PatternQueryConfig object
+     * @param queryInputStream      Siddhi Query InputStream
+     * @return                      PatternQueryConfig object
      */
-    public PatternQueryConfig getPatternQueryConfig() {
-        addEvent(((StateInputStream)(query.getInputStream())).getStateElement());
+    public PatternQueryConfig getPatternQueryConfig(InputStream queryInputStream) {
+        addEvent(((StateInputStream) queryInputStream).getStateElement());
         return new PatternQueryConfig(events);
     }
 
@@ -100,8 +100,8 @@ public class PatternConfigGenerator {
 
     /**
      * Generates an Event Config object for a Pattern Query's element, from the given Siddhi State Element object
-     * @param stateElement      Siddhi StateElement object, that holds data about a Pattern query's element
-     * @return                  Event Config object of a Pattern Query's element
+     * @param stateElement          Siddhi StateElement object, that holds data about a Pattern query's element
+     * @return                      Event Config object of a Pattern Query's element
      */
     private PatternQueryEventConfig generatePatternEventConfig(StateElement stateElement) {
         switch (getEventConfigType(stateElement)) {
@@ -266,8 +266,8 @@ public class PatternConfigGenerator {
 
     /**
      * Generates a Stream State Element Config object, from the given Siddhi StreamStateElement object
-     * @param streamStateElement        Siddhi StreamStateElement object, which represents State of a Stream
-     * @return                          Stream State Config object, which contains Stream State data
+     * @param streamStateElement        Siddhi StreamStateElement object, which represents a State element of a Stream
+     * @return                          Stream State Config object
      */
     private StreamStateElementConfig generateStreamStateElementConfig(StreamStateElement streamStateElement) {
         BasicSingleInputStream basicSingleInputStream = streamStateElement.getBasicSingleInputStream();

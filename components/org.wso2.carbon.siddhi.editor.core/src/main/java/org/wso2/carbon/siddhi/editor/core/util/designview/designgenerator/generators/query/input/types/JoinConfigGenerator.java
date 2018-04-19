@@ -31,6 +31,7 @@ import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Window;
+import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.JoinInputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
 import org.wso2.siddhi.query.api.expression.Expression;
@@ -42,49 +43,45 @@ import java.util.List;
  * Generator to create a QueryInputConfig of type Join
  */
 public class JoinConfigGenerator {
-    private Query query;
-    private String siddhiAppString;
-    private SiddhiApp siddhiApp;
-
     // Counts of elements in the Query
     private int streamCount = 0;
     private int tableCount = 0;
     private int aggregationCount = 0;
     private int windowCount = 0;
 
-    public JoinConfigGenerator(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
-        this.query = query;
-        this.siddhiAppString = siddhiAppString;
-        this.siddhiApp = siddhiApp;
-    }
-
     /**
-     * Gets a JoinQueryConfig object, from the Siddhi Query object
-     * @return          JoinQueryConfig object
+     * Gets a JoinQueryConfig object, from the given Siddhi Query InputStream object
+     * @param queryInputStream      Siddhi Query InputStream object, which contains data regarding Siddhi Query input
+     * @param siddhiApp             Compiled Siddhi app
+     * @param siddhiAppString       Complete Siddhi app string
+     * @return
      */
-    public JoinQueryConfig getJoinQueryConfig() {
-        switch (getType(query)) {
+    public JoinQueryConfig getJoinQueryConfig(InputStream queryInputStream,
+                                              SiddhiApp siddhiApp,
+                                              String siddhiAppString) {
+        switch (getType(queryInputStream, siddhiApp)) {
             case JOIN_STREAM:
-                return generateJoinStreamQueryConfig(query);
+                return generateJoinStreamQueryConfig(queryInputStream, siddhiAppString);
             case JOIN_TABLE:
-                return generateJoinTableQueryConfig(query);
+                return generateJoinTableQueryConfig(queryInputStream, siddhiAppString);
             case JOIN_AGGREGATION:
-                return generateJoinAggregationQueryConfig(query);
+                return generateJoinAggregationQueryConfig(queryInputStream, siddhiAppString);
             case JOIN_WINDOW:
-                return generateJoinWindowQueryConfig(query);
+                return generateJoinWindowQueryConfig(queryInputStream, siddhiAppString);
             default:
-                throw new IllegalArgumentException("Unknown type: " + getType(query) +
+                throw new IllegalArgumentException("Unknown type: " + getType(queryInputStream, siddhiApp) +
                         " for generating Join Query Config");
         }
     }
 
     /**
-     * Gets the type of JoinQueryConfig
-     * @param query     Siddhi Query object
-     * @return          Type of the query
+     * Gets the type of JoinQueryConfig, with the given Siddhi Query InputStream
+     * @param queryInputStream      Siddhi Query InputStream object, which contains data regarding Siddhi Query input
+     * @param siddhiApp             Compiled Siddhi app
+     * @return                      Type of the Join Query Config
      */
-    private JoinType getType(Query query) {
-        countElements(query.getInputStream().getUniqueStreamIds(), siddhiApp);
+    private JoinType getType(InputStream queryInputStream, SiddhiApp siddhiApp) {
+        countElements(queryInputStream.getUniqueStreamIds(), siddhiApp);
         if (tableCount > 0) {
             return JoinType.JOIN_TABLE;
         } else if (aggregationCount > 0) {
@@ -104,7 +101,7 @@ public class JoinConfigGenerator {
      * since Streams are automatically defined inside for these elements, in addition to defined streams
      * @param streamIds     List of Stream IDs, which consists of defined streams, and auto defined streams for each
      *                      table, aggregation, window
-     * @param siddhiApp     SiddhiApp object, which is a compiled Siddhi application
+     * @param siddhiApp     Compiled SiddhiApp
      */
     private void countElements(List<String> streamIds, SiddhiApp siddhiApp) {
         for (String streamId : streamIds) {
@@ -122,18 +119,19 @@ public class JoinConfigGenerator {
 
     /**
      * Generates Config for a Join Stream Query Input, from the given Siddhi Query
-     * @param query     Siddhi Query object
-     * @return          JoinStreamQueryConfig object
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @param siddhiAppString       Complete Siddhi app string
+     * @return                      JoinStreamQueryConfig object
      */
-    private JoinStreamQueryConfig generateJoinStreamQueryConfig(Query query) {
-        JoinInputStream joinInputStream = (JoinInputStream)(query.getInputStream());
+    private JoinStreamQueryConfig generateJoinStreamQueryConfig(InputStream queryInputStream, String siddhiAppString) {
+        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
 
         // Left side Stream Information of the join
         JoinedStreamConfig leftStreamConfig =
-                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()));
+                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
         // Right side Stream Information of the join
         JoinedStreamConfig rightStreamConfig =
-                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()));
+                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
 
         // Set 'isUnidirectional'
         if (joinInputStream.getTrigger().name().equalsIgnoreCase(JoinDirection.LEFT.toString())) {
@@ -151,19 +149,20 @@ public class JoinConfigGenerator {
 
     /**
      * Generates Config for a Join Table Query Input, from the given Siddhi Query
-     * @param query     Siddhi Query object
-     * @return          JoinTableQueryConfig object
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @param siddhiAppString       Complete Siddhi app string
+     * @return                      JoinTableQueryConfig object
      */
-    private JoinTableQueryConfig generateJoinTableQueryConfig(Query query) {
-        JoinInputStream joinInputStream = (JoinInputStream)(query.getInputStream());
+    private JoinTableQueryConfig generateJoinTableQueryConfig(InputStream queryInputStream, String siddhiAppString) {
+        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
 
         // Left side Stream Information of the join
         JoinedStreamConfig leftStreamConfig =
-                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()));
+                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
 
         // Right side Stream Information of the join
         JoinedStreamConfig rightStreamConfig =
-                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()));
+                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
 
         return new JoinTableQueryConfig(
                 generateJoinDirectionConfig(leftStreamConfig),
@@ -174,19 +173,21 @@ public class JoinConfigGenerator {
 
     /**
      * Generates Config for a Join Aggregation Query Input, from the given Siddhi Query
-     * @param query     Siddhi Query object
-     * @return          JoinAggregationQueryConfig object
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @param siddhiAppString       Complete Siddhi app string
+     * @return                      JoinAggregationQueryConfig object
      */
-    private JoinAggregationQueryConfig generateJoinAggregationQueryConfig(Query query) {
-        JoinInputStream joinInputStream = (JoinInputStream)(query.getInputStream());
+    private JoinAggregationQueryConfig generateJoinAggregationQueryConfig(InputStream queryInputStream,
+                                                                          String siddhiAppString) {
+        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
 
         // Left side Stream Information of the join
         JoinedStreamConfig leftStreamConfig =
-                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()));
+                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
 
         // Right side Stream Information of the join
         JoinedStreamConfig rightStreamConfig =
-                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()));
+                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
 
         return new JoinAggregationQueryConfig(
                 generateJoinDirectionConfig(leftStreamConfig),
@@ -199,19 +200,21 @@ public class JoinConfigGenerator {
 
     /**
      * Generates Config for a Join Window Query Input, from the given Siddhi Query
-     * @param query     Siddhi Query object
-     * @return          JoinWindowQueryConfig object
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @param siddhiAppString       Complete Siddhi app string
+     * @return                      JoinWindowQueryConfig object
      */
-    private JoinWindowQueryConfig generateJoinWindowQueryConfig(Query query) {
-        JoinInputStream joinInputStream = (JoinInputStream)(query.getInputStream());
+    private JoinWindowQueryConfig generateJoinWindowQueryConfig(InputStream queryInputStream,
+                                                                String siddhiAppString) {
+        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
 
         // Left side Stream Information of the join
         JoinedStreamConfig leftStreamConfig =
-                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()));
+                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
 
         // Right side Stream Information of the join
         JoinedStreamConfig rightStreamConfig =
-                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()));
+                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
 
         return new JoinWindowQueryConfig(
                 generateJoinDirectionConfig(leftStreamConfig),
@@ -223,10 +226,12 @@ public class JoinConfigGenerator {
      * Generates Config for a Joined Stream of a Join Query, with the given Siddhi SingleInputStream
      * @param singleInputStream     Siddhi SingleInputStream object,
      *                              that has information about a stream of a Join Query
+     * @param siddhiAppString       Complete Siddhi app string
      * @return                      JoinedStreamConfig object, that has specific extracted information
      *                              from the Siddhi SingleInputStream
      */
-    private JoinedStreamConfig generateJoinedStreamConfig(SingleInputStream singleInputStream) {
+    private JoinedStreamConfig generateJoinedStreamConfig(SingleInputStream singleInputStream,
+                                                          String siddhiAppString) {
         JoinedStreamConfig joinedStreamConfig = new JoinedStreamConfig();
         joinedStreamConfig.name = singleInputStream.getStreamId();
         joinedStreamConfig.as = singleInputStream.getStreamReferenceId();

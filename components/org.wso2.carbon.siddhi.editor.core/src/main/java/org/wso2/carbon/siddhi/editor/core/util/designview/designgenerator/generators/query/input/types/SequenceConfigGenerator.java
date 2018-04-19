@@ -32,6 +32,7 @@ import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.state.*;
 import org.wso2.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
+import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
 
 import java.util.ArrayList;
@@ -41,7 +42,6 @@ import java.util.List;
  * Generator for Sequence Query Config
  */
 public class SequenceConfigGenerator {
-    private Query query;
     private String siddhiAppString;
 
     // Data tree variables todo name
@@ -50,17 +50,17 @@ public class SequenceConfigGenerator {
 
     private List<SequenceQueryEventConfig> events = new ArrayList<>();
 
-    public SequenceConfigGenerator(Query query, String siddhiAppString) {
-        this.query = query;
+    public SequenceConfigGenerator(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
     }
 
     /**
-     * Gets a SequenceQueryConfig object, from the Query object
-     * @return      SequenceQueryConfig object
+     * Gets a SequenceQueryConfig object, from the given Siddhi Query InputStream object
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @return                      SequenceQueryConfig object
      */
-    public SequenceQueryConfig getSequenceQueryConfig() {
-        addEvent(((StateInputStream)(query.getInputStream())).getStateElement());
+    public SequenceQueryConfig getSequenceQueryConfig(InputStream queryInputStream) {
+        addEvent(((StateInputStream) queryInputStream).getStateElement());
         // Set 'forEvery' of the first element
         if (isStartEvery) {
             events.get(0).setForEvery(true);
