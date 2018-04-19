@@ -24,9 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
@@ -35,14 +32,9 @@ import org.wso2.carbon.sp.jobmanager.core.api.ApiResponseMessage;
 import org.wso2.carbon.sp.jobmanager.core.api.ManagersApiService;
 import org.wso2.carbon.sp.jobmanager.core.api.NotFoundException;
 import org.wso2.carbon.sp.jobmanager.core.bean.KafkaTransportDetails;
-import org.wso2.carbon.sp.jobmanager.core.bean.ManagerConfigurationDetails;
-import org.wso2.carbon.sp.jobmanager.core.dbhandler.StatusDashboardManagerDBHandler;
-import org.wso2.carbon.sp.jobmanager.core.exception.RDBMSTableException;
 import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
-import org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent;
-import org.wso2.carbon.sp.jobmanager.core.model.Manager;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppHolder;
@@ -69,7 +61,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     private static final Log logger = LogFactory.getLog(ManagersApiServiceImpl.class);
     private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
     private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";
-    private static StatusDashboardManagerDBHandler managerDashboard;
 
     /**
      * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
@@ -81,7 +72,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) Status Dashboard ManagerApiServiceImpl API");
         }
-        managerDashboard = new StatusDashboardManagerDBHandler();
+       // managerDashboard = new StatusDashboardManagerDBHandler();
     }
 
     /**
@@ -101,54 +92,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
         Object username = request.getProperty("username");
         return username != null ? username.toString() : null;
     }
-
-    /**
-     * This method is to add user specified manager's host and the port.
-     *
-     * @param manager
-     * @return
-     */
-
-    public Response addManager(Manager manager) {
-        if (manager.getHost() != null) {
-            String managerId = manager.getHost() + Constants.MANAGER_KEY_GENERATOR + String.valueOf(manager.getPort());
-            ManagerConfigurationDetails managerConfigurationDetails =
-                    new ManagerConfigurationDetails(managerId, manager.getHost(), Integer.valueOf(manager.getPort()));
-            try {
-                managerDashboard.insertManagerConfiguration(managerConfigurationDetails);
-                return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
-                        "managerId " + "\n" + managerId + "\n" + "successfully " + " added")).build();
-            } catch (RDBMSTableException e) {
-                logger.error("Error occured while inserting the Manager due to " + e.getMessage(), e);
-                return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error "
-                        + "occured while inserting the Manager due to " + e.getMessage())).build();
-            }
-        } else {
-            logger.error("There is no manager node specified:" + manager.toString());
-            return Response.status(Response.Status.BAD_REQUEST).entity("There is no manager nodes. Please add a "
-                    + "manager: " + manager.toString())
-                    .build();
-        }
-    }
-
-    /**
-     * This method is to delete requested manager node
-     *
-     * @param managerId
-     * @return
-     */
-    public Response deleteManager(String managerId) {
-        try {
-            managerDashboard.deleteManagerConfiguration(managerId);
-            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
-                    managerId + " Successfully deleted")).build();
-        } catch (RDBMSTableException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    new ApiResponseMessage(ApiResponseMessage.ERROR, "Error occured while deleting the "
-                            + "manager" + "\n" + managerId + "\n" + ex.getMessage())).build();
-        }
-    }
-
 
     /***
      * This method is to list down all the manager's details that are belongs to the same cluster
@@ -384,46 +327,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
 
     /**
-     * Add new manager nodes : User can add one or manager nodes
-     *
-     * @param manager  : Manager object that need to be added
-     * @param username : username of the user
-     * @return : Response whether the manager is successfully added or not.
-     * @throws NotFoundException
-     */
-
-    @Override
-    public Response addManager(Manager manager, Request request) throws NotFoundException {
-        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
-                Permission(Constants.PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to add Manager Node")
-                    .build();
-        } else {
-            return addManager(manager);
-        }
-    }
-
-    /**
-     * Delete an existing manager.
-     *
-     * @param managerId : id of the manager node (format : managerhost_managerport)
-     * @param username  :username of the user
-     * @return Response whether the manager successfully deleted or not.
-     * @throws NotFoundException
-     */
-
-    @Override
-    public Response deleteManager(String managerId, Request request) throws NotFoundException {
-        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
-                Permission(Constants.PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to delete manager "
-                    + "node").build();
-        } else {
-            return deleteManager(managerId);
-        }
-    }
-
-    /**
      * This method returns all the manager's details in the cluster (manager's host, manager's port, HA
      * details)
      *
@@ -540,24 +443,5 @@ public class ManagersApiServiceImpl extends ManagersApiService {
 
     private PermissionProvider getPermissionProvider() {
         return ManagerDataHolder.getInstance().getPermissionProvider();
-    }
-
-    @Reference(
-            name = "org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent",
-            service = DatasourceServiceComponent.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterServiceDatasource"
-    )
-    public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) DatasourceServiceComponent");
-        }
-    }
-
-    public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) DatasourceServiceComponent");
-        }
     }
 }

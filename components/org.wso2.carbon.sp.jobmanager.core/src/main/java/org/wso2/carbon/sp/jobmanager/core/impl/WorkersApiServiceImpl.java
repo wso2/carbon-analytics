@@ -22,9 +22,9 @@ package org.wso2.carbon.sp.jobmanager.core.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
+//import org.osgi.service.component.annotations.Reference;
+//import org.osgi.service.component.annotations.ReferenceCardinality;
+//import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.sp.jobmanager.core.api.NotFoundException;
@@ -32,7 +32,6 @@ import org.wso2.carbon.sp.jobmanager.core.api.WorkersApiService;
 import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
-import org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 import org.wso2.msf4j.Request;
@@ -92,24 +91,4 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private PermissionProvider getPermissionProvider() {
         return ManagerDataHolder.getInstance().getPermissionProvider();
     }
-
-    @Reference(
-            name = "org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent",
-            service = DatasourceServiceComponent.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterServiceDatasource"
-    )
-    public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) DatasourceServiceComponent");
-        }
-    }
-
-    public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) DatasourceServiceComponent");
-        }
-    }
-
 }

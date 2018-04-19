@@ -26,12 +26,15 @@ import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
 import org.wso2.carbon.sp.jobmanager.core.factories.ManagersApiServiceFactory;
-import org.wso2.carbon.sp.jobmanager.core.model.Manager;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -56,51 +59,6 @@ public class ManagersApi implements Microservice {
 
     private static String getUsername(Request request) {
         return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();
-    }
-
-    @POST
-    @Consumes({"application/json"})
-    @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Add a new manager.", notes = "Adds a new manager",
-                                         response = void.class, tags = {"Managers",})
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 201, message = "Manager is created successfully.",
-                                                response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 409,
-                                                message = "Request accepted but a manager with the given host and "
-                                                        + "port already exists.",
-                                                response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                                                response = void.class)})
-    public Response addManager(@Context Request request,
-                               @ApiParam(value = "Manager object need to be added.", required = true) Manager manager
-                              ) throws NotFoundException {
-        return managersApi.addManager(manager, request);
-    }
-
-    @DELETE
-    @Path("/{id}")
-
-    @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Deletes a manager.",
-                                         notes = "Removes the manager with the manager Id specified. Path param "
-                                                 + "**id** determines id of the manager. ",
-                                         response = ApiResponseMessage.class, tags = {"Managers",})
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The manager is successfully deleted.",
-                                                response = ApiResponseMessage.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The manager is not found",
-                                                response = ApiResponseMessage.class),
-
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                                                response = ApiResponseMessage.class)})
-    public Response deleteManager(@Context Request request,
-                                  @ApiParam(value = "Id of the manager.", required = true) @PathParam("id") String id)
-            throws NotFoundException {
-        return managersApi.deleteManager(id, request);
     }
 
     @GET
