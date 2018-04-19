@@ -19,48 +19,11 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants.query;
 
 /**
- * Has possible values for a query input type
+ * Type of a Query's Input
  */
-//public class QueryInputType {
-//    public static final String WINDOW_FILTER_PROJECTION = "window-filter-projection";
-//    // Join
-//    public static final String JOIN = "join";
-//    public static final String JOIN_STREAM = "stream";
-//    public static final String JOIN_TABLE = "table";
-//    public static final String JOIN_AGGREGATION = "aggregation";
-//    public static final String JOIN_WINDOW = "window";
-//
-//    // Pattern
-//    public static final String PATTERN = "pattern";
-//
-//    // Event Value in Pattern & Sequence
-//    public static final String COUNTING_EVENT = "counting";
-//    public static final String AND_OR_EVENT = "andor";
-//    public static final String NOT_FOR_EVENT = "notfor";
-//    public static final String NOT_AND_EVENT = "notand";
-//
-//    // Sequence
-//    public static final String SEQUENCE = "sequence";
-//}
-
-public enum QueryInputType { // todo remove unwanted
+public enum QueryInputType {
     WINDOW_FILTER_PROJECTION,
-    // Join
     JOIN,
-    STREAM,
-    TABLE,
-    AGGREGATION,
-    WINDOW,
-
-    // Pattern
     PATTERN,
-
-    // Event Value in Pattern & Sequence
-    COUNTING,
-    ANDOR,
-    NOTFOR,
-    NOTAND,
-
-    // Sequence
     SEQUENCE
 }

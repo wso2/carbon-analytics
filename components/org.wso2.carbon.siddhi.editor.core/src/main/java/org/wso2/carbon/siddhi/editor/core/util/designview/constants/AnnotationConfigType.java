@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Type of Annotation Config
+ * Type of an Annotation Config
  */
 public enum AnnotationConfigType {
     LIST,

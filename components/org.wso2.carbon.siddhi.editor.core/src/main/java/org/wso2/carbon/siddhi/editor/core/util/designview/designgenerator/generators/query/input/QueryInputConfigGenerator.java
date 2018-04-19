@@ -19,6 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.JoinConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.PatternConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.SequenceConfigGenerator;
@@ -73,15 +74,5 @@ public class QueryInputConfigGenerator {
             return ((StateInputStream) queryInputStream).getStateType().name(); // PATTERN or SEQUENCE
         }
         throw new IllegalArgumentException("Type of query is unknown for generating query input");
-    }
-
-    /**
-     * Type of the Query's input
-     */
-    private enum QueryInputType {
-        WINDOW_FILTER_PROJECTION,
-        JOIN,
-        PATTERN,
-        SEQUENCE
     }
 }

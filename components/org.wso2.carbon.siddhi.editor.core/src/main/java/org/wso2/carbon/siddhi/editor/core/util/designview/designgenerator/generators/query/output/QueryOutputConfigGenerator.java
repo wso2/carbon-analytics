@@ -24,6 +24,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.InsertOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateOrInsertIntoOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryOutputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.execution.query.output.stream.*;
 
@@ -104,15 +105,5 @@ public class QueryOutputConfigGenerator {
             setAttributeConfigs.add(new SetAttributeConfig(attributeName, attributeValue));
         }
         return setAttributeConfigs;
-    }
-
-    /**
-     * Query Output Type
-     */
-    private enum QueryOutputType {
-        INSERT,
-        DELETE,
-        UPDATE,
-        UPDATE_OR_INSERT_INTO
     }
 }
