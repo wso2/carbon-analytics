@@ -25,15 +25,21 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTy
  * Represents a Window | Filter | Projection QueryInputConfig, for Siddhi Query
  */
 public class WindowFilterProjectionQueryConfig extends QueryInputConfig {
+    private String subType;
     private String from;
     private String filter;
     private QueryWindowConfig window;
 
-    public WindowFilterProjectionQueryConfig(String from, String filter, QueryWindowConfig window) {
+    public WindowFilterProjectionQueryConfig(String subType, String from, String filter, QueryWindowConfig window) {
         super(QueryInputTypes.WINDOW_FILTER_PROJECTION);
+        this.subType = subType;
         this.from = from;
         this.filter = filter;
         this.window = window;
+    }
+
+    public String getSubType() {
+        return subType;
     }
 
     public String getFrom() {

@@ -23,6 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.OutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class QueryConfig extends SiddhiElementConfig {
     private List<String> groupBy;
     private String having;
     private String outputRateLimit;
-    private OutputConfig queryOutput;
+    private QueryOutputConfig queryOutput;
     private List<AnnotationConfig> annotationList;
 
     public QueryConfig(String id,
@@ -44,7 +45,7 @@ public class QueryConfig extends SiddhiElementConfig {
                        List<String> groupBy,
                        String having,
                        String outputRateLimit,
-                       OutputConfig queryOutput,
+                       QueryOutputConfig queryOutput,
                        List<AnnotationConfig> annotationList) {
         super(id);
         this.queryInput = queryInput;
@@ -76,7 +77,7 @@ public class QueryConfig extends SiddhiElementConfig {
         return outputRateLimit;
     }
 
-    public OutputConfig getQueryOutput() {
+    public QueryOutputConfig getQueryOutput() {
         return queryOutput;
     }
 
