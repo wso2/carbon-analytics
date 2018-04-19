@@ -21,7 +21,7 @@ package org.wso2.carbon.status.dashboard.core.model;
 import org.wso2.carbon.status.dashboard.core.bean.ManagerClusterInfo;
 
 /**
- * Class that gives an overview for manager node
+ * Class that gives an overview for manager node.
  */
 public class ManagerOverView {
     private String workerId;

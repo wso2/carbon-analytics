@@ -18,16 +18,16 @@
  */
 package org.wso2.carbon.status.dashboard.core.model;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.Objects;
 
 /**
  * StatsEnable
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-11-02T13:49:11.445Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-11-02T13:49:11.445Z")
 public class StatsEnable   {
   @JsonProperty("statsEnable")
   private Boolean statsEnable = null;

@@ -29,7 +29,6 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
-import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
@@ -54,7 +53,7 @@ public class DatasourceServiceComponent {
     }
 
     @Deactivate
-    protected void stop() throws Exception {
+    protected void stop() {
         logger.debug("Status dashboard datasource service component is deactivated.");
     }
 
@@ -70,9 +69,12 @@ public class DatasourceServiceComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DataSourceService");
         }
-        String dashboardDatasourceName = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs().getDashboardDatasourceName();
-        dashboardDatasourceName = dashboardDatasourceName != null ? dashboardDatasourceName : DASHBOARD_DATASOURCE_DEFAULT;
-        String metricsDatasourceName = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs().getMetricsDatasourceName();
+        String dashboardDatasourceName = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+                .getDashboardDatasourceName();
+        dashboardDatasourceName =
+                dashboardDatasourceName != null ? dashboardDatasourceName : DASHBOARD_DATASOURCE_DEFAULT;
+        String metricsDatasourceName = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+                .getMetricsDatasourceName();
         metricsDatasourceName = metricsDatasourceName != null ? metricsDatasourceName : METRICS_DATASOURCE_DEFAULT;
         MonitoringDataHolder.getInstance().setDashboardDataSource((HikariDataSource) service.getDataSource
                 (dashboardDatasourceName));
@@ -101,7 +103,7 @@ public class DatasourceServiceComponent {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterConfigProvider"
     )
-    protected void registerConfigProvider(ConfigProvider configProvider) throws ConfigurationException {
+    protected void registerConfigProvider(ConfigProvider configProvider) {
         MonitoringDataHolder.getInstance().setConfigProvider(configProvider);
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) ConfigProvider at " + ConfigProvider.class.getName());
@@ -142,7 +144,4 @@ public class DatasourceServiceComponent {
         }
         MonitoringDataHolder.getInstance().setClientBuilderService(null);
     }
-
-
-
 }

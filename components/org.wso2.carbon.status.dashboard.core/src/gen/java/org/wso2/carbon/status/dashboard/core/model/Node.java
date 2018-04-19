@@ -26,7 +26,8 @@ import java.util.Objects;
 /**
  * Worker bean class.
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-09-11T07:55:11.886Z")
 public class Node {
   @JsonProperty("host")
   private String host = null;

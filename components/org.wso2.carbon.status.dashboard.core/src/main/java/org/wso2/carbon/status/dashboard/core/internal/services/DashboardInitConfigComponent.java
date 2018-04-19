@@ -42,13 +42,13 @@ public class DashboardInitConfigComponent {
                     deploymentConfigurations);
             MonitoringDataHolder.getInstance().setStatusDashboardDeploymentConfigs(resolvedConfiguration);
         } catch (ConfigurationException e) {
-            logger.error("Error in reading configuration from the deployment.YML",e);
+            logger.error("Error in reading configuration from the deployment.YML", e);
         }
 
     }
 
     @Deactivate
-    protected void stop() throws Exception {
+    protected void stop() {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DashboardInitConfigComponent");
         }
@@ -57,6 +57,7 @@ public class DashboardInitConfigComponent {
 
     /**
      * Defauld and deployment Query merger.
+     *
      * @param defaultQueries
      * @return
      */
@@ -72,7 +73,8 @@ public class DashboardInitConfigComponent {
             String adminPassword = deploymentQueries.getPassword() == null ? defaultQueries.getPassword()
                     : deploymentQueries.getPassword();
             resolvedConfiguration.setPassword(adminPassword);
-            Integer pollingInterval = deploymentQueries.getPollingInterval() == null ? defaultQueries.getPollingInterval()
+            Integer pollingInterval =
+                    deploymentQueries.getPollingInterval() == null ? defaultQueries.getPollingInterval()
                     : deploymentQueries.getPollingInterval();
             resolvedConfiguration.setPollingInterval(pollingInterval);
 
@@ -90,18 +92,18 @@ public class DashboardInitConfigComponent {
                     null ? defaultQueries.getWorkerConnectionConfigurations().getConnectionTimeOut()
                     : deploymentQueries.getWorkerConnectionConfigurations().getConnectionTimeOut();
 
-           int readTimeOut = deploymentQueries.getWorkerConnectionConfigurations().getReadTimeOut() == null ?
+            int readTimeOut = deploymentQueries.getWorkerConnectionConfigurations().getReadTimeOut() == null ?
                     defaultQueries.getWorkerConnectionConfigurations().getReadTimeOut()
                     : deploymentQueries.getWorkerConnectionConfigurations().getReadTimeOut();
 
-            resolvedConfiguration.setWorkerConnectionConfigurations(connectionTimeout,readTimeOut);
+            resolvedConfiguration.setWorkerConnectionConfigurations(connectionTimeout, readTimeOut);
 
-            List<String> sysAdminRoles=deploymentQueries.getSysAdminRoles() ;
+            List<String> sysAdminRoles = deploymentQueries.getSysAdminRoles();
 
-            List<String> developerRoles=deploymentQueries.getDeveloperRoles();
+            List<String> developerRoles = deploymentQueries.getDeveloperRoles();
 
-            List<String> viewerRoles=deploymentQueries.getViewerRoles();
-            if (sysAdminRoles== null) {
+            List<String> viewerRoles = deploymentQueries.getViewerRoles();
+            if (sysAdminRoles == null) {
                 resolvedConfiguration.setSysAdminRoles(new ArrayList<>());
             } else {
                 resolvedConfiguration.setSysAdminRoles(sysAdminRoles);
@@ -109,10 +111,10 @@ public class DashboardInitConfigComponent {
 
             if (developerRoles == null) {
                 resolvedConfiguration.setDeveloperRoles(new ArrayList<>());
-            }else {
+            } else {
                 resolvedConfiguration.setDeveloperRoles(developerRoles);
             }
-            if (viewerRoles== null) {
+            if (viewerRoles == null) {
                 resolvedConfiguration.setViewerRoles(new ArrayList<>());
             } else {
                 resolvedConfiguration.setViewerRoles(viewerRoles);
@@ -136,6 +138,7 @@ public class DashboardInitConfigComponent {
         }
 
     }
+
     public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");

@@ -32,7 +32,6 @@ public class NodeConfigurationDetails {
     private String host;
     private int port;
 
-
     public NodeConfigurationDetails(String workerId, String host, int port) {
         this.workerId = workerId;
         this.host = host;
@@ -91,8 +90,6 @@ public class NodeConfigurationDetails {
                     throw new StatusDashboardValidationException("Invalid object:" + values.get(i));
             }
         }
-
-
     }
 
     public static String getColumnLabeles() {

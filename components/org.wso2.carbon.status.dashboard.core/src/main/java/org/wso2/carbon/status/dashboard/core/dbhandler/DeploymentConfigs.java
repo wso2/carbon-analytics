@@ -126,8 +126,8 @@ public class DeploymentConfigs {
         return workerConnectionConfigurations;
     }
 
-    public void setWorkerConnectionConfigurations(int connectionTimeOut,int readTimeOut) {
-        this.workerConnectionConfigurations = new WorkerConnectionConfigurations(connectionTimeOut,readTimeOut);
+    public void setWorkerConnectionConfigurations(int connectionTimeOut, int readTimeOut) {
+        this.workerConnectionConfigurations = new WorkerConnectionConfigurations(connectionTimeOut, readTimeOut);
     }
 
     public String getUsername() {

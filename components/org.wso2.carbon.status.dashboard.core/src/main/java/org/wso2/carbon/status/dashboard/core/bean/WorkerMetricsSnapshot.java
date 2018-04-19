@@ -34,7 +34,6 @@ public class WorkerMetricsSnapshot {
 
     public void updateRunningStatus(String status) {
         serverDetails.setRunningStatus(status);
-
     }
 
     public ServerDetails getServerDetails() {

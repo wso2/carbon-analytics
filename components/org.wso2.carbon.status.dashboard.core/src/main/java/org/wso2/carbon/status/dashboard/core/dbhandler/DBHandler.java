@@ -135,11 +135,6 @@ public class DBHandler {
     }
 
     /**
-     * Check the table is exsists.
-     *
-     * @return boolean isTableExists.
-     */
-    /**
      * Method for checking whether or not the given table (which reflects the current event table instance) exists.
      *
      * @return true/false based on the table existence.

@@ -56,7 +56,6 @@ public class Constants {
     public static final String WORKER_JVM_THREADS_COUNT = "jvm.threads.count";
     public static final String WORKER_JVM_THREADS_DAEMON_COUNT = "jvm.threads.daemon.count";
 
-
     //Default not open
     public static final String WORKER_JVM_MEMORY_POOL = "jvm.memory.pools";
     public static final String WORKER_JVM_BLOCKED_THREADS_COUNT = "jvm.threads.blocked.count";

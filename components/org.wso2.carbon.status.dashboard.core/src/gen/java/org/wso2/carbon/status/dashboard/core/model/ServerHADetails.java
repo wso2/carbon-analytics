@@ -36,8 +36,8 @@ public class ServerHADetails {
         return haStatus;
     }
 
-    public void setHAStatus(String HAStatus) {
-        this.haStatus = HAStatus;
+    public void setHAStatus(String haStatus) {
+        this.haStatus = haStatus;
     }
 
     public String getClusterId() {

@@ -18,8 +18,8 @@
 package org.wso2.carbon.status.dashboard.core.exception;
 
 /**
- * Represents an unchecked exceptions which may be thrown during runtime, from which we may not expect the Siddhi runtime
- * to reasonable recover.
+ * Represents an unchecked exceptions which may be thrown during runtime, from which we may not expect
+ * the Siddhi runtime to reasonable recover.
  */
 public class RDBMSTableException extends RuntimeException {
 

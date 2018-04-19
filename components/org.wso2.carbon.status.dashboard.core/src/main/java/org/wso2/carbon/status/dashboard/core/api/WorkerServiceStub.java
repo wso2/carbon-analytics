@@ -24,7 +24,6 @@ import feign.RequestLine;
 import feign.Response;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 
-
 /**
  * feign client for sending the request.
  */

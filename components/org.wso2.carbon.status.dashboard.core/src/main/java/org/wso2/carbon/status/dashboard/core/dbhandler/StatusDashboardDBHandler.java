@@ -34,12 +34,24 @@ import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
 import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.*;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS_PRIMARYKEY;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SQL_WHERE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.STRING_TEMPLATE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.TUPLES_SEPARATOR;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.WHITESPACE;
 
 /**
  * This class represents key database operations related to node data.
@@ -108,9 +120,9 @@ public class StatusDashboardDBHandler {
                 Map<String, String> attributesList = DBTableUtils.getInstance().loadWorkerConfigTableTuples
                         (statusDashboardQueryManager);
                 String resolvedTuples = String.format(
-                        "WORKERID " + String_TEMPLATE + " PRIMARY KEY" + TUPLES_SEPARATOR +
-                                "HOST " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                "PORT " + String_TEMPLATE, attributesList.get("WORKERID"), attributesList.get("HOST"),
+                        "WORKERID " + STRING_TEMPLATE + " PRIMARY KEY" + TUPLES_SEPARATOR +
+                                "HOST " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                "PORT " + STRING_TEMPLATE, attributesList.get("WORKERID"), attributesList.get("HOST"),
                         attributesList.get("PORT"));
                 resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
                         resolvedTuples);
@@ -137,9 +149,9 @@ public class StatusDashboardDBHandler {
             Map<String, String> attributesList = DBTableUtils.getInstance().loadManagerConfigTableTuples
                     (statusDashboardQueryManager);
             String resolvedTuples = String.format(
-                    "MANAGERID " + String_TEMPLATE + " PRIMARY KEY" + TUPLES_SEPARATOR +
-                            "HOST " + String_TEMPLATE + TUPLES_SEPARATOR +
-                            "PORT " + String_TEMPLATE, attributesList.get(Constants.MANAGERID), attributesList
+                    "MANAGERID " + STRING_TEMPLATE + " PRIMARY KEY" + TUPLES_SEPARATOR +
+                            "HOST " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                            "PORT " + STRING_TEMPLATE, attributesList.get(Constants.MANAGERID), attributesList
                             .get(Constants.HOST), attributesList.get(Constants.PORT));
             resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
                     resolvedTuples);
@@ -165,21 +177,21 @@ public class StatusDashboardDBHandler {
                 Map<String, String> attributesList = DBTableUtils.getInstance().loadWorkerGeneralTableTuples
                         (statusDashboardQueryManager);
                 String resolvedTuples = String.format(
-                        " CARBONID " + String_TEMPLATE + " PRIMARY KEY " + TUPLES_SEPARATOR +
-                                " WORKERID " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " JAVARUNTIMENAME " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " JAVAVMVERSION " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " JAVAVMVENDOR " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " JAVAHOME " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " JAVAVERSION " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " OSNAME " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " OSVERSION " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " USERHOME " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " USERTIMEZONE " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " USERNAME " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " USERCOUNTRY " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " REPOLOCATION " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                " SERVERSTARTTIME " + String_TEMPLATE + TUPLES_SEPARATOR + " " + String_TEMPLATE
+                        " CARBONID " + STRING_TEMPLATE + " PRIMARY KEY " + TUPLES_SEPARATOR +
+                                " WORKERID " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVARUNTIMENAME " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVAVMVERSION " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVAVMVENDOR " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVAHOME " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " JAVAVERSION " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " OSNAME " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " OSVERSION " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " USERHOME " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " USERTIMEZONE " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " USERNAME " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " USERCOUNTRY " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " REPOLOCATION " + STRING_TEMPLATE + TUPLES_SEPARATOR +
+                                " SERVERSTARTTIME " + STRING_TEMPLATE + TUPLES_SEPARATOR + " " + STRING_TEMPLATE
                         , attributesList.get("CARBONID"), attributesList.get("WORKERID"),
                         attributesList.get("JAVARUNTIMENAME"), attributesList.get("JAVAVMVERSION"),
                         attributesList.get("JAVAVMVENDOR"), attributesList.get("JAVAHOME"),
@@ -558,7 +570,6 @@ public class StatusDashboardDBHandler {
         return workerConfigurationDetails;
     }
 
-
     /**
      * select managers in the database.
      */
@@ -594,7 +605,6 @@ public class StatusDashboardDBHandler {
         }
         return workerConfigurationDetails;
     }
-
 
     /**
      * Generated thw worker ID condition.

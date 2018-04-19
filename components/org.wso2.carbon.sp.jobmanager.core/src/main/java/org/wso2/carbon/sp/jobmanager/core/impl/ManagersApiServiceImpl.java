@@ -21,7 +21,12 @@ package org.wso2.carbon.sp.jobmanager.core.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
@@ -48,10 +53,10 @@ import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.Response;
 
 /**
  * Distributed Siddhi Service Implementataion Class
@@ -87,7 +92,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
      */
     @Deactivate
     protected void stop() {
-
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) Status Dashboard ManagerApiServiceImpl API");
         }
@@ -510,16 +514,13 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     @Override
     public Response getRolesByUsername(Request request, String permissionSuffix) {
         boolean isAuthorized = getPermissionProvider().hasPermission(getUserName(request), new
-                Permission(Constants.PERMISSION_APP_NAME, Constants.PERMISSION_APP_NAME + "." + permissionSuffix));
+                Permission(Constants.PERMISSION_APP_NAME, Constants.PERMISSION_APP_NAME
+                + "." + permissionSuffix));
 
         if (getUserName(request) != null && isAuthorized) {
-            return Response.ok()
-                    .entity(isAuthorized)
-                    .build();
+            return Response.ok().entity(isAuthorized).build();
         } else {
-            return Response.ok()
-                    .entity(isAuthorized)
-                    .build();
+            return Response.ok().entity(isAuthorized).build();
         }
     }
 

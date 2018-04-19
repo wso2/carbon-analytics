@@ -18,7 +18,6 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean;
 
-
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidationException;
 
 import java.util.List;
@@ -170,7 +169,6 @@ public class WorkerGeneralDetails {
         return new Object[]{carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor, javaHome, javaVersion,
                 osName,
                 osVersion, userHome, userTimezone, userName, userCountry, repoLocation, serverStartTime};
-
     }
 
     public void setArrayList(List values) throws StatusDashboardValidationException {
@@ -232,8 +230,6 @@ public class WorkerGeneralDetails {
                     throw new StatusDashboardValidationException("Invalid length of object");
             }
         }
-
-
     }
 
     public static String getColumnLabeles() {

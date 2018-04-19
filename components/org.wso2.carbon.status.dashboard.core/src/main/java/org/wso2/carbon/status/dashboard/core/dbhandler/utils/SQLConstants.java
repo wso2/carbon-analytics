@@ -54,7 +54,7 @@ public class SQLConstants {
     public static final String PLACEHOLDER_RESULT = "{{RESULT}}";
     public static final String PLACEHOLDER_Q = "{{Q}}";
     public static final String PLACEHOLDER_COLUMNS_PRIMARYKEY = "{{COLUMNS, PRIMARY_KEYS}}";
-    public static final String String_TEMPLATE = "%s";
+    public static final String STRING_TEMPLATE = "%s";
     public static final String INTEGER_TEMPLATE = "%d";
     public static final String SQL_WHERE = "WHERE";
     public static final String WHITESPACE = " ";

@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class WorkerStateHolder {
     private static Map<String, WorkerMetricsSnapshot> workerMetricsSnapshotMap = new HashMap<>();
-    private static Map<String,ManagerMetricsSnapshot> managerMetricsSnapshotMap = new HashMap<>();
+    private static Map<String, ManagerMetricsSnapshot> managerMetricsSnapshotMap = new HashMap<>();
 
     private WorkerStateHolder() {
     }
@@ -38,7 +38,7 @@ public class WorkerStateHolder {
         return workerMetricsSnapshotMap.get(id);
     }
 
-    public static ManagerMetricsSnapshot getManagerMetrics(String id){
+    public static ManagerMetricsSnapshot getManagerMetrics(String id) {
         return managerMetricsSnapshotMap.get(id);
     }
 
@@ -46,7 +46,7 @@ public class WorkerStateHolder {
         workerMetricsSnapshotMap.put(id, metricsBean);
     }
 
-    public static void addManagerMetrics(String id,ManagerMetricsSnapshot managerMetricsBean){
-        managerMetricsSnapshotMap.put(id,managerMetricsBean);
+    public static void addManagerMetrics(String id, ManagerMetricsSnapshot managerMetricsBean) {
+        managerMetricsSnapshotMap.put(id, managerMetricsBean);
     }
 }

@@ -1,5 +1,8 @@
 package org.wso2.carbon.status.dashboard.core.bean;
 
+/**
+ * Class that contains the child siddhi app details.
+ */
 public class ChildApps {
     private String parentAppName;
     private String appName;

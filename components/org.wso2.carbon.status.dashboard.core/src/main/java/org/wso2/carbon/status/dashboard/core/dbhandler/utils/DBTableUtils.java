@@ -23,14 +23,22 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.QueryManager;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.*;
-
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_Q;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SEPARATOR;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SQL_WHERE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.WHITESPACE;
 
 /**
  * Class which holds the utility methods which are used by various units in the RDBMS Event Table implementation.
@@ -306,8 +314,8 @@ public class DBTableUtils {
      * @param value   the value of the element.
      * @throws SQLException if there are issues when the element is being set.
      */
-    private PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt, int ordinal, String type,
-                                                                 Object value, QueryManager statusDashboardQueryManager) throws SQLException {
+    private PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt,
+            int ordinal, String type, Object value, QueryManager statusDashboardQueryManager) throws SQLException {
         String doubleType = statusDashboardQueryManager.getQuery(Constants.DOUBLE_TYPE);
         String longType = statusDashboardQueryManager.getQuery(Constants.LONG_TYPE);
         String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);

@@ -23,15 +23,31 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
 import org.wso2.carbon.status.dashboard.core.api.MonitoringApiService;
 import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkerServiceFactory;
-import org.wso2.carbon.status.dashboard.core.bean.*;
+import org.wso2.carbon.status.dashboard.core.bean.ManagerClusterInfo;
+import org.wso2.carbon.status.dashboard.core.bean.ManagerMetricsSnapshot;
+import org.wso2.carbon.status.dashboard.core.bean.NodeConfigurationDetails;
+import org.wso2.carbon.status.dashboard.core.bean.ParentSiddhiApp;
+import org.wso2.carbon.status.dashboard.core.bean.ParentSummaryDetails;
+import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppStatus;
+import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppsData;
+import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
+import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsHistory;
+import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsSnapshot;
+import org.wso2.carbon.status.dashboard.core.bean.WorkerMoreMetricsHistory;
+import org.wso2.carbon.status.dashboard.core.bean.WorkerResponce;
 import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
@@ -42,9 +58,15 @@ import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 import org.wso2.carbon.status.dashboard.core.internal.WorkerStateHolder;
 import org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent;
 import org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent;
-import org.wso2.carbon.status.dashboard.core.model.*;
+import org.wso2.carbon.status.dashboard.core.model.DashboardConfig;
+import org.wso2.carbon.status.dashboard.core.model.ManagerDetails;
+import org.wso2.carbon.status.dashboard.core.model.ManagerOverView;
+import org.wso2.carbon.status.dashboard.core.model.Node;
+import org.wso2.carbon.status.dashboard.core.model.ServerDetails;
+import org.wso2.carbon.status.dashboard.core.model.ServerHADetails;
+import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
+import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
 
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -53,10 +75,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.*;
-
-
+import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.PROTOCOL;
+import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_COMMITTED;
+import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_INIT;
 
 /**
  * This API implement for handling the stream processor worker hadling such asadding , deleating, editing, fletching
@@ -64,8 +87,7 @@ import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.*;
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-11T07:55:11.886Z")
-@Component(service = MonitoringApiService.class,
-        immediate = true)
+@Component(service = MonitoringApiService.class, immediate = true)
 public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     private static StatusDashboardDBHandler dashboardStore;
@@ -138,9 +160,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 workerList.parallelStream().forEach(worker -> {
                     try {
                         WorkerOverview workerOverview = new WorkerOverview();
-                        feign.Response workerResponse = WorkerServiceFactory
-                                .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(worker.getHost(),
-                                        String.valueOf(worker.getPort())), getUsername(), getPassword()).getWorker();
+                        feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
+                                        generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort())),
+                                getUsername(), getPassword()).getWorker();
                         if ((workerResponse != null) && (workerResponse.status() == 200)) {
                             Long timeInMillis = System.currentTimeMillis();
                             String responseBody = workerResponse.body().toString();
@@ -152,17 +174,20 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 workerOverview.setStatusMessage(message);
                             }
                             feign.Response activeSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
-                                    PROTOCOL + generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort())), getUsername(), getPassword())
-                                    .getSiddhiApps(true);
+                                    PROTOCOL + generateURLHostPort(worker.getHost(), String.valueOf(
+                                            worker.getPort())), getUsername(), getPassword()).getSiddhiApps(true);
                             String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
-                            List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody, new TypeToken<List<String>>() {
-                            }.getType());
-                            feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
-                                    PROTOCOL + generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort())),
-                                    getUsername(), getPassword()).getSiddhiApps(false);
+                            List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody,
+                                    new TypeToken<List<String>>() {
+                                    }.getType());
+                            feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory
+                                    .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(worker.getHost(),
+                                            String.valueOf(worker.getPort())), getUsername(),
+                                            getPassword()).getSiddhiApps(false);
                             String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
-                            List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody, new TypeToken<List<String>>() {
-                            }.getType());
+                            List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody,
+                                    new TypeToken<List<String>>() {
+                                    }.getType());
                             serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
                             WorkerMetricsSnapshot snapshot = new WorkerMetricsSnapshot(serverDetails, timeInMillis);
                             WorkerStateHolder.addMetrics(worker.getWorkerId(), snapshot);
@@ -305,13 +330,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Get worker metrics history such as latency,memory,load average
-     *
      * @param workerId workerID
      * @param period   time interval that metrics needed.
      * @param type     type of metrics.
      * @return returnmetrics for a given time.
-     * @throws NotFoundException
      */
+
     @Override
     public Response getWorkerHistory(String workerId, String period, String type, Boolean more, String username) throws
             NotFoundException {
@@ -343,390 +367,173 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         history.setJvmGcPsScavengeTime(metricStore.selectWorkerMetrics(carbonId, timeInterval,
                                 Constants.WORKER_JVM_GC_PS_SCAVENGE_TIME, System.currentTimeMillis()));
                         history.setJvmMemoryHeapCommitted(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                WORKER_JVM_MEMORY_HEAP_COMMITTED,
-                                System.currentTimeMillis()));
+                                WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis()));
                         history.setJvmMemoryHeapInit(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                WORKER_JVM_MEMORY_HEAP_INIT,
-                                System.currentTimeMillis()));
+                                WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis()));
                         history.setJvmMemoryHeapMax(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_HEAP_MAX,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_HEAP_MAX, System.currentTimeMillis()));
                         history.setJvmMemoryHeapUsage(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_HEAP_USAGE,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_HEAP_USAGE, System.currentTimeMillis()));
                         history.setJvmMemoryHeapUsed(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_HEAP_USED,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_HEAP_USED, System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapInit(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_INIT,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_NON_HEAP_INIT, System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapMax(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_MAX,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_NON_HEAP_MAX, System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapCommitted(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_COMMITTED,
-                                System.currentTimeMillis
-                                        ()));
+                                Constants.WORKER_JVM_MEMORY_NON_HEAP_COMMITTED, System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapUsage(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_USAGE,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_NON_HEAP_USAGE, System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapUsed(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_USED,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_NON_HEAP_USED, System.currentTimeMillis()));
                         history.setJvmMemoryTotalCommitted(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_TOTAL_COMMITTED,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_TOTAL_COMMITTED, System.currentTimeMillis()));
                         history.setJvmMemoryTotalInit(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_TOTAL_INIT,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_TOTAL_INIT, System.currentTimeMillis()));
                         history.setJvmMemoryTotalMax(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_TOTAL_MAX,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_TOTAL_MAX, System.currentTimeMillis()));
                         history.setJvmMemoryTotalUsed(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_TOTAL_USED,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_TOTAL_USED, System.currentTimeMillis()));
                         history.setJvmOsPhysicalMemoryTotalSize(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_PHYSICAL_MEMORY_TOTAL_SIZE,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_TOTAL_SIZE, System.currentTimeMillis()));
                         history.setJvmOsPhysicalMemoryFreeSize(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_PHYSICAL_MEMORY_FREE_SIZE,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_FREE_SIZE, System.currentTimeMillis()));
                         history.setJvmThreadsDaemonCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_THREADS_DAEMON_COUNT,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_THREADS_DAEMON_COUNT, System.currentTimeMillis()));
                         history.setJvmOsFileDescriptorMaxCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_FILE_DESCRIPTOR_MAX_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_MAX_COUNT, System.currentTimeMillis()));
                         history.setJvmOsFileDescriptorOpenCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_FILE_DESCRIPTOR_OPEN_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_OPEN_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants.WORKER_JVM_THREADS_COUNT,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmOsSwapSpaceTotalSize(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_SWAP_SPACE_TOTAL_SIZE,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_SWAP_SPACE_TOTAL_SIZE, System.currentTimeMillis()));
                         history.setJvmOsSwapSpaceFreeSize(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_SWAP_SPACE_FREE_SIZE,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_SWAP_SPACE_FREE_SIZE, System.currentTimeMillis()));
                         history.setJvmOsCpuLoadProcess(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_CPU_LOAD_PROCESS,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_CPU_LOAD_PROCESS, System.currentTimeMillis()));
                         history.setJvmOsCpuLoadSystem(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_CPU_LOAD_SYSTEM,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_CPU_LOAD_SYSTEM, System.currentTimeMillis()));
                         history.setJvmOsSystemLoadAverage(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE, System.currentTimeMillis()));
                         history.setJvmOsVirtualMemoryCommittedSize(metricStore.selectWorkerMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE,
-                                System
-                                        .currentTimeMillis
-                                                ()));
+                                timeInterval, Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE,
+                                System.currentTimeMillis()));
                         //if only enabled
                         history.setJvmMemoryPoolsSize(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants.WORKER_JVM_MEMORY_POOL,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_POOL, System.currentTimeMillis()));
                         history.setJvmThreadsBlockedCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_BLOCKED_THREADS_COUNT,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_BLOCKED_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsDeadlockCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_DEADLOCKED_THREADS_COUNT,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_DEADLOCKED_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsNewCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_NEW_THREADS_COUNT,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_NEW_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsRunnableCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_RUNNABLE_THREADS_COUNT,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_RUNNABLE_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsTerminatedCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_TERMINATED_THREADS_COUNT,
-                                System.currentTimeMillis
-                                        ()));
+                                Constants.WORKER_JVM_TERMINATED_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsTimedWaitingCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_TIMD_WATING_THREADS_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_TIMD_WATING_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsWaitingCount(metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_WAITING_THREADS_COUNT,
-                                System.currentTimeMillis()));
+                                Constants.WORKER_JVM_WAITING_THREADS_COUNT, System.currentTimeMillis()));
                     } else {
                         history.setJvmClassLoadingLoadedCurrent(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_CLASS_LOADING_LOADED_CURRENT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_CLASS_LOADING_LOADED_CURRENT,
+                                System.currentTimeMillis()));
                         history.setJvmClassLoadingLoadedTotal(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_CLASS_LOADING_LOADED_TOTAL,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_CLASS_LOADING_LOADED_TOTAL,
+                                System.currentTimeMillis()));
                         history.setJvmClassLoadingUnloadedTotal(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_CLASS_LOADING_UNLOADED_TOTAL,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_CLASS_LOADING_UNLOADED_TOTAL,
+                                System.currentTimeMillis()));
                         history.setJvmGcPsMarksweepCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_GC_PS_MARKSWEEP_COUNT,
-                                System
-                                        .currentTimeMillis
-                                                ()));
+                                timeInterval, Constants.WORKER_JVM_GC_PS_MARKSWEEP_COUNT, System.currentTimeMillis()));
                         history.setJvmGcPsMarksweepTime(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_GC_PS_MARKSWEEP_TIME,
-                                System
-                                        .currentTimeMillis
-                                                ()));
+                                timeInterval, Constants.WORKER_JVM_GC_PS_MARKSWEEP_TIME, System.currentTimeMillis()));
                         history.setJvmGcPsScavengeCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_GC_PS_SCAVENGE_COUNT,
-                                System
-                                        .currentTimeMillis
-                                                ()));
+                                timeInterval, Constants.WORKER_JVM_GC_PS_SCAVENGE_COUNT, System.currentTimeMillis()));
                         history.setJvmGcPsScavengeTime(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_GC_PS_SCAVENGE_TIME,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_GC_PS_SCAVENGE_TIME, System.currentTimeMillis()));
                         history.setJvmMemoryHeapCommitted(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                WORKER_JVM_MEMORY_HEAP_COMMITTED,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis()));
                         history.setJvmMemoryHeapInit(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                WORKER_JVM_MEMORY_HEAP_INIT,
-                                System
-                                        .currentTimeMillis()));
+                                WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis()));
                         history.setJvmMemoryHeapMax(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_HEAP_MAX,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_HEAP_MAX, System.currentTimeMillis()));
                         history.setJvmMemoryHeapUsage(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_HEAP_USAGE,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_HEAP_USAGE, System.currentTimeMillis()));
                         history.setJvmMemoryHeapUsed(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_HEAP_USED,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_HEAP_USED, System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapInit(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_INIT,
-                                System
-                                        .currentTimeMillis
-                                                ()));
+                                timeInterval, Constants.WORKER_JVM_MEMORY_NON_HEAP_INIT, System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapMax(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_MAX,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_MEMORY_NON_HEAP_MAX, System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapCommitted(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_COMMITTED,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_MEMORY_NON_HEAP_COMMITTED,
+                                System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapUsage(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_USAGE,
-                                System
-                                        .currentTimeMillis
-                                                ()));
+                                timeInterval, Constants.WORKER_JVM_MEMORY_NON_HEAP_USAGE, System.currentTimeMillis()));
                         history.setJvmMemoryNonHeapUsed(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_NON_HEAP_USED,
-                                System
-                                        .currentTimeMillis
-                                                ()));
+                                timeInterval, Constants.WORKER_JVM_MEMORY_NON_HEAP_USED, System.currentTimeMillis()));
                         history.setJvmMemoryTotalCommitted(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_TOTAL_COMMITTED,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_MEMORY_TOTAL_COMMITTED, System.currentTimeMillis()));
                         history.setJvmMemoryTotalInit(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_TOTAL_INIT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_MEMORY_TOTAL_INIT, System.currentTimeMillis()));
                         history.setJvmMemoryTotalMax(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_TOTAL_MAX,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_TOTAL_MAX, System.currentTimeMillis()));
                         history.setJvmMemoryTotalUsed(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_TOTAL_USED,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_TOTAL_USED, System.currentTimeMillis()));
                         history.setJvmOsPhysicalMemoryTotalSize(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_PHYSICAL_MEMORY_TOTAL_SIZE,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_TOTAL_SIZE,
+                                System.currentTimeMillis()));
                         history.setJvmOsPhysicalMemoryFreeSize(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_PHYSICAL_MEMORY_FREE_SIZE,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_FREE_SIZE,
+                                System.currentTimeMillis()));
                         history.setJvmThreadsDaemonCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_THREADS_DAEMON_COUNT,
-                                System
-                                        .currentTimeMillis
-                                                ()));
+                                timeInterval, Constants.WORKER_JVM_THREADS_DAEMON_COUNT, System.currentTimeMillis()));
                         history.setJvmOsFileDescriptorMaxCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_FILE_DESCRIPTOR_MAX_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_MAX_COUNT,
+                                System.currentTimeMillis()));
                         history.setJvmOsFileDescriptorOpenCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_FILE_DESCRIPTOR_OPEN_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_OPEN_COUNT,
+                                System.currentTimeMillis()));
                         history.setJvmThreadsCount(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_THREADS_COUNT,
-                                System.currentTimeMillis
-                                        ()));
+                                Constants.WORKER_JVM_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmOsSwapSpaceTotalSize(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_SWAP_SPACE_TOTAL_SIZE,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_OS_SWAP_SPACE_TOTAL_SIZE,
+                                System.currentTimeMillis()));
                         history.setJvmOsSwapSpaceFreeSize(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_SWAP_SPACE_FREE_SIZE,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_OS_SWAP_SPACE_FREE_SIZE,
+                                System.currentTimeMillis()));
                         history.setJvmOsCpuLoadProcess(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_CPU_LOAD_PROCESS,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_OS_CPU_LOAD_PROCESS, System.currentTimeMillis()));
                         history.setJvmOsCpuLoadSystem(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_CPU_LOAD_SYSTEM,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_CPU_LOAD_SYSTEM, System.currentTimeMillis()));
                         history.setJvmOsSystemLoadAverage(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE, System.currentTimeMillis()));
                         history.setJvmOsVirtualMemoryCommittedSize(metricStore.selectWorkerAggregatedMetrics(carbonId,
                                 timeInterval,
-                                Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE, System.currentTimeMillis()));
                         //if only enabled
                         history.setJvmMemoryPoolsSize(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_MEMORY_POOL,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_MEMORY_POOL, System.currentTimeMillis()));
                         history.setJvmThreadsBlockedCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_BLOCKED_THREADS_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_BLOCKED_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsDeadlockCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_DEADLOCKED_THREADS_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_DEADLOCKED_THREADS_COUNT,
+                                System.currentTimeMillis()));
                         history.setJvmThreadsNewCount(metricStore.selectWorkerAggregatedMetrics(carbonId, timeInterval,
-                                Constants
-                                        .WORKER_JVM_NEW_THREADS_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                Constants.WORKER_JVM_NEW_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsRunnableCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_RUNNABLE_THREADS_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_RUNNABLE_THREADS_COUNT, System.currentTimeMillis()));
                         history.setJvmThreadsTerminatedCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_TERMINATED_THREADS_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_TERMINATED_THREADS_COUNT,
+                                System.currentTimeMillis()));
                         history.setJvmThreadsTimedWaitingCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_TIMD_WATING_THREADS_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_TIMD_WATING_THREADS_COUNT,
+                                System.currentTimeMillis()));
                         history.setJvmThreadsWaitingCount(metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .WORKER_JVM_WAITING_THREADS_COUNT,
-                                System
-                                        .currentTimeMillis()));
+                                timeInterval, Constants.WORKER_JVM_WAITING_THREADS_COUNT, System.currentTimeMillis()));
                     }
                     String jsonString = new Gson().toJson(history);
                     return Response.ok().entity(jsonString).build();
@@ -734,42 +541,21 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     WorkerMetricsHistory workerMetricsHistory = new WorkerMetricsHistory();
                     if (timeInterval <= 3600000) {
                         List<List<Object>> workerThroughput = metricStore.selectWorkerThroughput(carbonId,
-                                timeInterval,
-                                System
-                                        .currentTimeMillis());
+                                timeInterval, System.currentTimeMillis());
                         List<List<Object>> workerMemoryUsed = metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .HEAP_MEMORY_USED,
-                                System
-                                        .currentTimeMillis());
+                                Constants.HEAP_MEMORY_USED, System.currentTimeMillis());
                         List<List<Object>> workerMemoryTotal = metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .HEAP_MEMORY_MAX,
-                                System
-                                        .currentTimeMillis());
+                                Constants.HEAP_MEMORY_MAX, System.currentTimeMillis());
                         List<List<Object>> workerMemoryCommitted = metricStore.selectWorkerMetrics(carbonId,
-                                timeInterval,
-                                WORKER_JVM_MEMORY_HEAP_COMMITTED,
-                                System
-                                        .currentTimeMillis
-                                                ());
+                                timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis());
                         List<List<Object>> workerMemoryInit = metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                WORKER_JVM_MEMORY_HEAP_INIT,
-                                System
-                                        .currentTimeMillis());
+                                WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis());
                         List<List<Object>> workerSystemCUP = metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants.SYSTEM_CPU_USAGE,
-                                System.currentTimeMillis
-                                        ());
+                                Constants.SYSTEM_CPU_USAGE, System.currentTimeMillis());
                         List<List<Object>> workerProcessCUP = metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants
-                                        .PROCESS_CPU_USAGE,
-                                System
-                                        .currentTimeMillis());
+                                Constants.PROCESS_CPU_USAGE, System.currentTimeMillis());
                         List<List<Object>> workerLoadAverage = metricStore.selectWorkerMetrics(carbonId, timeInterval,
-                                Constants.LOAD_AVG_USAGE,
-                                System
-                                        .currentTimeMillis());
+                                Constants.LOAD_AVG_USAGE, System.currentTimeMillis());
                         workerMetricsHistory.setLoadAverage(workerLoadAverage);
                         workerMetricsHistory.setProcessCPUData(workerProcessCUP);
                         workerMetricsHistory.setSystemCPU(workerSystemCUP);
@@ -780,48 +566,21 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         workerMetricsHistory.setCommittedMemory(workerMemoryCommitted);
                     } else {
                         List<List<Object>> workerThroughput = metricStore.selectWorkerAggregatedThroughput(carbonId,
-                                timeInterval,
-                                System
-                                        .currentTimeMillis());
+                                timeInterval, System.currentTimeMillis());
                         List<List<Object>> workerMemoryUsed = metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .HEAP_MEMORY_USED,
-                                System
-                                        .currentTimeMillis());
+                                timeInterval, Constants.HEAP_MEMORY_USED, System.currentTimeMillis());
                         List<List<Object>> workerMemoryTotal = metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants.HEAP_MEMORY_MAX,
-                                System
-                                        .currentTimeMillis());
+                                timeInterval, Constants.HEAP_MEMORY_MAX, System.currentTimeMillis());
                         List<List<Object>> workerSystemCUP = metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .SYSTEM_CPU_USAGE,
-                                System
-                                        .currentTimeMillis());
+                                timeInterval, Constants.SYSTEM_CPU_USAGE, System.currentTimeMillis());
                         List<List<Object>> workerProcessCUP = metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .PROCESS_CPU_USAGE,
-                                System
-                                        .currentTimeMillis());
+                                timeInterval, Constants.PROCESS_CPU_USAGE, System.currentTimeMillis());
                         List<List<Object>> workerLoadAverage = metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                Constants
-                                        .LOAD_AVG_USAGE,
-                                System
-                                        .currentTimeMillis());
+                                timeInterval, Constants.LOAD_AVG_USAGE, System.currentTimeMillis());
                         List<List<Object>> workerMemoryCommitted = metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                WORKER_JVM_MEMORY_HEAP_COMMITTED,
-                                System
-                                        .currentTimeMillis());
+                                timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis());
                         List<List<Object>> workerMemoryInit = metricStore.selectWorkerAggregatedMetrics(carbonId,
-                                timeInterval,
-                                WORKER_JVM_MEMORY_HEAP_INIT,
-                                System
-                                        .currentTimeMillis());
+                                timeInterval, WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis());
                         workerMetricsHistory.setLoadAverage(workerLoadAverage);
                         workerMetricsHistory.setProcessCPUData(workerProcessCUP);
                         workerMetricsHistory.setSystemCPU(workerSystemCUP);
@@ -841,28 +600,13 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     switch (eachType) {
                         case "memory": {
                             List<List<Object>> workerMemoryUsed = metricStore.selectWorkerMetrics(carbonId,
-                                    timeInterval,
-                                    Constants
-                                            .HEAP_MEMORY_USED,
-                                    System
-                                            .currentTimeMillis());
+                                    timeInterval, Constants.HEAP_MEMORY_USED, System.currentTimeMillis());
                             List<List<Object>> workerMemoryTotal = metricStore.selectWorkerMetrics(carbonId,
-                                    timeInterval,
-                                    Constants
-                                            .HEAP_MEMORY_MAX,
-                                    System
-                                            .currentTimeMillis
-                                                    ());
+                                    timeInterval, Constants.HEAP_MEMORY_MAX, System.currentTimeMillis());
                             List<List<Object>> workerMemoryCommitted = metricStore.selectWorkerMetrics(carbonId,
-                                    timeInterval,
-                                    WORKER_JVM_MEMORY_HEAP_COMMITTED,
-                                    System
-                                            .currentTimeMillis());
+                                    timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis());
                             List<List<Object>> workerMemoryInit = metricStore.selectWorkerMetrics(carbonId,
-                                    timeInterval,
-                                    WORKER_JVM_MEMORY_HEAP_INIT,
-                                    System
-                                            .currentTimeMillis());
+                                    timeInterval, WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis());
                             workerMetricsHistory.setTotalMemory(workerMemoryTotal);
                             workerMetricsHistory.setUsedMemory(workerMemoryUsed);
                             workerMetricsHistory.setInitMemory(workerMemoryInit);
@@ -871,17 +615,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         }
                         case "cpu": {
                             List<List<Object>> workerSystemCUP = metricStore.selectWorkerMetrics(carbonId,
-                                    timeInterval,
-                                    Constants
-                                            .SYSTEM_CPU_USAGE,
-                                    System
-                                            .currentTimeMillis());
+                                    timeInterval, Constants.SYSTEM_CPU_USAGE, System.currentTimeMillis());
                             List<List<Object>> workerProcessCUP = metricStore.selectWorkerMetrics(carbonId,
-                                    timeInterval,
-                                    Constants
-                                            .PROCESS_CPU_USAGE,
-                                    System
-                                            .currentTimeMillis());
+                                    timeInterval, Constants.PROCESS_CPU_USAGE, System.currentTimeMillis());
 
                             workerMetricsHistory.setProcessCPUData(workerProcessCUP);
                             workerMetricsHistory.setSystemCPU(workerSystemCUP);
@@ -889,20 +625,13 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         }
                         case "load": {
                             List<List<Object>> workerLoadAverage = metricStore.selectWorkerMetrics(carbonId,
-                                    timeInterval,
-                                    Constants
-                                            .LOAD_AVG_USAGE,
-                                    System
-                                            .currentTimeMillis
-                                                    ());
+                                    timeInterval, Constants.LOAD_AVG_USAGE, System.currentTimeMillis());
                             workerMetricsHistory.setLoadAverage(workerLoadAverage);
                             break;
                         }
                         case "throughput": {
                             List<List<Object>> workerThroughput = metricStore.selectWorkerThroughput(carbonId,
-                                    timeInterval,
-                                    System
-                                            .currentTimeMillis());
+                                    timeInterval, System.currentTimeMillis());
                             workerMetricsHistory.setThroughput(workerThroughput);
                             break;
                         }
@@ -1716,17 +1445,13 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 } catch (RDBMSTableException e) {
                     logger.error("Error occured while inserting the Worker due to " + e.getMessage(), e);
                     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                            "Error occured while inserting the "
-                                    + "Worker due to "
-                                    + e.getMessage())).build();
+                            "Error occured while inserting the Worker due to " + e.getMessage())).build();
                 }
                 //This part to be sucess is optional at this level
                 String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
-                        String.valueOf(worker.getPort())),
-                        workerID);
+                        String.valueOf(worker.getPort())), workerID);
                 if (!response.contains("Unnable to reach worker.")) {
-                    WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
-                            WorkerGeneralDetails.class);
+                    WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response, WorkerGeneralDetails.class);
                     workerGeneralDetails.setWorkerId(workerID);
                     try {
                         workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
@@ -1740,22 +1465,13 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 } else if (response.contains("Unnable to reach worker.")) {
                     //shold able to add a worker so the responce is ok
                     return Response.status(Response.Status.OK).entity(new ApiResponseMessage
-                            (ApiResponseMessage.OK, "Worker id: "
-                                    + workerID
-                                    + "sucessfully added. But "
-                                    + "worker not reachable."))
-                            .build();
+                            (ApiResponseMessage.OK, "Worker id: " + workerID + "sucessfully added. But "
+                                    + "worker not reachable.")).build();
                 } else {
-                    //if the respnce is null but should able to add a worker
                     return Response.status(Response.Status.OK).entity(new ApiResponseMessage
                             (ApiResponseMessage.OK, "Worker id: "
-                                    + workerID + (
-                                    "sucessfully added. But unknown"
-                                            + " error has occured "
-                                            + "while "
-                                            + "trying to reach "
-                                            +
-                                            "worker"))).build();
+                                    + workerID + ("sucessfully added. But unknown error has occured while "
+                                    + "trying to reach worker"))).build();
                 }
             } else {
                 logger.error("Invalid data :" + worker.toString());
@@ -1781,7 +1497,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
             if (manager.getHost() != null && manager.getPort() != 0) {
-                String managerId = manager.getHost() + Constants.WORKER_KEY_GENERATOR + String.valueOf(manager.getPort());
+                String managerId = manager.getHost() + Constants.WORKER_KEY_GENERATOR
+                        + String.valueOf(manager.getPort());
                 NodeConfigurationDetails managerConfigurationDetails =
                         new NodeConfigurationDetails(managerId, manager.getHost(), Integer.valueOf(manager.getPort()));
                 try {
@@ -1795,8 +1512,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 }
             } else {
                 logger.error("There is no manager node specified:" + manager.toString());
-                return Response.status(Response.Status.BAD_REQUEST).entity("There is no manager node specified. Please add vaild host name and port" + manager.toString())
-                        .build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("There is no manager node specified. " +
+                        "Please add vaild host name and port" + manager.toString()).build();
             }
         } else {
             logger.error("Unauthorized to perform add manager for user : " + username);
@@ -1835,7 +1552,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     /**
      * Return all realtime statistics of the managers.If manager is not currently reachable then send the last
      * persistant state of that manager.
-     *
      * @return Realtime data and status of workers.
      * @throws NotFoundException
      */
@@ -1853,9 +1569,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     try {
                         ManagerOverView managerOverView = new ManagerOverView();
                         feign.Response managerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
-                                        generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())),
-                                getUsername(), getPassword()).getWorker();
-
+                                generateURLHostPort(manager.getHost(), String.valueOf(
+                                        manager.getPort())), getUsername(), getPassword()).getWorker();
                         if ((managerResponse != null) && (managerResponse.status() == 200)) {
                             Long timeInMillis = System.currentTimeMillis();
                             String responseBody = managerResponse.body().toString();
@@ -1867,14 +1582,20 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 managerOverView.setStatusMessage(message);
                             }
                             feign.Response activeSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
-                                    PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getSiddhiApps(true);
+                                    PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager
+                                            .getPort())), getUsername(), getPassword()).getSiddhiApps(true);
                             String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
-                            List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody, new TypeToken<List<String>>() {
+                            List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody,
+                                    new TypeToken<List<String>>() {
+
                                     }.getType());
-                            feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
-                                            generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getSiddhiApps(false);
+                            feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
+                                    PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager
+                                            .getPort())), getUsername(), getPassword()).getSiddhiApps(false);
                             String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
-                            List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody, new TypeToken<List<String>>() {
+                            List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody,
+                                    new TypeToken<List<String>>() {
+
                                     }.getType());
                             serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
                             ManagerMetricsSnapshot snapshot = new ManagerMetricsSnapshot(serverDetails, timeInMillis);
@@ -1883,7 +1604,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             managerOverView.setWorkerId(manager.getWorkerId());
 
                             feign.Response haDetails = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
-                                            generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())), getUsername(), getPassword()).getManagerDetails();
+                                            generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())),
+                                    getUsername(), getPassword()).getManagerDetails();
                             String haResponseBody = haDetails.body().toString();
                             ManagerClusterInfo clusterInfo = gson.fromJson(haResponseBody, ManagerClusterInfo.class);
                             managerOverView.setServerDetails(serverDetails);
@@ -1902,11 +1624,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             if (clusterInfo.getGroupId().equals(" ") || clusterID.equals(" ")) {
                                 nonClusterList.add(managerOverView);
                                 groupedManagers.put(Constants.NON_CLUSTERS_ID, nonClusterList);
-                            } else if (clusterID.equals(" ")) {
+                            } else if ((!clusterID.equals(" "))) {
                                 existingGroupList.add(managerOverView);
                                 groupedManagers.put(clusterID, existingGroupList);
                             }
-
                         } else {
                             managerOverView.setWorkerId(manager.getWorkerId());
                             ManagerDetails serverDetails = new ManagerDetails();
@@ -1927,7 +1648,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             }
                         }
                     } catch (feign.RetryableException e) {
-                        ManagerMetricsSnapshot lastSnapshot = WorkerStateHolder.getManagerMetrics(manager.getWorkerId());
+                        ManagerMetricsSnapshot lastSnapshot = WorkerStateHolder.getManagerMetrics(
+                                manager.getWorkerId());
                         if (lastSnapshot != null) {
                             lastSnapshot.updateRunningStatus(Constants.NOT_REACHABLE_ID);
                             ManagerOverView managerOverView = new ManagerOverView();
@@ -2103,7 +1825,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 }
             }
             logger.error("Inproper format of worker ID:" + managerId);
-            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + managerId).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Inproper format of worker ID:" + managerId).build();
         } else {
             logger.error("Unauthorized to perform get siddhi app details for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
@@ -2179,8 +1902,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                         .put("numberOfChildApp", Integer.toString(entry.getValue().getChildApps()));
                                 parentAppDetail.put("usedWorkerNodes",
                                         Integer.toString(entry.getValue().getUsedWorkerNode().size()));
-                                parentAppDetail.put("deployedChildApps", Integer.toString(entry.getValue().getDeployedChildApps().size()));
-                                parentAppDetail.put("notDeployedChildApps", Integer.toString(entry.getValue().getUnDeployedChildApps().size()));
+                                parentAppDetail.put("deployedChildApps", Integer.toString(entry.getValue()
+                                        .getDeployedChildApps().size()));
+                                parentAppDetail.put("notDeployedChildApps", Integer.toString(entry.getValue()
+                                        .getUnDeployedChildApps().size()));
                                 parentAppDetail.put("totalWorkerNodes", resourceClusterResponseBody);
                                 parentAppSummary.add(parentAppDetail);
                             }
@@ -2325,7 +2050,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @throws IOException
      */
     @Override
-    public Response getChildAppsDetails(String managerId, String appName, String username) throws NotFoundException, IOException {
+    public Response getChildAppsDetails(String managerId, String appName, String username)
+            throws NotFoundException, IOException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -2343,7 +2069,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         String jsonString = new Gson().toJson(managerResponse.body().toString());
                         return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
                     } else {
-                        return Response.status(Response.Status.NOT_FOUND).entity(managerResponse.body().toString()).build();
+                        return Response.status(Response.Status.NOT_FOUND).entity(managerResponse.body()
+                                .toString()).build();
                     }
                 } catch (feign.RetryableException e) {
                     String errString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
