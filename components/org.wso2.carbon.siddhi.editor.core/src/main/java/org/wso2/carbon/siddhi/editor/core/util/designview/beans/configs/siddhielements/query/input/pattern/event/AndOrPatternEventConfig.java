@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.pattern.event;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.pattern.PatternQueryEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.PatternSequenceEventType;
 
 // TODO: 4/4/18 add class comment
 public class AndOrPatternEventConfig extends PatternQueryEventConfig {
@@ -35,7 +35,7 @@ public class AndOrPatternEventConfig extends PatternQueryEventConfig {
      * Constructs with default values
      */
     public AndOrPatternEventConfig() {
-        super(QueryInputTypes.AND_OR_EVENT);
+        super(PatternSequenceEventType.ANDOR.toString());
         leftStreamEventReference = "";
         leftStreamName = "";
         leftStreamFilter = "";
@@ -53,7 +53,7 @@ public class AndOrPatternEventConfig extends PatternQueryEventConfig {
                                    String rightStreamEventReference,
                                    String rightStreamName,
                                    String rightStreamFilter) {
-        super(QueryInputTypes.AND_OR_EVENT, forEvery);
+        super(PatternSequenceEventType.ANDOR.toString(), forEvery);
         this.leftStreamEventReference = leftStreamEventReference;
         this.leftStreamName = leftStreamName;
         this.leftStreamFilter = leftStreamFilter;

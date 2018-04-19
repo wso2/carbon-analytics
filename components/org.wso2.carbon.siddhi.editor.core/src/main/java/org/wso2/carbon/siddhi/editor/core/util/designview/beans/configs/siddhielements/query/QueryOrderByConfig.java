@@ -16,23 +16,25 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.setattributeconfig;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query;
 
-// TODO: 4/5/18 class comment
-public class SetAttributeConfig {
-    private String attribute;
+/**
+ * Represents the 'orderBy' clause of QueryConfig
+ */
+public class QueryOrderByConfig {
     private String value;
+    private String order;
 
-    public SetAttributeConfig(String attribute, String value) {
-        this.attribute = attribute;
+    public QueryOrderByConfig(String value, String order) {
         this.value = value;
-    }
-
-    public String getAttribute() {
-        return attribute;
+        this.order = order;
     }
 
     public String getValue() {
         return value;
+    }
+
+    public String getOrder() {
+        return order;
     }
 }

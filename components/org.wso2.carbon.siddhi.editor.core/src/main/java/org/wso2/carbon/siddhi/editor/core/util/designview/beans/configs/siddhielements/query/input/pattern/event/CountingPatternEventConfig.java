@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.pattern.event;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.pattern.PatternQueryEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.PatternSequenceEventType;
 
 // TODO: 4/4/18 add class comment
 public class CountingPatternEventConfig extends PatternQueryEventConfig {
@@ -33,7 +33,7 @@ public class CountingPatternEventConfig extends PatternQueryEventConfig {
      * Constructs with default values
      */
     public CountingPatternEventConfig() {
-        super(QueryInputTypes.COUNTING_EVENT);
+        super(PatternSequenceEventType.COUNTING.toString());
         eventReference = "";
         streamName = "";
         filter = "";
@@ -47,7 +47,7 @@ public class CountingPatternEventConfig extends PatternQueryEventConfig {
                                       String filter,
                                       String minCount,
                                       String maxCount) {
-        super(QueryInputTypes.COUNTING_EVENT, forEvery);
+        super(PatternSequenceEventType.COUNTING.toString(), forEvery);
         this.eventReference = eventReference;
         this.streamName = streamName;
         this.filter = filter;

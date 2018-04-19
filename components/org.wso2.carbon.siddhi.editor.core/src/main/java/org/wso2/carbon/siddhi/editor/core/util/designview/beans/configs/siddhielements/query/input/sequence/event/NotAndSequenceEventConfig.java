@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.SequenceQueryEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.PatternSequenceEventType;
 
 // TODO: 4/4/18 add class comment
 public class NotAndSequenceEventConfig extends SequenceQueryEventConfig {
@@ -30,7 +30,7 @@ public class NotAndSequenceEventConfig extends SequenceQueryEventConfig {
     private String rightStreamFilter;
 
     public NotAndSequenceEventConfig() {
-        super(QueryInputTypes.NOT_AND_EVENT);
+        super(PatternSequenceEventType.NOTAND.toString());
         leftStreamName = "";
         leftStreamFilter = "";
         rightStreamEventReference = "";
@@ -45,7 +45,7 @@ public class NotAndSequenceEventConfig extends SequenceQueryEventConfig {
                                      String rightStreamEventReference,
                                      String rightStreamName,
                                      String rightStreamFilter) {
-        super(QueryInputTypes.NOT_AND_EVENT, within, forEvery);
+        super(PatternSequenceEventType.NOTAND.toString(), within, forEvery);
         this.leftStreamName = leftStreamName;
         this.leftStreamFilter = leftStreamFilter;
         this.rightStreamEventReference = rightStreamEventReference;

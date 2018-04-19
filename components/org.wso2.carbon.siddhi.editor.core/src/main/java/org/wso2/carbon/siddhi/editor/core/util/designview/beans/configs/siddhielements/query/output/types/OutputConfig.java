@@ -16,25 +16,8 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryOutputTypes;
-
-// TODO: 4/4/18 class comment
-public class DeleteOutputConfig extends OutputConfig {
-    private String forEventType;
-    private String on;
-
-    public DeleteOutputConfig(String forEventType, String on) {
-        this.forEventType = forEventType;
-        this.on = on;
-    }
-
-    public String getForEventType() {
-        return forEventType;
-    }
-
-    public String getOn() {
-        return on;
-    }
+// TODO: 4/11/18 class comment
+public abstract class OutputConfig {
 }

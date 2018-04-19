@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 
 /**
  * Represents a Window | Filter | Projection QueryInputConfig, for Siddhi Query
@@ -31,7 +31,7 @@ public class WindowFilterProjectionQueryConfig extends QueryInputConfig {
     private QueryWindowConfig window;
 
     public WindowFilterProjectionQueryConfig(String subType, String from, String filter, QueryWindowConfig window) {
-        super(QueryInputTypes.WINDOW_FILTER_PROJECTION);
+        super(QueryInputType.WINDOW_FILTER_PROJECTION.toString());
         this.subType = subType;
         this.from = from;
         this.filter = filter;

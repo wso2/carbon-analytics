@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Factory to create SourceMapAttribute of a Siddhi source's map
+ * Creates a SourceMapAttributeConfig object
  */
 public class SourceMapAttributeConfigFactory {
     public SourceMapAttribute getSourceMapAttributeConfig(List<String> values) {

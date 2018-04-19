@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.SequenceQueryEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.PatternSequenceEventType;
 
 // TODO: 4/4/18 add class comment
 public class NotForSequenceEventConfig extends SequenceQueryEventConfig {
@@ -28,7 +28,7 @@ public class NotForSequenceEventConfig extends SequenceQueryEventConfig {
     private String forDuration;
 
     public NotForSequenceEventConfig() {
-        super(QueryInputTypes.NOT_FOR_EVENT);
+        super(PatternSequenceEventType.NOTFOR.toString());
         streamName = "";
         filter = "";
         forDuration = "";
@@ -39,7 +39,7 @@ public class NotForSequenceEventConfig extends SequenceQueryEventConfig {
                                      String streamName,
                                      String filter,
                                      String forDuration) {
-        super(QueryInputTypes.NOT_FOR_EVENT, within, forEvery);
+        super(PatternSequenceEventType.NOTFOR.toString(), within, forEvery);
         this.streamName = streamName;
         this.filter = filter;
         this.forDuration = forDuration;

@@ -16,18 +16,14 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
+package org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input;
 
 /**
- * Has types of an AnnotationConfig
+ * Type of Event, of a Pattern or Sequence Query
  */
-public class AnnotationConfigTypes {
-    public static final String LIST = "list";
-    public static final String MAP = "map";
-
-    /**
-     * Avoids instantiation
-     */
-    private AnnotationConfigTypes() {
-    }
+public enum PatternSequenceEventType {
+    COUNTING,
+    ANDOR,
+    NOTFOR,
+    NOTAND,
 }

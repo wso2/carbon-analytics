@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator for Pattern Query Config
+ * Generates PatternQueryConfig with given Siddhi elements
  */
 public class PatternConfigGenerator {
     private String siddhiAppString;

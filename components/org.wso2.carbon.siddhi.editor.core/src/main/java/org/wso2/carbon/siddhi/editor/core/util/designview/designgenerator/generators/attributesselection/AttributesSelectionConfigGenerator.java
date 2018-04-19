@@ -30,15 +30,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator for creating Config for selection of Attributes
+ * Generates AttributesSelectionConfig with given Siddhi elements
  */
-public class SelectedAttributesConfigGenerator {
+public class AttributesSelectionConfigGenerator {
     /**
      * Generates config object with the given list of selected attributes
      * @param outputAttributes      List of selected attributes
      * @return                      Config object with selected attributes
      */
-    public AttributesSelectionConfig generateSelectedAttributesConfig(List<OutputAttribute> outputAttributes) {
+    public AttributesSelectionConfig generateAttributesSelectionConfig(List<OutputAttribute> outputAttributes) {
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
         AttributesSelectionConfigFactory attributesSelectionConfigFactory = new AttributesSelectionConfigFactory();
         if (!outputAttributes.isEmpty()) {

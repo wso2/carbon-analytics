@@ -20,7 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinDirectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinQueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.JoinWithType;
 
 /**
  * Represents a Join Window Query, for Siddhi Query's input
@@ -33,7 +33,7 @@ public class JoinWindowQueryConfig extends JoinQueryConfig {
     public JoinWindowQueryConfig(JoinDirectionConfig left,
                                  JoinDirectionConfig right,
                                  String on) {
-        super(QueryInputTypes.JOIN_WINDOW);
+        super(JoinWithType.WINDOW.toString());
         this.left = left;
         this.right = right;
         this.on = on;

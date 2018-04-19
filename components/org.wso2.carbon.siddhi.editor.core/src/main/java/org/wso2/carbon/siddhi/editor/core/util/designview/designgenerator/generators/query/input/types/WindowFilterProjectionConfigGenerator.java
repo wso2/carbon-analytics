@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create a QueryInputConfig of type WindowFilterProjection
+ * Generates WindowFilterProjectionQueryConfig with given Siddhi elements
  */
 public class WindowFilterProjectionConfigGenerator {
     private String siddhiAppString;

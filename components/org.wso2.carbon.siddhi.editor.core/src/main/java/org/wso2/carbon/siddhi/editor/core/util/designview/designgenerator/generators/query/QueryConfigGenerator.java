@@ -20,15 +20,17 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.attributesselection.SelectedAttributesConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.attributesselection.AttributesSelectionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.QueryInputConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.output.QueryOutputConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.execution.query.Query;
+import org.wso2.siddhi.query.api.execution.query.selection.OrderByAttribute;
 import org.wso2.siddhi.query.api.expression.Variable;
 
 import java.util.ArrayList;
@@ -36,35 +38,34 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Generator to create a Siddhi Query config
+ * Generates QueryConfig object out of given Siddhi elements
  */
 public class QueryConfigGenerator {
-    private String siddhiAppString;
-    private SiddhiApp siddhiApp;
-
-    public QueryConfigGenerator(String siddhiAppString, SiddhiApp siddhiApp) {
-        this.siddhiAppString = siddhiAppString;
-        this.siddhiApp = siddhiApp;
-    }
-
-    public QueryConfig generateQueryConfig(Query query) {
+    /**
+     * Generates a QueryConfig object with the given Siddhi Query object
+     * @param query                 Siddhi Query object
+     * @param siddhiAppString       Complete Siddhi app string
+     * @param siddhiApp             Compiled Siddhi app
+     * @return                      QueryConfig object
+     */
+    public QueryConfig generateQueryConfig(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
         // Generate Query Input
         QueryInputConfigGenerator queryInputConfigGenerator = new QueryInputConfigGenerator();
         QueryInputConfig queryInputConfig =
                 queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream(), siddhiAppString, siddhiApp);
 
         // Generate Query Select
-        SelectedAttributesConfigGenerator selectedAttributesConfigGenerator = new SelectedAttributesConfigGenerator();
+        AttributesSelectionConfigGenerator attributesSelectionConfigGenerator = new AttributesSelectionConfigGenerator();
         AttributesSelectionConfig querySelectConfig =
-                selectedAttributesConfigGenerator
-                        .generateSelectedAttributesConfig(query.getSelector().getSelectionList());
+                attributesSelectionConfigGenerator
+                        .generateAttributesSelectionConfig(query.getSelector().getSelectionList());
 
         // Generate Query Output
         QueryOutputConfigGenerator queryOutputConfigGenerator = new QueryOutputConfigGenerator();
         QueryOutputConfig queryOutputConfig =
                 queryOutputConfigGenerator.generateQueryOutputConfig(query.getOutputStream(), siddhiAppString);
 
-        // Set the Name & Id of the Query
+        // Get the Id of the Query
         String queryId = null;
         for (Annotation annotation : query.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase(SiddhiQueryAnnotation.INFO.toString())) {
@@ -72,35 +73,66 @@ public class QueryConfigGenerator {
                 break;
             }
         }
-
-        // Set UUID if no name has been given for the query
         if (queryId == null) {
+            // Set UUID if no Id has been given for the Query
             queryId = UUID.randomUUID().toString();
         }
 
-        // Group By
+        // Get Group By List
         List<String> groupBy = new ArrayList<>();
         for (Variable variable : query.getSelector().getGroupByList()) {
             groupBy.add(variable.getAttributeName());
         }
 
-        // Having
+        // Get Having clause
         String having = "";
         if (query.getSelector().getHavingExpression() != null) {
             having = ConfigBuildingUtilities.getDefinition(query.getSelector().getHavingExpression(), siddhiAppString);
         }
+
+        // Get OutputRateLimit
+        String outputRateLimit = "";
+        if (query.getOutputRate() != null) {
+            outputRateLimit = ConfigBuildingUtilities.getDefinition(query.getOutputRate(), siddhiAppString);
+        }
+
+        // Get orderBy
+        List<QueryOrderByConfig> orderBy = new ArrayList<>();
+        for (OrderByAttribute orderByAttribute : query.getSelector().getOrderByList()) {
+            orderBy.add(new QueryOrderByConfig(
+                    orderByAttribute.getVariable().getAttributeName(),
+                    orderByAttribute.getOrder().name()));
+        }
+
+
+//        return new QueryConfig(
+//                queryId,
+//                queryInputConfig,
+//                querySelectConfig,
+//                groupBy,
+//                having,
+//                outputRateLimit,
+//                queryOutputConfig,
+//                null); // TODO: 4/19/18 annotationList
 
         return new QueryConfig(
                 queryId,
                 queryInputConfig,
                 querySelectConfig,
                 groupBy,
+                orderBy,
+                Long.valueOf(ConfigBuildingUtilities.getDefinition(
+                        query.getSelector().getLimit(),
+                        siddhiAppString)),
                 having,
-                null,
+                outputRateLimit,
                 queryOutputConfig,
                 null);
     }
 
+    /**
+     * Annotation name of a Siddhi Query, needed for getting details of the Query
+     */
     private enum SiddhiQueryAnnotation {
         INFO,
         NAME,

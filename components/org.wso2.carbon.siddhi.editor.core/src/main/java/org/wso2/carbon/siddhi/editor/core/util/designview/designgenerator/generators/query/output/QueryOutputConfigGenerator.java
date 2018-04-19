@@ -19,17 +19,19 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.output;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.*;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.setattributeconfig.SetAttributeConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute.SetAttributeConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.DeleteOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.InsertOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateOrInsertIntoOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.output.stream.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create the output part of a Query Config
+ * Generates QueryOutputConfig with given Siddhi elements
  */
 public class QueryOutputConfigGenerator {
     // TODO: 4/17/18 comment

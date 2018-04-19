@@ -16,25 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AnnotationConfigType;
+// TODO: 4/5/18 class comment
+public class SetAttributeConfig {
+    private String attribute;
+    private String value;
 
-import java.util.List;
-
-/**
- * Represents a Siddhi annotation, whose content is in the following form:
- * - @element(value1, value2)
- */
-public class ListAnnotationConfig extends AnnotationConfig {
-    private List<AnnotationValue> value;
-
-    public ListAnnotationConfig(String name, List<AnnotationValue> value) {
-        super(name, AnnotationConfigType.LIST.toString());
+    public SetAttributeConfig(String attribute, String value) {
+        this.attribute = attribute;
         this.value = value;
     }
 
-    public List<AnnotationValue> getValue() {
+    public String getAttribute() {
+        return attribute;
+    }
+
+    public String getValue() {
         return value;
     }
 }

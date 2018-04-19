@@ -20,7 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinDirectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinQueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.JoinWithType;
 
 /**
  * Represents a Join Aggregation Query, for Siddhi Query's input
@@ -39,7 +39,7 @@ public class JoinAggregationQueryConfig extends JoinQueryConfig {
                                       String on,
                                       String within,
                                       String per) {
-        super(QueryInputTypes.JOIN_AGGREGATION);
+        super(JoinWithType.AGGREGATION.toString());
         this.left = left;
         this.joinType = joinType;
         this.right = right;

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types;
 
 // TODO: 4/4/18 class comment
 public class InsertOutputConfig extends OutputConfig {

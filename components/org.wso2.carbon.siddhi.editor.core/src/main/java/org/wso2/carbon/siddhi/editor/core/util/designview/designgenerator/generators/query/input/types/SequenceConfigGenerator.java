@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator for Sequence Query Config
+ * Generates SequenceQueryConfig with given Siddhi elements
  */
 public class SequenceConfigGenerator {
     private String siddhiAppString;

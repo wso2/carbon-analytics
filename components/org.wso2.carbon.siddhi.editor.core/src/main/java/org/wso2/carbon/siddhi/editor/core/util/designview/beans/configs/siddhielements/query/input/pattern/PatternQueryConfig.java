@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.pattern;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class PatternQueryConfig extends QueryInputConfig {
     private List<PatternQueryEventConfig> eventList;
 
     public PatternQueryConfig(List<PatternQueryEventConfig> eventList) {
-        super(QueryInputTypes.PATTERN);
+        super(QueryInputType.PATTERN.toString());
         this.eventList = eventList;
     }
 

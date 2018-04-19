@@ -20,7 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.SequenceQueryEventConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.countingsequence.CountingSequenceConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.PatternSequenceEventType;
 
 // TODO: 4/4/18 add class comment
 public class CountingSequenceEventConfig extends SequenceQueryEventConfig {
@@ -30,7 +30,7 @@ public class CountingSequenceEventConfig extends SequenceQueryEventConfig {
     private CountingSequenceConfig countingSequence;
 
     public CountingSequenceEventConfig() {
-        super(QueryInputTypes.COUNTING_EVENT);
+        super(PatternSequenceEventType.COUNTING.toString());
     }
 
     public CountingSequenceEventConfig(String within,
@@ -39,7 +39,7 @@ public class CountingSequenceEventConfig extends SequenceQueryEventConfig {
                                        String streamName,
                                        String filter,
                                        CountingSequenceConfig countingSequence) {
-        super(QueryInputTypes.COUNTING_EVENT, within, forEvery);
+        super(PatternSequenceEventType.COUNTING.toString(), within, forEvery);
         this.eventReference = eventReference;
         this.streamName = streamName;
         this.filter = filter;

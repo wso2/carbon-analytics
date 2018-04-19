@@ -32,7 +32,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.SinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceMap;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.attributesselection.SelectedAttributesConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.attributesselection.AttributesSelectionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.regexpatterns.CodeToDesignRegexPatterns;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGeneratorHelperException;
@@ -247,10 +247,10 @@ public class DesignGenerator {
 
             if (aggregationDefinition.getSelector() instanceof BasicSelector) {
                 BasicSelector selector = (BasicSelector) aggregationDefinition.getSelector();
-                SelectedAttributesConfigGenerator selectedAttributesConfigGenerator =
-                        new SelectedAttributesConfigGenerator();
+                AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
+                        new AttributesSelectionConfigGenerator();
                 selectedAttributesConfig =
-                        selectedAttributesConfigGenerator.generateSelectedAttributesConfig(selector.getSelectionList());
+                        attributesSelectionConfigGenerator.generateAttributesSelectionConfig(selector.getSelectionList());
                 // Populate 'groupBy' list
                 for (Variable variable : selector.getGroupByList()) {
                     groupBy.add(variable.getAttributeName());
@@ -310,8 +310,8 @@ public class DesignGenerator {
      * @param query     Siddhi query
      */
     private void addQueryConfig(Query query) {
-        QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
-        QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig(query);
+        QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator();
+        QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig(query, siddhiAppString, siddhiApp);
         siddhiAppConfig.add(queryConfig);
     }
 

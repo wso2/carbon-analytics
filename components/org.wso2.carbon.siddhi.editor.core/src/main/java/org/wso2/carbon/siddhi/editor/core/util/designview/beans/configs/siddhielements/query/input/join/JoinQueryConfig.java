@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 
 /**
  * Represents a Join QueryInputConfig, for Siddhi Query
@@ -28,7 +28,7 @@ public abstract class JoinQueryConfig extends QueryInputConfig {
     private String joinWith;
 
     public JoinQueryConfig(String joinWith) {
-        super(QueryInputTypes.JOIN);
+        super(QueryInputType.JOIN.toString());
         this.joinWith = joinWith;
     }
 

@@ -21,7 +21,6 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.OutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 
@@ -34,6 +33,8 @@ public class QueryConfig extends SiddhiElementConfig {
     private QueryInputConfig queryInput;
     private AttributesSelectionConfig select;
     private List<String> groupBy;
+    private List<QueryOrderByConfig> orderBy;
+    private long limit;
     private String having;
     private String outputRateLimit;
     private QueryOutputConfig queryOutput;
@@ -43,6 +44,8 @@ public class QueryConfig extends SiddhiElementConfig {
                        QueryInputConfig queryInput,
                        AttributesSelectionConfig select,
                        List<String> groupBy,
+                       List<QueryOrderByConfig> orderBy,
+                       long limit,
                        String having,
                        String outputRateLimit,
                        QueryOutputConfig queryOutput,
@@ -51,6 +54,8 @@ public class QueryConfig extends SiddhiElementConfig {
         this.queryInput = queryInput;
         this.select = select;
         this.groupBy = groupBy;
+        this.orderBy = orderBy;
+        this.limit = limit;
         this.having = having;
         this.outputRateLimit = outputRateLimit;
         this.queryOutput = queryOutput;
@@ -61,27 +66,71 @@ public class QueryConfig extends SiddhiElementConfig {
         return queryInput;
     }
 
+    public void setQueryInput(QueryInputConfig queryInput) {
+        this.queryInput = queryInput;
+    }
+
     public AttributesSelectionConfig getSelect() {
         return select;
+    }
+
+    public void setSelect(AttributesSelectionConfig select) {
+        this.select = select;
     }
 
     public List<String> getGroupBy() {
         return groupBy;
     }
 
+    public void setGroupBy(List<String> groupBy) {
+        this.groupBy = groupBy;
+    }
+
+    public List<QueryOrderByConfig> getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(List<QueryOrderByConfig> orderBy) {
+        this.orderBy = orderBy;
+    }
+
+    public long getLimit() {
+        return limit;
+    }
+
+    public void setLimit(long limit) {
+        this.limit = limit;
+    }
+
     public String getHaving() {
         return having;
+    }
+
+    public void setHaving(String having) {
+        this.having = having;
     }
 
     public String getOutputRateLimit() {
         return outputRateLimit;
     }
 
+    public void setOutputRateLimit(String outputRateLimit) {
+        this.outputRateLimit = outputRateLimit;
+    }
+
     public QueryOutputConfig getQueryOutput() {
         return queryOutput;
     }
 
+    public void setQueryOutput(QueryOutputConfig queryOutput) {
+        this.queryOutput = queryOutput;
+    }
+
     public List<AnnotationConfig> getAnnotationList() {
         return annotationList;
+    }
+
+    public void setAnnotationList(List<AnnotationConfig> annotationList) {
+        this.annotationList = annotationList;
     }
 }

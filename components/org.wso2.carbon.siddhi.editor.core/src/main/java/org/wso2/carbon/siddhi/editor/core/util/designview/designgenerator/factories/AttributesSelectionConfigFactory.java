@@ -27,7 +27,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSel
 import java.util.List;
 
 /**
- * Factory to create an AttributesSelectionConfig
+ * Creates an AttributesSelectionConfig object
  */
 public class AttributesSelectionConfigFactory {
     /**

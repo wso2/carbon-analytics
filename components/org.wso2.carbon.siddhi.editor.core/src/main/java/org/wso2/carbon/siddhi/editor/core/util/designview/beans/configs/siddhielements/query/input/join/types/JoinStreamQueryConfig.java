@@ -20,7 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinDirectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinQueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.JoinWithType;
 
 /**
  * Represents a Join Stream Query, for Siddhi Query's input
@@ -35,7 +35,7 @@ public class JoinStreamQueryConfig extends JoinQueryConfig {
                                  String joinType,
                                  JoinDirectionConfig right,
                                  String on) {
-        super(QueryInputTypes.JOIN_STREAM);
+        super(JoinWithType.STREAM.toString());
         this.left = left;
         this.joinType = joinType;
         this.right = right;

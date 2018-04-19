@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.QueryInputTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class SequenceQueryConfig extends QueryInputConfig {
     List<SequenceQueryEventConfig> events;
 
     public SequenceQueryConfig(List<SequenceQueryEventConfig> events) {
-        super(QueryInputTypes.SEQUENCE);
+        super(QueryInputType.SEQUENCE.toString());
         this.events = events;
     }
 

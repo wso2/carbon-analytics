@@ -16,20 +16,15 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
+package org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input;
 
 /**
- * Has elements of AggregationConfig
+ * Type of Join, of a Join Query
  */
-public class AggregationConfigElements {
-    public static final String SELECT_AGGREGATE_FUNCTION = "aggregateFunction";
-    public static final String SELECT_AGGREGATE_ATTRIBUTE = "attribute";
-    public static final String AGGREGATE_BY_TIME_STAMP = "timeStamp";
-    public static final String AGGREGATE_BY_TIME_PERIOD = "timePeriod";
-
-    /**
-     * Avoids instantiation
-     */
-    private AggregationConfigElements() {
-    }
+public enum JoinWithType {
+    JOIN,
+    STREAM,
+    TABLE,
+    AGGREGATION,
+    WINDOW
 }

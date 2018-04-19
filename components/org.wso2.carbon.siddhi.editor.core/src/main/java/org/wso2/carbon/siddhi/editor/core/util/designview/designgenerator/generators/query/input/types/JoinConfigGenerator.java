@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create a QueryInputConfig of type Join
+ * Generates JoinQueryConfig with given Siddhi elements
  */
 public class JoinConfigGenerator {
     // Counts of elements in the Query
@@ -54,7 +54,7 @@ public class JoinConfigGenerator {
      * @param queryInputStream      Siddhi Query InputStream object, which contains data regarding Siddhi Query input
      * @param siddhiApp             Compiled Siddhi app
      * @param siddhiAppString       Complete Siddhi app string
-     * @return
+     * @return                      JoinQueryConfig object
      */
     public JoinQueryConfig getJoinQueryConfig(InputStream queryInputStream,
                                               SiddhiApp siddhiApp,

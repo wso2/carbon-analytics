@@ -18,10 +18,12 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
-// TODO: 4/5/18 class comment
+/**
+ * Attribute Selection
+ */
 public class AttributeSelection {
-    public static final String TYPE_USER_DEFINED = "user-defined";
-    public static final String TYPE_ALL = "all";
+    public static final String TYPE_USER_DEFINED = "USER_DEFINED";
+    public static final String TYPE_ALL = "ALL";
     public static final String VALUE_ALL = "*";
 
     /**
