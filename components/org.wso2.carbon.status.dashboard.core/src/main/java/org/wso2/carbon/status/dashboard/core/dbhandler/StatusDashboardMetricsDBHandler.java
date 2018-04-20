@@ -460,7 +460,7 @@ public class StatusDashboardMetricsDBHandler {
                 String resultLabel = "VALUE";
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery
                         .replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                        columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                                columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK)
                         .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
@@ -478,7 +478,7 @@ public class StatusDashboardMetricsDBHandler {
                 String resultLabel = "M1_RATE";
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery
                         .replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                        columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                                columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK).replace
                                 (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, resultLabel)
@@ -495,7 +495,7 @@ public class StatusDashboardMetricsDBHandler {
                 String resultLabel = "M1_RATE";
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery
                         .replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                        columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                                columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK).replace
                                 (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, resultLabel)
@@ -520,7 +520,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param timeInterval   time interval that needed to be taken.
      * @param metricTypeName metrics type name ex: memory,cpu
      * @param currentTime    current time in milliseconds.
-     * @return List<List < Object>> of metrics data because charts needed in that format
+     * @return List<List   <   Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerMetrics(String workerId, long timeInterval, String metricTypeName, long
             currentTime) {
@@ -540,7 +540,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param timeInterval   time interval that needed to be taken.
      * @param metricTypeName metrics type name ex: memory,cpu
      * @param currentTime    current time in milliseconds.
-     * @return List<List < Object>> of metrics data because charts needed in that format
+     * @return List<List   <   Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerAggregatedMetrics(String workerId, long timeInterval, String metricTypeName, long
             currentTime) {
@@ -562,7 +562,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param workerId     source id of the metrics
      * @param timeInterval time interval that metrics needed to be taken.
      * @param currentTime  current time
-     * @return List<List < Object>> of metrics data because charts needed in that format
+     * @return List<List   <   Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerThroughput(String workerId, long timeInterval, long currentTime) {
         String resolvedSelectWorkerThroughputQuery = resolveTableName(selectWorkerThroughputQuery,
@@ -582,7 +582,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param workerId     source id of the metrics
      * @param timeInterval time interval that metrics needed to be taken.
      * @param currentTime  current time
-     * @return List<List < Object>> of metrics data because charts needed in that format
+     * @return List<List   <   Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerAggregatedThroughput(String workerId, long timeInterval, long currentTime) {
         long aggregationTime = DBTableUtils.getAggregation(timeInterval);
@@ -604,7 +604,8 @@ public class StatusDashboardMetricsDBHandler {
      * @param query selection query.
      * @return the selected object.
      */
-    private List<List<Object>> selectAppMemory(String query, String tableName, Object[] parameters, String timesStampLable) {
+    private List<List<Object>> selectAppMemory(String query, String tableName, Object[] parameters,
+                                               String timesStampLable) {
         Map<String, String> attributesTypeMap = workerAttributeTypeMap.get(tableName);
         Connection conn = this.getConnection();
         ResultSet rs = null;
@@ -613,7 +614,7 @@ public class StatusDashboardMetricsDBHandler {
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(query);
-            setDynamicValuesToStatement(stmt,parameters);
+            setDynamicValuesToStatement(stmt, parameters);
             rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
                 row = new ArrayList<>();
@@ -663,7 +664,7 @@ public class StatusDashboardMetricsDBHandler {
         String[] columnLabels = columns.split(",");
         try {
             stmt = conn.prepareStatement(query);
-            setDynamicValuesToStatement(stmt,parameters);
+            setDynamicValuesToStatement(stmt, parameters);
             rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
                 row = new ArrayList<>();
@@ -717,7 +718,7 @@ public class StatusDashboardMetricsDBHandler {
         List<Object> row;
         try {
             stmt = conn.prepareStatement(query);
-            setDynamicValuesToStatement(stmt,parameters);
+            setDynamicValuesToStatement(stmt, parameters);
             rs = DBHandler.getInstance().select(stmt);
             String timestampCol = "TIMESTAMP";
             if (isAggregated) {
@@ -764,25 +765,25 @@ public class StatusDashboardMetricsDBHandler {
         return str;
     }
 
-    private void setDynamicValuesToStatement(PreparedStatement statement,Object[] parameters) throws SQLException {
+    private void setDynamicValuesToStatement(PreparedStatement statement, Object[] parameters) throws SQLException {
         int counter = 1;
-        for (Object parameter : parameters){
-            if(parameter instanceof String){
+        for (Object parameter : parameters) {
+            if (parameter instanceof String) {
                 statement.setString(counter, (String) parameter);
-            } else if(parameter instanceof Long){
+            } else if (parameter instanceof Long) {
                 statement.setLong(counter, (Long) parameter);
-            } else if(parameter instanceof Double){
+            } else if (parameter instanceof Double) {
                 statement.setDouble(counter, (Double) parameter);
-            } else if(parameter instanceof Integer){
+            } else if (parameter instanceof Integer) {
                 statement.setInt(counter, (Integer) parameter);
-            } else if(parameter instanceof Float){
+            } else if (parameter instanceof Float) {
                 statement.setFloat(counter, (Float) parameter);
-            } else if(parameter instanceof Boolean){
+            } else if (parameter instanceof Boolean) {
                 statement.setBoolean(counter, (Boolean) parameter);
             } else {
                 logger.error("Invalid Type of Object.Found " + parameter.getClass());
             }
-            counter ++;
+            counter++;
         }
     }
 }

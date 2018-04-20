@@ -274,6 +274,7 @@ public class StatusDashboardDBHandler {
 
     /**
      * Method which is used to insert the worker configuration details to database.
+     *
      * @param workerConfigurationDetails
      * @return isSuccess
      * @throws RDBMSTableException
