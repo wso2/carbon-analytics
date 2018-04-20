@@ -3,7 +3,7 @@ package org.wso2.carbon.sp.jobmanager.core.bean;
 import java.util.List;
 
 /**
- *
+ * Bean class for kafkaTransport Details.
  */
 public class KafkaTransportDetails {
     private String appName;
