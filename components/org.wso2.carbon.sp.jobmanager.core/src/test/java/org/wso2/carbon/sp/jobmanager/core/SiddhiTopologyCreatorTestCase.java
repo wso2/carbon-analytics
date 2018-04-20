@@ -42,8 +42,8 @@ import org.wso2.siddhi.core.util.SiddhiTestHelper;
 import org.wso2.siddhi.core.util.transport.InMemoryBroker;
 
 import java.rmi.RemoteException;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -822,8 +822,8 @@ public class SiddhiTopologyCreatorTestCase {
                 + "From filteredStockStream#window.lengthBatch(4)\n"
                 + "Select symbol, avg(price) as avgPrice, quantity\n"
                 + "Insert into #avgPriceStream;\n"
-                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerInternalStream#window.length"
-                + "(1)\n"
+                + "From #avgPriceStream#window.time(5 min) as a r" +
+                "ight outer join companyTriggerInternalStream#window.length(1)\n"
                 + "On (companyTriggerInternalStream.symbol == a.symbol)\n"
                 + "Select a.symbol, a.avgPrice, a.quantity\n"
                 + "Insert into triggeredAvgStream;\n"
@@ -1130,9 +1130,9 @@ public class SiddhiTopologyCreatorTestCase {
      * execGroup.Newly created execGroup will be moved to as the first element of already created passthrough queries
      */
     @Test
-    public void testUsergivenSourceNoGroup(){
+    public void testUsergivenSourceNoGroup() {
         //Need to update after fixing the passthrough case
-        String siddhiApp ="@App:name('TestPlan12') \n"
+        String siddhiApp = "@App:name('TestPlan12') \n"
                 + "@source(type='kafka', topic.list='TestPlan12.stockStream', group.id='1', threading.option='single"
                 + ".thread', bootstrap.servers='localhost:9092', @map(type='xml'))  "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
@@ -1197,5 +1197,4 @@ public class SiddhiTopologyCreatorTestCase {
         }
         return siddhiAppRuntimeMap;
     }
-
 }

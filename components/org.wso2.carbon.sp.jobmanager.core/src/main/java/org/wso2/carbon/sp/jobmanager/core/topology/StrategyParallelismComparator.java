@@ -18,12 +18,13 @@
 
 package org.wso2.carbon.sp.jobmanager.core.topology;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * Comparator for subscription strategies.
  */
-public class StrategyParallelismComparator implements Comparator<SubscriptionStrategyDataHolder>{
+public class StrategyParallelismComparator implements Comparator<SubscriptionStrategyDataHolder>, Serializable {
     @Override
     public int compare(SubscriptionStrategyDataHolder o1, SubscriptionStrategyDataHolder o2) {
         return o1.getOfferedParallelism() - o2.getOfferedParallelism();

@@ -149,7 +149,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 AnnotationHelper.getAnnotationElement(SiddhiTopologyCreatorConstants.SIDDHIAPP_NAME_IDENTIFIER,
                         null, siddhiApp.getAnnotations());
         if (element == null) {
-            return SiddhiTopologyCreatorConstants.DEFAULT_SIDDHIAPP_NAME + "-" + UUID.randomUUID();//defaultName
+            return SiddhiTopologyCreatorConstants.DEFAULT_SIDDHIAPP_NAME + "-" + UUID.randomUUID(); //defaultName
         } else {
             return element.getValue();
         }
@@ -729,5 +729,4 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             }
         }
     }
-
 }
