@@ -19,7 +19,6 @@
 
 package org.wso2.carbon.sp.jobmanager.core.api;
 
-import org.wso2.carbon.sp.jobmanager.core.model.Manager;
 import org.wso2.msf4j.Request;
 
 import javax.ws.rs.core.Response;

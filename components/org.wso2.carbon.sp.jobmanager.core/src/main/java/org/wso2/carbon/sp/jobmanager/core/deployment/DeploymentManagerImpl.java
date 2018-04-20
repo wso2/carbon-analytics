@@ -44,7 +44,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Implementation regarding deploying siddhi applications in the resource cluster
+ * Implementation regarding deploying siddhi applications in the resource cluster.
  */
 public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolChangeListener {
     private static final Logger LOG = Logger.getLogger(DeploymentManagerImpl.class);

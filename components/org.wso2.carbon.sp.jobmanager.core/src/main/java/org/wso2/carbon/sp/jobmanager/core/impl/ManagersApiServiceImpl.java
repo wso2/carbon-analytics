@@ -21,9 +21,10 @@ package org.wso2.carbon.sp.jobmanager.core.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
@@ -33,7 +34,6 @@ import org.wso2.carbon.sp.jobmanager.core.api.ManagersApiService;
 import org.wso2.carbon.sp.jobmanager.core.api.NotFoundException;
 import org.wso2.carbon.sp.jobmanager.core.bean.KafkaTransportDetails;
 import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
-import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppDetails;
@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
+
 /**
  * Distributed Siddhi Service Implementataion Class
  */
@@ -62,31 +63,6 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
     private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";
 
-    /**
-     * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the activate method
-     */
-    @Activate
-    protected void start() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) Status Dashboard ManagerApiServiceImpl API");
-        }
-       // managerDashboard = new StatusDashboardManagerDBHandler();
-    }
-
-    /**
-     * This is the deactivation method of ConfigServiceComponent. This will be called when this component
-     * is being stopped or references are satisfied during runtime.
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
-     */
-    @Deactivate
-    protected void stop() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) Status Dashboard ManagerApiServiceImpl API");
-        }
-    }
 
     private static String getUserName(Request request) {
         Object username = request.getProperty("username");
@@ -442,6 +418,21 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     }
 
     private PermissionProvider getPermissionProvider() {
-        return ManagerDataHolder.getInstance().getPermissionProvider();
+        return ServiceDataHolder.getPermissionProvider();
+    }
+
+    @Reference(
+            name = "carbon.permission.provider",
+            service = PermissionProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterPermissionProvider"
+    )
+    protected void registerPermissionProvider(PermissionProvider permissionProvider) {
+        ServiceDataHolder.setPermissionProvider(permissionProvider);
+    }
+
+    protected void unregisterPermissionProvider(PermissionProvider permissionProvider) {
+        ServiceDataHolder.setPermissionProvider(null);
     }
 }
