@@ -28,8 +28,6 @@ import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 
 const dataConstants = {PAGE_LENGTH: 5};
 
-let currentPage = 1;
-
 /**
  * Class which manages Parent siddhi application details.
  */
@@ -41,8 +39,9 @@ export default class ParentAppTable  extends React.Component {
             workerId: this.props.id,
             appName : this.props.appName,
             appsList: [],
-            totalSize: []
+            totalSize: [],
         };
+        this.currentPage = 1;
         this.loadData = this.loadData.bind(this);
     }
 
@@ -50,7 +49,7 @@ export default class ParentAppTable  extends React.Component {
         let that = this;
         StatusDashboardAPIS.getChildAppDetails(this.state.workerId,this.state.appName)
             .then((response) =>{
-                    that.loadData(currentPage,response.data)
+                    that.loadData(this.currentPage,response.data)
             });
     }
     //todo fix pagination from API level
@@ -163,10 +162,10 @@ export default class ParentAppTable  extends React.Component {
                 <div style={{float: 'right'}}>
                     <Pagination
                         total={ Math.floor(this.state.totalSize / dataConstants.PAGE_LENGTH) + 1}
-                        current={currentPage}
+                        current={this.currentPage}
                         display={ dataConstants.PAGE_LENGTH }
                         onChange={ number => {
-                            currentPage = number;
+                            this.currentPage = number;
                             this.loadData(number, this.state.appsList);
                         }}
                     />
