@@ -19,7 +19,6 @@
 
 import React from "react";
 import {Link, Redirect} from "react-router-dom";
-//import { HashLink } from 'react-router-hash-link';
 // App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import {HttpStatus} from "../utils/Constants";
@@ -62,7 +61,6 @@ export default class AddWorker extends React.Component {
             hasPermission: false,
             isApiCalled: false,
             isError: false,
-            //isPopUpOpen: false
         };
         this._handleSubmit = this._handleSubmit.bind(this);
         this._showMessage = this._showMessage.bind(this);
@@ -133,14 +131,11 @@ export default class AddWorker extends React.Component {
                     if (response.status = HttpStatus.OK) {
                         console.log(response.data);
                         if (response.data === "manager") {
-                           // console.log("Hi am manager");
                             that._addManager(nodeID);
                         } else if (response.data === "worker") {
-                           // console.log("Hi am worker");
                             that._addWorker(nodeID);
                         } else {
                             this.handlePopupOpen();
-                            //console.log("am here");
                         }
                     } else {
 
@@ -249,9 +244,6 @@ export default class AddWorker extends React.Component {
         });
     }
 
-    //TODO:NEWLY ADDED
-
-
     _showError(message) {
         this.setState({
             messageStyle: errorMessageStyle,
@@ -281,16 +273,9 @@ export default class AddWorker extends React.Component {
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
                     that._showMessage("Worker '" + nodeID + "' is added successfully !");
-                    {/*<Link to={window.contextPath+'#hash'}*/
-                    }
-                    {/*scroll={el => el.scrollIntoView({ behavior: 'instant', block: 'end' })}/>*/
-                    }
                     setTimeout(function () {
-                        window.location.href = window.contextPath + '#hash';
-                        scroll(e1 => e1.scrollIntoView({behavior: 'instant', block: 'end'}))
+                        window.location.href = window.contextPath;
                     }, 1000)
-
-
                 } else {
                     that._showError("Error while adding worker '" + nodeID + "' . Try Again !");
                 }
@@ -330,16 +315,9 @@ export default class AddWorker extends React.Component {
         StatusDashboardOverViewAPI.createManager(node)
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
-                    console.log("Manager added");
                     this._showMessage("Manager " + nodeID + " is added successfully !");
                     setTimeout(function () {
-                        // window.location.href = window.contextPath;
-                        // <Redirect to={{pathname: `${window.contextPath}/siddhi-apps`}}/>
-                        //  window.location.href = window.contextPath +"/"+nodeID+"/siddhi-apps";
-
-                        //window.location.href = window.contextPath+'#hash';
-                        window.location.href = window.contextPath + '#hash';
-                        scroll(e1 => e1.scrollIntoView({behavior: 'instant', block: 'end'}))
+                        window.location.href = window.contextPath;
                     }, 1000)
                 } else {
                     that._showError("Error while adding manager " + nodeID + " .Try Again !");
@@ -401,7 +379,6 @@ export default class AddWorker extends React.Component {
                     onClick={() => {
                         let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
                         this._addWorker(nodeID);
-
                     }}
                 />,
                 <FlatButton
@@ -416,7 +393,6 @@ export default class AddWorker extends React.Component {
 
                 <FlatButton
                     label="Cancel"
-                    //backgroundColor='#f17b31'
                     style={popupButtonStyle}
                     onClick={() => {
                         this.setState({open: false, openAdd: false})
@@ -524,7 +500,6 @@ export default class AddWorker extends React.Component {
                     }}>
                         <i className="fw fw-loader5 fw-spin fw-inverse fw-5x"></i>
                     </div>
-
                 </div>
             );
         }

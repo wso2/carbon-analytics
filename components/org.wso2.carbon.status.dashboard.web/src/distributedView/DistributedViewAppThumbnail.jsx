@@ -129,33 +129,10 @@ export default class DistributedViewAppThumbnail extends React.Component {
                                 <p>Indicates total number of worker nodes in the resource cluster</p>
                             </ToolTip>
                         </GridTile>
-
-                        {/*<GridTile title="Used workerNodes" titlePosition="bottom" titleStyle={{fontSize: 10}} data-tip*/}
-                                  {/*data-for='usedWorkerNodes'>*/}
-                            {/*<div style={{display: 'inline', float: 'right', marginTop: '65%', marginRight: '60%'}}>*/}
-
-                                {/*<h1 className="deployed-apps-details">{this.props.distributedApp.usedWorkerNodes}</h1>*/}
-                            {/*</div>*/}
-                            {/*<ToolTip id='usedWorkerNodes' aria-haspopup='true' role='example'>*/}
-                                {/*<p>Indicates how many worker nodes used for the <br/> particular parent siddhi*/}
-                                    {/*applications deployment</p>*/}
-                            {/*</ToolTip>*/}
-
-                        {/*</GridTile>*/}
-                        {/*<GridTile title="workerNodes" titlePosition="bottom" titleStyle={{fontSize: 10}} data-tip*/}
-                                  {/*data-for='totalWorkerNodes'>*/}
-                            {/*<div style={{display: 'inline', float: 'right', marginTop: '65%', marginRight: '60%'}}>*/}
-
-                                {/*<h1 className="deployed-apps-details">{this.props.distributedApp.totalWorkerNodes}</h1>*/}
-                            {/*</div>*/}
-                            {/*<ToolTip id='totalWorkerNodes' aria-haspopup='true' role='example'>*/}
-                                {/*<p>Indicates total number of worker nodes inside resource cluster</p>*/}
-                            {/*</ToolTip>*/}
-                        {/*</GridTile>*/}
                     </GridList>
                 </Link>
             </div>
-        //if (this.props.worker.serverDetails.runningStatus === "Reachable") {
+
         if (this.props.distributedApp.usedWorkerNodes !== "0") {
             color = 'green';
             appStatus = 'Deployed'
@@ -176,8 +153,6 @@ export default class DistributedViewAppThumbnail extends React.Component {
                     title={this.props.distributedApp.parentAppName}
                     actionIcon={<IconButton ><CircleBorder
                         color={items[1]}/></IconButton>}
-                    // actionIcon={<IconButton><CircleBorder
-                    //     color={items[2]}/></IconButton>}
                     actionPosition="left"
                     style={{background: 'black'}}
                     titleBackground={'#424242'}

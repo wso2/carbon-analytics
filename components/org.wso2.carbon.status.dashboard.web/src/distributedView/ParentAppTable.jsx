@@ -84,17 +84,9 @@ export default class ParentAppTable  extends React.Component {
 
     renderRow(row) {
         let isInactive = (row.appStatus === "waiting");
-       // let app = entry.siddhiApp.replace(/\'|\"/g,'').replace(/>/g,'\>');
-        let appName=row.groupName.replace(row.appName,"");
-
         return (
 
             <TableRow >
-                <TableRowColumn>
-                    <div style={{height: 24, color: 'white'}}>
-                        {row.groupName}
-                    </div>
-                </TableRowColumn>
                 <TableRowColumn style={{width: '400px'}}>
                     {isInactive ? (
                         <div style={{height: 24, color: 'white'}}>
@@ -109,6 +101,11 @@ export default class ParentAppTable  extends React.Component {
                             </div>
 
                     )}
+                </TableRowColumn>
+                <TableRowColumn>
+                    <div style={{height: 24, color: 'white'}}>
+                        {row.groupName}
+                    </div>
                 </TableRowColumn>
                 <TableRowColumn>
                     <div style={{height: 24, color: 'white'}}>
@@ -139,11 +136,11 @@ export default class ParentAppTable  extends React.Component {
                     <TableHeader displaySelectAll={false}
                                  adjustForCheckbox={false}>
                         <TableRow>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Group Name</h3>
-                            </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Child Apps</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>App Status</h3>
+                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Group Name</h3>
+                            </TableHeaderColumn>
+                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Child App Status</h3>
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Worker Node</h3>
                             </TableHeaderColumn>

@@ -157,7 +157,6 @@ export default class WorkerOverview extends React.Component {
             }
         });
 
-        //todo: newly added to get the stored manager details
         StatusDashboardOverViewAPI.getManagerList()
             .then((response) =>{
                 if(response.status===HttpStatus.OK){
@@ -196,7 +195,6 @@ export default class WorkerOverview extends React.Component {
 
     componentWillUnmount() {
         clearInterval(this.state.interval);
-
     }
 
     componentWillMount() {

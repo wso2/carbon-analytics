@@ -170,8 +170,6 @@ export default class ManagerThumbnail extends React.Component {
             //statistics disabled workers
         } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>
-                {/*<Link style={{textDecoration: 'none'}}*/}
-                {/*to={window.contextPath + '/worker/' + this.props.worker.workerId}>*/}
                 <GridList cols={2} cellHeight={180} style={styles.gridList}>
                     <GridTile>
                         <h4 style={{
@@ -180,16 +178,6 @@ export default class ManagerThumbnail extends React.Component {
                             padding: 50
                         }}>{this.props.worker.statusMessage}</h4>
                     </GridTile>
-                    {/*<GridTile title="Siddhi Apps" titlePosition="bottom"*/}
-                    {/*titleStyle={{fontSize: 10, textAlign: 'center'}}>*/}
-                    {/*<div className="grid-tile-h1" style={{marginTop: 50}}><h1*/}
-                    {/*className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>*/}
-                    {/*<h1 style={{display: 'inline'}}> |</h1>*/}
-                    {/*<h1 className="inactive-apps">*/}
-                    {/*{this.props.worker.serverDetails.siddhiApps.inactive}*/}
-                    {/*</h1>*/}
-                    {/*</div>*/}
-                    {/*</GridTile>*/}
                 </GridList>
             </div>;
             lastUpdated = "#";
@@ -422,5 +410,4 @@ export default class ManagerThumbnail extends React.Component {
             </div>
         );
     }
-
 }

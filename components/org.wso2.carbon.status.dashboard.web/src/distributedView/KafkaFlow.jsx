@@ -32,8 +32,6 @@ export default class KafkaFlow extends React.Component {
             kafkaData: {},
             workerId: this.props.id,
             appName: this.props.appName,
-
-
         }
     }
 
@@ -80,26 +78,22 @@ export default class KafkaFlow extends React.Component {
 
                         )}
 
-
-
                         g.setNode(entry.appName, {labelType: "html", label: html,paddingBottom:0,paddingTop:0,paddingLeft:0,paddingRight:130,rx: 0, ry: 0});
                         wordLength = entry.appName.length;
 
-
                         entry.sourceList.map((source) => {
                             sourceHtml =
-                                "<div id='container' class='node-content'>"
+                                "<div id='container' class='node-content' title='kafka_topic'>"
                                 +"<span class='topic-indicator '></span>"
                                 + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + source + "</span>"
                                 + "</div>";
                             g.setNode(source, {labelType: "html", label: sourceHtml,paddingBottom:0,paddingTop:0,paddingLeft:0,paddingRight:150,rx: 0, ry: 0},{labelStyle:"width:300"});
-
                         });
 
                         entry.sinkList.map((sink) => {
 
                             sinkHtml =
-                                "<div id='container' class='node-content'>"
+                                "<div id='container' class='node-content' title='kafka_topic'>"
                                 +"<span class='topic-indicator '></span>"
                                 + "<span id='myTextInput' class='nodeLabel' itemref='myTextInput'>"  + sink + "</span>"
                                 + "</div>";
@@ -130,7 +124,6 @@ export default class KafkaFlow extends React.Component {
 
                         // Create the renderer
                         let render = new dagreD3.render();
-
 
                         let svg = d3.select(this.nodeTree);
                         let inner = svg.select("g");
@@ -192,7 +185,6 @@ export default class KafkaFlow extends React.Component {
                 height="500"
                 width="300"
             >
-                {/*{alert("Hi am here")}*/}
                 <g ref={(r) => {
                     this.nodeTreeGroup = r;
                 }}
@@ -205,7 +197,6 @@ export default class KafkaFlow extends React.Component {
                    viewBox="0 0 100 100"
                 />
             </svg>
-
         );
     }
 }

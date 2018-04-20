@@ -309,5 +309,3 @@ export default class DistributedOverview extends React.Component {
         return false;
     }
 }
-
-
