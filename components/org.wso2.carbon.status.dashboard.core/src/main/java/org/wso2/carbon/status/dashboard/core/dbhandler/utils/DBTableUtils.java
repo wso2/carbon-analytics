@@ -89,8 +89,8 @@ public class DBTableUtils {
     }
 
     public Map<String, String> loadWorkerConfigTableTuples(QueryManager statusDashboardQueryManager) {
-        String intType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
-        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
+        String intType = statusDashboardQueryManager.getQuery(Constants.INTEGER_DATA_TYPE);
+        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_DATA_TYPE);
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put(Constants.WORKERID, stringType);
         attributeSelection.put(Constants.HOST, stringType);
@@ -99,8 +99,8 @@ public class DBTableUtils {
     }
 
     public Map<String, Map<String, String>> loadWorkerAttributeTypeMap(QueryManager statusDashboardQueryManager) {
-        String integerType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
-        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
+        String integerType = statusDashboardQueryManager.getQuery(Constants.INTEGER_DATA_TYPE);
+        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_DATA_TYPE);
 
         Map<String, Map<String, String>> attributesTypeMaps = new HashMap<>();
         Map<String, String> attributesWorkerConfigTable = new LinkedHashMap<>();
@@ -137,7 +137,7 @@ public class DBTableUtils {
     }
 
     public Map<String, String> loadWorkerGeneralTableTuples(QueryManager statusDashboardQueryManager) {
-        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
+        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_DATA_TYPE);
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("CARBONID", stringType);
         attributeSelection.put("WORKERID", stringType);
@@ -206,9 +206,9 @@ public class DBTableUtils {
     }
 
     public Map<String, Map<String, String>> loadMetricsAttributeTypeMap(QueryManager statusDashboardQueryManager) {
-        String doubleType = statusDashboardQueryManager.getQuery(Constants.DOUBLE_TYPE);
-        String longType = statusDashboardQueryManager.getQuery(Constants.LONG_TYPE);
-        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
+        String doubleType = statusDashboardQueryManager.getQuery(Constants.DOUBLE_DATA_TYPE);
+        String longType = statusDashboardQueryManager.getQuery(Constants.LONG_DATA_TYPE);
+        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_DATA_TYPE);
         Map<String, String> attributesCounterTable = new HashMap<>();
         attributesCounterTable.put("ID", longType);
         attributesCounterTable.put("SOURCE", stringType);
@@ -286,8 +286,8 @@ public class DBTableUtils {
     }
 
     public Map<String, String> loadManagerConfigTableTuples(QueryManager statusDashboardQueryManager) {
-        String intType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
-        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
+        String intType = statusDashboardQueryManager.getQuery(Constants.INTEGER_DATA_TYPE);
+        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_DATA_TYPE);
         Map<String, String> managerAttributeSelection = new HashMap<>();
         managerAttributeSelection.put(Constants.MANAGERID, stringType);
         managerAttributeSelection.put(Constants.HOST, stringType);
@@ -317,12 +317,12 @@ public class DBTableUtils {
      */
     private PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt,
             int ordinal, String type, Object value, QueryManager statusDashboardQueryManager) throws SQLException {
-        String doubleType = statusDashboardQueryManager.getQuery(Constants.DOUBLE_TYPE);
-        String longType = statusDashboardQueryManager.getQuery(Constants.LONG_TYPE);
-        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_TYPE);
-        String integerType = statusDashboardQueryManager.getQuery(Constants.INTEGER_TYPE);
-        String floatType = statusDashboardQueryManager.getQuery(Constants.FLOAT_TYPE);
-        String booleanType = statusDashboardQueryManager.getQuery(Constants.BOOL_TYPE);
+        String doubleType = statusDashboardQueryManager.getQuery(Constants.DOUBLE_DATA_TYPE);
+        String longType = statusDashboardQueryManager.getQuery(Constants.LONG_DATA_TYPE);
+        String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_DATA_TYPE);
+        String integerType = statusDashboardQueryManager.getQuery(Constants.INTEGER_DATA_TYPE);
+        String floatType = statusDashboardQueryManager.getQuery(Constants.FLOAT_DATA_TYPE);
+        String booleanType = statusDashboardQueryManager.getQuery(Constants.BOOL_DATA_TYPE);
         if (doubleType.equalsIgnoreCase(type)) {
             stmt.setDouble(ordinal, (Double) value);
         } else if (stringType.equalsIgnoreCase(type)) {
@@ -403,12 +403,12 @@ public class DBTableUtils {
      */
     public Object fetchData(ResultSet rs, String attributeName, String attributeType, QueryManager metricsQueryManager)
             throws SQLException {
-        String doubleType = metricsQueryManager.getQuery(Constants.DOUBLE_TYPE);
-        String longType = metricsQueryManager.getQuery(Constants.LONG_TYPE);
-        String stringType = metricsQueryManager.getQuery(Constants.STRING_TYPE);
-        String integerType = metricsQueryManager.getQuery(Constants.INTEGER_TYPE);
-        String floatType = metricsQueryManager.getQuery(Constants.FLOAT_TYPE);
-        String booleanType = metricsQueryManager.getQuery(Constants.BOOL_TYPE);
+        String doubleType = metricsQueryManager.getQuery(Constants.DOUBLE_DATA_TYPE);
+        String longType = metricsQueryManager.getQuery(Constants.LONG_DATA_TYPE);
+        String stringType = metricsQueryManager.getQuery(Constants.STRING_DATA_TYPE);
+        String integerType = metricsQueryManager.getQuery(Constants.INTEGER_DATA_TYPE);
+        String floatType = metricsQueryManager.getQuery(Constants.FLOAT_DATA_TYPE);
+        String booleanType = metricsQueryManager.getQuery(Constants.BOOL_DATA_TYPE);
         if (doubleType.equalsIgnoreCase(attributeType)) {
             return rs.getDouble(attributeName);
         } else if (stringType.equalsIgnoreCase(attributeType)) {
