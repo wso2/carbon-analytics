@@ -34,8 +34,6 @@ let currentPage = 1;
  * Class which manages Parent siddhi application details.
  */
 export default class ParentAppTable  extends React.Component {
-
-
     constructor(props) {
         super(props);
         this.state = {
