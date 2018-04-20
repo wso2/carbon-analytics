@@ -31,9 +31,11 @@ const dataConstants = {PAGE_LENGTH: 5};
 let currentPage = 1;
 
 /**
- * class which manages Siddhi App list of a worker.
+ * Class which manages Parent siddhi application details.
  */
 export default class ParentAppTable  extends React.Component {
+
+
     constructor(props) {
         super(props);
         this.state = {
