@@ -23,7 +23,7 @@ import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerNodeConfig;
 
 /**
- * This class is to convert Types
+ * This class is to convert Types.
  */
 public class TypeConverter {
 

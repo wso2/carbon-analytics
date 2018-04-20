@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.api;
 
 @javax.annotation.Generated(value = "org.wso2.carbon.status.dashboard.core..codegen.languages.JavaMSF4JServerCodegen",

@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.internal;
 
 import org.wso2.carbon.status.dashboard.core.bean.ManagerMetricsSnapshot;

@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.bean;
 
 import org.wso2.carbon.status.dashboard.core.model.ServerDetails;

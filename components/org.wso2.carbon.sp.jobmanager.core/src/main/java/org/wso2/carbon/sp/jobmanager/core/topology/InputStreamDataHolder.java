@@ -15,12 +15,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.sp.jobmanager.core.topology;
 
 import org.wso2.carbon.sp.jobmanager.core.util.EventHolder;
 
 /**
- * Data Holder to hold required details of Input Streams in {@link SiddhiTopology}
+ * Data Holder to hold required details of Input Streams in {@link SiddhiTopology}.
  */
 public class InputStreamDataHolder {
     private String streamName;

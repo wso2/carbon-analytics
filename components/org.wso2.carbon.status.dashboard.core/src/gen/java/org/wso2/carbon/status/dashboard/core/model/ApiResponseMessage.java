@@ -16,13 +16,13 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Objects;
-
 
 /**
  * ApiResponseMessage
