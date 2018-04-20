@@ -22,7 +22,6 @@ package org.wso2.carbon.status.dashboard.core.model;
 /**
  * Manager Deails bean class.
  */
-
 public class ManagerDetails {
     private SiddhiAppStatus siddhiAppStatus;
     private WorkerMetrics workerMetrics;

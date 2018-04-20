@@ -28,7 +28,6 @@ public class WorkerOverview {
     private String statusMessage;
     private ServerDetails serverDetails;
 
-
     public WorkerOverview() {
         serverDetails = new ServerDetails();
     }

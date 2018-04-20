@@ -24,11 +24,10 @@ import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidation
 import java.util.List;
 
 /**
- * WorkerConfigurationDetails bean class.
+ * NodeConfigurationDetails bean class.
  *
  */
 public class NodeConfigurationDetails {
-
     private String workerId;
     private String host;
     private int port;

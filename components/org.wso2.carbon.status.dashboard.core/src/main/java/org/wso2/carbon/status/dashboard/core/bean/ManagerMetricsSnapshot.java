@@ -24,7 +24,6 @@ import org.wso2.carbon.status.dashboard.core.model.ManagerDetails;
 /**
  * Bean class for keeping the snapshot of manager status .
  */
-
 public class ManagerMetricsSnapshot {
     private ManagerDetails serverDetails = new ManagerDetails();
     private ManagerClusterInfo clusterInfo = new ManagerClusterInfo();
@@ -37,7 +36,6 @@ public class ManagerMetricsSnapshot {
 
     public void updateRunningStatus(String status) {
         serverDetails.setRunningStatus(status);
-
     }
 
     public ManagerDetails getServerDetails() {

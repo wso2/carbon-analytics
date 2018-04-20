@@ -92,7 +92,7 @@ const codeViewStyle = {
 };
 
 /**
- * class which manages Siddhi App specific details.
+ * Class which manages Siddhi App specific details.
  */
 export default class AppView extends React.Component {
 

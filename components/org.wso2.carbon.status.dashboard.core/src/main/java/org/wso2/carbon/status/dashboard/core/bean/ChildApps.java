@@ -26,10 +26,6 @@ public class ChildApps {
     private String appName;
     private String siddhiApp;
 
-    private ChildApps() {
-
-    }
-
     public String getParentAppName() {
         return parentAppName;
     }
