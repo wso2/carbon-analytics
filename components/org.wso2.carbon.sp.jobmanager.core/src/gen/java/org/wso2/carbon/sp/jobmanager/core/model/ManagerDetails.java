@@ -74,7 +74,7 @@ public class ManagerDetails {
         ManagerDetails managerDetails = (ManagerDetails) o;
         return
                 Objects.equals(this.haStatus, managerDetails.haStatus)&&
-                Objects.equals(this.groupId,managerDetails.groupId);
+                Objects.equals(this.groupId, managerDetails.groupId);
     }
 
     @Override
