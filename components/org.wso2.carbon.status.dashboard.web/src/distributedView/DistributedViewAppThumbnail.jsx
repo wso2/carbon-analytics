@@ -109,7 +109,7 @@ export default class DistributedViewAppThumbnail extends React.Component {
                             <ToolTip id='deployedChildApps' aria-haspopup='true' role='example'>
                             <p>Indicates number of deployed child apps</p>
                             </ToolTip>
-                            <ToolTip id='undeployedchildapps' aria-haspopup='true' role='example'>
+                            <ToolTip id='notDeployedChildApps' aria-haspopup='true' role='example'>
                                 <p>Indicates number of un-deployed child apps</p>
                             </ToolTip>
                         </GridTile>
