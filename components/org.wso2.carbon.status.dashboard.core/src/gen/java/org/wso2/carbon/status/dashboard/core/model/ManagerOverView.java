@@ -22,7 +22,7 @@ package org.wso2.carbon.status.dashboard.core.model;
 import org.wso2.carbon.status.dashboard.core.bean.ManagerClusterInfo;
 
 /**
- * Which are needed only to over view page.
+ * Details related to manager node that  are needed only to over view page.
  */
 public class ManagerOverView {
     private String workerId;

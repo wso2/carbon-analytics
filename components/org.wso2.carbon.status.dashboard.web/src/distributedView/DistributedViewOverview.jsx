@@ -224,7 +224,6 @@ export default class DistributedOverview extends React.Component {
                     </div>
                 );
             }
-            //deleted one condition
         } else if (this.state.isApiCalled && DistributedOverview.hasApps(this.state.clustersList)) {
             return <div style={styles.background}>
                 <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
@@ -236,7 +235,6 @@ export default class DistributedOverview extends React.Component {
                     <Divider inset={true} style={{width: '90%'}}/>
                     <div style={styles.root}>
                         <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
-
                             {Object.keys(appList).map(key => {
                                 return (
 

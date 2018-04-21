@@ -32,7 +32,6 @@ public class ParentSummaryDetails {
     private List<String> deployedChildApps = new ArrayList<>();
     private List<String> unDeployedChildApps = new ArrayList<>();
 
-
     public List<String> getGroups() {
         return groups;
     }

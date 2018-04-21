@@ -92,9 +92,9 @@ public class DBTableUtils {
         String intType = statusDashboardQueryManager.getQuery(Constants.DATA_TYPE_INTEGER);
         String stringType = statusDashboardQueryManager.getQuery(Constants.DATA_TYPE_STRING);
         Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put(Constants.WORKERID, stringType);
-        attributeSelection.put(Constants.HOST, stringType);
-        attributeSelection.put(Constants.PORT, intType);
+        attributeSelection.put(Constants.WORKER_HOST_PORT, stringType);
+        attributeSelection.put(Constants.NODE_HOST_NAME, stringType);
+        attributeSelection.put(Constants.NODE_PORT_VALUE, intType);
         return attributeSelection;
     }
 
@@ -104,12 +104,12 @@ public class DBTableUtils {
 
         Map<String, Map<String, String>> attributesTypeMaps = new HashMap<>();
         Map<String, String> attributesWorkerConfigTable = new LinkedHashMap<>();
-        attributesWorkerConfigTable.put(Constants.WORKERID, stringType);
-        attributesWorkerConfigTable.put(Constants.HOST, stringType);
-        attributesWorkerConfigTable.put(Constants.PORT, integerType);
+        attributesWorkerConfigTable.put(Constants.WORKER_HOST_PORT, stringType);
+        attributesWorkerConfigTable.put(Constants.NODE_HOST_NAME, stringType);
+        attributesWorkerConfigTable.put(Constants.NODE_PORT_VALUE, integerType);
         Map<String, String> attributesWorkerDetailsTable = new LinkedHashMap<>();
         attributesWorkerDetailsTable.put("CARBONID", stringType);
-        attributesWorkerDetailsTable.put(Constants.WORKERID, stringType);
+        attributesWorkerDetailsTable.put(Constants.WORKER_HOST_PORT, stringType);
         attributesWorkerDetailsTable.put("JAVARUNTIMENAME", stringType);
         attributesWorkerDetailsTable.put("JAVAVMVERSION", stringType);
         attributesWorkerDetailsTable.put("JAVAVMVENDOR", stringType);
@@ -125,9 +125,9 @@ public class DBTableUtils {
         attributesWorkerDetailsTable.put("SERVERSTARTTIME", stringType);
 
         Map<String, String> attributeManagerConfigTable = new LinkedHashMap<>();
-        attributeManagerConfigTable.put(Constants.MANAGERID, stringType);
-        attributeManagerConfigTable.put(Constants.HOST, stringType);
-        attributeManagerConfigTable.put(Constants.PORT, integerType);
+        attributeManagerConfigTable.put(Constants.MANAGER_HOST_PORT, stringType);
+        attributeManagerConfigTable.put(Constants.NODE_HOST_NAME, stringType);
+        attributeManagerConfigTable.put(Constants.NODE_PORT_VALUE, integerType);
 
         attributesTypeMaps.put("WORKERS_CONFIGURATION", attributesWorkerConfigTable);
         attributesTypeMaps.put("WORKERS_DETAILS", attributesWorkerDetailsTable);
@@ -289,9 +289,9 @@ public class DBTableUtils {
         String intType = statusDashboardQueryManager.getQuery(Constants.DATA_TYPE_INTEGER);
         String stringType = statusDashboardQueryManager.getQuery(Constants.DATA_TYPE_STRING);
         Map<String, String> managerAttributeSelection = new HashMap<>();
-        managerAttributeSelection.put(Constants.MANAGERID, stringType);
-        managerAttributeSelection.put(Constants.HOST, stringType);
-        managerAttributeSelection.put(Constants.PORT, intType);
+        managerAttributeSelection.put(Constants.MANAGER_HOST_PORT, stringType);
+        managerAttributeSelection.put(Constants.NODE_HOST_NAME, stringType);
+        managerAttributeSelection.put(Constants.NODE_PORT_VALUE, intType);
         return managerAttributeSelection;
     }
 
@@ -315,8 +315,9 @@ public class DBTableUtils {
      * @param value   the value of the element.
      * @throws SQLException if there are issues when the element is being set.
      */
-    private PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt,
-                                                                 int ordinal, String type, Object value, QueryManager statusDashboardQueryManager) throws SQLException {
+    private PreparedStatement populateStatementWithSingleElement(
+            PreparedStatement stmt, int ordinal, String type, Object value, QueryManager statusDashboardQueryManager)
+            throws SQLException {
         String doubleType = statusDashboardQueryManager.getQuery(Constants.DATA_TYPE_DOUBLE);
         String longType = statusDashboardQueryManager.getQuery(Constants.DATA_TYPE_LONG);
         String stringType = statusDashboardQueryManager.getQuery(Constants.DATA_TYPE_STRING);

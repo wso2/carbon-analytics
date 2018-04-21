@@ -152,8 +152,8 @@ public class StatusDashboardDBHandler {
             String resolvedTuples = String.format(
                     "MANAGERID " + STRING_TEMPLATE + " PRIMARY KEY" + TUPLES_SEPARATOR +
                             "HOST " + STRING_TEMPLATE + TUPLES_SEPARATOR +
-                            "PORT " + STRING_TEMPLATE, attributesList.get(Constants.MANAGERID), attributesList
-                            .get(Constants.HOST), attributesList.get(Constants.PORT));
+                            "PORT " + STRING_TEMPLATE, attributesList.get(Constants.MANAGER_HOST_PORT), attributesList
+                            .get(Constants.NODE_HOST_NAME), attributesList.get(Constants.NODE_PORT_VALUE));
             resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
                     resolvedTuples);
             try {
@@ -589,11 +589,11 @@ public class StatusDashboardDBHandler {
             while (rs.next()) {
                 row = new NodeConfigurationDetails();
                 row.setPort((Integer) DBTableUtils.getInstance().fetchData(rs, "PORT", attributesTypes.get
-                        (Constants.PORT), statusDashboardQueryManager));
+                        (Constants.NODE_PORT_VALUE), statusDashboardQueryManager));
                 row.setHost((String) DBTableUtils.getInstance().fetchData(rs, "HOST", attributesTypes.get
-                        (Constants.HOST), statusDashboardQueryManager));
+                        (Constants.NODE_HOST_NAME), statusDashboardQueryManager));
                 row.setWorkerId((String) DBTableUtils.getInstance().fetchData(rs, "MANAGERID",
-                        attributesTypes.get(Constants.MANAGERID),
+                        attributesTypes.get(Constants.MANAGER_HOST_PORT),
                         statusDashboardQueryManager));
                 workerConfigurationDetails.add(row);
             }

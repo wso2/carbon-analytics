@@ -88,10 +88,10 @@ public class Constants {
     public static final String NEVER_REACHED = "Never Reached";
     public static final int DEFAULT_TIME_INTERVAL_MILLIS = 300000;
 
-    public static final String MANAGERID = "MANAGERID";
-    public static final String WORKERID = "WORKERID";
-    public static final String HOST = "HOST";
-    public static final String PORT = "PORT";
+    public static final String MANAGER_HOST_PORT = "MANAGERID";
+    public static final String WORKER_HOST_PORT = "WORKERID";
+    public static final String NODE_HOST_NAME = "HOST";
+    public static final String NODE_PORT_VALUE = "PORT";
     public static final String DATA_TYPE_INTEGER = "integerType";
     public static final String DATA_TYPE_STRING = "stringType";
     public static final String DATA_TYPE_DOUBLE = "doubleType";

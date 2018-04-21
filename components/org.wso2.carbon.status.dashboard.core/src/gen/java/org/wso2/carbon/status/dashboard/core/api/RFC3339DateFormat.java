@@ -26,7 +26,7 @@ import java.text.FieldPosition;
 import java.util.Date;
 
 /**
- * RFC3339DateFormat.
+ * Helper class that helps to covert date format.
  */
 public class RFC3339DateFormat extends ISO8601DateFormat {
 
@@ -37,5 +37,4 @@ public class RFC3339DateFormat extends ISO8601DateFormat {
         toAppendTo.append(value);
         return toAppendTo;
     }
-
 }
