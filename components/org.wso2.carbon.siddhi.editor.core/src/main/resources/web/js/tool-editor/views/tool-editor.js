@@ -138,10 +138,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"streamList\":{" +
                         "\"0\":{ \"id\":\"1\"," +
                         "\"name\":\"das\"," +
-                        "\"attributes\":[{\"attribute\":\"DA\",\"type\":\"string\"}]}," +
+                        "\"attributeList\":{\"0\":{\"name\":\"DA\",\"type\":\"string\"},\"length\":1}}," +
                         "\"1\":{ \"id\":\"3\"," +
                         "\"name\":\"asc\"," +
-                        "\"attributes\":[{\"attribute\":\"\",\"type\":\"string\"}]}," +
+                        "\"attributeList\":{\"0\":{\"name\":\"DA\",\"type\":\"string\"},\"length\":1}}," +
                         "\"length\":2" +
                         "}," +
                         "\"queryList\":{" +

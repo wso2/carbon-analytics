@@ -20,12 +20,13 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
         'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation', 'aggregateByTimePeriod',
         'windowFilterProjectionQueryInput', 'queryWindow', 'patternQueryInput', 'patternQueryInputCounting',
         'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'edge', 'querySelect',
-        'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
+        'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto',
+        'attribute'],
     function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, Partition, Query, Stream, Table,
               Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindow,
               PatternQueryInput, PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
               PatternQueryInputNotAnd, Edge, QuerySelect, QueryOutput, QueryOutputInsert, QueryOutputDelete,
-              QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
+              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute) {
 
         /**
          * @class DesignView
@@ -69,7 +70,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             // adds attributes from a json object for an element object
             function addAttributesForElement(element, newElementObject) {
                 _.forEach(element.attributeList, function(attribute){
-                    newElementObject.addAttribute(attribute);
+                    var attributeObject = new Attribute(attribute);
+                    newElementObject.addAttribute(attributeObject);
                 });
             }
 

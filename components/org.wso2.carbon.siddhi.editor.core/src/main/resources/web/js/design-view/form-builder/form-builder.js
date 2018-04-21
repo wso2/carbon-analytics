@@ -16,11 +16,11 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'window', 'trigger', 'aggregation',
-        'aggregateByTimePeriod', 'querySelect', 'patternQueryInputCounting', 'patternQueryInputAndOr',
+define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 'table', 'window', 'trigger',
+        'aggregation', 'aggregateByTimePeriod', 'querySelect', 'patternQueryInputCounting', 'patternQueryInputAndOr',
         'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
-    function (require, log, $, _, jsPlumb, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
+    function (require, log, $, _, jsPlumb, Attribute, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
               QuerySelect, PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
               PatternQueryInputNotAnd, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto) {
@@ -178,11 +178,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 type: "object",
                                 title : 'Attribute',
                                 properties: {
-                                    attribute: {
+                                    name: {
+                                        title : 'Name',
                                         type: "string",
                                         minLength: 1
                                     },
                                     type: {
+                                        title : 'Type',
                                         type: "string",
                                         enum: [
                                             "string",
@@ -260,7 +262,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                     _.set(streamOptions, 'isInnerStream', false);
                     var stream = new Stream(streamOptions);
                     _.forEach(editor.getValue().attributes, function (attribute) {
-                        stream.addAttribute(attribute);
+                        var attributeObject = new Attribute(attribute);
+                        stream.addAttribute(attributeObject);
                     });
                     self.appData.addStream(stream);
 
@@ -296,7 +299,16 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 log.error(errorMessage);
             }
             var name = clickedElement.getName();
-            var attributes = clickedElement.getAttributeList();
+            var attributesList = clickedElement.getAttributeList();
+            var attributes = [];
+            _.forEach(attributesList, function (attribute) {
+                var attributeObject = {
+                    name: attribute.getName(),
+                    type: attribute.getType()
+                };
+                attributes.push(attributeObject);
+            });
+
             var fillWith = {
                 name : name,
                 attributes : attributes
@@ -325,11 +337,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 type: "object",
                                 title : 'Attribute',
                                 properties: {
-                                    attribute: {
+                                    name: {
+                                        title: "Name",
                                         type: "string",
                                         minLength: 1
                                     },
                                     type: {
+                                        title: "Type",
                                         type: "string",
                                         enum: [
                                             "string",
@@ -369,8 +383,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 // removing all elements from attribute list
                 clickedElement.getAttributeList().removeAllElements();
                 // adding new attributes to the attribute list
-                _.forEach(config.attributes, function(attribute){
-                    clickedElement.addAttribute(attribute);
+                _.forEach(config.attributes, function (attribute) {
+                    var attributeObject = new Attribute(attribute);
+                    clickedElement.addAttribute(attributeObject);
                 });
 
                 var textNode = $(element).parent().find('.streamnamenode');
@@ -432,11 +447,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 type: "object",
                                 title : 'Attribute',
                                 properties: {
-                                    attribute: {
+                                    name: {
+                                        title: "Name",
                                         type: "string",
                                         minLength: 1
                                     },
                                     type: {
+                                        title: "Type",
                                         type: "string",
                                         enum: [
                                             "string",
@@ -480,7 +497,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                     _.set(tableOptions, 'store', '');
                     var table = new Table(tableOptions);
                     _.forEach(editor.getValue().attributes, function (attribute) {
-                        table.addAttribute(attribute);
+                        var attributeObject = new Attribute(attribute);
+                        table.addAttribute(attributeObject);
                     });
                     self.appData.addTable(table);
 
@@ -516,7 +534,15 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 log.error(errorMessage);
             }
             var name = clickedElement.getName();
-            var attributes = clickedElement.getAttributeList();
+            var attributesList = clickedElement.getAttributeList();
+            var attributes = [];
+            _.forEach(attributesList, function (attribute) {
+                var attributeObject = {
+                    name: attribute.getName(),
+                    type: attribute.getType()
+                };
+                attributes.push(attributeObject);
+            });
             var fillWith = {
                 name : name,
                 attributes : attributes
@@ -545,11 +571,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 type: "object",
                                 title : 'Attribute',
                                 properties: {
-                                    attribute: {
+                                    name: {
+                                        title: "Name",
                                         type: "string",
                                         minLength: 1
                                     },
                                     type: {
+                                        title: "Type",
                                         type: "string",
                                         enum: [
                                             "string",
@@ -589,8 +617,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 // removing all elements from attribute list
                 clickedElement.getAttributeList().removeAllElements();
                 // adding new attributes to the attribute list
-                _.forEach(config.attributes, function(attribute){
-                    clickedElement.addAttribute(attribute);
+                _.forEach(config.attributes, function (attribute) {
+                    var attributeObject = new Attribute(attribute);
+                    clickedElement.addAttribute(attributeObject);
                 });
 
                 var textNode = $(element).parent().find('.tablenamenode');
@@ -652,11 +681,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 type: "object",
                                 title : 'Attribute',
                                 properties: {
-                                    attribute: {
+                                    name: {
+                                        title: "Name",
                                         type: "string",
                                         minLength: 1
                                     },
                                     type: {
+                                        title: "Type",
                                         type: "string",
                                         enum: [
                                             "string",
@@ -747,7 +778,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                     }
                     var window = new Window(windowOptions);
                     _.forEach(editor.getValue().attributes, function (attribute) {
-                        window.addAttribute(attribute);
+                        var attributeObject = new Attribute(attribute);
+                        window.addAttribute(attributeObject);
                     });
                     self.appData.addWindow(window);
 
@@ -783,7 +815,15 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                 log.error(errorMessage);
             }
             var name = clickedElement.getName();
-            var attributes = clickedElement.getAttributeList();
+            var attributesList = clickedElement.getAttributeList();
+            var attributes = [];
+            _.forEach(attributesList, function (attribute) {
+                var attributeObject = {
+                    name: attribute.getName(),
+                    type: attribute.getType()
+                };
+                attributes.push(attributeObject);
+            });
             var functionName = clickedElement.getFunction();
             var savedParameterValues = clickedElement.getParameters();
 
@@ -827,11 +867,13 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'stream', 'table', 'win
                                 type: "object",
                                 title : 'Attribute',
                                 properties: {
-                                    attribute: {
+                                    name: {
+                                        title: "Name",
                                         type: "string",
                                         minLength: 1
                                     },
                                     type: {
+                                        title: "Type",
                                         type: "string",
                                         enum: [
                                             "string",
