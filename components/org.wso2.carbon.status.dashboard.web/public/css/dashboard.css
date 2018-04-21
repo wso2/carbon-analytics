@@ -189,14 +189,12 @@ body {
 
 .node-content {height: 50px;
     line-height: 30px;
-    /*width: 400px;*/
 }
 
 .indicator {
     height: 58px;
     width: 15px;
     float: left;
-    /*margin: 1px 40px 1px 1px;*/
     margin: 1px 20px 1px 1px;
     background-color: blue
 }
@@ -212,7 +210,6 @@ body {
 .hostPort {
     font-size: 1em;
     color: #696969;
-    /*margin-right: -300px;*/
     font-weight: 400;
     display: block;
 }

@@ -17,32 +17,24 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
-import SyntaxHighlighter from "react-syntax-highlighter";
+import React from 'react';
+import {Link} from 'react-router-dom';
+import SyntaxHighlighter from 'react-syntax-highlighter';
 
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import Header from "../common/Header";
 import ParentAppTable from "./ParentAppTable";
 //Material UI
-import HomeButton from "material-ui/svg-icons/action/home";
-import {
-    Card,
-    CardHeader,
-    CardText,
-    Dialog,
-    Divider,
-    FlatButton,
-    Snackbar, RaisedButton
-} from "material-ui";
-//import DashboardUtils from "../utils/DashboardUtils";
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Card, CardHeader, CardText, Dialog, Divider, FlatButton, Snackbar, RaisedButton} from 'material-ui';
+
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
 import {Redirect} from 'react-router-dom';
-import Error403 from "../error-pages/Error403";
-import {HttpStatus} from "../utils/Constants";
-import KafkaFlow from "./KafkaFlow";
+import Error403 from '../error-pages/Error403';
+import {HttpStatus} from '../utils/Constants';
+import KafkaFlow from './KafkaFlow';
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
@@ -203,7 +195,6 @@ export default class AppView extends React.Component {
         });
     }
 
-
     showError(message) {
         this.setState({
             messageStyle: errorMessageStyle,
@@ -289,52 +280,65 @@ export default class AppView extends React.Component {
                                     titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
                         />
 
-                    <Divider/>
+                        <Divider/>
 
                         <CardText>
-                            <ul className='legend' style={{color: '#fff',
+                            <ul className='legend' style={{
+                                color: '#fff',
                                 fontSize: 14,
                                 textAlign: 'left',
                                 float: 'right',
                                 width: '100%',
                                 maxWidth: 250,
-                                height:30,
+                                height: 30,
                                 padding: 10,
-                                background: '#333'}}>
-                                    <li className='legend-key' style={{paddingRight:5,paddingLeft:5,paddingTop:0,paddingBottom:0,height:30,display: 'inline-block'}}>
-                                        <span className='legend-color' style={{ width: 15,
+                                background: '#333'
+                            }}>
+                                <li className='legend-key' style={{
+                                    paddingRight: 5,
+                                    paddingLeft: 5,
+                                    paddingTop: 0,
+                                    paddingBottom: 0,
+                                    height: 30,
+                                    display: 'inline-block'
+                                }}>
+                                        <span className='legend-color' style={{
+                                            width: 15,
                                             height: 15,
                                             float: 'left',
                                             margin: 5,
-                                            backgroundColor:'blue'}}ChildApps></span>
-                                        <span className='legend-text' style={{ lineHeight: 2,
-                                            fontSize: 12}}> Child Apps</span>
+                                            backgroundColor: 'blue'
+                                        }} ChildApps></span>
+                                    <span className='legend-text' style={{
+                                        lineHeight: 2,
+                                        fontSize: 12
+                                    }}> Child Apps</span>
 
-                                    </li>
-                                    <li className='legend-key' style={{paddingRight:5,paddingLeft:5,paddingTop:0,paddingBottom:0,
-                                        display: 'inline-block',height:30}}>
-                                         <span className='legend-color' style={{ width: 15,
-                                            height: 15,
-                                            float: 'left',
-                                            margin: 5,
-                                            backgroundColor:'red'}}></span>
-
-                                        <span className='legend-text' style={{ lineHeight: 2,
-                                            fontSize: 12}}> Kafka-Topics</span>
-
-                                    </li>
-
-
+                                </li>
+                                <li className='legend-key' style={{
+                                    paddingRight: 5, paddingLeft: 5, paddingTop: 0, paddingBottom: 0,
+                                    display: 'inline-block', height: 30
+                                }}>
+                                         <span className='legend-color' style={{
+                                             width: 15,
+                                             height: 15,
+                                             float: 'left',
+                                             margin: 5,
+                                             backgroundColor: 'red'
+                                         }}></span>
+                                    <span className='legend-text' style={{
+                                        lineHeight: 2,
+                                        fontSize: 12
+                                    }}> Kafka-Topics</span>
+                                </li>
                             </ul>
-                            <KafkaFlow id={this.props.match.params.id} appName={this.props.match.params.appName} />
+                            <KafkaFlow id={this.props.match.params.id} appName={this.props.match.params.appName}/>
                         </CardText>
                     </Card>
                 </div>
                 <div style={{width: '90%', marginLeft: 40}}>
                     <h3 style={{color: 'white'}}> Child App Details</h3>
-
                     <ParentAppTable id={this.props.match.params.id} appName={this.props.match.params.appName}/>
-
                 </div>
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
                           open={this.state.showMsg}

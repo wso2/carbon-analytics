@@ -17,25 +17,23 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link} from 'react-router-dom';
 //Material UI
-import {GridList} from "material-ui/GridList";
-import Info from "material-ui/svg-icons/action/info";
-import HomeButton from "material-ui/svg-icons/action/home";
-import {
-    Card, CardText, Divider, FlatButton, RaisedButton
-} from "material-ui";
+import {GridList} from 'material-ui/GridList';
+import Info from 'material-ui/svg-icons/action/info';
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Card, CardText, Divider, FlatButton, RaisedButton} from 'material-ui';
 //App Components
-import DistributedViewAppThumbnail from "./DistributedViewAppThumbnail";
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import Header from "../common/Header";
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
+import DistributedViewAppThumbnail from './DistributedViewAppThumbnail';
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import Header from '../common/Header';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
 import {Redirect} from 'react-router-dom';
-import FormPanel from "../common/FormPanel";
-import Error500 from "../error-pages/Error500";
-import {HttpStatus} from "../utils/Constants";
+import FormPanel from '../common/FormPanel';
+import Error500 from '../error-pages/Error500';
+import {HttpStatus} from '../utils/Constants';
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
@@ -149,19 +147,14 @@ export default class DistributedOverview extends React.Component {
                 }
             }
         });
-
-
     }
-
 
     componentWillUnmount() {
         clearInterval(this.state.interval);
-
     }
 
     componentWillMount() {
         let that = this;
-        // this.initAutoSync();
         AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({

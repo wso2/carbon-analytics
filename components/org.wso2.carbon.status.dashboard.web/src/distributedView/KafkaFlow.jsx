@@ -18,11 +18,11 @@
  */
 
 import React from 'react';
-import * as d3 from "d3";
+import * as d3 from 'd3';
 import * as dagreD3 from 'dagre-d3';
 
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import {HttpStatus} from "../utils/Constants";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import {HttpStatus} from '../utils/Constants';
 
 export default class KafkaFlow extends React.Component {
     constructor(props) {

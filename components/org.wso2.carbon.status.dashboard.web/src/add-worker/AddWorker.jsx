@@ -17,23 +17,23 @@
  *
  */
 
-import React from "react";
-import {Link, Redirect} from "react-router-dom";
+import React from 'react';
+import {Link, Redirect} from 'react-router-dom';
 // App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import {HttpStatus} from "../utils/Constants";
-import Header from "../common/Header";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import {HttpStatus} from '../utils/Constants';
+import Header from '../common/Header';
 // Material UI
-import HomeButton from "material-ui/svg-icons/action/home";
-import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from "material-ui";
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from 'material-ui';
 // CSS
-import "../../public/css/dashboard.css";
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import FormPanel from "../common/FormPanel";
-import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
-import Error403 from "../error-pages/Error403";
-import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
+import '../../public/css/dashboard.css';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import FormPanel from '../common/FormPanel';
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+import Error403 from '../error-pages/Error403';
+import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};

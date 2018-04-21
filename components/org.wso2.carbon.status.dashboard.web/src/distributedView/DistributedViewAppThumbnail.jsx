@@ -17,14 +17,14 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link} from 'react-router-dom';
 //Material UI
-import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar} from "material-ui";
-import ToolTip from "react-tooltip";
-import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
+import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar} from 'material-ui';
+import ToolTip from 'react-tooltip';
+import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
 
 const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex: 1}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
@@ -170,5 +170,4 @@ export default class DistributedViewAppThumbnail extends React.Component {
             </div>
         );
     }
-
 }

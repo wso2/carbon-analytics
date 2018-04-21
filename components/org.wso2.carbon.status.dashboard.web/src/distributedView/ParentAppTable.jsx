@@ -20,24 +20,24 @@
 import React from "react";
 
 //Material UI
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui/Table";
-import Pagination from "material-ui-pagination";
-import Circle from "material-ui/svg-icons/av/fiber-manual-record";
-import {TableFooter} from "material-ui/Table/index";
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import Pagination from 'material-ui-pagination';
+import Circle from 'material-ui/svg-icons/av/fiber-manual-record';
+import {TableFooter} from 'material-ui/Table/index';
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
 
 const dataConstants = {PAGE_LENGTH: 5};
 
 /**
  * Class which manages Parent siddhi application details.
  */
-export default class ParentAppTable  extends React.Component {
+export default class ParentAppTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             data: [],
             workerId: this.props.id,
-            appName : this.props.appName,
+            appName: this.props.appName,
             appsList: [],
             totalSize: [],
         };
@@ -47,18 +47,19 @@ export default class ParentAppTable  extends React.Component {
 
     componentWillMount() {
         let that = this;
-        StatusDashboardAPIS.getChildAppDetails(this.state.workerId,this.state.appName)
-            .then((response) =>{
-                    that.loadData(this.currentPage,response.data)
+        StatusDashboardAPIS.getChildAppDetails(this.state.workerId, this.state.appName)
+            .then((response) => {
+                that.loadData(this.currentPage, response.data)
             });
     }
+
     //todo fix pagination from API level
     loadData(pageNumber, response) {
         let sortedData = [];
         let pages = Math.floor(response.length / dataConstants.PAGE_LENGTH) + 1;
         if (pageNumber === pages) {
-            let loadedData=(dataConstants.PAGE_LENGTH * (pageNumber-1));
-            for (let i = loadedData ; i < response.length ; i++) {
+            let loadedData = (dataConstants.PAGE_LENGTH * (pageNumber - 1));
+            for (let i = loadedData; i < response.length; i++) {
                 sortedData.push(response[i]);
             }
             this.setState({
@@ -85,7 +86,7 @@ export default class ParentAppTable  extends React.Component {
         let isInactive = (row.appStatus === "waiting");
         return (
 
-            <TableRow >
+            <TableRow>
                 <TableRowColumn style={{width: '400px'}}>
                     {isInactive ? (
                         <div style={{height: 24, color: 'white'}}>
@@ -94,10 +95,10 @@ export default class ParentAppTable  extends React.Component {
                         </div>
                     ) : (
 
-                            <div style={{height: 24, color: 'white'}}>
-                                <Circle color={isInactive ? 'red' : 'green'} style={{float: 'left', marginRight: 5}}/>
-                                {row.appName}
-                            </div>
+                        <div style={{height: 24, color: 'white'}}>
+                            <Circle color={isInactive ? 'red' : 'green'} style={{float: 'left', marginRight: 5}}/>
+                            {row.appName}
+                        </div>
 
                     )}
                 </TableRowColumn>
@@ -108,7 +109,7 @@ export default class ParentAppTable  extends React.Component {
                 </TableRowColumn>
                 <TableRowColumn>
                     <div style={{height: 24, color: 'white'}}>
-                     {row.appStatus}
+                        {row.appStatus}
                     </div>
                 </TableRowColumn>
                 <TableRowColumn>
@@ -119,11 +120,11 @@ export default class ParentAppTable  extends React.Component {
 
                     ) : (
                         <div style={{height: 24, color: 'white'}}>
-                            {row.host+":"+row.port}
+                            {row.host + ":" + row.port}
                         </div>
 
                     )}
-                    </TableRowColumn>
+                </TableRowColumn>
             </TableRow>
         );
     }
@@ -150,10 +151,10 @@ export default class ParentAppTable  extends React.Component {
                         {this.state.data.map((row) => (
                             this.renderRow(row)
                         ))}
-                    </TableBody >
+                    </TableBody>
                     <TableFooter adjustForCheckbox={false} style={{height: 10}}>
                         <TableRow style={{height: 10}}>
-                            <TableRowColumn colSpan="1" style={{textAlign: 'center',height:10}}>
+                            <TableRowColumn colSpan="1" style={{textAlign: 'center', height: 10}}>
                             </TableRowColumn>
                         </TableRow>
                     </TableFooter>
@@ -161,10 +162,10 @@ export default class ParentAppTable  extends React.Component {
 
                 <div style={{float: 'right'}}>
                     <Pagination
-                        total={ Math.floor(this.state.totalSize / dataConstants.PAGE_LENGTH) + 1}
+                        total={Math.floor(this.state.totalSize / dataConstants.PAGE_LENGTH) + 1}
                         current={this.currentPage}
-                        display={ dataConstants.PAGE_LENGTH }
-                        onChange={ number => {
+                        display={dataConstants.PAGE_LENGTH}
+                        onChange={number => {
                             this.currentPage = number;
                             this.loadData(number, this.state.appsList);
                         }}

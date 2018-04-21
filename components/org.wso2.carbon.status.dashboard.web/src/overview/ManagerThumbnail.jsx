@@ -17,21 +17,21 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link} from 'react-router-dom';
 //Material UI
-import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar, Toggle} from "material-ui";
-import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
-import Delete from "material-ui/svg-icons/action/delete";
-import TrendDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
-import TrendUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
+import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar, Toggle} from 'material-ui';
+import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
+import Delete from 'material-ui/svg-icons/action/delete';
+import TrendDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
+import TrendUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
 import {HttpStatus} from '../utils/Constants';
-import OverviewChart from "./OverviewChart";
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import Clock from "./Clock";
+import OverviewChart from './OverviewChart';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import Clock from './Clock';
 
 const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex: 1}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
