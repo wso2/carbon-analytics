@@ -122,6 +122,7 @@ public class DBHandler {
 
     /**
      * Create table query.
+     *
      * @param conn
      * @param ps
      * @throws RDBMSTableException

@@ -25,7 +25,7 @@ package org.wso2.carbon.status.dashboard.core.bean;
 public class WorkerResponce {
     private String message;
     private int code;
- 
+
 
     public WorkerResponce(String message, int value) {
         this.message = message;

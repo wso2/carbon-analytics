@@ -52,7 +52,7 @@ import javax.ws.rs.core.Response;
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the managers API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2018-01-29T08:19:07.148Z")
+        date = "2018-01-29T08:19:07.148Z")
 public class ManagersApi implements Microservice {
     private static final Log logger = LogFactory.getLog(ManagersApi.class);
     private final ManagersApiService managersApi = ManagersApiServiceFactory.getManagersApi();
@@ -64,16 +64,16 @@ public class ManagersApi implements Microservice {
     @GET
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "List all the registered manager nodes.",
-                                         notes = "List all the managers that are connected with the give manager node"
-                                                 + " (HA mode).",
-                                         response = void.class, tags = {"Managers",})
+            notes = "List all the managers that are connected with the give manager node"
+                    + " (HA mode).",
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                                                response = void.class)})
+                    response = void.class)})
     public Response getAllManagers(@Context Request request) throws NotFoundException {
         return managersApi.getAllManagers(request);
     }
@@ -83,17 +83,17 @@ public class ManagersApi implements Microservice {
 
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get the summary details of all siddhi apps of a given manager.",
-                                         notes = "Retrieves the siddhi app summary details of manager with the "
-                                                 + "specified id.",
-                                         response = void.class, tags = {"Managers",})
+            notes = "Retrieves the siddhi app summary details of manager with the "
+                    + "specified id.",
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Summary successfully retrieved.",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "Summary not found.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                                                response = void.class)})
+                    response = void.class)})
     public Response getSiddhiApps(@Context Request request) throws NotFoundException {
         return managersApi.getSiddhiApps(request);
     }
@@ -103,16 +103,16 @@ public class ManagersApi implements Microservice {
 
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get the siddhi app exection plan of particular siddhi app",
-                                         notes = "Retrieves the text view of the siddhi application.",
-                                         response = void.class, tags = {"Managers",})
+            notes = "Retrieves the text view of the siddhi application.",
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Summary successfully retrieved.",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "Summary not found.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                                                response = void.class)})
+                    response = void.class)})
     public Response getSiddhiAppTextView(
             @Context Request request,
             @ApiParam(value = "name of the parent siddhi app.", required = true)
@@ -125,18 +125,18 @@ public class ManagersApi implements Microservice {
 
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get the details of child siddhi apps",
-                                         notes = "Retrieves the details of child siddhi apps with the specified "
-                                                 + "parent siddhi app name.",
-                                         response = void.class, tags = {"Managers",})
+            notes = "Retrieves the details of child siddhi apps with the specified "
+                    + "parent siddhi app name.",
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Child app details fully retrieved.",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "The parent application is not found.",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpexted error occured.",
-                                                response = void.class)})
+                    response = void.class)})
     public Response getChildSiddhiAppDetails(
             @Context Request request,
             @ApiParam(value = "name of the parent siddhi app.", required = true)
@@ -159,7 +159,7 @@ public class ManagersApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                                                response = void.class)})
+                    response = void.class)})
     public Response getRolesByUsername(@Context Request request,
                                        @ApiParam(value = "Id of the worker.", required = true)
                                        @QueryParam("permissionSuffix") String permissionSuffix)
@@ -171,18 +171,18 @@ public class ManagersApi implements Microservice {
     @Path("/kafkaDetails/{appName}")
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get the details of child siddhi apps",
-                                         notes = "Retrieves the details of child siddhi apps with the specified "
-                                                 + "parent siddhi app name.",
-                                         response = void.class, tags = {"Managers",})
+            notes = "Retrieves the details of child siddhi apps with the specified "
+                    + "parent siddhi app name.",
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Child app details fully retrieved.",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "The parent application is not found.",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpexted error occured.",
-                                                response = void.class)})
+                    response = void.class)})
     public Response getKafkaDetails(
             @Context Request request,
             @ApiParam(value = "name of the parent siddhi app.", required = true)

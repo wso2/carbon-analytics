@@ -48,7 +48,7 @@ import javax.ws.rs.core.Response;
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the workers API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2018-02-03T14:53:27.713Z")
+        date = "2018-02-03T14:53:27.713Z")
 public class WorkersApi implements Microservice {
     private static final Log logger = LogFactory.getLog(WorkersApi.class);
     private final WorkersApiService workersApi = WorkersApiServiceFactory.getWorkersApi();
@@ -56,17 +56,17 @@ public class WorkersApi implements Microservice {
     @GET
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get the number worker nodes in the resource cluster.",
-                                         notes = "Retrieve number of worker nodes in the resource cluster",
-                                         response = void.class, tags = {"Workers",})
+            notes = "Retrieve number of worker nodes in the resource cluster",
+            response = void.class, tags = {"Workers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Worker node details retrieved successfully.",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "Worker node is not found.",
-                                                response = void.class),
+                    response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                                                response = void.class)})
+                    response = void.class)})
     public Response getWorkers(@Context Request request)
             throws NotFoundException {
         return workersApi.getWorkers(request);

@@ -59,7 +59,7 @@ public class MonitoringRESTApiProvider implements RestApiProvider {
 
     @Deactivate
     protected void deactivate(BundleContext bundleContext) {
-       logger.debug("{} deactivated.", this.getClass().getName());
+        logger.debug("{} deactivated.", this.getClass().getName());
     }
 
 

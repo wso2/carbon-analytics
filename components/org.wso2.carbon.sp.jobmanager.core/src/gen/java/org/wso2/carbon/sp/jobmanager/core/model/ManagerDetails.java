@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2018-02-05T14:14:09.496Z")
+        date = "2018-02-05T14:14:09.496Z")
 public class ManagerDetails {
     @JsonProperty("haStatus")
     private String haStatus = null;
@@ -73,13 +73,13 @@ public class ManagerDetails {
         }
         ManagerDetails managerDetails = (ManagerDetails) o;
         return
-                Objects.equals(this.haStatus, managerDetails.haStatus)&&
-                Objects.equals(this.groupId, managerDetails.groupId);
+                Objects.equals(this.haStatus, managerDetails.haStatus) &&
+                        Objects.equals(this.groupId, managerDetails.groupId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(haStatus,groupId);
+        return Objects.hash(haStatus, groupId);
     }
 
     @Override

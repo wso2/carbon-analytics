@@ -331,6 +331,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Get worker metrics history such as latency,memory,load average
+     *
      * @param workerId workerID
      * @param period   time interval that metrics needed.
      * @param type     type of metrics.
@@ -1553,6 +1554,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     /**
      * Return all realtime statistics of the managers.If manager is not currently reachable then send the last
      * persistant state of that manager.
+     *
      * @return Realtime data and status of workers.
      * @throws NotFoundException
      */

@@ -25,7 +25,6 @@ import java.util.List;
 
 /**
  * NodeConfigurationDetails bean class.
- *
  */
 public class NodeConfigurationDetails {
     private String workerId;

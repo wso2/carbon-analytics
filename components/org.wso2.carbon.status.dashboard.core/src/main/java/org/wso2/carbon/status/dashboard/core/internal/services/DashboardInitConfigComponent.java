@@ -93,7 +93,7 @@ public class DashboardInitConfigComponent {
             resolvedConfiguration.setPassword(adminPassword);
             Integer pollingInterval =
                     deploymentQueries.getPollingInterval() == null ? defaultQueries.getPollingInterval()
-                    : deploymentQueries.getPollingInterval();
+                            : deploymentQueries.getPollingInterval();
             resolvedConfiguration.setPollingInterval(pollingInterval);
 
             String metricsDatasourceName = deploymentQueries.getMetricsDatasourceName() == null ?

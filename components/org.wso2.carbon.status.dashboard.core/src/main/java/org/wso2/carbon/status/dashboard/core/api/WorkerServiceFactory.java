@@ -31,6 +31,6 @@ public class WorkerServiceFactory {
                 MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
                         .getWorkerConnectionConfigurations().getConnectionTimeOut(), MonitoringDataHolder.getInstance()
                         .getStatusDashboardDeploymentConfigs().getWorkerConnectionConfigurations().getReadTimeOut(),
-                         WorkerServiceStub.class, url);
+                WorkerServiceStub.class, url);
     }
 }

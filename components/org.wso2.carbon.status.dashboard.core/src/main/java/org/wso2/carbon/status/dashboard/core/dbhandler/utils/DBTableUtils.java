@@ -316,7 +316,7 @@ public class DBTableUtils {
      * @throws SQLException if there are issues when the element is being set.
      */
     private PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt,
-            int ordinal, String type, Object value, QueryManager statusDashboardQueryManager) throws SQLException {
+                                                                 int ordinal, String type, Object value, QueryManager statusDashboardQueryManager) throws SQLException {
         String doubleType = statusDashboardQueryManager.getQuery(Constants.DOUBLE_DATA_TYPE);
         String longType = statusDashboardQueryManager.getQuery(Constants.LONG_DATA_TYPE);
         String stringType = statusDashboardQueryManager.getQuery(Constants.STRING_DATA_TYPE);

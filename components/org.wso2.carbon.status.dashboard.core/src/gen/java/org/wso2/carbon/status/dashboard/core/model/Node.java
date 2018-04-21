@@ -30,87 +30,89 @@ import java.util.Objects;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-11T07:55:11.886Z")
 public class Node {
-  @JsonProperty("host")
-  private String host = null;
+    @JsonProperty("host")
+    private String host = null;
 
-  @JsonProperty("port")
-  private int port = 9090;
+    @JsonProperty("port")
+    private int port = 9090;
 
     public Node host(String host) {
-    this.host = host;
-    return this;
-  }
+        this.host = host;
+        return this;
+    }
 
-   /**
-   * Get host
-   * @return host
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public String getHost() {
-    return host;
-  }
+    /**
+     * Get host
+     *
+     * @return host
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public String getHost() {
+        return host;
+    }
 
-  public void setHost(String host) {
-    this.host = host;
-  }
+    public void setHost(String host) {
+        this.host = host;
+    }
 
     public Node port(int port) {
-    this.port = port;
-    return this;
-  }
-
-   /**
-   * Get port
-   * @return port
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public int getPort() {
-    return port;
-  }
-
-  public void setPort(int port) {
-    this.port = port;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+        this.port = port;
+        return this;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    /**
+     * Get port
+     *
+     * @return port
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public int getPort() {
+        return port;
     }
-      Node worker = (Node) o;
-    return Objects.equals(this.host, worker.host) &&
-        Objects.equals(this.port, worker.port);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(host, port);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Worker {\n");
-
-    sb.append("    host: ").append(toIndentedString(host)).append("\n");
-    sb.append("    port: ").append(toIndentedString(port)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
+    public void setPort(int port) {
+        this.port = port;
     }
-    return o.toString().replace("\n", "\n    ");
-  }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Node worker = (Node) o;
+        return Objects.equals(this.host, worker.host) &&
+                Objects.equals(this.port, worker.port);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(host, port);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class Worker {\n");
+
+        sb.append("    host: ").append(toIndentedString(host)).append("\n");
+        sb.append("    port: ").append(toIndentedString(port)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
+    }
 
 }
 

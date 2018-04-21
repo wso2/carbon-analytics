@@ -28,7 +28,7 @@ public class ParentSiddhiApp {
     private String appName;
     private String id;
 
-    private ParentSiddhiApp(){
+    private ParentSiddhiApp() {
 
     }
 

@@ -160,7 +160,7 @@ public class ResourcePool implements Serializable {
      */
     public Map<ResourceNode, List<SiddhiAppHolder>> getNodeAppMapping() {
         return siddhiAppHoldersMap.values().stream().flatMap(List::stream).filter(siddhiAppHolder
-                                                                                          -> siddhiAppHolder
+                -> siddhiAppHolder
                 .getDeployedNode() != null)
                 .collect(Collectors.groupingBy(SiddhiAppHolder::getDeployedNode));
     }

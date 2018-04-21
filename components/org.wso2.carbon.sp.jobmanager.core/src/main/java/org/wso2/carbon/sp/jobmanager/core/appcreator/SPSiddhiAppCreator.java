@@ -88,17 +88,17 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     }
                     sinkValuesMap.put(ResourceManagerConstants.DESTINATIONS, StringUtils.join(destinations, ","));
                     String sinkString = getUpdatedQuery(ResourceManagerConstants.PARTITIONED_KAFKA_SINK_TEMPLATE,
-                                                        sinkValuesMap);
+                            sinkValuesMap);
                     sinkList.put(sinkValuesMap.get(ResourceManagerConstants.TOPIC_LIST), sinkString);
                     topicParallelismMap.put(sinkValuesMap.get(ResourceManagerConstants.TOPIC_LIST),
-                                            holder.getParallelism());
+                            holder.getParallelism());
                 } else {
                     //ATM we are handling both strategies in same manner. Later will improve to have multiple
                     // partitions for RR
                     if (partitionKeys.isEmpty()) {
                         //Define a sink only if there are no partitioned sinks present
                         String sinkString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_KAFKA_SINK_TEMPLATE,
-                                                            sinkValuesMap);
+                                sinkValuesMap);
                         sinkList.put(sinkValuesMap.get(ResourceManagerConstants.TOPIC_LIST), sinkString);
                     }
                 }
@@ -133,7 +133,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     log.info("Added " + partitions + " partitions to topic " + topic);
                 } else if (existingPartitions > partitions) {
                     log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
-                                     + " have to delete the topic and recreate with " + partitions + "partitions.");
+                            + " have to delete the topic and recreate with " + partitions + "partitions.");
                     AdminUtils.deleteTopic(zkUtils, topic);
                     long startTime = System.currentTimeMillis();
                     while (AdminUtils.topicExists(zkUtils, topic)) {
@@ -148,11 +148,11 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     }
                     if (!AdminUtils.topicExists(zkUtils, topic)) {
                         (new SafeKafkaInvoker()).createKafkaTopic(bootstrapServerURLs, zkUtils, topicConfig, topic,
-                                                                  partitions);
+                                partitions);
                         log.info("Created topic " + topic + "with " + partitions + " partitions.");
                     } else {
                         throw new SiddhiAppCreationException("Topic " + topic + " deletion failed. Hence Could not "
-                                                                     + "create new topic to facilitate new partitions."
+                                + "create new topic to facilitate new partitions."
                         );
                     }
                 }
@@ -181,10 +181,10 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         List<Integer> partitionNumbers = getPartitionNumbers(queryList.size(), subscriptionStrategy
                                 .getOfferedParallelism(), i);
                         sourceValuesMap.put(ResourceManagerConstants.PARTITION_LIST, StringUtils.join(partitionNumbers,
-                                                                                                      ","));
+                                ","));
                         String sourceString =
                                 getUpdatedQuery(ResourceManagerConstants.PARTITIONED_KAFKA_SOURCE_TEMPLATE,
-                                                sourceValuesMap);
+                                        sourceValuesMap);
                         Map<String, String> queryValuesMap = new HashMap<>(1);
                         queryValuesMap.put(inputStream.getStreamName(), sourceString);
                         String updatedQuery = getUpdatedQuery(queryList.get(i).getApp(), queryValuesMap);
@@ -193,7 +193,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                 } else if (subscriptionStrategy.getStrategy() == TransportStrategy.ROUND_ROBIN) {
                     sourceValuesMap.put(ResourceManagerConstants.CONSUMER_GROUP_ID, groupName);
                     String sourceString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_KAFKA_SOURCE_TEMPLATE,
-                                                          sourceValuesMap);
+                            sourceValuesMap);
                     Map<String, String> queryValuesMap = new HashMap<>(1);
                     queryValuesMap.put(inputStream.getStreamName(), sourceString);
                     updateQueryList(queryList, queryValuesMap);
@@ -202,7 +202,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         sourceValuesMap.put(ResourceManagerConstants.CONSUMER_GROUP_ID, groupName + "-" +
                                 i);
                         String sourceString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_KAFKA_SOURCE_TEMPLATE,
-                                                              sourceValuesMap);
+                                sourceValuesMap);
                         Map<String, String> queryValuesMap = new HashMap<>(1);
                         queryValuesMap.put(inputStream.getStreamName(), sourceString);
                         String updatedQuery = getUpdatedQuery(queryList.get(i).getApp(), queryValuesMap);

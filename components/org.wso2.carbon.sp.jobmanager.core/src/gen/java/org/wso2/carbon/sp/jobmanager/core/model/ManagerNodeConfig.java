@@ -28,7 +28,8 @@ import java.util.Objects;
  * Representation of a Manager Node configuration
  */
 @ApiModel(description = "Representation of a Manager Node configuration")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-23T12:20:42.963Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-23T12:20:42.963Z")
 public class ManagerNodeConfig {
     @JsonProperty("id")
     private String id = null;
