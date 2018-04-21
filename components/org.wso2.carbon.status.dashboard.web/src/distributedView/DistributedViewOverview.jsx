@@ -212,8 +212,7 @@ export default class DistributedOverview extends React.Component {
                                         <h1 style={errorTitleStyles}>Page Forbidden!</h1>
                                         <text style={errorMessageStyles}>You have no permission to access this page.
                                         </text>
-                                        <br/>
-                                        <br/>
+                                        <br/> <br/>
                                         <Link to={`${window.contextPath}/logout`}>
                                             <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
                                         </Link>
