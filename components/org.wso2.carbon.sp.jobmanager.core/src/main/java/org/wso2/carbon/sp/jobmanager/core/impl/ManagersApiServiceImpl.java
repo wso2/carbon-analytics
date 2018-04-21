@@ -83,9 +83,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
                     managerDetails.setGroupId(nodeDetail.getGroupId());
                     if (clusterCoordinator.isLeaderNode()) {
-                        managerDetails.setHaStatus(Constants.ACTIVE);
+                        managerDetails.setHaStatus(Constants.ACTIVE_STATUS);
                     } else {
-                        managerDetails.setHaStatus(Constants.PASIVE);
+                        managerDetails.setHaStatus(Constants.PASIVE_STATUS);
                     }
                 }
             }
@@ -192,7 +192,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                         siddhiAppHolder.getParentAppName() + "-", " ");
                 appHolder.setGroupName(groupName);
                 appHolder.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
-                appHolder.setAppStatus(Constants.WAITING);
+                appHolder.setAppStatus(Constants.WAITING_STATUS);
                 appList.add(appHolder);
             }));
             return Response.ok().entity(appList).build();
@@ -214,7 +214,7 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 appHolder.setFailedPingAttempts(
                         Integer.toString(siddhiAppHolder.getDeployedNode().getFailedPingAttempts()));
                 appHolder.setLastPingTimestamp(Long.toString(siddhiAppHolder.getDeployedNode().getLastPingTimestamp()));
-                appHolder.setAppStatus(Constants.ACTIVE);
+                appHolder.setAppStatus(Constants.ACTIVE_STATUS);
                 appList.add(appHolder);
             }));
             return Response.ok().entity(appList).build();

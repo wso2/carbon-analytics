@@ -30,15 +30,15 @@ public class Constants {
     public static final String MANAGERID = "MANAGERID";
     public static final String HOST = "HOST";
     public static final String PORT = "PORT";
-    public static final String INTEGER_TYPE = "integerType";
-    public static final String STRING_TYPE = "stringType";
-    public static final String DOUBLE_TYPE = "doubleType";
-    public static final String LONG_TYPE = "longType";
-    public static final String FLOAT_TYPE = "floatType";
-    public static final String BOOL_TYPE = "booleanType";
-    public static final String ACTIVE = "Active";
-    public static final String PASIVE = "pasive";
-    public static final String WAITING = "waiting";
+    public static final String DATA_TYPE_INTEGER = "integerType";
+    public static final String DATA_TYPE_STRING = "stringType";
+    public static final String DATA_TYPE_DOUBLE = "doubleType";
+    public static final String DATA_TYPE_LONG = "longType";
+    public static final String DATA_TYPE_FLOAT = "floatType";
+    public static final String DATA_TYPE_BOOL = "booleanType";
+    public static final String ACTIVE_STATUS = "Active";
+    public static final String PASIVE_STATUS = "pasive";
+    public static final String WAITING_STATUS = "waiting";
 
     public static final String KAFKA_SOURCE = "source";
     public static final String KAFKA_SOURCE_TOPIC_LIST = "topic.list";

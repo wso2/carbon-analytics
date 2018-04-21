@@ -92,12 +92,12 @@ public class Constants {
     public static final String WORKERID = "WORKERID";
     public static final String HOST = "HOST";
     public static final String PORT = "PORT";
-    public static final String INTEGER_DATA_TYPE = "integerType";
-    public static final String STRING_DATA_TYPE = "stringType";
-    public static final String DOUBLE_DATA_TYPE = "doubleType";
-    public static final String LONG_DATA_TYPE = "longType";
-    public static final String FLOAT_DATA_TYPE = "floatType";
-    public static final String BOOL_DATA_TYPE = "booleanType";
+    public static final String DATA_TYPE_INTEGER = "integerType";
+    public static final String DATA_TYPE_STRING = "stringType";
+    public static final String DATA_TYPE_DOUBLE = "doubleType";
+    public static final String DATA_TYPE_LONG = "longType";
+    public static final String DATA_TYPE_FLOAT = "floatType";
+    public static final String DATA_TYPE_BOOL = "booleanType";
 
     private Constants() {
         //preventing initialization
