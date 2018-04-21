@@ -74,14 +74,14 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                 {
                     id : "projection-query",
                     className : "projection-query",
-                    title : "Pass Through",
-                    icon : "/editor/images/passthrough.png"
+                    title : "Projection Query",
+                    icon : "/editor/images/projectionQuery.png"
                 },
                 {
                     id : "filter-query",
                     className : "filter-query",
                     title : "Filter Query",
-                    icon : "/editor/images/filter.png"
+                    icon : "/editor/images/filterQuery.png"
                 },
                 {
                     id : "window-query",
@@ -96,8 +96,8 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/join.png"
                 },
                 {
-                    id : "pattern-query-input",
-                    className : "pattern-query-input",
+                    id : "pattern-query",
+                    className : "pattern-query",
                     title : "Pattern Query",
                     icon : "/editor/images/patternQuery.png"
                 },

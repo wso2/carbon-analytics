@@ -144,20 +144,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"attributeList\":{\"0\":{\"name\":\"DA\",\"type\":\"string\"},\"length\":1}}," +
                         "\"length\":2" +
                         "}," +
-                        "\"queryList\":{" +
-                        "\"0\":{ \"id\":\"2\"," +
-                        "\"name\":\"\"," +
-                        "\"from\":\"1\"," +
-                        "\"insertInto\":\"3\"," +
-                        "\"filter\":\"\"," +
-                        "\"postWindowFilter\":\"\"," +
-                        "\"window\":\"\"," +
-                        "\"outputType\":\"all events\"," +
-                        "\"projection\":[\"\"]}," +
-                        "\"length\":1" +
-                        "}," +
+                        "\"windowFilterProjectionQueryList\":{\"0\":{\"id\":\"4\",\"queryInput\":{\"type\":\"window_filter_projection\",\"subType\":\"projection\",\"from\":\"das\",\"filter\":\"\",\"window\":\"\"},\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"\",\"as\":\"\"}]},\"groupBy\":[],\"having\":\"\",\"outputRateLimit\":\"\",\"queryOutput\":{\"type\":\"insert\",\"output\":{\"eventType\":\"all\"},\"target\":\"asc\"},\"annotationList\":{}},\"length\":1}," +
                         "\"patternQueryList\":{" +
-                        "\"0\":{\"id\":\"4\"," +
+                        "\"0\":{\"id\":\"2\"," +
                         "\"queryInput\":{" +
                         "\"type\":\"pattern\"," +
                         "\"connectedElementNameList\":[\"asc\"]," +
@@ -166,27 +155,27 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"joinQueryList\":{}," +
                         "\"partitionList\":{}," +
                         "\"edgeList\":{" +
-                        "\"0\":{ \"id\":\"2_1\"," +
-                        " \"parentId\":\"2\"," +
-                        " \"parentType\":\"query\"," +
-                        " \"childId\":\"1\"," +
-                        " \"childType\":\"stream\"}," +
-                        "\"1\":{ \"id\":\"3_2\"," +
-                        " \"parentId\":\"3\"," +
-                        " \"parentType\":\"stream\"," +
-                        " \"childId\":\"2\"," +
-                        " \"childType\":\"query\"}," +
-                        "\"2\":{ \"id\":\"4_3\"," +
-                        "\"parentId\":\"4\"," +
+                        "\"0\":{ \"id\":\"2_3\"," +
+                        "\"parentId\":\"2\"," +
                         "\"parentType\":\"query\"," +
                         "\"childId\":\"3\"," +
                         "\"childType\":\"stream\"}," +
-                        "\"3\":{ \"id\":\"3_4\"," +
+                        "\"1\":{ \"id\":\"3_2\"," +
+                        "\"parentId\":\"3\"," +
+                        "\"parentType\":\"query\"," +
+                        "\"childId\":\"2\"," +
+                        "\"childType\":\"stream\"}," +
+                        "\"2\":{\"id\":\"4_1\"," +
+                        "\"parentId\":\"4\"," +
+                        "\"parentType\":\"query\"," +
+                        "\"childId\":\"1\"," +
+                        "\"childType\":\"stream\"}," +
+                        "\"3\":{\"id\":\"3_4\"," +
                         "\"parentId\":\"3\"," +
                         "\"parentType\":\"query\"," +
                         "\"childId\":\"4\"," +
                         "\"childType\":\"stream\"}," +
-                        "\"length\":4"+
+                        "\"length\":4" +
                         "}," +
                         "\"finalElementCount\":0" +
                         "}";

@@ -15,10 +15,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'dagre', 'edge', 'patternQueryInput'
-        , 'queryOutput'],
+define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'dagre', 'edge',
+        'windowFilterProjectionQueryInput', 'patternQueryInput', 'queryOutput'],
 
-    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre, Edge, PatternQueryInput, QueryOutput) {
+    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre, Edge, WindowFilterProjectionQueryInput,
+              PatternQueryInput, QueryOutput) {
 
         var constants = {
             STREAM : 'streamdrop',
@@ -171,7 +172,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
                         // If the dropped Element is a Pattern Query then->
                         else if($(droppedElement).hasClass('pattern-query')) {
-                            self.handlePatternQuery(mouseTop, mouseLeft, false, undefined, "Pattern Query");
+                            self.handlePatternQuery(mouseTop, mouseLeft, false, undefined, "Pattern");
                         }
 
                         // If the dropped Element is a Partition then->
@@ -225,7 +226,14 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                     }
                     else if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                        || targetElement.hasClass(constants.WINDOW_QUERY) || targetElement.hasClass(constants.JOIN)) {
+                        || targetElement.hasClass(constants.WINDOW_QUERY)) {
+                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
+                            || sourceElement.hasClass(constants.WINDOW) || sourceElement.hasClass(constants.TRIGGER))) {
+                            connectionValidity = false;
+                            alert("Invalid Connection");
+                        }
+                    }
+                    else if (targetElement.hasClass(constants.JOIN)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE))) {
                             connectionValidity = false;
                             alert("Invalid Connection");
@@ -234,7 +242,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     else if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                         || sourceElement.hasClass(constants.WINDOW_QUERY)
                         || sourceElement.hasClass(constants.PATTERN) || sourceElement.hasClass(constants.JOIN)) {
-                        if (!(targetElement.hasClass(constants.STREAM))) { //TODO: can a output of a query connected to a table
+                        if (!(targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE
+                            || targetElement.hasClass(constants.WINDOW)))) {
                             connectionValidity = false;
                             alert("Invalid Connection");
                         }
@@ -275,14 +284,69 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     }
 
                     var model;
+                    var connectedElementName;
+
+                    if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
+                        || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
+                        || sourceElement.hasClass(constants.TRIGGER)) {
+
+                        if (sourceElement.hasClass(constants.STREAM)) {
+                            connectedElementName = self.appData.getStream(sourceId).getName();
+                        }
+                        else if (sourceElement.hasClass(constants.TABLE)) {
+                            connectedElementName = self.appData.getTable(sourceId).getName();
+                        }
+                        else if (sourceElement.hasClass(constants.WINDOW)) {
+                            connectedElementName = self.appData.getWindow(sourceId).getName();
+                        }
+                        else if (sourceElement.hasClass(constants.AGGREGATION)) {
+                            connectedElementName = self.appData.getAggregation(sourceId).getName();
+                        }
+                        else if (sourceElement.hasClass(constants.TRIGGER)) {
+                            connectedElementName = self.appData.getTrigger(sourceId).getName();
+                        }
+
+                        if (!sourceElement.hasClass(constants.AGGREGATION)
+                            && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
+                            || targetElement.hasClass(constants.WINDOW_QUERY))) {
+                            model = self.appData.getWindowFilterProjectionQuery(targetId);
+                            var subType;
+                            if (targetElement.hasClass(constants.PROJECTION)) {
+                                subType = 'projection';
+                            }
+                            else if (targetElement.hasClass(constants.FILTER)) {
+                                subType = 'filter';
+                            }
+                            if (targetElement.hasClass(constants.WINDOW_QUERY)) {
+                                subType = 'window';
+                            }
+                            if (model.getQueryInput() === '') {
+                                var queryInputOptions = {};
+                                _.set(queryInputOptions, 'subType', subType);
+                                _.set(queryInputOptions, 'from', connectedElementName);
+                                _.set(queryInputOptions, 'filter', '');
+                                _.set(queryInputOptions, 'window', '');
+                                var queryInputObject = new WindowFilterProjectionQueryInput(queryInputOptions);
+                                model.setQueryInput(queryInputObject);
+                            } else {
+                                model.getQueryInput().setFrom(connectedElementName);
+                            }
+                        }
+                        if (targetElement.hasClass(constants.JOIN)) {
+                            // model = self.appData.getJoinQuery(targetId);
+                            // var streams = model.getFrom();
+                            // if (streams === undefined || streams === "") {
+                            //     streams = [sourceId];
+                            // } else {
+                            //     streams.push(sourceId);
+                            // }
+                            // model.setFrom(streams);
+                        }
+                    }
+
 
                     if (sourceElement.hasClass(constants.STREAM)) {
-                        if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                            || targetElement.hasClass(constants.WINDOW_QUERY)) {
-                            model = self.appData.getQuery(targetId);
-                            model.setFrom(sourceId);
-                        }
-                        else if (targetElement.hasClass(constants.PATTERN)) {
+                        if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.appData.getPatternQuery(targetId);
                             var connectedStreamName = self.appData.getStream(sourceId).getName();
                             if (model.getQueryInput() === '') {
@@ -292,16 +356,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             } else {
                                 model.getQueryInput().addConnectedElementName(connectedStreamName);
                             }
-                        }
-                        else if (targetElement.hasClass(constants.JOIN)) {
-                            model = self.appData.getJoinQuery(targetId);
-                            var streams = model.getFrom();
-                            if (streams === undefined || streams === "") {
-                                streams = [sourceId];
-                            } else {
-                                streams.push(sourceId);
-                            }
-                            model.setFrom(streams);
                         }
                         else if (targetElement.hasClass(constants.PARTITION)) {
                             model = self.appData.getPartition(targetId);
@@ -380,29 +434,43 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                     }
 
-                    else if (targetElement.hasClass(constants.STREAM)) {
+                    else if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
+                        || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
-                            || sourceElement.hasClass(constants.WINDOW_QUERY)) {
-                            model = self.appData.getQuery(sourceId);
-                            model.setInsertInto(targetId);
-                        }
-                        else if (sourceElement.hasClass(constants.PATTERN)) {
-                            model = self.appData.getPatternQuery(sourceId);
-                            var connectedStreamName = self.appData.getStream(targetId).getName();
+                            || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.JOIN)
+                            || sourceElement.hasClass(constants.PATTERN)) {
+
+                            if (targetElement.hasClass(constants.STREAM)) {
+                                connectedElementName = self.appData.getStream(targetId).getName();
+                            }
+                            else if (targetElement.hasClass(constants.TABLE)) {
+                                connectedElementName = self.appData.getTable(targetId).getName();
+                            }
+                            else if (targetElement.hasClass(constants.WINDOW)) {
+                                connectedElementName = self.appData.getWindow(targetId).getName();
+                            }
+
+                            if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
+                                || sourceElement.hasClass(constants.WINDOW)) {
+                                model = self.appData.getWindowFilterProjectionQuery(sourceId);
+                            }
+                            else if (sourceElement.hasClass(constants.JOIN)) {
+                                model = self.appData.getJoinQuery(sourceId);
+                            }
+                            if (sourceElement.hasClass(constants.PATTERN)) {
+                                model = self.appData.getPatternQuery(sourceId);
+                            }
+
                             if (model.getQueryOutput() === '') {
                                 var queryOutputOptions = {};
                                 _.set(queryOutputOptions, 'type', '');
                                 _.set(queryOutputOptions, 'output', '');
-                                _.set(queryOutputOptions, 'target', connectedStreamName);
+                                _.set(queryOutputOptions, 'target', connectedElementName);
                                 var patternQueryOutputObject = new QueryOutput(queryOutputOptions);
                                 model.setQueryOutput(patternQueryOutputObject);
                             } else {
-                                model.getQueryOutput().setTarget(connectedStreamName);
+                                model.getQueryOutput().setTarget(connectedElementName);
                             }
-                        }
-                        else if (sourceElement.hasClass(constants.JOIN)) {
-                            model = self.appData.getJoinQuery(sourceId);
-                            model.setInsertInto(targetId);
                         }
                     }
 
@@ -455,24 +523,29 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
                     var model;
                     var streams;
+
+                    if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
+                        || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
+                        || sourceElement.hasClass(constants.TRIGGER)) {
+                        if (!sourceElement.hasClass(constants.AGGREGATION)
+                            && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
+                            || targetElement.hasClass(constants.WINDOW_QUERY))) {
+                            model = self.appData.getWindowFilterProjectionQuery(targetId);
+                            model.getQueryInput().setFrom('');
+                        }
+                        if (targetElement.hasClass(constants.JOIN)) {
+                            // model = self.appData.getJoinQuery(targetId);
+                            // if (model !== undefined) {
+                            //     streams = model.getFrom();
+                            //     var removedStream = streams.indexOf(sourceId);
+                            //     streams.splice(removedStream, 1);
+                            //     model.setFrom(streams);
+                            // }
+                        }
+                    }
+
                     if (sourceElement.hasClass(constants.STREAM)) {
-                        if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                            || targetElement.hasClass(constants.WINDOW_QUERY)) {
-                            model = self.appData.getQuery(targetId);
-                            if (model !== undefined) {
-                                model.setFrom('');
-                            }
-                        }
-                        else if (targetElement.hasClass(constants.JOIN)) {
-                            model = self.appData.getJoinQuery(targetId);
-                            if (model !== undefined) {
-                                streams = model.getFrom();
-                                var removedStream = streams.indexOf(sourceId);
-                                streams.splice(removedStream, 1);
-                                model.setFrom(streams);
-                            }
-                        }
-                        else if (targetElement.hasClass(constants.PATTERN)) {
+                        if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.appData.getPatternQuery(targetId);
                             var disconnectedStreamName = self.appData.getStream(sourceId).getName();
                             model.getQueryInput().removeConnectedElementName(disconnectedStreamName);
@@ -561,31 +634,33 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             }
                         }
                     }
-                    if (targetElement.hasClass(constants.STREAM)) {
+
+                    if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
+                        || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
-                            || sourceElement.hasClass(constants.WINDOW_QUERY)) {
-                            model = self.appData.getQuery(sourceId);
-                            if (model !== undefined) {
-                                model.setInsertInto('');
+                            || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.JOIN)
+                            || sourceElement.hasClass(constants.PATTERN)) {
+
+                            if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
+                                || sourceElement.hasClass(constants.WINDOW)) {
+                                model = self.appData.getWindowFilterProjectionQuery(sourceId);
+                                model.getQueryOutput().setTarget('');
                             }
-                        }
-                        else if (sourceElement.hasClass(constants.JOIN)) {
-                            if (targetElement.hasClass(constants.STREAM)) {
-                                model = self.appData.getJoinQuery(sourceId);
-                                if (model !== undefined) {
-                                    model.setInsertInto('');
-                                }
+                            else if (sourceElement.hasClass(constants.JOIN)) {
+                                //model = self.appData.getJoinQuery(sourceId);
+                                //model.getQueryOutput().setTarget('');
                             }
-                        }
-                        else if (sourceElement.hasClass(constants.PATTERN)) {
-                            model = self.appData.getPatternQuery(sourceId);
-                            model.getQueryOutput().setTarget('');
+                            else if (sourceElement.hasClass(constants.PATTERN)) {
+                                model = self.appData.getPatternQuery(sourceId);
+                                model.getQueryOutput().setTarget('');
+                            }
                         }
                     }
                 });
             }
 
             function addMemberToPartitionGroup(self) {
+                // TODO: isInner boolean should be set when adding to the partition.
                 _jsPlumb.bind('group:addMember', function (event) {
                     if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                         || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
@@ -685,7 +760,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             _.forEach(self.appData.patternQueryList, function(patternQuery){
 
                 var patternQueryId = patternQuery.getId();
-                var patternQueryName = "Pattern Query";
+                var patternQueryName = "Pattern";
                 var mouseTop = parseInt(patternQueryId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = parseInt(patternQueryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryId, patternQueryName);
@@ -693,7 +768,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
             _.forEach(self.appData.windowFilterProjectionQueryList, function(windowFilterProjectionQuery){
                 var queryId = windowFilterProjectionQuery.getId();
-                var querySubType = windowFilterProjectionQuery.getSubType();
+                var querySubType = windowFilterProjectionQuery.getQueryInput().getSubType();
 
                 var queryType;
                 if (querySubType === 'projection') {
@@ -941,20 +1016,21 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var queryName;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.newAgentId;
-                queryName = "Empty Query";
+                queryName = "Query";
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(queryId !== undefined) {
                     elementId = queryId;
                 } else {
                     console.log("queryId parameter is undefined");
                 }
-                queryName = "Empty Query";
+                queryName = "Query";
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             // increment the Element ID for the next dropped Element
             self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass(type);
+            self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropWindowFilterProjectionQuery(newAgent, elementId, type, mouseTop, mouseLeft, queryName,
                 isCodeToDesignMode);

@@ -135,14 +135,14 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
         /**
          @function drop stream that is defined as the output stream in a query configuration
+         * @param queryModel Query data holding object
          * @param position  position of selected query
          * @param id  id of selected query
          * @param outStream  name for new output stream
          * @param streamAttributes  projections list for output stream
          */
-        DropElements.prototype.dropStreamFromQuery = function (position , id, outStream, streamAttributes) {
+        DropElements.prototype.dropStreamFromQuery = function (queryModel, position , queryId, outStream, streamAttributes) {
             var self = this;
-            //TODO: send whether this should be an inner stream or not by checking query is inner
             var isStreamNameUsed = false;
             var elementID;
             _.forEach(self.appData.streamList, function(stream){
@@ -161,7 +161,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
                 // add the new out stream to the stream array
                 var streamOptions = {};
-                _.set(streamOptions, 'id', i);
+                _.set(streamOptions, 'id', elementID);
                 _.set(streamOptions, 'name', outStream);
                 _.set(streamOptions, 'isInnerStream', false);
                 var stream = new Stream(streamOptions);
@@ -182,12 +182,11 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             // make the connection
             _jsPlumb.connect({
-                source: id+'-out',
+                source: queryId+'-out',
                 target: elementID+'-in'
             });
             // update the query model with output stream
-            var query = self.appData.getQuery(id);
-            query.setInsertInto(elementID);
+            queryModel.getQueryOutput().setTarget(outStream);
         };
 
         /**

@@ -19,11 +19,11 @@
 define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 'table', 'window', 'trigger',
         'aggregation', 'aggregateByTimePeriod', 'querySelect', 'patternQueryInputCounting', 'patternQueryInputAndOr',
         'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindow'],
     function (require, log, $, _, jsPlumb, Attribute, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
               QuerySelect, PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
               PatternQueryInputNotAnd, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto) {
+              QueryOutputUpdateOrInsertInto, QueryWindow) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -1644,408 +1644,655 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
         };
 
         /**
-         * @function generate the form for the simple queries ( passthrough, filter and window)
+         * @function generate the form for the simple queries ( projection, filter and window)
          * @param element selected element(query)
          */
         FormBuilder.prototype.GeneratePropertiesFormForWindowFilterProjectionQueries = function (element) {
-        //     var self = this;
-        //     var formConsole = this.createTabForForm();
-        //     var formContainer = formConsole.getContentContainer();
-        //
-        //     // The container and the tool palette are disabled to prevent the user from dropping any elements
-        //     self.gridContainer.addClass('disabledbutton');
-        //     self.toolPaletteContainer.addClass('disabledbutton');
-        //
-        //     var id = $(element).parent().attr('id');
-        //     var clickedElement = self.appData.getQuery(id);
-        //     if(clickedElement === undefined) {
-        //         var errorMessage = 'unable to find clicked element';
-        //         log.error(errorMessage);
-        //     }
-        //     var type= $(element).parent();
-        //     if (!(clickedElement.getFrom())) {
-        //         alert('Connect an input stream'); //TODO: check here table also? Restructure all the forms according to this.
-        //         self.gridContainer.removeClass('disabledbutton');
-        //         self.toolPaletteContainer.removeClass('disabledbutton');
-        //
-        //         // close the form window
-        //         self.consoleListManager.removeConsole(formConsole);
-        //         self.consoleListManager.hideAllConsoles();
-        //     }
-        //     else if (!(clickedElement.getInsertInto())) {
-        //         // retrieve the query information from the collection
-        //         var name = clickedElement.getName();
-        //         var inStream = (self.appData.getStream(clickedElement.getFrom())).getName();
-        //         var filter1 = clickedElement.getFilter();
-        //         var window = clickedElement.getWindow();
-        //         var filter2 = clickedElement.getPostWindowFilter();
-        //         var fillWith;
-        //         if (type.hasClass(constants.PROJECTION)) {
-        //             fillWith = {
-        //                 name: name,
-        //                 from: inStream,
-        //                 projection: ''
-        //             };
-        //         } else if (type.hasClass(constants.FILTER)) {
-        //             fillWith = {
-        //                 name: name,
-        //                 from: inStream,
-        //                 filter: filter1,
-        //                 projection: ''
-        //             };
-        //         } else if (type.hasClass(constants.WINDOW_QUERY)) {
-        //             fillWith = {
-        //                 name: name,
-        //                 from: inStream,
-        //                 filter: filter1,
-        //                 window: window,
-        //                 postWindowFilter: filter2,
-        //                 projection: ''
-        //             };
-        //         }
-        //         // generate the form for the query an output stream is not connected
-        //         var editor = new JSONEditor(formContainer[0], {
-        //             schema: {
-        //                 type: 'object',
-        //                 title: 'Query',
-        //                 properties: {
-        //                     name: {
-        //                         type: 'string',
-        //                         title: 'Name',
-        //                         required: true,
-        //                         propertyOrder: 1
-        //                     },
-        //                     from: {
-        //                         type: 'string',
-        //                         title: 'From',
-        //                         required: true,
-        //                         propertyOrder: 2
-        //                     },
-        //                     filter: {
-        //                         type: 'string',
-        //                         title: 'Filter',
-        //                         propertyOrder: 3
-        //                     },
-        //                     window: {
-        //                         type: 'string',
-        //                         title: 'Window',
-        //                         propertyOrder: 4
-        //                     },
-        //                     postWindowFilter: {
-        //                         type: 'string',
-        //                         title: 'Post Window Filter',
-        //                         propertyOrder: 5
-        //                     },
-        //                     outputType: {
-        //                         type: 'string',
-        //                         title: 'Output Type',
-        //                         enum : ['all events' , 'current events' , 'expired events'],
-        //                         default: 'all events',
-        //                         propertyOrder: 6,
-        //                         required: true
-        //                     },
-        //                     insertInto: {
-        //                         type: 'string',
-        //                         title: 'Output Stream',
-        //                         propertyOrder: 7,
-        //                         required: true
-        //                     },
-        //                     projection: {
-        //                         type: 'array',
-        //                         title: 'Attributes',
-        //                         format: 'table',
-        //                         required: true,
-        //                         propertyOrder: 8,
-        //                         uniqueItems: true,
-        //                         items: {
-        //                             type: 'object',
-        //                             title : 'Attribute',
-        //                             properties: {
-        //                                 select: {
-        //                                     type: 'string',
-        //                                     title: 'select'
-        //                                 },
-        //                                 newName: {
-        //                                     type: 'string',
-        //                                     title: 'as'
-        //                                 },
-        //                                 type: {
-        //                                     type: "string",
-        //                                     enum: [
-        //                                         "string",
-        //                                         "int",
-        //                                         "long",
-        //                                         "float",
-        //                                         "double",
-        //                                         "boolean"
-        //                                     ],
-        //                                     default: "string"
-        //                                 }
-        //                             }
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             startval: fillWith,
-        //             disable_array_add: false,
-        //             disable_array_delete: false,
-        //             disable_array_reorder: true,
-        //             display_required_only: true,
-        //             no_additional_properties: true
-        //         });
-        //         // disable the uneditable fields
-        //         editor.getEditor('root.from').disable();
-        //
-        //         $(formContainer).append('<div id="form-submit"><button type="button" ' +
-        //             'class="btn btn-default">Submit</button></div>' +
-        //             '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
-        //
-        //         // 'Submit' button action
-        //         var submitButtonElement = $('#form-submit')[0];
-        //         submitButtonElement.addEventListener('click', function () {
-        //             self.gridContainer.removeClass('disabledbutton');
-        //             self.toolPaletteContainer.removeClass('disabledbutton');
-        //
-        //             // close the form window
-        //             self.consoleListManager.removeConsole(formConsole);
-        //             self.consoleListManager.hideAllConsoles();
-        //
-        //             var config = editor.getValue();
-        //
-        //             // change the query icon depending on the fields filled
-        //             if (config.window) {
-        //                 $(element).parent().removeClass();
-        //                 $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
-        //             } else if (config.filter || config.postWindowFilter) {
-        //                 $(element).parent().removeClass();
-        //                 $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
-        //             } else if (!(config.filter || config.postWindowFilter || config.window )) {
-        //                 $(element).parent().removeClass();
-        //                 $(element).parent().addClass(constants.PROJECTION+ ' jtk-draggable');
-        //             }
-        //
-        //             // obtain values from the form and update the query model
-        //             var config = editor.getValue();
-        //             clickedElement.setName(config.name);
-        //             clickedElement.setFilter(config.filter);
-        //             clickedElement.setWindow(config.window);
-        //             clickedElement.setPostWindowFilter(config.postWindowFilter);
-        //             clickedElement.setOutputType(config.outputType);
-        //             var streamAttributes = [];
-        //             var queryAttributes = [];
-        //             $.each( config.projection, function(key, value ) {
-        //                 streamAttributes.push({ attribute : value.newName , type : value.type});
-        //                 queryAttributes.push(value.select);
-        //             });
-        //             clickedElement.setProjection(queryAttributes);
-        //             var textNode = $(element).parent().find('.queryNameNode');
-        //             textNode.html(config.name);
-        //             // generate the stream defined as the output stream
-        //             var position = $(element).parent().position();
-        //             self.dropElements.dropStreamFromQuery(position, id, config.insertInto, streamAttributes);
-        //         });
-        //
-        //         // 'Cancel' button action
-        //         var cancelButtonElement = $('#form-cancel')[0];
-        //         cancelButtonElement.addEventListener('click', function () {
-        //             self.gridContainer.removeClass('disabledbutton');
-        //             self.toolPaletteContainer.removeClass('disabledbutton');
-        //             // close the form window
-        //             self.consoleListManager.removeConsole(formConsole);
-        //             self.consoleListManager.hideAllConsoles();
-        //         });
-        //     } else {
-        //         // retrieve the query information from the collection
-        //         var name = clickedElement.getName();
-        //         var inStream = (self.appData.getStream(clickedElement.getFrom())).getName();
-        //         var outStream = (self.appData.getStream(clickedElement.getInsertInto())).getName();
-        //         var filter1 = clickedElement.getFilter();
-        //         var window = clickedElement.getWindow();
-        //         var filter2 = clickedElement.getPostWindowFilter();
-        //         var outputType = clickedElement.getOutputType();
-        //         var attrString = [];
-        //         var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
-        //         if (clickedElement.getProjection() === '') {
-        //             for (var i = 0; i < outStreamAttributes.length; i++) {
-        //                 var attr = {select: '', newName: outStreamAttributes[i].attribute};
-        //                 attrString.push(attr);
-        //             }
-        //         } else {
-        //             var selectedAttributes = clickedElement.getProjection();
-        //             for (var i = 0; i < outStreamAttributes.length; i++) {
-        //                 var attr = {select: selectedAttributes[i], newName: outStreamAttributes[i].attribute};
-        //                 attrString.push(attr);
-        //             }
-        //         }
-        //
-        //         var fillWith;
-        //         if (type.hasClass(constants.PROJECTION)) {
-        //             fillWith = {
-        //                 name: name,
-        //                 from: inStream,
-        //                 projection: attrString,
-        //                 outputType :outputType,
-        //                 insertInto: outStream
-        //             };
-        //         } else if (type.hasClass(constants.FILTER)) {
-        //             fillWith = {
-        //                 name: name,
-        //                 from: inStream,
-        //                 filter: filter1,
-        //                 projection: attrString,
-        //                 outputType :outputType,
-        //                 insertInto: outStream
-        //             };
-        //         } else if (type.hasClass(constants.WINDOW_QUERY)) {
-        //             fillWith = {
-        //                 name: name,
-        //                 from: inStream,
-        //                 filter : filter1,
-        //                 window: window,
-        //                 pstWindowFilter : filter2,
-        //                 projection: attrString,
-        //                 outputType :outputType,
-        //                 insertInto: outStream
-        //             };
-        //         }
-        //         // generate form for the queries where both input and output streams are defined
-        //         var editor = new JSONEditor(formContainer[0], {
-        //             schema: {
-        //                 type: 'object',
-        //                 title: 'Query',
-        //                 properties: {
-        //                     name: {
-        //                         type: 'string',
-        //                         title: 'Name',
-        //                         required: true,
-        //                         propertyOrder: 1
-        //                     },
-        //                     from: {
-        //                         type: 'string',
-        //                         title: 'From',
-        //                         template: inStream,
-        //                         required: true,
-        //                         propertyOrder: 2
-        //                     },
-        //                     filter: {
-        //                         type: 'string',
-        //                         title: 'Filter',
-        //                         propertyOrder: 3
-        //                     },
-        //                     window: {
-        //                         type: 'string',
-        //                         title: 'Window',
-        //                         propertyOrder: 4
-        //                     },
-        //                     postWindowQuery: {
-        //                         type: 'string',
-        //                         title: 'Post Window Filter',
-        //                         propertyOrder: 5
-        //                     },
-        //                     projection: {
-        //                         type: 'array',
-        //                         title: 'Attributes',
-        //                         format: 'table',
-        //                         required: true,
-        //                         propertyOrder: 6,
-        //                         items: {
-        //                             type: 'object',
-        //                             title : 'Attribute',
-        //                             properties: {
-        //                                 select: {
-        //                                     type: 'string',
-        //                                     title: 'select'
-        //                                 },
-        //                                 newName: {
-        //                                     type: 'string',
-        //                                     title: 'as'
-        //                                 }
-        //                             }
-        //                         }
-        //                     },
-        //                     outputType: {
-        //                         type: 'string',
-        //                         title: 'Output Type',
-        //                         enum : ['all events' , 'current events' , 'expired events'],
-        //                         default: 'all events',
-        //                         required : true,
-        //                         propertyOrder: 7
-        //                     },
-        //                     insertInto: {
-        //                         type: 'string',
-        //                         template: outStream,
-        //                         required: true,
-        //                         propertyOrder: 8
-        //                     }
-        //                 }
-        //             },
-        //             startval: fillWith,
-        //             disable_array_add: true,
-        //             disable_array_delete: true,
-        //             disable_array_reorder: true,
-        //             display_required_only: true,
-        //             no_additional_properties: true
-        //         });
-        //
-        //         // disable fields that can not be changed
-        //         editor.getEditor('root.from').disable();
-        //         editor.getEditor('root.insertInto').disable();
-        //         for (var i = 0; i < outStreamAttributes.length; i++) {
-        //             editor.getEditor('root.projection.' + i + '.newName').disable();
-        //         }
-        //
-        //         $(formContainer).append('<div id="form-submit"><button type="button" ' +
-        //             'class="btn btn-default">Submit</button></div>' +
-        //             '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
-        //
-        //         // 'Submit' button action
-        //         var submitButtonElement = $('#form-submit')[0];
-        //         submitButtonElement.addEventListener('click', function () {
-        //             self.gridContainer.removeClass('disabledbutton');
-        //             self.toolPaletteContainer.removeClass('disabledbutton');
-        //
-        //             // close the form window
-        //             self.consoleListManager.removeConsole(formConsole);
-        //             self.consoleListManager.hideAllConsoles();
-        //             var config = editor.getValue();
-        //
-        //             // change the query icon depending on the fields(filter, window) filled
-        //             if (config.window) {
-        //                 $(element).parent().removeClass();
-        //                 $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
-        //             } else if (config.filter || config.postWindowFilter) {
-        //                 $(element).parent().removeClass();
-        //                 $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
-        //             } else if (!(config.filter || config.postWindowFilter || config.window )) {
-        //                 $(element).parent().removeClass();
-        //                 $(element).parent().addClass(constants.PROJECTION + ' jtk-draggable');
-        //             }
-        //
-        //             // update selected query model
-        //             clickedElement.setName(config.name);
-        //             clickedElement.setFilter(config.filter);
-        //             clickedElement.setWindow(config.window);
-        //             clickedElement.setPostWindowFilter(config.postWindowFilter);
-        //             var projections = [];
-        //             $.each(config.projection, function (index, attribute) {
-        //                 projections.push(attribute.select);
-        //             });
-        //             clickedElement.setProjection(projections);
-        //             clickedElement.setOutputType(config.outputType);
-        //             var textNode = $(element).parent().find('.queryNameNode');
-        //             textNode.html(config.name);
-        //         });
-        //
-        //         // 'Cancel' button action
-        //         var cancelButtonElement = $('#form-cancel')[0];
-        //         cancelButtonElement.addEventListener('click', function () {
-        //             self.gridContainer.removeClass('disabledbutton');
-        //             self.toolPaletteContainer.removeClass('disabledbutton');
-        //             // close the form window
-        //             self.consoleListManager.removeConsole(formConsole);
-        //             self.consoleListManager.hideAllConsoles();
-        //         });
-        //     }
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            // The container and the tool palette are disabled to prevent the user from dropping any elements
+            self.gridContainer.addClass('disabledbutton');
+            self.toolPaletteContainer.addClass('disabledbutton');
+
+            var id = $(element).parent().attr('id');
+            var clickedElement = self.appData.getWindowFilterProjectionQuery(id);
+            if (clickedElement.getQueryInput() === ''
+                || clickedElement.getQueryInput().getFrom() === '') {
+                alert('Connect an input element');
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            } else if (clickedElement.getQueryOutput() === '' || clickedElement.getQueryOutput().getTarget() === '') {
+                alert('Connect an output stream');
+                self.gridContainer.removeClass('disabledbutton');
+                self.toolPaletteContainer.removeClass('disabledbutton');
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+            } else {
+                var savedQueryInput = {};
+                if (clickedElement.getQueryInput().getWindow() === '') {
+                    savedQueryInput = {
+                        from : clickedElement.getQueryInput().getFrom(),
+                        filter : clickedElement.getQueryInput().getFilter()
+                    };
+                } else {
+                    savedQueryInput = {
+                        from : clickedElement.getQueryInput().getFrom(),
+                        filter : clickedElement.getQueryInput().getFilter(),
+                        window : {
+                            functionName: clickedElement.getQueryInput().getWindow().getFunction(),
+                            filter: clickedElement.getQueryInput().getWindow().getFilter(),
+                            parameters: clickedElement.getQueryInput().getWindow().getParameters()
+                        }
+                    };
+                }
+
+                var inputElementName = clickedElement.getQueryInput().getFrom();
+                var select = clickedElement.getSelect().value;
+                var savedGroupByAttributes = clickedElement.getGroupBy();
+                var having = clickedElement.getHaving();
+                var outputRateLimit = clickedElement.getOutputRateLimit();
+
+                var groupBy = [];
+                _.forEach(savedGroupByAttributes, function (savedGroupByAttribute) {
+                    var groupByAttributeObject = {
+                        attribute: savedGroupByAttribute
+                    };
+                    groupBy.push(groupByAttributeObject);
+                });
+
+                var possibleGroupByAttributes = [];
+                var isInputElementNameFound = false;
+                _.forEach(self.appData.streamList, function (stream) {
+                    if (stream.getName() === inputElementName) {
+                        isInputElementNameFound = true;
+                        _.forEach(stream.getAttributeList(), function (attribute) {
+                            possibleGroupByAttributes.push(attribute.getName());
+                        });
+                    }
+                });
+                if (!isInputElementNameFound) {
+                    _.forEach(self.appData.windowList, function (window) {
+                        if (window.getName() === inputElementName) {
+                            isInputElementNameFound = true;
+                            _.forEach(window.getAttributeList(), function (attribute) {
+                                possibleGroupByAttributes.push(attribute.getName());
+                            });
+                        }
+                    });
+                }
+                if (isInputElementNameFound) {
+                    _.forEach(self.appData.tableList, function (table) {
+                        if (table.getName() === inputElementName) {
+                            isInputElementNameFound = true;
+                            _.forEach(table.getAttributeList(), function (attribute) {
+                                possibleGroupByAttributes.push(attribute.getName());
+                            });
+                        }
+                    });
+                }
+
+                var savedQueryOutput = clickedElement.getQueryOutput();
+                if (savedQueryOutput !== undefined && savedQueryOutput !== "") {
+                    var savedQueryOutputTarget = savedQueryOutput.getTarget();
+                    var savedQueryOutputType = savedQueryOutput.getType();
+                    var output = savedQueryOutput.getOutput();
+                    var queryOutput;
+                    if (savedQueryOutputTarget !== undefined && savedQueryOutputType !== undefined && output !== undefined) {
+                        if (savedQueryOutputType === "insert") {
+                            queryOutput = {
+                                output: {
+                                    outputType: "Insert",
+                                    insertTarget: savedQueryOutputTarget,
+                                    eventType: (output.getEventType() === '') ? 'all' : output.getEventType()
+                                }
+                            };
+                        } else if (savedQueryOutputType === "delete") {
+                            queryOutput = {
+                                output: {
+                                    outputType: "Delete",
+                                    deleteTarget: savedQueryOutputTarget,
+                                    forEventType: (output.getForEventType() === '') ? 'all' : output.getForEventType(),
+                                    on: output.getOn()
+                                }
+                            };
+
+                        } else if (savedQueryOutputType === "update") {
+                            queryOutput = {
+                                output: {
+                                    outputType: "Update",
+                                    updateTarget: savedQueryOutputTarget,
+                                    forEventType: (output.getForEventType() === '') ? 'all' : output.getForEventType(),
+                                    set: output.getSet(),
+                                    on: output.getOn()
+                                }
+                            };
+                        } else if (savedQueryOutputType === "update_or_insert_into") {
+                            queryOutput = {
+                                output: {
+                                    outputType: "Update or Insert Into",
+                                    updateOrInsertIntoTarget: savedQueryOutputTarget,
+                                    forEventType: (output.getForEventType() === '') ? 'all' : output.getForEventType(),
+                                    set: output.getSet(),
+                                    on: output.getOn()
+                                }
+                            };
+                        }
+                    }
+                }
+
+                var fillWith = {
+                    queryInput : savedQueryInput,
+                    querySelect : {
+                        select : select
+                    },
+                    groupBy : groupBy,
+                    having : having,
+                    outputRateLimit : outputRateLimit,
+                    queryOutput: queryOutput
+                };
+
+                var editor = new JSONEditor(formContainer[0], {
+                    schema: {
+                        type: "object",
+                        title: "Pattern Query",
+                        properties: {
+                            queryInput: {
+                                propertyOrder: 1,
+                                type: "object",
+                                title: "Query Input",
+                                required: true,
+                                properties: {
+                                    from: {
+                                        required: true,
+                                        title: "From",
+                                        type: "string",
+                                        template: inputElementName,
+                                        minLength: 1
+                                    },
+                                    filter: {
+                                        title: "Filter",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    window: {
+                                        title: "Window",
+                                        type: "object",
+                                        properties: {
+                                            functionName: {
+                                                required: true,
+                                                title: "Function",
+                                                type: "string",
+                                                minLength: 1
+                                            },
+                                            parameters: {
+                                                required: true,
+                                                type: "array",
+                                                format: "table",
+                                                title: "Parameters",
+                                                uniqueItems: true,
+                                                items: {
+                                                    type: "object",
+                                                    title : 'Attribute',
+                                                    properties: {
+                                                        parameter: {
+                                                            type: 'string',
+                                                            title: 'Parameter Name',
+                                                            minLength: 1
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            filter: {
+                                                title: "Filter",
+                                                type: "string",
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            querySelect: {
+                                propertyOrder: 3,
+                                required: true,
+                                type: "object",
+                                title: "Query Select",
+                                properties: {
+                                    select: {
+                                        title: "Query Select Type",
+                                        required: true,
+                                        oneOf: [
+                                            {
+                                                $ref: "#/definitions/querySelectUserDefined",
+                                                title: "User-Defined"
+                                            },
+                                            {
+                                                $ref: "#/definitions/querySelectAll",
+                                                title: "All"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            groupBy: {
+                                propertyOrder: 4,
+                                type: "array",
+                                format: "table",
+                                title: "Group By Attributes",
+                                uniqueItems: true,
+                                items: {
+                                    type: "object",
+                                    title : 'Attribute',
+                                    properties: {
+                                        attribute: {
+                                            type: 'string',
+                                            title: 'Attribute Name',
+                                            enum: possibleGroupByAttributes,
+                                            default: ""
+                                        }
+                                    }
+                                }
+                            },
+                            having: {
+                                propertyOrder: 5,
+                                title: "Having",
+                                type: "string",
+                                minLength: 1
+                            },
+                            outputRateLimit: {
+                                propertyOrder: 6,
+                                title: "Output Rate Limit",
+                                type: "string",
+                                minLength: 1
+                            },
+                            queryOutput: {
+                                propertyOrder: 7,
+                                required: true,
+                                type: "object",
+                                title: "Query Output Type",
+                                properties: {
+                                    output: {
+                                        title: "Query Output Type",
+                                        required: true,
+                                        oneOf: [
+                                            {
+                                                $ref: "#/definitions/queryOutputInsertType",
+                                                title: "Insert Type"
+                                            },
+                                            {
+                                                $ref: "#/definitions/queryOutputDeleteType",
+                                                title: "Delete Type"
+                                            },
+                                            {
+                                                $ref: "#/definitions/queryOutputUpdateType",
+                                                title: "Update Type"
+                                            },
+                                            {
+                                                $ref: "#/definitions/queryOutputUpdateOrInsertIntoType",
+                                                title: "Update Or Insert Into Type"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        definitions: {
+                            querySelectUserDefined: {
+                                required: true,
+                                type: "array",
+                                format: "table",
+                                title: "User Defined",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    title: "Value Set",
+                                    type: "object",
+                                    properties: {
+                                        expression: {
+                                            title: "Expression",
+                                            type: "string",
+                                            minLength: 1
+                                        },
+                                        as: {
+                                            title: "As",
+                                            type: "string"
+                                        }
+                                    }
+                                }
+                            },
+                            querySelectAll: {
+                                type: "string",
+                                title: "All",
+                                template: '*'
+                            },
+                            queryOutputInsertType: {
+                                required: true,
+                                title: "Insert",
+                                type: "object",
+                                properties: {
+                                    outputType: {
+                                        required: true,
+                                        title: "Output Type",
+                                        type: "string",
+                                        template: "Insert"
+                                    },
+                                    eventType: {
+                                        required: true,
+                                        title: "For Every",
+                                        type: "string",
+                                        enum: ['current', 'expired', 'all'],
+                                        default: 'all'
+                                    },
+                                    insertTarget: {
+                                        type: 'string',
+                                        title: 'Insert Into',
+                                        template: savedQueryOutputTarget,
+                                        required: true
+                                    }
+                                }
+                            },
+                            queryOutputDeleteType: {
+                                required: true,
+                                title: "Delete",
+                                type: "object",
+                                properties: {
+                                    outputType: {
+                                        required: true,
+                                        title: "Output Type",
+                                        type: "string",
+                                        template: "Delete"
+                                    },
+                                    deleteTarget: {
+                                        type: 'string',
+                                        title: 'Delete From',
+                                        template: savedQueryOutputTarget,
+                                        required: true
+                                    },
+                                    forEventType: {
+                                        title: "For Every",
+                                        type: "string",
+                                        enum: ['current', 'expired', 'all'],
+                                        default: 'all'
+                                    },
+                                    on: {
+                                        type: 'string',
+                                        title: 'On',
+                                        minLength: 1,
+                                        required: true
+                                    }
+                                }
+                            },
+                            queryOutputUpdateType: {
+                                required: true,
+                                title: "Update",
+                                type: "object",
+                                properties: {
+                                    outputType: {
+                                        required: true,
+                                        title: "Output Type",
+                                        type: "string",
+                                        template: "Update"
+                                    },
+                                    updateTarget: {
+                                        type: 'string',
+                                        title: 'Update From',
+                                        template: savedQueryOutputTarget,
+                                        required: true
+                                    },
+                                    forEventType: {
+                                        title: "For Every",
+                                        type: "string",
+                                        enum: ['current', 'expired', 'all'],
+                                        default: 'all'
+                                    },
+                                    set: {
+                                        required: true,
+                                        type: "array",
+                                        format: "table",
+                                        title: "Set",
+                                        uniqueItems: true,
+                                        items: {
+                                            type: "object",
+                                            title: 'Set Condition',
+                                            properties: {
+                                                attribute: {
+                                                    type: "string",
+                                                    title: 'Attribute',
+                                                    minLength: 1
+                                                },
+                                                value: {
+                                                    type: "string",
+                                                    title: 'Value',
+                                                    minLength: 1
+                                                }
+                                            }
+                                        }
+                                    },
+                                    on: {
+                                        type: 'string',
+                                        title: 'On',
+                                        minLength: 1,
+                                        required: true
+                                    }
+                                }
+                            },
+                            queryOutputUpdateOrInsertIntoType: {
+                                required: true,
+                                title: "Update or Insert Into",
+                                type: "object",
+                                properties: {
+                                    outputType: {
+                                        required: true,
+                                        title: "Output Type",
+                                        type: "string",
+                                        template: "Update or Insert Into"
+                                    },
+                                    updateOrInsertIntoTarget: {
+                                        type: 'string',
+                                        title: 'Update or Insert Into',
+                                        template: savedQueryOutputTarget,
+                                        required: true
+                                    },
+                                    forEventType: {
+                                        title: "For Every",
+                                        type: "string",
+                                        enum: ['current', 'expired', 'all'],
+                                        default: 'all'
+                                    },
+                                    set: {
+                                        required: true,
+                                        type: "array",
+                                        format: "table",
+                                        title: "Set",
+                                        uniqueItems: true,
+                                        items: {
+                                            type: "object",
+                                            title: 'Set Condition',
+                                            properties: {
+                                                attribute: {
+                                                    type: "string",
+                                                    title: 'Attribute',
+                                                    minLength: 1
+                                                },
+                                                value: {
+                                                    type: "string",
+                                                    title: 'Value',
+                                                    minLength: 1
+                                                }
+                                            }
+                                        }
+                                    },
+                                    on: {
+                                        type: 'string',
+                                        title: 'On',
+                                        minLength: 1,
+                                        required: true
+                                    }
+                                }
+
+                            }
+
+                        }
+                    },
+                    startval: fillWith,
+                    disable_properties: false,
+                    display_required_only: true,
+                    no_additional_properties: true,
+                    disable_array_delete_all_rows: true,
+                    disable_array_delete_last_row: true,
+                    disable_array_reorder: true
+                });
+
+                $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                    'class="btn btn-default">Submit</button></div>' +
+                    '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+
+                // 'Submit' button action
+                var submitButtonElement = $('#form-submit')[0];
+                submitButtonElement.addEventListener('click', function () {
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
+
+                    // close the form window
+                    self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
+
+                    var config = editor.getValue();
+
+                    var subType;
+                    // change the query icon depending on the fields filled
+                    if (config.queryInput.window) {
+                        subType = "window";
+                        $(element).parent().removeClass();
+                        $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
+                    } else if (config.queryInput.filter ||
+                        (config.queryInput.window && config.queryInput.window.filter)) {
+                        subType = "filter";
+                        $(element).parent().removeClass();
+                        $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
+                    } else if (!(config.queryInput.filter || config.queryInput.window)
+                        || (config.queryInput.window && config.queryInput.window.filter)) {
+                        subType = "projection";
+                        $(element).parent().removeClass();
+                        $(element).parent().addClass(constants.PROJECTION + ' jtk-draggable');
+                    }
+
+                    var queryInput = clickedElement.getQueryInput();
+                    queryInput.setSubType(subType);
+                    if (config.queryInput.filter !== undefined) {
+                        queryInput.setFilter(config.queryInput.filter);
+                    } else {
+                        queryInput.setFilter('');
+                    }
+                    if (config.queryInput.window !== undefined) {
+                        var windowOptions = {};
+                        _.set(windowOptions, 'function', config.queryInput.window.functionName);
+                        _.set(windowOptions, 'parameters', config.queryInput.window.parameters);
+                        if (config.queryInput.window.filter !== undefined) {
+                            _.set(windowOptions, 'filter', config.queryInput.window.filter);
+                        } else {
+                            _.set(windowOptions, 'filter', '');
+                        }
+                        var queryWindow = new QueryWindow(windowOptions);
+                        queryInput.setWindow(queryWindow);
+                    } else {
+                        queryInput.setWindow('');
+                    }
+
+                    var selectAttributeOptions = {};
+                    if (config.querySelect.select instanceof Array) {
+                        _.set(selectAttributeOptions, 'type', 'user_defined');
+                        _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
+                    } else if (config.querySelect.select === "*") {
+                        _.set(selectAttributeOptions, 'type', 'all');
+                        _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
+                    } else {
+                        console.log("Value other than \"user_defined\" and \"all\" received!");
+                    }
+                    var selectObject = new QuerySelect(selectAttributeOptions);
+                    clickedElement.setSelect(selectObject);
+
+                    if (config.groupBy !== undefined) {
+                        var groupByAttributes = [];
+                        _.forEach(config.groupBy, function (groupByAttribute) {
+                            groupByAttributes.push(groupByAttribute.attribute);
+                        });
+                        clickedElement.setGroupBy(groupByAttributes);
+                    } else {
+                        clickedElement.setGroupBy('');
+                    }
+
+                    if (config.having !== undefined) {
+                        clickedElement.setHaving(config.having);
+                    } else {
+                        clickedElement.setHaving('');
+                    }
+
+                    if (config.outputRateLimit !== undefined) {
+                        clickedElement.setOutputRateLimit(config.outputRateLimit);
+                    } else {
+                        clickedElement.setOutputRateLimit('');
+                    }
+
+                    var queryOutput = clickedElement.getQueryOutput();
+                    var outputObject;
+                    var outputType;
+                    var outputTarget;
+                    if (config.queryOutput.output !== undefined) {
+                        if (config.queryOutput.output.outputType === "Insert") {
+                            outputType = "insert";
+                            outputTarget = config.queryOutput.output.insertTarget;
+                            outputObject = new QueryOutputInsert(config.queryOutput.output);
+                            if (config.queryOutput.output.eventType === undefined) {
+                                outputObject.setEventType('');
+                            }
+                        } else if (config.queryOutput.output.outputType === "Delete") {
+                            outputType = "delete";
+                            outputTarget = config.queryOutput.output.deleteTarget;
+                            outputObject = new QueryOutputDelete(config.queryOutput.output);
+                            if (config.queryOutput.output.forEventType === undefined) {
+                                outputObject.setForEventType('');
+                            }
+                        } else if (config.queryOutput.output.outputType === "Update") {
+                            outputType = "update";
+                            outputTarget = config.queryOutput.output.updateTarget;
+                            outputObject = new QueryOutputUpdate(config.queryOutput.output);
+                            if (config.queryOutput.output.forEventType === undefined) {
+                                outputObject.setForEventType('');
+                            }
+                        } else if (config.queryOutput.output.outputType === "Update or Insert Into") {
+                            outputType = "update_or_insert_into";
+                            outputTarget = config.queryOutput.output.updateOrInsertIntoTarget;
+                            outputObject = new QueryOutputUpdateOrInsertInto(config.queryOutput.output);
+                            if (config.queryOutput.output.forEventType === undefined) {
+                                outputObject.setForEventType('');
+                            }
+                        } else {
+                            console.log("Invalid output type for query received!")
+                        }
+                        queryOutput.setTarget(outputTarget);
+                        queryOutput.setOutput(outputObject);
+                        queryOutput.setType(outputType);
+                    }
+                });
+
+                // 'Cancel' button action
+                var cancelButtonElement = $('#form-cancel')[0];
+                cancelButtonElement.addEventListener('click', function () {
+                    self.gridContainer.removeClass('disabledbutton');
+                    self.toolPaletteContainer.removeClass('disabledbutton');
+                    // close the form window
+                    self.consoleListManager.removeConsole(formConsole);
+                    self.consoleListManager.hideAllConsoles();
+                });
+            }
         };
 
         /**

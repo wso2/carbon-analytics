@@ -159,7 +159,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             });
             _.forEach(siddhiAppContent.windowFilterProjectionQueryList, function(windowFilterProjectionQuery){
                 var queryObject = new Query(windowFilterProjectionQuery);
-                var windowFilterProjectionQueryInput = new WindowFilterProjectionQueryInput();
+                var windowFilterProjectionQueryInput =
+                    new WindowFilterProjectionQueryInput(windowFilterProjectionQuery.queryInput);
                 if (windowFilterProjectionQuery.window !== undefined && windowFilterProjectionQuery.window !== '') {
                     var queryWindowObject = new QueryWindow(windowFilterProjectionQuery.window);
                     windowFilterProjectionQueryInput.setWindow(queryWindowObject);
