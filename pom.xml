@@ -1711,12 +1711,12 @@
 
         <siddhi.io.tcp.version>2.0.7</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.0.0-M6</siddhi.io.email.version>
-        <siddhi.io.kafka.version>4.1.2</siddhi.io.kafka.version>
+        <siddhi.io.kafka.version>4.1.6</siddhi.io.kafka.version>
         <siddhi.io.http.version>1.0.4</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.0.6</siddhi.map.json.version>
         <siddhi.map.binary.version>1.0.3</siddhi.map.binary.version>
-        <siddhi.map.xml.version>4.0.2</siddhi.map.xml.version>
+        <siddhi.map.xml.version>4.0.11</siddhi.map.xml.version>
 
         <siddhi.store.rdbms.version>4.0.0-M7</siddhi.store.rdbms.version>
         <siddhi.store.solr.version>1.0.6</siddhi.store.solr.version>
