@@ -30,9 +30,7 @@ import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.sp.jobmanager.core.api.NotFoundException;
 import org.wso2.carbon.sp.jobmanager.core.api.WorkersApiService;
 import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
-import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
-import org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 import org.wso2.msf4j.Request;
@@ -45,7 +43,7 @@ import javax.ws.rs.core.Response;
  */
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2018-02-03T14:53:27.713Z")
+        date = "2018-02-03T14:53:27.713Z")
 @Component(service = WorkersApiService.class, immediate = true)
 
 public class WorkersApiServiceImpl extends WorkersApiService {
@@ -81,35 +79,30 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
-                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the "
-                                                                                + "execution plan").build();
+                    + "execution plan").build();
         } else {
             return getResourceCluster();
         }
     }
 
     private PermissionProvider getPermissionProvider() {
-        return ManagerDataHolder.getInstance().getPermissionProvider();
+        return ServiceDataHolder.getPermissionProvider();
     }
 
     @Reference(
-            name = "org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent",
-            service = DatasourceServiceComponent.class,
+            name = "carbon.permission.provider",
+            service = PermissionProvider.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterServiceDatasource"
+            unbind = "unregisterPermissionProvider"
     )
-    public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) DatasourceServiceComponent");
-        }
+    protected void registerPermissionProvider(PermissionProvider permissionProvider) {
+        ServiceDataHolder.setPermissionProvider(permissionProvider);
     }
 
-    public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) DatasourceServiceComponent");
-        }
+    protected void unregisterPermissionProvider(PermissionProvider permissionProvider) {
+        ServiceDataHolder.setPermissionProvider(null);
     }
-
 }

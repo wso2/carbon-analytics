@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.bean;
 
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidationException;
@@ -23,22 +24,20 @@ import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidation
 import java.util.List;
 
 /**
- * WorkerConfigurationDetails bean class.
+ * NodeConfigurationDetails bean class.
  */
-public class WorkerConfigurationDetails {
-
+public class NodeConfigurationDetails {
     private String workerId;
     private String host;
     private int port;
 
-
-    public WorkerConfigurationDetails(String workerId, String host, int port) {
+    public NodeConfigurationDetails(String workerId, String host, int port) {
         this.workerId = workerId;
         this.host = host;
         this.port = port;
     }
 
-    public WorkerConfigurationDetails() {
+    public NodeConfigurationDetails() {
     }
 
     public String getWorkerId() {
@@ -90,11 +89,13 @@ public class WorkerConfigurationDetails {
                     throw new StatusDashboardValidationException("Invalid object:" + values.get(i));
             }
         }
-
-
     }
 
     public static String getColumnLabeles() {
         return "WORKERID,HOST,PORT";
+    }
+
+    public static String getManagerColumnLabeles() {
+        return "MANAGERID,HOST,PORT";
     }
 }

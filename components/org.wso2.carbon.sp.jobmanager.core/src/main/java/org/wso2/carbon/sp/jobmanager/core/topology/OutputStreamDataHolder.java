@@ -18,14 +18,13 @@
 
 package org.wso2.carbon.sp.jobmanager.core.topology;
 
-
 import org.wso2.carbon.sp.jobmanager.core.util.EventHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Holder to hold required details of Output Streams in {@link SiddhiTopology}
+ * Data Holder to hold required details of Output Streams in {@link SiddhiTopology}.
  */
 public class OutputStreamDataHolder {
     private String streamName;

@@ -181,6 +181,10 @@
                     <basedir>${project.build.outputDirectory}/org/wso2/carbon/status/dashboard/core</basedir>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
     <properties>

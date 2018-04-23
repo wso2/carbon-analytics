@@ -44,7 +44,7 @@ public class CoordinatorChangeListener extends MemberEventListener {
             String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
             Integer httpInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
             log.info(String.format("ManagerNode { id: %s, host: %s, port: %s } added to the manager cluster" +
-                            " of the resource pool.", nodeId, httpInterfaceHost, httpInterfacePort));
+                    " of the resource pool.", nodeId, httpInterfaceHost, httpInterfacePort));
         }
     }
 

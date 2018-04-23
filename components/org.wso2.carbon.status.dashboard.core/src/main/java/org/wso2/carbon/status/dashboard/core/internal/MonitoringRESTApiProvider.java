@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.status.dashboard.core.internal;
 
 import org.osgi.framework.BundleContext;
@@ -58,7 +59,7 @@ public class MonitoringRESTApiProvider implements RestApiProvider {
 
     @Deactivate
     protected void deactivate(BundleContext bundleContext) {
-       logger.debug("{} deactivated.", this.getClass().getName());
+        logger.debug("{} deactivated.", this.getClass().getName());
     }
 
 

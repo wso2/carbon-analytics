@@ -17,28 +17,30 @@
  *
  */
 
-import React from "react";
-import {Link, Redirect} from "react-router-dom";
+import React from 'react';
+import {Link, Redirect} from 'react-router-dom';
 // App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import {HttpStatus} from "../utils/Constants";
-import Header from "../common/Header";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import {HttpStatus} from '../utils/Constants';
+import Header from '../common/Header';
 // Material UI
-import HomeButton from "material-ui/svg-icons/action/home";
-import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from "material-ui";
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from 'material-ui';
 // CSS
-import "../../public/css/dashboard.css";
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import FormPanel from "../common/FormPanel";
-import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
-import Error403 from "../error-pages/Error403";
-import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
+import '../../public/css/dashboard.css';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import FormPanel from '../common/FormPanel';
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+import Error403 from '../error-pages/Error403';
+import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
+
 const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 const buttonStyle = {marginLeft: 10, width: '30%', fontSize: '8px'};
+const popupButtonStyle = {marginLeft: 25, width: '30%', fontSize: '8px'};
 const textField = {width: 650};
 
 /**
@@ -50,15 +52,15 @@ export default class AddWorker extends React.Component {
         super();
         this.state = {
             sessionInvalid: false,
-            host:'',
-            port:'',
+            host: '',
+            port: '',
             messageStyle: '',
             showMsg: false,
             message: '',
             open: false,
             hasPermission: false,
             isApiCalled: false,
-            isError: false
+            isError: false,
         };
         this._handleSubmit = this._handleSubmit.bind(this);
         this._showMessage = this._showMessage.bind(this);
@@ -75,24 +77,24 @@ export default class AddWorker extends React.Component {
                     isApiCalled: true
                 });
             }).catch((error) => {
-            if(error.response != null){
-                if(error.response.status === 401){
+            if (error.response != null) {
+                if (error.response.status === 401) {
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,
-                        statusMessage:"Authentication fail. Please login again."
+                        statusMessage: "Authentication fail. Please login again."
                     })
-                } else if(error.response.status === 403){
+                } else if (error.response.status === 403) {
                     this.setState({
                         isApiCalled: true,
                         hasPermission: false,
-                        statusMessage:"User Have No Permission to view this page."
+                        statusMessage: "User Have No Permission to view this page."
                     })
                 } else {
                     this.setState({
-                        isError:true,
+                        isError: true,
                         hasPermission: false,
-                        statusMessage:"Error while adding worker!. Worker may exists or unexpected error has occurred."
+                        statusMessage: "Error while adding worker!. Worker may exists or unexpected error has occurred."
                     })
                 }
                 that._showError(that.state.statusMessage);
@@ -101,39 +103,135 @@ export default class AddWorker extends React.Component {
     }
 
     /**
+     * Method to handle popup open
+     */
+
+    handlePopupOpen() {
+        this.setState({open: true})
+    };
+
+    /**
      * Method to handle add worker submit button.
      */
     _handleSubmit(e) {
         e.preventDefault();
-        let worker = JSON.stringify({
+        let node = JSON.stringify({
             host: this.refs.host.input.value,
             port: this.refs.port.input.value,
         });
+
         let that = this;
-        let workerID = this.refs.host.input.value + ":" + this.refs.port.input.value;
-        StatusDashboardOverViewAPI.createWorker(worker)
+        let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+        console.log(this.refs.host.input.value, this.refs.port.input.value);
+
+
+        if (this.refs.port.input.value > 0 && this.refs.port.input.value <= 65535) {
+            StatusDashboardAPIS.getRuntimeEnv(nodeID)
+                .then((response) => {
+                    if (response.status = HttpStatus.OK) {
+                        console.log(response.data);
+                        if (response.data === "manager") {
+                            that._addManager(nodeID);
+                        } else if (response.data === "worker") {
+                            that._addWorker(nodeID);
+                        } else {
+                            this.handlePopupOpen();
+                        }
+                    } else {
+
+                        that._showError("Error while connecting with the node" + nodeID);
+                    }
+                }).catch((error) => {
+                if (error.response != null) {
+                    if (error.response.status === 401) {
+                        this.setState({
+                            isApiCalled: true,
+                            sessionInvalid: true,
+                            statusMessage: "Authentication fail. Please login again."
+                        })
+                    } else if (error.response.status === 403) {
+                        this.setState({
+                            isApiCalled: true,
+                            hasPermission: false,
+                            statusMessage: "User Have No Permission to view this"
+                        })
+                    } else if (error.response.status === 500) {
+                        this.setState({
+                            isApiCalled: true,
+                            hasPermission: false,
+                            statusMessage: "Unreachable node. Try again !"
+                        })
+                    } else {
+                        this.setState({
+                            isApiCalled: true,
+                            statusMessage: "Unknown error occurred!"
+                        })
+                    }
+                }
+                that._showError(that.state.statusMessage);
+            });
+        } else {
+            that._showError("In valid port number. Try again ");
+        }
+    }
+
+    /**
+     * method to handle test connection of a worker
+     */
+    _testConnection() {
+        let workerID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+        let that = this;
+
+        StatusDashboardAPIS.getRuntimeEnv(workerID)
             .then((response) => {
-                if (response.status === HttpStatus.OK) {
-                    that._showMessage("Worker '" + workerID + "' is added successfully !");
-                    setTimeout(function () {
-                        window.location.href = window.contextPath;
-                    }, 1000)
+                if (response.status = HttpStatus.OK) {
+                    if (response.data === "manager") {
+                        StatusDashboardAPIS.testConnection(workerID)
+                            .then((response) => {
+                                if (response.data.code === 200) {
+                                    that._showMessage("Successfully reached the manager : " + workerID);
+                                } else {
+                                    that._showError(response.data.message)
+                                }
+                            }).catch((error) => {
+                            that._showError("Error while testing the connection!! ");
+                        });
+                    } else if (response.data === "worker") {
+                        StatusDashboardAPIS.testConnection(workerID)
+                            .then((response) => {
+                                if (response.data.code === 200) {
+                                    that._showMessage("Successfully reached the worker : " + workerID);
+                                } else {
+                                    that._showError(response.data.message)
+                                }
+                            }).catch((error) => {
+                            that._showError("Error while testing the connection!! ");
+                        });
+                    } else {
+                        that._showError("Unreachable Node. Try Again !");
+                    }
                 } else {
-                    that._showError("Error while adding worker '" + workerID + "' . Try Again !");
+                    that._showError("Something went wrong please check ")
                 }
             }).catch((error) => {
-            if(error.response != null){
-                if(error.response.status === 401){
+            if (error.response != null) {
+                if (error.response.status === 401) {
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,
                         statusMessage: "Authentication fail. Please login again."
                     })
-                } else if(error.response.status === 403){
+                } else if (error.response.status === 403) {
                     this.setState({
                         isApiCalled: true,
                         hasPermission: false,
                         statusMessage: "User Have No Permission to view this"
+                    })
+                } else if (error.response.status === 500) {
+                    this.setState({
+                        isApiCalled: true,
+                        hasPermission: false,
+                        statusMessage: "Unreachable node. Try again !"
                     })
                 } else {
                     this.setState({
@@ -143,26 +241,6 @@ export default class AddWorker extends React.Component {
                 }
             }
             that._showError(that.state.statusMessage);
-        });
-
-
-    }
-
-    /**
-     * method to handle test connection of a worker
-     */
-    _testConnection() {
-        let workerID = this.refs.host.input.value + "_" + this.refs.port.input.value;
-        let that = this;
-        StatusDashboardAPIS.testConnection(workerID)
-            .then((response) => {
-                if (response.data.code === 200) {
-                    that._showMessage(response.data.message)
-                } else {
-                    that._showError(response.data.message)
-                }
-            }).catch((error) => {
-            that._showError("Error while testing the connection!! ");
         });
     }
 
@@ -182,8 +260,96 @@ export default class AddWorker extends React.Component {
         });
     }
 
+
+    _addWorker(nodeID) {
+        let node = JSON.stringify({
+            host: this.refs.host.input.value,
+            port: this.refs.port.input.value,
+        });
+
+        let that = this;
+        nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+        StatusDashboardOverViewAPI.createWorker(node)
+            .then((response) => {
+                if (response.status === HttpStatus.OK) {
+                    that._showMessage("Worker '" + nodeID + "' is added successfully !");
+                    setTimeout(function () {
+                        window.location.href = window.contextPath;
+                    }, 1000)
+                } else {
+                    that._showError("Error while adding worker '" + nodeID + "' . Try Again !");
+                }
+            }).catch((error) => {
+            if (error.response != null) {
+                if (error.response.status === 401) {
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
+                    })
+                } else if (error.response.status === 403) {
+                    this.setState({
+                        isApiCalled: true,
+                        hasPermission: false,
+                        statusMessage: "User Have No Permission to view this"
+                    })
+                } else {
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred!"
+                    })
+                }
+            }
+            that._showError(that.state.statusMessage);
+        });
+    }
+
+    _addManager(nodeID) {
+        let node = JSON.stringify({
+            host: this.refs.host.input.value,
+            port: this.refs.port.input.value,
+        });
+
+        let that = this;
+        nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+        StatusDashboardOverViewAPI.createManager(node)
+            .then((response) => {
+                if (response.status === HttpStatus.OK) {
+                    this._showMessage("Manager " + nodeID + " is added successfully !");
+                    setTimeout(function () {
+                        window.location.href = window.contextPath;
+                    }, 1000)
+                } else {
+                    that._showError("Error while adding manager " + nodeID + " .Try Again !");
+                }
+            }).catch((error) => {
+            if (error.response != null) {
+                if (error.response.status === 401) {
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
+                    })
+                } else if (error.response.status === 403) {
+                    this.setState({
+                        isApiCalled: true,
+                        hasPermission: false,
+                        statusMessage: "User Have No Permission to view this"
+                    })
+                } else {
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred!"
+                    })
+                }
+            }
+            that._showError(that.state.statusMessage);
+        });
+
+    }
+
     render() {
-        if(this.state.isError){
+        if (this.state.isError) {
             return <Error500 message={this.state.statusMessage}/>;
         }
         if (this.state.sessionInvalid) {
@@ -205,6 +371,35 @@ export default class AddWorker extends React.Component {
                 />
             ];
 
+            let nodeButtons = [
+                <FlatButton
+                    label="Worker"
+                    backgroundColor='#f17b31'
+                    style={popupButtonStyle}
+                    onClick={() => {
+                        let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+                        this._addWorker(nodeID);
+                    }}
+                />,
+                <FlatButton
+                    label="Manager"
+                    backgroundColor='#f17b31'
+                    style={popupButtonStyle}
+                    onClick={() => {
+                        let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+                        this._addManager(nodeID);
+                    }}
+                />,
+
+                <FlatButton
+                    label="Cancel"
+                    style={popupButtonStyle}
+                    onClick={() => {
+                        this.setState({open: false, openAdd: false})
+                    }}
+                />
+
+            ];
             return (
                 <div>
                     <Dialog
@@ -216,6 +411,18 @@ export default class AddWorker extends React.Component {
                         }}>
                         {this.state.message}
                     </Dialog>
+
+                    <Dialog
+                        title="Unreachable Node"
+                        actions={nodeButtons}
+                        modal={false}
+                        open={this.state.open}
+                        onRequestClose={() => {
+                            this.setState({open: false, openAdd: false});
+                        }}>
+                        Node details you entered is currently unreachable. Please choose the run time environment.
+                    </Dialog>
+
                     <Header/>
                     <div className="navigation-bar">
                         <Link to={window.contextPath}><FlatButton label="Overview >"
@@ -226,7 +433,7 @@ export default class AddWorker extends React.Component {
                     </div>
                     <MuiThemeProvider muiTheme={muiTheme}>
                         <div>
-                            <FormPanel title={"Let's add a new worker"} onSubmit={this._handleSubmit} width={650}>
+                            <FormPanel title={"Let's add a new node"} onSubmit={this._handleSubmit} width={650}>
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="host"
@@ -241,7 +448,7 @@ export default class AddWorker extends React.Component {
                                            }}
 
 
-                                /><br />
+                                /><br/>
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="port"
@@ -255,13 +462,13 @@ export default class AddWorker extends React.Component {
                                                });
                                            }}
 
-                                /><br />
-                                <br />
+                                /><br/>
+                                <br/>
                                 <RaisedButton
                                     disabled={this.state.host === '' || this.state.port === ''}
                                     backgroundColor='#f17b31'
                                     style={buttonStyle}
-                                    label="Add Worker"
+                                    label="Add Node"
                                     type="submit"/>
                                 <RaisedButton style={buttonStyle}
                                               disabled={this.state.host === '' || this.state.port === ''}
@@ -293,11 +500,8 @@ export default class AddWorker extends React.Component {
                     }}>
                         <i className="fw fw-loader5 fw-spin fw-inverse fw-5x"></i>
                     </div>
-
                 </div>
             );
         }
     }
-
 }
-

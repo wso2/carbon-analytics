@@ -46,7 +46,8 @@ class SafeZkClient {
     public ZkUtils createZkClient(String[] zooKeeperServerUrls, boolean isSecureKafkaCluster) {
         for (String zooKeeperServerUrl : zooKeeperServerUrls) {
             try {
-                zkClient = new ZkClient(zooKeeperServerUrl, 10000, 5000, ZKStringSerializer$.MODULE$);
+                zkClient = new ZkClient(
+                        zooKeeperServerUrl, 10000, 5000, ZKStringSerializer$.MODULE$);
                 zkUtils = new ZkUtils(zkClient, new ZkConnection(zooKeeperServerUrl), isSecureKafkaCluster);
                 break;
             } catch (ZkTimeoutException e) {

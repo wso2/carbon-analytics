@@ -28,6 +28,7 @@ import {
     TableRowColumn,
     Toggle
 } from "material-ui";
+
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -40,6 +41,8 @@ import { Redirect } from 'react-router-dom';
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import FormPanel from "../common/FormPanel";
 import Error500 from "../error-pages/Error500";
+import {HttpStatus} from "../utils/Constants";
+import ManagerThumbnail from "./ManagerThumbnail";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
@@ -73,6 +76,7 @@ export default class WorkerOverview extends React.Component {
         this.state = {
             sessionInvalid:false,
             clustersList: {},
+            managerClusterList:{},
             pInterval: window.localStorage.getItem("pInterval")!= null ? parseInt(window.localStorage.getItem("pInterval")): 5,
             currentTime: '',
             interval: '',
@@ -81,7 +85,7 @@ export default class WorkerOverview extends React.Component {
             counter: 0,
             hasManagerPermission: false,
             hasViewPermission: true,
-            statusMessage: "Currently there are no workers to display",
+            statusMessage: "Currently there are no nodes to display",
             isError: false
 
         };
@@ -127,8 +131,8 @@ export default class WorkerOverview extends React.Component {
                 this.setState({
                     clustersList: response.data,
                     isApiCalled: true,
-                    statusMessage:!WorkerOverview.hasWorkers(this.state.clustersList) ? "Currently there are no" +
-                        " workers to display" : ''
+                    statusMessage:!WorkerOverview.hasNodes(this.state.clustersList) ? "Currently there are no" +
+                        " nodes to display" : ''
                 });
             }).catch((error) => {
             if(error.response != null){
@@ -152,11 +156,45 @@ export default class WorkerOverview extends React.Component {
                 }
             }
         });
+
+        StatusDashboardOverViewAPI.getManagerList()
+            .then((response) =>{
+                if(response.status===HttpStatus.OK){
+                    this.setState({
+                        managerClusterList: response.data,
+                        isApiCalled: true,
+                        statusMessage:!WorkerOverview.hasNodes(this.state.managerClusterList)?"Currently there are no nodes to display" :''
+                    });
+                }else {
+                    console.log("manager connection failed")
+                }
+
+            }).catch((error)=>{
+            if(error.response != null){
+                if(error.response.status ===401){
+                    this.setState({
+                        isApiCalled:true,
+                        sessionInvalid:true,
+                        statusMessage:"Authentication failed. Please login again."
+                    })
+                } else if(error.response.status === 403){
+                    this.setState({
+                        isApiCalled:true,
+                        statusMessage:"User Have No Permission to view this page."
+                    })
+                }else {
+                    this.state({
+                        isError:true,
+                        isApiCalled:true,
+                        statusMessage:"Unknown error occurred! : "+JSON.stringify(error.response.data)
+                    });
+                }
+            }
+        });
     }
 
     componentWillUnmount() {
         clearInterval(this.state.interval);
-
     }
 
     componentWillMount() {
@@ -195,7 +233,7 @@ export default class WorkerOverview extends React.Component {
             return (
                 <div className="add-button">
                     <Link to={window.contextPath + '/add-worker'}><FlatButton
-                        label="Add New Worker"
+                        label="Add New Node"
                         icon={<ContentAdd />}
                         style={{marginTop: 10}}
                     /></Link>
@@ -205,7 +243,7 @@ export default class WorkerOverview extends React.Component {
             return (
                 <div className="add-button-disabled">
                     <FlatButton
-                        label="Add New Worker"
+                        label="Add New Node"
                         icon={<ContentAdd />}
                         style={{marginTop: 10, display: 'none'}}
                     />
@@ -255,6 +293,13 @@ export default class WorkerOverview extends React.Component {
                         that.setState({clustersList: response.data});
                     }).catch((error) => {
                 });
+
+                StatusDashboardOverViewAPI.getManagerList()
+                    .then((response) =>{
+                        that.setState({managerClusterList:response.data});
+                    }).catch((error) =>{
+
+                });
             }, parseInt(this.state.pInterval * 1000));
             this.setState({interval: interval});
         }
@@ -274,6 +319,13 @@ export default class WorkerOverview extends React.Component {
                     }).catch((error) => {
                     //TODO Need to use proper notification library to show the error
                 });
+
+                StatusDashboardOverViewAPI.getManagerList()
+                    .then((response) =>{
+                        that.setState({managerClusterList:response.data});
+                    }).catch((error) =>{
+
+                });
             }, parseInt(this.state.pInterval * 1000));
             this.setState({interval: interval, enableAutoSync: true});
             window.localStorage.setItem("enableAutoSync", true);
@@ -288,10 +340,12 @@ export default class WorkerOverview extends React.Component {
     /**
      * Method which render workers
      * @param workersList
+     * @param managerList
      * @returns {XML}
      */
-    renderWorkers(workersList) {
-        if (this.state.isApiCalled && !WorkerOverview.hasWorkers(this.state.clustersList)) {
+    renderWorkers(workersList,managerList) {
+
+        if (this.state.isApiCalled && !WorkerOverview.hasNodes(this.state.clustersList) && !WorkerOverview.hasNodes(this.state.managerClusterList)) {
             if(this.state.hasViewPermission) {
                 return (
                     <div style={styles.background}>
@@ -328,7 +382,69 @@ export default class WorkerOverview extends React.Component {
                     </div>
                 );
             }
-        } else if (this.state.isApiCalled && WorkerOverview.hasWorkers(this.state.clustersList)) {
+        }else if(this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList)) && (WorkerOverview.hasNodes(this.state.managerClusterList)))){
+            return(
+                <div style={styles.background}>
+                    <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
+                        {this.renderAddWorkerFlotting()}
+                        <div className="toggle">
+                            <Toggle labelPosition="left"
+                                    label={<b>Auto Sync</b>}
+                                    labelStyle={{color: 'white', fontSize: 18}}
+                                    toggled={this.state.enableAutoSync}
+                                    onToggle={this.autoSync}
+                                    thumbStyle={{backgroundColor: 'grey'}}
+                                    thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
+                                    trackSwitchedStyle={{backgroundColor: '#f17b31'}}>
+                            </Toggle>
+                        </div>
+                    </div>
+                    {Object.keys(workersList).map((id, workerList) => {
+
+                        {
+                        }
+                        return (
+                            <div>
+                                <h3 style={styles.h3}>{id}</h3>
+                                <Divider inset={true} style={{width: '90%'}}/>
+                                <div style={styles.root}>
+                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                        {workersList[id].map((worker) => {
+                                            return (
+                                                <WorkerThumbnail worker={worker}
+                                                                 currentTime={new Date().getTime()}/>
+
+                                            )
+                                        })}
+                                    </GridList>
+                                </div>
+                            </div>
+                        )
+                    })}
+                    <h3 style={styles.h3}>Distributed Deployments</h3>
+
+                    {Object.keys(managerList).map((id, workerList) => {
+                        return (
+                            <div>
+                                <h3 style={styles.h3}>{id}</h3>
+                                <Divider inset={true} style={{width: '90%'}}/>
+                                <div style={styles.root}>
+                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                        {managerList[id].map((worker) => {
+                                            return (
+                                                <ManagerThumbnail worker={worker}
+                                                                  currentTime={new Date().getTime()}/>
+
+                                            )
+                                        })}
+                                    </GridList>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            );
+        } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList))) && (!WorkerOverview.hasNodes(this.state.managerClusterList))) {
             return (
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
@@ -346,7 +462,10 @@ export default class WorkerOverview extends React.Component {
                         </div>
                     </div>
 
-                    { Object.keys(workersList).map((id, workerList) => {
+                    {Object.keys(workersList).map((id, workerList) => {
+                        {
+
+                        }
                         return (
                             <div>
                                 <h3 style={styles.h3}>{id}</h3>
@@ -357,6 +476,7 @@ export default class WorkerOverview extends React.Component {
                                             return (
                                                 <WorkerThumbnail worker={worker}
                                                                  currentTime={new Date().getTime()}/>
+
                                             )
                                         })}
                                     </GridList>
@@ -366,6 +486,51 @@ export default class WorkerOverview extends React.Component {
                     })}
                 </div>
             );
+
+        }else if(this.state.isApiCalled && (WorkerOverview.hasNodes(this.state.managerClusterList)) && (!WorkerOverview.hasNodes(this.state.clustersList))) {
+            return (
+                <div style={styles.background}>
+                    <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
+                        {this.renderAddWorkerFlotting()}
+                        <div className="toggle">
+                            <Toggle labelPosition="left"
+                                    label={<b>Auto Sync</b>}
+                                    labelStyle={{color: 'white', fontSize: 18}}
+                                    toggled={this.state.enableAutoSync}
+                                    onToggle={this.autoSync}
+                                    thumbStyle={{backgroundColor: 'grey'}}
+                                    thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
+                                    trackSwitchedStyle={{backgroundColor: '#f17b31'}}>
+                            </Toggle>
+                        </div>
+                    </div>
+
+                    {Object.keys(managerList).map((id, workerList) => {
+                        {
+                        }
+                        return (
+                            <div>
+                                <h3 style={styles.h3}>{id}</h3>
+                                <Divider inset={true} style={{width: '90%'}}/>
+                                <div style={styles.root}>
+                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                        {managerList[id].map((worker) => {
+                                            return (
+                                                <ManagerThumbnail worker={worker}
+                                                                  currentTime={new Date().getTime()}/>
+
+                                            )
+                                        })}
+                                    </GridList>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+
+            );
+
+
         } else {
             return (
                 <div style={{backgroundColor: '#222222', width: '100%', height: '1000px'}} data-toggle="loading"
@@ -386,23 +551,23 @@ export default class WorkerOverview extends React.Component {
             return <Error500 message={this.state.statusMessage}/>;
         }
         if (!this.state.sessionInvalid) {
-        return (
-            <div style={styles.background}>
-                <Header/>
-                <div className="navigation-bar">
-                    <FlatButton label="Overview" icon={<HomeButton color="black"/>}/>
+            return (
+                <div style={styles.background}>
+                    <Header/>
+                    <div className="navigation-bar">
+                        <FlatButton label="Overview" icon={<HomeButton color="black"/>}/>
+                    </div>
+                    {this.renderWorkers(this.state.clustersList,this.state.managerClusterList)}
                 </div>
-                {this.renderWorkers(this.state.clustersList)}
-            </div>
-        );
-    } else {
+            );
+        } else {
             return (
                 <Redirect to={{ pathname: `${window.contextPath}/logout` }} />
             );
-            }
-     }
+        }
+    }
 
-    static hasWorkers(clusters) {
+    static hasNodes(clusters) {
         for (let prop in clusters) {
             if (clusters.hasOwnProperty(prop)) {
                 return true;
@@ -410,7 +575,4 @@ export default class WorkerOverview extends React.Component {
         }
         return false;
     }
-
 }
-
-

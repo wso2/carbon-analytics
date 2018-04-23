@@ -19,7 +19,7 @@
 
 import Axios from "axios";
 
-import { MediaType } from '../Constants';
+import {MediaType} from '../Constants';
 import AuthManager from "../../auth/utils/AuthManager";
 
 export default class StatusDashboardAPIS {
@@ -30,7 +30,7 @@ export default class StatusDashboardAPIS {
      */
     static getHTTPClient() {
         let httpClient = Axios.create({
-            baseURL: window.location.origin +"/"+window.contextPath.substr(1) + '/apis/workers',
+            baseURL: window.location.origin + "/" + window.contextPath.substr(1) + '/apis/workers',
             timeout: 6000,
             headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID}
         });
@@ -146,4 +146,62 @@ export default class StatusDashboardAPIS {
             '/components/' + componentType + '/' + componentID + '/history', queryParams);
     }
 
+    /**
+     * This method will return the run time of the node.
+     * @param workerId
+     */
+    static getRuntimeEnv(workerId) {
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerId + '/runTime');
+    }
+
+    /**
+     * This method will return the siddhi app details that are deployed in the manager node.
+     * @param managerId
+     */
+    static getManagerSiddhiApps(managerId) {
+        return StatusDashboardAPIS.getHTTPClient().get('/manager' + '/' + managerId + '/siddhi-apps');
+    }
+
+    /**
+     * This method will return the HA details of the clustered manager nodes.
+     * @param managerId
+     */
+    static getManagerHADetails(managerId) {
+        return StatusDashboardAPIS.getHTTPClient().get('/manager' + '/' + managerId);
+    }
+
+    /**
+     * This method will return the text view of the parent siddhi application.
+     * @param managerId
+     * @param appName
+     */
+    static getSiddhiAppTextView(managerId, appName) {
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName);
+    }
+
+    /**
+     * This method will return the child app details.
+     * @param managerId
+     * @param appName
+     */
+    static getChildAppDetails(managerId, appName) {
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName + '/child-apps')
+    }
+
+    /**
+     * This method will delete existing manager node.
+     * @param managerId
+     */
+    static deleteManagerById(managerId) {
+        return StatusDashboardAPIS.getHTTPClient().delete('/manager/' + managerId)
+    }
+
+    /**
+     * This method will return the kafka details of each child apps
+     * @param managerId
+     * @param appName
+     */
+    static getKafkaDetails(managerId, appName) {
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName + '/child-apps/' + 'transport')
+    }
 }

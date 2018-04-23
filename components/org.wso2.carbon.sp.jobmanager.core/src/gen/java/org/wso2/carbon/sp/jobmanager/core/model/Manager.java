@@ -27,7 +27,7 @@ import java.util.Objects;
  * Manager class that holds host and port of the manager object
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2018-01-29T08:19:07.148Z")
+        date = "2018-01-29T08:19:07.148Z")
 public class Manager {
     @JsonProperty("host")
     private String host = null;

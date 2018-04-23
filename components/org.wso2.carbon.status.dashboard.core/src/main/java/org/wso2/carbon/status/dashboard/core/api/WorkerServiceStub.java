@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.api;
 
 import feign.Headers;
@@ -23,7 +24,6 @@ import feign.Param;
 import feign.RequestLine;
 import feign.Response;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
-
 
 /**
  * feign client for sending the request.
@@ -64,4 +64,34 @@ public interface WorkerServiceStub {
     @Headers("Content-Type: application/json")
     @RequestLine("POST /login")
     Response testConnection();
+
+    //APIS related to distributed view
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /runTime")
+    Response getRunTime();
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers")
+    Response getManagerDetails();
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers/siddhi-apps")
+    Response getSiddhiApps();
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /resourceClusterWorkers")
+    Response getResourceClusterWorkers();
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers/siddhi-apps-execution/{appName}")
+    Response getManagerSiddhiAppTextView(@Param("appName") String appName);
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers/siddhi-apps/{appName}")
+    Response getChildAppDetails(@Param("appName") String appName);
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /managers/kafkaDetails/{appName}")
+    Response getKafkaDetails(@Param("appName") String appName);
+
 }
