@@ -299,11 +299,8 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                                 deployedNode));
                     } else {
                         LOG.warn(String.format("Insufficient resources to deploy %s. Therefore, cannot re-balance " +
-                                        "Siddhi app %s. Hence, rolling back the deployment and waiting"
-                                        + " for "
-                                        +
-                                        "additional resources.", affectedPartialApp.getAppName(),
-                                affectedPartialApp.getParentAppName()));
+                                "Siddhi app %s. Hence, rolling back the deployment and waiting for additional " +
+                                "resources.", affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName()));
                         List<SiddhiAppHolder> appHolders = resourcePool.getSiddhiAppHoldersMap()
                                 .remove(affectedPartialApp.getParentAppName());
 

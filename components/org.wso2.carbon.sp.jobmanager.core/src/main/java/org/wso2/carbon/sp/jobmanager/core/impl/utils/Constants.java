@@ -36,8 +36,9 @@ public class Constants {
     public static final String DATA_TYPE_LONG = "longType";
     public static final String DATA_TYPE_FLOAT = "floatType";
     public static final String DATA_TYPE_BOOL = "booleanType";
-    public static final String ACTIVE_STATUS = "Active";
-    public static final String PASIVE_STATUS = "pasive";
+    public static final String HA_ACTIVE_STATUS = "Active";
+    public static final String SIDDHI_APP_ACTIVE_STATUS = "Active";
+    public static final String HA_PASIVE_STATUS = "pasive";
     public static final String WAITING_STATUS = "waiting";
 
     public static final String KAFKA_SOURCE = "source";
