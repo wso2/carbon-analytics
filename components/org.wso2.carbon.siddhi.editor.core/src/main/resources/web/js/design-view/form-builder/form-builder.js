@@ -246,34 +246,30 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                var isStreamNameUsed = false;
-                _.forEach(self.appData.streamList, function(stream){
-                    if(stream.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
-                        isStreamNameUsed = true;
-                    }
-                });
-                if(isStreamNameUsed) {
+                var isStreamNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name);
+                if (isStreamNameUsed) {
                     alert("Stream name \"" + editor.getValue().name + "\" is already used.");
-                } else {
-                    // add the new out stream to the stream array
-                    var streamOptions = {};
-                    _.set(streamOptions, 'id', i);
-                    _.set(streamOptions, 'name', editor.getValue().name);
-                    _.set(streamOptions, 'isInnerStream', false);
-                    var stream = new Stream(streamOptions);
-                    _.forEach(editor.getValue().attributes, function (attribute) {
-                        var attributeObject = new Attribute(attribute);
-                        stream.addAttribute(attributeObject);
-                    });
-                    self.appData.addStream(stream);
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-
-                    self.gridContainer.removeClass("disabledbutton");
-                    self.toolPaletteContainer.removeClass("disabledbutton");
+                    return;
                 }
+                // add the new out stream to the stream array
+                var streamOptions = {};
+                _.set(streamOptions, 'id', i);
+                _.set(streamOptions, 'name', editor.getValue().name);
+                _.set(streamOptions, 'isInnerStream', false);
+                var stream = new Stream(streamOptions);
+                _.forEach(editor.getValue().attributes, function (attribute) {
+                    var attributeObject = new Attribute(attribute);
+                    stream.addAttribute(attributeObject);
+                });
+                self.appData.addStream(stream);
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+
+                self.gridContainer.removeClass("disabledbutton");
+                self.toolPaletteContainer.removeClass("disabledbutton");
+
             });
             return editor.getValue().name;
         };
@@ -372,6 +368,12 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+                var isStreamNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name,
+                    clickedElement.getId());
+                if (isStreamNameUsed) {
+                    alert("Stream name \"" + editor.getValue().name + "\" is already used.");
+                    return;
+                }
                 // The container and the palette are disabled to prevent the user from dropping any elements
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
@@ -481,34 +483,30 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                var isTableNameUsed = false;
-                _.forEach(self.appData.tableList, function(table){
-                    if(table.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
-                        isTableNameUsed = true;
-                    }
-                });
-                if(isTableNameUsed) {
+                var isTableNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name);
+                if (isTableNameUsed) {
                     alert("Table name \"" + editor.getValue().name + "\" is already used.");
-                } else {
-                    // add the new out table to the table array
-                    var tableOptions = {};
-                    _.set(tableOptions, 'id', i);
-                    _.set(tableOptions, 'name', editor.getValue().name);
-                    _.set(tableOptions, 'store', '');
-                    var table = new Table(tableOptions);
-                    _.forEach(editor.getValue().attributes, function (attribute) {
-                        var attributeObject = new Attribute(attribute);
-                        table.addAttribute(attributeObject);
-                    });
-                    self.appData.addTable(table);
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-
-                    self.gridContainer.removeClass("disabledbutton");
-                    self.toolPaletteContainer.removeClass("disabledbutton");
+                    return;
                 }
+                // add the new out table to the table array
+                var tableOptions = {};
+                _.set(tableOptions, 'id', i);
+                _.set(tableOptions, 'name', editor.getValue().name);
+                _.set(tableOptions, 'store', '');
+                var table = new Table(tableOptions);
+                _.forEach(editor.getValue().attributes, function (attribute) {
+                    var attributeObject = new Attribute(attribute);
+                    table.addAttribute(attributeObject);
+                });
+                self.appData.addTable(table);
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+
+                self.gridContainer.removeClass("disabledbutton");
+                self.toolPaletteContainer.removeClass("disabledbutton");
+
             });
             return editor.getValue().name;
         };
@@ -606,6 +604,12 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+                var isTableNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name,
+                    clickedElement.getId());
+                if (isTableNameUsed) {
+                    alert("Table name \"" + editor.getValue().name + "\" is already used.");
+                    return;
+                }
                 // The container and the palette are disabled to prevent the user from dropping any elements
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
@@ -752,44 +756,39 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                var isWindowNameUsed = false;
-                _.forEach(self.appData.windowList, function(window){
-                    if(window.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
-                        isWindowNameUsed = true;
-                    }
-                });
-                if(isWindowNameUsed) {
+                var isWindowNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name);
+                if (isWindowNameUsed) {
                     alert("Window name \"" + editor.getValue().name + "\" is already used.");
-                } else {
-                    // add the new out window to the window array
-                    var windowOptions = {};
-                    _.set(windowOptions, 'id', i);
-                    _.set(windowOptions, 'name', editor.getValue().name);
-                    _.set(windowOptions, 'function', editor.getValue().functionName);
-                    var parameters = [];
-                    _.forEach(editor.getValue().parameters, function (parameter) {
-                        parameters.push(parameter.parameterValue);
-                    });
-                    _.set(windowOptions, 'parameters', parameters);
-                    if (editor.getValue().outputEventType !== undefined) {
-                        _.set(windowOptions, 'outputEventType', editor.getValue().outputEventType);
-                    } else {
-                        _.set(windowOptions, 'outputEventType', '');
-                    }
-                    var window = new Window(windowOptions);
-                    _.forEach(editor.getValue().attributes, function (attribute) {
-                        var attributeObject = new Attribute(attribute);
-                        window.addAttribute(attributeObject);
-                    });
-                    self.appData.addWindow(window);
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-
-                    self.gridContainer.removeClass("disabledbutton");
-                    self.toolPaletteContainer.removeClass("disabledbutton");
+                    return;
                 }
+                // add the new out window to the window array
+                var windowOptions = {};
+                _.set(windowOptions, 'id', i);
+                _.set(windowOptions, 'name', editor.getValue().name);
+                _.set(windowOptions, 'function', editor.getValue().functionName);
+                var parameters = [];
+                _.forEach(editor.getValue().parameters, function (parameter) {
+                    parameters.push(parameter.parameterValue);
+                });
+                _.set(windowOptions, 'parameters', parameters);
+                if (editor.getValue().outputEventType !== undefined) {
+                    _.set(windowOptions, 'outputEventType', editor.getValue().outputEventType);
+                } else {
+                    _.set(windowOptions, 'outputEventType', '');
+                }
+                var window = new Window(windowOptions);
+                _.forEach(editor.getValue().attributes, function (attribute) {
+                    var attributeObject = new Attribute(attribute);
+                    window.addAttribute(attributeObject);
+                });
+                self.appData.addWindow(window);
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+
+                self.gridContainer.removeClass("disabledbutton");
+                self.toolPaletteContainer.removeClass("disabledbutton");
             });
             return editor.getValue().name;
         };
@@ -940,6 +939,12 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+                var isWindowNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name,
+                    clickedElement.getId());
+                if (isWindowNameUsed) {
+                    alert("Window name \"" + editor.getValue().name + "\" is already used.");
+                    return;
+                }
                 // The container and the palette are disabled to prevent the user from dropping any elements
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
@@ -963,8 +968,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 // removing all elements from attribute list
                 clickedElement.getAttributeList().removeAllElements();
                 // adding new attributes to the attribute list
-                _.forEach(config.attributes, function(attribute){
-                    clickedElement.addAttribute(attribute);
+                _.forEach(config.attributes, function (attribute) {
+                    var attributeObject = new Attribute(attribute);
+                    clickedElement.addAttribute(attributeObject);
                 });
 
                 var textNode = $(element).parent().find('.windownamenode');
@@ -1034,30 +1040,25 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                var isTriggerNameUsed = false;
-                _.forEach(self.appData.triggerList, function(trigger){
-                    if(trigger.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
-                        isTriggerNameUsed = true;
-                    }
-                });
-                if(isTriggerNameUsed) {
+                var isTriggerNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name);
+                if (isTriggerNameUsed) {
                     alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
-                } else {
-                    // add the new out trigger to the trigger array
-                    var triggerOptions = {};
-                    _.set(triggerOptions, 'id', i);
-                    _.set(triggerOptions, 'name', editor.getValue().name);
-                    _.set(triggerOptions, 'at', editor.getValue().at);
-                    var trigger = new Trigger(triggerOptions);
-                    self.appData.addTrigger(trigger);
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
-
-                    self.gridContainer.removeClass("disabledbutton");
-                    self.toolPaletteContainer.removeClass("disabledbutton");
+                    return;
                 }
+                // add the new out trigger to the trigger array
+                var triggerOptions = {};
+                _.set(triggerOptions, 'id', i);
+                _.set(triggerOptions, 'name', editor.getValue().name);
+                _.set(triggerOptions, 'at', editor.getValue().at);
+                var trigger = new Trigger(triggerOptions);
+                self.appData.addTrigger(trigger);
+
+                // close the form window
+                self.consoleListManager.removeConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
+
+                self.gridContainer.removeClass("disabledbutton");
+                self.toolPaletteContainer.removeClass("disabledbutton");
             });
             return editor.getValue().name;
         };
@@ -1121,6 +1122,12 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+                var isTriggerNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name,
+                    clickedElement.getId());
+                if (isTriggerNameUsed) {
+                    alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
+                    return;
+                }
                 // The container and the palette are disabled to prevent the user from dropping any elements
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
@@ -1315,12 +1322,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                var isAggregationNameUsed = false;
-                _.forEach(self.appData.aggregationList, function(aggregation){
-                    if(aggregation.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
-                        isAggregationNameUsed = true;
-                    }
-                });
+                var isAggregationNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name);
                 if(isAggregationNameUsed) {
                     alert("Aggregation name \"" + editor.getValue().name + "\" is already used.");
                     return;
@@ -1572,17 +1574,12 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                //TODO: when the name is saved check whether this name is same as the previously saved name. If not, then only check whether it is unique.
-                // var isAggregationNameUsed = false;
-                // _.forEach(self.appData.aggregationList, function(aggregation){
-                //     if(aggregation.getName().toUpperCase() === editor.getValue().name.toUpperCase()) {
-                //         isAggregationNameUsed = true;
-                //     }
-                // });
-                // if(isAggregationNameUsed) {
-                //     alert("Aggregation name \"" + editor.getValue().name + "\" is already used.");
-                //     return;
-                // }
+                var isAggregationNameUsed = self.IsDefinitionElementNameUnique(editor.getValue().name,
+                    clickedElement.getId());
+                if(isAggregationNameUsed) {
+                    alert("Aggregation name \"" + editor.getValue().name + "\" is already used.");
+                    return;
+                }
                 // The container and the palette are disabled to prevent the user from dropping any elements
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
@@ -3684,5 +3681,56 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             }
         };
 
+        /**
+         * @function check whether given name to the definition element is unique
+         * @param elementName given name to the definition element
+         * @param skipElementID this element name will be ignored when checking the unique name. This is used when
+         *          saving the same name after editing a particular element
+         * @return {boolean}
+         */
+        FormBuilder.prototype.IsDefinitionElementNameUnique = function (elementName, skipElementID) {
+            var self = this;
+            var isNameUsed = false;
+            _.forEach(self.appData.streamList, function (stream) {
+                if (stream.getName().toUpperCase() === elementName.toUpperCase()) {
+                    if (!(skipElementID !== undefined && skipElementID === stream.getId())) {
+                        isNameUsed = true;
+                    }
+                }
+            });
+
+            _.forEach(self.appData.tableList, function (table) {
+                if (table.getName().toUpperCase() === elementName.toUpperCase()) {
+                    if (!(skipElementID !== undefined && skipElementID === table.getId())) {
+                        isNameUsed = true;
+                    }
+                }
+            });
+
+            _.forEach(self.appData.windowList, function (window) {
+                if (window.getName().toUpperCase() === elementName.toUpperCase()) {
+                    if (!(skipElementID !== undefined && skipElementID === window.getId())) {
+                        isNameUsed = true;
+                    }
+                }
+            });
+
+            _.forEach(self.appData.aggregationList, function (aggregation) {
+                if (aggregation.getName().toUpperCase() === elementName.toUpperCase()) {
+                    if (!(skipElementID !== undefined && skipElementID === aggregation.getId())) {
+                        isNameUsed = true;
+                    }
+                }
+            });
+
+            _.forEach(self.appData.triggerList, function (trigger) {
+                if (trigger.getName().toUpperCase() === elementName.toUpperCase()) {
+                    if (!(skipElementID !== undefined && skipElementID === trigger.getId())) {
+                        isNameUsed = true;
+                    }
+                }
+            });
+            return isNameUsed;
+        };
         return FormBuilder;
     });
