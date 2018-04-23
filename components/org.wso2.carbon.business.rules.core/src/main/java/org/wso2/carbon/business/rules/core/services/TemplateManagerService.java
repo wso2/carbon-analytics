@@ -268,6 +268,12 @@ public class TemplateManagerService implements BusinessRulesService {
         String businessRuleUUID = businessRuleFromScratch.getUuid();
         // Get nodes where business rule should be deployed
         nodeList = getNodeListForBusinessRuleFromScratch(businessRuleFromScratch);
+        if (nodeList == null) {
+            log.error(String.format("Failed to find configurations of nodes for deploying business rule %s .",
+                    removeCRLFCharacters(uuid)));
+            return TemplateManagerConstants.ERROR;
+        }
+
         Map<String, Artifact> derivedArtifacts;
         Artifact deployableSiddhiApp;
         try {
@@ -287,13 +293,6 @@ public class TemplateManagerService implements BusinessRulesService {
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed. ", e);
-        }
-
-
-        if (nodeList == null) {
-            log.error(String.format("Failed to find configurations of nodes for deploying business rule %s .",
-                    removeCRLFCharacters(uuid)));
-            return TemplateManagerConstants.ERROR;
         }
 
         if (toDeploy) {
@@ -471,13 +470,13 @@ public class TemplateManagerService implements BusinessRulesService {
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
             List<String> nodeList = getNodeListForBusinessRuleFromScratch(businessRuleFromScratch);
-            ruleTemplateIDs.add(businessRuleFromScratch.getInputRuleTemplateUUID());
-            ruleTemplateIDs.add(businessRuleFromScratch.getOutputRuleTemplateUUID());
-
             if (nodeList == null) {
                 throw new TemplateManagerServiceException("Failed to find configurations of nodes " +
                         "for deploying business rules.");
             }
+
+            ruleTemplateIDs.add(businessRuleFromScratch.getInputRuleTemplateUUID());
+            ruleTemplateIDs.add(businessRuleFromScratch.getOutputRuleTemplateUUID());
 
             int currentState;
             try {
@@ -529,21 +528,39 @@ public class TemplateManagerService implements BusinessRulesService {
         return status;
     }
 
+    /**
+     * Returns whether the given node list has at least one element, and qualifies for deployment
+     * @param nodeList : List of node host and ports
+     * @return         : Whether the given node list has at least one element
+     */
+    private boolean hasAtLeastOneNode(List<String> nodeList) {
+        return (nodeList != null && !nodeList.isEmpty());
+    }
+
+    /**
+     * Gets list of node host and port, in which, the given BusinessRuleFromScratch object should be deployed
+     * @param businessRuleFromScratch : Business rule from scratch object
+     * @return                        : List of node host and ports to deploy, when valid, otherwise null
+     */
     private List<String> getNodeListForBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
-        String inputTemplateUUID = businessRuleFromScratch.getInputRuleTemplateUUID();
-        String outputTemplateUUID = businessRuleFromScratch.getOutputRuleTemplateUUID();
-        List<String> nodeList = getNodesList(inputTemplateUUID);
-        List<String> outputNodeList = getNodesList(outputTemplateUUID);
-        String businessRuleUUID = businessRuleFromScratch.getUuid();
-        if (nodeList != null && outputNodeList != null) {
-            nodeList.removeAll(outputNodeList);
-            nodeList.addAll(outputNodeList);
-            return nodeList;
-        } else {
-            log.error(String.format("Failed to find configurations of nodes for deploying business rule %s ",
-                    removeCRLFCharacters(businessRuleUUID)));
-            return null;
+        List<String> inputNodeList = getNodesList(businessRuleFromScratch.getInputRuleTemplateUUID());
+        List<String> outputNodeList = getNodesList(businessRuleFromScratch.getOutputRuleTemplateUUID());
+
+        if (hasAtLeastOneNode(inputNodeList) && hasAtLeastOneNode(outputNodeList)) {
+            inputNodeList.removeAll(outputNodeList);
+            inputNodeList.addAll(outputNodeList);
+            return inputNodeList;
         }
+        if (hasAtLeastOneNode(inputNodeList)) {
+            return inputNodeList;
+        }
+        if (hasAtLeastOneNode(outputNodeList)) {
+            return outputNodeList;
+        }
+
+        log.error(String.format("Failed to find configurations of nodes for deploying business rule %s ",
+                removeCRLFCharacters(businessRuleFromScratch.getUuid())));
+        return null;
     }
 
     private void deployBusinessRule(BusinessRule businessRule, String nodeURL, Map<String, Artifact> derivedArtifacts)

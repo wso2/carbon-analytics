@@ -31,7 +31,8 @@ import io.swagger.annotations.ApiModelProperty;
  * Representation of a Node which consists of an id and an InterfaceConfig
  */
 @ApiModel(description = "Representation of a Node which consists of an id and an InterfaceConfig")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-23T12:20:42.963Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-23T12:20:42.963Z")
 public class NodeConfig {
     @JsonProperty("id")
     private String id = null;

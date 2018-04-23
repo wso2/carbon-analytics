@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Data holder for data required for {@link SiddhiTopologyCreatorImpl} which is responsible for creating
+ * Data holder for data required for {@link SiddhiTopologyCreatorImpl} which is responsible for creating.
  * {@link SiddhiTopology}
  */
 public class SiddhiTopologyDataHolder {

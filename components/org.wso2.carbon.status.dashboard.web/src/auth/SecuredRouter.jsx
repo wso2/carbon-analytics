@@ -31,6 +31,10 @@ import WorkerHistory from "../worker-history/WorkerHistory";
 import WorkerHistoryMore from "../worker-history-more/WorkerHistoryMore";
 import WorkerSpecific from "../worker/WorkerSpecific";
 import Error404 from "../error-pages/Error404";
+import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import DistributedViewAppThumbnail from "../distributedView/DistributedViewAppThumbnail";
+import DistributedOverview from "../distributedView/DistributedViewOverview";
+import AppView from "../distributedView/AppView";
 /**
  * App context.
  */
@@ -66,7 +70,6 @@ export default class SecuredRouter extends Component {
                 <Redirect to={{ pathname: `${appContext}/login`, search: params }} />
             );
         }
-
         return (
             <Switch>
                 <Route exact path={appContext} component={WorkerOverview}/>
@@ -82,6 +85,8 @@ export default class SecuredRouter extends Component {
                 <Route exact path={appContext + '/worker/:id'} component={WorkerSpecific}/>
                 <Route exact path={appContext + '/worker/history/:id'} component={WorkerHistory}/>
                 <Route exact path={appContext + '/worker/history/:id/more'} component={WorkerHistoryMore}/>
+                <Route exact path={appContext +  '/:id/siddhi-apps'} component= {DistributedOverview}/>
+                <Route exact path={appContext + '/:id/siddhi-apps/:appName'} component={AppView}/>
                 <Route component={Error404}/>
             </Switch>
         );

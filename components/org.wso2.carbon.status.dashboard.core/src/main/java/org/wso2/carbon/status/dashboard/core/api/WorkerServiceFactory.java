@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.api;
 
 import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
@@ -30,6 +31,6 @@ public class WorkerServiceFactory {
                 MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
                         .getWorkerConnectionConfigurations().getConnectionTimeOut(), MonitoringDataHolder.getInstance()
                         .getStatusDashboardDeploymentConfigs().getWorkerConnectionConfigurations().getReadTimeOut(),
-                         WorkerServiceStub.class, url);
+                WorkerServiceStub.class, url);
     }
 }

@@ -19,7 +19,7 @@
 package org.wso2.carbon.sp.jobmanager.core.util;
 
 /**
- * This class contains constants needed for the Topology creation
+ * This class contains constants needed for the Topology creation.
  */
 public class SiddhiTopologyCreatorConstants {
     public static final Integer DEFAULT_PARALLEL = 1;

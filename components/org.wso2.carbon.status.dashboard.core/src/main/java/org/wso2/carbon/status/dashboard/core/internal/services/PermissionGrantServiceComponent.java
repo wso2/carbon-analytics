@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.internal.services;
 
 import org.osgi.framework.BundleContext;
@@ -64,7 +65,7 @@ public class PermissionGrantServiceComponent {
             logger.debug("Status dashboard permission grant service component is activated.");
         }
         try {
-            DeploymentConfigs resolvedConfiguration=MonitoringDataHolder.getInstance()
+            DeploymentConfigs resolvedConfiguration = MonitoringDataHolder.getInstance()
                     .getStatusDashboardDeploymentConfigs();
             RolesProvider rolesProvider = new RolesProvider(resolvedConfiguration);
             MonitoringDataHolder.getInstance().setRolesProvider(rolesProvider);
@@ -85,7 +86,7 @@ public class PermissionGrantServiceComponent {
 
     private void initPermission() throws UnauthorizedException, IdPClientException {
         for (Permission permission : getAllPermission()) {
-            if(!permissionProvider.isPermissionExists(permission)) {
+            if (!permissionProvider.isPermissionExists(permission)) {
                 permissionProvider.addPermission(permission);
             }
         }
@@ -167,6 +168,7 @@ public class PermissionGrantServiceComponent {
                 Constants.PERMISSION_SUFFIX_VIEWER));
         return permissions;
     }
+
     /**
      * Build basic dashboard permission string.
      *

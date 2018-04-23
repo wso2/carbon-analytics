@@ -19,8 +19,9 @@
 
 import Axios from "axios";
 
-import { MediaType } from '../Constants';
+import {MediaType} from '../Constants';
 import AuthManager from "../../auth/utils/AuthManager";
+
 /**
  * This should remove after fixing app by paralleling call workers
  */
@@ -32,14 +33,15 @@ export default class StatusDashboardOverViewAPI {
      */
     static getHTTPClient() {
         let httpClient = Axios.create({
-            baseURL: window.location.origin + "/"+window.contextPath.substr(1)+'/apis/workers',
+            baseURL: window.location.origin + "/" + window.contextPath.substr(1) + '/apis/workers',
             timeout: 15000,
-            headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID,"Content-Type":"application/json"}
+            headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID, "Content-Type": "application/json"}
         });
         httpClient.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;
         httpClient.defaults.headers.put['Content-Type'] = MediaType.APPLICATION_JSON;
         return httpClient;
     }
+
     /**
      * This method will return a list of Siddhi Apps of worker given by ID.
      */
@@ -97,6 +99,30 @@ export default class StatusDashboardOverViewAPI {
      */
     static createWorker(worker) {
         return StatusDashboardOverViewAPI.getHTTPClient().post('', worker);
+    }
+
+    /**
+     * This method will create a manager with given manager details json.
+     * @param worker
+     * @returns {*}
+     */
+    static createManager(manager) {
+        return StatusDashboardOverViewAPI.getHTTPClient().post('/manager', manager);
+    }
+
+    /**
+     * This method will return the HA details of manager node.
+     * @param managerId
+     */
+    static getManagerHADetails(managerId) {
+        return StatusDashboardOverViewAPI.getHTTPClient().get('/manager' + '/' + managerId);
+    }
+
+    /**
+     * This method will return a list of managers real-time details.
+     */
+    static getManagerList() {
+        return StatusDashboardOverViewAPI.getHTTPClient().get('/manager');
     }
 
 }

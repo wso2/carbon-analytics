@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.status.dashboard.core.dbhandler;
 
+package org.wso2.carbon.status.dashboard.core.dbhandler;
 
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.database.query.manager.QueryProvider;
@@ -31,7 +31,6 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,7 @@ public class QueryManager {
     }
 
     private Map<String, String> readConfigs(String databaseType, String databaseVersion) throws ConfigurationException,
-            QueryMappingNotAvailableException, IOException {
+            QueryMappingNotAvailableException {
         try {
             DeploymentConfigs deploymentConfigurations = MonitoringDataHolder.getInstance()
                     .getConfigProvider()
@@ -64,8 +63,8 @@ public class QueryManager {
             } else {
                 throw new RuntimeException("Unable to load queries.yaml file.");
             }
-            queries = QueryProvider.mergeMapping(databaseType, databaseVersion, (ArrayList<Queries>)componentQueries,
-                    (ArrayList<Queries>)deploymentQueries);
+            queries = QueryProvider.mergeMapping(databaseType, databaseVersion, componentQueries,
+                    deploymentQueries);
         } catch (ConfigurationException e) {
             throw new ConfigurationException("Unable to read queries.yaml configurations: " + e.getMessage(), e);
         } catch (QueryMappingNotAvailableException e) {

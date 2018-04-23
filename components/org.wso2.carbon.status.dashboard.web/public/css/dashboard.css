@@ -173,3 +173,62 @@ body {
     opacity: 1;
 }
 
+.deployed-apps-details {
+    color: white;
+    display: inline;
+}
+
+/*style sheet for kafka flow diagram*/
+
+.node rect {
+    stroke: #bbb;
+    fill: #333;
+    stroke-width: 2px;
+    height: 60px;
+}
+
+.node-content {height: 50px;
+    line-height: 30px;
+}
+
+.indicator {
+    height: 58px;
+    width: 15px;
+    float: left;
+    margin: 1px 20px 1px 1px;
+    background-color: blue
+}
+
+.nodeLabel {
+    font-size: 1em;
+    color: #fff;
+    margin-right: 10px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.hostPort {
+    font-size: 1em;
+    color: #696969;
+    font-weight: 400;
+    display: block;
+}
+
+.nodes .label {
+    text-align: left;
+    width: 500px;
+}
+
+.edgePath path {
+    stroke: #bbb;
+    stroke-width: 2px;
+    fill: none;
+}
+
+.topic-indicator {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: red
+}

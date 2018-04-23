@@ -42,7 +42,7 @@ class SafeKafkaInvoker {
     public void createKafkaTopic(String[] bootstrapServerURLs, ZkUtils zkUtils, Properties topicConfig,
                                  String topic, Integer partitions) {
         AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
-                               topicConfig, RackAwareMode.Enforced$.MODULE$);
+                topicConfig, RackAwareMode.Enforced$.MODULE$);
     }
 
     /**
@@ -54,6 +54,6 @@ class SafeKafkaInvoker {
      */
     public void addKafkaPartition(ZkUtils zkUtils, String topic, Integer partitions) {
         AdminUtils.addPartitions(zkUtils, topic, partitions, "", true,
-                                 RackAwareMode.Enforced$.MODULE$);
+                RackAwareMode.Enforced$.MODULE$);
     }
 }

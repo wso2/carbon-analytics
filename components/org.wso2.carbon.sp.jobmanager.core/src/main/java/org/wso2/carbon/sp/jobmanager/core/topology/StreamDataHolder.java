@@ -16,13 +16,12 @@
  * under the License.
  */
 
-
 package org.wso2.carbon.sp.jobmanager.core.topology;
 
 import org.wso2.carbon.sp.jobmanager.core.util.EventHolder;
 
 /**
- * Temporary class for enable mapping
+ * Temporary class for enable mapping.
  */
 public class StreamDataHolder {
 
