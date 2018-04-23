@@ -868,6 +868,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(streamId !== undefined) {
                     elementId = streamId;
+                    self.generateNextNewAgentId();
                 } else {
                     console.log("streamId parameter is undefined");
                 }
@@ -896,6 +897,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(tableId !== undefined) {
                     elementId = tableId;
+                    self.generateNextNewAgentId();
                 } else {
                     console.log("tableId parameter is undefined");
                 }
@@ -923,6 +925,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(windowId !== undefined) {
                     elementId = windowId;
+                    self.generateNextNewAgentId();
                 } else {
                     console.log("windowId parameter is undefined");
                 }
@@ -950,6 +953,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(triggerId !== undefined) {
                     elementId = triggerId;
+                    self.generateNextNewAgentId();
                 } else {
                     console.log("triggerId parameter is undefined");
                 }
@@ -978,6 +982,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(aggregationId !== undefined) {
                     elementId = aggregationId;
+                    self.generateNextNewAgentId();
                 } else {
                     console.log("aggregationId parameter is undefined");
                 }
@@ -1004,6 +1009,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(queryId !== undefined) {
                     elementId = queryId;
+                    self.generateNextNewAgentId();
                 } else {
                     console.log("queryId parameter is undefined");
                 }
@@ -1025,6 +1031,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var newAgent = $('<div>').attr('id', self.getNewAgentId()).addClass('joquerydrop');
             var droptype = "joquerydrop";
             // Drop the element instantly since its projections will be set only when the user requires it
+            //self.generateNextNewAgentId();
             self.dropElements.dropQuery(newAgent, self.getNewAgentId(), droptype, mouseTop, mouseLeft, "Join Query",
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
@@ -1040,6 +1047,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(patternQueryId !== undefined) {
                     elementId = patternQueryId;
+                    self.generateNextNewAgentId();
                 } else {
                     console.log("patternQueryId parameter is undefined");
                 }
@@ -1058,16 +1066,22 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
             var newAgent = $('<div>').attr('id', self.getNewAgentId()).addClass('partitiondrop');
             // Drop the element instantly since its projections will be set only when the user requires it
+            //self.generateNextNewAgentId();
             self.dropElements.dropPartition(newAgent, self.getNewAgentId(), mouseTop, mouseLeft, isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
             //TODO: connection points should be able to remove( close icon). Then update on connection detach.
         };
 
-        DesignGrid.prototype.getNewAgentId = function () {
+        DesignGrid.prototype.generateNextNewAgentId = function () {
             // TODO: Not finalized
-            var currentId = parseInt(this.newAgentId) +1;
-            return this.newAgentId = "" + currentId + "";
+            var newId = parseInt(this.newAgentId) +1;
+            return this.newAgentId = "" + newId + "";
+        };
+
+        DesignGrid.prototype.getNewAgentId = function () {
+            var self = this;
+            return self.generateNextNewAgentId();
         };
 
         return DesignGrid;
