@@ -60,7 +60,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
 
             // newAgentId --> newAgent ID (Dropped Element ID)
-            this.newAgentId = "1";
+            this.newAgentId = "0";
             var dropElementsOpts = {};
             _.set(dropElementsOpts, 'container', self.container);
             _.set(dropElementsOpts, 'appData', self.appData);
@@ -796,12 +796,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             });
         };
 
-        DesignGrid.prototype.generateNextId = function () {
-            // TODO: Not finalized
-            var currentId = parseInt(this.newAgentId) +1;
-            this.newAgentId = "" + currentId + "";
-        };
-
         /**
          * @function Auto align the diagram
          */
@@ -865,7 +859,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = self.newAgentId;
+                elementId = self.getNewAgentId();
                 // The container and the toolbox are disabled to prevent the user from dropping any elements before
                 // initializing a Stream Element
                 self.canvas.addClass("disabledbutton");
@@ -880,8 +874,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            // increment the Element ID for the next dropped Element
-            self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass('streamdrop');
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
@@ -895,7 +887,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = self.newAgentId;
+                elementId = self.getNewAgentId();
                 // The container and the toolbox are disabled to prevent the user from dropping any elements before
                 // initializing a Table Element
                 self.canvas.addClass("disabledbutton");
@@ -910,8 +902,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            // increment the Element ID for the next dropped Element
-            self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass('tabledrop');
             self.canvas.append(newAgent);
             // Drop the Table element. Inside this a it generates the table definition form.
@@ -924,7 +914,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = self.newAgentId;
+                elementId = self.getNewAgentId();
                 // The container and the toolbox are disabled to prevent the user from dropping any elements before
                 // initializing a window Element
                 self.canvas.addClass("disabledbutton");
@@ -939,8 +929,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            // increment the Element ID for the next dropped Element
-            self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass('windowdrop');
             self.canvas.append(newAgent);
             // Drop the Table element. Inside this a it generates the table definition form.
@@ -953,7 +941,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = self.newAgentId;
+                elementId = self.getNewAgentId();
                 // The container and the toolbox are disabled to prevent the user from dropping any elements before
                 // initializing a Trigger Element
                 self.canvas.addClass("disabledbutton");
@@ -968,8 +956,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            // increment the Element ID for the next dropped Element
-            self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass('triggerdrop');
             self.canvas.append(newAgent);
             // Drop the Trigger element. Inside this a it generates the trigger definition form.
@@ -983,7 +969,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = self.newAgentId;
+                elementId = self.getNewAgentId();
                 // The container and the toolbox are disabled to prevent the user from dropping any elements before
                 // initializing a Aggregation Element
                 self.canvas.addClass("disabledbutton");
@@ -998,8 +984,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            // increment the Element ID for the next dropped Element
-            self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass('aggregationdrop');
             self.canvas.append(newAgent);
             // Drop the Aggregation element. Inside this a it generates the aggregation definition form.
@@ -1015,7 +999,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var elementId;
             var queryName;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = self.newAgentId;
+                elementId = self.getNewAgentId();
                 queryName = "Query";
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(queryId !== undefined) {
@@ -1027,8 +1011,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            // increment the Element ID for the next dropped Element
-            self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass(type);
             self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
@@ -1040,13 +1022,12 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
         DesignGrid.prototype.handleJoinQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('joquerydrop');
+            var newAgent = $('<div>').attr('id', self.getNewAgentId()).addClass('joquerydrop');
             var droptype = "joquerydrop";
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropQuery(newAgent, self.newAgentId, droptype, mouseTop, mouseLeft, "Join Query",
+            self.dropElements.dropQuery(newAgent, self.getNewAgentId(), droptype, mouseTop, mouseLeft, "Join Query",
                 isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
@@ -1055,7 +1036,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = self.newAgentId;
+                elementId = self.getNewAgentId();
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(patternQueryId !== undefined) {
                     elementId = patternQueryId;
@@ -1065,8 +1046,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            // increment the Element ID for the next dropped Element
-            self.generateNextId();
             var newAgent = $('<div>').attr('id', elementId).addClass('patternQueryDrop');
             self.canvas.append(newAgent);
             // Drop the Table element. Inside this a it generates the table definition form.
@@ -1077,17 +1056,18 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
         DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.newAgentId).addClass('partitiondrop');
+            var newAgent = $('<div>').attr('id', self.getNewAgentId()).addClass('partitiondrop');
             // Drop the element instantly since its projections will be set only when the user requires it
-            self.dropElements.dropPartition(newAgent, self.newAgentId, mouseTop, mouseLeft, isCodeToDesignMode);
+            self.dropElements.dropPartition(newAgent, self.getNewAgentId(), mouseTop, mouseLeft, isCodeToDesignMode);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-            self.generateNextId();
             self.dropElements.registerElementEventListeners(newAgent);
             //TODO: connection points should be able to remove( close icon). Then update on connection detach.
         };
 
         DesignGrid.prototype.getNewAgentId = function () {
-            return this.newAgentId;
+            // TODO: Not finalized
+            var currentId = parseInt(this.newAgentId) +1;
+            return this.newAgentId = "" + currentId + "";
         };
 
         return DesignGrid;

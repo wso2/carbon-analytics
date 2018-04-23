@@ -170,9 +170,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 });
                 self.appData.addStream(stream);
 
-                // increment the variable newAgentId and the final element count
+                // increment the variable final element count
                 self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
-                self.designGrid.generateNextId();
                 self.registerElementEventListeners(newAgent);
             }
             // The container and the tool palette are disabled to prevent the user from dropping any elements
