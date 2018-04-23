@@ -137,7 +137,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
          @function drop stream that is defined as the output stream in a query configuration
          * @param queryModel Query data holding object
          * @param position  position of selected query
-         * @param id  id of selected query
+         * @param queryId  id of selected query
          * @param outStream  name for new output stream
          * @param streamAttributes  projections list for output stream
          */
@@ -521,6 +521,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 _.set(queryOptions, 'queryInput', '');
                 _.set(queryOptions, 'select', '');
                 _.set(queryOptions, 'groupBy', '');
+                _.set(queryOptions, 'limit', '');
                 _.set(queryOptions, 'having', '');
                 _.set(queryOptions, 'outputRateLimit', '');
                 _.set(queryOptions, 'queryOutput', '');
@@ -598,6 +599,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 _.set(patternQueryOptions, 'queryInput', '');
                 _.set(patternQueryOptions, 'select', '');
                 _.set(patternQueryOptions, 'groupBy', '');
+                _.set(patternQueryOptions, 'limit', '');
                 _.set(patternQueryOptions, 'having', '');
                 _.set(patternQueryOptions, 'outputRateLimit', '');
                 _.set(patternQueryOptions, 'queryOutput', '');

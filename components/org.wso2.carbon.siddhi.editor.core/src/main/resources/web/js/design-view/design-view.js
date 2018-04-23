@@ -20,13 +20,14 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
         'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation', 'aggregateByTimePeriod',
         'windowFilterProjectionQueryInput', 'queryWindow', 'patternQueryInput', 'patternQueryInputCounting',
         'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'edge', 'querySelect',
-        'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto',
+        'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
+        'queryOutputUpdateOrInsertInto',
         'attribute'],
     function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, Partition, Query, Stream, Table,
               Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindow,
               PatternQueryInput, PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
-              PatternQueryInputNotAnd, Edge, QuerySelect, QueryOutput, QueryOutputInsert, QueryOutputDelete,
-              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute) {
+              PatternQueryInputNotAnd, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert,
+              QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute) {
 
         /**
          * @class DesignView
@@ -79,6 +80,14 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             function setSelectForQuery(query, querySelect) {
                 var querySelectObject = new QuerySelect(querySelect);
                 query.setSelect(querySelectObject);
+            }
+
+            // sets the query orderBy part in a query
+            function setOrderByForQuery(query, queryOrderBy) {
+                _.forEach(queryOrderBy, function(queryOrderByValue){
+                    var queryOrderByValueObject = new QueryOrderByValue(queryOrderByValue);
+                    query.addOrderByValue(queryOrderByValueObject);
+                });
             }
 
             // sets the query output attribute in a query
@@ -154,6 +163,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 });
                 patternQueryObject.setQueryInput(patternQueryInput);
                 setSelectForQuery(patternQueryObject, patternQuery.select);
+                setOrderByForQuery(patternQueryObject, patternQuery.orderBy);
                 setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
                 appData.addPatternQuery(patternQueryObject);
             });
@@ -167,6 +177,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 }
                 queryObject.setQueryInput(windowFilterProjectionQueryInput);
                 setSelectForQuery(queryObject, windowFilterProjectionQuery.select);
+                setOrderByForQuery(queryObject, windowFilterProjectionQuery.orderBy);
                 setQueryOutputForQuery(queryObject, windowFilterProjectionQuery.queryOutput);
                 appData.addWindowFilterProjectionQuery(queryObject);
             });

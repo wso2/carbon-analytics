@@ -19,11 +19,11 @@
 define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 'table', 'window', 'trigger',
         'aggregation', 'aggregateByTimePeriod', 'querySelect', 'patternQueryInputCounting', 'patternQueryInputAndOr',
         'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindow'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindow', 'queryOrderByValue'],
     function (require, log, $, _, jsPlumb, Attribute, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
               QuerySelect, PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
               PatternQueryInputNotAnd, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindow) {
+              QueryOutputUpdateOrInsertInto, QueryWindow, QueryOrderByValue) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -1698,6 +1698,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 var select = clickedElement.getSelect().value;
                 var savedGroupByAttributes = clickedElement.getGroupBy();
                 var having = clickedElement.getHaving();
+                var savedOrderByAttributes = clickedElement.getOrderBy();
+                var limit = clickedElement.getLimit();
                 var outputRateLimit = clickedElement.getOutputRateLimit();
 
                 var groupBy = [];
@@ -1706,6 +1708,15 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         attribute: savedGroupByAttribute
                     };
                     groupBy.push(groupByAttributeObject);
+                });
+
+                var orderBy = [];
+                _.forEach(savedOrderByAttributes, function (savedOrderByValue) {
+                    var orderByValueObject = {
+                        attribute: savedOrderByValue.getValue(),
+                        order: savedOrderByValue.getOrder()
+                    };
+                    orderBy.push(orderByValueObject);
                 });
 
                 var possibleGroupByAttributes = [];
@@ -1795,6 +1806,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     },
                     groupBy : groupBy,
                     having : having,
+                    orderBy : orderBy,
+                    limit : limit,
                     outputRateLimit : outputRateLimit,
                     queryOutput: queryOutput
                 };
@@ -1802,7 +1815,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 var editor = new JSONEditor(formContainer[0], {
                     schema: {
                         type: "object",
-                        title: "Pattern Query",
+                        title: "Query",
                         properties: {
                             queryInput: {
                                 propertyOrder: 1,
@@ -1906,14 +1919,47 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                                 type: "string",
                                 minLength: 1
                             },
-                            outputRateLimit: {
+                            orderBy: {
                                 propertyOrder: 6,
+                                type: "array",
+                                format: "table",
+                                title: "Order By Attributes",
+                                uniqueItems: true,
+                                items: {
+                                    type: "object",
+                                    title : 'Attribute',
+                                    properties: {
+                                        attribute: {
+                                            required: true,
+                                            type: 'string',
+                                            title: 'Attribute Name',
+                                            enum: possibleGroupByAttributes,
+                                            default: ""
+                                        },
+                                        order: {
+                                            required: true,
+                                            type: "string",
+                                            title: "Order",
+                                            enum: ['asc', 'desc'],
+                                            default: 'asc'
+                                        }
+                                    }
+                                }
+                            },
+                            limit: {
+                                propertyOrder: 7,
+                                title: "Limit",
+                                type: "number",
+                                minLength: 1
+                            },
+                            outputRateLimit: {
+                                propertyOrder: 8,
                                 title: "Output Rate Limit",
                                 type: "string",
                                 minLength: 1
                             },
                             queryOutput: {
-                                propertyOrder: 7,
+                                propertyOrder: 9,
                                 required: true,
                                 type: "object",
                                 title: "Query Output Type",
@@ -2235,6 +2281,23 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         clickedElement.setHaving('');
                     }
 
+                    clickedElement.getOrderBy().removeAllElements();
+                    if (config.orderBy !== undefined) {
+                        _.forEach(config.orderBy, function (orderByValue) {
+                            var orderByValueObjectOptions = {};
+                            _.set(orderByValueObjectOptions, 'value', orderByValue.attribute);
+                            _.set(orderByValueObjectOptions, 'order', orderByValue.order);
+                            var orderByValueObject = new QueryOrderByValue(orderByValueObjectOptions);
+                            clickedElement.addOrderByValue(orderByValueObject);
+                        });
+                    }
+
+                    if (config.limit !== undefined) {
+                        clickedElement.setLimit(config.limit);
+                    } else {
+                        clickedElement.setLimit('');
+                    }
+
                     if (config.outputRateLimit !== undefined) {
                         clickedElement.setOutputRateLimit(config.outputRateLimit);
                     } else {
@@ -2390,6 +2453,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 var select = clickedElement.getSelect().value;
                 var savedGroupByAttributes = clickedElement.getGroupBy();
                 var having = clickedElement.getHaving();
+                var savedOrderByAttributes = clickedElement.getOrderBy();
+                var limit = clickedElement.getLimit();
                 var outputRateLimit = clickedElement.getOutputRateLimit();
 
                 var groupBy = [];
@@ -2400,12 +2465,21 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     groupBy.push(groupByAttributeObject);
                 });
 
+                var orderBy = [];
+                _.forEach(savedOrderByAttributes, function (savedOrderByValue) {
+                    var orderByValueObject = {
+                        attribute: savedOrderByValue.getValue(),
+                        order: savedOrderByValue.getOrder()
+                    };
+                    orderBy.push(orderByValueObject);
+                });
+
                 var possibleGroupByAttributes = [];
                 _.forEach(inputStreams, function (inputStreamName) {
                     _.forEach(self.appData.streamList, function (stream) {
                         if (stream.getName() === inputStreamName) {
                             _.forEach(stream.getAttributeList(), function (attribute) {
-                                possibleGroupByAttributes.push(attribute.attribute);
+                                possibleGroupByAttributes.push(attribute.getName());
                             });
                         }
                     });
@@ -2468,6 +2542,8 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     },
                     groupBy : groupBy,
                     having : having,
+                    orderBy : orderBy,
+                    limit : limit,
                     outputRateLimit : outputRateLimit,
                     queryOutput: queryOutput
                 };
@@ -2565,14 +2641,47 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                                 type: "string",
                                 minLength: 1
                             },
-                            outputRateLimit: {
+                            orderBy: {
                                 propertyOrder: 6,
+                                type: "array",
+                                format: "table",
+                                title: "Order By Attributes",
+                                uniqueItems: true,
+                                items: {
+                                    type: "object",
+                                    title : 'Attribute',
+                                    properties: {
+                                        attribute: {
+                                            required: true,
+                                            type: 'string',
+                                            title: 'Attribute Name',
+                                            enum: possibleGroupByAttributes,
+                                            default: ""
+                                        },
+                                        order: {
+                                            required: true,
+                                            type: "string",
+                                            title: "Order",
+                                            enum: ['asc', 'desc'],
+                                            default: 'asc'
+                                        }
+                                    }
+                                }
+                            },
+                            limit: {
+                                propertyOrder: 7,
+                                title: "Limit",
+                                type: "number",
+                                minLength: 1
+                            },
+                            outputRateLimit: {
+                                propertyOrder: 8,
                                 title: "Output Rate Limit",
                                 type: "string",
                                 minLength: 1
                             },
                             queryOutput: {
-                                propertyOrder: 7,
+                                propertyOrder: 9,
                                 required: true,
                                 type: "object",
                                 title: "Query Output Type",
@@ -3123,6 +3232,23 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         clickedElement.setHaving(config.having);
                     } else {
                         clickedElement.setHaving('');
+                    }
+
+                    clickedElement.getOrderBy().removeAllElements();
+                    if (config.orderBy !== undefined) {
+                        _.forEach(config.orderBy, function (orderByValue) {
+                            var orderByValueObjectOptions = {};
+                            _.set(orderByValueObjectOptions, 'value', orderByValue.attribute);
+                            _.set(orderByValueObjectOptions, 'order', orderByValue.order);
+                            var orderByValueObject = new QueryOrderByValue(orderByValueObjectOptions);
+                            clickedElement.addOrderByValue(orderByValueObject);
+                        });
+                    }
+
+                    if (config.limit !== undefined) {
+                        clickedElement.setLimit(config.limit);
+                    } else {
+                        clickedElement.setLimit('');
                     }
 
                     if (config.outputRateLimit !== undefined) {

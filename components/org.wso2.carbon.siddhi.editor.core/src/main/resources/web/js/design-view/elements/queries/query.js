@@ -33,6 +33,14 @@ define(['require', 'elementArray'],
                 queryInput*: {Query Input JSON},
                 select*: {Query Select JSON},
                 groupBy: ['value1',...],
+                orderBy: [
+                    {
+                        value*: '',
+                        order: 'asc|desc'
+                    },
+                    ...
+                ],
+                limit: <integer|long>,
                 having: '',
                 outputRateLimit: ''
                 queryOutput*: {Query Output JSON},
@@ -42,6 +50,8 @@ define(['require', 'elementArray'],
             this.queryInput = options.queryInput;
             this.select = options.select;
             this.groupBy = options.groupBy;
+            this.orderBy = new ElementArray();
+            this.limit = options.limit;
             this.having = options.having;
             this.outputRateLimit = options.outputRateLimit;
             this.queryOutput = options.queryOutput;
@@ -50,6 +60,10 @@ define(['require', 'elementArray'],
 
         Query.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
+        };
+
+        Query.prototype.addOrderByValue = function (orderByValue) {
+            this.orderBy.push(orderByValue);
         };
 
         Query.prototype.getId = function () {
@@ -66,6 +80,14 @@ define(['require', 'elementArray'],
 
         Query.prototype.getGroupBy = function () {
             return this.groupBy;
+        };
+
+        Query.prototype.getOrderBy = function () {
+            return this.orderBy;
+        };
+
+        Query.prototype.getLimit = function () {
+            return this.limit;
         };
 
         Query.prototype.getHaving = function () {
@@ -98,6 +120,14 @@ define(['require', 'elementArray'],
 
         Query.prototype.setGroupBy = function (groupBy) {
             this.groupBy = groupBy;
+        };
+
+        Query.prototype.setOrderBy = function (orderBy) {
+            this.orderBy = orderBy;
+        };
+
+        Query.prototype.setLimit = function (limit) {
+            this.limit = limit;
         };
 
         Query.prototype.setHaving = function (having) {
