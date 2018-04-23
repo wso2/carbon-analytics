@@ -151,7 +151,7 @@ public class SiddhiTopologyCreatorTestCase {
      * Filter query can reside in an execGroup with parallel > 1 and the corresponding stream will have
      * {@link TransportStrategy#ROUND_ROBIN}
      */
-    @Test
+    @Test(dependsOnMethods = "testSiddhiTopologyCreator")
     public void testFilterQuery() {
         String siddhiApp = "@App:name('TestPlan2') "
                 + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
@@ -201,7 +201,6 @@ public class SiddhiTopologyCreatorTestCase {
             log.error(e.getMessage(), e);
         } finally {
             siddhiManager.shutdown();
-            KafkaTestUtil.deleteTopic(topics);
         }
     }
 
@@ -209,7 +208,7 @@ public class SiddhiTopologyCreatorTestCase {
      *Window can can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream.
      * This test will also validate ability to create topics and partitions on demand.
      */
-    @Test
+    @Test(dependsOnMethods = "testFilterQuery")
     public void testPartitionWithWindow() {
         String siddhiApp = "@App:name('TestPlan3') "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -276,7 +275,7 @@ public class SiddhiTopologyCreatorTestCase {
     /**
      * Sequence can can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream
      */
-    @Test
+    @Test(dependsOnMethods = "testPartitionWithWindow")
     public void testPartitionWithSequence() {
         String siddhiApp = "@App:name('TestPlan4') "
                 + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
@@ -343,7 +342,6 @@ public class SiddhiTopologyCreatorTestCase {
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         } finally {
-            KafkaTestUtil.deleteTopic(topics);
             siddhiManager.shutdown();
         }
     }
@@ -351,7 +349,7 @@ public class SiddhiTopologyCreatorTestCase {
     /**
      * Pattern can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream
      */
-    @Test
+    @Test(dependsOnMethods = "testPartitionWithSequence")
     public void testPartitionWithPattern() {
         String siddhiApp = "@App:name('TestPlan5') "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -436,7 +434,6 @@ public class SiddhiTopologyCreatorTestCase {
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         } finally {
-            KafkaTestUtil.deleteTopic(topics);
             siddhiManager.shutdown();
         }
     }
@@ -447,7 +444,7 @@ public class SiddhiTopologyCreatorTestCase {
      * The partitioned streams in the join will subscribe with {@link TransportStrategy#FIELD_GROUPING}
      * The unpartitioned streams in the join will subscribe with {@link TransportStrategy#ALL}
      */
-    @Test
+    @Test(dependsOnMethods = "testPartitionWithPattern")
     public void testJoinWithPartition() {
         String siddhiApp = "@App:name('TestPlan6') "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -525,7 +522,6 @@ public class SiddhiTopologyCreatorTestCase {
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         } finally {
-            KafkaTestUtil.deleteTopic(topics);
             siddhiManager.shutdown();
         }
 
@@ -537,7 +533,7 @@ public class SiddhiTopologyCreatorTestCase {
      * A partitioned stream used outside the Partition but inside the same execGroup will have the Subscription
      * strategy of {@link TransportStrategy#FIELD_GROUPING}
      */
-    @Test
+    @Test(dependsOnMethods = "testJoinWithPartition")
     public void testPartitionStrategy() {
         AtomicInteger highTempStreamCount = new AtomicInteger(0);
         String siddhiApp = "@App:name('TestPlan7') "
@@ -639,7 +635,6 @@ public class SiddhiTopologyCreatorTestCase {
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         } finally {
-            KafkaTestUtil.deleteTopic(topics);
             siddhiManager.shutdown();
         }
     }
@@ -649,7 +644,7 @@ public class SiddhiTopologyCreatorTestCase {
      * A stream used by multiple partitions residing in different executionGroups and under same Partition key gets
      * assigned with the respective parallelism as as distinct publishing strategies.
      */
-    @Test
+    @Test(dependsOnMethods = "testPartitionStrategy")
     public void testPartitionMultiSubscription() {
         AtomicInteger dumbStreamCount = new AtomicInteger(0);
         String siddhiApp = "@App:name('TestPlan8') \n"
@@ -801,7 +796,7 @@ public class SiddhiTopologyCreatorTestCase {
      * A stream used by multiple partitions residing in different executionGroups and different Partition key gets
      * assigned with the {@link TransportStrategy#FIELD_GROUPING} and corresponding parallelism.
      */
-    @Test
+    @Test(dependsOnMethods = "testPartitionMultiSubscription")
     public void testPartitionWithMultiKey() {
         AtomicInteger dumbStreamCount = new AtomicInteger(0);
         String siddhiApp = "@App:name('TestPlan9') \n"
@@ -917,7 +912,7 @@ public class SiddhiTopologyCreatorTestCase {
      * user given Sink used in (parallel/multiple execGroups) will get assigned to a all the execGroups after Topology
      * creation
      */
-    @Test
+    @Test(dependsOnMethods = "testPartitionWithMultiKey")
     public void testUserDefinedSink() {
         String siddhiApp = "@App:name('TestPlan10') \n"
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
@@ -1004,7 +999,7 @@ public class SiddhiTopologyCreatorTestCase {
      * streamID will be added to the respective sink so that the placeholder will bridge the stream to the required
      * source.
      */
-    @Test
+    @Test(dependsOnMethods = "testUserDefinedSink")
     public void testSinkStreamForSource() {
 
         String siddhiApp = "@App:name('TestPlan11')\n"
@@ -1120,6 +1115,7 @@ public class SiddhiTopologyCreatorTestCase {
         } finally {
             siddhiManager.shutdown();
             InMemoryBroker.unsubscribe(subscriptionTakingOver);
+            InMemoryBroker.unsubscribe(subscriptionTakingOverTable);
         }
 
     }
@@ -1129,7 +1125,7 @@ public class SiddhiTopologyCreatorTestCase {
      * when user given sources are located in more than 1 execGroup then a passthrough query will be added in a new
      * execGroup.Newly created execGroup will be moved to as the first element of already created passthrough queries
      */
-    @Test
+    @Test(dependsOnMethods = "testSinkStreamForSource")
     public void testUsergivenSourceNoGroup() {
         //Need to update after fixing the passthrough case
         String siddhiApp = "@App:name('TestPlan12') \n"
