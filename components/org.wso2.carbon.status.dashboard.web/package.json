@@ -29,6 +29,7 @@
     "dagre-d3": "^0.6.1",
     "html-loader": "^0.5.0",
     "material-ui": "^0.19.4",
+    "material-ui-next": "^1.0.0-beta.42",
     "material-ui-pagination": "^1.1.6",
     "prop-types": "^15.5.10",
     "qs": "^6.5.1",
