@@ -153,7 +153,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
             });
             if(!isStreamNameUsed) {
                 elementID = self.designGrid.getNewAgentId();
-                var newAgent = $('<div>').attr('id', elementID).addClass('streamdrop');
+                var newAgent = $('<div>').attr('id', elementID).addClass('streamDrop');
                 $(self.container).append(newAgent);
 
                 // drop the stream
@@ -509,7 +509,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
             */
             var self = this;
-            //TODO : check text node division. we might need to add a new div to handle this.
             var node = $('<div>' + text + '</div>');
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
@@ -540,8 +539,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
             });
 
             var finalElement = newAgent;
-            var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
-            var connectionOut = $('<div class="connectorOut">').attr('id', i + '-out').addClass('connection');
+            var connectionIn = $('<div class="connectorInQuery">').attr('id', i + '-in').addClass('connection');
+            var connectionOut = $('<div class="connectorOutQuery">').attr('id', i + '-out').addClass('connection');
 
             finalElement.css({
                 'top': top,
@@ -662,6 +661,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
          * @param i id of the element
          * @param top top position of the element
          * @param left left position of the element
+         * @param text text to be displayed on the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
          */
         DropElements.prototype.dropCompleteJoinQueryElement = function (newAgent, i, top, left) {
             // var self = this;
@@ -828,19 +829,19 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
             newElement.on('click', '.element-close-icon', function () {
                 var elementId = newElement[0].id;
 
-                if (newElement.hasClass('streamdrop')) {
+                if (newElement.hasClass('streamDrop')) {
                     self.appData.removeStream(elementId);
 
-                } else if (newElement.hasClass('tabledrop')) {
+                } else if (newElement.hasClass('tabledDrop')) {
                     self.appData.removeTable(elementId);
 
-                } else if (newElement.hasClass('windowdrop')) {
+                } else if (newElement.hasClass('windowDrop')) {
                     self.appData.removeWindow(elementId);
 
-                } else if (newElement.hasClass('triggerdrop')) {
+                } else if (newElement.hasClass('triggerDrop')) {
                     self.appData.removeTrigger(elementId);
 
-                } else if (newElement.hasClass('aggregationdrop')) {
+                } else if (newElement.hasClass('aggregationDrop')) {
                     self.appData.removeAggregation(elementId);
 
                 } else if (newElement.hasClass('projectionQueryDrop')) {
@@ -855,10 +856,10 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 } else if (newElement.hasClass('patternQueryDrop')) {
                     self.appData.removePatternQuery(elementId);
 
-                } else if (newElement.hasClass('joquerydrop')) {
+                } else if (newElement.hasClass('joinQueryDrop')) {
                     self.appData.removeJoinQuery(elementId);
 
-                } else if (newElement.hasClass('partitiondrop')) {
+                } else if (newElement.hasClass('partitionDrop')) {
                     self.appData.removePartition(elementId);
 
                 }

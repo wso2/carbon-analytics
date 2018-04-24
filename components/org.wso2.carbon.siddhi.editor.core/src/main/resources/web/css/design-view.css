@@ -73,23 +73,23 @@
     background-color: #fff;
 }
 
-.streamdrop {
+.streamDrop {
     background-image: url("../images/stream.png");
 }
 
-.tabledrop {
+.tabledDrop {
     background-image: url("../images/table.png");
 }
 
-.windowdrop {
+.windowDrop {
     background-image: url("../images/window.png");
 }
 
-.triggerdrop {
+.triggerDrop {
     background-image: url("../images/trigger.png");
 }
 
-.aggregationdrop {
+.aggregationDrop {
     background-image: url("../images/aggregation.png");
 }
 
@@ -105,7 +105,7 @@
     background-image: url("../images/windowQuery.png");
 }
 
-.joquerydrop {
+.joinQueryDrop {
     background-image: url("../images/join.png");
 }
 
@@ -117,8 +117,8 @@
     Dropped Elements corresponding to their toolbox elements
 */
 
-.streamdrop, .tabledrop, .windowdrop, .triggerdrop, .aggregationdrop, .projectionQueryDrop, .filterQueryDrop,
-.windowQueryDrop, .joquerydrop, .patternQueryDrop {
+.streamDrop, .tabledDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
+.windowQueryDrop, .joinQueryDrop, .patternQueryDrop {
     border-radius: 0.5em;
     opacity: 0.8;
     width: 60px;
@@ -140,7 +140,7 @@
     transition: box-shadow 0.15s ease-in;
 }
 
-.partitiondrop {
+.partitionDrop {
     border: 1px solid #346789;
     width: 250px;
     height: 250px;
@@ -274,14 +274,14 @@ td {
 }
 
 .connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation,
-.connectorInPatternQuery {
+.connectorInQuery, .connectorInPatternQuery, .connectorInJoinQuery {
     float: left;
     margin-top: -33%;
     margin-left: -13px;
 }
 
 .connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation,
-.connectorOutPatternQuery {
+.connectorOutQuery, .connectorOutPatternQuery, .connectorOutJoinQuery {
     float: right;
     margin-top: -33%;
     margin-right: -13px;
@@ -315,7 +315,7 @@ td {
 }
 
 .aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
-.partitionNameNode, .patternQueryNameNode {
+.partitionNameNode, .patternQueryNameNode, .joinQueryNameNode {
     float: right;
     width: inherit;
     height: inherit;

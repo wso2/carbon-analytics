@@ -34,17 +34,17 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
         JSONEditor.plugins.selectize.enable = true;
 
         var constants = {
-            STREAM : 'streamdrop',
-            TABLE : 'tabledrop',
-            WINDOW :'windowdrop',
-            TRIGGER :'triggerdrop',
-            AGGREGATION : 'aggregationdrop',
+            STREAM : 'streamDrop',
+            TABLE : 'tabledDrop',
+            WINDOW :'windowDrop',
+            TRIGGER :'triggerDrop',
+            AGGREGATION : 'aggregationDrop',
             PROJECTION : 'projectionQueryDrop',
             FILTER : 'filterQueryDrop',
-            JOIN : 'joquerydrop',
+            JOIN : 'joinQueryDrop',
             WINDOW_QUERY : 'windowQueryDrop',
             PATTERN : 'patternQueryDrop',
-            PARTITION :'partitiondrop'
+            PARTITION :'partitionDrop'
         };
 
         /**
@@ -217,7 +217,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         //                 }
                         //             },
                         //             propertyOrder: 1
-                        //         }, //TODO: start here
+                        //         },
                         //         Info: {
                         //             type: 'object',
                         //             title: 'Info',
@@ -262,6 +262,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     stream.addAttribute(attributeObject);
                 });
                 self.appData.addStream(stream);
+
+                var textNode = $('#'+i).find('.streamNameNode');
+                textNode.html(editor.getValue().name);
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
@@ -390,7 +393,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     clickedElement.addAttribute(attributeObject);
                 });
 
-                var textNode = $(element).parent().find('.streamnamenode');
+                var textNode = $(element).parent().find('.streamNameNode');
                 textNode.html(config.name);
 
                 // close the form window
@@ -499,6 +502,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     table.addAttribute(attributeObject);
                 });
                 self.appData.addTable(table);
+
+                var textNode = $('#'+i).find('.tableNameNode');
+                textNode.html(editor.getValue().name);
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
@@ -626,7 +632,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     clickedElement.addAttribute(attributeObject);
                 });
 
-                var textNode = $(element).parent().find('.tablenamenode');
+                var textNode = $(element).parent().find('.tableNameNode');
                 textNode.html(config.name);
 
                 // close the form window
@@ -782,6 +788,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     window.addAttribute(attributeObject);
                 });
                 self.appData.addWindow(window);
+
+                var textNode = $('#'+i).find('.windowNameNode');
+                textNode.html(editor.getValue().name);
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
@@ -973,7 +982,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     clickedElement.addAttribute(attributeObject);
                 });
 
-                var textNode = $(element).parent().find('.windownamenode');
+                var textNode = $(element).parent().find('.windowNameNode');
                 textNode.html(config.name);
 
                 // close the form window
@@ -1052,6 +1061,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 _.set(triggerOptions, 'at', editor.getValue().at);
                 var trigger = new Trigger(triggerOptions);
                 self.appData.addTrigger(trigger);
+
+                var textNode = $('#'+i).find('.triggerNameNode');
+                textNode.html(editor.getValue().name);
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
@@ -1138,7 +1150,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 clickedElement.setName(config.name);
                 clickedElement.setAt(config.at);
 
-                var textNode = $(element).parent().find('.triggernamenode');
+                var textNode = $(element).parent().find('.triggerNameNode');
                 textNode.html(config.name);
 
                 // close the form window
@@ -1365,6 +1377,9 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
                 var aggregation = new Aggregation(aggregationOptions);
                 self.appData.addAggregation(aggregation);
+
+                var textNode = $('#'+i).find('.aggregationNameNode');
+                textNode.html(editor.getValue().name);
 
                 // close the form aggregation
                 self.consoleListManager.removeConsole(formConsole);
@@ -1620,7 +1635,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 }
                 clickedElement.setAggregateByTimePeriod(aggregateByTimePeriod);
 
-                var textNode = $(element).parent().find('.aggregationnamenode');
+                var textNode = $(element).parent().find('.aggregationNameNode');
                 textNode.html(config.name);
 
                 // close the form aggregation

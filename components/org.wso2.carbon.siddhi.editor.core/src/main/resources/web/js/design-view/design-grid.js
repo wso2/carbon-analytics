@@ -22,17 +22,17 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
               PatternQueryInput, QueryOutput) {
 
         var constants = {
-            STREAM : 'streamdrop',
-            TABLE : 'tabledrop',
-            WINDOW :'windowdrop',
-            TRIGGER :'triggerdrop',
-            AGGREGATION : 'aggregationdrop',
+            STREAM : 'streamDrop',
+            TABLE : 'tabledDrop',
+            WINDOW :'windowDrop',
+            TRIGGER :'triggerDrop',
+            AGGREGATION : 'aggregationDrop',
             PROJECTION : 'projectionQueryDrop',
             FILTER : 'filterQueryDrop',
-            JOIN : 'joquerydrop',
+            JOIN : 'joinQueryDrop',
             WINDOW_QUERY : 'windowQueryDrop',
             PATTERN : 'patternQueryDrop',
-            PARTITION :'partitiondrop'
+            PARTITION :'partitionDrop'
         };
 
         /**
@@ -152,27 +152,30 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
                         // If the dropped Element is a Projection Query then->
                         else if ($(droppedElement).hasClass('projection-query')) {
-                            self.handleWindowFilterProjectionQuery(constants.PROJECTION, mouseTop, mouseLeft, false);
+                            self.handleWindowFilterProjectionQuery(constants.PROJECTION, mouseTop, mouseLeft, false,
+                                "Query");
                         }
 
                         // If the dropped Element is a Filter query then->
                         else if ($(droppedElement).hasClass('filter-query')) {
-                            self.handleWindowFilterProjectionQuery(constants.FILTER, mouseTop, mouseLeft, false);
+                            self.handleWindowFilterProjectionQuery(constants.FILTER, mouseTop, mouseLeft, false,
+                                "Query");
                         }
 
                         // If the dropped Element is a Window Query then->
                         else if ($(droppedElement).hasClass('window-query')) {
-                            self.handleWindowFilterProjectionQuery(constants.WINDOW_QUERY, mouseTop, mouseLeft, false);
+                            self.handleWindowFilterProjectionQuery(constants.WINDOW_QUERY, mouseTop, mouseLeft, false,
+                                "Query");
                         }
 
                         // If the dropped Element is a Join Query then->
                         else if ($(droppedElement).hasClass('join-query')) {
-                            self.handleJoinQuery(mouseTop, mouseLeft, false);
+                            self.handleJoinQuery(mouseTop, mouseLeft, false, "Join");
                         }
 
                         // If the dropped Element is a Pattern Query then->
                         else if($(droppedElement).hasClass('pattern-query')) {
-                            self.handlePatternQuery(mouseTop, mouseLeft, false, undefined, "Pattern");
+                            self.handlePatternQuery(mouseTop, mouseLeft, false, "Pattern");
                         }
 
                         // If the dropped Element is a Partition then->
@@ -763,11 +766,12 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 var patternQueryName = "Pattern";
                 var mouseTop = parseInt(patternQueryId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = parseInt(patternQueryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
-                self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryId, patternQueryName);
+                self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
             });
 
             _.forEach(self.appData.windowFilterProjectionQueryList, function(windowFilterProjectionQuery){
                 var queryId = windowFilterProjectionQuery.getId();
+                var queryName = "Query";
                 var querySubType = windowFilterProjectionQuery.getQueryInput().getSubType();
 
                 var queryType;
@@ -781,7 +785,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
                 var mouseTop = parseInt(queryId)*100  - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = parseInt(queryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
-                self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryId);
+                self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
             });
 
             _.forEach(self.appData.edgeList, function(edge){
@@ -875,7 +879,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass('streamdrop');
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.STREAM);
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
             self.dropElements.dropStream(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
@@ -904,7 +908,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass('tabledrop');
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.TABLE);
             self.canvas.append(newAgent);
             // Drop the Table element. Inside this a it generates the table definition form.
             self.dropElements.dropTable(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, tableName);
@@ -932,7 +936,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass('windowdrop');
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.WINDOW);
             self.canvas.append(newAgent);
             // Drop the Table element. Inside this a it generates the table definition form.
             self.dropElements.dropWindow(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, windowName);
@@ -960,7 +964,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass('triggerdrop');
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.TRIGGER);
             self.canvas.append(newAgent);
             // Drop the Trigger element. Inside this a it generates the trigger definition form.
             self.dropElements.dropTrigger(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, triggerName);
@@ -989,7 +993,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass('aggregationdrop');
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.AGGREGATION);
             self.canvas.append(newAgent);
             // Drop the Aggregation element. Inside this a it generates the aggregation definition form.
             self.dropElements.dropAggregation(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, aggregationName);
@@ -999,13 +1003,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
 
         DesignGrid.prototype.handleWindowFilterProjectionQuery = function (type, mouseTop, mouseLeft,
-                                                                           isCodeToDesignMode, queryId) {
+                                                                           isCodeToDesignMode, queryName, queryId) {
             var self = this;
             var elementId;
-            var queryName;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                queryName = "Query";
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(queryId !== undefined) {
                     elementId = queryId;
@@ -1013,7 +1015,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 } else {
                     console.log("queryId parameter is undefined");
                 }
-                queryName = "Query";
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
@@ -1038,8 +1039,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        DesignGrid.prototype.handlePatternQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, patternQueryId,
-                                                            patternQueryName) {
+        DesignGrid.prototype.handlePatternQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, patternQueryName,
+                                                            patternQueryId) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -1054,17 +1055,18 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass('patternQueryDrop');
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.PATTERN);
             self.canvas.append(newAgent);
             // Drop the Table element. Inside this a it generates the table definition form.
-            self.dropElements.dropPatternQuery(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, patternQueryName);
+            self.dropElements.dropPatternQuery(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
+                patternQueryName);
             self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
         DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.getNewAgentId()).addClass('partitiondrop');
+            var newAgent = $('<div>').attr('id', self.getNewAgentId()).addClass(constants.PARTITION);
             // Drop the element instantly since its projections will be set only when the user requires it
             //self.generateNextNewAgentId();
             self.dropElements.dropPartition(newAgent, self.getNewAgentId(), mouseTop, mouseLeft, isCodeToDesignMode);
