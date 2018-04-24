@@ -61,7 +61,7 @@ public class QueryManager {
                 PersistenceStoreConfigs componentConfigurations = readYamlContent(url.openStream());
                 componentQueries = componentConfigurations.getQueries();
             } else {
-                throw new RuntimeException("Unable to load queries.yaml file.");
+                throw new ConfigurationException("Unable to load queries.yaml file.");
             }
             queries = QueryProvider.mergeMapping(databaseType, databaseVersion, (ArrayList<Queries>) componentQueries,
                     (ArrayList<Queries>) deploymentQueries);
@@ -75,9 +75,9 @@ public class QueryManager {
         return queries;
     }
 
-    public String getQuery(String key) {
+    public String getQuery(String key) throws ConfigurationException {
         if (!queries.containsKey(key)) {
-            throw new RuntimeException("Unable to find the configuration entry for the key: " + key);
+            throw new ConfigurationException("Unable to find the configuration entry for the key: " + key);
         }
         return queries.get(key);
     }
