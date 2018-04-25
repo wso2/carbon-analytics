@@ -32,6 +32,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
         JSONEditor.plugins.sceditor.emoticonsEnabled = true;
         JSONEditor.defaults.options.disable_collapse = true;
         JSONEditor.plugins.selectize.enable = true;
+        JSONEditor.defaults.options.object_layout = "grid";
 
         var constants = {
             STREAM : 'streamDrop',
@@ -53,7 +54,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
          * @param {Object} options Rendering options for the view
          */
         var FormBuilder = function (options) {
-            this.appData = options.appData;
+            this.configurationData = options.configurationData;
             this.dropElements = options.dropElements;
             this.application = options.application;
             this.consoleListManager = options.application.outputController;
@@ -106,27 +107,27 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             var formConsole = this.consoleListManager.newFormConsole(consoleOptions);
             $(formConsole).on( "close-button-in-form-clicked", function() {
                 if(elementType === constants.STREAM) {
-                    if(self.appData.getStream(elementId) === undefined) {
+                    if(self.configurationData.getSiddhiAppConfig().getStream(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
                 }
                 if(elementType === constants.TABLE) {
-                    if(self.appData.getTable(elementId) === undefined) {
+                    if(self.configurationData.getSiddhiAppConfig().getTable(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
                 }
                 if(elementType === constants.WINDOW) {
-                    if(self.appData.getWindow(elementId) === undefined) {
+                    if(self.configurationData.getSiddhiAppConfig().getWindow(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
                 }
                 if(elementType === constants.TRIGGER) {
-                    if(self.appData.getTrigger(elementId) === undefined) {
+                    if(self.configurationData.getSiddhiAppConfig().getTrigger(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
                 }
                 if(elementType === constants.AGGREGATION) {
-                    if(self.appData.getAggregation(elementId) === undefined) {
+                    if(self.configurationData.getSiddhiAppConfig().getAggregation(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
                 }
@@ -261,7 +262,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     var attributeObject = new Attribute(attribute);
                     stream.addAttribute(attributeObject);
                 });
-                self.appData.addStream(stream);
+                self.configurationData.getSiddhiAppConfig().addStream(stream);
 
                 var textNode = $('#'+i).find('.streamNameNode');
                 textNode.html(editor.getValue().name);
@@ -292,7 +293,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
             var id = $(element).parent().attr('id');
             // retrieve the stream information from the collection
-            var clickedElement = self.appData.getStream(id);
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(id);
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
@@ -501,7 +502,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     var attributeObject = new Attribute(attribute);
                     table.addAttribute(attributeObject);
                 });
-                self.appData.addTable(table);
+                self.configurationData.getSiddhiAppConfig().addTable(table);
 
                 var textNode = $('#'+i).find('.tableNameNode');
                 textNode.html(editor.getValue().name);
@@ -532,7 +533,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
             var id = $(element).parent().attr('id');
             // retrieve the table information from the collection
-            var clickedElement = self.appData.getTable(id);
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
@@ -787,7 +788,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     var attributeObject = new Attribute(attribute);
                     window.addAttribute(attributeObject);
                 });
-                self.appData.addWindow(window);
+                self.configurationData.getSiddhiAppConfig().addWindow(window);
 
                 var textNode = $('#'+i).find('.windowNameNode');
                 textNode.html(editor.getValue().name);
@@ -817,7 +818,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
             var id = $(element).parent().attr('id');
             // retrieve the window information from the collection
-            var clickedElement = self.appData.getWindow(id);
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getWindow(id);
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
@@ -1060,7 +1061,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 _.set(triggerOptions, 'name', editor.getValue().name);
                 _.set(triggerOptions, 'at', editor.getValue().at);
                 var trigger = new Trigger(triggerOptions);
-                self.appData.addTrigger(trigger);
+                self.configurationData.getSiddhiAppConfig().addTrigger(trigger);
 
                 var textNode = $('#'+i).find('.triggerNameNode');
                 textNode.html(editor.getValue().name);
@@ -1090,7 +1091,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
             var id = $(element).parent().attr('id');
             // retrieve the trigger information from the collection
-            var clickedElement = self.appData.getTrigger(id);
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
@@ -1376,7 +1377,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 _.set(aggregationOptions, 'aggregateByTimePeriod', aggregateByTimePeriod);
 
                 var aggregation = new Aggregation(aggregationOptions);
-                self.appData.addAggregation(aggregation);
+                self.configurationData.getSiddhiAppConfig().addAggregation(aggregation);
 
                 var textNode = $('#'+i).find('.aggregationNameNode');
                 textNode.html(editor.getValue().name);
@@ -1407,7 +1408,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
             var id = $(element).parent().attr('id');
             // retrieve the aggregation information from the collection
-            var clickedElement = self.appData.getAggregation(id);
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getAggregation(id);
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
@@ -1669,7 +1670,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             self.toolPaletteContainer.addClass('disabledbutton');
 
             var id = $(element).parent().attr('id');
-            var clickedElement = self.appData.getWindowFilterProjectionQuery(id);
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQuery(id);
             if (clickedElement.getQueryInput() === ''
                 || clickedElement.getQueryInput().getFrom() === '') {
                 alert('Connect an input element');
@@ -1733,7 +1734,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
                 var possibleGroupByAttributes = [];
                 var isInputElementNameFound = false;
-                _.forEach(self.appData.streamList, function (stream) {
+                _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function (stream) {
                     if (stream.getName() === inputElementName) {
                         isInputElementNameFound = true;
                         _.forEach(stream.getAttributeList(), function (attribute) {
@@ -1742,7 +1743,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     }
                 });
                 if (!isInputElementNameFound) {
-                    _.forEach(self.appData.windowList, function (window) {
+                    _.forEach(self.configurationData.getSiddhiAppConfig().windowList, function (window) {
                         if (window.getName() === inputElementName) {
                             isInputElementNameFound = true;
                             _.forEach(window.getAttributeList(), function (attribute) {
@@ -1752,7 +1753,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     });
                 }
                 if (isInputElementNameFound) {
-                    _.forEach(self.appData.tableList, function (table) {
+                    _.forEach(self.configurationData.getSiddhiAppConfig().tableList, function (table) {
                         if (table.getName() === inputElementName) {
                             isInputElementNameFound = true;
                             _.forEach(table.getAttributeList(), function (attribute) {
@@ -2384,7 +2385,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             self.toolPaletteContainer.addClass('disabledbutton');
 
             var id = $(element).parent().attr('id');
-            var clickedElement = self.appData.getPatternQuery(id);
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getPatternQuery(id);
             if (clickedElement.getQueryInput() === ''
                 || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
                 alert('Connect input streams');
@@ -2488,7 +2489,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
                 var possibleGroupByAttributes = [];
                 _.forEach(inputStreams, function (inputStreamName) {
-                    _.forEach(self.appData.streamList, function (stream) {
+                    _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function (stream) {
                         if (stream.getName() === inputStreamName) {
                             _.forEach(stream.getAttributeList(), function (attribute) {
                                 possibleGroupByAttributes.push(attribute.getName());
@@ -3331,7 +3332,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
         //     self.toolPaletteContainer.addClass('disabledbutton');
         //
         //     var id = $(element).parent().attr('id');
-        //     var clickedElement = self.appData.getJoinQuery(id);
+        //     var clickedElement = self.configurationData.getSiddhiAppConfig().getJoinQuery(id);
         //     if (!(clickedElement.getFrom()) || clickedElement.getFrom().length !== 2) {
         //         alert('Connect TWO input streams');
         //         self.gridContainer.removeClass('disabledbutton');
@@ -3354,11 +3355,11 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
         //     else {
         //         var streams = [];
         //         $.each(clickedElement.getFrom(), function (index, streamID) {
-        //             streams.push((self.appData.getStream(streamID)).getName());
+        //             streams.push((self.configurationData.getSiddhiAppConfig().getStream(streamID)).getName());
         //         });
         //         var projections = [];
-        //         var insertInto = self.appData.getStream(clickedElement.getInsertInto()).getName();
-        //         var outStreamAttributes = (self.appData.getStream(clickedElement.getInsertInto())).getAttributeList();
+        //         var insertInto = self.configurationData.getSiddhiAppConfig().getStream(clickedElement.getInsertInto()).getName();
+        //         var outStreamAttributes = (self.configurationData.getSiddhiAppConfig().getStream(clickedElement.getInsertInto())).getAttributeList();
         //         if (!(clickedElement.getProjection())) {
         //             for (var i = 0; i < outStreamAttributes.length; i++) {
         //                 var attr = {select: '', newName: outStreamAttributes[i].attribute};
@@ -3600,7 +3601,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
         FormBuilder.prototype.GeneratePartitionKeyForm = function (element) {
             var self = this;
             var id = $(element.target).parent().attr('id');
-            var partition = self.appData.getPartition(id);
+            var partition = self.configurationData.getSiddhiAppConfig().getPartition(id);
             var connections = jsPlumb.getConnections(element);
             var connected= false;
             var connectedStream = null;
@@ -3623,7 +3624,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 $.each(partitionKeys, function ( index , key) {
                     if( key.stream == connectedStream){
                         fillWith ={
-                            stream : (self.appData.getStream(connectedStream)).getName(),
+                            stream : (self.configurationData.getSiddhiAppConfig().getStream(connectedStream)).getName(),
                             property : key.property
                         }
                     }
@@ -3645,7 +3646,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                                 title: 'Stream',
                                 required: true,
                                 propertyOrder: 1,
-                                template: (self.appData.getStream(connectedStream)).getName()
+                                template: (self.configurationData.getSiddhiAppConfig().getStream(connectedStream)).getName()
                             },
                             property: {
                                 type: 'string',
@@ -3706,7 +3707,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
         FormBuilder.prototype.IsDefinitionElementNameUnique = function (elementName, skipElementID) {
             var self = this;
             var isNameUsed = false;
-            _.forEach(self.appData.streamList, function (stream) {
+            _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function (stream) {
                 if (stream.getName().toUpperCase() === elementName.toUpperCase()) {
                     if (!(skipElementID !== undefined && skipElementID === stream.getId())) {
                         isNameUsed = true;
@@ -3714,7 +3715,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 }
             });
 
-            _.forEach(self.appData.tableList, function (table) {
+            _.forEach(self.configurationData.getSiddhiAppConfig().tableList, function (table) {
                 if (table.getName().toUpperCase() === elementName.toUpperCase()) {
                     if (!(skipElementID !== undefined && skipElementID === table.getId())) {
                         isNameUsed = true;
@@ -3722,7 +3723,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 }
             });
 
-            _.forEach(self.appData.windowList, function (window) {
+            _.forEach(self.configurationData.getSiddhiAppConfig().windowList, function (window) {
                 if (window.getName().toUpperCase() === elementName.toUpperCase()) {
                     if (!(skipElementID !== undefined && skipElementID === window.getId())) {
                         isNameUsed = true;
@@ -3730,7 +3731,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 }
             });
 
-            _.forEach(self.appData.aggregationList, function (aggregation) {
+            _.forEach(self.configurationData.getSiddhiAppConfig().aggregationList, function (aggregation) {
                 if (aggregation.getName().toUpperCase() === elementName.toUpperCase()) {
                     if (!(skipElementID !== undefined && skipElementID === aggregation.getId())) {
                         isNameUsed = true;
@@ -3738,7 +3739,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                 }
             });
 
-            _.forEach(self.appData.triggerList, function (trigger) {
+            _.forEach(self.configurationData.getSiddhiAppConfig().triggerList, function (trigger) {
                 if (trigger.getName().toUpperCase() === elementName.toUpperCase()) {
                     if (!(skipElementID !== undefined && skipElementID === trigger.getId())) {
                         isNameUsed = true;

@@ -135,6 +135,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     this._sourceView.editorResize();
 
                     var JSONString = "{" +
+                        "\"siddhiAppConfig\": {" +
                         "\"streamList\":{" +
                         "\"0\":{ \"id\":\"1\"," +
                         "\"name\":\"das\"," +
@@ -154,6 +155,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"length\":1},"+
                         "\"joinQueryList\":{}," +
                         "\"partitionList\":{}," +
+                        "\"finalElementCount\":0" +
+                        "}," +
                         "\"edgeList\":{" +
                         "\"0\":{ \"id\":\"2_3\"," +
                         "\"parentId\":\"2\"," +
@@ -176,8 +179,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"childId\":\"4\"," +
                         "\"childType\":\"stream\"}," +
                         "\"length\":4" +
-                        "}," +
-                        "\"finalElementCount\":0" +
+                        "}" +
                         "}";
 
                     this.JSONObject = JSON.parse(JSONString);
@@ -196,16 +198,16 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
                                 "<span class=\"toggle-button-text\">Source View</span>");
                             designView.renderDesignGrid(self.JSONObject);
-                            console.log(JSON.stringify(designView.getSiddhiAppContent()));
-                            self.JSONObject = JSON.parse(JSON.stringify(designView.getSiddhiAppContent()));
+                            console.log(JSON.stringify(designView.getConfigurationData()));
+                            self.JSONObject = JSON.parse(JSON.stringify(designView.getConfigurationData()));
                         } else if (designContainer.is(':visible')) {
-                            self.JSONObject = JSON.parse(JSON.stringify(designView.getSiddhiAppContent()));
+                            self.JSONObject = JSON.parse(JSON.stringify(designView.getConfigurationData()));
                             designContainer.hide();
                             sourceContainer.show();
                             self._sourceView.editorResize();
                             toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
                                 "<span class=\"toggle-button-text\">Design View</span>");
-                            console.log(JSON.stringify(designView.getSiddhiAppContent()));
+                            console.log(JSON.stringify(designView.getConfigurationData()));
                         }
                     });
                 },

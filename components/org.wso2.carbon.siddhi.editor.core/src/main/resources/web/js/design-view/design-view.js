@@ -16,18 +16,17 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid', 'appData',
-        'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation', 'aggregateByTimePeriod',
-        'windowFilterProjectionQueryInput', 'queryWindow', 'patternQueryInput', 'patternQueryInputCounting',
-        'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'edge', 'querySelect',
-        'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
-        'queryOutputUpdateOrInsertInto',
-        'attribute'],
-    function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, AppData, Partition, Query, Stream, Table,
-              Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindow,
-              PatternQueryInput, PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
-              PatternQueryInputNotAnd, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert,
-              QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute) {
+define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid',
+        'configurationData', 'appData', 'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation',
+        'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'patternQueryInput',
+        'patternQueryInputCounting', 'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd',
+        'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete',
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute'],
+    function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
+              Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
+              QueryWindow, PatternQueryInput, PatternQueryInputCounting, PatternQueryInputAndOr,
+              PatternQueryInputNotFor, PatternQueryInputNotAnd, Edge, QuerySelect, QueryOrderByValue, QueryOutput,
+              QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute) {
 
         /**
          * @class DesignView
@@ -56,11 +55,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
 
         /**
          * @function Initializes the AppData object with th provided configuration
-         * @param siddhiAppContent siddhi application details as a json
+         * @param configurationData siddhi application details as a json
          */
-        DesignView.prototype.initialiseSiddhiAppData = function (siddhiAppContent) {
+        DesignView.prototype.initialiseSiddhiAppData = function (configurationData) {
             var self = this;
             var appData = new AppData();
+            self.configurationData = new ConfigurationData(appData);
 
             // adds annotations from a json object for an element object
             function addAnnotationsForElement(element, newElementObject) {
@@ -110,31 +110,31 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 query.setQueryOutput(queryOutputObject);
             }
 
-            _.forEach(siddhiAppContent.streamList, function(stream){
+            _.forEach(configurationData.siddhiAppConfig.streamList, function(stream){
                 var streamObject = new Stream(stream);
                 //addAnnotationsForElement(stream, streamObject);
                 addAttributesForElement(stream, streamObject);
                 appData.addStream(streamObject);
             });
-            _.forEach(siddhiAppContent.tableList, function(table){
+            _.forEach(configurationData.siddhiAppConfig.tableList, function(table){
                 var tableObject = new Table(table);
                 //addAnnotationsForElement(table, tableObject);
                 addAttributesForElement(table, tableObject);
                 appData.addTable(tableObject);
             });
-            _.forEach(siddhiAppContent.windowList, function(window){
+            _.forEach(configurationData.siddhiAppConfig.windowList, function(window){
                 var windowObject = new Window(window);
                 //addAnnotationsForElement(window, windowObject);
                 addAttributesForElement(window, windowObject);
                 appData.addWindow(windowObject);
             });
-            _.forEach(siddhiAppContent.triggerList, function(trigger){
+            _.forEach(configurationData.siddhiAppConfig.triggerList, function(trigger){
                 var triggerObject = new Trigger(trigger);
                 //addAnnotationsForElement(trigger, triggerObject);
                 addAttributesForElement(trigger, triggerObject);
                 appData.addTrigger(triggerObject);
             });
-            _.forEach(siddhiAppContent.aggregationList, function(aggregation){
+            _.forEach(configurationData.siddhiAppConfig.aggregationList, function(aggregation){
                 var aggregationObject = new Aggregation(aggregation);
                 //addAnnotationsForElement(aggregation, aggregationObject);
                 setSelectForQuery(aggregationObject, aggregation.select);
@@ -142,7 +142,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriodSubElement);
                 appData.addAggregation(aggregationObject);
             });
-            _.forEach(siddhiAppContent.patternQueryList, function(patternQuery){
+            _.forEach(configurationData.siddhiAppConfig.patternQueryList, function(patternQuery){
                 var patternQueryObject = new Query(patternQuery);
                 var patternQueryInput = new PatternQueryInput();
                 _.forEach(patternQuery.queryInput.eventList, function(event){
@@ -167,7 +167,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
                 appData.addPatternQuery(patternQueryObject);
             });
-            _.forEach(siddhiAppContent.windowFilterProjectionQueryList, function(windowFilterProjectionQuery){
+            _.forEach(configurationData.siddhiAppConfig.windowFilterProjectionQueryList, function(windowFilterProjectionQuery){
                 var queryObject = new Query(windowFilterProjectionQuery);
                 var windowFilterProjectionQueryInput =
                     new WindowFilterProjectionQueryInput(windowFilterProjectionQuery.queryInput);
@@ -181,7 +181,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 setQueryOutputForQuery(queryObject, windowFilterProjectionQuery.queryOutput);
                 appData.addWindowFilterProjectionQuery(queryObject);
             });
-            // _.forEach(siddhiAppContent.joinQueryList, function(joinQuery){
+            // _.forEach(configurationData.siddhiAppConfig.joinQueryList, function(joinQuery){
             //     var joinQueryObject = new JoinQuery(joinQuery);
             //     var leftStreamSubElement = new LeftStream(joinQuery.join.leftStream);
             //     var rightStreamSubElement = new RightStream(joinQuery.join.rightStream);
@@ -191,13 +191,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             //     joinQueryObject.setJoin(joinSubElement);
             //     appData.addJoinQuery(joinQueryObject);
             // });
-            _.forEach(siddhiAppContent.partitionList, function(partition){
+            _.forEach(configurationData.siddhiAppConfig.partitionList, function(partition){
                 appData.addPartition(new Partition(partition));
             });
-            _.forEach(siddhiAppContent.edgeList, function(edge){
-                appData.addEdge(new Edge(edge));
+            _.forEach(configurationData.edgeList, function(edge){
+                self.configurationData.addEdge(new Edge(edge));
             });
-            self.siddhiAppContent = appData;
         };
 
         /**
@@ -225,20 +224,20 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
 
         /**
          * @function Renders design view in the design container
-         * @param siddhiAppContent Siddhi application content
+         * @param configurationData Siddhi application content
          */
-        DesignView.prototype.renderDesignGrid = function (siddhiAppContent) {
-            this.initialiseSiddhiAppData(siddhiAppContent);
+        DesignView.prototype.renderDesignGrid = function (configurationData) {
+            this.initialiseSiddhiAppData(configurationData);
             var designViewGridOpts = {};
             _.set(designViewGridOpts, 'container', this.designViewGridContainer);
-            _.set(designViewGridOpts, 'appData', this.siddhiAppContent);
+            _.set(designViewGridOpts, 'configurationData', this.configurationData);
             _.set(designViewGridOpts, 'application', this.application);
             var designViewGrid = new DesignViewGrid(designViewGridOpts);
             designViewGrid.render();
         };
 
-        DesignView.prototype.getSiddhiAppContent = function () {
-            return this.siddhiAppContent;
+        DesignView.prototype.getConfigurationData = function () {
+            return this.configurationData;
         };
 
         DesignView.prototype.emptyDesignViewGridContainer = function () {

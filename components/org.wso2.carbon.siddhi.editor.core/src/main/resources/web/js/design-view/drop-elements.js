@@ -34,7 +34,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
             if (!container.length > 0) {
                 log.error(errorMessage);
             }
-            this.appData = options.appData;
+            this.configurationData = options.configurationData;
             this.container = options.container;
             this.application = options.application;
             this.designGrid = options.designGrid;
@@ -42,7 +42,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             var formBuilderOptions = {};
             _.set(formBuilderOptions, 'application', this.application);
-            _.set(formBuilderOptions, 'appData', this.appData);
+            _.set(formBuilderOptions, 'configurationData', this.configurationData);
             _.set(formBuilderOptions, 'dropElements', this);
             this.formBuilder = new FormBuilder(formBuilderOptions);
         };
@@ -141,11 +141,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
          * @param outStream  name for new output stream
          * @param streamAttributes  projections list for output stream
          */
-        DropElements.prototype.dropStreamFromQuery = function (queryModel, position , queryId, outStream, streamAttributes) {
+        DropElements.prototype.dropStreamFromQuery = function (queryModel, position , queryId, outStream,
+                                                               streamAttributes) {
             var self = this;
             var isStreamNameUsed = false;
             var elementID;
-            _.forEach(self.appData.streamList, function(stream){
+            _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function(stream){
                 if(stream.getName().toUpperCase() === outStream.toUpperCase()) {
                     isStreamNameUsed = true;
                     elementID = stream.getId();
@@ -168,10 +169,11 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 _.forEach(streamAttributes, function (attribute) {
                     stream.addAttribute(attribute);
                 });
-                self.appData.addStream(stream);
+                self.configurationData.getSiddhiAppConfig().addStream(stream);
 
                 // increment the variable final element count
-                self.appData.setFinalElementCount(self.appData.getFinalElementCount() + 1);
+                self.configurationData.getSiddhiAppConfig()
+                    .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
                 self.registerElementEventListeners(newAgent);
             }
             // The container and the tool palette are disabled to prevent the user from dropping any elements
@@ -525,7 +527,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 _.set(queryOptions, 'outputRateLimit', '');
                 _.set(queryOptions, 'queryOutput', '');
                 var query = new Query(queryOptions);
-                self.appData.addWindowFilterProjectionQuery(query);
+                self.configurationData.getSiddhiAppConfig().addWindowFilterProjectionQuery(query);
             }
             var settingsIconId = "" + i + "-dropQuerySettingsId";
             var propertiesIcon = $('<img src="/editor/images/settings.png" id="' + settingsIconId + '" ' +
@@ -579,7 +581,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
          * @param isCodeToDesignMode whether code to design mode is enable or not
          * @param patternQueryName name of the patternQuery
          */
-        DropElements.prototype.dropPatternQuery = function (newAgent, i, top, left, isCodeToDesignMode, patternQueryName) {
+        DropElements.prototype.dropPatternQuery = function (newAgent, i, top, left, isCodeToDesignMode,
+                                                            patternQueryName) {
 
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
@@ -604,7 +607,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 _.set(patternQueryOptions, 'queryOutput', '');
 
                 var patternQuery = new Query(patternQueryOptions);
-                self.appData.addPatternQuery(patternQuery);
+                self.configurationData.getSiddhiAppConfig().addPatternQuery(patternQuery);
             }
 
             /*
@@ -799,7 +802,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 _.set(partitionOptions, 'queries', []);
                 var newPartition = new Partition(partitionOptions);
                 newPartition.setId(i);
-                self.appData.addPartition(newPartition);
+                self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
             }
         };
 
@@ -830,41 +833,42 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 var elementId = newElement[0].id;
 
                 if (newElement.hasClass('streamDrop')) {
-                    self.appData.removeStream(elementId);
+                    self.configurationData.getSiddhiAppConfig().removeStream(elementId);
 
                 } else if (newElement.hasClass('tabledDrop')) {
-                    self.appData.removeTable(elementId);
+                    self.configurationData.getSiddhiAppConfig().removeTable(elementId);
 
                 } else if (newElement.hasClass('windowDrop')) {
-                    self.appData.removeWindow(elementId);
+                    self.configurationData.getSiddhiAppConfig().removeWindow(elementId);
 
                 } else if (newElement.hasClass('triggerDrop')) {
-                    self.appData.removeTrigger(elementId);
+                    self.configurationData.getSiddhiAppConfig().removeTrigger(elementId);
 
                 } else if (newElement.hasClass('aggregationDrop')) {
-                    self.appData.removeAggregation(elementId);
+                    self.configurationData.getSiddhiAppConfig().removeAggregation(elementId);
 
                 } else if (newElement.hasClass('projectionQueryDrop')) {
-                    self.appData.removeWindowFilterProjectionQuery(elementId);
+                    self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
 
                 } else if (newElement.hasClass('filterQueryDrop')) {
-                    self.appData.removeWindowFilterProjectionQuery(elementId);
+                    self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
 
                 } else if (newElement.hasClass('windowQueryDrop')) {
-                    self.appData.removeWindowFilterProjectionQuery(elementId);
+                    self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
 
                 } else if (newElement.hasClass('patternQueryDrop')) {
-                    self.appData.removePatternQuery(elementId);
+                    self.configurationData.getSiddhiAppConfig().removePatternQuery(elementId);
 
                 } else if (newElement.hasClass('joinQueryDrop')) {
-                    self.appData.removeJoinQuery(elementId);
+                    self.configurationData.getSiddhiAppConfig().removeJoinQuery(elementId);
 
                 } else if (newElement.hasClass('partitionDrop')) {
-                    self.appData.removePartition(elementId);
+                    self.configurationData.getSiddhiAppConfig().removePartition(elementId);
 
                 }
                 if(_jsPlumb.getGroupFor(newElement)){
-                    var queries = self.appData.getPartition(_jsPlumb.getGroupFor(newElement).id).getQueries();
+                    var queries = self.configurationData.getSiddhiAppConfig()
+                        .getPartition(_jsPlumb.getGroupFor(newElement).id).getQueries();
                     var removedQueryIndex = null;
                     $.each( queries , function (index, query) {
                         if(query.getId() === $(newElement).attr('id')){
@@ -872,13 +876,15 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                         }
                     });
                     queries.splice(removedQueryIndex,1);
-                    self.appData.getPartition(_jsPlumb.getGroupFor(newElement).id).setQueries(queries);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getPartition(_jsPlumb.getGroupFor(newElement).id).setQueries(queries);
                     _jsPlumb.remove(newElement);
                     _jsPlumb.removeFromGroup(newElement);
                 } else {
                     _jsPlumb.remove(newElement);
                 }
-                self.appData.setFinalElementCount(self.appData.getFinalElementCount() - 1);
+                self.configurationData.getSiddhiAppConfig()
+                    .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);
             });
         };
 

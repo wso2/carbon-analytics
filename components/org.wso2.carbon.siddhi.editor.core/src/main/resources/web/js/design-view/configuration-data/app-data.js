@@ -35,7 +35,6 @@ define(['require', 'elementArray'],
             this.patternQueryList = new ElementArray();
             this.joinQueryList = new ElementArray();
             this.partitionList = new ElementArray();
-            this.edgeList = new ElementArray();
             // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
             this.finalElementCount = 0;
 
@@ -77,10 +76,6 @@ define(['require', 'elementArray'],
             this.partitionList.push(partition);
         };
 
-        AppData.prototype.addEdge = function (edge) {
-            this.edgeList.push(edge);
-        };
-
         AppData.prototype.removeStream = function (streamId) {
             this.streamList.removeElement(streamId);
         };
@@ -115,10 +110,6 @@ define(['require', 'elementArray'],
 
         AppData.prototype.removePartition = function (partitionId) {
             this.partitionList.removeElement(partitionId);
-        };
-
-        AppData.prototype.removeEdge = function (edgeId) {
-            this.edgeList.removeElement(edgeId);
         };
 
         AppData.prototype.setFinalElementCount = function (finalElementCount) {
@@ -159,10 +150,6 @@ define(['require', 'elementArray'],
 
         AppData.prototype.getPartition = function (partitionId) {
             return this.partitionList.getElement(partitionId);
-        };
-
-        AppData.prototype.getEdge = function (edgeId) {
-            return this.edgeList.getElement(edgeId);
         };
 
         AppData.prototype.getFinalElementCount = function () {
