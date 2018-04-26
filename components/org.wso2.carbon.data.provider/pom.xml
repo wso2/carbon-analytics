@@ -68,6 +68,12 @@
             <artifactId>javax.websocket-api</artifactId>
         </dependency>
 
+        <!--UI Server-->
+        <dependency>
+            <groupId>org.wso2.carbon.uiserver</groupId>
+            <artifactId>org.wso2.carbon.uiserver</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
