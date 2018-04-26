@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.data.provider;
+package org.wso2.carbon.data.provider.internal;
 
 import com.google.gson.JsonElement;
 import org.osgi.framework.BundleContext;
@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
+import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
