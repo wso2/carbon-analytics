@@ -94,14 +94,14 @@ public class CodeGenerator {
             siddhiAppStringBuilder.append(generateAggregationString(aggregation));
         }
 
-        for (SourceConfig source : siddhiApp.getSourceList()) {
-            siddhiAppStringBuilder.append(generateSourceString(source));
-        }
-
         // TODO source and sink should be somehow connected to a stream over here
-        for (SinkConfig sink : siddhiApp.getSinkList()) {
-            siddhiAppStringBuilder.append(generateSinkString(sink));
-        }
+//        for (SourceConfig source : siddhiApp.getSourceList()) {
+//            siddhiAppStringBuilder.append(generateSourceString(source));
+//        }
+//
+//        for (SinkConfig sink : siddhiApp.getSinkList()) {
+//            siddhiAppStringBuilder.append(generateSinkString(sink));
+//        }
 
         for (QueryConfig query : siddhiApp.getQueryList()) {
             siddhiAppStringBuilder.append(generateQueryString(query));
