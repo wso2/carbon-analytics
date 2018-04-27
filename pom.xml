@@ -1562,8 +1562,8 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
         <!--Dashboard-->
-        <carbon.uiserver.version>0.19.3</carbon.uiserver.version>
-        <carbon.uiserver.version.range>[0.19.2, 1.0.0]</carbon.uiserver.version.range>
+        <carbon.uiserver.version>0.19.5</carbon.uiserver.version>
+        <carbon.uiserver.version.range>[0.19.3, 1.0.0]</carbon.uiserver.version.range>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->

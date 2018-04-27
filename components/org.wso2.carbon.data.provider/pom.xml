@@ -68,6 +68,12 @@
             <artifactId>javax.websocket-api</artifactId>
         </dependency>
 
+        <!--UI Server-->
+        <dependency>
+            <groupId>org.wso2.carbon.uiserver</groupId>
+            <artifactId>org.wso2.carbon.uiserver</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -148,6 +154,8 @@
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="${javax.ws.rs.version.range}",
             javax.websocket.*;version="${javax.websocket.version.range}",
+            org.wso2.carbon.uiserver.api.*; version="${carbon.uiserver.version.range}",
+            org.wso2.carbon.uiserver.spi.*; version="${carbon.uiserver.version.range}",
             org.slf4j.*;version="${slf4j.version.range}",
             com.google.gson.*; version="${gson.version.range}",
             org.wso2.siddhi.*;version="${siddhi.version.range}",
@@ -157,7 +165,7 @@
         </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.websocket.WebSocketEndpoint",
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
+            osgi.service; objectClass="org.wso2.carbon.uiserver.spi.RestApiProvider",
             osgi.service; objectClass="org.wso2.carbon.data.provider.DataProvider";serviceCount="2"
         </carbon.component>
     </properties>
