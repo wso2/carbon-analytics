@@ -44,7 +44,6 @@ import java.util.Locale;
 import java.util.Map;
 
 @Component(
-        name = "siddhi-data-provider",
         service = DataProvider.class,
         immediate = true
 )
