@@ -20,15 +20,11 @@
 import React from "react";
 import {Link} from "react-router-dom";
 //Material UI
-import {GridList} from "material-ui/GridList";
+import {GridList} from "material-ui-next";
 import Info from "material-ui/svg-icons/action/info";
 import HomeButton from "material-ui/svg-icons/action/home";
-import {
-    Card, CardText, CardTitle, Divider, FlatButton, FloatingActionButton, RaisedButton, Table, TableBody, TableRow,
-    TableRowColumn,
-    Toggle
-} from "material-ui";
-
+import {Card, Divider, Button} from "material-ui-next";
+import {Toggle} from "material-ui";
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -36,7 +32,7 @@ import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import Header from "../common/Header";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
-import {FormattedMessage} from "react-intl";
+// import {FormattedMessage} from "react-intl";
 import { Redirect } from 'react-router-dom';
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import FormPanel from "../common/FormPanel";
@@ -232,7 +228,7 @@ export default class WorkerOverview extends React.Component {
         if (this.state.hasManagerPermission) {
             return (
                 <div className="add-button">
-                    <Link to={window.contextPath + '/add-worker'}><FlatButton
+                    <Link to={window.contextPath + '/add-worker'}><Button
                         label="Add New Node"
                         icon={<ContentAdd />}
                         style={{marginTop: 10}}
@@ -242,7 +238,7 @@ export default class WorkerOverview extends React.Component {
         } else {
             return (
                 <div className="add-button-disabled">
-                    <FlatButton
+                    <Button
                         label="Add New Node"
                         icon={<ContentAdd />}
                         style={{marginTop: 10, display: 'none'}}
@@ -262,18 +258,18 @@ export default class WorkerOverview extends React.Component {
             return (
                 <div className="floating-button">
                     <Link to={window.contextPath + '/add-worker'}>
-                        <FloatingActionButton backgroundColor='#f17b31'>
+                        <Button variant="fab" backgroundColor='#f17b31'>
                             <ContentAdd />
-                        </FloatingActionButton>
+                        </Button>
                     </Link>
                 </div>
             )
         } else {
             return (
                 <div className="floating-button">
-                    <FloatingActionButton backgroundColor='#f17b31'
+                    <Button variant="fab" backgroundColor='#f17b31'
                                           style={{marginTop: 10, display: 'none'}}>
-                    </FloatingActionButton>
+                    </Button>
                 </div>
             )
         }
@@ -350,7 +346,7 @@ export default class WorkerOverview extends React.Component {
                 return (
                     <div style={styles.background}>
                         <div className="info-card" style={{backgroundColor: '#f17b31'}}>
-                            <FlatButton
+                            <Button
                                 label={this.state.statusMessage}
                                 icon={<Info />}
                                 style={{marginTop: 10, backgroundColor: '#f17b31'}}
@@ -364,7 +360,7 @@ export default class WorkerOverview extends React.Component {
                     <div style={styles.background}>
                         <Card style={{width:700,high:'100%',marginTop:'10%',marginLeft: '33%',backgroundColor:'#1a1a1a',
                             borderColor:'#f17b31',borderRadius:2,borderBottomColor:'#f17b31'}}>
-                            <CardText  style={{borderBottom:'1px solid #AE5923',borderTop:'1px solid #AE5923'}}>
+                            <div  style={{borderBottom:'1px solid #AE5923',borderTop:'1px solid #AE5923'}}>
                                 <FormPanel title={""} width={650}>
                                     <div style={errorContainerStyles}>
                                         <i class="fw fw-security fw-inverse fw-5x"></i>
@@ -373,11 +369,11 @@ export default class WorkerOverview extends React.Component {
                                         <br/>
                                         <br/>
                                         <Link to={`${window.contextPath}/logout`} >
-                                            <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
+                                            <Button variant="raised" backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
                                         </Link>
                                     </div>
                                 </FormPanel>
-                            </CardText>
+                            </div>
                         </Card>
                     </div>
                 );
@@ -555,7 +551,7 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <Header/>
                     <div className="navigation-bar">
-                        <FlatButton label="Overview" icon={<HomeButton color="black"/>}/>
+                        <Button label="Overview" icon={<HomeButton color="black"/>}/>
                     </div>
                     {this.renderWorkers(this.state.clustersList,this.state.managerClusterList)}
                 </div>

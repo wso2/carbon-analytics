@@ -20,7 +20,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 //Material UI
-import { CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar } from "material-ui";
+import { CardActions, Dialog, Button, GridList, GridListTile, IconButton, Snackbar } from "material-ui-next";
 import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
 import Delete from "material-ui/svg-icons/action/delete";
 import TrendDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
@@ -168,14 +168,14 @@ export default class WorkerThumbnail extends React.Component {
                 <Link style={{ textDecoration: 'none' }}
                     to={window.contextPath + '/worker/' + this.props.worker.workerId}>
                     <GridList cols={2} cellHeight={180} style={styles.gridList}>
-                        <GridTile>
+                        <GridListTile>
                             <h4 style={{
                                 textAlign: 'center',
                                 color: 'white',
                                 padding: 50
                             }}>{this.props.worker.statusMessage}</h4>
-                        </GridTile>
-                        <GridTile title="Siddhi Apps" titlePosition="bottom"
+                        </GridListTile>
+                        <GridListTile title="Siddhi Apps" titlePosition="bottom"
                             titleStyle={{ fontSize: 10, textAlign: 'center' }}>
                             <div className="grid-tile-h1" style={{ marginTop: 50 }}><h1
                                 className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
@@ -184,7 +184,7 @@ export default class WorkerThumbnail extends React.Component {
                                     {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
                                 </h1>
                             </div>
-                        </GridTile>
+                        </GridListTile>
                     </GridList></Link>
             </div>;
             lastUpdated = "#";
@@ -260,7 +260,7 @@ export default class WorkerThumbnail extends React.Component {
                     <Link style={{ textDecoration: 'none' }}
                         to={window.contextPath + '/worker/' + this.props.worker.workerId}>
                         <GridList cols={4} cellHeight={180} style={styles.gridList}>
-                            <GridTile title="" titlePosition="bottom" titleStyle={{ fontSize: 10 }}>
+                            <GridListTile title="" titlePosition="bottom" titleStyle={{ fontSize: 10 }}>
                                 <div style={{ height: '50%' }}>
                                     <OverviewChart
                                         chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}
@@ -277,9 +277,9 @@ export default class WorkerThumbnail extends React.Component {
                                     </div>
                                 </div>
 
-                            </GridTile>
+                            </GridListTile>
 
-                            <GridTile title="" titlePosition="bottom" titleStyle={{ fontSize: 10 }}>
+                            <GridListTile title="" titlePosition="bottom" titleStyle={{ fontSize: 10 }}>
                                 <div style={{ height: '50%' }}>
                                     <OverviewChart
                                         chartValue={this.state.worker.serverDetails.workerMetrics.memoryUsage * 100}
@@ -296,9 +296,9 @@ export default class WorkerThumbnail extends React.Component {
                                     </div>
                                 </div>
 
-                            </GridTile>
+                            </GridListTile>
 
-                            <GridTile title="" titlePosition="bottom" titleStyle={{ fontSize: 10 }}>
+                            <GridListTile title="" titlePosition="bottom" titleStyle={{ fontSize: 10 }}>
                                 <div class="grid-tile-h1" style={{ height: '38%' }}>
                                     {loadAvg}
                                 </div>
@@ -314,8 +314,8 @@ export default class WorkerThumbnail extends React.Component {
                                     </div>
                                 </div>
 
-                            </GridTile>
-                            <GridTile title="" titlePosition="bottom" titleStyle={{ fontSize: 10 }}>
+                            </GridListTile>
+                            <GridListTile title="" titlePosition="bottom" titleStyle={{ fontSize: 10 }}>
                                 <div className="grid-tile-h1" style={{ height: '38%', marginTop: 20 }}><h1
                                     className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
                                     <h1 style={{ display: 'inline' }}> | </h1>
@@ -328,7 +328,7 @@ export default class WorkerThumbnail extends React.Component {
                                         <p style={{ color: 'white', fontSize: 10, marginLeft: 5, textAlign: 'center' }} >Siddhi Apps</p>
                                     </div>
                                 </div>
-                            </GridTile>
+                            </GridListTile>
                         </GridList>
                     </Link>
                 </div>;
@@ -359,12 +359,12 @@ export default class WorkerThumbnail extends React.Component {
     render() {
         let items = this.renderGridTile();
         let actionsButtons = [
-            <FlatButton
+            <Button
                 label="Yes"
                 backgroundColor='#f17b31'
                 onClick={this.deleteWorker}
             />,
-            <FlatButton
+            <Button
                 label="No"
                 onClick={() => {
                     this.setState({ open: false })
@@ -384,7 +384,7 @@ export default class WorkerThumbnail extends React.Component {
                     {"Do you want to delete worker '" + this.state.workerID + "' ?"}
                 </Dialog>
 
-                <GridTile
+                <GridListTile
                     title={this.state.workerID}
                     subtitle=
                     {<span>Last Updated: {this.renderTime(items[1])}
@@ -400,7 +400,7 @@ export default class WorkerThumbnail extends React.Component {
                         {this.renderDeleteWorker()}
                     </CardActions>
                     {items[0]}
-                </GridTile>
+                </GridListTile>
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle} open={this.state.showMsg}
                     message={this.state.message} autoHideDuration={4000}
                     onRequestClose={() => {
