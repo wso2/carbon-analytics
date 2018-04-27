@@ -22,20 +22,24 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 
 import java.util.List;
 
-// TODO: 4/4/18 class comment
-public class UpdateOutputConfig extends OutputConfig {
-    private String forEventType;
+/**
+ * todo class comment
+ */
+public class UpdateInsertIntoOutputConfig extends OutputConfig {
     private List<SetAttributeConfig> set;
     private String on;
 
-    public UpdateOutputConfig(String forEventType, List<SetAttributeConfig> set, String on) {
-        this.forEventType = forEventType;
-        this.set = set;
-        this.on = on;
+    public UpdateInsertIntoOutputConfig() {
     }
 
-    public String getForEventType() {
-        return forEventType;
+    public UpdateInsertIntoOutputConfig(String eventType) {
+        super(eventType);
+    }
+
+    public UpdateInsertIntoOutputConfig(String eventType, List<SetAttributeConfig> set, String on) {
+        super(eventType);
+        this.set = set;
+        this.on = on;
     }
 
     public List<SetAttributeConfig> getSet() {
@@ -44,5 +48,13 @@ public class UpdateOutputConfig extends OutputConfig {
 
     public String getOn() {
         return on;
+    }
+
+    public void setSet(List<SetAttributeConfig> set) {
+        this.set = set;
+    }
+
+    public void setOn(String on) {
+        this.on = on;
     }
 }

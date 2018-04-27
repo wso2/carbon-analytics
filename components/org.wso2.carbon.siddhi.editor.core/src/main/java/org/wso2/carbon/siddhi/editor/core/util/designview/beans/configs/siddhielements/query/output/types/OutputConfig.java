@@ -20,4 +20,20 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 // TODO: 4/11/18 class comment
 public abstract class OutputConfig {
+    private String eventType;
+
+    public OutputConfig() {
+    }
+
+    public OutputConfig(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
 }

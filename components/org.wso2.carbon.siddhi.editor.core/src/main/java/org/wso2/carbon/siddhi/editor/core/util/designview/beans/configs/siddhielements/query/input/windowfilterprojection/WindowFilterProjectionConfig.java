@@ -16,25 +16,36 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.pattern;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryWindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 
-import java.util.List;
-
 /**
- * Represents a Pattern QueryInputConfig, for Siddhi Query
+ * Represents a Window | Filter | Projection QueryInputConfig, for Siddhi Query
  */
-public class PatternQueryConfig extends QueryInputConfig {
-    private List<PatternQueryEventConfig> eventList;
+public class WindowFilterProjectionConfig extends QueryInputConfig {
+    private String from;
+    private String filter;
+    private QueryWindowConfig window;
 
-    public PatternQueryConfig(List<PatternQueryEventConfig> eventList) {
-        super(QueryInputType.PATTERN.toString());
-        this.eventList = eventList;
+    public WindowFilterProjectionConfig(String type, String from, String filter, QueryWindowConfig window) {
+        super(type);
+        this.from = from;
+        this.filter = filter;
+        this.window = window;
     }
 
-    public List<PatternQueryEventConfig> getEventList() {
-        return eventList;
+    public String getFrom() {
+        return from;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public QueryWindowConfig getWindow() {
+        return window;
     }
 }

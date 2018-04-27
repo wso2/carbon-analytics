@@ -16,25 +16,33 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence;
-
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input;
 
 import java.util.List;
 
 /**
- * Represents a Sequence QueryInputConfig, for Siddhi Query
+ * Represents a Siddhi Window, inside the 'input' part of a Siddhi Query
  */
-public class SequenceQueryConfig extends QueryInputConfig {
-    List<SequenceQueryEventConfig> events;
+public class QueryWindowConfig {
+    private String function;
+    private List<String> parameters;
+    private String filter;
 
-    public SequenceQueryConfig(List<SequenceQueryEventConfig> events) {
-        super(QueryInputType.SEQUENCE.toString());
-        this.events = events;
+    public QueryWindowConfig(String function, List<String> parameters, String filter) {
+        this.function = function;
+        this.parameters = parameters;
+        this.filter = filter;
     }
 
-    public List<SequenceQueryEventConfig> getEvents() {
-        return events;
+    public String getFunction() {
+        return function;
+    }
+
+    public List<String> getParameters() {
+        return parameters;
+    }
+
+    public String getFilter() {
+        return filter;
     }
 }

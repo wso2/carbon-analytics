@@ -16,17 +16,31 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.countingsequence;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence;
 
-// TODO: 4/4/18 class comment
-public abstract class CountingSequenceConfig {
-    private String type;
+/**
+ * Represents a Condition element of Pattern | Sequence QueryInputConfig
+ */
+public class PatternSequenceConditionConfig {
+    private String id;
+    private String streamName;
+    private String filter;
 
-    public CountingSequenceConfig(String type) {
-        this.type = type;
+    public PatternSequenceConditionConfig(String id, String streamName, String filter) {
+        this.id = id;
+        this.streamName = streamName;
+        this.filter = filter;
     }
 
-    public String getType() {
-        return type;
+    public String getId() {
+        return id;
+    }
+
+    public String getStreamName() {
+        return streamName;
+    }
+
+    public String getFilter() {
+        return filter;
     }
 }

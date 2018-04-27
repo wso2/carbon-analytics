@@ -16,22 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join;
 
 import java.util.List;
 
 /**
- * Represents a Siddhi Window, inside the 'input' part of a Siddhi Query
+ * Represents Window of a Join element of Join QueryInputConfig
  */
-public class QueryWindowConfig {
+public class JoinElementWindowConfig {
     private String function;
     private List<String> parameters;
-    private String filter;
 
-    public QueryWindowConfig(String function, List<String> parameters, String filter) {
+    public JoinElementWindowConfig() {
+    }
+
+    public JoinElementWindowConfig(String function, List<String> parameters) {
         this.function = function;
         this.parameters = parameters;
-        this.filter = filter;
     }
 
     public String getFunction() {
@@ -42,7 +43,11 @@ public class QueryWindowConfig {
         return parameters;
     }
 
-    public String getFilter() {
-        return filter;
+    public void setFunction(String function) {
+        this.function = function;
+    }
+
+    public void setParameters(List<String> parameters) {
+        this.parameters = parameters;
     }
 }

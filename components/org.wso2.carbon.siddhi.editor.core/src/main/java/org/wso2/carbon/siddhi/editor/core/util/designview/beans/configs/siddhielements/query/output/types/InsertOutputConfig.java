@@ -20,13 +20,10 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 // TODO: 4/4/18 class comment
 public class InsertOutputConfig extends OutputConfig {
-    private String eventType;
-
-    public InsertOutputConfig(String eventType) {
-        this.eventType = eventType;
+    public InsertOutputConfig() {
     }
 
-    public String getEventType() {
-        return eventType;
+    public InsertOutputConfig(String eventType) {
+        super(eventType);
     }
 }

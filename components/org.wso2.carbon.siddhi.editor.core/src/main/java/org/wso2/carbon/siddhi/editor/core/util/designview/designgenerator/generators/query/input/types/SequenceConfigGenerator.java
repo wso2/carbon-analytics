@@ -18,17 +18,16 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.SequenceQueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.AndOrSequenceEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.CountingSequenceEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.SequenceQueryEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.NotAndSequenceEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.NotForSequenceEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.countingsequence.CountingPatternCountingSequence;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.countingsequence.CountingSequenceConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.sequence.event.countingsequence.MinMaxCountingSequenceValue;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.SequenceQueryConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.AndOrSequenceEventConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.CountingSequenceEventConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.SequenceQueryEventConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.NotAndSequenceEventConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.NotForSequenceEventConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.countingsequence.CountingPatternCountingSequence;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.countingsequence.CountingSequenceConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.countingsequence.MinMaxCountingSequenceValue;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.state.*;
 import org.wso2.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
@@ -44,9 +43,18 @@ import java.util.List;
 public class SequenceConfigGenerator {
     private String siddhiAppString;
 
-    // Data tree variables todo name
-    private boolean isStartEvery = false;
-    private String startEveryWithin = "";
+    private boolean isEvery = false;
+    private boolean isFirstStateElementTraversed = false;
+    private String firstWithinStatement = "";
+
+    private boolean isEveryStateToggled = false;
+
+    private boolean isNotForExist = false;
+    private int notForIndex = -1;
+    private int sequenceElementsCount = 0;
+
+    private List<String> withins = new ArrayList<>();
+
 
     private List<SequenceQueryEventConfig> events = new ArrayList<>();
 
@@ -61,11 +69,22 @@ public class SequenceConfigGenerator {
      */
     public SequenceQueryConfig getSequenceQueryConfig(InputStream queryInputStream) {
         addEvent(((StateInputStream) queryInputStream).getStateElement());
-        // Set 'forEvery' of the first element
-        if (isStartEvery) {
-            events.get(0).setForEvery(true);
-            events.get(0).setWithin(startEveryWithin);
+        // Penetrate NotFor within
+        if (isNotForExist) {
+            withins.add(notForIndex, firstWithinStatement);
+            withins.remove(0);
         }
+
+        // Add Within
+        for (int i = 0; i < events.size(); i++) {
+            events.get(i).setWithin(withins.get(i));
+        }
+
+        // Add Every
+        if (isEvery) {
+            events.get(0).setForEvery(true);
+        }
+
         return new SequenceQueryConfig(events);
     }
 
@@ -74,17 +93,28 @@ public class SequenceConfigGenerator {
      * @param stateElement      Siddhi StateElement object, that holds data about a Sequence query's element
      */
     private void addEvent(StateElement stateElement) {
+        if (!isFirstStateElementTraversed) {
+            if (stateElement.getWithin() != null) {
+                // This is the first ever element that has 'within'
+                firstWithinStatement = ConfigBuildingUtilities.getDefinition(stateElement.getWithin(), siddhiAppString);
+                isFirstStateElementTraversed = true;
+            }
+        }
+        if (stateElement.getWithin() != null) {
+            withins.add(ConfigBuildingUtilities.getDefinition(stateElement.getWithin(), siddhiAppString));
+        }
         if (stateElement instanceof NextStateElement) {
             addEvent(((NextStateElement) stateElement).getStateElement());
             addEvent(((NextStateElement) stateElement).getNextStateElement());
         } else if (stateElement instanceof EveryStateElement){
             // Only the first Element of Sequence can fall into this. Otherwise a compilation error would have occurred
-            isStartEvery = true;
-            if (stateElement.getWithin() != null) {
-                startEveryWithin = ConfigBuildingUtilities.getDefinition(stateElement.getWithin(), siddhiAppString);
-            }
+            isEvery = true;
+            isEveryStateToggled = true; // TODO: 4/20/18 confirm
             addEvent(((EveryStateElement) stateElement).getStateElement());
+            isEveryStateToggled = false; // TODO: 4/20/18 confirm
         } else {
+            // This is a single element
+            sequenceElementsCount++;
             events.add(generateSequenceEventConfig(stateElement));
         }
     }
@@ -110,6 +140,8 @@ public class SequenceConfigGenerator {
             }
             throw new IllegalArgumentException("Event config type for StateElement is unknown");
         } else if (stateElement instanceof AbsentStreamStateElement) {
+            notForIndex = sequenceElementsCount;
+            isNotForExist = true;
             return EventConfigType.NOT_FOR;
         }
         throw new IllegalArgumentException("Event config type for StateElement is unknown");
@@ -123,19 +155,24 @@ public class SequenceConfigGenerator {
     private SequenceQueryEventConfig generateSequenceEventConfig(StateElement stateElement) {
         switch (getEventConfigType(stateElement)) {
             case COUNTING:
+                // Single element without within statement todo in a nice way
+                if (!isEveryStateToggled && (stateElement.getWithin() == null)) {
+                    withins.add("");
+                }
                 return generateCountSequenceEventConfig((CountStateElement) stateElement);
             case NOT_AND:
+                // Single element without within statement todo in a nice way
+                if (!isEveryStateToggled && (stateElement.getWithin() == null)) {
+                    withins.add("");
+                }
                 return generateNotAndEventConfig((LogicalStateElement) stateElement);
             case AND_OR:
+                // Single element without within statement todo in a nice way
+                if (!isEveryStateToggled && (stateElement.getWithin() == null)) {
+                    withins.add("");
+                }
                 return generateAndOrEventConfig((LogicalStateElement) stateElement);
             case NOT_FOR:
-                if (isStartEvery) {
-                    // Has started with an element with 'every' keyword, and this is the relevant element
-                    NotForSequenceEventConfig notForSequenceEventConfig =
-                            generateNotForEventConfig((AbsentStreamStateElement) stateElement);
-//                    notForSequenceEventConfig.setWithin(startEveryWithin);
-                    return notForSequenceEventConfig;
-                }
                 return generateNotForEventConfig((AbsentStreamStateElement) stateElement);
             default:
                 throw new IllegalArgumentException("Unknown type: " + getEventConfigType(stateElement) +

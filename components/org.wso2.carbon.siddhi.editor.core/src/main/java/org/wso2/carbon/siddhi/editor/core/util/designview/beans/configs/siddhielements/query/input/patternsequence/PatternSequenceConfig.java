@@ -16,36 +16,33 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
-
-import java.util.Map;
+import java.util.List;
 
 /**
- * Represents a Siddhi Sink
+ * Represents a Pattern | Sequence QueryInputConfig, for Siddhi Query
  */
-public class SinkConfig extends SiddhiElementConfig {
+public class PatternSequenceConfig {
     private String type;
-    private Map<String, String> options;
-    private SinkMap map;
+    private List<PatternSequenceConditionConfig> conditionList;
+    private String logic;
 
-    public SinkConfig(String id, String type, Map<String, String> options, SinkMap map) {
-        super(id);
+    public PatternSequenceConfig(String type, List<PatternSequenceConditionConfig> conditionList, String logic) {
         this.type = type;
-        this.options = options;
-        this.map = map;
+        this.conditionList = conditionList;
+        this.logic = logic;
     }
 
     public String getType() {
         return type;
     }
 
-    public Map<String, String> getOptions() {
-        return options;
+    public List<PatternSequenceConditionConfig> getConditionList() {
+        return conditionList;
     }
 
-    public SinkMap getMap() {
-        return map;
+    public String getLogic() {
+        return logic;
     }
 }

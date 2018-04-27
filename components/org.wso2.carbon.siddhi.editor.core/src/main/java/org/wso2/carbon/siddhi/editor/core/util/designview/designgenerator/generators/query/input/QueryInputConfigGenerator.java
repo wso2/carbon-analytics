@@ -45,7 +45,9 @@ public class QueryInputConfigGenerator {
     public QueryInputConfig generateQueryInputConfig(InputStream queryInputStream,
                                                      String siddhiAppString,
                                                      SiddhiApp siddhiApp) {
+        // TODO: 4/25/18 THIS METHOD SHOULD BE REDONE
         String queryInputType = getQueryInputType(queryInputStream);
+
         if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW_FILTER_PROJECTION.toString())) {
             return new WindowFilterProjectionConfigGenerator(siddhiAppString)
                     .getWindowFilterProjectionQueryConfig(queryInputStream);
@@ -57,13 +59,25 @@ public class QueryInputConfigGenerator {
             return new SequenceConfigGenerator(siddhiAppString).getSequenceQueryConfig(queryInputStream);
             // TODO: 4/9/18 implement for sequence
         }
+
+//        if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW_FILTER_PROJECTION.toString())) {
+//            return new WindowFilterProjectionConfigGenerator(siddhiAppString)
+//                    .getWindowFilterProjectionQueryConfig(queryInputStream);
+//        } else if (queryInputType.equalsIgnoreCase(QueryInputType.JOIN.toString())) {
+//            return new JoinConfigGenerator().getJoinQueryConfig(queryInputStream, siddhiApp, siddhiAppString);
+//        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString())) {
+//            return new PatternConfigGenerator(siddhiAppString).getPatternQueryConfig(queryInputStream);
+//        } else if (queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
+//            return new SequenceConfigGenerator(siddhiAppString).getSequenceQueryConfig(queryInputStream);
+//            // TODO: 4/9/18 implement for sequence
+//        }
         throw new IllegalArgumentException("Unknown type: " + queryInputType);
     }
 
     /**
      * Gets the type of the Query's Input, with the given Siddhi InputStream object
      * @param queryInputStream      Siddhi InputStream object, which contains data about the Query's input part
-     * @return                      Type of Query's Input todo change type from String to QueryInputType
+     * @return                      Type of Query's Input
      */
     private String getQueryInputType(InputStream queryInputStream) {
         if (queryInputStream instanceof SingleInputStream) {

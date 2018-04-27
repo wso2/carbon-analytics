@@ -20,19 +20,21 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 // TODO: 4/4/18 class comment
 public class DeleteOutputConfig extends OutputConfig {
-    private String forEventType;
     private String on;
 
-    public DeleteOutputConfig(String forEventType, String on) {
-        this.forEventType = forEventType;
-        this.on = on;
+    public DeleteOutputConfig() {
     }
 
-    public String getForEventType() {
-        return forEventType;
+    public DeleteOutputConfig(String eventType, String on) {
+        super(eventType);
+        this.on = on;
     }
 
     public String getOn() {
         return on;
+    }
+
+    public void setOn(String on) {
+        this.on = on;
     }
 }

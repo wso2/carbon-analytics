@@ -38,6 +38,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.regexpattern
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGeneratorHelperException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.factories.AnnotationConfigFactory;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGeneratorHelper;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -58,10 +59,7 @@ import org.wso2.siddhi.query.api.expression.Variable;
 import org.wso2.siddhi.query.api.expression.constant.TimeConstant;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -105,7 +103,8 @@ public class DesignGenerator {
 
 
         // TODO: 3/27/18 implement
-        return null;
+//        return null;
+        return new EventFlow(siddhiAppConfig, Collections.emptyList());
     }
 
     /**
@@ -125,11 +124,22 @@ public class DesignGenerator {
      * Loads Triggers from the SiddhiApp
      */
     private void loadTriggers() {
+        final String EVERY_SPLIT_KEYWORD = "every ";
         for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
+            // Get 'at'
+            String at = "";
+            if (triggerDefinition.getAtEvery() != null) {
+                at = EVERY_SPLIT_KEYWORD +
+                        ConfigBuildingUtilities.getDefinition(triggerDefinition, siddhiAppString)
+                                .split(EVERY_SPLIT_KEYWORD)[1];
+            } else if (triggerDefinition.getAt() != null) {
+                at = triggerDefinition.getAt();
+            }
+
             siddhiAppConfig.add(new TriggerConfig(
                     triggerDefinition.getId(),
                     triggerDefinition.getId(),
-                    triggerDefinition.getAt(),
+                    at,
                     null)); // TODO: 3/29/18 annotationList
         }
     }
@@ -250,7 +260,8 @@ public class DesignGenerator {
                 AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
                         new AttributesSelectionConfigGenerator();
                 selectedAttributesConfig =
-                        attributesSelectionConfigGenerator.generateAttributesSelectionConfig(selector.getSelectionList());
+                        attributesSelectionConfigGenerator.generateAttributesSelectionConfig(
+                                selector.getSelectionList());
                 // Populate 'groupBy' list
                 for (Variable variable : selector.getGroupByList()) {
                     groupBy.add(variable.getAttributeName());

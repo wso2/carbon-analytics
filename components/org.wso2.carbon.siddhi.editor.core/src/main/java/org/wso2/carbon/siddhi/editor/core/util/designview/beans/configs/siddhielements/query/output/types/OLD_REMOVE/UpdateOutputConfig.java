@@ -16,19 +16,20 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.OLD_REMOVE;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.OutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute.SetAttributeConfig;
 
 import java.util.List;
 
 // TODO: 4/4/18 class comment
-public class UpdateOrInsertIntoOutputConfig extends OutputConfig {
+public class UpdateOutputConfig extends OutputConfig {
     private String forEventType;
     private List<SetAttributeConfig> set;
     private String on;
 
-    public UpdateOrInsertIntoOutputConfig(String forEventType, List<SetAttributeConfig> set, String on) {
+    public UpdateOutputConfig(String forEventType, List<SetAttributeConfig> set, String on) {
         this.forEventType = forEventType;
         this.set = set;
         this.on = on;

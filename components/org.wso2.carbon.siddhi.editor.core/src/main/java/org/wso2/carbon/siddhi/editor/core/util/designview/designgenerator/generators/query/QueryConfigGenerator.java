@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
@@ -49,23 +50,24 @@ public class QueryConfigGenerator {
      * @return                      QueryConfig object
      */
     public QueryConfig generateQueryConfig(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
-        // Generate Query Input
+        // Generate Input
         QueryInputConfigGenerator queryInputConfigGenerator = new QueryInputConfigGenerator();
         QueryInputConfig queryInputConfig =
                 queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream(), siddhiAppString, siddhiApp);
 
-        // Generate Query Select
-        AttributesSelectionConfigGenerator attributesSelectionConfigGenerator = new AttributesSelectionConfigGenerator();
+        // Generate Select
+        AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
+                new AttributesSelectionConfigGenerator();
         AttributesSelectionConfig querySelectConfig =
                 attributesSelectionConfigGenerator
                         .generateAttributesSelectionConfig(query.getSelector().getSelectionList());
 
-        // Generate Query Output
+        // Generate Output
         QueryOutputConfigGenerator queryOutputConfigGenerator = new QueryOutputConfigGenerator();
         QueryOutputConfig queryOutputConfig =
                 queryOutputConfigGenerator.generateQueryOutputConfig(query.getOutputStream(), siddhiAppString);
 
-        // Get the Id of the Query
+        // Get Query ID
         String queryId = null;
         for (Annotation annotation : query.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase(SiddhiQueryAnnotation.INFO.toString())) {
@@ -74,29 +76,17 @@ public class QueryConfigGenerator {
             }
         }
         if (queryId == null) {
-            // Set UUID if no Id has been given for the Query
+            // Set UUID when no Id is present
             queryId = UUID.randomUUID().toString();
         }
 
-        // Get Group By List
+        // Get 'groupBy' list
         List<String> groupBy = new ArrayList<>();
         for (Variable variable : query.getSelector().getGroupByList()) {
             groupBy.add(variable.getAttributeName());
         }
 
-        // Get Having clause
-        String having = "";
-        if (query.getSelector().getHavingExpression() != null) {
-            having = ConfigBuildingUtilities.getDefinition(query.getSelector().getHavingExpression(), siddhiAppString);
-        }
-
-        // Get OutputRateLimit
-        String outputRateLimit = "";
-        if (query.getOutputRate() != null) {
-            outputRateLimit = ConfigBuildingUtilities.getDefinition(query.getOutputRate(), siddhiAppString);
-        }
-
-        // Get orderBy
+        // Get 'orderBy' list
         List<QueryOrderByConfig> orderBy = new ArrayList<>();
         for (OrderByAttribute orderByAttribute : query.getSelector().getOrderByList()) {
             orderBy.add(new QueryOrderByConfig(
@@ -104,16 +94,20 @@ public class QueryConfigGenerator {
                     orderByAttribute.getOrder().name()));
         }
 
+        // Get 'having' expression
+        String having = "";
+        if (query.getSelector().getHavingExpression() != null) {
+            having = ConfigBuildingUtilities.getDefinition(query.getSelector().getHavingExpression(), siddhiAppString);
+        }
 
-//        return new QueryConfig(
-//                queryId,
-//                queryInputConfig,
-//                querySelectConfig,
-//                groupBy,
-//                having,
-//                outputRateLimit,
-//                queryOutputConfig,
-//                null); // TODO: 4/19/18 annotationList
+        // Get 'outputRateLimit'
+        String outputRateLimit = "";
+        if (query.getOutputRate() != null) {
+            outputRateLimit = ConfigBuildingUtilities.getDefinition(query.getOutputRate(), siddhiAppString);
+        }
+
+        // Get annotation list
+        List<AnnotationConfig> annotationList = new ArrayList<>(); // TODO: 4/20/18 implement list population
 
         return new QueryConfig(
                 queryId,
@@ -121,13 +115,11 @@ public class QueryConfigGenerator {
                 querySelectConfig,
                 groupBy,
                 orderBy,
-                Long.valueOf(ConfigBuildingUtilities.getDefinition(
-                        query.getSelector().getLimit(),
-                        siddhiAppString)),
+                Long.valueOf(ConfigBuildingUtilities.getDefinition(query.getSelector().getLimit(), siddhiAppString)),
                 having,
                 outputRateLimit,
                 queryOutputConfig,
-                null);
+                annotationList);
     }
 
     /**
