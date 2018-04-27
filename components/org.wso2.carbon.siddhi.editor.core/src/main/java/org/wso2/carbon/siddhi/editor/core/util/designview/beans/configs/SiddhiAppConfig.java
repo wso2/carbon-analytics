@@ -25,8 +25,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.pattern.PatternQueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.SequenceQueryConfig;
+//import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.pattern.PatternQueryConfig;
+//import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.SequenceQueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.SinkConfig;
@@ -144,10 +144,10 @@ public class SiddhiAppConfig {
             windowFilterProjectionQueryList.add(queryConfig);
         } else if (queryInputConfig instanceof JoinConfig) {
             joinQueryList.add(queryConfig);
-        } else if (queryInputConfig instanceof PatternQueryConfig) {
-            patternQueryList.add(queryConfig);
-        } else if (queryInputConfig instanceof SequenceQueryConfig) {
-            sequenceQueryList.add(queryConfig);
+//        } else if (queryInputConfig instanceof PatternQueryConfig) {
+//            patternQueryList.add(queryConfig);
+//        } else if (queryInputConfig instanceof SequenceQueryConfig) {
+//            sequenceQueryList.add(queryConfig);
         } else {
             throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
         }
