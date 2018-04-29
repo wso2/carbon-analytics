@@ -26,6 +26,7 @@ import org.wso2.carbon.stream.processor.statistics.api.NotFoundException;
 import org.wso2.carbon.stream.processor.statistics.api.StatisticsApiService;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
+import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 import org.wso2.msf4j.Request;
 
 import javax.ws.rs.core.Response;
@@ -65,7 +66,7 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
         try {
             String osMetricsJSON = gson.toJson(operatingSystemMetricSet.getMetrics());
             return Response.status(Response.Status.OK).entity(osMetricsJSON).build();
-        } catch (Exception e) {
+        } catch (MetricsConfigException e) {
             String message = e.getMessage();
             WorkerStatistics workerStatistics = operatingSystemMetricSet.getDefault();
             if(("Wso2 Carbon metrics is not enabled.".equalsIgnoreCase(message)) ||
