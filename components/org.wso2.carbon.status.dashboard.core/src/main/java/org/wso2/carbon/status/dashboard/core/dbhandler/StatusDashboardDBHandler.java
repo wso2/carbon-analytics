@@ -211,7 +211,7 @@ public class StatusDashboardDBHandler {
                     stmt.close();
                 } catch (SQLException e) {
                     throw new RDBMSTableException("Error creating table there may have already existing database ." +
-                            WORKER_DETAILS_TABLE);
+                            WORKER_DETAILS_TABLE, e);
                 } finally {
                     closePreparedStatement(stmt);
                     cleanupConnection(conn);
@@ -287,7 +287,7 @@ public class StatusDashboardDBHandler {
         try {
             return this.insert(columnNames, records, WORKER_CONFIG_TABLE);
         } catch (RDBMSTableException e) {
-            throw new RDBMSTableException(e.getMessage(), e);
+            throw new RDBMSTableException("Error inserting worker configuration details, " + e.getMessage(), e);
         }
 
     }
@@ -348,7 +348,8 @@ public class StatusDashboardDBHandler {
             DBHandler.getInstance().insert(stmt);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException(e.getMessage(), e);
+            throw new RDBMSTableException("Error insert entry to table '" + tableName + "' caused by " +
+                    e.getMessage(), e);
         } finally {
             closePreparedStatement(stmt);
             cleanupConnection(conn);
@@ -428,7 +429,7 @@ public class StatusDashboardDBHandler {
             try {
                 details.setArrayList(row);
             } catch (StatusDashboardValidationException e) {
-                logger.error("Error mapping the data in row in worker general details.");
+                logger.error("Error mapping the data in row in worker general details.", e);
             }
             return details;
         } else {
@@ -468,7 +469,7 @@ public class StatusDashboardDBHandler {
             try {
                 details.setArrayList(row);
             } catch (StatusDashboardValidationException e) {
-                logger.error("Error mapping the data in row : " + row.toString());
+                logger.error("Error mapping the data in row : " + row.toString(), e);
             }
             return details;
         } else {

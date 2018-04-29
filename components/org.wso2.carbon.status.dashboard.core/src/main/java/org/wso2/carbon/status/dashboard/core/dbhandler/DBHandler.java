@@ -82,7 +82,7 @@ public class DBHandler {
             try {
                 stmt.close();
             } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
+                logger.error("Error closing statement due to " + e.getMessage() + " in insert.", e);
                 //ignore
             }
         }
@@ -151,7 +151,7 @@ public class DBHandler {
         } catch (SQLException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Table  assumed to not exist since its existence check resulted "
-                        + "in exception ");
+                        + "in exception ", e);
             }
             return false;
         }

@@ -365,7 +365,7 @@ public class DBTableUtils {
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             return databaseMetaData.getDatabaseProductName();
         } catch (SQLException e) {
-            throw new RuntimeException("Error occurred while getting the rdbms database type from the meta data.");
+            throw new RuntimeException("Error occurred while getting the rdbms database type from the meta data.", e);
         }
     }
 

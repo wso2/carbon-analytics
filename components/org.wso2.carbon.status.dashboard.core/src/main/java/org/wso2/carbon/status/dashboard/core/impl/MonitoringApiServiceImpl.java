@@ -913,6 +913,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             if (logger.isDebugEnabled()) {
                 logger.warn(removeCRLFCharacters(workerId) + " Unnable to reach worker.", e);
             } else {
+                // if e include large log is pringting continously.
                 logger.warn(removeCRLFCharacters(workerId) + " Unnable to reach worker.");
             }
             return workerId + " Unnable to reach worker. Caused by: " + e.getMessage();
@@ -1459,7 +1460,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
                     } catch (RDBMSTableException e) {
                         logger.warn("Worker " + removeCRLFCharacters(workerID) +
-                                " currently not active. Retry to reach " + "later");
+                                " currently not active. Retry to reach " + "later", e);
                     }
                     workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: "

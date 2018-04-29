@@ -696,7 +696,8 @@ public class StatusDashboardMetricsDBHandler {
                     stmt.close();
                 }
             } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
+                logger.error("Error closing statement while select entries from table '" + tableName + "' caused by"
+                        + e.getMessage(), e);
                 //ignore
             }
             cleanupConnection(conn);
