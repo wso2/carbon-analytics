@@ -17,15 +17,15 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 //App Components
-import DashboardUtils from "../utils/DashboardUtils";
-import ChartCard from "../common/ChartCard";
+import DashboardUtils from '../utils/DashboardUtils';
+import ChartCard from '../common/ChartCard';
 // Material UI
-import {Card, CardHeader, CardMedia, Divider} from "material-ui";
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
 
 const memoryMetadata = {
-    names: ['Time', 'Total Committed','Total Init','Total Max','Total Used'],
+    names: ['Time', 'Total Committed', 'Total Init', 'Total Max', 'Total Used'],
     types: ['time', 'linear', 'linear']
 };
 
@@ -51,7 +51,7 @@ export default class JVMOTotalMemory extends React.Component {
             jvmMemoryTotalInit: nextprops.data[1],
             jvmMemoryTotalMax: nextprops.data[2],
             jvmMemoryTotalUsed: nextprops.data[3],
-            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length > 10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -59,7 +59,7 @@ export default class JVMOTotalMemory extends React.Component {
         const memoryLineChartConfig = {
             x: 'Time',
             charts: [
-                {type: 'area', y: 'Total Committed',fill: '#FFEB3B', style: {markRadius: 2}},
+                {type: 'area', y: 'Total Committed', fill: '#FFEB3B', style: {markRadius: 2}},
                 {type: 'area', y: 'Total Init', fill: '#8c51a5', style: {markRadius: 2}},
                 {type: 'area', y: 'Total Max', fill: '#f17b31', style: {markRadius: 2}},
                 {type: 'area', y: 'Total Used', fill: '#1bf1b9', style: {markRadius: 2}}
@@ -67,23 +67,23 @@ export default class JVMOTotalMemory extends React.Component {
             width: 700,
             height: 200,
             style: {
-                tickLabelColor:'#f2f2f2',
+                tickLabelColor: '#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 12,
+                legendTitleSize: 12
             },
-            legend:true,
+            legend: true,
             interactiveLegend: true,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             gridColor: '#f2f2f2',
-            xAxisTickCount:this.state.tickCount
+            xAxisTickCount: this.state.tickCount
         };
-        if(this.state.jvmMemoryTotalCommitted.length === 0 && this.state.jvmMemoryTotalInit.length === 0
-            && this.state.virtualMemory.length === 0&& this.state.jvmMemoryPoolsSize.length === 0 &&
-            this.jvmMemoryTotalUsed.length === 0){
-            return(
+        if (this.state.jvmMemoryTotalCommitted.length === 0 && this.state.jvmMemoryTotalInit.length === 0
+            && this.state.virtualMemory.length === 0 && this.state.jvmMemoryPoolsSize.length === 0 &&
+            this.jvmMemoryTotalUsed.length === 0) {
+            return (
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
@@ -100,15 +100,15 @@ export default class JVMOTotalMemory extends React.Component {
             );
         }
 
-        let data3 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryTotalCommitted , this.state.jvmMemoryTotalInit);
-        let y3 = DashboardUtils.initCombinedYDomain(this.state.jvmMemoryTotalInit,this.state.jvmMemoryTotalCommitted);
-        let data4 = DashboardUtils.getCombinedChartList(data3 , this.state.jvmMemoryTotalMax);
-        let y4 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryTotalMax,y3);
-        let data = DashboardUtils.getCombinedChartList(data4 , this.state.jvmMemoryTotalUsed);
-        let y = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryTotalUsed,y4);
+        let data3 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryTotalCommitted, this.state.jvmMemoryTotalInit);
+        let y3 = DashboardUtils.initCombinedYDomain(this.state.jvmMemoryTotalInit, this.state.jvmMemoryTotalCommitted);
+        let data4 = DashboardUtils.getCombinedChartList(data3, this.state.jvmMemoryTotalMax);
+        let y4 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryTotalMax, y3);
+        let data = DashboardUtils.getCombinedChartList(data4, this.state.jvmMemoryTotalUsed);
+        let y = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryTotalUsed, y4);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig}  yDomain={y}
+                <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig} yDomain={y}
                            title="JVM Total Memory (bytes)"/>
             </div>
         );

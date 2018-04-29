@@ -19,6 +19,7 @@
 package org.wso2.carbon.siddhi.metrics.core;
 
 import org.apache.log4j.Logger;
+import org.awaitility.Awaitility;
 import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterSuite;
@@ -39,6 +40,8 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.core.util.statistics.EventBufferHolder;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Test case for carbon metrics inside siddhi.
@@ -78,6 +81,7 @@ public class StatisticsTestCase {
     protected static void destroy() throws Exception {
         metrics.deactivate();
     }
+    
     @Test
     public void statisticsMetricsFactory() throws InterruptedException {
         StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SiddhiMetricsFactory());
@@ -116,6 +120,7 @@ public class StatisticsTestCase {
        bufferedEventsTracker.registerEventBufferHolder(eventBufferHolder,"test.size");
         AssertJUnit.assertEquals("test.size",bufferedEventsTracker.getName(eventBufferHolder));
     }
+    
     @Test
     public void statisticsTest1() throws InterruptedException {
         log.info("statistics test 1");
@@ -158,7 +163,6 @@ public class StatisticsTestCase {
             inputHandler.send(new Object[]{"IBM", 75.6f, 100});
         }
         Thread.sleep(3010);
-        //Assert.assertFalse(metricManagementService.isReporterRunning("Console"));
         String name1 = MetricService.name("org.wso2.siddhi.SiddhiApps.MetricsTest",
                 "Siddhi.Queries.query1.memory");
         String name2 = MetricService.name("org.wso2.siddhi.SiddhiApps.MetricsTest",
@@ -246,6 +250,7 @@ public class StatisticsTestCase {
         AssertJUnit.assertTrue(eventArrived);
         metricManagementService.stopReporter("Console");
     }
+    
     private class mockmoryObject{
         String name;
 

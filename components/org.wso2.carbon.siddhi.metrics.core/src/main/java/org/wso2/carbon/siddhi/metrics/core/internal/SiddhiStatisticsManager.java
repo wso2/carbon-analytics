@@ -28,31 +28,32 @@ public class SiddhiStatisticsManager implements StatisticsManager {
     private String siddhiAppName;
     private SiddhiMetricsManagement metricsManagement;
     private boolean isStatisticEnabled;
-    public SiddhiStatisticsManager(String siddhiAppName,boolean isStatisticEnabled) {
+    
+    public SiddhiStatisticsManager(String siddhiAppName, boolean isStatisticEnabled) {
         this.siddhiAppName = siddhiAppName;
         this.metricsManagement = SiddhiMetricsManagement.getInstance();
         this.isStatisticEnabled = isStatisticEnabled;
     }
-
+    
     @Override
     public void startReporting() {
         this.metricsManagement.startMetrics(siddhiAppName);
     }
-
+    
     @Override
     public void stopReporting() {
         this.metricsManagement.stopMetrics(siddhiAppName);
     }
-
+    
     @Override
     public void cleanup() {
         this.metricsManagement.cleanUpMetrics(siddhiAppName);
     }
-
+    
     public String getSiddhiAppName() {
         return siddhiAppName;
     }
-
+    
     public boolean isStatisticEnabled() {
         return isStatisticEnabled;
     }

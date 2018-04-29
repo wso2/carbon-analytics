@@ -304,7 +304,7 @@ public class StatusDashboardDBHandler {
         try {
             return this.insert(columnNames, records, WORKER_DETAILS_TABLE);
         } catch (RDBMSTableException e) {
-            throw new RDBMSTableException("Error inserting worker general details.", e);
+            throw new RDBMSTableException("Error inserting worker general details." + e.getMessage(), e);
         }
     }
 
@@ -405,7 +405,7 @@ public class StatusDashboardDBHandler {
             return true;
         } catch (SQLException e) {
             throw new RDBMSTableException("Error occurred while deleting the node:" + nodeId + " in a table " +
-                    tableName + DATASOURCE_ID, e);
+                    tableName + DATASOURCE_ID + " due to " + e.getMessage(), e);
         } finally {
             closePreparedStatement(stmt);
             cleanupConnection(conn);
@@ -429,7 +429,7 @@ public class StatusDashboardDBHandler {
             try {
                 details.setArrayList(row);
             } catch (StatusDashboardValidationException e) {
-                logger.error("Error mapping the data in row in worker general details.", e);
+                logger.error("Error mapping the data in row in worker general details due to " + e.getMessage(), e);
             }
             return details;
         } else {
@@ -469,7 +469,7 @@ public class StatusDashboardDBHandler {
             try {
                 details.setArrayList(row);
             } catch (StatusDashboardValidationException e) {
-                logger.error("Error mapping the data in row : " + row.toString(), e);
+                logger.error("Error mapping the data in row : " + row.toString()+ " due to " + e.getMessage(), e);
             }
             return details;
         } else {
@@ -508,7 +508,7 @@ public class StatusDashboardDBHandler {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table.", e);
+            throw new RDBMSTableException("Error retrieving records from table due to " + e.getMessage(), e);
         } finally {
             try {
                 if (rs != null) {
@@ -559,7 +559,8 @@ public class StatusDashboardDBHandler {
             stmt.close();
             rs.close();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table '" + "WORKER CONFIGURATION", e);
+            throw new RDBMSTableException("Error retrieving records from table '" + "WORKER CONFIGURATION" +
+                    " due to " + e.getMessage(), e);
         } finally {
             if (stmt != null) {
                 try {
@@ -601,7 +602,8 @@ public class StatusDashboardDBHandler {
             stmt.close();
             rs.close();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table '" + "MANAGER CONFIGURATION", e);
+            throw new RDBMSTableException("Error retrieving records from table '" + "MANAGER CONFIGURATION" +
+                    " due to " + e.getMessage(), e);
         } finally {
             closePreparedStatement(stmt);
             cleanupConnection(conn);

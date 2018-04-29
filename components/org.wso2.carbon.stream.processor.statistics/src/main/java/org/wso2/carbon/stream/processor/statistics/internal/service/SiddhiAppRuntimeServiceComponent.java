@@ -41,18 +41,18 @@ import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStati
 )
 public class SiddhiAppRuntimeServiceComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SiddhiAppRuntimeServiceComponent.class);
-
+    
     public SiddhiAppRuntimeServiceComponent() {
     }
-
+    
     @Activate
     protected void start(BundleContext bundleContext) {
     }
-
+    
     @Deactivate
     protected void stop() {
     }
-
+    
     /**
      * Get the ConfigProvider service.
      * This is the bind method that gets called for ConfigProvider service registration that satisfy the policy.
@@ -69,7 +69,7 @@ public class SiddhiAppRuntimeServiceComponent {
     protected void registerSiddhiAppRuntimeService(SiddhiAppRuntimeService appRuntimeService) throws ConfigurationException {
         StreamProcessorStatisticDataHolder.getInstance().setSiddhiAppRuntimeService(appRuntimeService);
     }
-
+    
     /**
      * This is the unbind method for the above reference that gets called for ConfigProvider instance un-registrations.
      *

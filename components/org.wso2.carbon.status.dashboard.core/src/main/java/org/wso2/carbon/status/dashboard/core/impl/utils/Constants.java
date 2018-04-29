@@ -98,7 +98,9 @@ public class Constants {
     public static final String DATA_TYPE_LONG = "longType";
     public static final String DATA_TYPE_FLOAT = "floatType";
     public static final String DATA_TYPE_BOOL = "booleanType";
-
+    
+    public static final int HOUR = 3600000;
+    
     private Constants() {
         //preventing initialization
     }

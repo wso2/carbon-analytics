@@ -35,23 +35,22 @@ import static org.wso2.carbon.metrics.core.Level.OFF;
 /**
  * Siddhi Memory usage MMetrics Tracker.
  */
-public class SiddhiBufferedEventsMetric implements BufferedEventsTracker{
+public class SiddhiBufferedEventsMetric implements BufferedEventsTracker {
     private ConcurrentMap<Object, ObjectMetric> registeredObjects = new ConcurrentHashMap<Object, ObjectMetric>();
     private MetricService metricService;
     private String siddhiAppName;
     private boolean statisticEnabled;
-
+    
     public SiddhiBufferedEventsMetric(MetricService metricService, String siddhiAppName, boolean isStatisticEnabled) {
         this.metricService = metricService;
         this.siddhiAppName = siddhiAppName;
         this.statisticEnabled = isStatisticEnabled;
     }
-
-
+    
     /**
      * Register the object that needs to be measured the buffered events count usage.
      *
-     * @param eventBufferHolder          Buffered object.
+     * @param eventBufferHolder Buffered object.
      * @parambufferedEventsTrackerId An unique value to identify the  Buffered object.
      */
     @Override
@@ -60,9 +59,8 @@ public class SiddhiBufferedEventsMetric implements BufferedEventsTracker{
             registeredObjects.put(eventBufferHolder, new ObjectMetric(eventBufferHolder, bufferedEventsTrackerId));
             SiddhiMetricsManagement.getInstance().addComponent(siddhiAppName, bufferedEventsTrackerId);
         }
-
     }
-
+    
     /**
      * @return Name of the buffered event tracker.
      */
@@ -74,40 +72,40 @@ public class SiddhiBufferedEventsMetric implements BufferedEventsTracker{
             return null;
         }
     }
-
+    
     class ObjectMetric {
         private final EventBufferHolder eventBufferHolder;
         private String name;
-
+        
         public ObjectMetric(final EventBufferHolder eventBufferHolder, String name) {
             this.eventBufferHolder = eventBufferHolder;
             this.name = name;
             initMetric();
         }
-
+        
         public String getName() {
             return name;
         }
-
+        
         private void initMetric() {
-                metricService.gauge(
-                        name,
-                        Level.OFF,
-                        new Gauge<Long>() {
-                            @Override
-                            public Long getValue() {
-                                try {
-                                    if (eventBufferHolder != null) {
-                                        return eventBufferHolder.getBufferedEvents();
-                                    } else {
-                                        return 0L;
-                                    }
-                                } catch (Throwable e) {
+            metricService.gauge(
+                    name,
+                    Level.OFF,
+                    new Gauge<Long>() {
+                        @Override
+                        public Long getValue() {
+                            try {
+                                if (eventBufferHolder != null) {
+                                    return eventBufferHolder.getBufferedEvents();
+                                } else {
                                     return 0L;
                                 }
+                            } catch (Throwable e) {
+                                return 0L;
                             }
-                        });
-            if(statisticEnabled) {
+                        }
+                    });
+            if (statisticEnabled) {
                 SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(name, INFO);
             } else {
                 SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(name, OFF);

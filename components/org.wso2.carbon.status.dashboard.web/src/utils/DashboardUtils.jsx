@@ -85,6 +85,7 @@ export default class DashboardUtils {
         }
         return [min, max];
     }
+
     static getCombinedYDomain(chartA, prevYDomain) {
         let max, min;
         if (!(chartA.length === 0)) {
@@ -95,10 +96,11 @@ export default class DashboardUtils {
                 return Math.min(max, arr[1]);
             }, Infinity);
         }
-        max=max>prevYDomain[1]?max:prevYDomain[1];
-        min=min<prevYDomain[0]?min:prevYDomain[0];
-        return [min,max];
+        max = max > prevYDomain[1] ? max : prevYDomain[1];
+        min = min < prevYDomain[0] ? min : prevYDomain[0];
+        return [min, max];
     }
+
     /**
      * Method to get y domain of a given data set.
      * @param arr
@@ -113,14 +115,14 @@ export default class DashboardUtils {
         if (max === 0) {
             return [min, 10];
         }
-        if(((min===max)&&(min===0))||(min!==max)) {
+        if (((min === max) && (min === 0)) || (min !== max)) {
             return [min, max];
-        }else {
-            return [0,max]
+        } else {
+            return [0, max]
         }
     }
 
-    static generateguid () {
+    static generateguid() {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)

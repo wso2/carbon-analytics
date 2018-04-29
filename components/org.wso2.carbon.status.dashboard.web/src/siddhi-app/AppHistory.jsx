@@ -17,24 +17,23 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link, Redirect} from 'react-router-dom';
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import ChartCard from "../common/ChartCard";
-import Header from "../common/Header";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import ChartCard from '../common/ChartCard';
+import Header from '../common/Header';
 //Material UI
-import HomeButton from "material-ui/svg-icons/action/home";
-import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from "material-ui";
-import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
-import RaisedButton from "material-ui/RaisedButton";
-import { Redirect } from 'react-router-dom';
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import Error403 from "../error-pages/Error403";
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from 'material-ui';
+import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
+import RaisedButton from 'material-ui/RaisedButton';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import Error403 from '../error-pages/Error403';
 
 const styles = {
-    button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}
+    button: {margin: 12, backgroundColor: '#f17b31', fontSize: 10}
 };
 const memoryMetadata = {names: ['Time', 'Memory(bytes)'], types: ['time', 'linear']};
 
@@ -98,13 +97,13 @@ export default class AppSpecific extends React.Component {
                     throughputAll: response.data[0].throughput.data,
                     memory: response.data[0].memory.data,
                     isApiWaiting: false,
-                    tickCountTp: (response.data[0].throughput.data.length>20)?10:response.data[0].throughput.data.length,
-                    tickCountLt: (response.data[0].latency.data.length>20)?10:response.data[0].latency.data.length,
-                    tickCountMem: (response.data[0].memory.data.length>20)?10:response.data[0].memory.data.length,
+                    tickCountTp: (response.data[0].throughput.data.length > 20) ? 10 : response.data[0].throughput.data.length,
+                    tickCountLt: (response.data[0].latency.data.length > 20) ? 10 : response.data[0].latency.data.length,
+                    tickCountMem: (response.data[0].memory.data.length > 20) ? 10 : response.data[0].memory.data.length,
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
@@ -130,7 +129,7 @@ export default class AppSpecific extends React.Component {
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
@@ -149,28 +148,28 @@ export default class AppSpecific extends React.Component {
         this.handleApi(this.state.period);
     }
 
-    renderLatencyChart(){
+    renderLatencyChart() {
 
         const latencyLineChartConfig = {
             x: 'Time',
             charts: [{type: 'area', y: 'Latency(milliseconds)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
-            legend:true,
+            legend: true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxistickCountTp:this.state.tickCountLt,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            xAxistickCountTp: this.state.tickCountLt,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             style: {
-                tickLabelColor:'white',
+                tickLabelColor: 'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 12,
+                legendTitleSize: 12
             }
         };
-        if(this.state.latency.length === 0) {
+        if (this.state.latency.length === 0) {
             return (
                 <Card><CardHeader title="Latency"/><Divider/>
                     <CardMedia>
@@ -181,32 +180,33 @@ export default class AppSpecific extends React.Component {
                 </Card>
             );
         }
-        return(
+        return (
             <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
                        title="Latency"/>
         );
     }
-    renderMemoryChart(){
+
+    renderMemoryChart() {
         const memoryLineChartConfig = {
             x: 'Time',
             charts: [{type: 'area', y: 'Memory(bytes)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
-            legend:true,
+            legend: true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxistickCountTp:this.state.tickCountMem,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            xAxistickCountTp: this.state.tickCountMem,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             style: {
-                tickLabelColor:'white',
+                tickLabelColor: 'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 12,
+                legendTitleSize: 12
             }
         };
-        if(this.state.memory.length === 0) {
+        if (this.state.memory.length === 0) {
             return (
                 <Card><CardHeader title="Memory Usage"/><Divider/>
                     <CardMedia>
@@ -217,33 +217,34 @@ export default class AppSpecific extends React.Component {
                 </Card>
             );
         }
-        return(
+        return (
             <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
                        title="Memory Usage"/>
         );
     }
-    renderThroughputChart(){
+
+    renderThroughputChart() {
 
         const tpLineChartConfig = {
             x: 'Time',
             charts: [{type: 'area', y: 'Throughput(events/second)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
-            legend:true,
+            legend: true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxistickCountTp:this.state.tickCountTp,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            xAxistickCountTp: this.state.tickCountTp,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             style: {
-                tickLabelColor:'white',
+                tickLabelColor: 'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 12,
+                legendTitleSize: 12
             }
         };
-        if(this.state.throughputAll.length === 0) {
+        if (this.state.throughputAll.length === 0) {
             return (
                 <Card><CardHeader title="Throughput"/><Divider/>
                     <CardMedia>
@@ -254,7 +255,7 @@ export default class AppSpecific extends React.Component {
                 </Card>
             );
         }
-        return(
+        return (
             <ChartCard data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
                        title="Throughput"/>
         );
@@ -302,14 +303,14 @@ export default class AppSpecific extends React.Component {
                 <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
             );
         }
-        if(this.state.hasViewerPermission) {
+        if (this.state.hasViewerPermission) {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     <Header/>
                     <div className="navigation-bar">
                         <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                   icon={<HomeButton color="black"/>}/></Link>
-                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
+                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id}>
                             <FlatButton label={this.state.workerID + " >"}/></Link>
                         <Link
                             to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +

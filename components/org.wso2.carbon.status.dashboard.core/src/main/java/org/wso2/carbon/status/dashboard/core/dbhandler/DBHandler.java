@@ -37,15 +37,15 @@ import java.sql.SQLException;
 public class DBHandler {
     private static final Logger logger = LoggerFactory.getLogger(DBHandler.class);
     private static DBHandler instance = new DBHandler();
-
+    
     private DBHandler() {
-
+    
     }
-
+    
     public static DBHandler getInstance() {
         return instance;
     }
-
+    
     /**
      * Initialize the db connection.
      *
@@ -65,8 +65,8 @@ public class DBHandler {
             throw new RDBMSTableException("Error initializing connection.", e);
         }
     }
-
-
+    
+    
     /**
      * Insert node data node db.
      *
@@ -87,7 +87,7 @@ public class DBHandler {
             }
         }
     }
-
+    
     /**
      * Delete nodes data to node db.
      *
@@ -102,24 +102,24 @@ public class DBHandler {
             throw new RDBMSTableException(" Error while processing the delete operation.", e);
         }
     }
-
+    
     /**
      * Select node from the node DB.
      *
      * @return list of object.
      */
-
+    
     ResultSet select(PreparedStatement stmt) {
         ResultSet rs;
         try {
             rs = stmt.executeQuery();
-
+            
         } catch (SQLException e) {
             throw new RDBMSTableException("Error retrieving records from table", e);
         }
         return rs;
     }
-
+    
     /**
      * Create table query.
      *
@@ -135,7 +135,7 @@ public class DBHandler {
             throw new RDBMSTableException("Unable to create table.", e);
         }
     }
-
+    
     /**
      * Method for checking whether or not the given table (which reflects the current event table instance) exists.
      *

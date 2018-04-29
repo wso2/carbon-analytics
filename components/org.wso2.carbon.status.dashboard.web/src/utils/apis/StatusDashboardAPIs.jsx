@@ -17,10 +17,9 @@
  *
  */
 
-import Axios from "axios";
-
+import Axios from 'axios';
 import {MediaType} from '../Constants';
-import AuthManager from "../../auth/utils/AuthManager";
+import AuthManager from '../../auth/utils/AuthManager';
 
 export default class StatusDashboardAPIS {
 

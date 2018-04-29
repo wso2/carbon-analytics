@@ -17,12 +17,12 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 //App Components
-import DashboardUtils from "../utils/DashboardUtils";
-import ChartCard from "../common/ChartCard";
+import DashboardUtils from '../utils/DashboardUtils';
+import ChartCard from '../common/ChartCard';
 // Material UI
-import {Card, CardHeader, CardMedia, Divider} from "material-ui";
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
 
 const cpuMetadata = {names: ['Time', 'System Load Avg'], types: ['time', 'linear', 'linear']};
 
@@ -41,7 +41,7 @@ export default class JVMLoad extends React.Component {
     componentWillReceiveProps(nextprops) {
         this.setState({
             jvmOsSystemLoadAverage: nextprops.data[0],
-            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length > 10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -54,21 +54,21 @@ export default class JVMLoad extends React.Component {
             width: 700,
             height: 200,
             style: {
-                tickLabelColor:'#f2f2f2',
+                tickLabelColor: '#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 12,
+                legendTitleSize: 12
             },
-            legend:true,
+            legend: true,
             interactiveLegend: true,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             gridColor: '#f2f2f2',
-            xAxisTickCount:this.state.tickCount
+            xAxisTickCount: this.state.tickCount
         };
-        if(this.state.jvmOsSystemLoadAverage.length === 0){
-            return(
+        if (this.state.jvmOsSystemLoadAverage.length === 0) {
+            return (
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader

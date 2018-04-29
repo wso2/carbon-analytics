@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -31,58 +31,58 @@ public class SiddhiAppStatus {
     private String agetime;
     private boolean isStatEnabled;
     private SiddhiAppMetricsHistory appMetricsHistory;
-
+    
     public SiddhiAppStatus() {
     }
-
+    
     public String getAppName() {
         return appName;
     }
-
+    
     public void setAppName(String appName) {
         this.appName = appName;
     }
-
+    
     public String getStatus() {
         return status;
     }
-
+    
     public void setStatus(String status) {
         this.status = status;
     }
-
+    
     public long getAge() {
         return age;
     }
-
+    
     public void setAge(long age) {
         this.age = age;
     }
-
+    
     public String getAgetime() {
         return agetime;
     }
-
+    
     public void populateAgetime() {
         this.agetime = getTimeAgo();
     }
-
+    
     public boolean isStatEnabled() {
         return isStatEnabled;
     }
-
+    
     public void setStatEnabled(boolean statEnabled) {
         isStatEnabled = statEnabled;
     }
-
+    
     public SiddhiAppMetricsHistory getAppMetricsHistory() {
         return appMetricsHistory;
     }
-
+    
     public void setAppMetricsHistory(SiddhiAppMetricsHistory appMetricsHistory) {
         this.appMetricsHistory = appMetricsHistory;
     }
-
+    
     /**
      * Get human readable time format
      *
@@ -97,7 +97,7 @@ public class SiddhiAppStatus {
                 (this.age));
         long sec = TimeUnit.MILLISECONDS.toSeconds(this.age) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
                 .toMinutes(this.age));
-
+        
         if (days > 0) {
             ageString = ageString + " " + days + "d";
         }

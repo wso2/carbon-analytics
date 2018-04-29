@@ -22,17 +22,16 @@ package org.wso2.carbon.status.dashboard.core.bean;
 /**
  * Siddhi app Component Bean class.
  */
-public class WorkerResponce {
+public class WorkerResponse {
     private String message;
     private int code;
 
-
-    public WorkerResponce(String message, int value) {
+    public WorkerResponse(String message, int value) {
         this.message = message;
         this.code = value;
     }
 
-    public WorkerResponce() {
+    public WorkerResponse() {
     }
 
     public String getMessage() {

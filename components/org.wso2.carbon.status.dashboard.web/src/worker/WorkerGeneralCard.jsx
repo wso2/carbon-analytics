@@ -17,16 +17,16 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 //App Components
 //Material UI
-import {Card, CardText, CardTitle, Divider, FontIcon} from "material-ui";
-import {Table, TableBody, TableRow, TableRowColumn} from "material-ui/Table/index";
-import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
-import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
+import {Card, CardText, CardTitle, Divider, FontIcon} from 'material-ui';
+import {Table, TableBody, TableRow, TableRowColumn} from 'material-ui/Table/index';
+import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
+import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
 
 const styles = {
-    borderBottom: {borderBottomColor:'rgba(215,215,215,0.05)'},
+    borderBottom: {borderBottomColor: 'rgba(215,215,215,0.05)'},
     rowColor: {color: 'rgba(255,255,255,0.87)'}, length: {width: 200}
 };
 
@@ -65,9 +65,9 @@ export default class WorkerGeneralCard extends React.Component {
             });
     }
 
-    getSnapshotTime(){
-        if(this.state.haDetails.clusterID === "Non Clusters" ||
-            (this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Active")){
+    getSnapshotTime() {
+        if (this.state.haDetails.clusterID === "Non Clusters" ||
+            (this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Active")) {
             return (
                 <TableRow style={styles.borderBottom}>
                     <TableRowColumn style={styles.length}>
@@ -80,12 +80,12 @@ export default class WorkerGeneralCard extends React.Component {
             );
         }
         return (
-            <div />
+            <div/>
         );
     }
 
-    getSyncTime(){
-        if(this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Passive"){
+    getSyncTime() {
+        if (this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Passive") {
             return (
                 <TableRow style={styles.borderBottom}>
                     <TableRowColumn style={styles.length}>
@@ -98,12 +98,12 @@ export default class WorkerGeneralCard extends React.Component {
             );
         }
         return (
-            <div />
+            <div/>
         );
     }
 
-    getClusterId(){
-        if(this.state.haDetails.clusterID !== "Non Clusters"){
+    getClusterId() {
+        if (this.state.haDetails.clusterID !== "Non Clusters") {
             return (
                 <TableRow style={styles.borderBottom}>
                     <TableRowColumn style={styles.length}>
@@ -116,13 +116,13 @@ export default class WorkerGeneralCard extends React.Component {
             );
         }
         return (
-            <div />
+            <div/>
         );
     }
 
     render() {
-        if(!this.state.isApiCalled){
-            return(
+        if (!this.state.isApiCalled) {
+            return (
                 <div style={{paddingLeft: 20, width: '30%', float: 'left', boxSizing: 'border-box'}}>
                     <Card style={{height: 660}}>
                         <CardTitle title="Server General Details"/>
@@ -191,7 +191,7 @@ export default class WorkerGeneralCard extends React.Component {
                                         {this.state.haDetails.runningStatus === "Reachable" ?
                                             <FontIcon style={{fontSize: '13px'}}>
                                                 <CircleBorder style={{height: '13px'}} color='green'/> Running
-                                            </FontIcon>:
+                                            </FontIcon> :
                                             <FontIcon style={{fontSize: '13px'}}>
                                                 <CircleBorder style={{height: '13px'}} color='red'/> Not Reachable
                                             </FontIcon>}
@@ -228,7 +228,8 @@ export default class WorkerGeneralCard extends React.Component {
                                     <TableRowColumn style={styles.length}>
                                         Country
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.userCountry}>
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={this.state.generalDetails.userCountry}>
                                         {this.state.generalDetails.userCountry}
                                     </TableRowColumn>
                                 </TableRow>
@@ -236,7 +237,8 @@ export default class WorkerGeneralCard extends React.Component {
                                     <TableRowColumn style={styles.length}>
                                         Time Zone
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.userTimezone}>
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={this.state.generalDetails.userTimezone}>
                                         {this.state.generalDetails.userTimezone}
                                     </TableRowColumn>
                                 </TableRow>
@@ -244,7 +246,8 @@ export default class WorkerGeneralCard extends React.Component {
                                     <TableRowColumn style={styles.length}>
                                         Java Version
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.javaVersion}>
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={this.state.generalDetails.javaVersion}>
                                         {this.state.generalDetails.javaVersion}
                                     </TableRowColumn>
                                 </TableRow>

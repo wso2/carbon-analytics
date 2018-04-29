@@ -20,9 +20,7 @@ package org.wso2.carbon.stream.processor.statistics.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
@@ -37,10 +35,10 @@ public class StreamProcessorStatisticDataHolder {
     private MetricManagementService metricManagementService;
     private NodeInfo nodeInfo;
     private SiddhiAppRuntimeService siddhiAppRuntimeService;
-
+    
     private StreamProcessorStatisticDataHolder() {
     }
-
+    
     /**
      * Provide instance of StreamProcessorStatisticDataHolder class.
      *
@@ -49,6 +47,7 @@ public class StreamProcessorStatisticDataHolder {
     public static StreamProcessorStatisticDataHolder getInstance() {
         return instance;
     }
+    
     /**
      * Returns servicers provider.
      *
@@ -57,7 +56,7 @@ public class StreamProcessorStatisticDataHolder {
     public ConfigProvider getConfigProvider() {
         return this.configProvider;
     }
-
+    
     /**
      * Sets instance of servicers provider.
      *
@@ -66,34 +65,35 @@ public class StreamProcessorStatisticDataHolder {
     public void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
     }
-
+    
     /**
      * Return the instance of  metrics configuration
+     *
      * @return metricsConfig Instance of Metrics Config
      */
     public MetricManagementService getMetricsManagementService() {
         return metricManagementService;
     }
-
+    
     /**
      * Sets the instance of  metrics configuration
      */
     public void setMetricsManagementService(MetricManagementService metricManagementService) {
         this.metricManagementService = metricManagementService;
     }
-
+    
     public NodeInfo getNodeInfo() {
         return nodeInfo;
     }
-
+    
     public void setNodeInfo(NodeInfo nodeInfo) {
         this.nodeInfo = nodeInfo;
     }
-
+    
     public SiddhiAppRuntimeService getSiddhiAppRuntimeService() {
         return siddhiAppRuntimeService;
     }
-
+    
     public void setSiddhiAppRuntimeService(SiddhiAppRuntimeService siddhiAppRuntimeService) {
         this.siddhiAppRuntimeService = siddhiAppRuntimeService;
     }

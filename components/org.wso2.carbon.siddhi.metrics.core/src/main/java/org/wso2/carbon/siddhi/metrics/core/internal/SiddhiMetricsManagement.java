@@ -37,17 +37,17 @@ public class SiddhiMetricsManagement {
     private MetricManagementService metricManagementService;
     private MetricService metricService;
     private static SiddhiMetricsManagement instance = new SiddhiMetricsManagement();
-
+    
     private SiddhiMetricsManagement() {
         metricManagementService = SiddhiMetricsDataHolder.getInstance().getMetricManagementService();
         metricService = SiddhiMetricsDataHolder.getInstance().getMetricService();
         componentMap = new HashMap<>();
     }
-
+    
     public static SiddhiMetricsManagement getInstance() {
         return instance;
     }
-
+    
     public void addComponent(String siddhiAppName, String componentMetricsName) {
         List<String> registeredComponent = componentMap.get(siddhiAppName);
         if (registeredComponent == null) {
@@ -58,27 +58,27 @@ public class SiddhiMetricsManagement {
             componentMap.get(siddhiAppName).add(componentMetricsName);
         }
     }
-
+    
     public void startMetrics(String siddhiAppName) {
         List<String> registeredComponent = componentMap.get(siddhiAppName);
         if (registeredComponent != null) {
-            for (String component:registeredComponent) {
+            for (String component : registeredComponent) {
                 this.metricManagementService.setMetricLevel(component, INFO);
             }
         }
     }
-
+    
     public void stopMetrics(String siddhiAppName) {
         List<String> registeredComponents = componentMap.get(siddhiAppName);
-        for (String component:registeredComponents) {
+        for (String component : registeredComponents) {
             this.metricManagementService.setMetricLevel(component, OFF);
         }
-
+        
     }
-
+    
     public void cleanUpMetrics(String siddhiAppName) {
         List<String> registeredComponents = componentMap.get(siddhiAppName);
-        for (String component:registeredComponents) {
+        for (String component : registeredComponents) {
             metricService.remove(component);
         }
         componentMap.remove(siddhiAppName);

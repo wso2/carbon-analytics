@@ -19,29 +19,30 @@
 /**
  * class which manages worker specific details.
  */
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link, Redirect} from 'react-router-dom';
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import ChartCard from "../common/ChartCard";
-import DashboardUtils from "../utils/DashboardUtils";
-import Header from "../common/Header";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import ChartCard from '../common/ChartCard';
+import DashboardUtils from '../utils/DashboardUtils';
+import Header from '../common/Header';
 //Material UI
-import RaisedButton from "material-ui/RaisedButton";
-import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
-import HomeButton from "material-ui/svg-icons/action/home";
-import {Card, CardHeader, CardMedia, Divider, FlatButton} from "material-ui";
-import { Redirect } from 'react-router-dom';
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import Error403 from "../error-pages/Error403";
-import AuthManager from "../auth/utils/AuthManager";
-const styles = {button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}};
+import RaisedButton from 'material-ui/RaisedButton';
+import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Card, CardHeader, CardMedia, Divider, FlatButton} from 'material-ui';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import Error403 from '../error-pages/Error403';
+import AuthManager from '../auth/utils/AuthManager';
+
+const styles = {button: {margin: 12, backgroundColor: '#f17b31', fontSize: 10}};
 const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
-const memoryMetadata = {names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
-    types: ['time', 'linear', 'linear', 'linear', 'linear']};
+const memoryMetadata = {
+    names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear']
+};
 const loadAvgMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
 const throughputMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
-
 
 
 /**
@@ -109,11 +110,11 @@ export default class WorkerHistory extends React.Component {
                     throughputAll: response.data.throughput.data,
                     isApiWaiting: false,
                     //assume all have same polling interval
-                    tickCount:response.data.systemCPU.data.length>10 ? 10 : response.data.systemCPU.data.length
+                    tickCount: response.data.systemCPU.data.length > 10 ? 10 : response.data.systemCPU.data.length
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
@@ -139,7 +140,7 @@ export default class WorkerHistory extends React.Component {
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
@@ -169,18 +170,18 @@ export default class WorkerHistory extends React.Component {
                 {type: 'area', y: 'Process CPU', style: {markRadius: 2}}],
             width: 800,
             height: 250,
-            legend:true,
+            legend: true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            xAxisTickCount: this.state.tickCount,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             style: {
-                tickLabelColor:'white',
+                tickLabelColor: 'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 12,
+                legendTitleSize: 12
             }
         };
         if (this.state.systemCpu.length === 0 && this.state.processCpu.length === 0) {
@@ -194,7 +195,7 @@ export default class WorkerHistory extends React.Component {
                 </Card>
             );
         }
-        let intY= DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
+        let intY = DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
         return (
             <ChartCard
                 data={DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu)} yDomain={intY}
@@ -205,23 +206,23 @@ export default class WorkerHistory extends React.Component {
     renderMemoryChart() {
         const memoryLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Used Memory',fill: '#058DC7',style: {markRadius: 2}},
-                {type: 'area', y: 'Init Memory', fill: '#50B432', style: { markRadius: 2}},
-                {type: 'area', y: 'Committed Memory', fill: '#f17b31', style: { markRadius: 2}},
+            charts: [{type: 'area', y: 'Used Memory', fill: '#058DC7', style: {markRadius: 2}},
+                {type: 'area', y: 'Init Memory', fill: '#50B432', style: {markRadius: 2}},
+                {type: 'area', y: 'Committed Memory', fill: '#f17b31', style: {markRadius: 2}},
                 {type: 'area', y: 'Total Memory', fill: '#8c51a5', style: {markRadius: 2}}],
             width: 800,
             height: 250,
-            legend:true,interactiveLegend: true,
+            legend: true, interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            xAxisTickCount: this.state.tickCount,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             style: {
-                tickLabelColor:'white',
+                tickLabelColor: 'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 12,
+                legendTitleSize: 12
             }
         };
         if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0 && this.state.initMem.length === 0
@@ -237,11 +238,11 @@ export default class WorkerHistory extends React.Component {
             );
         }
         let data1 = DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.initMem);
-        let intY= DashboardUtils.initCombinedYDomain(this.state.usedMem, this.state.initMem);
+        let intY = DashboardUtils.initCombinedYDomain(this.state.usedMem, this.state.initMem);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.committedMem);
-        let y2=DashboardUtils.getCombinedYDomain(this.state.committedMem,intY);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.committedMem, intY);
         let data = DashboardUtils.getCombinedChartList(data2, this.state.totalMem);
-        let y3=DashboardUtils.getCombinedYDomain(this.state.totalMem,y2);
+        let y3 = DashboardUtils.getCombinedYDomain(this.state.totalMem, y2);
         return (
             <ChartCard data={data} yDomain={y3}
                        metadata={memoryMetadata} config={memoryLineChartConfig} title="Memory Usage"/>
@@ -250,19 +251,19 @@ export default class WorkerHistory extends React.Component {
 
     renderLoadAverageChart() {
         const loadAvgLineChartConfig = {
-            x: 'Time', charts: [{type: 'area', y: 'Load Average',  style: {markRadius: 2}}], width: 800, height: 250,
-            legend:true,
+            x: 'Time', charts: [{type: 'area', y: 'Load Average', style: {markRadius: 2}}], width: 800, height: 250,
+            legend: true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            xAxisTickCount: this.state.tickCount,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             style: {
-                tickLabelColor:'white',
+                tickLabelColor: 'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 12,
+                legendTitleSize: 12
             }
         };
         if (this.state.loadAvg.length === 0) {
@@ -284,19 +285,23 @@ export default class WorkerHistory extends React.Component {
 
     renderThroughputChart() {
         const throughputChartConfig = {
-                x: 'Time', charts: [{type: 'area', y: 'Throughput(events/second)',  style: {markRadius: 2}}], width: 800, height: 250,
-                legend:true,interactiveLegend: true,
-                gridColor: 'white',
-                xAxisTickCount:this.state.tickCount,
-                tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
-                style: {
-                    tickLabelColor:'white',
-                    legendTextColor: '#9c9898',
-                    legendTitleColor: '#9c9898',
-                    axisLabelColor: '#9c9898',
-                    legendTextSize:12,
-                    legendTitleSize:12
-                }
+            x: 'Time',
+            charts: [{type: 'area', y: 'Throughput(events/second)', style: {markRadius: 2}}],
+            width: 800,
+            height: 250,
+            legend: true,
+            interactiveLegend: true,
+            gridColor: 'white',
+            xAxisTickCount: this.state.tickCount,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
+            style: {
+                tickLabelColor: 'white',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898',
+                legendTextSize: 12,
+                legendTitleSize: 12
+            }
         };
         if (this.state.throughputAll.length === 0) {
             return (
@@ -366,7 +371,7 @@ export default class WorkerHistory extends React.Component {
                 <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
             );
         }
-        if(this.state.hasViewerPermission) {
+        if (this.state.hasViewerPermission) {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     <Header/>
@@ -374,7 +379,7 @@ export default class WorkerHistory extends React.Component {
                         <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                   icon={<HomeButton color="black"/>}/>
                         </Link>
-                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
+                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id}>
                             <FlatButton label={this.state.workerID + " >"}/></Link>
                         <RaisedButton label="Metrics" disabled disabledLabelColor='white'
                                       disabledBackgroundColor='#f17b31'/>

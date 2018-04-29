@@ -40,13 +40,13 @@ public class SiddhiMemoryUsageMetric implements MemoryUsageTracker {
     private MetricService metricService;
     private String siddhiAppName;
     private boolean statisticEnabled;
-
-    public SiddhiMemoryUsageMetric(MetricService metricService, String siddhiAppName,boolean isStatisticEnabled) {
+    
+    public SiddhiMemoryUsageMetric(MetricService metricService, String siddhiAppName, boolean isStatisticEnabled) {
         this.metricService = metricService;
         this.siddhiAppName = siddhiAppName;
         this.statisticEnabled = isStatisticEnabled;
     }
-
+    
     /**
      * Register the object that needs to be measured the memory usage.
      *
@@ -60,7 +60,7 @@ public class SiddhiMemoryUsageMetric implements MemoryUsageTracker {
             SiddhiMetricsManagement.getInstance().addComponent(siddhiAppName, memoryTrackerId);
         }
     }
-
+    
     /**
      * @return Name of the memory usage tracker.
      */
@@ -72,36 +72,36 @@ public class SiddhiMemoryUsageMetric implements MemoryUsageTracker {
             return null;
         }
     }
-
+    
     class ObjectMetric {
         private final Object object;
         private String name;
-
+        
         public ObjectMetric(final Object object, String name) {
             this.object = object;
             this.name = name;
             initMetric();
         }
-
+        
         public String getName() {
             return name;
         }
-
+        
         private void initMetric() {
-                metricService.gauge(
-                        name,
-                        Level.OFF,
-                        new Gauge<Long>() {
-                            @Override
-                            public Long getValue() {
-                                try {
-                                    return ObjectSizeCalculator.getObjectSize(object);
-                                } catch (UnsupportedOperationException e) {
-                                    return 0L;
-                                }
+            metricService.gauge(
+                    name,
+                    Level.OFF,
+                    new Gauge<Long>() {
+                        @Override
+                        public Long getValue() {
+                            try {
+                                return ObjectSizeCalculator.getObjectSize(object);
+                            } catch (UnsupportedOperationException e) {
+                                return 0L;
                             }
-                        });
-            if(statisticEnabled) {
+                        }
+                    });
+            if (statisticEnabled) {
                 SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(name, INFO);
             } else {
                 SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(name, OFF);
