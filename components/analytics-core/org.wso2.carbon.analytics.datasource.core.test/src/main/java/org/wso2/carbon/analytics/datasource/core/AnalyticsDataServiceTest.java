@@ -503,7 +503,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(new ColumnDefinitionExt("STR1", ColumnType.STRING, true, false));
         this.service.createTable(tenantId, tableName);
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
-        Assert.assertEquals(this.service.search(tenantId, tableName, "STR1:S*", 0, 150).size(), 0);
+        Assert.assertEquals(this.service.search(tenantId, tableName, "_STR1:S*", 0, 150).size(), 0);
         List<Record> records = this.generateIndexRecords(tenantId, tableName, 98, 0);
         this.service.put(records);
         List<String> ids = new ArrayList<>();
@@ -513,7 +513,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         ids.add(records.get(97).getId());
         Assert.assertEquals(AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(tenantId, tableName, 2, null, ids)).size(), 4);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:S*", 0, 150);
+        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "_STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 98);
         this.service.delete(tenantId, tableName, ids);
         Assert.assertEquals(AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(
@@ -521,7 +521,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(
                 tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)).size(), 94);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        result = this.service.search(tenantId, tableName, "STR1:S*", 0, 150);
+        result = this.service.search(tenantId, tableName, "_STR1:S*", 0, 150);
         Assert.assertEquals(result.size(), 94);
         Assert.assertEquals(AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(tenantId, tableName, 3, null, ids)).size(), 0);
         this.cleanupTable(tenantId, tableName);
@@ -1283,6 +1283,25 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         drillDownRequest.addCategoryPath("location2", path);
         List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
         Assert.assertEquals(1, results.size());
+        this.cleanupTable(tenantId, tableName);
+    }
+
+    @Test (dependsOnMethods = "testFacetSplitterForField")
+    public void testUppercaseWildcardQueries() throws AnalyticsException {
+        int tenantId = 4;
+        String tableName = "Books";
+        this.cleanupTable(tenantId, tableName);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinitionExt("STR1", ColumnType.STRING, true, false));
+        this.service.createTable(tenantId, tableName);
+        this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+        List<Record> records = this.generateIndexRecords(tenantId, tableName, 100, 0);
+        this.service.put(records);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        List<SearchResultEntry> result = this.service.search(tenantId, tableName, "_STR1:S*", 0, 150);
+        Assert.assertEquals(result.size(), 100);
+        int count = this.service.searchCount(tenantId, tableName, "_STR1:STR*");
+        Assert.assertEquals(count, 100);
         this.cleanupTable(tenantId, tableName);
     }
 
