@@ -65,6 +65,7 @@ public class AnalyticsIndexerInfo {
     private String taxonomyWriterLRUCacheType;
 
     private int taxonomyWriterLRUCacheSize;
+    private boolean lowercaseExpandedTerms;
 
 
     public Analyzer getLuceneAnalyzer() {
@@ -217,5 +218,13 @@ public class AnalyticsIndexerInfo {
 
     public AnalyticsIndexFacetConfig getIndexFacetConfig() {
         return indexFacetConfig;
+    }
+
+    public void setLowercaseExpandedTerms(boolean lowercaseExpandedTerms) {
+        this.lowercaseExpandedTerms = lowercaseExpandedTerms;
+    }
+
+    public boolean isLowercaseExpandedTerms() {
+        return lowercaseExpandedTerms;
     }
 }

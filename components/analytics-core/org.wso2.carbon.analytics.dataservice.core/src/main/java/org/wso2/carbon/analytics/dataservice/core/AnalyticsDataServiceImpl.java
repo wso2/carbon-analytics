@@ -161,6 +161,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             indexerInfo.setTaxonomyWriterLRUCacheSize(config.getTaxonomyWriterCacheConfiguration().getCacheSize());
         }
         indexerInfo.setIndexFacetConfig(config.getAnalyticsFacetConfiguration());
+        indexerInfo.setLowercaseExpandedTerms(config.getLowercaseExpandedTerms());
         this.indexer = new AnalyticsDataIndexer(indexerInfo);
         AnalyticsServiceHolder.setAnalyticsDataService(this);
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
