@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.SiddhiAppConverter;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
@@ -76,25 +77,40 @@ public class CodeGenerator {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
         StringBuilder siddhiAppStringBuilder = new StringBuilder();
 
+        siddhiAppStringBuilder.append("-- Streams").append(Constants.NEW_LINE);
         for (StreamConfig stream : siddhiApp.getStreamList()) {
-            siddhiAppStringBuilder.append(generateStreamString(stream));
+            siddhiAppStringBuilder.append(generateStreamString(stream))
+                    .append(Constants.NEW_LINE);
         }
+        siddhiAppStringBuilder.append(Constants.NEW_LINE);
 
+        siddhiAppStringBuilder.append("-- Tables").append(Constants.NEW_LINE);
         for (TableConfig table : siddhiApp.getTableList()) {
-            siddhiAppStringBuilder.append(generateTableString(table));
+            siddhiAppStringBuilder.append(generateTableString(table))
+                    .append(Constants.NEW_LINE);
         }
+        siddhiAppStringBuilder.append(Constants.NEW_LINE);
 
+        siddhiAppStringBuilder.append("-- Windows").append(Constants.NEW_LINE);
         for (WindowConfig window : siddhiApp.getWindowList()) {
-            siddhiAppStringBuilder.append(generateWindowString(window));
+            siddhiAppStringBuilder.append(generateWindowString(window))
+                    .append(Constants.NEW_LINE);
         }
+        siddhiAppStringBuilder.append(Constants.NEW_LINE);
 
+        siddhiAppStringBuilder.append("-- Triggers").append(Constants.NEW_LINE);
         for (TriggerConfig trigger : siddhiApp.getTriggerList()) {
-            siddhiAppStringBuilder.append(generateTriggerString(trigger));
+            siddhiAppStringBuilder.append(generateTriggerString(trigger))
+                    .append(Constants.NEW_LINE);
         }
+        siddhiAppStringBuilder.append(Constants.NEW_LINE);
 
+        siddhiAppStringBuilder.append("-- Aggregations").append(Constants.NEW_LINE);
         for (AggregationConfig aggregation : siddhiApp.getAggregationList()) {
-            siddhiAppStringBuilder.append(generateAggregationString(aggregation));
+            siddhiAppStringBuilder.append(generateAggregationString(aggregation))
+                    .append(Constants.NEW_LINE);
         }
+        siddhiAppStringBuilder.append(Constants.NEW_LINE);
 
         // TODO source and sink should be somehow connected to a stream over here
 //        for (SourceConfig source : siddhiApp.getSourceList()) {
@@ -105,9 +121,15 @@ public class CodeGenerator {
 //            siddhiAppStringBuilder.append(generateSinkString(sink));
 //        }
 
-        for (QueryConfig query : siddhiApp.getQueryList()) {
+        siddhiAppStringBuilder.append("-- Queries").append(Constants.NEW_LINE);
+        for (QueryConfig query : siddhiApp.getWindowFilterProjectionQueryList()) {
             siddhiAppStringBuilder.append(generateQueryString(query));
         }
+        for (QueryConfig query: siddhiApp.getJoinQueryList()) {
+            siddhiAppStringBuilder.append(generateQueryString(query));
+        }
+        siddhiAppStringBuilder.append(Constants.NEW_LINE);
+        siddhiAppStringBuilder.append(Constants.NEW_LINE);
 
         // TODO: 4/23/18 Add the partitions loop
 
@@ -920,7 +942,6 @@ public class CodeGenerator {
     public static void main(String[] args) {
         CodeGenerator codeGenerator = CodeGeneratorSingleton.getInstance();
 
-
         Map<String, String> options = new HashMap<>();
         options.put("jdbc.url", "jdbc:mysql://localhost:3306/production");
         options.put("username", "wso2");
@@ -937,22 +958,14 @@ public class CodeGenerator {
         attributes.add(attribute2);
 
         StreamConfig stream = new StreamConfig("InStream", "InStream", false, attributes, annotations);
-        String streamStr = codeGenerator.generateStreamString(stream);
-        System.out.println("\n" + streamStr);
 
         TableConfig table = new TableConfig("InTable", "InTable", attributes, store, annotations);
-        String tableStr = codeGenerator.generateTableString(table);
-        System.out.println("\n" + tableStr);
 
         List<String> parameters = new ArrayList<>();
         parameters.add("1 second");
         WindowConfig window = new WindowConfig("InWindow", "InWindow", attributes, "timeBatch", parameters, "all", annotations);
-        String windowStr = codeGenerator.generateWindowString(window);
-        System.out.println("\n" + windowStr);
 
         TriggerConfig trigger = new TriggerConfig("InTrigger", "InTrigger", "every 5 min", annotations);
-        String triggerStr = codeGenerator.generateTriggerString(trigger);
-        System.out.println("\n" + triggerStr);
 
 
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
@@ -974,8 +987,6 @@ public class CodeGenerator {
                 aggregateByTimePeriod,
                 store,
                 annotations);
-        String aggregationStr = codeGenerator.generateAggregationString(aggregation);
-        System.out.println("\n" + aggregationStr);
 
 
         List<String> params = new ArrayList<>();
@@ -1002,7 +1013,7 @@ public class CodeGenerator {
         List<QueryOrderByConfig> orderBy = new ArrayList<>();
         orderBy.add(new QueryOrderByConfig("name", "desc"));
 
-        QueryConfig queryConfig = new QueryConfig("QueryID",
+        QueryConfig query = new QueryConfig("QueryID",
                 windowFilterProjectionQueryConfig,
                 userDefinedSelection,
                 groupBy,
@@ -1012,8 +1023,47 @@ public class CodeGenerator {
                 "<the-output-rate-limit>",
                 queryOutputConfig,
                 annotations);
-        String queryStr = codeGenerator.generateQueryString(queryConfig);
-        System.out.println("\n" + queryStr);
+
+        SiddhiAppConfig siddhiApp = new SiddhiAppConfig();
+        siddhiApp.add(stream);
+        siddhiApp.add(stream);
+        siddhiApp.add(stream);
+        siddhiApp.add(stream);
+
+        siddhiApp.add(table);
+        siddhiApp.add(table);
+        siddhiApp.add(table);
+        siddhiApp.add(table);
+        siddhiApp.add(table);
+
+        siddhiApp.add(window);
+        siddhiApp.add(window);
+        siddhiApp.add(window);
+        siddhiApp.add(window);
+        siddhiApp.add(window);
+
+        siddhiApp.add(trigger);
+        siddhiApp.add(trigger);
+        siddhiApp.add(trigger);
+        siddhiApp.add(trigger);
+        siddhiApp.add(trigger);
+
+        siddhiApp.add(aggregation);
+        siddhiApp.add(aggregation);
+        siddhiApp.add(aggregation);
+        siddhiApp.add(aggregation);
+        siddhiApp.add(aggregation);
+
+        siddhiApp.add(query);
+        siddhiApp.add(query);
+        siddhiApp.add(query);
+        siddhiApp.add(query);
+        siddhiApp.add(query);
+
+        EventFlow eventFlow = new EventFlow(siddhiApp, new ArrayList<>());
+
+        String appCode = codeGenerator.getSiddhiAppCode(eventFlow);
+        System.out.println(appCode);
     }
 
 }
