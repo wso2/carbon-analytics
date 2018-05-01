@@ -74,4 +74,7 @@
          to do the indexing operations of the local shards. When this value is increased, the parallel I/O operations being done on the
          system grows larger. So a system which can handle parallel I/O operation could increase this, e.g. SSDs -->
     <indexWorkerCount>8</indexWorkerCount>
+    <!-- Whether terms of wildcard, prefix, fuzzy and range lucene queries are to be automatically lower-cased or
+    not. By default this will be true and property can be used to override that behavior -->
+    <lowercaseExpandedTerms>false</lowercaseExpandedTerms>
 </analytics-dataservice-configuration>

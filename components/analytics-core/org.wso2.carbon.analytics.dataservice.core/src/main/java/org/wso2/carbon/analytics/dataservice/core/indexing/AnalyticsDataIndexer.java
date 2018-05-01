@@ -492,7 +492,8 @@ public class AnalyticsDataIndexer {
             throws org.apache.lucene.queryparser.classic.ParseException, AnalyticsIndexException {
         Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
         String validatedQuery = getValidatedLuceneQuery(query);
-        return new AnalyticsQueryParser(analyzer, indices).parse(validatedQuery);
+        return new AnalyticsQueryParser(analyzer, indices,
+                indexerInfo.isLowercaseExpandedTerms()).parse(validatedQuery);
     }
 
     private String getValidatedLuceneQuery(String query) {
@@ -679,7 +680,8 @@ public class AnalyticsDataIndexer {
             } else {
                 validatedQuery = query;
             }
-            Query indexQuery = new AnalyticsQueryParser(analyzer, indices).parse(validatedQuery);
+            Query indexQuery = new AnalyticsQueryParser(analyzer, indices,
+                    indexerInfo.isLowercaseExpandedTerms()).parse(validatedQuery);
             TotalHitCountCollector collector = new TotalHitCountCollector();
             searcher.search(indexQuery, collector);
             int result = collector.getTotalHits();
@@ -947,7 +949,8 @@ public class AnalyticsDataIndexer {
             Query queryObj = new MatchAllDocsQuery();
             if (drillDownRequest.getQuery() != null && !drillDownRequest.getQuery().isEmpty()) {
                 Analyzer analyzer = getPerFieldAnalyzerWrapper(indices);
-                queryObj = (new AnalyticsQueryParser(analyzer, indices)).parse(drillDownRequest.getQuery());
+                queryObj = (new AnalyticsQueryParser(analyzer, indices,
+                        indexerInfo.isLowercaseExpandedTerms()).parse(drillDownRequest.getQuery()));
             }
             DrillDownQuery drillDownQuery = new DrillDownQuery(config, queryObj);
             String[] path = drillDownRequest.getPath();

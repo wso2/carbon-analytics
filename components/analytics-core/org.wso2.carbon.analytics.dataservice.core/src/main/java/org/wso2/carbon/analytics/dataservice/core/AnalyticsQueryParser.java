@@ -46,7 +46,14 @@ public class AnalyticsQueryParser extends QueryParser {
         super(null, analyzer);
         this.indices = indices;
     }
-    
+
+    public AnalyticsQueryParser(Analyzer analyzer, Map<String, ColumnDefinition> indices,
+                                boolean lowercaseExpandedTerms) {
+        super(null, analyzer);
+        this.indices = indices;
+        setLowercaseExpandedTerms(lowercaseExpandedTerms);
+    }
+
     @Override
     public Query getRangeQuery(String field, String part1, String part2, boolean si, boolean ei) throws ParseException {
         AnalyticsSchema.ColumnType type = null;

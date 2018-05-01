@@ -51,4 +51,7 @@
     <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
          ideal count being 'number of indexing nodes * CPU cores' -->
     <shardCount>6</shardCount>
+    <!-- Whether terms of wildcard, prefix, fuzzy and range lucene queries are to be automatically lower-cased or
+    not. By default this will be true and property can be used to override that behavior -->
+    <lowercaseExpandedTerms>false</lowercaseExpandedTerms>
 </analytics-dataservice-configuration>

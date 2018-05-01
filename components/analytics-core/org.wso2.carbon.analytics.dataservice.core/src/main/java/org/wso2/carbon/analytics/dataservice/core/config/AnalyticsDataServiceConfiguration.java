@@ -58,6 +58,7 @@ public class AnalyticsDataServiceConfiguration {
     private int maxIndexerCommunicatorBufferSize = Constants.DEFAULT_MAX_INDEXER_COMMUNICATOR_BUFFER_SIZE;
 
     private int queueCleanupThreshold = Constants.DEFAULT_INDEXING_QUEUE_CLEANUP_THRESHOLD;
+    private boolean lowercaseExpandedTerms = Constants.DEFAULT_LOWERCASE_EXPANDED_TERMS;
 
     @XmlElement (name = "analytics-record-store", nillable = false)
     public AnalyticsRecordStoreConfiguration[] getAnalyticsRecordStoreConfigurations() {
@@ -194,6 +195,15 @@ public class AnalyticsDataServiceConfiguration {
 
     public void setStaticQuorumConfiguration(StaticQuorumConfiguration staticQuorumConfiguration) {
         this.staticQuorumConfiguration = staticQuorumConfiguration;
+    }
+
+    @XmlElement( name = "lowercaseExpandedTerms", defaultValue = "" + Constants.DEFAULT_LOWERCASE_EXPANDED_TERMS)
+    public boolean getLowercaseExpandedTerms() {
+        return lowercaseExpandedTerms;
+    }
+
+    public void setLowercaseExpandedTerms(boolean lowercaseExpandedTerms) {
+        this.lowercaseExpandedTerms = lowercaseExpandedTerms;
     }
 
 }

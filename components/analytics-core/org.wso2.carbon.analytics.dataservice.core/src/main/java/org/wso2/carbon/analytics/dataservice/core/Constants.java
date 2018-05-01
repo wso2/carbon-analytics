@@ -81,6 +81,7 @@ public class Constants {
                     "index_data" + File.separator;
 
     public static final String INDEX_STORE_DIR_PREFIX = "shard";
+    public static final boolean DEFAULT_LOWERCASE_EXPANDED_TERMS = true;
 
     public static final String LOCAL_SHARD_ALLOCATION_CONFIG_LOCATION =
             getDataDirPath(AnalyticsDataSourceConstants.CARBON_HOME_VAR) + File.separator +
