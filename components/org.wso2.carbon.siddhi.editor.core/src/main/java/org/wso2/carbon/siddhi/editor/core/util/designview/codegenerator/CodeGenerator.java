@@ -43,6 +43,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.DeleteOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.InsertOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateInsertIntoOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute.SetAttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.SinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
@@ -417,7 +419,9 @@ public class CodeGenerator {
         StringBuilder queryInputStringBuilder = new StringBuilder();
 
         switch (queryInput.getType().toLowerCase()) {
-            case "window_filter_projection":
+            case "window":
+            case "filter":
+            case "projection":
                 WindowFilterProjectionConfig windowFilterProjectionQuery = (WindowFilterProjectionConfig) queryInput;
                 queryInputStringBuilder.append(getWindowFilterProjectionQueryInputAsString(windowFilterProjectionQuery));
                 break;
@@ -434,7 +438,7 @@ public class CodeGenerator {
 //                queryInputStringBuilder.append(getSequenceQueryInputAsString(sequenceQuery));
                 break;
             default:
-                throw new CodeGenerationException("Unidentified Query Input Type Has Been Given");
+                throw new CodeGenerationException("Unidentified Query Input Type Has Been Given: " + queryInput.getType());
         }
 
         return queryInputStringBuilder.toString();
@@ -456,15 +460,19 @@ public class CodeGenerator {
         switch (queryOutput.getType().toLowerCase()) {
             case "insert":
                 InsertOutputConfig insertOutputConfig = (InsertOutputConfig) queryOutput.getOutput();
-                queryOutputStringBuilder.append(getQueryInsetOutputAsString(insertOutputConfig));
+                queryOutputStringBuilder.append(getQueryInsetOutputAsString(insertOutputConfig, queryOutput.getTarget()));
                 break;
             case "delete":
                 DeleteOutputConfig deleteOutputConfig = (DeleteOutputConfig) queryOutput.getOutput();
-                queryOutputStringBuilder.append(getQueryDeleteOutputAsString(deleteOutputConfig));
+                queryOutputStringBuilder.append(getQueryDeleteOutputAsString(deleteOutputConfig, queryOutput.getTarget()));
                 break;
             case "update":
+                UpdateInsertIntoOutputConfig updateIntoOutput = (UpdateInsertIntoOutputConfig) queryOutput.getOutput();
+                queryOutputStringBuilder.append(getQueryUpdateOutputAsString(queryOutput.getType(), updateIntoOutput, queryOutput.getTarget()));
                 break;
             case "update_or_insert_into":
+                UpdateInsertIntoOutputConfig updateInsertIntoOutput = (UpdateInsertIntoOutputConfig) queryOutput.getOutput();
+                queryOutputStringBuilder.append(getQueryUpdateOutputAsString(queryOutput.getType(), updateInsertIntoOutput, queryOutput.getTarget()));
                 break;
             default:
                 throw new CodeGenerationException("Unidentified query output type: " + queryOutput.getType());
@@ -473,12 +481,145 @@ public class CodeGenerator {
         return queryOutputStringBuilder.toString();
     }
 
-    private String getQueryDeleteOutputAsString(DeleteOutputConfig deleteOutput) {
-        return VOID_RETURN;
+    private String getQueryUpdateOutputAsString(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput, String target) {
+        if (updateInsertIntoOutput == null) {
+            throw new CodeGenerationException("The given UpdateInsertIntoOutputConfig is null");
+        } else if (updateInsertIntoOutput.getSet() == null || updateInsertIntoOutput.getSet().isEmpty()) {
+            throw new CodeGenerationException("The 'set' values in the update/insert query is empty");
+        } else if (updateInsertIntoOutput.getOn() == null || updateInsertIntoOutput.getOn().isEmpty()) {
+            throw new CodeGenerationException("The 'on' value of the update/insert query is empty");
+        } else if (target == null || target.isEmpty()) {
+            throw new CodeGenerationException("The given target for the update/insert into query is null");
+        }
+
+        StringBuilder updateInsertIntoOutputStringBuilder = new StringBuilder();
+        if (type.equals("update")) {
+            updateInsertIntoOutputStringBuilder.append(Constants.UPDATE);
+        } else if (type.equals("update_or_insert_into")) {
+            updateInsertIntoOutputStringBuilder.append(Constants.UPDATE_OR_INSERT_INTO);
+        }
+
+        updateInsertIntoOutputStringBuilder.append(Constants.SPACE)
+                .append(target)
+                .append(Constants.NEW_LINE)
+                .append(Constants.TAB_SPACE)
+                .append(Constants.SET)
+                .append(Constants.SPACE);
+
+        int setAttributesLeft = updateInsertIntoOutput.getSet().size();
+        for (SetAttributeConfig setAttribute : updateInsertIntoOutput.getSet()) {
+            if (setAttribute == null) {
+                throw new CodeGenerationException("The given SetAttributeConfig instance is null in the update output query type");
+            } else if (setAttribute.getAttribute() == null || setAttribute.getAttribute().isEmpty()) {
+                throw new CodeGenerationException("The given attribute value to be set is null");
+            } else if (setAttribute.getValue() == null || setAttribute.getValue().isEmpty()) {
+                throw new CodeGenerationException("The given value to the value for update query output is null");
+            }
+
+            updateInsertIntoOutputStringBuilder.append(setAttribute.getAttribute())
+                    .append(Constants.SPACE)
+                    .append(Constants.EQUALS)
+                    .append(Constants.SPACE)
+                    .append(setAttribute.getValue());
+            if (setAttributesLeft != 1) {
+                updateInsertIntoOutputStringBuilder.append(Constants.COMMA)
+                        .append(Constants.SPACE);
+            }
+            setAttributesLeft--;
+        }
+
+        updateInsertIntoOutputStringBuilder.append(Constants.NEW_LINE)
+                .append(Constants.TAB_SPACE)
+                .append(Constants.ON)
+                .append(Constants.SPACE)
+                .append(updateInsertIntoOutput.getOn())
+                .append(Constants.SEMI_COLON);
+
+        return updateInsertIntoOutputStringBuilder.toString();
     }
 
-    private String getQueryInsetOutputAsString(InsertOutputConfig insertOutput) {
-        return VOID_RETURN;
+    private String getQueryDeleteOutputAsString(DeleteOutputConfig deleteOutput, String target) {
+        if (deleteOutput == null) {
+            throw new CodeGenerationException("The given DeleteOutputConfig instance is null");
+        } else if (deleteOutput.getOn() == null || deleteOutput.getOn().isEmpty()) {
+            throw new CodeGenerationException("The 'on' statement of the given DeleteOutputConfig instance is null");
+        } else if (target == null || target.isEmpty()) {
+            throw new CodeGenerationException("The given query output target is null");
+        }
+
+        StringBuilder deleteOutputStringBuilder = new StringBuilder();
+
+        deleteOutputStringBuilder.append(Constants.DELETE)
+                .append(Constants.SPACE)
+                .append(target);
+
+        if (deleteOutput.getEventType() != null && !deleteOutput.getEventType().isEmpty()) {
+            deleteOutputStringBuilder
+                    .append(Constants.NEW_LINE)
+                    .append(Constants.TAB_SPACE)
+                    .append(Constants.FOR);
+            switch (deleteOutput.getEventType().toLowerCase()) {
+                case "current":
+                    deleteOutputStringBuilder.append(Constants.CURRENT_EVENTS);
+                    break;
+                case "expired":
+                    deleteOutputStringBuilder.append(Constants.EXPIRED_EVENTS);
+                    break;
+                case "all":
+                    deleteOutputStringBuilder.append(Constants.ALL_EVENTS);
+                    break;
+                default:
+                    throw new CodeGenerationException("Unidentified event type: " + deleteOutput.getEventType());
+            }
+        }
+
+        deleteOutputStringBuilder.append(Constants.NEW_LINE)
+                .append(Constants.TAB_SPACE)
+                .append(Constants.ON)
+                .append(Constants.SPACE)
+                .append(deleteOutput.getOn())
+                .append(Constants.SEMI_COLON);
+
+        return deleteOutputStringBuilder.toString();
+    }
+
+    private String getQueryInsetOutputAsString(InsertOutputConfig insertOutput, String target) {
+        if (insertOutput == null) {
+            throw new CodeGenerationException("The InsertOutputConfig instance given is null");
+        } else if (target == null || target.isEmpty()) {
+            throw new CodeGenerationException("The target for the given query output is null");
+        }
+
+        StringBuilder insertOutputStringBuilder = new StringBuilder();
+
+        insertOutputStringBuilder.append(Constants.INSERT)
+                .append(Constants.SPACE);
+
+        if (insertOutput.getEventType() != null && !insertOutput.getEventType().isEmpty()) {
+            switch (insertOutput.getEventType().toLowerCase()) {
+                case "current":
+                    insertOutputStringBuilder.append(Constants.CURRENT_EVENTS)
+                            .append(Constants.SPACE);
+                    break;
+                case "expired":
+                    insertOutputStringBuilder.append(Constants.EXPIRED_EVENTS)
+                            .append(Constants.SPACE);
+                    break;
+                case "all":
+                    insertOutputStringBuilder.append(Constants.ALL_EVENTS)
+                            .append(Constants.SPACE);
+                    break;
+                default:
+                    throw new CodeGenerationException("Unidentified event type: " + insertOutput.getEventType());
+            }
+        }
+
+        insertOutputStringBuilder.append(Constants.INTO)
+                .append(Constants.SPACE)
+                .append(target)
+                .append(Constants.SEMI_COLON);
+
+        return insertOutputStringBuilder.toString();
     }
 
     private String getQueryOrderByAsString(List<QueryOrderByConfig> orderByList) {
@@ -715,6 +856,9 @@ public class CodeGenerator {
      */
     private class Constants {
 
+        public static final String UPDATE = "update";
+        public static final String UPDATE_OR_INSERT_INTO = "update or insert into";
+        public static final String SET = "set";
         // TODO: 4/18/18 add all the needed constants here
         private static final char NEW_LINE = '\n';
         private static final char COMMA = ',';
@@ -740,8 +884,11 @@ public class CodeGenerator {
         private static final String DEFINE_AGGREGATION = "define aggregation";
 
         private static final String OUTPUT_CURRENT_EVENTS = "output current events";
+        private static final String CURRENT_EVENTS = "current events";
         private static final String OUTPUT_EXPIRED_EVENTS = "output expired events";
+        private static final String EXPIRED_EVENTS = "expired events";
         private static final String OUTPUT_ALL_EVENTS = "output all events";
+        private static final String ALL_EVENTS = "all events";
 
         private static final String AT = "at";
         private static final String FROM = "from";
@@ -758,6 +905,12 @@ public class CodeGenerator {
         private static final String STORE = "@store(type='";
         private static final String HAVING = "having";
         private static final String OUTPUT = "output";
+        private static final String ON = "on";
+        private static final String INSERT = "insert";
+        private static final String INTO = "into";
+        private static final String DELETE = "delete";
+        private static final String FOR = "for";
+
 
         private Constants() {
         }
@@ -825,34 +978,42 @@ public class CodeGenerator {
         System.out.println("\n" + aggregationStr);
 
 
-//        List<String> params = new ArrayList<>();
-//        params.add("1 second");
-//        QueryWindowConfig queryWindowConfig = new QueryWindowConfig("time", params, "age < 30");
-//        WindowFilterProjectionConfig windowFilterProjectionQueryConfig = new WindowFilterProjectionConfig("window",
-//                "InStream",
-//                "age >= 18",
-//                queryWindowConfig);
-//
-//        InsertOutputConfig insertOutputConfig = new InsertOutputConfig("current");
-//        QueryOutputConfig queryOutputConfig = new QueryOutputConfig("insert",
-//                insertOutputConfig,
-//                "OutStream");
+        List<String> params = new ArrayList<>();
+        params.add("1 second");
+        QueryWindowConfig queryWindowConfig = new QueryWindowConfig("time", params, "age < 30");
+        WindowFilterProjectionConfig windowFilterProjectionQueryConfig = new WindowFilterProjectionConfig("window",
+                "InStream",
+                "age >= 18",
+                queryWindowConfig);
 
-//        List<QueryOrderByConfig> orderBy = new ArrayList<>();
-//        orderBy.add(new QueryOrderByConfig("name", "desc"));
+        InsertOutputConfig insertOutputConfig = new InsertOutputConfig(null);
+        DeleteOutputConfig deleteOutputConfig = new DeleteOutputConfig(null, "<event>");
 
-//        QueryConfig queryConfig = new QueryConfig("QueryID",
-//                windowFilterProjectionQueryConfig,
-//                userDefinedSelection,
-//                groupBy,
-//                orderBy,
-//                100,
-//                "Your Mom",
-//                "No U",
-//                queryOutputConfig,
-//                annotations);
-//        String queryStr = codeGenerator.generateQueryString(queryConfig);
-//        System.out.println("\n" + queryStr);
+        List<SetAttributeConfig> set = new ArrayList<>();
+        set.add(new SetAttributeConfig("<attribute1>", "<value1>"));
+        set.add(new SetAttributeConfig("<attribute2>", "<value2>"));
+        set.add(new SetAttributeConfig("<attribute3>", "<value3>"));
+
+        UpdateInsertIntoOutputConfig updateInsertIntoOutputConfig = new UpdateInsertIntoOutputConfig("", set, "<event>");
+        QueryOutputConfig queryOutputConfig = new QueryOutputConfig("update_or_insert_into",
+                updateInsertIntoOutputConfig,
+                "OutStream");
+
+        List<QueryOrderByConfig> orderBy = new ArrayList<>();
+        orderBy.add(new QueryOrderByConfig("name", "desc"));
+
+        QueryConfig queryConfig = new QueryConfig("QueryID",
+                windowFilterProjectionQueryConfig,
+                userDefinedSelection,
+                groupBy,
+                orderBy,
+                100,
+                "<a-having-value>",
+                "<the-output-rate-limit>",
+                queryOutputConfig,
+                annotations);
+        String queryStr = codeGenerator.generateQueryString(queryConfig);
+        System.out.println("\n" + queryStr);
     }
 
 }
