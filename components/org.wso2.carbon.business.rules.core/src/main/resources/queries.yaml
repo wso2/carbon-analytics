@@ -65,7 +65,7 @@ queries:
       RETRIEVE_ALL_RULE_TEMPLATES: SELECT * FROM rule_templates
       DELETE_RULE_TEMPLATE: DELETE FROM rule_templates WHERE rule_templates.uuid = ?
 
-   type: mysql
+   type: MySQL
    version: default
 
   -
@@ -88,5 +88,5 @@ queries:
       RETRIEVE_ALL_RULE_TEMPLATES: SELECT * FROM rule_templates
       DELETE_RULE_TEMPLATE: DELETE FROM rule_templates WHERE rule_templates.uuid = ?
 
-   type: oracle
+   type: Oracle
    version: default
