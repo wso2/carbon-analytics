@@ -26,7 +26,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregateByTimePeriod;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
@@ -49,10 +48,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
-import org.wso2.carbon.siddhi.editor.core.util.designview.singletons.CodeGeneratorSingleton;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +60,7 @@ import java.util.Map;
 public class CodeGenerator {
 
     // TODO: 5/2/18 Look for constants for all the cases in switch case
-    
+
     private static final String VOID_RETURN = "";
 
     /**
@@ -126,7 +122,7 @@ public class CodeGenerator {
         for (QueryConfig query : siddhiApp.getWindowFilterProjectionQueryList()) {
             siddhiAppStringBuilder.append(generateQueryString(query));
         }
-        for (QueryConfig query: siddhiApp.getJoinQueryList()) {
+        for (QueryConfig query : siddhiApp.getJoinQueryList()) {
             siddhiAppStringBuilder.append(generateQueryString(query));
         }
         siddhiAppStringBuilder.append(Constants.NEW_LINE);
@@ -224,19 +220,19 @@ public class CodeGenerator {
 
         if (window.getOutputEventType() != null && !window.getOutputEventType().isEmpty()) {
             windowStringBuilder.append(Constants.SPACE);
-            switch (window.getOutputEventType()) {
+            switch (window.getOutputEventType().toLowerCase()) {
                 // TODO: 4/26/18 The cases must be constants and not free strings
-                case "current":
+                case "current_events":
                     windowStringBuilder.append(Constants.OUTPUT_CURRENT_EVENTS);
                     break;
-                case "expired":
+                case "expired_events":
                     windowStringBuilder.append(Constants.OUTPUT_EXPIRED_EVENTS);
                     break;
-                case "all":
+                case "all_events":
                     windowStringBuilder.append(Constants.OUTPUT_ALL_EVENTS);
                     break;
                 default:
-                    throw new CodeGenerationException("Unidentified output event type:" + window.getOutputEventType());
+                    throw new CodeGenerationException("Unidentified output event type: " + window.getOutputEventType());
             }
         }
         windowStringBuilder.append(Constants.SEMI_COLON);
@@ -398,40 +394,6 @@ public class CodeGenerator {
         return partitionStringBuilder.toString();
     }
 
-    private String getQueryOutputRateLimitAsString(String outputRateLimit) {
-        if (outputRateLimit == null || outputRateLimit.isEmpty()) {
-            return VOID_RETURN;
-        }
-        StringBuilder outputRateLimitStringBuilder = new StringBuilder();
-        outputRateLimitStringBuilder.append(Constants.OUTPUT)
-                .append(Constants.SPACE)
-                .append(outputRateLimit);
-
-        return outputRateLimitStringBuilder.toString();
-    }
-
-    private String getQueryHavingAsString(String having) {
-        if (having == null || having.isEmpty()) {
-            return VOID_RETURN;
-        }
-
-        StringBuilder havingStringBuilder = new StringBuilder();
-        havingStringBuilder.append(Constants.HAVING).append(Constants.SPACE).append(having);
-
-        return havingStringBuilder.toString();
-    }
-
-    private String getQueryLimitAsString(long limit) {
-        if (limit != 0) {
-            StringBuilder limitStringBuilder = new StringBuilder();
-            limitStringBuilder.append(Constants.LIMIT)
-                    .append(Constants.SPACE)
-                    .append(limit);
-            return limitStringBuilder.toString();
-        }
-        return VOID_RETURN;
-    }
-
     private String getQueryInputAsString(QueryInputConfig queryInput) {
         if (queryInput == null) {
             throw new CodeGenerationException("Query Input Cannot Be Null");
@@ -467,8 +429,191 @@ public class CodeGenerator {
         return queryInputStringBuilder.toString();
     }
 
+    private String getWindowFilterProjectionQueryInputAsString(WindowFilterProjectionConfig windowFilterProjection) {
+        if (windowFilterProjection == null) {
+            throw new CodeGenerationException("The WindowFilterProjection Instance Is Null");
+        } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
+            throw new CodeGenerationException("From Value Is Null");
+        }
+
+        StringBuilder windowFilterProjectionStringBuilder = new StringBuilder();
+        windowFilterProjectionStringBuilder.append(Constants.FROM)
+                .append(Constants.SPACE)
+                .append(windowFilterProjection.getFrom());
+
+        if (windowFilterProjection.getFilter() != null && !windowFilterProjection.getFilter().isEmpty()) {
+            windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
+                    .append(windowFilterProjection.getFilter())
+                    .append(Constants.CLOSE_SQUARE_BRACKET);
+        }
+
+        if (windowFilterProjection.getWindow() != null) {
+            QueryWindowConfig queryWindow = windowFilterProjection.getWindow();
+            windowFilterProjectionStringBuilder.append(Constants.HASH)
+                    .append(Constants.WINDOW)
+                    .append(Constants.FULL_STOP)
+                    .append(queryWindow.getFunction())
+                    .append(Constants.OPEN_BRACKET)
+                    .append(getParameterListAsString(queryWindow.getParameters()))
+                    .append(Constants.CLOSE_BRACKET);
+        }
+
+        if (windowFilterProjection.getPostWindowFilter() != null && !windowFilterProjection.getPostWindowFilter().isEmpty()) {
+            windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
+                    .append(windowFilterProjection.getPostWindowFilter())
+                    .append(Constants.CLOSE_SQUARE_BRACKET);
+        }
+
+        return windowFilterProjectionStringBuilder.toString();
+    }
+
+    private String getJoinQueryInputAsString(JoinConfig joinQuery) {
+        StringBuilder joinQueryStringBuilder = new StringBuilder();
+        return joinQueryStringBuilder.toString();
+    }
+
+    private String getPatternQueryInputAsString(PatternSequenceConfig patternQuery) {
+        StringBuilder patternQueryStringBuilder = new StringBuilder();
+        return patternQueryStringBuilder.toString();
+    }
+
     private String getSequenceQueryInputAsString(PatternSequenceConfig sequenceQuery) {
         return VOID_RETURN;
+    }
+
+    private String getQuerySelectAsString(AttributesSelectionConfig attributesSelection) {
+        if (attributesSelection == null) {
+            throw new CodeGenerationException(" Attribute Selection Instance Cannot Be Null");
+        }
+
+        StringBuilder attributesSelectionStringBuilder = new StringBuilder();
+
+        attributesSelectionStringBuilder.append(Constants.SELECT)
+                .append(Constants.SPACE);
+
+        if (attributesSelection.getType() == null || attributesSelection.getType().isEmpty()) {
+            throw new CodeGenerationException("The Type Of Attribute Selection Cannot Be Null");
+        }
+
+        switch (attributesSelection.getType().toUpperCase()) {
+            case AttributeSelection.TYPE_USER_DEFINED:
+                UserDefinedSelectionConfig userDefinedSelection = (UserDefinedSelectionConfig) attributesSelection;
+                attributesSelectionStringBuilder.append(getUserDefinedSelectionAsString(userDefinedSelection));
+                break;
+            case AttributeSelection.TYPE_ALL:
+                attributesSelectionStringBuilder.append(Constants.ALL);
+                break;
+            default:
+                throw new CodeGenerationException("Undefined Attribute Selection Type");
+        }
+
+        return attributesSelectionStringBuilder.toString();
+    }
+
+    private String getUserDefinedSelectionAsString(UserDefinedSelectionConfig userDefinedSelection) {
+        // TODO: 4/23/18 Complete to get rid of duplicate code
+        StringBuilder userDefinedSelectionStringBuilder = new StringBuilder();
+
+        if (userDefinedSelection == null || userDefinedSelection.getValue() == null || userDefinedSelection.getValue().isEmpty()) {
+            throw new CodeGenerationException("UserDefinedSelection Instance '" + userDefinedSelection.toString() + "' is null");
+        }
+
+        int attributesLeft = userDefinedSelection.getValue().size();
+        for (SelectedAttribute attribute : userDefinedSelection.getValue()) {
+            userDefinedSelectionStringBuilder.append(attribute.getExpression());
+            if (attribute.getAs() != null && !attribute.getAs().isEmpty()) {
+                userDefinedSelectionStringBuilder.append(Constants.SPACE)
+                        .append(Constants.AS)
+                        .append(Constants.SPACE)
+                        .append(attribute.getAs());
+            }
+            if (attributesLeft != 1) {
+                userDefinedSelectionStringBuilder.append(Constants.COMMA)
+                        .append(Constants.SPACE);
+            }
+            attributesLeft--;
+        }
+
+        return userDefinedSelectionStringBuilder.toString();
+    }
+
+    private String getQueryGroupByAsString(List<String> groupByList) {
+        if (groupByList == null) {
+            return VOID_RETURN;
+        }
+
+        StringBuilder groupByListStringBuilder = new StringBuilder();
+        groupByListStringBuilder.append(Constants.GROUP_BY)
+                .append(Constants.SPACE);
+        groupByListStringBuilder.append(getParameterListAsString(groupByList));
+        return groupByListStringBuilder.toString();
+    }
+
+    private String getQueryOrderByAsString(List<QueryOrderByConfig> orderByList) {
+        if (orderByList == null || orderByList.isEmpty()) {
+            return VOID_RETURN;
+        }
+
+        StringBuilder orderByListStringBuilder = new StringBuilder();
+        orderByListStringBuilder.append(Constants.ORDER_BY)
+                .append(Constants.SPACE);
+
+        int orderByAttributesLeft = orderByList.size();
+        for (QueryOrderByConfig orderByAttribute : orderByList) {
+            if (orderByAttribute == null) {
+                throw new CodeGenerationException("Query Order By Attribute Cannot Be Null");
+            } else if (orderByAttribute.getValue() == null || orderByAttribute.getValue().isEmpty()) {
+                throw new CodeGenerationException("Query Order By Attribute Value Cannot Be Null");
+            }
+
+            orderByListStringBuilder.append(orderByAttribute.getValue());
+            if (orderByAttribute.getOrder() != null && !orderByAttribute.getOrder().isEmpty()) {
+                orderByListStringBuilder.append(Constants.SPACE)
+                        .append(orderByAttribute.getOrder());
+            }
+
+            if (orderByAttributesLeft != 1) {
+                orderByListStringBuilder.append(Constants.COMMA)
+                        .append(Constants.SPACE);
+            }
+            orderByAttributesLeft--;
+        }
+
+        return orderByListStringBuilder.toString();
+    }
+
+    private String getQueryLimitAsString(long limit) {
+        if (limit != 0) {
+            StringBuilder limitStringBuilder = new StringBuilder();
+            limitStringBuilder.append(Constants.LIMIT)
+                    .append(Constants.SPACE)
+                    .append(limit);
+            return limitStringBuilder.toString();
+        }
+        return VOID_RETURN;
+    }
+
+    private String getQueryHavingAsString(String having) {
+        if (having == null || having.isEmpty()) {
+            return VOID_RETURN;
+        }
+
+        StringBuilder havingStringBuilder = new StringBuilder();
+        havingStringBuilder.append(Constants.HAVING).append(Constants.SPACE).append(having);
+
+        return havingStringBuilder.toString();
+    }
+
+    private String getQueryOutputRateLimitAsString(String outputRateLimit) {
+        if (outputRateLimit == null || outputRateLimit.isEmpty()) {
+            return VOID_RETURN;
+        }
+        StringBuilder outputRateLimitStringBuilder = new StringBuilder();
+        outputRateLimitStringBuilder.append(Constants.OUTPUT)
+                .append(Constants.SPACE)
+                .append(outputRateLimit);
+
+        return outputRateLimitStringBuilder.toString();
     }
 
     private String getQueryOutputAsString(QueryOutputConfig queryOutput) {
@@ -502,6 +647,90 @@ public class CodeGenerator {
         }
 
         return queryOutputStringBuilder.toString();
+    }
+
+    private String getQueryInsetOutputAsString(InsertOutputConfig insertOutput, String target) {
+        if (insertOutput == null) {
+            throw new CodeGenerationException("The InsertOutputConfig instance given is null");
+        } else if (target == null || target.isEmpty()) {
+            throw new CodeGenerationException("The target for the given query output is null");
+        }
+
+        StringBuilder insertOutputStringBuilder = new StringBuilder();
+
+        insertOutputStringBuilder.append(Constants.INSERT)
+                .append(Constants.SPACE);
+
+        if (insertOutput.getEventType() != null && !insertOutput.getEventType().isEmpty()) {
+            switch (insertOutput.getEventType().toLowerCase()) {
+                case "current":
+                    insertOutputStringBuilder.append(Constants.CURRENT_EVENTS)
+                            .append(Constants.SPACE);
+                    break;
+                case "expired":
+                    insertOutputStringBuilder.append(Constants.EXPIRED_EVENTS)
+                            .append(Constants.SPACE);
+                    break;
+                case "all":
+                    insertOutputStringBuilder.append(Constants.ALL_EVENTS)
+                            .append(Constants.SPACE);
+                    break;
+                default:
+                    throw new CodeGenerationException("Unidentified event type: " + insertOutput.getEventType());
+            }
+        }
+
+        insertOutputStringBuilder.append(Constants.INTO)
+                .append(Constants.SPACE)
+                .append(target)
+                .append(Constants.SEMI_COLON);
+
+        return insertOutputStringBuilder.toString();
+    }
+
+    private String getQueryDeleteOutputAsString(DeleteOutputConfig deleteOutput, String target) {
+        if (deleteOutput == null) {
+            throw new CodeGenerationException("The given DeleteOutputConfig instance is null");
+        } else if (deleteOutput.getOn() == null || deleteOutput.getOn().isEmpty()) {
+            throw new CodeGenerationException("The 'on' statement of the given DeleteOutputConfig instance is null");
+        } else if (target == null || target.isEmpty()) {
+            throw new CodeGenerationException("The given query output target is null");
+        }
+
+        StringBuilder deleteOutputStringBuilder = new StringBuilder();
+
+        deleteOutputStringBuilder.append(Constants.DELETE)
+                .append(Constants.SPACE)
+                .append(target);
+
+        if (deleteOutput.getEventType() != null && !deleteOutput.getEventType().isEmpty()) {
+            deleteOutputStringBuilder
+                    .append(Constants.NEW_LINE)
+                    .append(Constants.TAB_SPACE)
+                    .append(Constants.FOR);
+            switch (deleteOutput.getEventType().toLowerCase()) {
+                case "current":
+                    deleteOutputStringBuilder.append(Constants.CURRENT_EVENTS);
+                    break;
+                case "expired":
+                    deleteOutputStringBuilder.append(Constants.EXPIRED_EVENTS);
+                    break;
+                case "all":
+                    deleteOutputStringBuilder.append(Constants.ALL_EVENTS);
+                    break;
+                default:
+                    throw new CodeGenerationException("Unidentified event type: " + deleteOutput.getEventType());
+            }
+        }
+
+        deleteOutputStringBuilder.append(Constants.NEW_LINE)
+                .append(Constants.TAB_SPACE)
+                .append(Constants.ON)
+                .append(Constants.SPACE)
+                .append(deleteOutput.getOn())
+                .append(Constants.SEMI_COLON);
+
+        return deleteOutputStringBuilder.toString();
     }
 
     private String getQueryUpdateOutputAsString(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput, String target) {
@@ -559,164 +788,6 @@ public class CodeGenerator {
                 .append(Constants.SEMI_COLON);
 
         return updateInsertIntoOutputStringBuilder.toString();
-    }
-
-    private String getQueryDeleteOutputAsString(DeleteOutputConfig deleteOutput, String target) {
-        if (deleteOutput == null) {
-            throw new CodeGenerationException("The given DeleteOutputConfig instance is null");
-        } else if (deleteOutput.getOn() == null || deleteOutput.getOn().isEmpty()) {
-            throw new CodeGenerationException("The 'on' statement of the given DeleteOutputConfig instance is null");
-        } else if (target == null || target.isEmpty()) {
-            throw new CodeGenerationException("The given query output target is null");
-        }
-
-        StringBuilder deleteOutputStringBuilder = new StringBuilder();
-
-        deleteOutputStringBuilder.append(Constants.DELETE)
-                .append(Constants.SPACE)
-                .append(target);
-
-        if (deleteOutput.getEventType() != null && !deleteOutput.getEventType().isEmpty()) {
-            deleteOutputStringBuilder
-                    .append(Constants.NEW_LINE)
-                    .append(Constants.TAB_SPACE)
-                    .append(Constants.FOR);
-            switch (deleteOutput.getEventType().toLowerCase()) {
-                case "current":
-                    deleteOutputStringBuilder.append(Constants.CURRENT_EVENTS);
-                    break;
-                case "expired":
-                    deleteOutputStringBuilder.append(Constants.EXPIRED_EVENTS);
-                    break;
-                case "all":
-                    deleteOutputStringBuilder.append(Constants.ALL_EVENTS);
-                    break;
-                default:
-                    throw new CodeGenerationException("Unidentified event type: " + deleteOutput.getEventType());
-            }
-        }
-
-        deleteOutputStringBuilder.append(Constants.NEW_LINE)
-                .append(Constants.TAB_SPACE)
-                .append(Constants.ON)
-                .append(Constants.SPACE)
-                .append(deleteOutput.getOn())
-                .append(Constants.SEMI_COLON);
-
-        return deleteOutputStringBuilder.toString();
-    }
-
-    private String getQueryInsetOutputAsString(InsertOutputConfig insertOutput, String target) {
-        if (insertOutput == null) {
-            throw new CodeGenerationException("The InsertOutputConfig instance given is null");
-        } else if (target == null || target.isEmpty()) {
-            throw new CodeGenerationException("The target for the given query output is null");
-        }
-
-        StringBuilder insertOutputStringBuilder = new StringBuilder();
-
-        insertOutputStringBuilder.append(Constants.INSERT)
-                .append(Constants.SPACE);
-
-        if (insertOutput.getEventType() != null && !insertOutput.getEventType().isEmpty()) {
-            switch (insertOutput.getEventType().toLowerCase()) {
-                case "current":
-                    insertOutputStringBuilder.append(Constants.CURRENT_EVENTS)
-                            .append(Constants.SPACE);
-                    break;
-                case "expired":
-                    insertOutputStringBuilder.append(Constants.EXPIRED_EVENTS)
-                            .append(Constants.SPACE);
-                    break;
-                case "all":
-                    insertOutputStringBuilder.append(Constants.ALL_EVENTS)
-                            .append(Constants.SPACE);
-                    break;
-                default:
-                    throw new CodeGenerationException("Unidentified event type: " + insertOutput.getEventType());
-            }
-        }
-
-        insertOutputStringBuilder.append(Constants.INTO)
-                .append(Constants.SPACE)
-                .append(target)
-                .append(Constants.SEMI_COLON);
-
-        return insertOutputStringBuilder.toString();
-    }
-
-    private String getQueryOrderByAsString(List<QueryOrderByConfig> orderByList) {
-        if (orderByList == null || orderByList.isEmpty()) {
-            return VOID_RETURN;
-        }
-
-        StringBuilder orderByListStringBuilder = new StringBuilder();
-        orderByListStringBuilder.append(Constants.ORDER_BY)
-                .append(Constants.SPACE);
-
-        int orderByAttributesLeft = orderByList.size();
-        for (QueryOrderByConfig orderByAttribute : orderByList) {
-            if (orderByAttribute == null) {
-                throw new CodeGenerationException("Query Order By Attribute Cannot Be Null");
-            } else if (orderByAttribute.getValue() == null || orderByAttribute.getValue().isEmpty()) {
-                throw new CodeGenerationException("Query Order By Attribute Value Cannot Be Null");
-            }
-
-            orderByListStringBuilder.append(orderByAttribute.getValue());
-            if (orderByAttribute.getOrder() != null && !orderByAttribute.getOrder().isEmpty()) {
-                orderByListStringBuilder.append(Constants.SPACE)
-                        .append(orderByAttribute.getOrder());
-            }
-
-            if (orderByAttributesLeft != 1) {
-                orderByListStringBuilder.append(Constants.COMMA)
-                        .append(Constants.SPACE);
-            }
-            orderByAttributesLeft--;
-        }
-
-        return orderByListStringBuilder.toString();
-    }
-
-    private String getQueryGroupByAsString(List<String> groupByList) {
-        if (groupByList == null) {
-            return VOID_RETURN;
-        }
-
-        StringBuilder groupByListStringBuilder = new StringBuilder();
-        groupByListStringBuilder.append(Constants.GROUP_BY)
-                .append(Constants.SPACE);
-        groupByListStringBuilder.append(getParameterListAsString(groupByList));
-        return groupByListStringBuilder.toString();
-    }
-
-    private String getQuerySelectAsString(AttributesSelectionConfig attributesSelection) {
-        if (attributesSelection == null) {
-            throw new CodeGenerationException(" Attribute Selection Instance Cannot Be Null");
-        }
-
-        StringBuilder attributesSelectionStringBuilder = new StringBuilder();
-
-        attributesSelectionStringBuilder.append(Constants.SELECT)
-                .append(Constants.SPACE);
-
-        if (attributesSelection.getType() == null || attributesSelection.getType().isEmpty()) {
-            throw new CodeGenerationException("The Type Of Attribute Selection Cannot Be Null");
-        }
-
-        switch (attributesSelection.getType().toUpperCase()) {
-            case AttributeSelection.TYPE_USER_DEFINED:
-                UserDefinedSelectionConfig userDefinedSelection = (UserDefinedSelectionConfig) attributesSelection;
-                attributesSelectionStringBuilder.append(getUserDefinedSelectionAsString(userDefinedSelection));
-                break;
-            case AttributeSelection.TYPE_ALL:
-                attributesSelectionStringBuilder.append(Constants.ALL);
-                break;
-            default:
-                throw new CodeGenerationException("Undefined Attribute Selection Type");
-        }
-
-        return attributesSelectionStringBuilder.toString();
     }
 
     private String getAttributesAsString(List<AttributeConfig> attributes) {
@@ -782,81 +853,6 @@ public class CodeGenerator {
         return storeStringBuilder.toString();
     }
 
-    private String getPatternQueryInputAsString(PatternSequenceConfig patternQuery) {
-        StringBuilder patternQueryStringBuilder = new StringBuilder();
-        return patternQueryStringBuilder.toString();
-    }
-
-    private String getWindowFilterProjectionQueryInputAsString(WindowFilterProjectionConfig windowFilterProjection) {
-        if (windowFilterProjection == null) {
-            throw new CodeGenerationException("The WindowFilterProjection Instance Is Null");
-        } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
-            throw new CodeGenerationException("From Value Is Null");
-        }
-
-        StringBuilder windowFilterProjectionStringBuilder = new StringBuilder();
-        windowFilterProjectionStringBuilder.append(Constants.FROM)
-                .append(Constants.SPACE)
-                .append(windowFilterProjection.getFrom());
-
-        if (windowFilterProjection.getFilter() != null && !windowFilterProjection.getFilter().isEmpty()) {
-            windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
-                    .append(windowFilterProjection.getFilter())
-                    .append(Constants.CLOSE_SQUARE_BRACKET);
-        }
-
-        if (windowFilterProjection.getWindow() != null) {
-            QueryWindowConfig queryWindow = windowFilterProjection.getWindow();
-            windowFilterProjectionStringBuilder.append(Constants.HASH)
-                    .append(Constants.WINDOW)
-                    .append(Constants.FULL_STOP)
-                    .append(queryWindow.getFunction())
-                    .append(Constants.OPEN_BRACKET)
-                    .append(getParameterListAsString(queryWindow.getParameters()))
-                    .append(Constants.CLOSE_BRACKET);
-        }
-
-        if (windowFilterProjection.getPostWindowFilter() != null && !windowFilterProjection.getPostWindowFilter().isEmpty()) {
-            windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
-                    .append(windowFilterProjection.getPostWindowFilter())
-                    .append(Constants.CLOSE_SQUARE_BRACKET);
-        }
-
-        return windowFilterProjectionStringBuilder.toString();
-    }
-
-    private String getJoinQueryInputAsString(JoinConfig joinQuery) {
-        StringBuilder joinQueryStringBuilder = new StringBuilder();
-        return joinQueryStringBuilder.toString();
-    }
-
-    private String getUserDefinedSelectionAsString(UserDefinedSelectionConfig userDefinedSelection) {
-        // TODO: 4/23/18 Complete to get rid of duplicate code
-        StringBuilder userDefinedSelectionStringBuilder = new StringBuilder();
-
-        if (userDefinedSelection == null || userDefinedSelection.getValue() == null || userDefinedSelection.getValue().isEmpty()) {
-            throw new CodeGenerationException("UserDefinedSelection Instance '" + userDefinedSelection.toString() + "' is null");
-        }
-
-        int attributesLeft = userDefinedSelection.getValue().size();
-        for (SelectedAttribute attribute : userDefinedSelection.getValue()) {
-            userDefinedSelectionStringBuilder.append(attribute.getExpression());
-            if (attribute.getAs() != null && !attribute.getAs().isEmpty()) {
-                userDefinedSelectionStringBuilder.append(Constants.SPACE)
-                        .append(Constants.AS)
-                        .append(Constants.SPACE)
-                        .append(attribute.getAs());
-            }
-            if (attributesLeft != 1) {
-                userDefinedSelectionStringBuilder.append(Constants.COMMA)
-                        .append(Constants.SPACE);
-            }
-            attributesLeft--;
-        }
-
-        return userDefinedSelectionStringBuilder.toString();
-    }
-
     private String getParameterListAsString(List<String> parameters) {
         StringBuilder parametersStringBuilder = new StringBuilder();
 
@@ -879,26 +875,23 @@ public class CodeGenerator {
      */
     private class Constants {
 
-        public static final String UPDATE = "update";
-        public static final String UPDATE_OR_INSERT_INTO = "update or insert into";
-        public static final String SET = "set";
-        // TODO: 4/18/18 add all the needed constants here
-        private static final char NEW_LINE = '\n';
-        private static final char COMMA = ',';
-        private static final char SPACE = ' ';
-        private static final char OPEN_BRACKET = '(';
+        private static final char ALL = '*';
         private static final char CLOSE_BRACKET = ')';
-        private static final char SEMI_COLON = ';';
-        private static final char OPEN_SQUARE_BRACKET = '[';
         private static final char CLOSE_SQUARE_BRACKET = ']';
-        private static final char HASH = '#';
-        private static final char SINGLE_QUOTE = '\'';
+        private static final char COMMA = ',';
         private static final char DOUBLE_QUOTE = '\"';
         private static final char EQUALS = '=';
-        private static final char ALL = '*';
         private static final char FULL_STOP = '.';
+        private static final char HASH = '#';
+        private static final char NEW_LINE = '\n';
+        private static final char OPEN_BRACKET = '(';
+        private static final char OPEN_SQUARE_BRACKET = '[';
+        private static final char SEMI_COLON = ';';
+        private static final char SINGLE_QUOTE = '\'';
+        private static final char SPACE = ' ';
 
         private static final String TAB_SPACE = "    ";
+        private static final String THRIPPLE_DOTS = "...";
 
         private static final String DEFINE_STREAM = "define stream";
         private static final String DEFINE_TABLE = "define table";
@@ -906,25 +899,25 @@ public class CodeGenerator {
         private static final String DEFINE_TRIGGER = "define trigger";
         private static final String DEFINE_AGGREGATION = "define aggregation";
 
+        // TODO: 5/2/18 combine 'OUTPUT_<VALUE>_EVENTS' with 'OUTPUT + SPACE + <VALUE>_EVENTS'
         private static final String OUTPUT_CURRENT_EVENTS = "output current events";
-        private static final String CURRENT_EVENTS = "current events";
         private static final String OUTPUT_EXPIRED_EVENTS = "output expired events";
-        private static final String EXPIRED_EVENTS = "expired events";
         private static final String OUTPUT_ALL_EVENTS = "output all events";
+
+        private static final String CURRENT_EVENTS = "current events";
+        private static final String EXPIRED_EVENTS = "expired events";
         private static final String ALL_EVENTS = "all events";
 
-        private static final String AT = "at";
         private static final String FROM = "from";
         private static final String SELECT = "select";
+        private static final String AT = "at";
         private static final String AS = "as";
         private static final String GROUP_BY = "group by";
         private static final String ORDER_BY = "order by";
         private static final String AGGREGATE_BY = "aggregate by";
         private static final String EVERY = "every";
-        private static final String THRIPPLE_DOTS = "...";
         private static final String LIMIT = "limit";
         private static final String WINDOW = "window";
-
         private static final String STORE = "@store(type='";
         private static final String HAVING = "having";
         private static final String OUTPUT = "output";
@@ -933,7 +926,9 @@ public class CodeGenerator {
         private static final String INTO = "into";
         private static final String DELETE = "delete";
         private static final String FOR = "for";
-
+        public static final String UPDATE = "update";
+        public static final String UPDATE_OR_INSERT_INTO = "update or insert into";
+        public static final String SET = "set";
 
         private Constants() {
         }
