@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.SiddhiAppConverter;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
@@ -64,6 +63,8 @@ import java.util.Map;
  */
 public class CodeGenerator {
 
+    // TODO: 5/2/18 Look for constants for all the cases in switch case
+    
     private static final String VOID_RETURN = "";
 
     /**
@@ -813,12 +814,12 @@ public class CodeGenerator {
                     .append(Constants.OPEN_BRACKET)
                     .append(getParameterListAsString(queryWindow.getParameters()))
                     .append(Constants.CLOSE_BRACKET);
+        }
 
-            if (queryWindow.getFilter() != null && !queryWindow.getFilter().isEmpty()) {
-                windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
-                        .append(queryWindow.getFilter())
-                        .append(Constants.CLOSE_SQUARE_BRACKET);
-            }
+        if (windowFilterProjection.getPostWindowFilter() != null && !windowFilterProjection.getPostWindowFilter().isEmpty()) {
+            windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
+                    .append(windowFilterProjection.getPostWindowFilter())
+                    .append(Constants.CLOSE_SQUARE_BRACKET);
         }
 
         return windowFilterProjectionStringBuilder.toString();
@@ -991,11 +992,12 @@ public class CodeGenerator {
 
         List<String> params = new ArrayList<>();
         params.add("1 second");
-        QueryWindowConfig queryWindowConfig = new QueryWindowConfig("time", params, "age < 30");
+        QueryWindowConfig queryWindowConfig = new QueryWindowConfig("time", params);
         WindowFilterProjectionConfig windowFilterProjectionQueryConfig = new WindowFilterProjectionConfig("window",
                 "InStream",
                 "age >= 18",
-                queryWindowConfig);
+                queryWindowConfig,
+                "age < 30");
 
         InsertOutputConfig insertOutputConfig = new InsertOutputConfig(null);
         DeleteOutputConfig deleteOutputConfig = new DeleteOutputConfig(null, "<event>");
@@ -1026,38 +1028,15 @@ public class CodeGenerator {
 
         SiddhiAppConfig siddhiApp = new SiddhiAppConfig();
         siddhiApp.add(stream);
-        siddhiApp.add(stream);
-        siddhiApp.add(stream);
-        siddhiApp.add(stream);
 
-        siddhiApp.add(table);
-        siddhiApp.add(table);
-        siddhiApp.add(table);
-        siddhiApp.add(table);
         siddhiApp.add(table);
 
         siddhiApp.add(window);
-        siddhiApp.add(window);
-        siddhiApp.add(window);
-        siddhiApp.add(window);
-        siddhiApp.add(window);
 
-        siddhiApp.add(trigger);
-        siddhiApp.add(trigger);
-        siddhiApp.add(trigger);
-        siddhiApp.add(trigger);
         siddhiApp.add(trigger);
 
         siddhiApp.add(aggregation);
-        siddhiApp.add(aggregation);
-        siddhiApp.add(aggregation);
-        siddhiApp.add(aggregation);
-        siddhiApp.add(aggregation);
 
-        siddhiApp.add(query);
-        siddhiApp.add(query);
-        siddhiApp.add(query);
-        siddhiApp.add(query);
         siddhiApp.add(query);
 
         EventFlow eventFlow = new EventFlow(siddhiApp, new ArrayList<>());

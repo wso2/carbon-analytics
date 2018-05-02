@@ -50,6 +50,8 @@ import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
+import org.wso2.carbon.siddhi.editor.core.util.designview.SiddhiAppConverter;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.eventflow.SiddhiAppMap;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
@@ -886,6 +888,22 @@ public class EditorMicroservice implements Microservice {
                     .entity(e.getMessage())
                     .build();
         }
+    }
+
+    @POST
+    @Path("/code-view")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response constructSiddhiAppString(String jsonString) {
+        Gson gson = new Gson();
+        org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow eventFlow = gson.fromJson(jsonString, org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow.class);
+        SiddhiAppConverter siddhiAppConverter = new SiddhiAppConverter();
+        String siddhiAppString = siddhiAppConverter.generateCode(eventFlow);
+
+        return Response.status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(siddhiAppString)
+                .build();
     }
 
     /**
