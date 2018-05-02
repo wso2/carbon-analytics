@@ -667,70 +667,69 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
          * @param text text to be displayed on the element
          * @param isCodeToDesignMode whether code to design mode is enable or not
          */
-        DropElements.prototype.dropCompleteJoinQueryElement = function (newAgent, i, top, left) {
-            // var self = this;
-            // /*
-            //  A text node division will be appended to the newAgent element so that the element name can be changed in
-            //  the text node and doesn't need to be appended to the newAgent Element every time the user changes it
-            // */
-            // var self = this;
-            // var node = $('<div>' + text + '</div>');
-            // newAgent.append(node);
-            // node.attr('id', i + "-nodeInitial");
-            // node.attr('class', "queryNameNode");
-            //if(!isCodeToDesignMode) {
-            //         //add the new join query to the join query array
-            //         var joinQueryOptions = {};
-            //         _.set(joinQueryOptions, 'id', '');
-            //         _.set(joinQueryOptions, 'join', '');
-            //         _.set(joinQueryOptions, 'projection', '');
-            //         _.set(joinQueryOptions, 'outputType', '');
-            //         _.set(joinQueryOptions, 'insertInto', '');
-            //         _.set(joinQueryOptions, 'from', '');
-            //
-            //         var newJoinQuery = new JoinQuery(joinQueryOptions);
-            //         newJoinQuery.setId(i);
-            //         self.appData.addJoinQuery(newJoinQuery);
-            //     }
-            //     var settingsIconId = ""+ i + "-dropJoinQuerySettingsId";
-            //     var propertiesIcon = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-            //         'class="element-prop-icon collapse">');
-            //     newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
-            //         .append(propertiesIcon);
-            //     self.dropCompleteJoinQueryElement(newAgent , i, top, left);
-            //
-            //     var settingsIconElement = $('#'+settingsIconId)[0];
-            //     settingsIconElement.addEventListener('click', function () {
-            //         self.formBuilder.GeneratePropertiesFormForJoinQuery(this);
-            //     });
-            // var finalElement =  newAgent;
-            // var connectionIn = $('<div class="connectorIn">').attr('id', i + '-in').addClass('connection');
-            // var connectionOut = $('<div class="connectorOut">').attr('id', i + '-out').addClass('connection');
-            //
-            // finalElement.css({
-            //     'top': top,
-            //     'left': left
-            // });
-            //
-            // finalElement.append(connectionIn);
-            // finalElement.append(connectionOut);
-            //
-            // $(self.container).append(finalElement);
-            //
-            // _jsPlumb.draggable(finalElement, {
-            //     containment: 'grid-container'
-            // });
-            //
-            // _jsPlumb.makeTarget(connectionIn, {
-            //     anchor: 'Left',
-            //     maxConnections:2
-            // });
-            //
-            // _jsPlumb.makeSource(connectionOut, {
-            //     anchor: 'Right',
-            //     uniqueEndpoint: true,
-            //     maxConnections: 1
-            // });
+        DropElements.prototype.dropJoinQuery = function (newAgent, i, top, left, text, isCodeToDesignMode) {
+            /*
+             A text node division will be appended to the newAgent element so that the element name can be changed in
+             the text node and doesn't need to be appended to the newAgent Element every time the user changes it
+            */
+            var self = this;
+            var node = $('<div>' + text + '</div>');
+            newAgent.append(node);
+            node.attr('id', i + "-nodeInitial");
+            node.attr('class', "joinQueryNameNode");
+            if (!isCodeToDesignMode) {
+                //add the new join query to the join query array
+                var queryOptions = {};
+                _.set(queryOptions, 'id', i);
+                _.set(queryOptions, 'queryInput', '');
+                _.set(queryOptions, 'select', '');
+                _.set(queryOptions, 'groupBy', '');
+                _.set(queryOptions, 'limit', '');
+                _.set(queryOptions, 'having', '');
+                _.set(queryOptions, 'outputRateLimit', '');
+                _.set(queryOptions, 'queryOutput', '');
+                var query = new Query(queryOptions);
+                self.configurationData.getSiddhiAppConfig().addJoinQuery(query);
+            }
+            var settingsIconId = "" + i + "-dropJoinQuerySettingsId";
+            var propertiesIcon = $('<img src="/editor/images/settings.png" id="' + settingsIconId + '" ' +
+                'class="element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
+                .append(propertiesIcon);
+
+            var settingsIconElement = $('#' + settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForJoinQuery(this);
+            });
+
+            var finalElement = newAgent;
+            var connectionIn = $('<div class="connectorInJoinQuery">').attr('id', i + '-in').addClass('connection');
+            var connectionOut = $('<div class="connectorOutJoinQuery">').attr('id', i + '-out').addClass('connection');
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            finalElement.append(connectionIn);
+            finalElement.append(connectionOut);
+
+            $(self.container).append(finalElement);
+
+            _jsPlumb.draggable(finalElement, {
+                containment: 'grid-container'
+            });
+
+            _jsPlumb.makeTarget(connectionIn, {
+                anchor: 'Left',
+                maxConnections:2
+            });
+
+            _jsPlumb.makeSource(connectionOut, {
+                anchor: 'Right',
+                uniqueEndpoint: true,
+                maxConnections: 1
+            });
         };
 
         /**
@@ -835,7 +834,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 if (newElement.hasClass('streamDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeStream(elementId);
 
-                } else if (newElement.hasClass('tabledDrop')) {
+                } else if (newElement.hasClass('tableDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeTable(elementId);
 
                 } else if (newElement.hasClass('windowDrop')) {

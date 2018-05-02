@@ -35,7 +35,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
         var constants = {
             STREAM : 'streamDrop',
-            TABLE : 'tabledDrop',
+            TABLE : 'tableDrop',
             WINDOW :'windowDrop',
             TRIGGER :'triggerDrop',
             AGGREGATION : 'aggregationDrop',
@@ -235,6 +235,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         // }
                     }
                 },
+                show_errors: "always",
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 display_required_only: true,
@@ -359,6 +360,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         }
                     }
                 },
+                show_errors: "always",
                 disable_properties: true,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
@@ -475,6 +477,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         }
                     }
                 },
+                show_errors: "always",
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 display_required_only: true,
@@ -598,6 +601,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         }
                     }
                 },
+                show_errors: "always",
                 disable_properties: true,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
@@ -751,6 +755,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         }
                     }
                 },
+                show_errors: "always",
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 display_required_only: true,
@@ -935,6 +940,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         }
                     }
                 },
+                show_errors: "always",
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 display_required_only: true,
@@ -1038,6 +1044,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         }
                     }
                 },
+                show_errors: "always",
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 display_required_only: true,
@@ -1122,6 +1129,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         }
                     }
                 },
+                show_errors: "always",
                 disable_properties: true,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
@@ -1322,6 +1330,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         }
                     }
                 },
+                show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
@@ -1414,7 +1423,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
             }
             var name = clickedElement.getName();
             var from = clickedElement.getFrom();
-            var select = clickedElement.getSelect().value;
+            var select = clickedElement.getSelect().getValue();
             var savedGroupByAttributes = clickedElement.getGroupBy();
             var aggregateByAttribute = clickedElement.getAggregateByAttribute();
             var aggregateByTimePeriod = clickedElement.getAggregateByTimePeriod();
@@ -1575,6 +1584,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                         }
                     }
                 },
+                show_errors: "always",
                 startval: fillWith,
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
@@ -2688,7 +2698,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
                     }
                 });
 
-                var select = clickedElement.getSelect().value;
+                var select = clickedElement.getSelect().getValue();
                 var savedGroupByAttributes = clickedElement.getGroupBy();
                 var having = clickedElement.getHaving();
                 var savedOrderByAttributes = clickedElement.getOrderBy();
@@ -3347,6 +3357,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb', 'attribute', 'stream', 
 
                         }
                     },
+                    show_errors: "always",
                     startval: fillWith,
                     disable_properties: false,
                     display_required_only: true,

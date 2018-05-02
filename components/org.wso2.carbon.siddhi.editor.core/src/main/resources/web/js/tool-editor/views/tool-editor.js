@@ -145,13 +145,13 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"attributeList\":{\"0\":{\"name\":\"DA\",\"type\":\"string\"},\"length\":1}}," +
                         "\"length\":2" +
                         "}," +
-                        "\"windowFilterProjectionQueryList\":{\"0\":{\"id\":\"4\",\"queryInput\":{\"type\":\"window_filter_projection\",\"subType\":\"projection\",\"from\":\"das\",\"filter\":\"\",\"window\":\"\"},\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"\",\"as\":\"\"}]},\"groupBy\":[],\"orderBy\":{\"0\":{\"value\":\"DA\",\"order\":\"desc\"},\"length\":1},\"limit\":12,\"having\":\"\",\"outputRateLimit\":\"\",\"queryOutput\":{\"type\":\"insert\",\"output\":{\"eventType\":\"all\"},\"target\":\"asc\"},\"annotationList\":{}},\"length\":1}," +
+                        "\"windowFilterProjectionQueryList\":{\"0\":{\"id\":\"4\",\"queryInput\":{\"type\":\"projection\",\"from\":\"das\",\"filter\":\"\",\"window\":\"\"},\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"\",\"as\":\"\"}]},\"groupBy\":[],\"orderBy\":{\"0\":{\"value\":\"DA\",\"order\":\"desc\"},\"length\":1},\"limit\":12,\"having\":\"\",\"outputRateLimit\":\"\",\"queryOutput\":{\"type\":\"insert\",\"output\":{\"eventType\":\"all\"},\"target\":\"asc\"},\"annotationList\":{}},\"length\":1}," +
                         "\"patternQueryList\":{" +
                         "\"0\":{\"id\":\"2\"," +
                         "\"queryInput\":{" +
                         "\"type\":\"pattern\"," +
                         "\"connectedElementNameList\":[\"asc\"]," +
-                        "\"eventList\":{\"0\":{\"type\":\"andor\",\"forEvery\":true,\"leftEventReference\":\"12\",\"leftStreamName\":\"asc\",\"leftFilter\":\"11\",\"connectedWith\":\"and\",\"rightEventReference\":\"13\",\"rightStreamName\":\"asc\",\"rightFilter\":\"14\",\"within\":\"15\"},\"1\":{\"type\":\"notfor\",\"forEvery\":true,\"streamName\":\"asc\",\"filter\":\"321\",\"forDuration\":\"123\"},\"length\":2}},\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"ewq\",\"as\":\"ewq\"}]},\"groupBy\":[],\"orderBy\":{\"0\":{\"value\":\"DA\",\"order\":\"desc\"},\"length\":1},\"limit\":45,\"having\":\"eq\",\"outputRateLimit\":\"ewq\",\"queryOutput\":{\"type\":\"delete\",\"output\":{\"forEventType\":\"all\",\"on\":\"w\"},\"target\":\"asc\"},\"annotationList\":{}}," +
+                        "\"eventList\":{\"0\":{\"type\":\"andor\",\"forEvery\":true,\"leftEventReference\":\"12\",\"leftStreamName\":\"asc\",\"leftFilter\":\"11\",\"connectedWith\":\"and\",\"rightEventReference\":\"13\",\"rightStreamName\":\"asc\",\"rightFilter\":\"14\",\"within\":\"15\"},\"1\":{\"type\":\"notfor\",\"forEvery\":true,\"streamName\":\"asc\",\"filter\":\"321\",\"forDuration\":\"123\"},\"length\":2}},\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"ewq\",\"as\":\"ewq\"}]},\"groupBy\":[],\"orderBy\":{\"0\":{\"value\":\"DA\",\"order\":\"desc\"},\"length\":1},\"limit\":45,\"having\":\"eq\",\"outputRateLimit\":\"ewq\",\"queryOutput\":{\"type\":\"delete\",\"output\":{\"eventType\":\"all\",\"on\":\"w\"},\"target\":\"asc\"},\"annotationList\":{}}," +
                         "\"length\":1},"+
                         "\"joinQueryList\":{}," +
                         "\"partitionList\":{}," +
@@ -181,6 +181,108 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"length\":4" +
                         "}" +
                         "}";
+                    // var JSONString = "{" +
+                    //     "  \"siddhiAppConfig\": {" +
+                    //     "    \"finalElementCount\": 4," +
+                    //     "    \"appName\": \"\"," +
+                    //     "    \"appDescription\": \"\"," +
+                    //     "    \"queryList\": []," +
+                    //     "    \"windowFilterProjectionQueryList\": []," +
+                    //     "    \"joinQueryList\": []," +
+                    //     "    \"patternQueryList\": []," +
+                    //     "    \"sequenceQueryList\": []," +
+                    //     "    \"sinkList\": []," +
+                    //     "    \"sourceList\": []," +
+                    //     "    \"streamList\": [" +
+                    //     "      {" +
+                    //     "        \"name\": \"InStream\"," +
+                    //     "        \"isInnerStream\": false," +
+                    //     "        \"attributeList\": [" +
+                    //     "          {" +
+                    //     "            \"name\": \"name\"," +
+                    //     "            \"type\": \"string\"" +
+                    //     "          }," +
+                    //     "          {" +
+                    //     "            \"name\": \"age\"," +
+                    //     "            \"type\": \"int\"" +
+                    //     "          }" +
+                    //     "        ]," +
+                    //     "        \"annotationList\": []," +
+                    //     "        \"id\": \"InStream\"" +
+                    //     "      }" +
+                    //     "    ]," +
+                    //     "    \"tableList\": [" +
+                    //     "      {" +
+                    //     "        \"name\": \"InTable\"," +
+                    //     "        \"attributeList\": [" +
+                    //     "          {" +
+                    //     "            \"name\": \"name\"," +
+                    //     "            \"type\": \"string\"" +
+                    //     "          }," +
+                    //     "          {" +
+                    //     "            \"name\": \"age\"," +
+                    //     "            \"type\": \"int\"" +
+                    //     "          }" +
+                    //     "        ]," +
+                    //     "        \"annotationList\": []," +
+                    //     "        \"id\": \"InTable\"" +
+                    //     "      }" +
+                    //     "    ]," +
+                    //     "    \"triggerList\": [" +
+                    //     "      {" +
+                    //     "        \"name\": \"InTrigger\"," +
+                    //     "        \"id\": \"InTrigger\"" +
+                    //     "      }" +
+                    //     "    ]," +
+                    //     "    \"windowList\": []," +
+                    //     "    \"aggregationList\": [" +
+                    //     "      {" +
+                    //     "        \"name\": \"InAggregation\"," +
+                    //     "        \"from\": \"InStream\"," +
+                    //     "        \"select\": {" +
+                    //     "          \"value\": [" +
+                    //     "            {" +
+                    //     "              \"expression\": \"name\"," +
+                    //     "              \"as\": \"name\"" +
+                    //     "            }," +
+                    //     "            {" +
+                    //     "              \"expression\": \"avg(age)\"," +
+                    //     "              \"as\": \"avgAge\"" +
+                    //     "            }" +
+                    //     "          ]," +
+                    //     "          \"type\": \"user_defined\"" +
+                    //     "        }," +
+                    //     "        \"groupBy\": [" +
+                    //     "          \"name\"" +
+                    //     "        ]," +
+                    //     "        \"aggregateByAttribute\": \"name\"," +
+                    //     "        \"aggregateByTimePeriod\": {" +
+                    //     "          \"minValue\": \"seconds\"," +
+                    //     "          \"maxValue\": \"years\"" +
+                    //     "        }," +
+                    //     "        \"annotationList\": [" +
+                    //     "          {" +
+                    //     "            \"value\": [" +
+                    //     "              {" +
+                    //     "                \"value\": \"AGG_TIMESTAMP\"," +
+                    //     "                \"isString\": true" +
+                    //     "              }," +
+                    //     "              {" +
+                    //     "                \"value\": \"name\"," +
+                    //     "                \"isString\": true" +
+                    //     "              }" +
+                    //     "            ]," +
+                    //     "            \"name\": \"PrimaryKey\"," +
+                    //     "            \"type\": \"LIST\"" +
+                    //     "          }" +
+                    //     "        ]," +
+                    //     "        \"id\": \"InAggregation\"" +
+                    //     "      }" +
+                    //     "    ]" +
+                    //     "  }," +
+                    //     "  \"edgeList\": []" +
+                    //     "}";
+                    //tODO: check the query icon in code to design
 
                     this.JSONObject = JSON.parse(JSONString);
                     console.log(this.JSONObject);

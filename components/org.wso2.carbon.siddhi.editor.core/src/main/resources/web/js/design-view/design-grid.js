@@ -23,7 +23,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
         var constants = {
             STREAM : 'streamDrop',
-            TABLE : 'tabledDrop',
+            TABLE : 'tableDrop',
             WINDOW :'windowDrop',
             TRIGGER :'triggerDrop',
             AGGREGATION : 'aggregationDrop',
@@ -230,8 +230,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     }
                     else if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)) {
-                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
-                            || sourceElement.hasClass(constants.WINDOW) || sourceElement.hasClass(constants.TRIGGER))) {
+                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW))) {
                             connectionValidity = false;
                             alert("Invalid Connection");
                         }
@@ -243,10 +242,10 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                     }
                     else if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
-                        || sourceElement.hasClass(constants.WINDOW_QUERY)
-                        || sourceElement.hasClass(constants.PATTERN) || sourceElement.hasClass(constants.JOIN)) {
-                        if (!(targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE
-                            || targetElement.hasClass(constants.WINDOW)))) {
+                        || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.PATTERN)
+                        || sourceElement.hasClass(constants.JOIN)) {
+                        if (!(targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
+                            || targetElement.hasClass(constants.WINDOW))) {
                             connectionValidity = false;
                             alert("Invalid Connection");
                         }
@@ -319,19 +318,19 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             || targetElement.hasClass(constants.WINDOW_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
-                            var subType;
+                            var type;
                             if (targetElement.hasClass(constants.PROJECTION)) {
-                                subType = 'projection';
+                                type = 'projection';
                             }
                             else if (targetElement.hasClass(constants.FILTER)) {
-                                subType = 'filter';
+                                type = 'filter';
                             }
                             if (targetElement.hasClass(constants.WINDOW_QUERY)) {
-                                subType = 'window';
+                                type = 'window';
                             }
                             if (model.getQueryInput() === '') {
                                 var queryInputOptions = {};
-                                _.set(queryInputOptions, 'subType', subType);
+                                _.set(queryInputOptions, 'type', type);
                                 _.set(queryInputOptions, 'from', connectedElementName);
                                 _.set(queryInputOptions, 'filter', '');
                                 _.set(queryInputOptions, 'window', '');
@@ -785,10 +784,11 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().windowFilterProjectionQueryList, function(windowFilterProjectionQuery){
+            _.forEach(self.configurationData.getSiddhiAppConfig().windowFilterProjectionQueryList,
+                function(windowFilterProjectionQuery){
                 var queryId = windowFilterProjectionQuery.getId();
                 var queryName = "Query";
-                var querySubType = windowFilterProjectionQuery.getQueryInput().getSubType();
+                var querySubType = windowFilterProjectionQuery.getQueryInput().getType();
 
                 var queryType;
                 if (querySubType === 'projection') {
@@ -1058,13 +1058,26 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        DesignGrid.prototype.handleJoinQuery = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+        DesignGrid.prototype.handleJoinQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, joinQueryName,
+                                                         joinQueryId) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.getNewAgentId()).addClass('joquerydrop');
-            var droptype = "joquerydrop";
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.getNewAgentId();
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(joinQueryId !== undefined) {
+                    elementId = joinQueryId;
+                    self.generateNextNewAgentId();
+                } else {
+                    console.log("queryId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.JOIN);
+            self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
-            //self.generateNextNewAgentId();
-            self.dropElements.dropQuery(newAgent, self.getNewAgentId(), droptype, mouseTop, mouseLeft, "Join Query",
+            self.dropElements.dropJoinQuery(newAgent, elementId, mouseTop, mouseLeft, joinQueryName,
                 isCodeToDesignMode);
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);

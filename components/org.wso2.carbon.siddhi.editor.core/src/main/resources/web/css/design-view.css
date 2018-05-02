@@ -77,7 +77,7 @@
     background-image: url("../images/stream.png");
 }
 
-.tabledDrop {
+.tableDrop {
     background-image: url("../images/table.png");
 }
 
@@ -117,7 +117,7 @@
     Dropped Elements corresponding to their toolbox elements
 */
 
-.streamDrop, .tabledDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
+.streamDrop, .tableDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
 .windowQueryDrop, .joinQueryDrop, .patternQueryDrop {
     border-radius: 0.5em;
     opacity: 0.8;
