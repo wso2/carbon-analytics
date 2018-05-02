@@ -28,7 +28,7 @@ define(
         var QueryOutputUpdateOrInsertInto = function (options) {
             /*
              Data storing structure as follows
-                forEventType: 'current|expired|all',
+                eventType: 'current|expired|all',
                 set*: [
                     {
                         attribute*: '',
@@ -38,13 +38,13 @@ define(
                 ],
                 on*: ''
             */
-            this.forEventType = options.forEventType;
+            this.eventType = options.eventType;
             this.set = options.set;
             this.on = options.on;
         };
 
-        QueryOutputUpdateOrInsertInto.prototype.getForEventType = function () {
-            return this.forEventType;
+        QueryOutputUpdateOrInsertInto.prototype.getEventType = function () {
+            return this.eventType;
         };
 
         QueryOutputUpdateOrInsertInto.prototype.getSet = function () {
@@ -55,8 +55,8 @@ define(
             return this.on;
         };
 
-        QueryOutputUpdateOrInsertInto.prototype.setForEventType = function (forEventType) {
-            this.forEventType = forEventType;
+        QueryOutputUpdateOrInsertInto.prototype.setEventType = function (eventType) {
+            this.eventType = eventType;
         };
 
         QueryOutputUpdateOrInsertInto.prototype.setSet = function (set) {

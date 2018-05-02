@@ -28,7 +28,7 @@ define(
         var QueryOutputUpdate = function (options) {
             /*
              Data storing structure as follows
-                forEventType: 'current|expired|all',
+                eventType: 'current|expired|all',
                 set*: [
                     {
                         attribute*: '',
@@ -38,13 +38,13 @@ define(
                 ],
                 on*: ''
             */
-            this.forEventType = options.forEventType;
+            this.eventType = options.eventType;
             this.set = options.set;
             this.on = options.on;
         };
 
-        QueryOutputUpdate.prototype.getForEventType = function () {
-            return this.forEventType;
+        QueryOutputUpdate.prototype.getEventType = function () {
+            return this.eventType;
         };
 
         QueryOutputUpdate.prototype.getSet = function () {
@@ -55,8 +55,8 @@ define(
             return this.on;
         };
 
-        QueryOutputUpdate.prototype.setForEventType = function (forEventType) {
-            this.forEventType = forEventType;
+        QueryOutputUpdate.prototype.setEventType = function (eventType) {
+            this.eventType = eventType;
         };
 
         QueryOutputUpdate.prototype.setSet = function (set) {

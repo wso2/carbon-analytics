@@ -28,23 +28,23 @@ define(
         var QueryOutputDelete = function (options) {
             /*
              Data storing structure as follows
-                forEventType: 'current|expired|all',
+                eventType: 'current|expired|all',
                 on*: ''
             */
-            this.forEventType = options.forEventType;
+            this.eventType = options.eventType;
             this.on = options.on;
         };
 
-        QueryOutputDelete.prototype.getForEventType = function () {
-            return this.forEventType;
+        QueryOutputDelete.prototype.getEventType = function () {
+            return this.eventType;
         };
 
         QueryOutputDelete.prototype.getOn = function () {
             return this.on;
         };
 
-        QueryOutputDelete.prototype.setForEventType = function (forEventType) {
-            this.forEventType = forEventType;
+        QueryOutputDelete.prototype.setEventType = function (eventType) {
+            this.eventType = eventType;
         };
 
         QueryOutputDelete.prototype.setOn = function (on) {
