@@ -26,12 +26,10 @@ import java.util.List;
 public class QueryWindowConfig {
     private String function;
     private List<String> parameters;
-    private String filter;
 
-    public QueryWindowConfig(String function, List<String> parameters, String filter) {
+    public QueryWindowConfig(String function, List<String> parameters) {
         this.function = function;
         this.parameters = parameters;
-        this.filter = filter;
     }
 
     public String getFunction() {
@@ -40,9 +38,5 @@ public class QueryWindowConfig {
 
     public List<String> getParameters() {
         return parameters;
-    }
-
-    public String getFilter() {
-        return filter;
     }
 }

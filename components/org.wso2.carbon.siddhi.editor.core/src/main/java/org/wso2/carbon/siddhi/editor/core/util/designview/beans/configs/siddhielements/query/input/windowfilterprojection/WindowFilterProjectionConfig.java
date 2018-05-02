@@ -29,12 +29,18 @@ public class WindowFilterProjectionConfig extends QueryInputConfig {
     private String from;
     private String filter;
     private QueryWindowConfig window;
+    private String postWindowFilter;
 
-    public WindowFilterProjectionConfig(String type, String from, String filter, QueryWindowConfig window) {
+    public WindowFilterProjectionConfig(String type,
+                                        String from,
+                                        String filter,
+                                        QueryWindowConfig window,
+                                        String postWindowFilter) {
         super(type);
         this.from = from;
         this.filter = filter;
         this.window = window;
+        this.postWindowFilter = postWindowFilter;
     }
 
     public String getFrom() {
@@ -47,5 +53,9 @@ public class WindowFilterProjectionConfig extends QueryInputConfig {
 
     public QueryWindowConfig getWindow() {
         return window;
+    }
+
+    public String getPostWindowFilter() {
+        return postWindowFilter;
     }
 }
