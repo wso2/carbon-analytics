@@ -36,14 +36,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generates JoinQueryConfig with given Siddhi elements TODO method comments
+ * Generator for JoinQueryConfig
  */
 public class JoinConfigGenerator {
-    // Counts of elements in the Query
-    private int streamCount = 0;
-    private int tableCount = 0;
-    private int aggregationCount = 0;
-    private int windowCount = 0;
+    // Elements of the Join Input Stream
+    private List<String> streamIDs = new ArrayList<>();
+    private List<String> tableIDs = new ArrayList<>();
+    private List<String> aggregationIDs = new ArrayList<>();
+    private List<String> windowIDs = new ArrayList<>();
 
     /**
      * Gets a JoinQueryConfig object, from the given Siddhi Query InputStream object
@@ -52,70 +52,40 @@ public class JoinConfigGenerator {
      * @param siddhiAppString       Complete Siddhi app string
      * @return                      JoinQueryConfig object
      */
-    public JoinConfig getJoinQueryConfig(InputStream queryInputStream,
-                                              SiddhiApp siddhiApp,
-                                              String siddhiAppString) {
+    public JoinConfig getJoinQueryConfig(InputStream queryInputStream, SiddhiApp siddhiApp, String siddhiAppString) {
+        distinguishElements(queryInputStream.getUniqueStreamIds(), siddhiApp);
         return generateJoinConfig(queryInputStream, siddhiAppString, siddhiApp);
-//        switch (getType(queryInputStream, siddhiApp)) {
-//            case JOIN_STREAM:
-//                return generateJoinStreamQueryConfig(queryInputStream, siddhiAppString);
-//            case JOIN_TABLE:
-//                return generateJoinTableQueryConfig(queryInputStream, siddhiAppString);
-//            case JOIN_AGGREGATION:
-//                return generateJoinAggregationQueryConfig(queryInputStream, siddhiAppString);
-//            case JOIN_WINDOW:
-//                return generateJoinWindowQueryConfig(queryInputStream, siddhiAppString);
-//            default:
-//                throw new IllegalArgumentException("Unknown type: " + getType(queryInputStream, siddhiApp) +
-//                        " for generating Join Query Config");
-//        }
     }
 
-//    /**
-//     * Gets the type of JoinQueryConfig, with the given Siddhi Query InputStream
-//     * @param queryInputStream      Siddhi Query InputStream object, which contains data regarding Siddhi Query input
-//     * @param siddhiApp             Compiled Siddhi app
-//     * @return                      Type of the Join Query Config
-//     */
-//    private JoinType getType(InputStream queryInputStream, SiddhiApp siddhiApp) {
-//        countElements(queryInputStream.getUniqueStreamIds(), siddhiApp);
-//        if (tableCount == 1) {
-//            return JoinType.JOIN_TABLE;
-//        } else if (aggregationCount == 1) {
-//            return JoinType.JOIN_AGGREGATION;
-//        } else if (windowCount == 1) {
-//            return JoinType.JOIN_WINDOW;
-//        } else if (streamCount > 0) {
-//            return JoinType.JOIN_STREAM;
-//        } else {
-//            throw new IllegalArgumentException("Unknown element present in Join Query");
-//        }
-//    }
-
-    private JoinWithType getJoinWithType(InputStream queryInputStream, SiddhiApp siddhiApp) {
-        // TODO this method is under testing
-        countElements(queryInputStream.getUniqueStreamIds(), siddhiApp);
-        if (tableCount == 1) {
+    /**
+     * Gets the JoinWithType for the JoinQueryConfig
+     * @return      JoinWithType object
+     */
+    private JoinWithType getJoinWithType() {
+        if (tableIDs.size() == 1) {
             return JoinWithType.TABLE;
-        } else if (aggregationCount == 1) {
+        } else if (aggregationIDs.size() == 1) {
             return JoinWithType.AGGREGATION;
-        } else if (windowCount == 1) {
+        } else if (windowIDs.size() == 1) {
             return JoinWithType.WINDOW;
-        } else if (streamCount > 0) {
+        } else if (!streamIDs.isEmpty()) {
             return JoinWithType.STREAM;
         } else {
             throw new IllegalArgumentException("Unknown element present in Join Query");
         }
     }
 
-    private JoinElementType getJoinElementType(String streamId, SiddhiApp siddhiApp) {
-        // TODO this method is under testing.
-        // TODO maybe we can optimize by adding to a list of TABLES & all when counting
-        if (siddhiApp.getTableDefinitionMap().containsKey(streamId)) {
+    /**
+     * Gets the JoinElementType with the given streamId, which is an element of the join
+     * @param streamId      ID of the stream, defined for a window|table|aggregation|stream
+     * @return              JoinElementType
+     */
+    private JoinElementType getJoinElementType(String streamId) {
+        if (tableIDs.contains(streamId)) {
             return JoinElementType.TABLE;
-        } else if (siddhiApp.getAggregationDefinitionMap().containsKey(streamId)) {
+        } else if (aggregationIDs.contains(streamId)) {
             return JoinElementType.AGGREGATION;
-        } else if (siddhiApp.getWindowDefinitionMap().containsKey(streamId)) {
+        } else if (windowIDs.contains(streamId)) {
             return JoinElementType.WINDOW;
         } else {
             return JoinElementType.STREAM;
@@ -123,26 +93,26 @@ public class JoinConfigGenerator {
     }
 
     /**
-     * Counts number of tables, aggregations, windows and defined streams in the given SiddhiApp,
-     * with the given list of Stream Ids,
-     * since Streams are automatically defined inside for these elements, in addition to defined streams
-     * @param streamIds     List of Stream IDs, which consists of defined streams, and auto defined streams for each
-     *                      table, aggregation, window
+     * Distinguishes elements that are represented with each Stream ID in the given list of streamIds,
+     * and adds the streamId to the relevant list,
+     * since Streams are manually defined in the Siddhi run time for Tables, Aggregations and Windows
+     * @param streamIds     IDs of Streams, inclusive of the Streams defined for Tables, Aggregations and Windows,
+     *                      by the Siddhi run time
      * @param siddhiApp     Compiled SiddhiApp
      */
-    private void countElements(List<String> streamIds, SiddhiApp siddhiApp) {
+    private void distinguishElements(List<String> streamIds, SiddhiApp siddhiApp) {
         for (String streamId : streamIds) {
             if (siddhiApp.getTableDefinitionMap().containsKey(streamId)) {
-                tableCount++;
+                tableIDs.add(streamId);
             } else if (siddhiApp.getAggregationDefinitionMap().containsKey(streamId)) {
-                aggregationCount++;
+                aggregationIDs.add(streamId);
             } else if (siddhiApp.getWindowDefinitionMap().containsKey(streamId)) {
-                windowCount++;
+                windowIDs.add(streamId);
             } else {
-                streamCount++;
+                streamIDs.add(streamId);
             }
         }
-        if (streamCount == 0) {
+        if (streamIDs.isEmpty()) {
             throw new IllegalArgumentException("Unable to convert a Join Query Input with no streams");
         }
     }
@@ -151,20 +121,18 @@ public class JoinConfigGenerator {
      * Generates Config for a Join Element of a Join QueryInput, with the given Siddhi SingleInputStream
      * @param singleInputStream     Siddhi SingleInputStream object
      * @param siddhiAppString       Complete Siddhi app string
-     * @return                      JoinElementConfig object,
-     *                              that has specific extracted information from the Siddhi SingleInputStream
+     * @return                      JoinElementConfig object, representing a Left|Right element of a join
      */
-    private JoinElementConfig generateJoinElementConfig(SingleInputStream singleInputStream,
-                                                        String siddhiAppString,
-                                                        SiddhiApp siddhiApp) {
-        // TODO: THIS METHOD IS IN TESTING
+    private JoinElementConfig generateJoinElementConfig(SingleInputStream singleInputStream, String siddhiAppString) {
+        JoinElementType joinElementType = getJoinElementType(singleInputStream.getStreamId());
 
+        // Instantiate JoinElementConfig with default values
         JoinElementConfig joinElementConfig =
                 new JoinElementConfig(
-                        "foo", // TODO: 4/27/18 Have a method to get the type
+                        joinElementType.toString(),
                         singleInputStream.getStreamId(),
-                        "", // TODO Confirm whether this should be "" or null
-                        new JoinElementWindowConfig(), // TODO Confirm whether this should be {} or null
+                        "", // TODO Confirm whether "" or null
+                        new JoinElementWindowConfig(), // TODO Confirm whether {} or null
                         singleInputStream.getStreamReferenceId(),
                         false);
 
@@ -182,77 +150,30 @@ public class JoinConfigGenerator {
             }
         }
 
-        // Special Conditions
-        JoinElementType joinElementType = getJoinElementType(singleInputStream.getStreamId(), siddhiApp);
         if (joinElementType.equals(JoinElementType.WINDOW)) {
-            // Cannot have Inner Window. Force a null todo
+            // If the Join element is of type 'window', Set stream handler window to null
             joinElementConfig.setWindow(null); // TODO confirm whether {} or null
         }
-        // TODO I STOPPED HERE ***********************
 
         return joinElementConfig;
     }
 
-//    /**
-//     * Generates Config for a Join Element of a Join QueryInput, with the given Siddhi SingleInputStream
-//     * @param singleInputStream     Siddhi SingleInputStream object
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinElementConfig object,
-//     *                              that has specific extracted information from the Siddhi SingleInputStream
-//     */
-//    private JoinElementConfig generateJoinElementConfig(SingleInputStream singleInputStream, String siddhiAppString) {
-//        // TODO: Check which type is 'singleInputStream'.
-//        // TODO: If defined window, there cannot be a query window.
-//        // TODO: Seems that's handled below in noArg instantiation. Confirm with test queries
-//
-//        JoinElementConfig joinElementConfig =
-//                new JoinElementConfig(
-//                        singleInputStream.getStreamId(),
-//                        "", // TODO Confirm whether this should be "" or null
-//                        new JoinElementWindowConfig(), // TODO Confirm whether this should be {} or null
-//                        singleInputStream.getStreamReferenceId(),
-//                        false);
-//
-//        for (StreamHandler streamHandler : singleInputStream.getStreamHandlers()) {
-//            if (streamHandler instanceof Filter) {
-//                String definition = ConfigBuildingUtilities.getDefinition(streamHandler, siddhiAppString);
-//                joinElementConfig.setFilter(definition.substring(1, definition.length() - 1).trim());
-//            } else if (streamHandler instanceof Window) {
-//                List<String> windowParameters = new ArrayList<>();
-//                for (Expression expression : streamHandler.getParameters()) {
-//                    windowParameters.add(ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));
-//                }
-//                joinElementConfig.setWindow(
-//                        new JoinElementWindowConfig(((Window)streamHandler).getName(), windowParameters));
-//            }
-//        }
-//
-//        return joinElementConfig;
-//    }
-
-    public JoinConfig generateJoinConfig(InputStream queryInputStream, String siddhiAppString, SiddhiApp siddhiApp) {
-        // TODO THIS METHOD IS IN TESTING
-
-        // TODO if this comes
-        // TODO *** No need for 'getType' method. After counting validation, this method occurs
-        // TODO *** 'Window' validations are handled inside leftElement, while generating JoinElementConfig
-        // TODO *** 'Aggregation' validation will happen in this method (within and per)
-
+    /**
+     * Generates a JoinConfig, which represents a Join Input of a Siddhi Query
+     * @param queryInputStream      Siddhi Query InputStream object
+     * @param siddhiAppString       Complete Siddhi app string
+     * @param siddhiApp             Compiled SiddhiApp object
+     * @return                      JoinConfig object
+     */
+    private JoinConfig generateJoinConfig(InputStream queryInputStream, String siddhiAppString, SiddhiApp siddhiApp) {
         JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
-        // TODO 'type' of leftElement should be calculated with another method
         // Left element of the join
         JoinElementConfig leftElement =
-                generateJoinElementConfig(
-                        (SingleInputStream)(joinInputStream.getLeftInputStream()),
-                        siddhiAppString,
-                        siddhiApp);
+                generateJoinElementConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
 
         // Right element of the join
         JoinElementConfig rightElement =
-                generateJoinElementConfig(
-                        (SingleInputStream)(joinInputStream.getRightInputStream()),
-                        siddhiAppString,
-                        siddhiApp);
+                generateJoinElementConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
 
         // Set 'isUnidirectional'
         if (joinInputStream.getTrigger().name().equalsIgnoreCase(JoinDirection.LEFT.toString())) {
@@ -263,7 +184,7 @@ public class JoinConfigGenerator {
 
         JoinConfig joinConfig =
                 new JoinConfig(
-                        getJoinWithType(queryInputStream, siddhiApp).toString(),
+                        getJoinWithType().toString(),
                         leftElement,
                         joinInputStream.getType().name(),
                         rightElement,
@@ -271,333 +192,15 @@ public class JoinConfigGenerator {
                         null, // TODO: 4/25/18 confirm whether null or ''
                         null); // TODO: 4/25/18 confirm whether null or ''
 
-        // TODO this will only happen for Aggregations
+        // 'within' and 'per' can be not null only for Aggregations
         if (joinInputStream.getWithin() != null) {
             joinConfig.setWithin(ConfigBuildingUtilities.getDefinition(joinInputStream.getWithin(), siddhiAppString));
         }
-        if (joinInputStream.getWithin() != null) {
-            joinConfig.setWithin(ConfigBuildingUtilities.getDefinition(joinInputStream.getWithin(), siddhiAppString));
+        if (joinInputStream.getPer() != null) {
+            joinConfig.setPer(ConfigBuildingUtilities.getDefinition(joinInputStream.getPer(), siddhiAppString));
         }
 
         return joinConfig;
-    }
-
-    //////// TODO [OLD METHODS] BEGIN
-
-//    /**
-//     * Generates Config for a Join Stream Query Input, from the given Siddhi Query
-//     * @param queryInputStream      Siddhi Query InputStream object
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinStreamQueryConfig object
-//     */
-//    private JoinConfig generateJoinStreamQueryConfig(InputStream queryInputStream, String siddhiAppString) {
-//        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
-//
-//        // Left element of the join
-//        JoinElementConfig leftElement =
-//                generateJoinElementConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
-//
-//        // Right element of the join
-//        JoinElementConfig rightElement =
-//                generateJoinElementConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
-//
-//        // Set 'isUnidirectional'
-//        if (joinInputStream.getTrigger().name().equalsIgnoreCase(JoinDirection.LEFT.toString())) {
-//            leftElement.setUnidirectional(true);
-//        } else if (joinInputStream.getTrigger().name().equalsIgnoreCase(JoinDirection.RIGHT.toString())) {
-//            rightElement.setUnidirectional(true);
-//        }
-//
-//        return new JoinConfig(
-//                JoinWithType.STREAM.toString(),
-//                leftElement,
-//                joinInputStream.getType().name(),
-//                rightElement,
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString),
-//                null, // TODO: 4/25/18 confirm whether null or ''
-//                null); // TODO: 4/25/18 confirm whether null or ''
-//    }
-//
-//    /**
-//     * Generates Config for a Join Table Query Input, from the given Siddhi Query
-//     * @param queryInputStream      Siddhi Query InputStream object
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinTableQueryConfig object
-//     */
-//    private JoinConfig generateJoinTableQueryConfig(InputStream queryInputStream, String siddhiAppString) {
-//        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
-//
-//        // Left element of the join
-//        JoinElementConfig leftElement =
-//                generateJoinElementConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
-//
-//        // Right element of the join
-//        JoinElementConfig rightElement =
-//                generateJoinElementConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
-//
-//        return new JoinConfig(
-//                JoinWithType.TABLE.toString(),
-//                leftElement,
-//                joinInputStream.getType().name(),
-//                rightElement,
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString),
-//                null, // TODO: 4/25/18 confirm whether null or ''
-//                null); // TODO: 4/25/18 confirm whether null or ''
-//    }
-//
-//    /**
-//     * Generates Config for a Join Aggregation Query Input, from the given Siddhi Query
-//     * @param queryInputStream      Siddhi Query InputStream object
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinAggregationQueryConfig object
-//     */
-//    private JoinConfig generateJoinAggregationQueryConfig(InputStream queryInputStream, String siddhiAppString) {
-//        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
-//
-//        // Left element of the join
-//        JoinElementConfig leftElement =
-//                generateJoinElementConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
-//
-//        // Right element of the join
-//        JoinElementConfig rightElement =
-//                generateJoinElementConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
-//
-//        return new JoinConfig(
-//                JoinWithType.AGGREGATION.toString(),
-//                leftElement,
-//                joinInputStream.getType().name(),
-//                rightElement,
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString),
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getWithin(), siddhiAppString),
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getPer(), siddhiAppString));
-//    }
-//
-//    /**
-//     * Generates Config for a Join Window Query Input, from the given Siddhi Query
-//     * @param queryInputStream      Siddhi Query InputStream object
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinWindowQueryConfig object
-//     */
-//    private JoinConfig generateJoinWindowQueryConfig(InputStream queryInputStream, String siddhiAppString) {
-//        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
-//
-//        // Left element of the join
-//        JoinElementConfig leftElement =
-//                generateJoinElementConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
-//
-//        // Right element of the join
-//        JoinElementConfig rightElement =
-//                generateJoinElementConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
-//
-//        // TODO: 4/25/18 set 'window' to null
-//
-//        return new JoinConfig(
-//                JoinWithType.WINDOW.toString(),
-//                leftElement,
-//                joinInputStream.getType().name(),
-//                rightElement,
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString),
-//                null, // TODO: 4/25/18 confirm whether null or ''
-//                null); // TODO: 4/25/18 confirm whether null or ''
-//    }
-
-    //////// TODO [OLD METHODS] END
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /////////////////////////////////////////////////
-
-//    /**
-//     * Generates Config for a Join Stream Query Input, from the given Siddhi Query
-//     * @param queryInputStream      Siddhi Query InputStream object
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinStreamQueryConfig object
-//     */
-//    private JoinStreamQueryConfig generateJoinStreamQueryConfig(InputStream queryInputStream, String siddhiAppString) {
-//        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
-//
-//        // Left side Stream Information of the join
-//        JoinedStreamConfig leftStreamConfig =
-//                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
-//        // Right side Stream Information of the join
-//        JoinedStreamConfig rightStreamConfig =
-//                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
-//
-//        // Set 'isUnidirectional'
-//        if (joinInputStream.getTrigger().name().equalsIgnoreCase(JoinDirection.LEFT.toString())) {
-//            leftStreamConfig.isUnidirectional = true;
-//        } else if (joinInputStream.getTrigger().name().equalsIgnoreCase(JoinDirection.RIGHT.toString())) {
-//            rightStreamConfig.isUnidirectional = true;
-//        }
-//
-//        return new JoinStreamQueryConfig(
-//                generateJoinDirectionConfig(leftStreamConfig),
-//                joinInputStream.getType().name(),
-//                generateJoinDirectionConfig(rightStreamConfig),
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString));
-//    }
-
-//    /**
-//     * Generates Config for a Join Table Query Input, from the given Siddhi Query
-//     * @param queryInputStream      Siddhi Query InputStream object
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinTableQueryConfig object
-//     */
-//    private JoinTableQueryConfig generateJoinTableQueryConfig(InputStream queryInputStream, String siddhiAppString) {
-//        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
-//
-//        // Left side Stream Information of the join
-//        JoinedStreamConfig leftStreamConfig =
-//                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
-//
-//        // Right side Stream Information of the join
-//        JoinedStreamConfig rightStreamConfig =
-//                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
-//
-//        return new JoinTableQueryConfig(
-//                generateJoinDirectionConfig(leftStreamConfig),
-//                joinInputStream.getType().name(),
-//                generateJoinDirectionConfig(rightStreamConfig),
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString));
-//    }
-
-//    /**
-//     * Generates Config for a Join Aggregation Query Input, from the given Siddhi Query
-//     * @param queryInputStream      Siddhi Query InputStream object
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinAggregationQueryConfig object
-//     */
-//    private JoinAggregationQueryConfig generateJoinAggregationQueryConfig(InputStream queryInputStream,
-//                                                                          String siddhiAppString) {
-//        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
-//
-//        // Left side Stream Information of the join
-//        JoinedStreamConfig leftStreamConfig =
-//                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
-//
-//        // Right side Stream Information of the join
-//        JoinedStreamConfig rightStreamConfig =
-//                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
-//
-//        return new JoinAggregationQueryConfig(
-//                generateJoinDirectionConfig(leftStreamConfig),
-//                joinInputStream.getType().name(),
-//                generateJoinDirectionConfig(rightStreamConfig),
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString),
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getWithin(), siddhiAppString),
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getPer(), siddhiAppString));
-//    }
-
-//    /**
-//     * Generates Config for a Join Window Query Input, from the given Siddhi Query
-//     * @param queryInputStream      Siddhi Query InputStream object
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinWindowQueryConfig object
-//     */
-//    private JoinWindowQueryConfig generateJoinWindowQueryConfig(InputStream queryInputStream,
-//                                                                String siddhiAppString) {
-//        JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
-//
-//        // Left side Stream Information of the join
-//        JoinedStreamConfig leftStreamConfig =
-//                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
-//
-//        // Right side Stream Information of the join
-//        JoinedStreamConfig rightStreamConfig =
-//                generateJoinedStreamConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
-//
-//        return new JoinWindowQueryConfig(
-//                generateJoinDirectionConfig(leftStreamConfig),
-//                generateJoinDirectionConfig(rightStreamConfig),
-//                ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString));
-//    }
-//
-//    /**
-//     * Generates Config for a Joined Stream of a Join Query, with the given Siddhi SingleInputStream
-//     * @param singleInputStream     Siddhi SingleInputStream object,
-//     *                              that has information about a stream of a Join Query
-//     * @param siddhiAppString       Complete Siddhi app string
-//     * @return                      JoinedStreamConfig object, that has specific extracted information
-//     *                              from the Siddhi SingleInputStream
-//     */
-//    private JoinedStreamConfig generateJoinedStreamConfig(SingleInputStream singleInputStream,
-//                                                          String siddhiAppString) {
-//        JoinedStreamConfig joinedStreamConfig = new JoinedStreamConfig();
-//        joinedStreamConfig.name = singleInputStream.getStreamId();
-//        joinedStreamConfig.as = singleInputStream.getStreamReferenceId();
-//
-//        for (StreamHandler streamHandler : singleInputStream.getStreamHandlers()) {
-//            if (streamHandler instanceof Filter) {
-//                String definition = ConfigBuildingUtilities.getDefinition(streamHandler, siddhiAppString);
-//                joinedStreamConfig.filter = definition.substring(1, definition.length() - 1).trim();
-//            } else if (streamHandler instanceof Window) {
-//                for (Expression expression : streamHandler.getParameters()) {
-//                    joinedStreamConfig.windowParameters.add(
-//                            ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));
-//                }
-//                joinedStreamConfig.windowFunction = ((Window)streamHandler).getName();
-//            }
-//        }
-//
-//        return joinedStreamConfig;
-//    }
-//
-//    /**
-//     * Generates a JoinDirectionConfig object from the given JoinedStreamConfig object
-//     * @param joinedStreamConfig        JoinedStreamConfig object, that has specific extracted information
-//     *                                  of a stream that is present in a Join Query
-//     * @return                          JoinDirectionConfig object, that will be used in a Join Query Config
-//     */
-//    private JoinDirectionConfig generateJoinDirectionConfig(JoinedStreamConfig joinedStreamConfig) {
-//        return new JoinDirectionConfig(
-//                joinedStreamConfig.name,
-//                joinedStreamConfig.filter,
-//                new JoinDirectionWindowConfig(
-//                        joinedStreamConfig.windowFunction,
-//                        joinedStreamConfig.windowParameters),
-//                joinedStreamConfig.isUnidirectional,
-//                joinedStreamConfig.as);
-//    }
-//
-//    /**
-//     * Config for a stream present in a side of the join
-//     */
-//    private class JoinedStreamConfig {
-//        private String name;
-//        private String filter;
-//        private String windowFunction;
-//        private List<String> windowParameters;
-//        private String as;
-//        private boolean isUnidirectional;
-//
-//        private JoinedStreamConfig() {
-//            this.name = "";
-//            this.filter = "";
-//            this.windowFunction = "";
-//            this.windowParameters = new ArrayList<>();
-//            this.as = "";
-//            this.isUnidirectional = false;
-//        }
-//    }
-
-    /**
-     * Join Type
-     */
-    private enum JoinType {
-        JOIN_STREAM,
-        JOIN_TABLE,
-        JOIN_AGGREGATION,
-        JOIN_WINDOW
     }
 
     /**
