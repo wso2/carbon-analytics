@@ -91,7 +91,8 @@ public class WindowFilterProjectionConfigGenerator {
                 WindowFilterProjectionQueryType.PROJECTION.toString(),
                 queryInputStream.getUniqueStreamIds().get(0),
                 null,
-                null);
+                null,
+                "");
     }
 
     /**
@@ -104,11 +105,13 @@ public class WindowFilterProjectionConfigGenerator {
         // Filter query will have just one StreamHandler, that's the Filter
         Filter filter = (Filter) ((BasicSingleInputStream) queryInputStream).getStreamHandlers().get(0);
         String filterDefinition = ConfigBuildingUtilities.getDefinition(filter, siddhiAppString);
+
         return new WindowFilterProjectionConfig(
                 WindowFilterProjectionQueryType.FILTER.toString(),
                 from,
                 filterDefinition.substring(1, filterDefinition.length() - 1).trim(),
-                null);
+                null,
+                "");
     }
 
     /**
@@ -118,7 +121,7 @@ public class WindowFilterProjectionConfigGenerator {
      */
     private WindowFilterProjectionConfig generateWindowQueryInput(InputStream queryInputStream) {
         String mainFilter = null;
-        String windowFilter = null;
+        String postWindowFilter = "";
         String function = null;
         List<String> parameters = new ArrayList<>();
 
@@ -131,7 +134,7 @@ public class WindowFilterProjectionConfigGenerator {
                     mainFilter = definition.substring(1, definition.length() - 1).trim();
                 } else {
                     definition = ConfigBuildingUtilities.getDefinition(streamHandler, siddhiAppString);
-                    windowFilter = definition.substring(1, definition.length() - 1).trim();
+                    postWindowFilter = definition.substring(1, definition.length() - 1).trim();
                 }
             } else if (streamHandler instanceof Window) {
                 for (Expression expression : streamHandler.getParameters()) {
@@ -145,7 +148,8 @@ public class WindowFilterProjectionConfigGenerator {
                 WindowFilterProjectionQueryType.WINDOW.toString(),
                 queryInputStream.getUniqueStreamIds().get(0),
                 mainFilter,
-                new QueryWindowConfig(function, parameters, windowFilter));
+                new QueryWindowConfig(function, parameters),
+                postWindowFilter);
     }
 
     /**
