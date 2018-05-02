@@ -29,12 +29,10 @@ define(
             /*
              Data storing structure as follows.
                 function*: '',
-                parameters*: ['value1',...],
-                filter: ''
+                parameters*: ['value1',...]'
             */
             this.function = options.function;
             this.parameters = options.parameters;
-            this.filter = options.filter;
         };
 
         QueryWindow.prototype.getFunction = function () {
@@ -45,20 +43,12 @@ define(
             return this.parameters;
         };
 
-        QueryWindow.prototype.getFilter = function () {
-            return this.filter;
-        };
-
         QueryWindow.prototype.setFunction = function (functionName) {
             this.function = functionName;
         };
 
         QueryWindow.prototype.setParameters = function (parameters) {
             this.parameters = parameters;
-        };
-
-        QueryWindow.prototype.setFilter = function (filter) {
-            this.filter = filter;
         };
 
         return QueryWindow;

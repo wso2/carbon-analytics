@@ -28,29 +28,25 @@ define(
         var WindowFilterProjectionQueryInput = function (options) {
             /*
              Data storing structure as follows.
-                type*: 'window_filter_projection',
-                subType*: 'window|filter|projection',
+                type*: 'window|filter|projection',
                 from*: '',
                 filter: '',
                 window: {
                     function*: '',
                     parameters*: ['value1',...],
                     filter: ''
-                }
+                },
+                postWindowFilter: ''
             */
-            this.type = 'window_filter_projection';
-            this.subType = options.subType;
+            this.type = options.type;
             this.from = options.from;
             this.filter = options.filter;
             this.window = options.window;
+            this.postWindowFilter = options.postWindowFilter;
         };
 
         WindowFilterProjectionQueryInput.prototype.getType = function () {
             return this.type;
-        };
-
-        WindowFilterProjectionQueryInput.prototype.getSubType = function () {
-            return this.subType;
         };
 
         WindowFilterProjectionQueryInput.prototype.getFrom = function () {
@@ -65,8 +61,12 @@ define(
             return this.window;
         };
 
-        WindowFilterProjectionQueryInput.prototype.setSubType = function (subType) {
-            this.subType = subType;
+        WindowFilterProjectionQueryInput.prototype.getPostWindowFilter = function () {
+            return this.postWindowFilter;
+        };
+
+        WindowFilterProjectionQueryInput.prototype.setType = function (type) {
+            this.type = type;
         };
 
         WindowFilterProjectionQueryInput.prototype.setFrom = function (from) {
@@ -79,6 +79,10 @@ define(
 
         WindowFilterProjectionQueryInput.prototype.setWindow = function (window) {
             this.window = window;
+        };
+
+        WindowFilterProjectionQueryInput.prototype.setPostWindowFilter = function (postWindowFilter) {
+            this.postWindowFilter = postWindowFilter;
         };
 
         return WindowFilterProjectionQueryInput;
