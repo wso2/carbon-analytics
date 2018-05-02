@@ -77,11 +77,11 @@ public class ServiceComponent {
             ServiceDataHolder.setRdbmsService(new RDBMSServiceImpl());
             ServiceDataHolder.setDeploymentManager(new DeploymentManagerImpl());
             resourceManagerAPIServiceRegistration = bundleContext.registerService(Microservice.class.getName(),
-                                                                                  new ResourceManagerApi(), null);
+                    new ResourceManagerApi(), null);
             distributionServiceRegistration = bundleContext.registerService(
                     DistributionService.class.getName(),
                     new DistributionManagerServiceImpl(new SPSiddhiAppCreator(),
-                                                       ServiceDataHolder.getDeploymentManager()),
+                            ServiceDataHolder.getDeploymentManager()),
                     null);
         }
     }

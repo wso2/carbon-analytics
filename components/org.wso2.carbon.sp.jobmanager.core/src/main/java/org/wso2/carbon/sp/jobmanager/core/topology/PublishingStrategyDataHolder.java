@@ -25,27 +25,19 @@ import org.wso2.carbon.sp.jobmanager.core.util.TransportStrategy;
  * multiple publishing strategies for each consumer.
  */
 public class PublishingStrategyDataHolder {
-    private String consumerGroupName;
     private TransportStrategy strategy;
     private String groupingField = null;
     private int parallelism;
 
-    public PublishingStrategyDataHolder(String consumerGroupName, TransportStrategy strategy, int parallelism) {
-        this.consumerGroupName = consumerGroupName;
+    public PublishingStrategyDataHolder(TransportStrategy strategy, int parallelism) {
         this.strategy = strategy;
         this.parallelism = parallelism;
     }
 
-    public PublishingStrategyDataHolder(String consumerGroupName,
-                                        TransportStrategy strategy, String groupingField, int parallelism) {
-        this.consumerGroupName = consumerGroupName;
+    public PublishingStrategyDataHolder(TransportStrategy strategy, String groupingField, int parallelism) {
         this.strategy = strategy;
         this.groupingField = groupingField;
         this.parallelism = parallelism;
-    }
-
-    public String getConsumerGroupName() {
-        return consumerGroupName;
     }
 
     public TransportStrategy getStrategy() {

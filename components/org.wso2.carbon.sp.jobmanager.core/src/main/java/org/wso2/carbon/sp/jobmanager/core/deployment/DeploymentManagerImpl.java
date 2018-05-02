@@ -44,7 +44,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Implementation regarding deploying siddhi applications in the resource cluster
+ * Implementation regarding deploying siddhi applications in the resource cluster.
  */
 public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolChangeListener {
     private static final Logger LOG = Logger.getLogger(DeploymentManagerImpl.class);
@@ -74,17 +74,17 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                     }
                     if (waitingToDeploy) {
                         LOG.info(String.format("Exact Siddhi app with name: %s is already exists in waiting mode. " +
-                                                       "Hence, trying to re-deploy.", distributedSiddhiQuery
-                                                       .getAppName()));
+                                "Hence, trying to re-deploy.", distributedSiddhiQuery
+                                .getAppName()));
                         rollback(existingApps);
                     } else {
                         LOG.info(String.format("Exact Siddhi app with name: %s is already deployed.",
-                                               distributedSiddhiQuery.getAppName()));
+                                distributedSiddhiQuery.getAppName()));
                         shouldDeploy = false;
                     }
                 } else {
                     LOG.info("Different Siddhi app with name:" + distributedSiddhiQuery.getAppName() + " is already " +
-                                     "deployed. Hence, un-deploying existing Siddhi app.");
+                            "deployed. Hence, un-deploying existing Siddhi app.");
                     rollback(deployedSiddhiAppHoldersMap.get(distributedSiddhiQuery.getAppName()));
                 }
             }
@@ -92,15 +92,15 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
             if (shouldDeploy) {
                 for (SiddhiAppHolder appHolder : appsToDeploy) {
                     ResourceNode deployedNode = deploy(new SiddhiQuery(appHolder.getAppName(),
-                                                                       appHolder.getSiddhiApp()), 0);
+                            appHolder.getSiddhiApp()), 0);
                     if (deployedNode != null) {
                         appHolder.setDeployedNode(deployedNode);
                         deployedApps.add(appHolder);
                         LOG.info(String.format("Siddhi app %s of %s successfully deployed in %s.",
-                                               appHolder.getAppName(), appHolder.getParentAppName(), deployedNode));
+                                appHolder.getAppName(), appHolder.getParentAppName(), deployedNode));
                     } else {
                         LOG.warn(String.format("Insufficient resources to deploy Siddhi app %s of %s. Hence, rolling " +
-                                                       "back.", appHolder.getAppName(), appHolder.getParentAppName()));
+                                "back.", appHolder.getAppName(), appHolder.getParentAppName()));
                         isDeployed = false;
                         break;
                     }
@@ -149,8 +149,8 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         distributedSiddhiQuery.getQueryGroups().forEach(queryGroup -> {
             queryGroup.getSiddhiQueries().forEach(query -> {
                 siddhiAppHolders.add(new SiddhiAppHolder(distributedSiddhiQuery.getAppName(),
-                                                         queryGroup.getGroupName(), query.getAppName(), query.getApp(),
-                                                         null));
+                        queryGroup.getGroupName(), query.getAppName(), query.getApp(),
+                        null));
             });
         });
         return siddhiAppHolders;
@@ -249,8 +249,8 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                         partialAppHolder.setDeployedNode(deployedNode);
                         currentDeployedPartialApps.add(partialAppHolder);
                         LOG.info(String.format("Siddhi app %s of %s successfully deployed in %s.",
-                                               partialAppHolder.getAppName(), partialAppHolder.getParentAppName(),
-                                               deployedNode));
+                                partialAppHolder.getAppName(), partialAppHolder.getParentAppName(),
+                                deployedNode));
                     } else {
                         deployedCompletely = false;
                         break;
@@ -263,8 +263,8 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                     LOG.info("Siddhi app " + parentSiddhiAppName + " successfully deployed.");
                 } else {
                     LOG.warn(String.format("Still insufficient resources to deploy %s. Hence, rolling back the " +
-                                                   "deployment and waiting for additional resources.",
-                                           parentSiddhiAppName));
+                                    "deployment and waiting for additional resources.",
+                            parentSiddhiAppName));
                     rollback(currentDeployedPartialApps);
                 }
             }
@@ -286,7 +286,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
 
             if (affectedPartialApps != null) {
                 LOG.info(String.format("Siddhi apps %s were affected by the removal of node %s. Hence, re-deploying " +
-                                               "them in other resource nodes.", affectedPartialApps, resourceNode));
+                        "them in other resource nodes.", affectedPartialApps, resourceNode));
                 rollback(affectedPartialApps);
 
                 affectedPartialApps.forEach(affectedPartialApp -> {
@@ -295,15 +295,12 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                     if (deployedNode != null) {
                         affectedPartialApp.setDeployedNode(deployedNode);
                         LOG.info(String.format("Siddhi app %s of %s successfully deployed in %s.",
-                                               affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName(),
-                                               deployedNode));
+                                affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName(),
+                                deployedNode));
                     } else {
                         LOG.warn(String.format("Insufficient resources to deploy %s. Therefore, cannot re-balance " +
-                                                       "Siddhi app %s. Hence, rolling back the deployment and waiting"
-                                                       + " for "
-                                                       +
-                                                       "additional resources.", affectedPartialApp.getAppName(),
-                                               affectedPartialApp.getParentAppName()));
+                                "Siddhi app %s. Hence, rolling back the deployment and waiting for additional " +
+                                "resources.", affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName()));
                         List<SiddhiAppHolder> appHolders = resourcePool.getSiddhiAppHoldersMap()
                                 .remove(affectedPartialApp.getParentAppName());
 
@@ -311,7 +308,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                             appHolders.forEach(e -> e.setDeployedNode(null));
                             rollback(appHolders);
                             resourcePool.getAppsWaitingForDeploy().put(affectedPartialApp.getParentAppName(),
-                                                                       appHolders);
+                                    appHolders);
                         }
                     }
                 });
@@ -331,17 +328,17 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
 
                 deployedAppHolders.forEach(appHolder -> {
                     String appName = SiddhiAppDeployer.deploy(resourceNode, new SiddhiQuery(appHolder.getAppName(),
-                                                                                            appHolder.getSiddhiApp()));
+                            appHolder.getSiddhiApp()));
                     if (appName == null || appName.isEmpty()) {
                         LOG.warn(String.format("Couldn't re-deploy partial Siddhi app %s of %s in %s. Therefore, " +
-                                                       "assuming the %s has left the resource pool.", appHolder
-                                                       .getAppName(),
-                                               appHolder.getParentAppName(), resourceNode, resourceNode));
+                                        "assuming the %s has left the resource pool.", appHolder
+                                        .getAppName(),
+                                appHolder.getParentAppName(), resourceNode, resourceNode));
                         resourcePool.removeResourceNode(resourceNode.getId());
                     } else {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug(String.format("Partial Siddhi app %s of %s successfully re-deployed in %s.",
-                                                    appName, appHolder.getParentAppName(), resourceNode));
+                                    appName, appHolder.getParentAppName(), resourceNode));
                         }
                     }
                 });
@@ -360,19 +357,19 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
             String appName = SiddhiAppDeployer.deploy(resourceNode, siddhiQuery);
             if (appName == null || appName.isEmpty()) {
                 LOG.warn(String.format("Couldn't deploy partial Siddhi app %s in %s", siddhiQuery.getAppName(),
-                                       resourceNode));
+                        resourceNode));
                 if (retry < resourcePool.getResourceNodeMap().size()) {
                     deployedNode = deploy(siddhiQuery, retry + 1);
                 } else {
                     if (LOG.isDebugEnabled()) {
                         LOG.warn(String.format("Couldn't deploy partial Siddhi app %s even after %s attempts.",
-                                               siddhiQuery.getAppName(), retry));
+                                siddhiQuery.getAppName(), retry));
                     }
                 }
             } else {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(String.format("Partial Siddhi app %s successfully deployed in %s.",
-                                            appName, resourceNode));
+                            appName, resourceNode));
                 }
                 deployedNode = resourceNode;
             }
@@ -391,12 +388,12 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                 if (appHolder.getDeployedNode() != null) {
                     if (!SiddhiAppDeployer.unDeploy(appHolder.getDeployedNode(), appHolder.getAppName())) {
                         LOG.warn(String.format("Could not un-deploy Siddhi app %s from %s.",
-                                               appHolder.getAppName(), appHolder.getDeployedNode()));
+                                appHolder.getAppName(), appHolder.getDeployedNode()));
                     } else {
                         appHolder.setDeployedNode(null);
                         if (LOG.isDebugEnabled()) {
                             LOG.debug(String.format("Siddhi app %s un-deployed from %s.",
-                                                    appHolder.getAppName(), appHolder.getDeployedNode()));
+                                    appHolder.getAppName(), appHolder.getDeployedNode()));
                         }
                     }
                 }

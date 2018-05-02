@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.308-SNAPSHOT</version>
+    <version>2.0.318-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -1504,11 +1504,12 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.308-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.1.7</siddhi.version>
-        <siddhi.bundle.version>4.1.7</siddhi.bundle.version>
+        <carbon.analytics.version>2.0.318-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.1.17</siddhi.version>
+        <siddhi.bundle.version>4.1.17</siddhi.bundle.version>
+
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.0.52</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.0.55</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.52, 6.1.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
@@ -1561,8 +1562,8 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
         <!--Dashboard-->
-        <carbon.uiserver.version>0.19.2</carbon.uiserver.version>
-        <carbon.uiserver.version.range>[0.19.2, 1.0.0]</carbon.uiserver.version.range>
+        <carbon.uiserver.version>0.19.5</carbon.uiserver.version>
+        <carbon.uiserver.version.range>[0.19.3, 1.0.0]</carbon.uiserver.version.range>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->
@@ -1710,12 +1711,12 @@
 
         <siddhi.io.tcp.version>2.0.7</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.0.0-M6</siddhi.io.email.version>
-        <siddhi.io.kafka.version>4.1.2</siddhi.io.kafka.version>
+        <siddhi.io.kafka.version>4.1.7</siddhi.io.kafka.version>
         <siddhi.io.http.version>1.0.4</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.0.6</siddhi.map.json.version>
         <siddhi.map.binary.version>1.0.3</siddhi.map.binary.version>
-        <siddhi.map.xml.version>4.0.2</siddhi.map.xml.version>
+        <siddhi.map.xml.version>4.0.11</siddhi.map.xml.version>
 
         <siddhi.store.rdbms.version>4.0.0-M7</siddhi.store.rdbms.version>
         <siddhi.store.solr.version>1.0.6</siddhi.store.solr.version>

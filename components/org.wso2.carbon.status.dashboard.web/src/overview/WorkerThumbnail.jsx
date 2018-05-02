@@ -178,10 +178,10 @@ export default class WorkerThumbnail extends React.Component {
                         <GridTile title="Siddhi Apps" titlePosition="bottom"
                             titleStyle={{ fontSize: 10, textAlign: 'center' }}>
                             <div className="grid-tile-h1" style={{ marginTop: 50 }}><h1
-                                className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
+                                className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
                                 <h1 style={{ display: 'inline' }}> |</h1>
                                 <h1 className="inactive-apps">
-                                    {this.props.worker.serverDetails.siddhiApps.inactive}
+                                    {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
                                 </h1>
                             </div>
                         </GridTile>
@@ -317,10 +317,10 @@ export default class WorkerThumbnail extends React.Component {
                             </GridTile>
                             <GridTile title="" titlePosition="bottom" titleStyle={{ fontSize: 10 }}>
                                 <div className="grid-tile-h1" style={{ height: '38%', marginTop: 20 }}><h1
-                                    className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
+                                    className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
                                     <h1 style={{ display: 'inline' }}> | </h1>
                                     <h1 className="inactive-apps">
-                                        {this.props.worker.serverDetails.siddhiApps.inactive}
+                                        {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
                                     </h1>
                                 </div>
                                 <div style={{ height: '62%' }}>

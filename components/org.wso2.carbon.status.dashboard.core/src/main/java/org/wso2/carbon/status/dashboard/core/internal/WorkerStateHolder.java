@@ -16,8 +16,10 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.internal;
 
+import org.wso2.carbon.status.dashboard.core.bean.ManagerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsSnapshot;
 
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import java.util.Map;
  */
 public class WorkerStateHolder {
     private static Map<String, WorkerMetricsSnapshot> workerMetricsSnapshotMap = new HashMap<>();
+    private static Map<String, ManagerMetricsSnapshot> managerMetricsSnapshotMap = new HashMap<>();
 
     private WorkerStateHolder() {
     }
@@ -36,7 +39,15 @@ public class WorkerStateHolder {
         return workerMetricsSnapshotMap.get(id);
     }
 
+    public static ManagerMetricsSnapshot getManagerMetrics(String id) {
+        return managerMetricsSnapshotMap.get(id);
+    }
+
     public static void addMetrics(String id, WorkerMetricsSnapshot metricsBean) {
         workerMetricsSnapshotMap.put(id, metricsBean);
+    }
+
+    public static void addManagerMetrics(String id, ManagerMetricsSnapshot managerMetricsBean) {
+        managerMetricsSnapshotMap.put(id, managerMetricsBean);
     }
 }

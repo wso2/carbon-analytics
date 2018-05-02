@@ -29,7 +29,8 @@ import io.swagger.annotations.ApiModelProperty;
  * Represents a HTTP Interface configuration which consists of host and port of the node.
  */
 @ApiModel(description = "Represents a HTTP Interface configuration which consists of host and port of the node.")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-23T12:20:42.963Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-23T12:20:42.963Z")
 public class InterfaceConfig {
     @JsonProperty("host")
     private String host = null;
