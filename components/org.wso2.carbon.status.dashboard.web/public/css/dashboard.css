@@ -230,5 +230,28 @@ body {
     width: 15px;
     float: left;
     margin: 1px 40px 1px 1px;
-    background-color: red
+    background-color: red;
+}
+
+.btn-primary {
+    background: #f17b31 !important;
+    color: #fff !important;
+    margin-right: 10px !important;
+}
+
+.btn-primary:hover {
+    background: #4e4e4e !important;
+}
+
+.btn-default {
+    background: none !important;
+    color: #fff !important;
+}
+
+.btn-default:hover {
+    background: #4e4e4e !important;
+}
+
+.floating-button button:hover {
+    background: #4e4e4e !important;
 }
