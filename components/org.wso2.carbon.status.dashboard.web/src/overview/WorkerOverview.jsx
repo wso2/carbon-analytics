@@ -20,11 +20,10 @@
 import React from "react";
 import {Link} from "react-router-dom";
 //Material UI
-import {GridList} from "material-ui-next";
+import {GridList, Toggle} from "material-ui";
 import Info from "material-ui/svg-icons/action/info";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, Divider, Button} from "material-ui-next";
-import {Toggle} from "material-ui";
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -39,6 +38,7 @@ import FormPanel from "../common/FormPanel";
 import Error500 from "../error-pages/Error500";
 import {HttpStatus} from "../utils/Constants";
 import ManagerThumbnail from "./ManagerThumbnail";
+import '../../public/css/dashboard.css';
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
@@ -46,7 +46,9 @@ const styles = {
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
-    background: {backgroundColor: '#222222'}
+    background: {backgroundColor: '#222222'},
+    divider: {backgroundColor: '#9E9E9E', width: '90%'},
+    navBtn:{color:'#fff',padding:'0 16px 0 12px', verticalAlign:'middle'}
 };
 const errorTitleStyles = {
     color: "#c7cad1",
@@ -228,18 +230,17 @@ export default class WorkerOverview extends React.Component {
         if (this.state.hasManagerPermission) {
             return (
                 <div className="add-button">
-                    <Link to={window.contextPath + '/add-worker'}><Button
-                        label="Add New Node"
-                        icon={<ContentAdd />}
-                        style={{marginTop: 10}}
-                    /></Link>
+                    <Link to={window.contextPath + '/add-worker'}>
+                        <Button style={{marginTop: 10}}>
+                            <ContentAdd /> Add New Node
+                        </Button>
+                    </Link>
                 </div>
             )
         } else {
             return (
                 <div className="add-button-disabled">
                     <Button
-                        label="Add New Node"
                         icon={<ContentAdd />}
                         style={{marginTop: 10, display: 'none'}}
                     />
@@ -258,7 +259,7 @@ export default class WorkerOverview extends React.Component {
             return (
                 <div className="floating-button">
                     <Link to={window.contextPath + '/add-worker'}>
-                        <Button variant="fab" backgroundColor='#f17b31'>
+                        <Button variant="fab" style={{backgroundColor: '#f17b31'}}>
                             <ContentAdd />
                         </Button>
                     </Link>
@@ -347,10 +348,8 @@ export default class WorkerOverview extends React.Component {
                     <div style={styles.background}>
                         <div className="info-card" style={{backgroundColor: '#f17b31'}}>
                             <Button
-                                label={this.state.statusMessage}
-                                icon={<Info />}
                                 style={{marginTop: 10, backgroundColor: '#f17b31'}}
-                            />
+                            ><Info /> {this.state.statusMessage}</Button>
                         </div>
                         {this.renderAddWorker()}
                     </div>
@@ -369,7 +368,8 @@ export default class WorkerOverview extends React.Component {
                                         <br/>
                                         <br/>
                                         <Link to={`${window.contextPath}/logout`} >
-                                            <Button variant="raised" backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
+                                            <Button variant="raised" backgroundColor='#f17b31'
+                                                    style={buttonStyle}>Login</Button>
                                         </Link>
                                     </div>
                                 </FormPanel>
@@ -402,7 +402,7 @@ export default class WorkerOverview extends React.Component {
                         return (
                             <div>
                                 <h3 style={styles.h3}>{id}</h3>
-                                <Divider inset={true} style={{width: '90%'}}/>
+                                <Divider inset={true} style={styles.divider}/>
                                 <div style={styles.root}>
                                     <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                         {workersList[id].map((worker) => {
@@ -423,7 +423,7 @@ export default class WorkerOverview extends React.Component {
                         return (
                             <div>
                                 <h3 style={styles.h3}>{id}</h3>
-                                <Divider inset={true} style={{width: '90%'}}/>
+                                <Divider inset={true} style={styles.divider}/>
                                 <div style={styles.root}>
                                     <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                         {managerList[id].map((worker) => {
@@ -465,7 +465,7 @@ export default class WorkerOverview extends React.Component {
                         return (
                             <div>
                                 <h3 style={styles.h3}>{id}</h3>
-                                <Divider inset={true} style={{width: '90%'}}/>
+                                <Divider inset={true} style={styles.divider}/>
                                 <div style={styles.root}>
                                     <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                         {workersList[id].map((worker) => {
@@ -507,7 +507,7 @@ export default class WorkerOverview extends React.Component {
                         return (
                             <div>
                                 <h3 style={styles.h3}>{id}</h3>
-                                <Divider inset={true} style={{width: '90%'}}/>
+                                <Divider inset={true} style={styles.divider}/>
                                 <div style={styles.root}>
                                     <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                         {managerList[id].map((worker) => {
@@ -551,7 +551,8 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <Header/>
                     <div className="navigation-bar">
-                        <Button label="Overview" icon={<HomeButton color="black"/>}/>
+                        <Button style={styles.navBtn}>
+                            <HomeButton style={{paddingRight:8, color:'#000'}}/>Overview</Button>
                     </div>
                     {this.renderWorkers(this.state.clustersList,this.state.managerClusterList)}
                 </div>
