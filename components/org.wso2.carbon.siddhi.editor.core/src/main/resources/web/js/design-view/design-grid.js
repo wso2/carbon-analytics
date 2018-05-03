@@ -194,7 +194,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // check the validity of the connections and drop if invalid
             function checkConnectionValidityBeforeElementDrop() { //TODO: streams can be connected to streams?
                 _jsPlumb.bind('beforeDrop', function (connection) {
-                    var connectionValidity = true;
+                    var connectionValidity = false;
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     var targetElement = $('#' + targetId);
@@ -206,39 +206,45 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     // avoid the expose of inner-streams outside the group
                     if (sourceElement.hasClass(constants.STREAM) && _jsPlumb.getGroupFor(sourceId) !== undefined) {
                         if (_jsPlumb.getGroupFor(sourceId) !== _jsPlumb.getGroupFor(targetId)) {
-                            connectionValidity = false;
                             alert("Invalid Connection: Inner Streams are not exposed to outside");
+                        } else {
+                            connectionValidity = true;
                         }
                     }
                     else if (targetElement.hasClass(constants.STREAM) && _jsPlumb.getGroupFor(targetId) !== undefined) {
                         if (_jsPlumb.getGroupFor(targetId) !== _jsPlumb.getGroupFor(sourceId)) {
-                            connectionValidity = false;
                             alert("Invalid Connection: Inner Streams are not exposed to outside");
+                        } else {
+                            connectionValidity = true;
                         }
                     }
                     if (sourceElement.hasClass(constants.PARTITION)) {
                         if ($(_jsPlumb.getGroupFor(targetId)).attr('id') !== sourceId) {
-                            connectionValidity = false;
                             alert("Invalid Connection: Connect to a partition query");
+                        } else {
+                            connectionValidity = true;
                         }
                     }
                     else if (targetElement.hasClass(constants.PATTERN)) {
                         if(!(sourceElement.hasClass(constants.STREAM))) {
-                            connectionValidity = false;
                             alert("Invalid Connection");
+                        } else {
+                            connectionValidity = true;
                         }
                     }
                     else if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW))) {
-                            connectionValidity = false;
                             alert("Invalid Connection");
+                        } else {
+                            connectionValidity = true;
                         }
                     }
                     else if (targetElement.hasClass(constants.JOIN)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE))) {
-                            connectionValidity = false;
                             alert("Invalid Connection");
+                        } else {
+                            connectionValidity = true;
                         }
                     }
                     else if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
@@ -246,8 +252,9 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         || sourceElement.hasClass(constants.JOIN)) {
                         if (!(targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                             || targetElement.hasClass(constants.WINDOW))) {
-                            connectionValidity = false;
                             alert("Invalid Connection");
+                        } else {
+                            connectionValidity = true;
                         }
                     }
                     return connectionValidity;
