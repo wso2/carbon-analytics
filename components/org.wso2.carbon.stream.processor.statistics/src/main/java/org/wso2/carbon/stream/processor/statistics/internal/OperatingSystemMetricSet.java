@@ -184,7 +184,6 @@ public class OperatingSystemMetricSet {
                 workerStatistics.setInSync(nodeInfo.isInSync());
                 workerStatistics.setLastSyncTime(dateFormatter.format(new Date(nodeInfo.getLastSyncedTimestamp())));
             }
-
         }
     }
 
