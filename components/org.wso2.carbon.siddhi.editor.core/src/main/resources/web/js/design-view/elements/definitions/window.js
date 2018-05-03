@@ -38,7 +38,7 @@ define(['require', 'elementArray'],
                 ],
                 function*: ‘time|length|timeBatch|lengthBatch...’,
                 parameters*: ['value1',...],
-                outputEventType: ‘{current |expired |all}’,
+                outputEventType: ‘current_events|expired_events|all_events’,
                 annotationList: [
                     {
                         name: ‘’,

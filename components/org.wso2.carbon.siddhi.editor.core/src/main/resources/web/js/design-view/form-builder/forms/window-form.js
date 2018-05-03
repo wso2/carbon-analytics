@@ -123,11 +123,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                             title: "Output Event Type",
                             propertyOrder: 5,
                             enum: [
-                                "current",
-                                "expired",
-                                "all"
+                                "current events",
+                                "expired events",
+                                "all events"
                             ],
-                            default: "current"
+                            default: "current events"
                         }
                     }
                 },
@@ -159,9 +159,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 });
                 _.set(windowOptions, 'parameters', parameters);
                 if (editor.getValue().outputEventType !== undefined) {
-                    _.set(windowOptions, 'outputEventType', editor.getValue().outputEventType);
+                    if(editor.getValue().outputEventType === "all events"){
+                        _.set(windowOptions, 'outputEventType', 'all_events');
+                    } else if(editor.getValue().outputEventType === "current events"){
+                        _.set(windowOptions, 'outputEventType', 'current_events');
+                    } else if(editor.getValue().outputEventType === "expired events"){
+                        _.set(windowOptions, 'outputEventType', 'expired_events');
+                    }
                 } else {
-                    _.set(windowOptions, 'outputEventType', '');
+                    _.set(windowOptions, 'outputEventType', 'all_events');
                 }
                 var window = new Window(windowOptions);
                 _.forEach(editor.getValue().attributes, function (attribute) {
@@ -223,7 +229,17 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 parameters.push(parameterObject);
             });
 
-            var outputEventType = clickedElement.getOutputEventType();
+            var outputEventType = '';
+            var savedOutputEventType = clickedElement.getOutputEventType();
+            if (savedOutputEventType === '') {
+                outputEventType = 'all events';
+            } else if (savedOutputEventType === 'all_events') {
+                outputEventType = 'all events';
+            } else if (savedOutputEventType === 'current_events') {
+                outputEventType = 'current events';
+            } else if (savedOutputEventType === 'expired_events') {
+                outputEventType = 'expired events';
+            }
             var fillWith = {
                 name : name,
                 attributes : attributes,
@@ -307,11 +323,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                             title: "Output Event Type",
                             propertyOrder: 5,
                             enum: [
-                                "current",
-                                "expired",
-                                "all"
+                                "current events",
+                                "expired events",
+                                "all events"
                             ],
-                            default: "current"
+                            default: "current events"
                         }
                     }
                 },
@@ -351,9 +367,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 clickedElement.setParameters(parameters);
                 clickedElement.setOutputEventType(config.outputEventType);
                 if (config.outputEventType !== undefined) {
-                    clickedElement.setOutputEventType(config.outputEventType);
+                    if(config.outputEventType === "all events"){
+                        clickedElement.setOutputEventType('all_events');
+                    } else if(config.outputEventType === "current events"){
+                        clickedElement.setOutputEventType('current_events');
+                    } else if(config.outputEventType === "expired events"){
+                        clickedElement.setOutputEventType('expired_events');
+                    }
                 } else {
-                    clickedElement.setOutputEventType('');
+                    clickedElement.setOutputEventType('all_events');
                 }
                 // removing all elements from attribute list
                 clickedElement.getAttributeList().removeAllElements();

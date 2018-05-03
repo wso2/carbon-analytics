@@ -227,11 +227,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         var eventType;
                         if (output.getEventType() === '') {
                             eventType = 'all events';
-                        } else if (output.getEventType() === 'all') {
+                        } else if (output.getEventType() === 'all_events') {
                             eventType = 'all events';
-                        } else if (output.getEventType() === 'current') {
+                        } else if (output.getEventType() === 'current_events') {
                             eventType = 'current events';
-                        } else if (output.getEventType() === 'expired') {
+                        } else if (output.getEventType() === 'expired_events') {
                             eventType = 'expired events';
                         }
                         if (savedQueryOutputType === "insert") {
@@ -957,11 +957,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         if (outputConfig.output.eventType === undefined) {
                             outputObject.setEventType('');
                         } else if(outputConfig.output.eventType === "all events"){
-                            outputObject.setEventType('all');
+                            outputObject.setEventType('all_events');
                         } else if(outputConfig.output.eventType === "current events"){
-                            outputObject.setEventType('current');
+                            outputObject.setEventType('current_events');
                         } else if(outputConfig.output.eventType === "expired events"){
-                            outputObject.setEventType('expired');
+                            outputObject.setEventType('expired_events');
                         }
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setOutput(outputObject);

@@ -28,7 +28,7 @@ define(
         var QueryOutputUpdateOrInsertInto = function (options) {
             /*
              Data storing structure as follows
-                eventType: 'current|expired|all',
+                eventType: 'current_events|expired_events|all_events',
                 set*: [
                     {
                         attribute*: '',
