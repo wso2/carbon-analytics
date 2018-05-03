@@ -36,16 +36,20 @@ import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
  * Generates QueryInputConfig object out of given Siddhi elements
  */
 public class QueryInputConfigGenerator {
+    private String siddhiAppString;
+    private SiddhiApp siddhiApp;
+
+    public QueryInputConfigGenerator(String siddhiAppString, SiddhiApp siddhiApp) {
+        this.siddhiAppString = siddhiAppString;
+        this.siddhiApp = siddhiApp;
+    }
+
     /**
      * Generates Config for Query Input, from given Siddhi Query object and the complete Siddhi app string
      * @param queryInputStream      Siddhi Query InputStream object
-     * @param siddhiAppString       Complete Siddhi app string
-     * @param siddhiApp             Compiled Siddhi app
      * @return                      QueryInputConfig object
      */
-    public QueryInputConfig generateQueryInputConfig(InputStream queryInputStream,
-                                                     String siddhiAppString,
-                                                     SiddhiApp siddhiApp) {
+    public QueryInputConfig generateQueryInputConfig(InputStream queryInputStream) {
         // TODO: 4/25/18 THIS METHOD SHOULD BE REDONE
         String queryInputType = getQueryInputType(queryInputStream);
 

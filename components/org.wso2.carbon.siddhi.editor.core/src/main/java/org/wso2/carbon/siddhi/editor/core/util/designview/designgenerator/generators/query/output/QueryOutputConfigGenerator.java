@@ -35,17 +35,22 @@ import java.util.List;
  * Generates QueryOutputConfig with given Siddhi elements
  */
 public class QueryOutputConfigGenerator {
+    private String siddhiAppString;
+
+    public QueryOutputConfigGenerator(String siddhiAppString) {
+        this.siddhiAppString = siddhiAppString;
+    }
+
     // TODO: 4/17/18 comment
-    public QueryOutputConfig generateQueryOutputConfig(OutputStream queryOutputStream, String siddhiAppString) {
+    public QueryOutputConfig generateQueryOutputConfig(OutputStream queryOutputStream) {
         if (queryOutputStream instanceof InsertIntoStream) {
             return generateInsertOutputConfig((InsertIntoStream) queryOutputStream);
         } else if (queryOutputStream instanceof DeleteStream) {
-            return generateDeleteOutputConfig((DeleteStream) queryOutputStream, siddhiAppString);
+            return generateDeleteOutputConfig((DeleteStream) queryOutputStream);
         } else if (queryOutputStream instanceof UpdateStream) {
-            return generateUpdateOutputConfig((UpdateStream) queryOutputStream, siddhiAppString);
+            return generateUpdateOutputConfig((UpdateStream) queryOutputStream);
         } else if (queryOutputStream instanceof UpdateOrInsertStream) {
-            return generateUpdateOrInsertIntoOutputConfig(
-                    (UpdateOrInsertStream) queryOutputStream, siddhiAppString);
+            return generateUpdateOrInsertIntoOutputConfig((UpdateOrInsertStream) queryOutputStream);
         }
         throw new IllegalArgumentException("Unknown type of Query Output Stream for generating Query Output Config");
     }
@@ -57,7 +62,7 @@ public class QueryOutputConfigGenerator {
                 insertIntoStream.getId());
     }
 
-    private QueryOutputConfig generateDeleteOutputConfig(DeleteStream deleteStream, String siddhiAppString) {
+    private QueryOutputConfig generateDeleteOutputConfig(DeleteStream deleteStream) {
         return new QueryOutputConfig(
                 QueryOutputType.DELETE.toString(),
                 new DeleteOutputConfig(
@@ -66,32 +71,28 @@ public class QueryOutputConfigGenerator {
                 deleteStream.getId());
     }
 
-    private QueryOutputConfig generateUpdateOutputConfig(UpdateStream updateStream, String siddhiAppString) {
+    private QueryOutputConfig generateUpdateOutputConfig(UpdateStream updateStream) {
         return new QueryOutputConfig(
                 QueryOutputType.UPDATE.toString(),
                 new UpdateOutputConfig(
                         updateStream.getOutputEventType().name(),
-                        generateSetAttributeConfigsList(
-                                updateStream.getUpdateSet().getSetAttributeList(), siddhiAppString),
+                        generateSetAttributeConfigsList(updateStream.getUpdateSet().getSetAttributeList()),
                         ConfigBuildingUtilities.getDefinition(updateStream.getOnUpdateExpression(), siddhiAppString)),
                 updateStream.getId());
     }
 
-    private QueryOutputConfig generateUpdateOrInsertIntoOutputConfig(UpdateOrInsertStream updateOrInsertStream,
-                                                                     String siddhiAppString) {
+    private QueryOutputConfig generateUpdateOrInsertIntoOutputConfig(UpdateOrInsertStream updateOrInsertStream) {
         return new QueryOutputConfig(
                 QueryOutputType.UPDATE_OR_INSERT_INTO.toString(),
                 new UpdateOrInsertIntoOutputConfig(
                         updateOrInsertStream.getOutputEventType().name(),
-                        generateSetAttributeConfigsList(
-                                updateOrInsertStream.getUpdateSet().getSetAttributeList(), siddhiAppString),
+                        generateSetAttributeConfigsList(updateOrInsertStream.getUpdateSet().getSetAttributeList()),
                         ConfigBuildingUtilities.getDefinition(
                                 updateOrInsertStream.getOnUpdateExpression(), siddhiAppString)),
                 updateOrInsertStream.getId());
     }
 
-    private List<SetAttributeConfig> generateSetAttributeConfigsList(List<UpdateSet.SetAttribute> setAttributes,
-                                                                     String siddhiAppString) {
+    private List<SetAttributeConfig> generateSetAttributeConfigsList(List<UpdateSet.SetAttribute> setAttributes) {
         List<SetAttributeConfig> setAttributeConfigs = new ArrayList<>();
         for (UpdateSet.SetAttribute setAttribute : setAttributes) {
             // Attribute name and value

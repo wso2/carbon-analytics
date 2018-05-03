@@ -254,7 +254,7 @@ public class DesignGenerator {
             if (aggregationDefinition.getSelector() instanceof BasicSelector) {
                 BasicSelector selector = (BasicSelector) aggregationDefinition.getSelector();
                 AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
-                        new AttributesSelectionConfigGenerator();
+                        new AttributesSelectionConfigGenerator(siddhiAppString, siddhiApp);
                 selectedAttributesConfig =
                         attributesSelectionConfigGenerator.generateAttributesSelectionConfig(
                                 selector.getSelectionList());
