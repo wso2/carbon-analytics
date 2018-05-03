@@ -230,11 +230,7 @@ public class DesignGenerator {
         for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
             List<String> parameters = new ArrayList<>();
             for (Expression expression : windowDefinition.getWindow().getParameters()) {
-                if (expression instanceof TimeConstant) {
-                    parameters.add(((TimeConstant) expression).getValue().toString());
-                } else {
-                    // TODO: 4/2/18 Find examples and add
-                }
+                parameters.add(ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));
             }
             siddhiAppConfig.add(new WindowConfig(
                     windowDefinition.getId(),
