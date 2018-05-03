@@ -106,6 +106,13 @@ public class QueryConfigGenerator {
             outputRateLimit = ConfigBuildingUtilities.getDefinition(query.getOutputRate(), siddhiAppString);
         }
 
+        // Get 'limit'
+        long limit = 0;
+        if (query.getSelector().getLimit() != null) {
+            limit = Long.valueOf(
+                    ConfigBuildingUtilities.getDefinition(query.getSelector().getLimit(), siddhiAppString));
+        }
+
         // Get annotation list
         List<AnnotationConfig> annotationList = new ArrayList<>(); // TODO: 4/20/18 implement list population
 
@@ -115,7 +122,7 @@ public class QueryConfigGenerator {
                 querySelectConfig,
                 groupBy,
                 orderBy,
-                Long.valueOf(ConfigBuildingUtilities.getDefinition(query.getSelector().getLimit(), siddhiAppString)),
+                limit,
                 having,
                 outputRateLimit,
                 queryOutputConfig,
