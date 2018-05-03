@@ -37,6 +37,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryWindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
@@ -365,18 +366,30 @@ public class CodeGenerator {
         queryStringBuilder.append(getAnnotationsAsString(query.getAnnotationList()))
                 .append(getQueryInputAsString(query.getQueryInput()))
                 .append(Constants.NEW_LINE)
-                .append(getQuerySelectAsString(query.getSelect()))
-                .append(Constants.NEW_LINE)
-                .append(getQueryGroupByAsString(query.getGroupBy()))
-                .append(Constants.NEW_LINE)
-                .append(getQueryOrderByAsString(query.getOrderBy()))
-                .append(Constants.NEW_LINE)
-                .append(getQueryLimitAsString(query.getLimit()))
-                .append(Constants.NEW_LINE)
-                .append(getQueryHavingAsString(query.getHaving()))
-                .append(Constants.NEW_LINE)
-                .append(getQueryOutputRateLimitAsString(query.getOutputRateLimit()))
-                .append(Constants.NEW_LINE)
+                .append(getQuerySelectAsString(query.getSelect()));
+
+        if (query.getGroupBy() != null && !query.getGroupBy().isEmpty()) {
+            queryStringBuilder.append(Constants.NEW_LINE)
+                    .append(getQueryGroupByAsString(query.getGroupBy()));
+        }
+        if (query.getOrderBy() != null && !query.getOrderBy().isEmpty()) {
+            queryStringBuilder.append(Constants.NEW_LINE)
+                    .append(getQueryOrderByAsString(query.getOrderBy()));
+        }
+        if (query.getLimit() != 0) {
+            queryStringBuilder.append(Constants.NEW_LINE)
+                    .append(getQueryLimitAsString(query.getLimit()));
+        }
+        if (query.getHaving() != null && !query.getHaving().isEmpty()) {
+            queryStringBuilder.append(Constants.NEW_LINE)
+                    .append(getQueryHavingAsString(query.getHaving()));
+        }
+        if (query.getOutputRateLimit() != null && !query.getOutputRateLimit().isEmpty()) {
+            queryStringBuilder.append(Constants.NEW_LINE)
+                    .append(getQueryOutputRateLimitAsString(query.getOutputRateLimit()));
+        }
+
+        queryStringBuilder.append(Constants.NEW_LINE)
                 .append(getQueryOutputAsString(query.getQueryOutput()));
 
         return queryStringBuilder.toString();
@@ -415,9 +428,6 @@ public class CodeGenerator {
                 queryInputStringBuilder.append(getJoinQueryInputAsString(joinQuery));
                 break;
             case "pattern":
-//                PatternSequenceConfig patternQuery = (PatternSequenceConfig) queryInput;
-//                queryInputStringBuilder.append(getPatternQueryInputAsString(patternQuery));
-                break;
             case "sequence":
 //                PatternSequenceConfig sequenceQuery = (PatternSequenceConfig) queryInput;
 //                queryInputStringBuilder.append(getSequenceQueryInputAsString(sequenceQuery));
@@ -467,9 +477,101 @@ public class CodeGenerator {
         return windowFilterProjectionStringBuilder.toString();
     }
 
-    private String getJoinQueryInputAsString(JoinConfig joinQuery) {
-        StringBuilder joinQueryStringBuilder = new StringBuilder();
-        return joinQueryStringBuilder.toString();
+    private String getJoinQueryInputAsString(JoinConfig join) {
+        if (join == null) {
+            throw new CodeGenerationException("The given JoinConfig instance is null");
+        }
+
+        StringBuilder joinStringBuilder = new StringBuilder();
+
+        joinStringBuilder.append(Constants.FROM)
+                .append(Constants.SPACE)
+                .append(getJoinElement(join.getLeft()))
+                .append(Constants.SPACE)
+                .append(getJoinType(join.getJoinType()))
+                .append(Constants.SPACE)
+                .append(getJoinElement(join.getRight()));
+
+        if (join.getJoinWith().equalsIgnoreCase("AGGREGATION")) {
+            joinStringBuilder.append(Constants.NEW_LINE)
+                    .append(Constants.TAB_SPACE)
+                    .append(Constants.WITHIN)
+                    .append(Constants.SPACE)
+                    .append(join.getWithin())
+                    .append(Constants.NEW_LINE)
+                    .append(Constants.TAB_SPACE)
+                    .append(Constants.PER)
+                    .append(Constants.SPACE)
+                    .append(join.getPer());
+        }
+
+        joinStringBuilder.append(Constants.NEW_LINE)
+                .append(Constants.TAB_SPACE)
+                .append(Constants.ON)
+                .append(Constants.SPACE)
+                .append(join.getOn());
+
+        return joinStringBuilder.toString();
+    }
+
+    private String getJoinElement(JoinElementConfig joinElement) {
+        StringBuilder joinElementStringBuilder = new StringBuilder();
+
+        joinElementStringBuilder.append(joinElement.getFrom());
+
+        if (joinElement.getFilter() != null && !joinElement.getFilter().isEmpty()) {
+            if (joinElement.getType().equalsIgnoreCase("window")) {
+                joinElementStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
+                        .append(joinElement.getFilter())
+                        .append(Constants.CLOSE_SQUARE_BRACKET);
+            } else if (joinElement.getWindow() != null) {
+                joinElementStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
+                        .append(joinElement.getFilter())
+                        .append(Constants.CLOSE_SQUARE_BRACKET)
+                        .append(Constants.HASH)
+                        .append(Constants.WINDOW)
+                        .append(Constants.FULL_STOP)
+                        .append(joinElement.getWindow().getFunction())
+                        .append(Constants.OPEN_BRACKET)
+                        .append(getParameterListAsString(joinElement.getWindow().getParameters()))
+                        .append(Constants.CLOSE_BRACKET);
+            } else {
+                throw new CodeGenerationException("The given " + joinElement.getType() + " cannot have a filter without a window");
+            }
+        }
+
+        if (joinElement.getAs() != null && !joinElement.getAs().isEmpty()) {
+            joinElementStringBuilder.append(Constants.SPACE)
+                    .append(Constants.AS)
+                    .append(Constants.SPACE)
+                    .append(joinElement.getAs());
+        }
+
+        if (joinElement.isUnidirectional()) {
+            joinElementStringBuilder.append(Constants.SPACE)
+                    .append(Constants.UNIDIRECTIONAL);
+        }
+
+        return joinElementStringBuilder.toString();
+    }
+
+    private String getJoinType(String joinType) {
+        if (joinType == null || joinType.isEmpty()) {
+            throw new CodeGenerationException("The join type value given is null");
+        }
+
+        switch (joinType.toUpperCase()) {
+            case "JOIN":
+                return Constants.JOIN;
+            case "LEFT_OUTER":
+                return Constants.LEFT_OUTER_JOIN;
+            case "RIGHT_OUTER":
+                return Constants.RIGHT_OUTER_JOIN;
+            case "FULL_OUTER":
+                return Constants.FULL_OUTER_JOIN;
+            default:
+                throw new CodeGenerationException("Invalid Join Type: " + joinType);
+        }
     }
 
     private String getPatternQueryInputAsString(PatternSequenceConfig patternQuery) {
@@ -520,12 +622,17 @@ public class CodeGenerator {
 
         int attributesLeft = userDefinedSelection.getValue().size();
         for (SelectedAttribute attribute : userDefinedSelection.getValue()) {
+            if (attribute.getExpression() == null || attribute.getExpression().isEmpty()) {
+                throw new CodeGenerationException("The given expression of the attribute is null");
+            }
             userDefinedSelectionStringBuilder.append(attribute.getExpression());
             if (attribute.getAs() != null && !attribute.getAs().isEmpty()) {
-                userDefinedSelectionStringBuilder.append(Constants.SPACE)
-                        .append(Constants.AS)
-                        .append(Constants.SPACE)
-                        .append(attribute.getAs());
+                if (!attribute.getAs().equals(attribute.getExpression())) {
+                    userDefinedSelectionStringBuilder.append(Constants.SPACE)
+                            .append(Constants.AS)
+                            .append(Constants.SPACE)
+                            .append(attribute.getAs());
+                }
             }
             if (attributesLeft != 1) {
                 userDefinedSelectionStringBuilder.append(Constants.COMMA)
@@ -538,7 +645,7 @@ public class CodeGenerator {
     }
 
     private String getQueryGroupByAsString(List<String> groupByList) {
-        if (groupByList == null) {
+        if (groupByList == null || groupByList.isEmpty()) {
             return VOID_RETURN;
         }
 
@@ -663,15 +770,15 @@ public class CodeGenerator {
 
         if (insertOutput.getEventType() != null && !insertOutput.getEventType().isEmpty()) {
             switch (insertOutput.getEventType().toLowerCase()) {
-                case "current":
+                case "current_events":
                     insertOutputStringBuilder.append(Constants.CURRENT_EVENTS)
                             .append(Constants.SPACE);
                     break;
-                case "expired":
+                case "expired_events":
                     insertOutputStringBuilder.append(Constants.EXPIRED_EVENTS)
                             .append(Constants.SPACE);
                     break;
-                case "all":
+                case "all_events":
                     insertOutputStringBuilder.append(Constants.ALL_EVENTS)
                             .append(Constants.SPACE);
                     break;
@@ -709,13 +816,13 @@ public class CodeGenerator {
                     .append(Constants.TAB_SPACE)
                     .append(Constants.FOR);
             switch (deleteOutput.getEventType().toLowerCase()) {
-                case "current":
+                case "current_events":
                     deleteOutputStringBuilder.append(Constants.CURRENT_EVENTS);
                     break;
-                case "expired":
+                case "expired_events":
                     deleteOutputStringBuilder.append(Constants.EXPIRED_EVENTS);
                     break;
-                case "all":
+                case "all_events":
                     deleteOutputStringBuilder.append(Constants.ALL_EVENTS);
                     break;
                 default:
@@ -874,7 +981,7 @@ public class CodeGenerator {
      * the CodeGenerator class to build the entire Siddhi app string
      */
     private class Constants {
-
+        // TODO: 5/3/18 Change the name of the constants class to something else
         private static final char ALL = '*';
         private static final char CLOSE_BRACKET = ')';
         private static final char CLOSE_SQUARE_BRACKET = ']';
@@ -929,6 +1036,13 @@ public class CodeGenerator {
         public static final String UPDATE = "update";
         public static final String UPDATE_OR_INSERT_INTO = "update or insert into";
         public static final String SET = "set";
+        public static final String UNIDIRECTIONAL = "unidirectional";
+        public static final String JOIN = "join";
+        public static final String LEFT_OUTER_JOIN = "left outer join";
+        public static final String RIGHT_OUTER_JOIN = "right outer join";
+        public static final String FULL_OUTER_JOIN = "full outer join";
+        public static final String WITHIN = "within";
+        public static final String PER = "per";
 
         private Constants() {
         }
