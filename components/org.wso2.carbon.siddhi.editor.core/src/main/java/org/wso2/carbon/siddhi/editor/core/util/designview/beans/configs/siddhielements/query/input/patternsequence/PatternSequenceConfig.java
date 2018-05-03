@@ -18,24 +18,21 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+
 import java.util.List;
 
 /**
  * Represents a Pattern | Sequence QueryInputConfig, for Siddhi Query
  */
-public class PatternSequenceConfig {
-    private String type;
+public class PatternSequenceConfig extends QueryInputConfig {
     private List<PatternSequenceConditionConfig> conditionList;
     private String logic;
 
     public PatternSequenceConfig(String type, List<PatternSequenceConditionConfig> conditionList, String logic) {
-        this.type = type;
+        super(type);
         this.conditionList = conditionList;
         this.logic = logic;
-    }
-
-    public String getType() {
-        return type;
     }
 
     public List<PatternSequenceConditionConfig> getConditionList() {

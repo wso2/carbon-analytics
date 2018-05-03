@@ -43,4 +43,16 @@ public class PatternSequenceConditionConfig {
     public String getFilter() {
         return filter;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setStreamName(String streamName) {
+        this.streamName = streamName;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
 }
