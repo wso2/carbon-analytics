@@ -21,12 +21,13 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'patternQueryInput',
         'patternQueryInputCounting', 'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd',
         'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource'],
     function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindow, PatternQueryInput, PatternQueryInputCounting, PatternQueryInputAndOr,
               PatternQueryInputNotFor, PatternQueryInputNotAnd, Edge, QuerySelect, QueryOrderByValue, QueryOutput,
-              QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute) {
+              QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute,
+              JoinQueryInput, JoinQuerySource) {
 
         /**
          * @class DesignView
@@ -171,8 +172,9 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 var queryObject = new Query(windowFilterProjectionQuery);
                 var windowFilterProjectionQueryInput =
                     new WindowFilterProjectionQueryInput(windowFilterProjectionQuery.queryInput);
-                if (windowFilterProjectionQuery.window !== undefined && windowFilterProjectionQuery.window !== '') {
-                    var queryWindowObject = new QueryWindow(windowFilterProjectionQuery.window);
+                if (windowFilterProjectionQuery.queryInput.window !== undefined
+                    && windowFilterProjectionQuery.queryInput.window !== '') {
+                    var queryWindowObject = new QueryWindow(windowFilterProjectionQuery.queryInput.window);
                     windowFilterProjectionQueryInput.setWindow(queryWindowObject);
                 }
                 queryObject.setQueryInput(windowFilterProjectionQueryInput);
@@ -181,16 +183,27 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 setQueryOutputForQuery(queryObject, windowFilterProjectionQuery.queryOutput);
                 appData.addWindowFilterProjectionQuery(queryObject);
             });
-            // _.forEach(configurationData.siddhiAppConfig.joinQueryList, function(joinQuery){
-            //     var joinQueryObject = new JoinQuery(joinQuery);
-            //     var leftStreamSubElement = new LeftStream(joinQuery.join.leftStream);
-            //     var rightStreamSubElement = new RightStream(joinQuery.join.rightStream);
-            //     var joinSubElement = new new Join(joinQuery.join);
-            //     joinSubElement.setLeftStream(leftStreamSubElement);
-            //     joinSubElement.setRightStream(rightStreamSubElement);
-            //     joinQueryObject.setJoin(joinSubElement);
-            //     appData.addJoinQuery(joinQueryObject);
-            // });
+            _.forEach(configurationData.siddhiAppConfig.joinQueryList, function(joinQuery){
+                var queryObject = new Query(joinQuery);
+                var joinQueryInput = new JoinQueryInput(joinQuery.queryInput);
+                var leftSource = new JoinQuerySource(joinQuery.queryInput.left);
+                if (joinQuery.queryInput.left.window !== undefined && joinQuery.queryInput.left.window !== '') {
+                    var leftWindowObject = new QueryWindow(joinQuery.queryInput.left.window);
+                    leftSource.setWindow(leftWindowObject);
+                }
+                var rightSource = new JoinQuerySource(joinQuery.queryInput.right);
+                if (joinQuery.queryInput.right.window !== undefined && joinQuery.queryInput.right.window !== '') {
+                    var rightWindowObject = new QueryWindow(joinQuery.queryInput.right.window);
+                    rightSource.setWindow(rightWindowObject);
+                }
+                joinQueryInput.setLeft(leftSource);
+                joinQueryInput.setRight(rightSource);
+                queryObject.setQueryInput(joinQueryInput);
+                setSelectForQuery(queryObject, joinQuery.select);
+                setOrderByForQuery(queryObject, joinQuery.orderBy);
+                setQueryOutputForQuery(queryObject, joinQuery.queryOutput);
+                appData.addJoinQuery(queryObject);
+            });
             _.forEach(configurationData.siddhiAppConfig.partitionList, function(partition){
                 appData.addPartition(new Partition(partition));
             });

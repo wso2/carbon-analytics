@@ -16,10 +16,10 @@
  * under the License.
  */
 define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'dagre', 'edge',
-        'windowFilterProjectionQueryInput', 'patternQueryInput', 'queryOutput'],
+        'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternQueryInput', 'queryOutput'],
 
     function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre, Edge, WindowFilterProjectionQueryInput,
-              PatternQueryInput, QueryOutput) {
+              JoinQueryInput, PatternQueryInput, QueryOutput) {
 
         var constants = {
             STREAM : 'streamDrop',
@@ -242,7 +242,9 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                     }
                     else if (targetElement.hasClass(constants.JOIN)) {
-                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE))) {
+                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
+                        || sourceElement.hasClass(constants.AGGREGATION || sourceElement.hasClass(constants.TRIGGER)
+                            || sourceElement.hasClass(constants.WINDOW)))) {
                             alert("Invalid Connection");
                         } else {
                             connectionValidity = true;
@@ -349,15 +351,24 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 model.getQueryInput().setFrom(connectedElementName);
                             }
                         }
+
                         if (targetElement.hasClass(constants.JOIN)) {
-                            // model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
-                            // var streams = model.getFrom();
-                            // if (streams === undefined || streams === "") {
-                            //     streams = [sourceId];
-                            // } else {
-                            //     streams.push(sourceId);
-                            // }
-                            // model.setFrom(streams);
+                            model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
+                            if (model.getQueryInput() === '') {
+                                var queryInputOptions = {};
+                                _.set(queryInputOptions, 'joinWith', '');
+                                _.set(queryInputOptions, 'left', '');
+                                _.set(queryInputOptions, 'joinType', '');
+                                _.set(queryInputOptions, 'right', '');
+                                _.set(queryInputOptions, 'on', '');
+                                _.set(queryInputOptions, 'within', '');
+                                _.set(queryInputOptions, 'per', '');
+                                var queryInputObject = new JoinQueryInput(queryInputOptions);
+                                model.setQueryInput(queryInputObject);
+                            } else {
+                                //TODO: check whether one stream/trigger is connected in join with another definition of any type
+                                //model.getQueryInput().setFrom(connectedElementName);
+                            }
                         }
                     }
 

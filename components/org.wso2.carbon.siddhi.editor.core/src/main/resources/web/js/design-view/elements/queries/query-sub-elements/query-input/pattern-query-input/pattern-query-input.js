@@ -35,7 +35,8 @@ define(['require', 'elementArray'],
                 ]
             */
             this.type = 'pattern';
-            this.connectedElementNameList = []; // This will hold all the connected streams to the pattern query
+            //TODO: remove this connectedElementNameList when sending the json to backend
+            this.connectedElementNameList = []; // This will hold all the connected streams to the pattern query(front end use only)
             this.eventList = new ElementArray();
         };
 
