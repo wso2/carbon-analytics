@@ -150,6 +150,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 });
 
+                _.forEach(self.configurationData.getSiddhiAppConfig().triggerList, function (trigger) {
+                    if (trigger.getName() === inputElementName) {
+                        isInputElementNameFound = true;
+                        inputElementType = 'trigger';
+                        possibleGroupByAttributes.push('triggered_time');
+                    }
+                    // triggers cannot be connected as a query output in any type query
+                });
+
                 _.forEach(self.configurationData.getSiddhiAppConfig().windowList, function (window) {
                     if (!isInputElementNameFound && window.getName() === inputElementName) {
                         isInputElementNameFound = true;
@@ -166,13 +175,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 _.forEach(self.configurationData.getSiddhiAppConfig().tableList, function (table) {
-                    if (!isInputElementNameFound && table.getName() === inputElementName) {
-                        isInputElementNameFound = true;
-                        inputElementType = 'table';
-                        _.forEach(table.getAttributeList(), function (attribute) {
-                            possibleGroupByAttributes.push(attribute.getName());
-                        });
-                    }
+                    // tables cannot be connected as input in a window filter projection query
                     if (!isOutputElementNameFound && table.getName() === outputElementName) {
                         isOutputElementNameFound = true;
                         outputElementType = 'table';
@@ -339,7 +342,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 properties: {
                                     from: {
                                         required: true,
-                                        title: "Stream/Table",
+                                        title: "Stream/Trigger",
                                         type: "string",
                                         template: inputElementName,
                                         minLength: 1

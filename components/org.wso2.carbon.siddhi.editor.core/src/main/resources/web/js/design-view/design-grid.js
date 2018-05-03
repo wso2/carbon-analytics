@@ -234,7 +234,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     }
                     else if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)) {
-                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW))) {
+                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
+                        || sourceElement.hasClass(constants.TRIGGER))) {
                             alert("Invalid Connection");
                         } else {
                             connectionValidity = true;
@@ -320,7 +321,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 .getName();
                         }
 
-                        if (!sourceElement.hasClass(constants.AGGREGATION)
+                        if ((sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
+                            || sourceElement.hasClass(constants.TRIGGER))
                             && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                             || targetElement.hasClass(constants.WINDOW_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
@@ -358,7 +360,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             // model.setFrom(streams);
                         }
                     }
-
 
                     if (sourceElement.hasClass(constants.STREAM)) {
                         if (targetElement.hasClass(constants.PATTERN)) {
@@ -548,7 +549,9 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)) {
-                        if (!sourceElement.hasClass(constants.AGGREGATION)
+
+                        if ((sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
+                            || sourceElement.hasClass(constants.TRIGGER))
                             && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                             || targetElement.hasClass(constants.WINDOW_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
