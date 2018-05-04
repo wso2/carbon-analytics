@@ -75,7 +75,11 @@ public class CodeGenerator {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
         StringBuilder siddhiAppStringBuilder = new StringBuilder();
 
-        siddhiAppStringBuilder.append("-- Streams").append(Constants.NEW_LINE);
+        siddhiAppStringBuilder.append(generateAppNameAndDescription(siddhiApp.getAppName(), siddhiApp.getAppDescription()))
+                .append(Constants.NEW_LINE)
+                .append(Constants.NEW_LINE)
+                .append("-- Streams")
+                .append(Constants.NEW_LINE);
         for (StreamConfig stream : siddhiApp.getStreamList()) {
             siddhiAppStringBuilder.append(generateStreamString(stream))
                     .append(Constants.NEW_LINE);
@@ -132,6 +136,37 @@ public class CodeGenerator {
         // TODO: 4/23/18 Add the partitions loop
 
         return siddhiAppStringBuilder.toString();
+    }
+
+    /**
+     * Generates a string representation of the Siddhi app name and description annotations
+     * based on the given parameters
+     *
+     * @param appName        The name of the Siddhi app
+     * @param appDescription The description of the siddhi app
+     * @return The Siddhi annotation representation of the name and the description
+     */
+    private String generateAppNameAndDescription(String appName, String appDescription) {
+        if (appName == null || appName.isEmpty()) {
+            throw new CodeGenerationException("The Siddhi App name is null");
+        }
+
+        StringBuilder appNameAndDescriptionBuilder = new StringBuilder();
+
+        appNameAndDescriptionBuilder.append(Constants.APP_NAME)
+                .append(appName)
+                .append(Constants.SINGLE_QUOTE)
+                .append(Constants.CLOSE_BRACKET);
+
+        if (appDescription != null && !appDescription.isEmpty()) {
+            appNameAndDescriptionBuilder.append(Constants.NEW_LINE)
+                    .append(Constants.APP_DESCRIPTION)
+                    .append(appDescription)
+                    .append(Constants.SINGLE_QUOTE)
+                    .append(Constants.CLOSE_BRACKET);
+        }
+
+        return appNameAndDescriptionBuilder.toString();
     }
 
     /**
@@ -480,10 +515,26 @@ public class CodeGenerator {
     private String getJoinQueryInputAsString(JoinConfig join) {
         if (join == null) {
             throw new CodeGenerationException("The given JoinConfig instance is null");
+        } else if (join.getJoinWith() == null || join.getJoinType().isEmpty()) {
+            throw new CodeGenerationException("The join with attribute given is null");
+        } else if (join.getJoinType() == null || join.getJoinType().isEmpty()) {
+            throw new CodeGenerationException("The join type given is null");
+        } else if (join.getOn() == null || join.getOn().isEmpty()) {
+            throw new CodeGenerationException("The 'on' attribute in the join query is null");
+        } else if (join.getLeft() == null || join.getRight() == null) {
+            throw new CodeGenerationException("The join element(s) given is null");
+        } else if (join.getLeft().getType() == null || join.getLeft().getType().isEmpty()) {
+            throw new CodeGenerationException("The left join element does not have a type");
+        } else if (join.getRight().getType() == null || join.getRight().getType().isEmpty()) {
+            throw new CodeGenerationException("The right join element does not have a type");
+        } else if (!(join.getLeft().getType().equalsIgnoreCase("STREAM") ||
+                join.getRight().getType().equalsIgnoreCase("STREAM") ||
+                join.getLeft().getType().equalsIgnoreCase("TRIGGER") ||
+                join.getRight().getType().equalsIgnoreCase("TRIGGER"))) {
+            throw new CodeGenerationException("Atleast one of the join elements must be of type 'stream' or 'trigger'");
         }
 
         StringBuilder joinStringBuilder = new StringBuilder();
-
         joinStringBuilder.append(Constants.FROM)
                 .append(Constants.SPACE)
                 .append(getJoinElement(join.getLeft()))
@@ -493,6 +544,12 @@ public class CodeGenerator {
                 .append(getJoinElement(join.getRight()));
 
         if (join.getJoinWith().equalsIgnoreCase("AGGREGATION")) {
+            if (join.getWithin() == null || join.getWithin().isEmpty()) {
+                throw new CodeGenerationException("The 'within' attribute for the given join aggregation query is null");
+            } else if (join.getPer() == null || join.getPer().isEmpty()) {
+                throw new CodeGenerationException("The 'per' attribute for the given join aggregation query is null");
+            }
+
             joinStringBuilder.append(Constants.NEW_LINE)
                     .append(Constants.TAB_SPACE)
                     .append(Constants.WITHIN)
@@ -515,16 +572,28 @@ public class CodeGenerator {
     }
 
     private String getJoinElement(JoinElementConfig joinElement) {
+        if (joinElement == null) {
+            throw new CodeGenerationException("The given JoinElementConfig instance given is null");
+        } else if (joinElement.getFrom() == null || joinElement.getFrom().isEmpty()) {
+            throw new CodeGenerationException("The 'from' value in the given JoinElementConfig instance is null");
+        }
+
         StringBuilder joinElementStringBuilder = new StringBuilder();
 
         joinElementStringBuilder.append(joinElement.getFrom());
 
         if (joinElement.getFilter() != null && !joinElement.getFilter().isEmpty()) {
-            if (joinElement.getType().equalsIgnoreCase("window")) {
+            if (joinElement.getType().equalsIgnoreCase("WINDOW")) {
                 joinElementStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
                         .append(joinElement.getFilter())
                         .append(Constants.CLOSE_SQUARE_BRACKET);
-            } else if (joinElement.getWindow() != null) {
+            } else if (!joinElement.getWindow().isEmpty()) {
+                if (joinElement.getWindow().getFunction() == null || joinElement.getWindow().getFunction().isEmpty()) {
+                    throw new CodeGenerationException("The 'function' value of the given window in the join query is null");
+                } else if (joinElement.getWindow().getParameters() == null) {
+                    throw new CodeGenerationException("The parameter list for the given window is null");
+                }
+
                 joinElementStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
                         .append(joinElement.getFilter())
                         .append(Constants.CLOSE_SQUARE_BRACKET)
@@ -538,6 +607,20 @@ public class CodeGenerator {
             } else {
                 throw new CodeGenerationException("The given " + joinElement.getType() + " cannot have a filter without a window");
             }
+        } else if (!joinElement.getWindow().isEmpty()) {
+            if (joinElement.getWindow().getFunction() == null || joinElement.getWindow().getFunction().isEmpty()) {
+                throw new CodeGenerationException("The 'function' of the given window in the join query is null");
+            } else if (joinElement.getWindow().getParameters() == null) {
+                throw new CodeGenerationException("The parameter list for the given window is null");
+            }
+
+            joinElementStringBuilder.append(Constants.HASH)
+                    .append(Constants.WINDOW)
+                    .append(Constants.FULL_STOP)
+                    .append(joinElement.getWindow().getFunction())
+                    .append(Constants.OPEN_BRACKET)
+                    .append(getParameterListAsString(joinElement.getWindow().getParameters()))
+                    .append(Constants.CLOSE_BRACKET);
         }
 
         if (joinElement.getAs() != null && !joinElement.getAs().isEmpty()) {
@@ -1033,19 +1116,24 @@ public class CodeGenerator {
         private static final String INTO = "into";
         private static final String DELETE = "delete";
         private static final String FOR = "for";
-        public static final String UPDATE = "update";
-        public static final String UPDATE_OR_INSERT_INTO = "update or insert into";
-        public static final String SET = "set";
-        public static final String UNIDIRECTIONAL = "unidirectional";
-        public static final String JOIN = "join";
-        public static final String LEFT_OUTER_JOIN = "left outer join";
-        public static final String RIGHT_OUTER_JOIN = "right outer join";
-        public static final String FULL_OUTER_JOIN = "full outer join";
-        public static final String WITHIN = "within";
-        public static final String PER = "per";
+        private static final String UPDATE = "update";
+        private static final String UPDATE_OR_INSERT_INTO = "update or insert into";
+        private static final String SET = "set";
+        private static final String UNIDIRECTIONAL = "unidirectional";
+        private static final String JOIN = "join";
+        private static final String LEFT_OUTER_JOIN = "left outer join";
+        private static final String RIGHT_OUTER_JOIN = "right outer join";
+        private static final String FULL_OUTER_JOIN = "full outer join";
+        private static final String WITHIN = "within";
+        private static final String PER = "per";
+        private static final String APP_NAME = "@App:name('";
+        private static final String APP_DESCRIPTION = "@App:description('";
 
         private Constants() {
         }
+
+        // TODO: 5/4/18 Add another constants class for values that are not used to create the siddhi app
+        // use these values for things like switch cases
 
     }
 
