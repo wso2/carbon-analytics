@@ -22,6 +22,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.factories.AttributesSelectionConfigFactory;
+import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 import org.wso2.siddhi.query.api.expression.AttributeFunction;
 import org.wso2.siddhi.query.api.expression.Variable;
@@ -33,6 +34,14 @@ import java.util.List;
  * Generates AttributesSelectionConfig with given Siddhi elements
  */
 public class AttributesSelectionConfigGenerator {
+    private String siddhiAppString;
+    private SiddhiApp siddhiApp;
+
+    public AttributesSelectionConfigGenerator(String siddhiAppString, SiddhiApp siddhiApp) {
+        this.siddhiAppString = siddhiAppString;
+        this.siddhiApp = siddhiApp;
+    }
+
     /**
      * Generates config object with the given list of selected attributes
      * @param outputAttributes      List of selected attributes
@@ -42,6 +51,7 @@ public class AttributesSelectionConfigGenerator {
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
         AttributesSelectionConfigFactory attributesSelectionConfigFactory = new AttributesSelectionConfigFactory();
         if (!outputAttributes.isEmpty()) {
+            // ConfigBuildingUtilities.getDefinition(outputAttributes.get(0), siddhiAppString) TODO look into
             for (OutputAttribute outputAttribute : outputAttributes) {
                 selectedAttributes.add(generateSelectedAttributeConfig(outputAttribute));
             }
@@ -89,6 +99,7 @@ public class AttributesSelectionConfigGenerator {
 
             return new SelectedAttribute(attributeName, attributeAlias);
         } else {
+            // TODO No select expression instanceof check was done for 'StringConstant', 'IntConstant' and stuff (subclasses of Expression class)
             throw new IllegalArgumentException("Expression of the OutputAttribute is of unknown class");
         }
     }

@@ -194,7 +194,9 @@ public class JoinConfigGenerator {
 
         // 'within' and 'per' can be not null only for Aggregations
         if (joinInputStream.getWithin() != null) {
-            joinConfig.setWithin(ConfigBuildingUtilities.getDefinition(joinInputStream.getWithin(), siddhiAppString));
+            joinConfig.setWithin(
+                    ConfigBuildingUtilities.getDefinition(
+                            joinInputStream.getWithin(), siddhiAppString).split("within ")[1]);
         }
         if (joinInputStream.getPer() != null) {
             joinConfig.setPer(ConfigBuildingUtilities.getDefinition(joinInputStream.getPer(), siddhiAppString));

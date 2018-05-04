@@ -51,21 +51,21 @@ public class QueryConfigGenerator {
      */
     public QueryConfig generateQueryConfig(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
         // Generate Input
-        QueryInputConfigGenerator queryInputConfigGenerator = new QueryInputConfigGenerator();
+        QueryInputConfigGenerator queryInputConfigGenerator = new QueryInputConfigGenerator(siddhiAppString, siddhiApp);
         QueryInputConfig queryInputConfig =
-                queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream(), siddhiAppString, siddhiApp);
+                queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream());
 
         // Generate Select
         AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
-                new AttributesSelectionConfigGenerator();
+                new AttributesSelectionConfigGenerator(siddhiAppString, siddhiApp);
         AttributesSelectionConfig querySelectConfig =
                 attributesSelectionConfigGenerator
                         .generateAttributesSelectionConfig(query.getSelector().getSelectionList());
 
         // Generate Output
-        QueryOutputConfigGenerator queryOutputConfigGenerator = new QueryOutputConfigGenerator();
+        QueryOutputConfigGenerator queryOutputConfigGenerator = new QueryOutputConfigGenerator(siddhiAppString);
         QueryOutputConfig queryOutputConfig =
-                queryOutputConfigGenerator.generateQueryOutputConfig(query.getOutputStream(), siddhiAppString);
+                queryOutputConfigGenerator.generateQueryOutputConfig(query.getOutputStream());
 
         // Get Query ID
         String queryId = null;
