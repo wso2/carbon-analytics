@@ -130,58 +130,39 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 var possibleGroupByAttributes = [];
-                var isInputElementNameFound = false;
-                var isOutputElementNameFound = false;
                 var inputElementType = '';
                 var outputElementType = '';
                 var outputElementAttributesList = [];
-                _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function (stream) {
-                    if (stream.getName() === inputElementName) {
-                        isInputElementNameFound = true;
-                        inputElementType = 'stream';
-                        _.forEach(stream.getAttributeList(), function (attribute) {
-                            possibleGroupByAttributes.push(attribute.getName());
-                        });
-                    }
-                    if (stream.getName() === outputElementName) {
-                        isOutputElementNameFound = true;
-                        outputElementType = 'stream';
-                        outputElementAttributesList = stream.getAttributeList();
-                    }
-                });
 
-                _.forEach(self.configurationData.getSiddhiAppConfig().triggerList, function (trigger) {
-                    if (trigger.getName() === inputElementName) {
-                        isInputElementNameFound = true;
-                        inputElementType = 'trigger';
+                var inputElement =
+                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(inputElementName);
+                if (inputElement !== undefined) {
+                    if (inputElement.type !== undefined
+                        && (inputElement.type === 'stream' || inputElement.type === 'window')) {
+                        inputElementType = inputElement.type;
+                        if (inputElement.element !== undefined) {
+                            _.forEach(inputElement.element.getAttributeList(), function (attribute) {
+                                possibleGroupByAttributes.push(attribute.getName());
+                            });
+                        }
+                    } else if (inputElement.type !== undefined && (inputElement.type === 'trigger')) {
+                        inputElementType = inputElement.type;
                         possibleGroupByAttributes.push('triggered_time');
                     }
-                    // triggers cannot be connected as a query output in any type query
-                });
+                }
 
-                _.forEach(self.configurationData.getSiddhiAppConfig().windowList, function (window) {
-                    if (!isInputElementNameFound && window.getName() === inputElementName) {
-                        isInputElementNameFound = true;
-                        inputElementType = 'window';
-                        _.forEach(window.getAttributeList(), function (attribute) {
-                            possibleGroupByAttributes.push(attribute.getName());
-                        });
+                var outputElement =
+                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+                if (outputElement !== undefined) {
+                    if (outputElement.type !== undefined
+                        && (outputElement.type === 'stream' || outputElement.type === 'table'
+                            || outputElement.type === 'window')) {
+                        outputElementType = outputElement.type;
+                        if (outputElement.element !== undefined) {
+                            outputElementAttributesList = outputElement.element.getAttributeList();
+                        }
                     }
-                    if (!isOutputElementNameFound && window.getName() === outputElementName) {
-                        isOutputElementNameFound = true;
-                        outputElementType = 'window';
-                        outputElementAttributesList = window.getAttributeList();
-                    }
-                });
-
-                _.forEach(self.configurationData.getSiddhiAppConfig().tableList, function (table) {
-                    // tables cannot be connected as input in a window filter projection query
-                    if (!isOutputElementNameFound && table.getName() === outputElementName) {
-                        isOutputElementNameFound = true;
-                        outputElementType = 'table';
-                        outputElementAttributesList = table.getAttributeList();
-                    }
-                });
+                }
 
                 var select = [];
                 if (clickedElement.getSelect() === '') {
