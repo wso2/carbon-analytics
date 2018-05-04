@@ -153,6 +153,8 @@ public class JoinConfigGenerator {
         if (joinElementType.equals(JoinElementType.WINDOW)) {
             // If the Join element is of type 'window', Set stream handler window to null
             joinElementConfig.setWindow(null); // TODO confirm whether {} or null
+        } else if (!joinElementConfig.getFilter().isEmpty() && joinElementConfig.getWindow().isEmpty()) {
+            throw new IllegalArgumentException("A Window Join with a filter, cannot exist without a window");
         }
 
         return joinElementConfig;
