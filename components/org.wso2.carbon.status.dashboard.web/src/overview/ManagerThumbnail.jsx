@@ -20,7 +20,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 //Material UI
-import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar, Toggle} from 'material-ui';
+import {CardActions, Dialog, Divider, FlatButton, GridList, GridTile, IconButton, Snackbar, Toggle} from 'material-ui';
 import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
 import Delete from 'material-ui/svg-icons/action/delete';
 import TrendDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
@@ -32,12 +32,34 @@ import OverviewChart from './OverviewChart';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
 import Clock from './Clock';
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
+import WorkerOverview from "./WorkerOverview";
+import WorkerThumbnail from "./WorkerThumbnail";
+import DistributedViewResourceNodeThumbnail from "./DistributedViewResourceNodeThumbnail";
+import DistributedViewAppThumbnail from "../distributedView/DistributedViewAppThumbnail";
 
-const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex: 1}};
+const style = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex: 1}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 const constants = {memory: "memory", cpu: "cpu", load: "load", down: "down", up: "up", na: "n/a"};
+
+const styles = {
+    root: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-around',
+        backgroundColor: '#222222',
+        width: '100%'
+    },
+    gridList: {width: '90%', height: '100%', padding: 40},
+    h3: {color: 'white', marginLeft: '4%', backgroundColor: '#222222'},
+    h3Title: {color: '#C0C0C0', marginLeft: '4%', backgroundColor: '#222222'},
+    titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
+    headerStyle: {height: 30, backgroundColor: '#242424'},
+    paper: {height: 50, width: 500, textAlign: 'center'},
+    background: {backgroundColor: '#222222'}
+};
 
 export default class ManagerThumbnail extends React.Component {
     constructor(props) {
@@ -51,11 +73,66 @@ export default class ManagerThumbnail extends React.Component {
             open: false,
             workerID: this.props.worker.workerId.split("_")[0] + ":" + this.props.worker.workerId.split("_")[1],
             worker: this.props.worker,
-            hasPermission: false
+            hasPermission: false,
+            isApiCalled: false,
+            sessionInvalid: false,
+            isError: false,
+            //TODO: ONLY FOR TESTING
+            resourceClustersList: {}
         };
         this.deleteManager = this.deleteManager.bind(this);
         this.showError = this.showError.bind(this);
         this.showMessage = this.showMessage.bind(this);
+        this.renderWorkers = this.renderWorkers.bind(this);
+        //this.getResourceClusterList = this.getResourceClusterList.bind(this);
+    }
+
+
+    // //todo: ONLY FOR TESTING
+    componentDidMount() {
+        let that = this;
+
+        StatusDashboardOverViewAPI.getResourceClusterNodes(this.props.worker.workerId)
+            .then((response) => {
+                if (response.status === HttpStatus.OK) {
+                    this.setState({
+                        resourceClustersList: response.data,
+                    });
+                } else {
+                    that.showError("Manager '" + this.props.worker.workerId + "' is not rendered successfully !!");
+                }
+
+            }).catch((error) => {
+            if (error.response != null) {
+                if (error.response.status === 401) {
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
+                    })
+                } else if (error.response.status === 403) {
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "User Have No Permission to view this page."
+                    });
+                } else {
+                    this.setState({
+                        isError: true,
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                    });
+                }
+            }
+        });
+
+
+        console.log("ids" + this.state.workerID);
+        console.log("ID" + this.state.workerId);
+
+
+        // console.log("ressy" + this.state.resourceClustersList);
+
+        //todo: check the catch
     }
 
     componentWillMount() {
@@ -127,7 +204,7 @@ export default class ManagerThumbnail extends React.Component {
     renderDeleteManager() {
         if (this.state.hasPermission) {
             return (
-                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Manager" style={{zIndex: 1}}
+                <IconButton iconStyle={style.smallIcon} tooltip="Delete Manager" style={{zIndex: 1}}
                             tooltipPosition="bottom-center" onClick={() => {
                     this.setState({open: true})
                 }}><Delete color="grey"/></IconButton>
@@ -141,13 +218,140 @@ export default class ManagerThumbnail extends React.Component {
         }
     }
 
+
+    renderWorkers(workersList) {
+
+        if (ManagerThumbnail.hasNodes(this.state.resourceClustersList)) {
+            return (
+
+                Object.keys(workersList).map((id, workerList) => {
+                    if (id === 'ResourceCluster') {
+                        return (
+                            <div style={{marginLeft: '-60px', height: '100%'}}>
+                                <h4 style={styles.h3Title}>Workers</h4>
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    width: '290%',
+                                    height: '100%',
+                                    padding: '40px',
+                                    justifyContent: 'space-around',
+                                    backgroundColor: '#222222'
+                                }}>
+
+                                    <GridList cols={3} padding={50} cellHeight={300} style={style.gridList}>
+                                        {workersList[id].map((worker) => {
+
+                                            if (worker.statusMessage === "Please add the node manually.") {
+                                                return (
+                                                    <div>
+                                                        <DistributedViewResourceNodeThumbnail worker={worker}
+                                                                                              currentTime={new Date().getTime()}/>
+                                                    </div>
+                                                )
+
+                                            } else {
+                                                return (
+                                                    <div>
+                                                        <WorkerThumbnail worker={worker}
+                                                                         currentTime={new Date().getTime()}/>
+                                                    </div>
+                                                )
+                                            }
+
+                                        })}
+                                    </GridList>
+                                </div>
+                            </div>
+                        )
+
+                    } else if(id !=='Never Reached' && id !== 'Single Node Deployments' && id !=='ResourceCluster' && id !== " ") {
+                        return (
+                            <div style={{marginLeft: '-60px', height: '100%'}}>
+                                <h3 style={styles.h3}>HA Deployments</h3>
+                                <Divider inset={true} style={{width: '300%',marginLeft: '22px'}}/>
+                                <h3 style={styles.h3Title}>Group Id : {id}</h3>
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    width: '290%',
+                                    height: '100%',
+                                    padding: '40px',
+                                    justifyContent: 'space-around',
+                                    backgroundColor: '#222222'
+                                }}>
+
+                                    <GridList cols={3} padding={50} cellHeight={300} style={style.gridList}>
+                                        {workersList[id].map((worker) => {
+
+                                            return (
+                                                <div>
+                                                    <WorkerThumbnail worker={worker}
+                                                                     currentTime={new Date().getTime()}/>
+                                                </div>
+                                            )
+                                        })}
+                                    </GridList>
+                                </div>
+                            </div>
+                        )
+                    } else {
+                        return (
+                            <div style={{marginLeft: '-60px', height: '100%'}}>
+                                <h3 style={styles.h3}>{id}</h3>
+                                <Divider inset={true} style={{width: '320%',marginLeft: '22px'}}/>
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    width: '290%',
+                                    height: '100%',
+                                    padding: '40px',
+                                    justifyContent: 'space-around',
+                                    backgroundColor: '#222222'
+                                }}>
+
+                                    <GridList cols={3} padding={50} cellHeight={300} style={style.gridList}>
+                                        {workersList[id].map((worker) => {
+
+                                            return (
+                                                <div>
+                                                    <WorkerThumbnail worker={worker}
+                                                                     currentTime={new Date().getTime()}/>
+                                                </div>
+                                            )
+                                        })}
+                                    </GridList>
+                                </div>
+                            </div>
+                        )
+                    }
+
+                })
+            );
+        } else {
+            console.log("am not passing")
+        }
+
+    }
+
+
+    static hasNodes(clusters) {
+        for (let prop in clusters) {
+            if (clusters.hasOwnProperty(prop)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     renderGridTile() {
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
         if (this.props.worker.clusterInfo.groupId === " ") {
             if (this.props.worker.statusMessage == null) {
                 gridTiles = <div>
-                    <GridList cols={1} cellHeight={180} style={styles.gridList}>
+                    <GridList cols={1} cellHeight={180} style={style.gridList}>
                         <h2 style={{textAlign: 'center', color: 'white', padding: 50}}>Manager is not reachable!</h2>
                     </GridList>
                 </div>;
@@ -155,7 +359,7 @@ export default class ManagerThumbnail extends React.Component {
                 color = 'red';
             } else {
                 gridTiles = <div>
-                    <GridList cols={1} cellHeight={180} style={styles.gridList}>
+                    <GridList cols={1} cellHeight={180} style={style.gridList}>
                         <h2 style={{textAlign: 'center', color: 'white', padding: 15}}>Manager is not reachable!
                             <br/>
                             <text style={{textAlign: 'center', fontSize: 12, color: 'white'}}>
@@ -170,7 +374,7 @@ export default class ManagerThumbnail extends React.Component {
             //statistics disabled workers
         } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>
-                <GridList cols={2} cellHeight={180} style={styles.gridList}>
+                <GridList cols={2} cellHeight={180} style={style.gridList}>
                     <GridTile>
                         <h4 style={{
                             textAlign: 'center',
@@ -194,7 +398,7 @@ export default class ManagerThumbnail extends React.Component {
                         haStatus = 'Active'
                     } else if (this.props.worker.clusterInfo.haStatus === "Pasive") {
                         color = 'grey';
-                        haStatus = 'Pasive'
+                        haStatus = 'Passive'
 
                     }
                 } else {
@@ -254,7 +458,7 @@ export default class ManagerThumbnail extends React.Component {
                     <div>
                         <Link style={{textDecoration: 'none'}}
                               to={window.contextPath + "/" + this.props.worker.workerId + "/siddhi-apps"}>
-                            <GridList cols={4} cellHeight={180} style={styles.gridList}>
+                            <GridList cols={4} cellHeight={180} style={style.gridList}>
                                 <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                     <div><OverviewChart
                                         chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}
@@ -295,7 +499,7 @@ export default class ManagerThumbnail extends React.Component {
             } else {
                 gridTiles =
                     <div style={{cursor: 'not-allowed'}}>
-                        <GridList cols={4} cellHeight={180} style={styles.gridList}>
+                        <GridList cols={4} cellHeight={180} style={style.gridList}>
                             <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                 <div><OverviewChart
                                     chartValue={this.props.worker.serverDetails.workerMetrics.systemCPU * 100}
@@ -373,7 +577,7 @@ export default class ManagerThumbnail extends React.Component {
             />,
         ];
         return (
-            <div>
+            <div style={styles.root}>
                 <Dialog
                     title="Confirmation"
                     actions={actionsButtons}
@@ -402,12 +606,24 @@ export default class ManagerThumbnail extends React.Component {
                     </CardActions>
                     {items[0]}
                 </GridTile>
+
+
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle} open={this.state.showMsg}
                           message={this.state.message} autoHideDuration={4000}
                           onRequestClose={() => {
                               this.setState({showMsg: false, message: ""})
                           }}/>
+                <div style={{
+                    width: '200%', height: '200%', display: 'flex',
+                    flexWrap: 'wrap'
+                }}>
+
+
+                    {this.renderWorkers(this.state.resourceClustersList)}
+                </div>
             </div>
-        );
+
+        )
+            ;
     }
 }

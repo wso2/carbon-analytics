@@ -45,8 +45,9 @@ import {HttpStatus} from "../utils/Constants";
 import ManagerThumbnail from "./ManagerThumbnail";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
-    gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
+    gridList: {width: '90%', height: '100%', padding: 40},
     h3: {color: 'white', marginLeft: '4%', backgroundColor: '#222222'},
+    h3Title:{color: '#C0C0C0', marginLeft: '4%', backgroundColor: '#222222'},
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
@@ -191,6 +192,7 @@ export default class WorkerOverview extends React.Component {
                 }
             }
         });
+        console.log("managering"+ this.state.managerClusterList)
     }
 
     componentWillUnmount() {
@@ -399,48 +401,56 @@ export default class WorkerOverview extends React.Component {
                             </Toggle>
                         </div>
                     </div>
-                    {Object.keys(workersList).map((id, workerList) => {
 
-                        {
-                        }
-                        return (
-                            <div>
-                                <h3 style={styles.h3}>{id}</h3>
-                                <Divider inset={true} style={{width: '90%'}}/>
-                                <div style={styles.root}>
-                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
-                                        {workersList[id].map((worker) => {
-                                            return (
-                                                <WorkerThumbnail worker={worker}
-                                                                 currentTime={new Date().getTime()}/>
-
-                                            )
-                                        })}
-                                    </GridList>
-                                </div>
-                            </div>
-                        )
-                    })}
                     <h3 style={styles.h3}>Distributed Deployments</h3>
 
                     {Object.keys(managerList).map((id, workerList) => {
-                        return (
-                            <div>
-                                <h3 style={styles.h3}>{id}</h3>
-                                <Divider inset={true} style={{width: '90%'}}/>
-                                <div style={styles.root}>
-                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
-                                        {managerList[id].map((worker) => {
-                                            return (
-                                                <ManagerThumbnail worker={worker}
-                                                                  currentTime={new Date().getTime()}/>
+                        if(id !== " "){
+                            return (
 
-                                            )
-                                        })}
-                                    </GridList>
+                                <div style={{height:'100%'}}>
+                                    <Divider inset={true} style={{width: '90%'}}/>
+                                    <h3 style={styles.h3Title}>Group Id : {id}</h3>
+                                    <h4 style={styles.h3Title}>Managers</h4>
+                                    <div style={styles.root}>
+                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                            {managerList[id].map((worker) => {
+                                                return (
+                                                    <ManagerThumbnail worker={worker}
+                                                                      currentTime={new Date().getTime()}/>
+
+                                                )
+                                            })}
+                                        </GridList>
+                                    </div>
                                 </div>
-                            </div>
-                        )
+                            )
+
+                        } else {
+                            return (
+
+                                <div style={{height:'100%'}}>
+                                    <h3 style={styles.h3}>Managers</h3>
+                                    <Divider inset={true} style={{width: '90%'}}/>
+                                    <div style={styles.root}>
+                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                            {managerList[id].map((worker) => {
+
+                                                console.log("manager"+ worker.workerId);
+
+                                                return (
+                                                    <ManagerThumbnail worker={worker}
+                                                                      currentTime={new Date().getTime()}/>
+
+                                                )
+                                            })}
+                                        </GridList>
+                                    </div>
+                                </div>
+                            )
+
+                        }
+
                     })}
                 </div>
             );
@@ -504,17 +514,18 @@ export default class WorkerOverview extends React.Component {
                             </Toggle>
                         </div>
                     </div>
+                    <h3 style={styles.h3}>Distributed Deployments</h3>
 
                     {Object.keys(managerList).map((id, workerList) => {
-                        {
-                        }
                         return (
                             <div>
-                                <h3 style={styles.h3}>{id}</h3>
+                                <h3 style={styles.h3}>Group Id: {id}</h3>
                                 <Divider inset={true} style={{width: '90%'}}/>
+                                <h3 style={styles.h3Title}>Managers</h3>
                                 <div style={styles.root}>
                                     <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                         {managerList[id].map((worker) => {
+                                            console.log("manager "+ worker);
                                             return (
                                                 <ManagerThumbnail worker={worker}
                                                                   currentTime={new Date().getTime()}/>

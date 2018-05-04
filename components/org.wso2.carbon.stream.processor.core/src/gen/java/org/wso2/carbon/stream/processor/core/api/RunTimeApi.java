@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 
-@Path("/runTime")
+@Path("/nodeDetails")
 
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the runTime API")
@@ -46,6 +46,7 @@ import javax.ws.rs.core.Response;
 public class RunTimeApi implements Microservice {
     private final RunTimeApiService delegate = RunTimeApiServiceFactory.getRunTimeApi();
 
+    @Path("/runTime")
     @GET
     @io.swagger.annotations.ApiOperation(value = "Returns the runtime of the stream processor.",
                                          notes = "Returns the run time given in the carbon.sh.", response = void.class,

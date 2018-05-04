@@ -139,7 +139,7 @@ export default class WorkerThumbnail extends React.Component {
     renderGridTile() {
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
-        if (this.props.worker.serverDetails.clusterID == null) {
+        if (this.props.worker.serverDetails.clusterID == null && this.props.worker.statusMessage !=="Please add the node manually.") {
             if (this.props.worker.statusMessage == null) {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={180} style={styles.gridList}>
@@ -163,10 +163,10 @@ export default class WorkerThumbnail extends React.Component {
                 color = 'red';
             }
             //statistics disabled workers
-        } else if (!this.props.worker.serverDetails.isStatsEnabled) {
+        } else if (!this.props.worker.serverDetails.isStatsEnabled && this.props.worker.statusMessage !=="Please add the node manually." ) {
             gridTiles = <div>
-                <Link style={{ textDecoration: 'none' }}
-                    to={window.contextPath + '/worker/' + this.props.worker.workerId}>
+                <Link style={{textDecoration: 'none'}}
+                      to={window.contextPath + '/worker/' + this.props.worker.workerId}>
                     <GridList cols={2} cellHeight={180} style={styles.gridList}>
                         <GridTile>
                             <h4 style={{
@@ -176,10 +176,10 @@ export default class WorkerThumbnail extends React.Component {
                             }}>{this.props.worker.statusMessage}</h4>
                         </GridTile>
                         <GridTile title="Siddhi Apps" titlePosition="bottom"
-                            titleStyle={{ fontSize: 10, textAlign: 'center' }}>
-                            <div className="grid-tile-h1" style={{ marginTop: 50 }}><h1
+                                  titleStyle={{fontSize: 10, textAlign: 'center'}}>
+                            <div className="grid-tile-h1" style={{marginTop: 50}}><h1
                                 className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
-                                <h1 style={{ display: 'inline' }}> |</h1>
+                                <h1 style={{display: 'inline'}}> |</h1>
                                 <h1 className="inactive-apps">
                                     {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
                                 </h1>
@@ -207,6 +207,38 @@ export default class WorkerThumbnail extends React.Component {
                     color = 'red'
                 }
             }
+
+        } else if(this.props.worker.statusMessage ==="Please add the node manually."){
+            gridTiles = <div>
+                <Link style={{ textDecoration: 'none' }} to={window.contextPath + '/add-worker'}>
+                    <GridList cols={1} cellHeight={180} style={styles.gridList}>
+                        <GridTile>
+                            <h4 style={{
+                                textAlign: 'center',
+                                color: 'white',
+                                padding: 50
+                            }}> Node id is {this.props.worker.nodeId}</h4>
+                            <h4 style={{
+                                textAlign: 'center',
+                                color: 'white',
+                                padding: 50
+                            }}>Node id is {this.props.worker.nodeId} <br/>Please add the node manually.</h4>
+                        </GridTile>
+                        {/*<GridTile title="Siddhi Apps" titlePosition="bottom"*/}
+                        {/*titleStyle={{ fontSize: 10, textAlign: 'center' }}>*/}
+                        {/*<div className="grid-tile-h1" style={{ marginTop: 50 }}><h1*/}
+                        {/*className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>*/}
+                        {/*<h1 style={{ display: 'inline' }}> |</h1>*/}
+                        {/*<h1 className="inactive-apps">*/}
+                        {/*{this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}*/}
+                        {/*</h1>*/}
+                        {/*</div>*/}
+                        {/*</GridTile>*/}
+                    </GridList>
+                </Link>
+            </div>;
+            lastUpdated = "#";
+
         } else {
             //handling trend for cpu, memory and load average
             let cpuTrend, memoryTrend, loadTrend, loadAvg, loadTrendImg;
