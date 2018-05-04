@@ -54,7 +54,7 @@ public class JoinConfigGenerator {
      */
     public JoinConfig getJoinQueryConfig(InputStream queryInputStream, SiddhiApp siddhiApp, String siddhiAppString) {
         distinguishElements(queryInputStream.getUniqueStreamIds(), siddhiApp);
-        return generateJoinConfig(queryInputStream, siddhiAppString, siddhiApp);
+        return generateJoinConfig(queryInputStream, siddhiAppString);
     }
 
     /**
@@ -164,10 +164,9 @@ public class JoinConfigGenerator {
      * Generates a JoinConfig, which represents a Join Input of a Siddhi Query
      * @param queryInputStream      Siddhi Query InputStream object
      * @param siddhiAppString       Complete Siddhi app string
-     * @param siddhiApp             Compiled SiddhiApp object
      * @return                      JoinConfig object
      */
-    private JoinConfig generateJoinConfig(InputStream queryInputStream, String siddhiAppString, SiddhiApp siddhiApp) {
+    private JoinConfig generateJoinConfig(InputStream queryInputStream, String siddhiAppString) {
         JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
         // Left element of the join
         JoinElementConfig leftElement =
