@@ -50,4 +50,12 @@ public class JoinElementWindowConfig {
     public void setParameters(List<String> parameters) {
         this.parameters = parameters;
     }
+
+    /**
+     * Returns whether the object is empty or not
+     * @return      Empty status of the object
+     */
+    public boolean isEmpty() {
+        return function == null && parameters == null;
+    }
 }
