@@ -38,45 +38,23 @@ define(['require', 'lodash'],
         FormUtils.prototype.IsDefinitionElementNameUnique = function (elementName, skipElementID) {
             var self = this;
             var isNameUsed = false;
-            _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function (stream) {
-                if (stream.getName().toUpperCase() === elementName.toUpperCase()) {
-                    if (!(skipElementID !== undefined && skipElementID === stream.getId())) {
-                        isNameUsed = true;
+            var streamList = self.configurationData.getSiddhiAppConfig().streamList;
+            var tableList = self.configurationData.getSiddhiAppConfig().tableList;
+            var windowList = self.configurationData.getSiddhiAppConfig().windowList;
+            var aggregationList = self.configurationData.getSiddhiAppConfig().aggregationList;
+            var triggerList = self.configurationData.getSiddhiAppConfig().triggerList;
+
+            var listNames = [streamList, tableList, windowList, aggregationList, triggerList];
+            _.forEach(listNames, function (list) {
+                _.forEach(list, function (element) {
+                    if (element.getName().toUpperCase() === elementName.toUpperCase()) {
+                        if (!(skipElementID !== undefined && skipElementID === element.getId())) {
+                            isNameUsed = true;
+                        }
                     }
-                }
+                });
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().tableList, function (table) {
-                if (table.getName().toUpperCase() === elementName.toUpperCase()) {
-                    if (!(skipElementID !== undefined && skipElementID === table.getId())) {
-                        isNameUsed = true;
-                    }
-                }
-            });
-
-            _.forEach(self.configurationData.getSiddhiAppConfig().windowList, function (window) {
-                if (window.getName().toUpperCase() === elementName.toUpperCase()) {
-                    if (!(skipElementID !== undefined && skipElementID === window.getId())) {
-                        isNameUsed = true;
-                    }
-                }
-            });
-
-            _.forEach(self.configurationData.getSiddhiAppConfig().aggregationList, function (aggregation) {
-                if (aggregation.getName().toUpperCase() === elementName.toUpperCase()) {
-                    if (!(skipElementID !== undefined && skipElementID === aggregation.getId())) {
-                        isNameUsed = true;
-                    }
-                }
-            });
-
-            _.forEach(self.configurationData.getSiddhiAppConfig().triggerList, function (trigger) {
-                if (trigger.getName().toUpperCase() === elementName.toUpperCase()) {
-                    if (!(skipElementID !== undefined && skipElementID === trigger.getId())) {
-                        isNameUsed = true;
-                    }
-                }
-            });
             return isNameUsed;
         };
 
