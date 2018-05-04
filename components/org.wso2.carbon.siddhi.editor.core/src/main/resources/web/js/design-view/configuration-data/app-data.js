@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray'],
-    function (require, ElementArray) {
+define(['require', 'elementArray', 'lodash'],
+    function (require, ElementArray, _) {
 
         /**
          * @class AppData
@@ -154,6 +154,88 @@ define(['require', 'elementArray'],
 
         AppData.prototype.getFinalElementCount = function () {
             return this.finalElementCount;
+        };
+
+        /**
+         * @function Get the element by providing the element id
+         * @param elementId id of the definition element
+         * @return requestedElement returns undefined if the requested element is not found
+         */
+        AppData.prototype.getDefinitionElementById = function (elementId) {
+            var self = this;
+            var requestedElement = undefined;
+            var streamList = self.streamList;
+            var tableList = self.tableList;
+            var windowList = self.windowList;
+            var aggregationList = self.aggregationList;
+            var triggerList = self.triggerList;
+            var lists = [streamList, tableList, windowList, aggregationList, triggerList];
+
+            _.forEach(lists, function (list) {
+                _.forEach(list, function (element) {
+                    if (element.getId() === elementId) {
+                        var type = '';
+                        if (list === streamList) {
+                            type = 'stream';
+                        } else if (list === tableList) {
+                            type = 'table';
+                        } else if (list === windowList) {
+                            type = 'window';
+                        } else if (list === aggregationList) {
+                            type = 'aggregation';
+                        } else if (list === triggerList) {
+                            type = 'trigger';
+                        }
+                        requestedElement = {
+                            type: type,
+                            element: element
+                        };
+                    }
+                });
+            });
+
+            return requestedElement;
+        };
+
+        /**
+         * @function Get the element by providing the element name
+         * @param elementName name of the definition element
+         * @return requestedElement returns undefined if the requested element is not found
+         */
+        AppData.prototype.getDefinitionElementByName = function (elementName) {
+            var self = this;
+            var requestedElement = undefined;
+            var streamList = self.streamList;
+            var tableList = self.tableList;
+            var windowList = self.windowList;
+            var aggregationList = self.aggregationList;
+            var triggerList = self.triggerList;
+            var listNames = [streamList, tableList, windowList, aggregationList, triggerList];
+
+            _.forEach(listNames, function (list) {
+                _.forEach(list, function (element) {
+                    if (element.getName().toUpperCase() === elementName.toUpperCase()) {
+                        var type = '';
+                        if (list === streamList) {
+                            type = 'stream';
+                        } else if (list === tableList) {
+                            type = 'table';
+                        } else if (list === windowList) {
+                            type = 'window';
+                        } else if (list === aggregationList) {
+                            type = 'aggregation';
+                        } else if (list === triggerList) {
+                            type = 'trigger';
+                        }
+                        requestedElement = {
+                            type: type,
+                            element: element
+                        };
+                    }
+                });
+            });
+
+            return requestedElement;
         };
 
         return AppData;
