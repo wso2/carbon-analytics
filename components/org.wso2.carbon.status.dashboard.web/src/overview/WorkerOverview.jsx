@@ -31,7 +31,6 @@ import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import Header from "../common/Header";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
-// import {FormattedMessage} from "react-intl";
 import { Redirect } from 'react-router-dom';
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import FormPanel from "../common/FormPanel";
