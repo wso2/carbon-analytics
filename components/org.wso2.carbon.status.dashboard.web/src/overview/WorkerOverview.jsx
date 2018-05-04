@@ -42,7 +42,7 @@ import '../../public/css/dashboard.css';
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
-    h3: {color: 'white', marginLeft: '4%', backgroundColor: '#222222'},
+    h3: {color: '#dedede', marginLeft: '4%', backgroundColor: '#222222'},
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
@@ -386,7 +386,7 @@ export default class WorkerOverview extends React.Component {
                         <div className="toggle">
                             <Toggle labelPosition="left"
                                     label={<b>Auto Sync</b>}
-                                    labelStyle={{color: 'white', fontSize: 18}}
+                                    labelStyle={{color: '#dedede', fontSize: 18}}
                                     toggled={this.state.enableAutoSync}
                                     onToggle={this.autoSync}
                                     thumbStyle={{backgroundColor: 'grey'}}
@@ -404,7 +404,7 @@ export default class WorkerOverview extends React.Component {
                                 <h3 style={styles.h3}>{id}</h3>
                                 <Divider inset={true} style={styles.divider}/>
                                 <div style={styles.root}>
-                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                    <GridList className={'node-wrapper'} cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                         {workersList[id].map((worker) => {
                                             return (
                                                 <WorkerThumbnail worker={worker}
@@ -448,7 +448,7 @@ export default class WorkerOverview extends React.Component {
                         <div className="toggle">
                             <Toggle labelPosition="left"
                                     label={<b>Auto Sync</b>}
-                                    labelStyle={{color: 'white', fontSize: 18}}
+                                    labelStyle={{color: '#dedede', fontSize: 18}}
                                     toggled={this.state.enableAutoSync}
                                     onToggle={this.autoSync}
                                     thumbStyle={{backgroundColor: 'grey'}}
@@ -467,7 +467,7 @@ export default class WorkerOverview extends React.Component {
                                 <h3 style={styles.h3}>{id}</h3>
                                 <Divider inset={true} style={styles.divider}/>
                                 <div style={styles.root}>
-                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                    <GridList cols={3} padding={40} cellHeight={150} style={styles.gridList}>
                                         {workersList[id].map((worker) => {
                                             return (
                                                 <WorkerThumbnail worker={worker}
@@ -491,7 +491,7 @@ export default class WorkerOverview extends React.Component {
                         <div className="toggle">
                             <Toggle labelPosition="left"
                                     label={<b>Auto Sync</b>}
-                                    labelStyle={{color: 'white', fontSize: 18}}
+                                    labelStyle={{color: '#dedede', fontSize: 18}}
                                     toggled={this.state.enableAutoSync}
                                     onToggle={this.autoSync}
                                     thumbStyle={{backgroundColor: 'grey'}}

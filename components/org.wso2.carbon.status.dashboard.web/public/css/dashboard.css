@@ -49,13 +49,18 @@ body {
 }
 
 .grid-tile-h1 {
-    color: rgba(255,255,255,0.87);
+    color: rgba(255,255,255,0.57);
     text-align: center;
+}
+
+.grid-tile-h1 h4 {
+    font-weight: 500;
 }
 
 .floating-button {
     position: fixed;
     right: 100px;
+    z-index: 9;
 }
 
 .navigation-bar{
@@ -254,4 +259,33 @@ body {
 
 .floating-button button:hover {
     background: #4e4e4e !important;
+}
+
+.btn-delete {
+    width: 21px !important;
+    height: 21px !important;
+}
+
+.btn-delete:hover svg {
+    fill: #aeaeae !important;
+}
+
+.node-overview p span {
+    padding: 0 5px;
+    font-size: 18px;
+}
+
+p.node-title {
+    font-size: 16px !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+}
+
+p.node-last-update {
+    font-size: 12px !important;
+    color: #dedede !important;
+}
+
+.node-wrapper {
+    min-width: 350px !important;
 }
