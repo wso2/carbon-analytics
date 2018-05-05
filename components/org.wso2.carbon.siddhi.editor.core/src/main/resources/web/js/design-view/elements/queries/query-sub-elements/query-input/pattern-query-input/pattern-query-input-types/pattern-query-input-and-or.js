@@ -40,15 +40,17 @@ define(
                 within: ''
             */
             this.type = 'andor';
-            this.forEvery = options.forEvery;
-            this.leftEventReference = options.leftEventReference;
-            this.leftStreamName = options.leftStreamName;
-            this.leftFilter = options.leftFilter;
-            this.connectedWith = options.connectedWith;
-            this.rightEventReference = options.rightEventReference;
-            this.rightStreamName = options.rightStreamName;
-            this.rightFilter = options.rightFilter;
-            this.within = options.within;
+            if (options !== undefined) {
+                this.forEvery = options.forEvery;
+                this.leftEventReference = options.leftEventReference;
+                this.leftStreamName = options.leftStreamName;
+                this.leftFilter = options.leftFilter;
+                this.connectedWith = options.connectedWith;
+                this.rightEventReference = options.rightEventReference;
+                this.rightStreamName = options.rightStreamName;
+                this.rightFilter = options.rightFilter;
+                this.within = options.within;
+            }
         };
 
         PatternQueryInputAndOr.prototype.getType = function () {

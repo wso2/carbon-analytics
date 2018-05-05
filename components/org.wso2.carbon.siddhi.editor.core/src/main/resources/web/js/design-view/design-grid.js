@@ -282,8 +282,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var edgeInTheEdgeList = self.configurationData.getEdge(edgeId);
                     if(edgeInTheEdgeList !== undefined) {
                         //TODO update the model. why?: query type can be changed even the connection  is same
-                        //edgeInTheEdgeList.setParentType('');
-                        //edgeInTheEdgeList.setChildType('');
+                        //edgeInTheEdgeList.setParentType(undefined);
+                        //edgeInTheEdgeList.setChildType(undefined);
                     } else {
                         var edgeOptions = {};
                         _.set(edgeOptions, 'id', edgeId);
@@ -339,12 +339,10 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             if (targetElement.hasClass(constants.WINDOW_QUERY)) {
                                 type = 'window';
                             }
-                            if (model.getQueryInput() === '') {
+                            if (model.getQueryInput() === undefined) {
                                 var queryInputOptions = {};
                                 _.set(queryInputOptions, 'type', type);
                                 _.set(queryInputOptions, 'from', connectedElementName);
-                                _.set(queryInputOptions, 'filter', '');
-                                _.set(queryInputOptions, 'window', '');
                                 var queryInputObject = new WindowFilterProjectionQueryInput(queryInputOptions);
                                 model.setQueryInput(queryInputObject);
                             } else {
@@ -377,7 +375,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
                             var connectedStreamName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
                                 .getName();
-                            if (model.getQueryInput() === '') {
+                            if (model.getQueryInput() === undefined) {
                                 var patternQueryInputObject = new PatternQueryInput();
                                 patternQueryInputObject.addConnectedElementName(connectedStreamName);
                                 model.setQueryInput(patternQueryInputObject);
@@ -387,7 +385,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                         else if (targetElement.hasClass(constants.PARTITION)) {
                             model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
-                            var newPartitionKey = {'stream': sourceId, 'property': ''};
+                            var newPartitionKey = {'stream': sourceId, 'property': undefined};
                             var partitionKeys = (model.getPartition('partition'));
                             partitionKeys['with'].push(newPartitionKey);
 
@@ -405,7 +403,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 else if (queryElement.hasClass(constants.JOIN)) {
                                     model = self.configurationData.getSiddhiAppConfig().getJoinQuery(queryID);
                                     var streams = model.getFrom();
-                                    if (streams === undefined || streams === "") {
+                                    if (streams === undefined) {
                                         streams = [sourceId];
                                     } else {
                                         streams.push(sourceId);
@@ -415,7 +413,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 else if (queryElement.hasClass(constants.PATTERN)) {
                                     model = self.configurationData.getSiddhiAppConfig().getPatternQuery(queryID);
                                     var streams = model.getFrom();
-                                    if (streams === undefined || streams === "") {
+                                    if (streams === undefined) {
                                         streams = [sourceId];
                                     } else {
                                         streams.push(sourceId);
@@ -443,7 +441,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             else if (targetElement.hasClass(constants.JOIN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
                                 var streams = model.getFrom();
-                                if (streams === undefined || streams === "") {
+                                if (streams === undefined) {
                                     streams = [streamID];
                                 } else {
                                     streams.push(streamID);
@@ -453,7 +451,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             else if (targetElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
                                 var streams = model.getFrom();
-                                if (streams === undefined || streams === "") {
+                                if (streams === undefined) {
                                     streams = [streamID];
                                 } else {
                                     streams.push(streamID);
@@ -494,10 +492,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(sourceId);
                             }
 
-                            if (model.getQueryOutput() === '') {
+                            if (model.getQueryOutput() === undefined) {
                                 var queryOutputOptions = {};
-                                _.set(queryOutputOptions, 'type', '');
-                                _.set(queryOutputOptions, 'output', '');
                                 _.set(queryOutputOptions, 'target', connectedElementName);
                                 var patternQueryOutputObject = new QueryOutput(queryOutputOptions);
                                 model.setQueryOutput(patternQueryOutputObject);
@@ -567,7 +563,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             || targetElement.hasClass(constants.WINDOW_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
-                            model.getQueryInput().setFrom('');
+                            model.getQueryInput().setFrom(undefined);
+                            return;
                         }
                         if (targetElement.hasClass(constants.JOIN)) {
                             // model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
@@ -611,7 +608,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                         || queryElement.hasClass(constants.WINDOW_QUERY)) {
                                         model = self.configurationData.getSiddhiAppConfig().getQuery(queryID);
                                         if (model !== undefined) {
-                                            model.setFrom('');
+                                            model.setFrom(undefined);
                                         }
                                     }
                                     else if (queryElement.hasClass(constants.JOIN)) {
@@ -649,7 +646,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             || targetElement.hasClass(constants.WINDOW_QUERY)) {
                             model = self.configurationData.getSiddhiAppConfig().getQuery(targetId);
                             if (model !== undefined) {
-                                model.setFrom('');
+                                model.setFrom(undefined);
                             }
                         }
                         else if (targetElement.hasClass(constants.JOIN)) {
@@ -682,16 +679,14 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 || sourceElement.hasClass(constants.WINDOW)) {
                                 model = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(sourceId);
-                                model.getQueryOutput().setTarget('');
                             }
                             else if (sourceElement.hasClass(constants.JOIN)) {
-                                //model = self.configurationData.getSiddhiAppConfig().getJoinQuery(sourceId);
-                                //model.getQueryOutput().setTarget('');
+                                model = self.configurationData.getSiddhiAppConfig().getJoinQuery(sourceId);
                             }
                             else if (sourceElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(sourceId);
-                                model.getQueryOutput().setTarget('');
                             }
+                            model.getQueryOutput().setTarget(undefined);
                         }
                     }
                 });

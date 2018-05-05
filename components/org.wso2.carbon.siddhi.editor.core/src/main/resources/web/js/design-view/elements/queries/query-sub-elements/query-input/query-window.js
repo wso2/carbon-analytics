@@ -31,8 +31,10 @@ define(
                 function*: '',
                 parameters*: ['value1',...]'
             */
-            this.function = options.function;
-            this.parameters = options.parameters;
+            if (options !== undefined) {
+                this.function = options.function;
+                this.parameters = options.parameters;
+            }
         };
 
         QueryWindow.prototype.getFunction = function () {

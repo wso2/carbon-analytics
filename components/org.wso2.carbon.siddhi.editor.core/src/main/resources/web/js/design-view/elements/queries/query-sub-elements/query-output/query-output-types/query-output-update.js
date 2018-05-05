@@ -38,9 +38,11 @@ define(
                 ],
                 on*: ''
             */
-            this.eventType = options.eventType;
-            this.set = options.set;
-            this.on = options.on;
+            if (options !== undefined) {
+                this.eventType = options.eventType;
+                this.set = options.set;
+                this.on = options.on;
+            }
         };
 
         QueryOutputUpdate.prototype.getEventType = function () {

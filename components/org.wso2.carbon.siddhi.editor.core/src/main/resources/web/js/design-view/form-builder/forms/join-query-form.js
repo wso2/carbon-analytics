@@ -27,9 +27,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @param {Object} options Rendering options for the view
          */
         var JoinQueryForm = function (options) {
-            this.configurationData = options.configurationData;
-            this.application = options.application;
-            this.consoleListManager = options.application.outputController;
+            if (options !== undefined) {
+                this.configurationData = options.configurationData;
+                this.application = options.application;
+                this.consoleListManager = options.application.outputController;
+            }
             this.gridContainer = $("#grid-container");
             this.toolPaletteContainer = $("#tool-palette-container");
         };

@@ -31,8 +31,10 @@ define(
                 value*: '',
                 order: 'asc|desc'
             */
-            this.value = options.value;
-            this.order = options.order;
+            if (options !== undefined) {
+                this.value = options.value;
+                this.order = options.order;
+            }
         };
 
         QueryOrderBy.prototype.getValue = function () {

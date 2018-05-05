@@ -30,7 +30,9 @@ define(
              Data storing structure as follows
                 eventType: 'current_events|expired_events|all_events'
             */
-            this.eventType = options.eventType;
+            if (options !== undefined) {
+                this.eventType = options.eventType;
+            }
         };
 
         QueryOutputInsert.prototype.getEventType = function () {

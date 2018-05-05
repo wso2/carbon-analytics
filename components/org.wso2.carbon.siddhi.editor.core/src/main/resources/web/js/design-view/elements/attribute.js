@@ -33,8 +33,10 @@ define(
                     type: ‘’
                 }
             */
-            this.name = options.name;
-            this.type = options.type;
+            if (options !== undefined) {
+                this.name = options.name;
+                this.type = options.type;
+            }
         };
 
         Attribute.prototype.getName = function () {

@@ -31,8 +31,10 @@ define(
                 eventType: 'current_events|expired_events|all_events',
                 on*: ''
             */
-            this.eventType = options.eventType;
-            this.on = options.on;
+            if (options !== undefined) {
+                this.eventType = options.eventType;
+                this.on = options.on;
+            }
         };
 
         QueryOutputDelete.prototype.getEventType = function () {

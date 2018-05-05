@@ -25,10 +25,12 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
          * @param {Object} options Rendering options for the view
          */
         var TriggerForm = function (options) {
-            this.configurationData = options.configurationData;
-            this.application = options.application;
-            this.formUtils = options.formUtils;
-            this.consoleListManager = options.application.outputController;
+            if (options !== undefined) {
+                this.configurationData = options.configurationData;
+                this.application = options.application;
+                this.formUtils = options.formUtils;
+                this.consoleListManager = options.application.outputController;
+            }
             this.gridContainer = $("#grid-container");
             this.toolPaletteContainer = $("#tool-palette-container");
         };
@@ -69,6 +71,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                     }
                 },
                 show_errors: "always",
+                disable_properties: false,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 display_required_only: true,
@@ -80,6 +83,11 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
+
+                var errors = editor.validate();
+                if(errors.length) {
+                    return;
+                }
                 var isTriggerNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name);
                 if (isTriggerNameUsed) {
                     alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
@@ -153,9 +161,11 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                     }
                 },
                 show_errors: "always",
-                disable_properties: true,
+                disable_properties: false,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true,
                 startval: fillWith
             });
             $(formContainer).append('<div id="form-submit"><button type="button" ' +
@@ -165,6 +175,11 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+
+                var errors = editor.validate();
+                if(errors.length) {
+                    return;
+                }
                 var isTriggerNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name,
                     clickedElement.getId());
                 if (isTriggerNameUsed) {

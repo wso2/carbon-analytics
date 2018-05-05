@@ -34,11 +34,13 @@ define(
                 childId: '',
                 childType: '',
             */
-            this.id = options.id;
-            this.parentId = options.parentId;
-            this.parentType = options.parentType;
-            this.childId = options.childId;
-            this.childType = options.childType;
+            if (options !== undefined) {
+                this.id = options.id;
+                this.parentId = options.parentId;
+                this.parentType = options.parentType;
+                this.childId = options.childId;
+                this.childType = options.childType;
+            }
         };
 
         Edge.prototype.getId = function () {

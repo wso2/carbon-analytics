@@ -25,10 +25,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
          * @param {Object} options Rendering options for the view
          */
         var TableForm = function (options) {
-            this.configurationData = options.configurationData;
-            this.application = options.application;
-            this.formUtils = options.formUtils;
-            this.consoleListManager = options.application.outputController;
+            if (options !== undefined) {
+                this.configurationData = options.configurationData;
+                this.application = options.application;
+                this.formUtils = options.formUtils;
+                this.consoleListManager = options.application.outputController;
+            }
             this.gridContainer = $("#grid-container");
             this.toolPaletteContainer = $("#tool-palette-container");
         };
@@ -95,6 +97,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                     }
                 },
                 show_errors: "always",
+                disable_properties: false,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 display_required_only: true,
@@ -106,6 +109,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
+
+                var errors = editor.validate();
+                if(errors.length) {
+                    return;
+                }
                 var isTableNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name);
                 if (isTableNameUsed) {
                     alert("Table name \"" + editor.getValue().name + "\" is already used.");
@@ -115,7 +123,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                 var tableOptions = {};
                 _.set(tableOptions, 'id', i);
                 _.set(tableOptions, 'name', editor.getValue().name);
-                _.set(tableOptions, 'store', '');
+                _.set(tableOptions, 'store', undefined);
                 var table = new Table(tableOptions);
                 _.forEach(editor.getValue().attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);
@@ -157,15 +165,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                 log.error(errorMessage);
             }
             var name = clickedElement.getName();
-            var attributesList = clickedElement.getAttributeList();
-            var attributes = [];
-            _.forEach(attributesList, function (attribute) {
-                var attributeObject = {
-                    name: attribute.getName(),
-                    type: attribute.getType()
-                };
-                attributes.push(attributeObject);
-            });
+            var attributes = clickedElement.getAttributeList();
             var fillWith = {
                 name : name,
                 attributes : attributes
@@ -218,9 +218,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                     }
                 },
                 show_errors: "always",
-                disable_properties: true,
+                disable_properties: false,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true,
                 startval: fillWith
             });
             $(formContainer).append('<div id="form-submit"><button type="button" ' +
@@ -230,6 +232,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+
+                var errors = editor.validate();
+                if(errors.length) {
+                    return;
+                }
                 var isTableNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name,
                     clickedElement.getId());
                 if (isTableNameUsed) {

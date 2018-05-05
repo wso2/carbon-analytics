@@ -38,13 +38,15 @@ define(
                 within: ''
             */
             this.type = 'notand';
-            this.forEvery = options.forEvery;
-            this.leftStreamName = options.leftStreamName;
-            this.leftFilter = options.leftFilter;
-            this.rightEventReference = options.rightEventReference;
-            this.rightStreamName = options.rightStreamName;
-            this.rightFilter = options.rightFilter;
-            this.within = options.within;
+            if (options !== undefined) {
+                this.forEvery = options.forEvery;
+                this.leftStreamName = options.leftStreamName;
+                this.leftFilter = options.leftFilter;
+                this.rightEventReference = options.rightEventReference;
+                this.rightStreamName = options.rightStreamName;
+                this.rightFilter = options.rightFilter;
+                this.within = options.within;
+            }
         };
 
         PatternQueryInputNotAnd.prototype.getType = function () {

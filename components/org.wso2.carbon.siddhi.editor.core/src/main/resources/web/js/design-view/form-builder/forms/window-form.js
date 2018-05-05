@@ -25,10 +25,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
          * @param {Object} options Rendering options for the view
          */
         var WindowForm = function (options) {
-            this.configurationData = options.configurationData;
-            this.application = options.application;
-            this.formUtils = options.formUtils;
-            this.consoleListManager = options.application.outputController;
+            if (options !== undefined) {
+                this.configurationData = options.configurationData;
+                this.application = options.application;
+                this.formUtils = options.formUtils;
+                this.consoleListManager = options.application.outputController;
+            }
             this.gridContainer = $("#grid-container");
             this.toolPaletteContainer = $("#tool-palette-container");
         };
@@ -132,6 +134,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                     }
                 },
                 show_errors: "always",
+                disable_properties: false,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 display_required_only: true,
@@ -143,6 +146,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
+
+                var errors = editor.validate();
+                if(errors.length) {
+                    return;
+                }
                 var isWindowNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name);
                 if (isWindowNameUsed) {
                     alert("Window name \"" + editor.getValue().name + "\" is already used.");
@@ -209,15 +217,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 log.error(errorMessage);
             }
             var name = clickedElement.getName();
-            var attributesList = clickedElement.getAttributeList();
-            var attributes = [];
-            _.forEach(attributesList, function (attribute) {
-                var attributeObject = {
-                    name: attribute.getName(),
-                    type: attribute.getType()
-                };
-                attributes.push(attributeObject);
-            });
+            var attributes = clickedElement.getAttributeList();
             var functionName = clickedElement.getFunction();
             var savedParameterValues = clickedElement.getParameters();
 
@@ -231,7 +231,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
 
             var outputEventType = '';
             var savedOutputEventType = clickedElement.getOutputEventType();
-            if (savedOutputEventType === '') {
+            if (savedOutputEventType === undefined) {
                 outputEventType = 'all events';
             } else if (savedOutputEventType === 'all_events') {
                 outputEventType = 'all events';
@@ -332,6 +332,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                     }
                 },
                 show_errors: "always",
+                disable_properties: false,
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 display_required_only: true,
@@ -345,6 +346,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+
+                var errors = editor.validate();
+                if(errors.length) {
+                    return;
+                }
                 var isWindowNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name,
                     clickedElement.getId());
                 if (isWindowNameUsed) {

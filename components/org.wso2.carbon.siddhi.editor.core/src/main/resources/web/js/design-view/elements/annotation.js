@@ -40,9 +40,11 @@ define(
                     value: {‘option’:’value’}
                 }
             */
-            this.name = options.name;
-            this.type = options.type;
-            this.value = options.value;
+            if (options !== undefined) {
+                this.name = options.name;
+                this.type = options.type;
+                this.value = options.value;
+            }
         };
 
         Annotation.prototype.getName = function () {

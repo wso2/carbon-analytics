@@ -172,8 +172,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 var queryObject = new Query(windowFilterProjectionQuery);
                 var windowFilterProjectionQueryInput =
                     new WindowFilterProjectionQueryInput(windowFilterProjectionQuery.queryInput);
-                if (windowFilterProjectionQuery.queryInput.window !== undefined
-                    && windowFilterProjectionQuery.queryInput.window !== '') {
+                if (windowFilterProjectionQuery.queryInput.window !== undefined) {
                     var queryWindowObject = new QueryWindow(windowFilterProjectionQuery.queryInput.window);
                     windowFilterProjectionQueryInput.setWindow(queryWindowObject);
                 }
@@ -187,12 +186,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 var queryObject = new Query(joinQuery);
                 var joinQueryInput = new JoinQueryInput(joinQuery.queryInput);
                 var leftSource = new JoinQuerySource(joinQuery.queryInput.left);
-                if (joinQuery.queryInput.left.window !== undefined && joinQuery.queryInput.left.window !== '') {
+                if (joinQuery.queryInput.left.window !== undefined) {
                     var leftWindowObject = new QueryWindow(joinQuery.queryInput.left.window);
                     leftSource.setWindow(leftWindowObject);
                 }
                 var rightSource = new JoinQuerySource(joinQuery.queryInput.right);
-                if (joinQuery.queryInput.right.window !== undefined && joinQuery.queryInput.right.window !== '') {
+                if (joinQuery.queryInput.right.window !== undefined) {
                     var rightWindowObject = new QueryWindow(joinQuery.queryInput.right.window);
                     rightSource.setWindow(rightWindowObject);
                 }

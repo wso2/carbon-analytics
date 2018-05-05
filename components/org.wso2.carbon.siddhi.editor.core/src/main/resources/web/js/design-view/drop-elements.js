@@ -519,13 +519,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 //add the new join query to the join query array
                 var queryOptions = {};
                 _.set(queryOptions, 'id', i);
-                _.set(queryOptions, 'queryInput', '');
-                _.set(queryOptions, 'select', '');
-                _.set(queryOptions, 'groupBy', '');
-                _.set(queryOptions, 'limit', '');
-                _.set(queryOptions, 'having', '');
-                _.set(queryOptions, 'outputRateLimit', '');
-                _.set(queryOptions, 'queryOutput', '');
                 var query = new Query(queryOptions);
                 self.configurationData.getSiddhiAppConfig().addWindowFilterProjectionQuery(query);
             }
@@ -598,14 +591,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 //add the new join query to the join query array
                 var patternQueryOptions = {};
                 _.set(patternQueryOptions, 'id', i);
-                _.set(patternQueryOptions, 'queryInput', '');
-                _.set(patternQueryOptions, 'select', '');
-                _.set(patternQueryOptions, 'groupBy', '');
-                _.set(patternQueryOptions, 'limit', '');
-                _.set(patternQueryOptions, 'having', '');
-                _.set(patternQueryOptions, 'outputRateLimit', '');
-                _.set(patternQueryOptions, 'queryOutput', '');
-
                 var patternQuery = new Query(patternQueryOptions);
                 self.configurationData.getSiddhiAppConfig().addPatternQuery(patternQuery);
             }
@@ -681,13 +666,6 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 //add the new join query to the join query array
                 var queryOptions = {};
                 _.set(queryOptions, 'id', i);
-                _.set(queryOptions, 'queryInput', '');
-                _.set(queryOptions, 'select', '');
-                _.set(queryOptions, 'groupBy', '');
-                _.set(queryOptions, 'limit', '');
-                _.set(queryOptions, 'having', '');
-                _.set(queryOptions, 'outputRateLimit', '');
-                _.set(queryOptions, 'queryOutput', '');
                 var query = new Query(queryOptions);
                 self.configurationData.getSiddhiAppConfig().addJoinQuery(query);
             }
@@ -793,7 +771,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
             if(!isCodeToDesignMode) {
                 //add the new partition to the partition array
                 var partitionOptions = {};
-                _.set(partitionOptions, 'id', '');
+                _.set(partitionOptions, 'id', i);
                 _.set(partitionOptions, 'partition', {
                     // this will contain json objects { stream : '', property :''}
                     "with" :[]

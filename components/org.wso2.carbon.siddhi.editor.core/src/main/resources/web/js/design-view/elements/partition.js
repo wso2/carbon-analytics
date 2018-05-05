@@ -34,9 +34,11 @@ define(
                 },
                 "queries" :[]
             */
-            this.id = options.id;
-            this.partition = options.partition;
-            this.queries = options.queries;
+            if (options !== undefined) {
+                this.id = options.id;
+                this.partition = options.partition;
+                this.queries = options.queries;
+            }
         };
 
         Partition.prototype.getId = function () {

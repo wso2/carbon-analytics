@@ -32,9 +32,11 @@ define(
                 output*: {INSERT JSON|DELETE JSON|UPDATE JSON|UPDATE-OR-INSERT JSON},
                 target*: ''
             */
-            this.type = options.type;
-            this.output = options.output;
-            this.target = options.target;
+            if (options !== undefined) {
+                this.type = options.type;
+                this.output = options.output;
+                this.target = options.target;
+            }
         };
 
         QueryOutput.prototype.getType = function () {

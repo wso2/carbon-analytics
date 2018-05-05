@@ -35,10 +35,12 @@ define(
                 forDuration*: ''
             */
             this.type = 'notfor';
-            this.forEvery = options.forEvery;
-            this.streamName = options.streamName;
-            this.filter = options.filter;
-            this.forDuration = options.forDuration;
+            if (options !== undefined) {
+                this.forEvery = options.forEvery;
+                this.streamName = options.streamName;
+                this.filter = options.filter;
+                this.forDuration = options.forDuration;
+            }
         };
 
         PatternQueryInputNotFor.prototype.getType = function () {

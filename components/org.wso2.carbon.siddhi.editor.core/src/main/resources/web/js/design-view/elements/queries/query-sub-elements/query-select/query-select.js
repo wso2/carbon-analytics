@@ -40,8 +40,10 @@ define(
                 type*: 'all',
                 value*: '*'
             */
-            this.type = options.type;
-            this.value = options.value;
+            if (options !== undefined) {
+                this.type = options.type;
+                this.value = options.value;
+            }
         };
 
         QuerySelect.prototype.getType = function () {

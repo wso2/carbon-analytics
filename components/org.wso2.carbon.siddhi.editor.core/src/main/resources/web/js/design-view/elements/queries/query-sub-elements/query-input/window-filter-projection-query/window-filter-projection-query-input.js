@@ -38,11 +38,13 @@ define(
                 },
                 postWindowFilter: ''
             */
-            this.type = options.type;
-            this.from = options.from;
-            this.filter = options.filter;
-            this.window = options.window;
-            this.postWindowFilter = options.postWindowFilter;
+            if (options !== undefined) {
+                this.type = options.type;
+                this.from = options.from;
+                this.filter = options.filter;
+                this.window = options.window;
+                this.postWindowFilter = options.postWindowFilter;
+            }
         };
 
         WindowFilterProjectionQueryInput.prototype.getType = function () {

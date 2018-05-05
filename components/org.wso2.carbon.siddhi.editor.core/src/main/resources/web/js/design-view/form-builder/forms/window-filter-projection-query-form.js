@@ -33,9 +33,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @param {Object} options Rendering options for the view
          */
         var WindowFilterProjectionQueryForm = function (options) {
-            this.configurationData = options.configurationData;
-            this.application = options.application;
-            this.consoleListManager = options.application.outputController;
+            if (options !== undefined) {
+                this.configurationData = options.configurationData;
+                this.application = options.application;
+                this.consoleListManager = options.application.outputController;
+            }
             this.gridContainer = $("#grid-container");
             this.toolPaletteContainer = $("#tool-palette-container");
         };
@@ -55,8 +57,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQuery(id);
-            if (clickedElement.getQueryInput() === ''
-                || clickedElement.getQueryInput().getFrom() === '') {
+            if (clickedElement.getQueryInput() === undefined
+                || clickedElement.getQueryInput().getFrom() === undefined) {
                 alert('Connect an input element');
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
@@ -64,7 +66,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
-            } else if (clickedElement.getQueryOutput() === '' || clickedElement.getQueryOutput().getTarget() === '') {
+            } else if (clickedElement.getQueryOutput() === undefined ||
+                clickedElement.getQueryOutput().getTarget() === undefined) {
                 alert('Connect an output stream');
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
@@ -74,7 +77,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.consoleListManager.hideAllConsoles();
             } else {
                 var savedQueryInput = {};
-                if (clickedElement.getQueryInput().getWindow() === '') {
+                if (clickedElement.getQueryInput().getWindow() === undefined) {
                     savedQueryInput = {
                         input: {
                             from : clickedElement.getQueryInput().getFrom()
@@ -130,8 +133,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 var possibleGroupByAttributes = [];
-                var inputElementType = '';
-                var outputElementType = '';
+                var inputElementType = undefined;
+                var outputElementType = undefined;
                 var outputElementAttributesList = [];
 
                 var inputElement =
@@ -165,18 +168,18 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var select = [];
-                if (clickedElement.getSelect() === '') {
+                if (clickedElement.getSelect() === undefined) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
-                            expression: '',
+                            expression: undefined,
                             as: outputElementAttributesList[i].getName()
                         };
                         select.push(attr);
                     }
-                } else if(clickedElement.getSelect().getValue() === '') {
+                } else if(clickedElement.getSelect().getValue() === undefined) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
-                            expression: '',
+                            expression: undefined,
                             as: outputElementAttributesList[i].getName()
                         };
                         select.push(attr);
@@ -186,7 +189,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 } else if (!(clickedElement.getSelect().getValue() === '*')) {
                     var selectedAttributes = clickedElement.getSelect().getValue();
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
-                        var expressionStatement = "";
+                        var expressionStatement = undefined;
                         if (selectedAttributes[i] !== undefined && selectedAttributes[i].expression !== undefined) {
                             expressionStatement = selectedAttributes[i].expression;
                         }
@@ -199,17 +202,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var savedQueryOutput = clickedElement.getQueryOutput();
-                if (savedQueryOutput !== undefined && savedQueryOutput !== "") {
+                if (savedQueryOutput !== undefined) {
                     var savedQueryOutputTarget = savedQueryOutput.getTarget();
                     var savedQueryOutputType = savedQueryOutput.getType();
                     var output = savedQueryOutput.getOutput();
                     var queryOutput;
-                    if ((savedQueryOutputTarget !== undefined && savedQueryOutputTarget !== '')
-                        && (savedQueryOutputType !== undefined && savedQueryOutputType !== '')
-                        && (output !== undefined && output !== '')) {
+                    if ((savedQueryOutputTarget !== undefined)
+                        && (savedQueryOutputType !== undefined)
+                        && (output !== undefined)) {
                         // getting the event tpe and pre load it
                         var eventType;
-                        if (output.getEventType() === '') {
+                        if (output.getEventType() === undefined) {
                             eventType = 'all events';
                         } else if (output.getEventType() === 'all_events') {
                             eventType = 'all events';
@@ -840,7 +843,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (inputConfig.filter !== undefined && inputConfig.filter.filter !== undefined) {
                         queryInput.setFilter(inputConfig.filter.filter);
                     } else {
-                        queryInput.setFilter('');
+                        queryInput.setFilter(undefined);
                     }
 
                     if (inputConfig.window !== undefined) {
@@ -850,14 +853,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         var queryWindow = new QueryWindow(windowOptions);
                         queryInput.setWindow(queryWindow);
                     } else {
-                        queryInput.setWindow('');
+                        queryInput.setWindow(undefined);
                     }
 
                     if (inputConfig.postWindowFilter !== undefined &&
                         inputConfig.postWindowFilter.filter !== undefined) {
                         queryInput.setPostWindowFilter(inputConfig.postWindowFilter.filter);
                     } else {
-                        queryInput.setPostWindowFilter('');
+                        queryInput.setPostWindowFilter(undefined);
                     }
 
                     var selectAttributeOptions = {};
@@ -880,13 +883,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         });
                         clickedElement.setGroupBy(groupByAttributes);
                     } else {
-                        clickedElement.setGroupBy('');
+                        clickedElement.setGroupBy(undefined);
                     }
 
                     if (selectConfig.postFilter !== undefined && selectConfig.postFilter.having !== undefined) {
                         clickedElement.setHaving(selectConfig.postFilter.having);
                     } else {
-                        clickedElement.setHaving('');
+                        clickedElement.setHaving(undefined);
                     }
 
                     clickedElement.clearOrderByValueList();
@@ -903,14 +906,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (outputConfig.limit !== undefined && outputConfig.limit.limit !== undefined) {
                         clickedElement.setLimit(outputConfig.limit.limit);
                     } else {
-                        clickedElement.setLimit('');
+                        clickedElement.setLimit(undefined);
                     }
 
                     if (outputConfig.outputRateLimit !== undefined
                         && outputConfig.outputRateLimit.outputRateLimit !== undefined) {
                         clickedElement.setOutputRateLimit(outputConfig.outputRateLimit.outputRateLimit);
                     } else {
-                        clickedElement.setOutputRateLimit('');
+                        clickedElement.setOutputRateLimit(undefined);
                     }
 
                     var queryOutput = clickedElement.getQueryOutput();
@@ -939,7 +942,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
 
                         if (outputConfig.output.eventType === undefined) {
-                            outputObject.setEventType('');
+                            outputObject.setEventType(undefined);
                         } else if(outputConfig.output.eventType === "all events"){
                             outputObject.setEventType('all_events');
                         } else if(outputConfig.output.eventType === "current events"){

@@ -38,13 +38,15 @@ define(
                 within: ''
             */
             this.type = 'counting';
-            this.forEvery = options.forEvery;
-            this.eventReference = options.eventReference;
-            this.streamName = options.streamName;
-            this.filter = options.filter;
-            this.minCount = options.minCount;
-            this.maxCount = options.maxCount;
-            this.within = options.within;
+            if (options !== undefined) {
+                this.forEvery = options.forEvery;
+                this.eventReference = options.eventReference;
+                this.streamName = options.streamName;
+                this.filter = options.filter;
+                this.minCount = options.minCount;
+                this.maxCount = options.maxCount;
+                this.within = options.within;
+            }
         };
 
         PatternQueryInputCounting.prototype.getType = function () {
