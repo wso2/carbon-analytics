@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray'],
-    function (require, ElementArray) {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class Table
@@ -51,11 +51,13 @@ define(['require', 'elementArray'],
                     }
                 ]
             */
-            this.id = options.id;
-            this.name = options.name;
-            this.store = options.store;
-            this.attributeList =  new ElementArray();
-            this.annotationList =  new ElementArray();
+            if (options !== undefined) {
+                this.id = options.id;
+                this.name = options.name;
+                this.store = options.store;
+            }
+            this.attributeList = [];
+            this.annotationList = [];
         };
 
         Table.prototype.addAttribute = function (attribute) {
@@ -64,6 +66,14 @@ define(['require', 'elementArray'],
 
         Table.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
+        };
+
+        Table.prototype.clearAnnotationList = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationList);
+        };
+
+        Table.prototype.clearAttributeList = function () {
+            ElementUtils.prototype.removeAllElements(this.attributeList);
         };
 
         Table.prototype.getId = function () {

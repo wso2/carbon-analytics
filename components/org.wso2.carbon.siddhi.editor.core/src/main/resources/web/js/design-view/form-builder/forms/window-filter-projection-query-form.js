@@ -889,7 +889,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         clickedElement.setHaving('');
                     }
 
-                    clickedElement.getOrderBy().removeAllElements();
+                    clickedElement.clearOrderByValueList();
                     if (outputConfig.orderBy !== undefined) {
                         _.forEach(outputConfig.orderBy, function (orderByValue) {
                             var orderByValueObjectOptions = {};

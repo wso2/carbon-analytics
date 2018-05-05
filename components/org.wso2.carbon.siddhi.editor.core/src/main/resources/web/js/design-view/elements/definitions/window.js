@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray'],
-    function (require, ElementArray) {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class Window
@@ -53,13 +53,15 @@ define(['require', 'elementArray'],
                     }
                 ]
             */
-            this.id = options.id;
-            this.name = options.name;
-            this.attributeList =  new ElementArray();
-            this.function =  options.function;
-            this.parameters = options.parameters;
-            this.outputEventType = options.outputEventType;
-            this.annotationList =  new ElementArray();
+            if (options !== undefined) {
+                this.id = options.id;
+                this.windowName = options.name;
+                this.function = options.function;
+                this.parameters = options.parameters;
+                this.outputEventType = options.outputEventType;
+            }
+            this.attributeList = [];
+            this.annotationList =  [];
         };
 
         Window.prototype.addAttribute = function (attribute) {
@@ -70,12 +72,20 @@ define(['require', 'elementArray'],
             this.annotationList.push(annotation);
         };
 
+        Window.prototype.clearAnnotationList = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationList);
+        };
+
+        Window.prototype.clearAttributeList = function () {
+            ElementUtils.prototype.removeAllElements(this.attributeList);
+        };
+
         Window.prototype.getId = function () {
             return this.id;
         };
 
         Window.prototype.getName = function () {
-            return this.name;
+            return this.windowName;
         };
 
         Window.prototype.getAttributeList = function () {
@@ -103,7 +113,7 @@ define(['require', 'elementArray'],
         };
 
         Window.prototype.setName = function (name) {
-            this.name = name;
+            this.windowName = name;
         };
 
         Window.prototype.setAttributeList = function (attributeList) {

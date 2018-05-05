@@ -20,23 +20,23 @@ define(
     function () {
 
         /**
-         * @class ElementArray
+         * @class ElementUtils
          * @constructor
-         * @class ElementArray  Creates an array for an element type
+         * @class ElementUtils  Contains utility methods regard to elements
          */
-        var ElementArray = function () {
+        var ElementUtils = function () {
+
         };
 
-        ElementArray.prototype = Array.prototype;
-
         /**
-         * Returns the searched element if found. Otherwise null will be returned.
-         * @param {number} elementId id of the element
+         * Returns the searched element if found from a given array. Otherwise undefined will be returned.
+         * @param array Array which the elementId is needed to be found.
+         * @param elementId Id of the element.
          * @returns {element}
          */
-        ElementArray.prototype.getElement = function (elementId) {
+        ElementUtils.prototype.getElement = function (array, elementId) {
             var foundElement = undefined;
-            this.forEach(function(element){
+            array.forEach(function(element){
                 if (typeof element.getId === 'function' && element.getId() === elementId) {
                     foundElement = element;
                 }
@@ -46,15 +46,15 @@ define(
 
         /**
          * Removes an element from the array.
-         * @param {number} elementId id of the element to be removed.
+         * @param array Array which the element is needed to be removed.
+         * @param elementId Id of the element to be removed.
          */
-        ElementArray.prototype.removeElement = function (elementId) {
-            var self = this;
-            self.every(function(element){
+        ElementUtils.prototype.removeElement = function (array, elementId) {
+            array.every(function(element){
                 if (element.id === elementId) {
-                    var index = self.indexOf(element);
+                    var index = array.indexOf(element);
                     if (index > -1) {
-                        self.splice(index, 1);
+                        array.splice(index, 1);
                     }
                 }
             });
@@ -62,11 +62,12 @@ define(
 
         /**
          * Removes all elements from the array.
+         * @param array Given array.
          */
-        ElementArray.prototype.removeAllElements = function () {
-            this.length = 0;
+        ElementUtils.prototype.removeAllElements = function (array) {
+            array.length = 0;
         };
 
-        return ElementArray;
+        return ElementUtils;
 
     });

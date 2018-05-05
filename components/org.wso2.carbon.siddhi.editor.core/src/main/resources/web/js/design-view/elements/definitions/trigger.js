@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray'],
-    function (require, ElementArray) {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class Trigger
@@ -45,14 +45,20 @@ define(['require', 'elementArray'],
                     }
                 ]
             */
-            this.id = options.id;
-            this.name = options.name;
-            this.at = options.at;
-            this.annotationList =  new ElementArray();
+            if (options !== undefined) {
+                this.id = options.id;
+                this.name = options.name;
+                this.at = options.at;
+            }
+            this.annotationList =  [];
         };
 
         Trigger.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
+        };
+
+        Trigger.prototype.clearAnnotationList = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationList);
         };
 
         Trigger.prototype.getId = function () {

@@ -817,7 +817,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                     var config = editor.getValue();
                     var patternQueryInput = clickedElement.getQueryInput();
                     var newEventObject;
-                    patternQueryInput.getEventList().removeAllElements();
+                    patternQueryInput.clearEventList();
                     if (config.queryInput.queryInput1 !== undefined) {
                         _.forEach(config.queryInput.queryInput1, function (queryInputEvent) {
                             if (queryInputEvent.inputType === "Counting Pattern Event") {
@@ -917,7 +917,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                         clickedElement.setHaving('');
                     }
 
-                    clickedElement.getOrderBy().removeAllElements();
+                    clickedElement.clearOrderByValueList();
                     if (config.orderBy !== undefined) {
                         _.forEach(config.orderBy, function (orderByValue) {
                             var orderByValueObjectOptions = {};

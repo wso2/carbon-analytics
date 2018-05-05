@@ -378,7 +378,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                     clickedElement.setOutputEventType('all_events');
                 }
                 // removing all elements from attribute list
-                clickedElement.getAttributeList().removeAllElements();
+                clickedElement.clearAttributeList();
                 // adding new attributes to the attribute list
                 _.forEach(config.attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);

@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray'],
-    function (require, ElementArray) {
+define(
+    function () {
 
         /**
          * @class PatternQueryInput
@@ -37,7 +37,7 @@ define(['require', 'elementArray'],
             this.type = 'pattern';
             //TODO: remove this connectedElementNameList when sending the json to backend
             this.connectedElementNameList = []; // This will hold all the connected streams to the pattern query(front end use only)
-            this.eventList = new ElementArray();
+            this.eventList = [];
         };
 
         PatternQueryInput.prototype.addConnectedElementName = function (connectedElementName) {
@@ -53,6 +53,10 @@ define(['require', 'elementArray'],
              if (index > -1) {
                  this.connectedElementNameList.splice(index, 1);
              }
+        };
+
+        PatternQueryInput.prototype.clearEventList = function () {
+            ElementUtils.prototype.removeAllElements(this.eventList);
         };
 
         PatternQueryInput.prototype.getConnectedElementNameList = function () {

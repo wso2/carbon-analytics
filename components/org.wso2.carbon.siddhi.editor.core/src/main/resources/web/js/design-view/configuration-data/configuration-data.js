@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray'],
-    function (require, ElementArray) {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class ConfigurationData
@@ -27,7 +27,7 @@ define(['require', 'elementArray'],
          */
         var ConfigurationData = function (siddhiAppConfig) {
             this.siddhiAppConfig = siddhiAppConfig;
-            this.edgeList = new ElementArray();
+            this.edgeList = [];
         };
 
         ConfigurationData.prototype.addEdge = function (edge) {
@@ -35,7 +35,7 @@ define(['require', 'elementArray'],
         };
         
         ConfigurationData.prototype.removeEdge = function (edgeId) {
-            this.edgeList.removeElement(edgeId);
+            ElementUtils.prototype.removeElement(this.edgeList, edgeId);
         };
 
         ConfigurationData.prototype.getSiddhiAppConfig = function () {
@@ -43,7 +43,7 @@ define(['require', 'elementArray'],
         };
 
         ConfigurationData.prototype.getEdge = function (edgeId) {
-            return this.edgeList.getElement(edgeId);
+            return ElementUtils.prototype.getElement(this.edgeList, edgeId);
         };
 
         ConfigurationData.prototype.setSiddhiAppConfig = function (siddhiAppConfig) {

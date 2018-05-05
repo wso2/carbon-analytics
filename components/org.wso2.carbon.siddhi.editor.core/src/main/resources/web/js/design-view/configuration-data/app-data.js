@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray', 'lodash'],
-    function (require, ElementArray, _) {
+define(['require', 'elementUtils', 'lodash'],
+    function (require, ElementUtils, _) {
 
         /**
          * @class AppData
@@ -26,15 +26,15 @@ define(['require', 'elementArray', 'lodash'],
          */
         var AppData = function () {
             // initiates the collections
-            this.streamList = new ElementArray();
-            this.tableList = new ElementArray();
-            this.windowList = new ElementArray();
-            this.triggerList = new ElementArray();
-            this.aggregationList = new ElementArray();
-            this.windowFilterProjectionQueryList = new ElementArray();
-            this.patternQueryList = new ElementArray();
-            this.joinQueryList = new ElementArray();
-            this.partitionList = new ElementArray();
+            this.streamList = [];
+            this.tableList = [];
+            this.windowList = [];
+            this.triggerList = [];
+            this.aggregationList = [];
+            this.windowFilterProjectionQueryList = [];
+            this.patternQueryList = [];
+            this.joinQueryList = [];
+            this.partitionList = [];
             // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
             this.finalElementCount = 0;
 
@@ -77,39 +77,39 @@ define(['require', 'elementArray', 'lodash'],
         };
 
         AppData.prototype.removeStream = function (streamId) {
-            this.streamList.removeElement(streamId);
+            ElementUtils.prototype.removeElement(this.streamList, streamId);
         };
 
         AppData.prototype.removeTable = function (tableId) {
-            this.tableList.removeElement(tableId);
+            ElementUtils.prototype.removeElement(this.tableList, tableId);
         };
 
         AppData.prototype.removeWindow = function (windowId) {
-            this.windowList.removeElement(windowId);
+            ElementUtils.prototype.removeElement(this.windowList, windowId);
         };
 
         AppData.prototype.removeTrigger = function (triggerId) {
-            this.triggerList.removeElement(triggerId);
+            ElementUtils.prototype.removeElement(this.triggerList, triggerId);
         };
 
         AppData.prototype.removeAggregation = function (aggregationId) {
-            this.aggregationList.removeElement(aggregationId);
+            ElementUtils.prototype.removeElement(this.aggregationList, aggregationId);
         };
 
         AppData.prototype.removeWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
-            this.windowFilterProjectionQueryList.removeElement(windowFilterProjectionQueryId);
+            ElementUtils.prototype.removeElement(this.windowFilterProjectionQueryList, windowFilterProjectionQueryId);
         };
 
         AppData.prototype.removePatternQuery = function (patternQueryId) {
-            this.patternQueryList.removeElement(patternQueryId);
+            ElementUtils.prototype.removeElement(this.patternQueryList, patternQueryId);
         };
 
         AppData.prototype.removeJoinQuery = function (joinQueryId) {
-            this.joinQueryList.removeElement(joinQueryId);
+            ElementUtils.prototype.removeElement(this.joinQueryList, joinQueryId);
         };
 
         AppData.prototype.removePartition = function (partitionId) {
-            this.partitionList.removeElement(partitionId);
+            ElementUtils.prototype.removeElement(this.partitionList, partitionId);
         };
 
         AppData.prototype.setFinalElementCount = function (finalElementCount) {
@@ -117,39 +117,39 @@ define(['require', 'elementArray', 'lodash'],
         };
 
         AppData.prototype.getStream = function (streamId) {
-            return this.streamList.getElement(streamId);
+            return ElementUtils.prototype.getElement(this.streamList, streamId);
         };
 
         AppData.prototype.getTable = function (tableId) {
-            return this.tableList.getElement(tableId);
+            return ElementUtils.prototype.getElement(this.tableList, tableId);
         };
 
         AppData.prototype.getWindow = function (windowId) {
-            return this.windowList.getElement(windowId);
+            return ElementUtils.prototype.getElement(this.windowList, windowId);
         };
 
         AppData.prototype.getTrigger = function (triggerId) {
-            return this.triggerList.getElement(triggerId);
+            return ElementUtils.prototype.getElement(this.triggerList, triggerId);
         };
 
         AppData.prototype.getAggregation = function (aggregationId) {
-            return this.aggregationList.getElement(aggregationId);
+            return ElementUtils.prototype.getElement(this.aggregationList, aggregationId);
         };
 
         AppData.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
-            return this.windowFilterProjectionQueryList.getElement(windowFilterProjectionQueryId);
+            return ElementUtils.prototype.getElement(this.windowFilterProjectionQueryList, windowFilterProjectionQueryId);
         };
 
         AppData.prototype.getPatternQuery = function (patternQueryId) {
-            return this.patternQueryList.getElement(patternQueryId);
+            return ElementUtils.prototype.getElement(this.patternQueryList, patternQueryId);
         };
 
         AppData.prototype.getJoinQuery = function (joinQueryId) {
-            return this.joinQueryList.getElement(joinQueryId);
+            return ElementUtils.prototype.getElement(this.joinQueryList, joinQueryId);
         };
 
         AppData.prototype.getPartition = function (partitionId) {
-            return this.partitionList.getElement(partitionId);
+            return ElementUtils.prototype.getElement(this.partitionList, partitionId);
         };
 
         AppData.prototype.getFinalElementCount = function () {

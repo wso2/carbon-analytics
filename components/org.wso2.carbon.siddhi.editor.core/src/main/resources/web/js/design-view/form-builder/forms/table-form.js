@@ -245,7 +245,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                 // update selected table model
                 clickedElement.setName(config.name);
                 // removing all elements from attribute list
-                clickedElement.getAttributeList().removeAllElements();
+                clickedElement.clearAttributeList();
                 // adding new attributes to the attribute list
                 _.forEach(config.attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);

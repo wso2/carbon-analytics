@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray'],
-    function (require, ElementArray) {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class Stream
@@ -51,11 +51,13 @@ define(['require', 'elementArray'],
                     }
                 ]
             */
-            this.id = options.id;
-            this.name = options.name;
-            this.isInnerStream = options.isInnerStream;
-            this.attributeList =  new ElementArray();
-            this.annotationList =  new ElementArray();
+            if (options !== undefined) {
+                this.id = options.id;
+                this.name = options.name;
+                this.isInnerStream = options.isInnerStream;
+            }
+            this.attributeList = [];
+            this.annotationList = [];
         };
 
         Stream.prototype.addAttribute = function (attribute) {
@@ -64,6 +66,14 @@ define(['require', 'elementArray'],
 
         Stream.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
+        };
+
+        Stream.prototype.clearAnnotationList = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationList);
+        };
+
+        Stream.prototype.clearAttributeList = function () {
+            ElementUtils.prototype.removeAllElements(this.attributeList);
         };
 
         Stream.prototype.getId = function () {

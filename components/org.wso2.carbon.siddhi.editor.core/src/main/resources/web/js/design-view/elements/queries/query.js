@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray'],
-    function (require, ElementArray) {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class Query
@@ -46,16 +46,18 @@ define(['require', 'elementArray'],
                 queryOutput*: {Query Output JSON},
                 annotationList: {Annotation JSON Array}
             */
-            this.id = options.id;
-            this.queryInput = options.queryInput;
-            this.select = options.select;
-            this.groupBy = options.groupBy;
-            this.orderBy = new ElementArray();
-            this.limit = options.limit;
-            this.having = options.having;
-            this.outputRateLimit = options.outputRateLimit;
-            this.queryOutput = options.queryOutput;
-            this.annotationList =  new ElementArray();
+            if (options !== undefined) {
+                this.id = options.id;
+                this.queryInput = options.queryInput;
+                this.select = options.select;
+                this.groupBy = options.groupBy;
+                this.limit = options.limit;
+                this.having = options.having;
+                this.outputRateLimit = options.outputRateLimit;
+                this.queryOutput = options.queryOutput;
+            }
+            this.orderBy = [];
+            this.annotationList = [];
         };
 
         Query.prototype.addAnnotation = function (annotation) {
@@ -64,6 +66,14 @@ define(['require', 'elementArray'],
 
         Query.prototype.addOrderByValue = function (orderByValue) {
             this.orderBy.push(orderByValue);
+        };
+
+        Query.prototype.clearAnnotationList = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationList);
+        };
+
+        Query.prototype.clearOrderByValueList = function () {
+            ElementUtils.prototype.removeAllElements(this.orderBy);
         };
 
         Query.prototype.getId = function () {

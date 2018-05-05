@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementArray'],
-    function (require, ElementArray) {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class Aggregation
@@ -29,7 +29,7 @@ define(['require', 'elementArray'],
             /*
              Data storing structure as follows
                 id: '',
-                name: '',
+                name*: '',
                 from*: ‘’,
                 select*: [
                     {
@@ -67,23 +67,25 @@ define(['require', 'elementArray'],
                     }
                 ]
             */
-            this.id = options.id;
-            this.name = options.name;
-            this.from = options.from;
-            this.select =  options.select;
-            this.groupBy =  options.groupBy;
-            this.aggregateByAttribute =  options.aggregateByAttribute;
-            this.aggregateByTimePeriod =  options.aggregateByTimePeriod;
-            this.store =  options.store;
-            this.annotationList =  new ElementArray();
-        };
-
-        Aggregation.prototype.addSelectAttribute = function (selectAttribute) {
-            this.select.push(selectAttribute);
+            if (options !== undefined) {
+                this.id = options.id;
+                this.name = options.name;
+                this.from = options.from;
+                this.select = options.select;
+                this.groupBy = options.groupBy;
+                this.aggregateByAttribute = options.aggregateByAttribute;
+                this.aggregateByTimePeriod = options.aggregateByTimePeriod;
+                this.store = options.store;
+            }
+            this.annotationList =  [];
         };
 
         Aggregation.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
+        };
+
+        Aggregation.prototype.clearAnnotationList = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationList);
         };
 
         Aggregation.prototype.getId = function () {
