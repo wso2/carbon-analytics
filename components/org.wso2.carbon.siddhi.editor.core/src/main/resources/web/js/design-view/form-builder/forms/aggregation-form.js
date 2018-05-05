@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect'],
-    function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
+        'elementUtils'],
+    function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -25,10 +26,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
          * @param {Object} options Rendering options for the view
          */
         var AggregationForm = function (options) {
-            this.configurationData = options.configurationData;
-            this.application = options.application;
-            this.formUtils = options.formUtils;
-            this.consoleListManager = options.application.outputController;
+            if (options !== undefined) {
+                this.configurationData = options.configurationData;
+                this.application = options.application;
+                this.formUtils = options.formUtils;
+                this.consoleListManager = options.application.outputController;
+            }
             this.gridContainer = $("#grid-container");
             this.toolPaletteContainer = $("#tool-palette-container");
         };
@@ -45,12 +48,46 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 '<div id="define-aggregation" class="define-aggregation"></div>');
             formContainer.append(propertyDiv);
             var aggregationElement = $("#define-aggregation")[0];
+            $(aggregationElement).append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
+                '<div id="form-aggregation-select" class="col-md-4"></div>' +
+                '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
+
+            var possibleFromSources = [];
+            _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function (stream) {
+                possibleFromSources.push(stream.getName());
+            });
+            _.forEach(self.configurationData.getSiddhiAppConfig().triggerList, function (trigger) {
+                possibleFromSources.push(trigger.getName());
+            });
+            var possibleGroupByAttributes = [];
+            var firstPossibleSourceName = possibleFromSources[0];
+
+            var firstPossibleSource =
+                self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(firstPossibleSourceName);
+            if (firstPossibleSource !== undefined) {
+                if (firstPossibleSource.type !== undefined && (firstPossibleSource.type === 'stream')) {
+                    var timestampAttributeFound = false;
+                    if (firstPossibleSource.element !== undefined) {
+                        _.forEach(firstPossibleSource.element.getAttributeList(), function (attribute) {
+                            if (attribute.getName().toLowerCase() === 'timestamp') {
+                                timestampAttributeFound = true;
+                            }
+                            possibleGroupByAttributes.push(attribute.getName());
+                        });
+                    }
+                    if (!timestampAttributeFound) {
+                        possibleGroupByAttributes.push('timestamp');
+                    }
+                } else if (firstPossibleSource.type !== undefined && (firstPossibleSource.type === 'trigger')) {
+                    possibleGroupByAttributes.push('triggered_time');
+                }
+            }
 
             // generate the form to define a aggregation
-            var editor = new JSONEditor(aggregationElement, {
+            var editorInput = new JSONEditor($('#form-aggregation-input')[0], {
                 schema: {
                     type: "object",
-                    title: "Aggregation",
+                    title: "Aggregation Input",
                     properties: {
                         name: {
                             type: "string",
@@ -62,61 +99,126 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         from: {
                             type: "string",
                             title: "From",
-                            minLength: 1,
+                            enum: possibleFromSources,
                             required: true,
                             propertyOrder: 2
-                        },
-                        querySelect: {
-                            propertyOrder: 3,
+                        }
+                    }
+                },
+                show_errors: "always",
+                disable_properties: true,
+                display_required_only: true,
+                no_additional_properties: true
+            });
+            var selectScheme = {
+                schema: {
+                    options: {
+                        disable_properties: false
+                    },
+                    type: "object",
+                    title: "Aggregation Select",
+                    properties: {
+                        select: {
+                            propertyOrder: 1,
+                            title: "Select",
                             required: true,
-                            type: "object",
-                            title: "Query Select",
-                            properties: {
-                                select: {
-                                    title: "Query Select Type",
-                                    required: true,
-                                    oneOf: [
-                                        {
-                                            $ref: "#/definitions/userDefined",
-                                            title: "User-Defined"
-                                        },
-                                        {
-                                            $ref: "#/definitions/all",
-                                            title: "All"
-                                        }
-                                    ]
+                            oneOf: [
+                                {
+                                    $ref: "#/definitions/selectAll",
+                                    title: "All Attributes"
+                                },
+                                {
+                                    $ref: "#/definitions/selectUserDefined",
+                                    title: "User Defined Attributes"
                                 }
-                            }
+                            ]
                         },
                         groupBy: {
-                            required: true,
-                            propertyOrder: 5,
+                            propertyOrder: 2,
                             type: "array",
                             format: "table",
                             title: "Group By Attributes",
                             uniqueItems: true,
+                            minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 properties: {
                                     attribute: {
+                                        type: 'string',
+                                        title: 'Attribute Name',
+                                        enum: possibleGroupByAttributes
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    definitions: {
+                        selectUserDefined: {
+                            required: true,
+                            type: "array",
+                            format: "table",
+                            title: "Select Attributes",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                title: "Value Set",
+                                type: "object",
+                                properties: {
+                                    expression: {
+                                        title: "Expression",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    as: {
+                                        title: "As",
                                         type: "string"
                                     }
                                 }
                             }
                         },
+                        selectAll: {
+                            type: "string",
+                            title: "Select All Attributes",
+                            template: '*'
+                        }
+                    }
+                },
+                show_errors: "always",
+                disable_properties: false,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true
+            };
+            var editorSelect = new JSONEditor($('#form-aggregation-select')[0], selectScheme);
+            var aggregateScheme = {
+                schema: {
+                    type: "object",
+                    title: "Aggregate By",
+                    properties: {
                         aggregateByAttribute: {
                             required: true,
-                            type: "string",
+                            type: "object",
                             title: "Aggregate by Attribute",
-                            minLength: 1,
-                            propertyOrder: 6
+                            propertyOrder: 1,
+                            properties: {
+                                attribute: {
+                                    required: true,
+                                    type: "string",
+                                    title: "Attribute Name",
+                                    enum: possibleGroupByAttributes
+                                }
+                            }
                         },
                         aggregateByTimePeriod: {
+                            required: true,
                             type: "object",
                             title: "Aggregate by Time Period",
-                            required: true,
-                            propertyOrder: 7,
+                            propertyOrder: 2,
+                            options: {
+                                disable_properties: false
+                            },
                             properties: {
                                 minValue: {
                                     type: "string",
@@ -136,9 +238,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                 maxValue: {
                                     type: "string",
                                     title: "Ending Time Value",
-                                    required: true,
                                     enum: [
-                                        "",
                                         "seconds",
                                         "minutes",
                                         "hours",
@@ -147,49 +247,48 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                         "months",
                                         "years"
                                     ],
-                                    default: ""
+                                    default: "seconds"
                                 }
                             }
-
-                        }
-                    },
-                    definitions: {
-                        userDefined: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "User Defined",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                title: "Value Set",
-                                type: "object",
-                                properties: {
-                                    expression: {
-                                        title: "Expression",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    as: {
-                                        title: "As",
-                                        type: "string"
-                                    }
-                                }
-                            }
-                        },
-                        all: {
-                            type: "string",
-                            title: "All",
-                            template: '*'
                         }
                     }
                 },
                 show_errors: "always",
-                disable_properties: false,
-                disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true,
+                disable_properties: true,
                 display_required_only: true,
                 no_additional_properties: true
+            };
+            var editorAggregate = new JSONEditor($('#form-aggregation-aggregate')[0], aggregateScheme);
+
+            var fromNode = editorInput.getEditor('root.from');
+            editorInput.watch('root.from',function() {
+                var fromValue = fromNode.getValue();
+                var inputElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(fromValue);
+                ElementUtils.prototype.removeAllElements(possibleGroupByAttributes);
+                if (inputElement !== undefined) {
+                    if (inputElement.type !== undefined && (inputElement.type === 'stream')) {
+                        var timestampAttributeFound = false;
+                        if (inputElement.element !== undefined) {
+                            _.forEach(inputElement.element.getAttributeList(), function (attribute) {
+                                if (attribute.getName().toLowerCase() === 'timestamp') {
+                                    timestampAttributeFound = true;
+                                }
+                                possibleGroupByAttributes.push(attribute.getName());
+                            });
+                        }
+                        if (!timestampAttributeFound) {
+                            possibleGroupByAttributes.push('timestamp');
+                        }
+                    } else if (inputElement.type !== undefined && (inputElement.type === 'trigger')) {
+                        possibleGroupByAttributes.push('triggered_time');
+                    }
+                }
+
+                $('#form-aggregation-select').empty();
+                editorSelect = new JSONEditor($('#form-aggregation-select')[0], selectScheme);
+                $('#form-aggregation-aggregate').empty();
+                editorAggregate = new JSONEditor($('#form-aggregation-aggregate')[0], aggregateScheme);
+                editorAggregate.setValue({aggregateByTimePeriod: editorAggregate.getValue().aggregateByTimePeriod});
             });
 
             formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
@@ -197,44 +296,51 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             // 'Submit' button action
             var submitButtonElement = $('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                var isAggregationNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name);
+                var inputErrors = editorInput.validate();
+                var selectErrors = editorSelect.validate();
+                var aggregateErrors = editorAggregate.validate();
+                if(inputErrors.length || selectErrors.length || aggregateErrors.length) {
+                    return;
+                }
+                var isAggregationNameUsed = self.formUtils.IsDefinitionElementNameUnique(editorInput.getValue().name);
                 if(isAggregationNameUsed) {
-                    alert("Aggregation name \"" + editor.getValue().name + "\" is already used.");
+                    alert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
                     return;
                 }
                 // add the new aggregation to the aggregation array
                 var aggregationOptions = {};
                 _.set(aggregationOptions, 'id', i);
-                _.set(aggregationOptions, 'name', editor.getValue().name);
-                _.set(aggregationOptions, 'from', editor.getValue().from);
-                _.set(aggregationOptions, 'aggregateByAttribute', editor.getValue().aggregateByAttribute);
+                _.set(aggregationOptions, 'name', editorInput.getValue().name);
+                _.set(aggregationOptions, 'from', editorInput.getValue().from);
+                _.set(aggregationOptions, 'aggregateByAttribute',
+                    editorAggregate.getValue().aggregateByAttribute.attribute);
 
                 var selectAttributeOptions = {};
-                if (editor.getValue().querySelect.select instanceof Array) {
+                if (editorSelect.getValue().select instanceof Array) {
                     _.set(selectAttributeOptions, 'type', 'user_defined');
-                    _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
-                } else if (editor.getValue().querySelect.select === "*") {
+                    _.set(selectAttributeOptions, 'value', editorSelect.getValue().select);
+                } else if (editorSelect.getValue().select === "*") {
                     _.set(selectAttributeOptions, 'type', 'all');
-                    _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
+                    _.set(selectAttributeOptions, 'value', editorSelect.getValue().select);
                 } else {
                     console.log("Value other than \"user_defined\" and \"all\" received!");
                 }
                 var selectObject = new QuerySelect(selectAttributeOptions);
                 _.set(aggregationOptions, 'select', selectObject);
 
-                if (editor.getValue().groupBy !== undefined) {
+                if (editorSelect.getValue().groupBy !== undefined) {
                     var groupByAttributes = [];
-                    _.forEach(editor.getValue().groupBy, function (groupByAttribute) {
+                    _.forEach(editorSelect.getValue().groupBy, function (groupByAttribute) {
                         groupByAttributes.push(groupByAttribute.attribute);
                     });
                     _.set(aggregationOptions, 'groupBy', groupByAttributes);
                 } else {
-                    _.set(aggregationOptions, 'groupBy', '');
+                    _.set(aggregationOptions, 'groupBy', undefined);
                 }
 
-                var aggregateByTimePeriod = new AggregateByTimePeriod(editor.getValue().aggregateByTimePeriod);
-                if (editor.getValue().aggregateByTimePeriod === undefined) {
-                    aggregateByTimePeriod.setMaxValue('');
+                var aggregateByTimePeriod = new AggregateByTimePeriod(editorAggregate.getValue().aggregateByTimePeriod);
+                if (editorAggregate.getValue().aggregateByTimePeriod.maxValue === undefined) {
+                    aggregateByTimePeriod.setMaxValue(undefined);
                 }
                 _.set(aggregationOptions, 'aggregateByTimePeriod', aggregateByTimePeriod);
 
@@ -242,7 +348,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 self.configurationData.getSiddhiAppConfig().addAggregation(aggregation);
 
                 var textNode = $('#'+i).find('.aggregationNameNode');
-                textNode.html(editor.getValue().name);
+                textNode.html(editorInput.getValue().name);
 
                 // close the form aggregation
                 self.consoleListManager.removeConsole(formConsole);
@@ -252,7 +358,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 self.toolPaletteContainer.removeClass("disabledbutton");
 
             });
-            return editor.getValue().name;
+            return editorInput.getValue().name;
         };
 
         /**
@@ -289,21 +395,80 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 groupBy.push(groupByAttributeObject);
             });
 
-            var fillWith = {
+            var fillInput = {
                 name : name,
-                from : from,
-                querySelect : {
-                    select: select
-                },
-                groupBy : groupBy,
-                aggregateByAttribute : aggregateByAttribute,
-                aggregateByTimePeriod : aggregateByTimePeriod
+                from : from
             };
+
+            var fillSelect = {};
+            if (groupBy.length === 0) {
+                fillSelect = {
+                    select: select
+                };
+            } else {
+                fillSelect = {
+                    select: select,
+                    groupBy : groupBy
+                };
+            }
+
+            var fillAggregate = {};
+            if (aggregateByTimePeriod.getMaxValue() === undefined) {
+                fillAggregate = {
+                    aggregateByAttribute: {
+                        attribute : aggregateByAttribute
+                    },
+                    aggregateByTimePeriod : {
+                        minValue: aggregateByTimePeriod.getMinValue()
+                    }
+                };
+            } else {
+                fillAggregate = {
+                    aggregateByAttribute: {
+                        attribute : aggregateByAttribute
+                    },
+                    aggregateByTimePeriod : aggregateByTimePeriod
+                };
+            }
+
+            $(formContainer).append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
+                '<div id="form-aggregation-select" class="col-md-4"></div>' +
+                '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
+
+            var possibleFromSources = [];
+            _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function (stream) {
+                possibleFromSources.push(stream.getName());
+            });
+            _.forEach(self.configurationData.getSiddhiAppConfig().triggerList, function (trigger) {
+                possibleFromSources.push(trigger.getName());
+            });
+
+            var possibleGroupByAttributes = [];
+            var savedSource = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(from);
+            if (savedSource !== undefined) {
+                if (savedSource.type !== undefined && (savedSource.type === 'stream')) {
+                    var timestampAttributeFound = false;
+                    if (savedSource.element !== undefined) {
+                        _.forEach(savedSource.element.getAttributeList(), function (attribute) {
+                            if (attribute.getName().toLowerCase() === 'timestamp') {
+                                timestampAttributeFound = true;
+                            }
+                            possibleGroupByAttributes.push(attribute.getName());
+                        });
+                    }
+                    if (!timestampAttributeFound) {
+                        possibleGroupByAttributes.push('timestamp');
+                    }
+                } else if (savedSource.type !== undefined && (savedSource.type === 'trigger')) {
+                    possibleGroupByAttributes.push('triggered_time');
+                }
+            }
+
             // generate the form to define a aggregation
-            var editor = new JSONEditor(formContainer[0], {
+            var editorInput = new JSONEditor($('#form-aggregation-input')[0], {
                 schema: {
                     type: "object",
-                    title: "Aggregation",
+                    title: "Aggregation Input",
                     properties: {
                         name: {
                             type: "string",
@@ -315,61 +480,128 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         from: {
                             type: "string",
                             title: "From",
-                            minLength: 1,
+                            enum: possibleFromSources,
                             required: true,
                             propertyOrder: 2
-                        },
-                        querySelect: {
-                            propertyOrder: 3,
+                        }
+                    }
+                },
+                startval: fillInput,
+                show_errors: "always",
+                disable_properties: true,
+                display_required_only: true,
+                no_additional_properties: true
+            });
+            var selectScheme = {
+                schema: {
+                    options: {
+                        disable_properties: false
+                    },
+                    type: "object",
+                    title: "Aggregation Select",
+                    properties: {
+                        select: {
+                            propertyOrder: 1,
+                            title: "Select",
                             required: true,
-                            type: "object",
-                            title: "Query Select",
-                            properties: {
-                                select: {
-                                    title: "Query Select Type",
-                                    required: true,
-                                    oneOf: [
-                                        {
-                                            $ref: "#/definitions/userDefined",
-                                            title: "User-Defined"
-                                        },
-                                        {
-                                            $ref: "#/definitions/all",
-                                            title: "All"
-                                        }
-                                    ]
+                            oneOf: [
+                                {
+                                    $ref: "#/definitions/selectAll",
+                                    title: "All Attributes"
+                                },
+                                {
+                                    $ref: "#/definitions/selectUserDefined",
+                                    title: "User Defined Attributes"
                                 }
-                            }
+                            ]
                         },
                         groupBy: {
-                            required: true,
-                            propertyOrder: 5,
+                            propertyOrder: 2,
                             type: "array",
                             format: "table",
                             title: "Group By Attributes",
                             uniqueItems: true,
+                            minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 properties: {
                                     attribute: {
+                                        type: 'string',
+                                        title: 'Attribute Name',
+                                        enum: possibleGroupByAttributes
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    definitions: {
+                        selectUserDefined: {
+                            required: true,
+                            type: "array",
+                            format: "table",
+                            title: "Select Attributes",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                title: "Value Set",
+                                type: "object",
+                                properties: {
+                                    expression: {
+                                        title: "Expression",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    as: {
+                                        title: "As",
                                         type: "string"
                                     }
                                 }
                             }
                         },
+                        selectAll: {
+                            type: "string",
+                            title: "Select All Attributes",
+                            template: '*'
+                        }
+                    }
+                },
+                show_errors: "always",
+                startval: fillSelect,
+                disable_properties: false,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true,
+                display_required_only: true,
+                no_additional_properties: true
+            };
+            var editorSelect = new JSONEditor($('#form-aggregation-select')[0], selectScheme);
+            var aggregateScheme = {
+                schema: {
+                    type: "object",
+                    title: "Aggregate By",
+                    properties: {
                         aggregateByAttribute: {
                             required: true,
-                            type: "string",
+                            type: "object",
                             title: "Aggregate by Attribute",
-                            minLength: 1,
-                            propertyOrder: 6
+                            propertyOrder: 1,
+                            properties: {
+                                attribute: {
+                                    required: true,
+                                    type: "string",
+                                    title: "Attribute Name",
+                                    enum: possibleGroupByAttributes
+                                }
+                            }
                         },
                         aggregateByTimePeriod: {
+                            required: true,
                             type: "object",
                             title: "Aggregate by Time Period",
-                            required: true,
-                            propertyOrder: 7,
+                            propertyOrder: 2,
+                            options: {
+                                disable_properties: false
+                            },
                             properties: {
                                 minValue: {
                                     type: "string",
@@ -389,9 +621,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                 maxValue: {
                                     type: "string",
                                     title: "Ending Time Value",
-                                    required: true,
                                     enum: [
-                                        "",
                                         "seconds",
                                         "minutes",
                                         "hours",
@@ -400,51 +630,51 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                         "months",
                                         "years"
                                     ],
-                                    default: ""
+                                    default: "seconds"
                                 }
                             }
-
-                        }
-                    },
-                    definitions: {
-                        userDefined: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "User Defined",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                title: "Value Set",
-                                type: "object",
-                                properties: {
-                                    expression: {
-                                        title: "Expression",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    as: {
-                                        title: "As",
-                                        type: "string"
-                                    }
-                                }
-                            }
-                        },
-                        all: {
-                            type: "string",
-                            title: "All",
-                            template: '*'
                         }
                     }
                 },
+                startval: fillAggregate,
                 show_errors: "always",
-                startval: fillWith,
-                disable_properties: false,
-                disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true,
+                disable_properties: true,
                 display_required_only: true,
                 no_additional_properties: true
+            };
+            var editorAggregate = new JSONEditor($('#form-aggregation-aggregate')[0], aggregateScheme);
+
+            var fromNode = editorInput.getEditor('root.from');
+            editorInput.watch('root.from',function() {
+                var fromValue = fromNode.getValue();
+                var inputElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(fromValue);
+                ElementUtils.prototype.removeAllElements(possibleGroupByAttributes);
+                if (inputElement !== undefined) {
+                    if (inputElement.type !== undefined && (inputElement.type === 'stream')) {
+                        var timestampAttributeFound = false;
+                        if (inputElement.element !== undefined) {
+                            _.forEach(inputElement.element.getAttributeList(), function (attribute) {
+                                if (attribute.getName().toLowerCase() === 'timestamp') {
+                                    timestampAttributeFound = true;
+                                }
+                                possibleGroupByAttributes.push(attribute.getName());
+                            });
+                        }
+                        if (!timestampAttributeFound) {
+                            possibleGroupByAttributes.push('timestamp');
+                        }
+                    } else if (inputElement.type !== undefined && (inputElement.type === 'trigger')) {
+                        possibleGroupByAttributes.push('triggered_time');
+                    }
+                }
+
+                $('#form-aggregation-select').empty();
+                editorSelect = new JSONEditor($('#form-aggregation-select')[0], selectScheme);
+                $('#form-aggregation-aggregate').empty();
+                editorAggregate = new JSONEditor($('#form-aggregation-aggregate')[0], aggregateScheme);
+                editorAggregate.setValue({aggregateByTimePeriod: editorAggregate.getValue().aggregateByTimePeriod});
             });
+
             $(formContainer).append('<div id="form-submit"><button type="button" ' +
                 'class="btn btn-default">Submit</button></div>' +
                 '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
@@ -452,54 +682,62 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             // 'Submit' button action
             var submitButtonElement = $('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                var isAggregationNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name,
+                var inputErrors = editorInput.validate();
+                var selectErrors = editorSelect.validate();
+                var aggregateErrors = editorAggregate.validate();
+                if(inputErrors.length || selectErrors.length || aggregateErrors.length) {
+                    return;
+                }
+                var isAggregationNameUsed = self.formUtils.IsDefinitionElementNameUnique(editorInput.getValue().name,
                     clickedElement.getId());
                 if(isAggregationNameUsed) {
-                    alert("Aggregation name \"" + editor.getValue().name + "\" is already used.");
+                    alert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
                     return;
                 }
                 // The container and the palette are disabled to prevent the user from dropping any elements
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
 
-                var config = editor.getValue();
+                var configInput = editorInput.getValue();
+                var configSelect = editorSelect.getValue();
+                var configAggregate = editorAggregate.getValue();
 
                 // update selected aggregation model
-                clickedElement.setName(config.name);
-                clickedElement.setFrom(config.from);
-                clickedElement.setAggregateByAttribute(config.aggregateByAttribute);
+                clickedElement.setName(configInput.name);
+                clickedElement.setFrom(configInput.from);
+                clickedElement.setAggregateByAttribute(configAggregate.aggregateByAttribute.attribute);
 
                 var selectAttributeOptions = {};
-                if (config.querySelect.select instanceof Array) {
+                if (configSelect.select instanceof Array) {
                     _.set(selectAttributeOptions, 'type', 'user_defined');
-                    _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
-                } else if (config.querySelect.select === "*") {
+                    _.set(selectAttributeOptions, 'value', configSelect.select);
+                } else if (configSelect.select === "*") {
                     _.set(selectAttributeOptions, 'type', 'all');
-                    _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
+                    _.set(selectAttributeOptions, 'value', configSelect.select);
                 } else {
                     console.log("Value other than \"user_defined\" and \"all\" received!");
                 }
                 var selectObject = new QuerySelect(selectAttributeOptions);
                 clickedElement.setSelect(selectObject);
 
-                if (config.groupBy !== undefined) {
+                if (configSelect.groupBy !== undefined) {
                     var groupByAttributes = [];
-                    _.forEach(config.groupBy, function (groupByAttribute) {
+                    _.forEach(configSelect.groupBy, function (groupByAttribute) {
                         groupByAttributes.push(groupByAttribute.attribute);
                     });
                     clickedElement.setGroupBy(groupByAttributes);
                 } else {
-                    clickedElement.setGroupBy('');
+                    clickedElement.setGroupBy(undefined);
                 }
 
-                var aggregateByTimePeriod = new AggregateByTimePeriod(config.aggregateByTimePeriod);
-                if (config.aggregateByTimePeriod === undefined) {
-                    aggregateByTimePeriod.setMaxValue('');
+                var aggregateByTimePeriod = new AggregateByTimePeriod(configAggregate.aggregateByTimePeriod);
+                if (configAggregate.aggregateByTimePeriod.maxValue === undefined) {
+                    aggregateByTimePeriod.setMaxValue(undefined);
                 }
                 clickedElement.setAggregateByTimePeriod(aggregateByTimePeriod);
 
                 var textNode = $(element).parent().find('.aggregationNameNode');
-                textNode.html(config.name);
+                textNode.html(configInput.name);
 
                 // close the form aggregation
                 self.consoleListManager.removeConsole(formConsole);

@@ -31,8 +31,10 @@ define(
                 minValue*: '', // At least one value should be added, and that will be marked as the minValue
                 maxValue: '' // Max value is added if the user wants to define a range of timestamps
             */
-            this.minValue = options.minValue;
-            this.maxValue = options.maxValue;
+            if (options !== undefined) {
+                this.minValue = options.minValue;
+                this.maxValue = options.maxValue;
+            }
         };
 
         AggregateByTimePeriod.prototype.getMinValue = function () {
