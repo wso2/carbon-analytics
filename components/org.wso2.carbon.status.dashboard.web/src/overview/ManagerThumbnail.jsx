@@ -227,13 +227,13 @@ export default class ManagerThumbnail extends React.Component {
                 Object.keys(workersList).map((id, workerList) => {
                     if (id === 'ResourceCluster') {
                         return (
-                            <div style={{marginLeft: '-60px', height: '100%'}}>
+                            <div style={{marginLeft: '-60px', height: '200%'}}>
                                 <h4 style={styles.h3Title}>Workers</h4>
                                 <div style={{
                                     display: 'flex',
                                     flexWrap: 'wrap',
                                     width: '290%',
-                                    height: '100%',
+                                    height: '200%',
                                     padding: '40px',
                                     justifyContent: 'space-around',
                                     backgroundColor: '#222222'
@@ -265,65 +265,6 @@ export default class ManagerThumbnail extends React.Component {
                             </div>
                         )
 
-                    } else if(id !=='Never Reached' && id !== 'Single Node Deployments' && id !=='ResourceCluster' && id !== " ") {
-                        return (
-                            <div style={{marginLeft: '-60px', height: '100%'}}>
-                                <h3 style={styles.h3}>HA Deployments</h3>
-                                <Divider inset={true} style={{width: '300%',marginLeft: '22px'}}/>
-                                <h3 style={styles.h3Title}>Group Id : {id}</h3>
-                                <div style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    width: '290%',
-                                    height: '100%',
-                                    padding: '40px',
-                                    justifyContent: 'space-around',
-                                    backgroundColor: '#222222'
-                                }}>
-
-                                    <GridList cols={3} padding={50} cellHeight={300} style={style.gridList}>
-                                        {workersList[id].map((worker) => {
-
-                                            return (
-                                                <div>
-                                                    <WorkerThumbnail worker={worker}
-                                                                     currentTime={new Date().getTime()}/>
-                                                </div>
-                                            )
-                                        })}
-                                    </GridList>
-                                </div>
-                            </div>
-                        )
-                    } else {
-                        return (
-                            <div style={{marginLeft: '-60px', height: '100%'}}>
-                                <h3 style={styles.h3}>{id}</h3>
-                                <Divider inset={true} style={{width: '320%',marginLeft: '22px'}}/>
-                                <div style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    width: '290%',
-                                    height: '100%',
-                                    padding: '40px',
-                                    justifyContent: 'space-around',
-                                    backgroundColor: '#222222'
-                                }}>
-
-                                    <GridList cols={3} padding={50} cellHeight={300} style={style.gridList}>
-                                        {workersList[id].map((worker) => {
-
-                                            return (
-                                                <div>
-                                                    <WorkerThumbnail worker={worker}
-                                                                     currentTime={new Date().getTime()}/>
-                                                </div>
-                                            )
-                                        })}
-                                    </GridList>
-                                </div>
-                            </div>
-                        )
                     }
 
                 })
