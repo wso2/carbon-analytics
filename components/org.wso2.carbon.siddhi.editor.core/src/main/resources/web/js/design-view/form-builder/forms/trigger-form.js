@@ -88,7 +88,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 if(errors.length) {
                     return;
                 }
-                var isTriggerNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name);
+                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
                 if (isTriggerNameUsed) {
                     alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
                     return;
@@ -180,7 +180,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 if(errors.length) {
                     return;
                 }
-                var isTriggerNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name,
+                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
                     clickedElement.getId());
                 if (isTriggerNameUsed) {
                     alert("Trigger name \"" + editor.getValue().name + "\" is already used.");

@@ -33,6 +33,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
             if (options !== undefined) {
                 this.configurationData = options.configurationData;
                 this.application = options.application;
+                this.formUtils = options.formUtils;
                 this.consoleListManager = options.application.outputController;
             }
             this.gridContainer = $("#grid-container");

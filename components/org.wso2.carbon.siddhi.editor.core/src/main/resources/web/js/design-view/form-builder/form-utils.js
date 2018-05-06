@@ -35,7 +35,7 @@ define(['require', 'lodash'],
          *          saving the same name after editing a particular element
          * @return {boolean}
          */
-        FormUtils.prototype.IsDefinitionElementNameUnique = function (elementName, skipElementID) {
+        FormUtils.prototype.isDefinitionElementNameUnique = function (elementName, skipElementID) {
             var self = this;
             var isNameUsed = false;
             var streamList = self.configurationData.getSiddhiAppConfig().streamList;
@@ -56,6 +56,30 @@ define(['require', 'lodash'],
             });
 
             return isNameUsed;
+        };
+
+        /**
+         * @function This method removes undefined, null, empty arrays, empty object property fields from a JSON object
+         * @param objectElement object which is needed to be cleaned
+         * @return cleaned element
+         */
+        FormUtils.prototype.cleanJSONObject = function (objectElement) {
+            var self = this;
+            for (var propertyName in objectElement) {
+                if (objectElement.hasOwnProperty(propertyName)
+                    && (objectElement[propertyName] === null
+                        || (!_.isNumber(objectElement[propertyName]) && _.isEmpty(objectElement[propertyName]))
+                        || objectElement[propertyName] === undefined)) {
+                    delete objectElement[propertyName];
+                } else if (objectElement.hasOwnProperty(propertyName)
+                    && objectElement[propertyName] instanceof Object) {
+                    self.cleanJSONObject(objectElement[propertyName]);
+                    if (objectElement.hasOwnProperty(propertyName) && _.isEmpty(objectElement[propertyName])) {
+                        delete objectElement[propertyName];
+                    }
+                }
+            }
+            return objectElement;
         };
 
         return FormUtils;

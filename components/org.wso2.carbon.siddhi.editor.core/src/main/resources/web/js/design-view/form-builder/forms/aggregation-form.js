@@ -302,7 +302,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 if(inputErrors.length || selectErrors.length || aggregateErrors.length) {
                     return;
                 }
-                var isAggregationNameUsed = self.formUtils.IsDefinitionElementNameUnique(editorInput.getValue().name);
+                var isAggregationNameUsed = self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name);
                 if(isAggregationNameUsed) {
                     alert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
                     return;
@@ -688,7 +688,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 if(inputErrors.length || selectErrors.length || aggregateErrors.length) {
                     return;
                 }
-                var isAggregationNameUsed = self.formUtils.IsDefinitionElementNameUnique(editorInput.getValue().name,
+                var isAggregationNameUsed = self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name,
                     clickedElement.getId());
                 if(isAggregationNameUsed) {
                     alert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");

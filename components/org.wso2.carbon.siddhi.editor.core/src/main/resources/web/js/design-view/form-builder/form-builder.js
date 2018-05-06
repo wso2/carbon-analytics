@@ -321,6 +321,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
             var windowFilterProjectionQueryForm = new WindowFilterProjectionQueryForm(formOptions);
             windowFilterProjectionQueryForm.generatePropertiesForm(element, formConsole, formContainer);
         };
@@ -337,6 +338,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
             var patternQueryForm = new PatternQueryForm(formOptions);
             patternQueryForm.generatePropertiesForm(element, formConsole, formContainer);
         };
@@ -353,6 +355,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
             var joinQueryForm = new JoinQueryForm(formOptions);
             joinQueryForm.generatePropertiesForm(element, formConsole, formContainer);
         };

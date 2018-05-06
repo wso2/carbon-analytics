@@ -114,7 +114,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                 if(errors.length) {
                     return;
                 }
-                var isTableNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name);
+                var isTableNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
                 if (isTableNameUsed) {
                     alert("Table name \"" + editor.getValue().name + "\" is already used.");
                     return;
@@ -237,7 +237,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                 if(errors.length) {
                     return;
                 }
-                var isTableNameUsed = self.formUtils.IsDefinitionElementNameUnique(editor.getValue().name,
+                var isTableNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
                     clickedElement.getId());
                 if (isTableNameUsed) {
                     alert("Table name \"" + editor.getValue().name + "\" is already used.");
