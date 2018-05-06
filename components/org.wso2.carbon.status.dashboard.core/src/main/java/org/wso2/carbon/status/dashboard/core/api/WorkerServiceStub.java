@@ -97,7 +97,4 @@ public interface WorkerServiceStub {
     @Headers("Content-Type: application/json")
     @RequestLine("GET /resourceClusterWorkers/clusteredWorkerNodeDetails")
     Response getClusterNodeDetails();
-
-
-
 }
