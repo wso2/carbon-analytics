@@ -24,7 +24,6 @@ package org.wso2.carbon.status.dashboard.core.model;
  */
 public class WorkerOverview {
     private String workerId;
-//    // TODO: 4/24/18 testing
     private String nodeId;
     private Long lastUpdate;
     private String statusMessage;
