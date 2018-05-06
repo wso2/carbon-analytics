@@ -17,34 +17,34 @@
  *
  */
 
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import {Link} from 'react-router-dom';
 //Material UI
-import { CardActions, Button, IconButton, Snackbar, Tooltip, Typography } from "material-ui-next";
-import {Dialog, GridList, GridTile} from "material-ui";
-import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
-import Delete from "material-ui/svg-icons/action/delete";
-import TrendDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
-import TrendUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
+import {Button, CardActions, IconButton, Snackbar, Tooltip, Typography} from 'material-ui-next';
+import {Dialog, GridList, GridTile} from 'material-ui';
+import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
+import Delete from 'material-ui/svg-icons/action/delete';
+import TrendDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
+import TrendUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
 import '../../public/css/dashboard.css';
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import { HttpStatus } from '../utils/Constants';
-import OverviewChart from "./OverviewChart";
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import Clock from "./Clock";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import {HttpStatus} from '../utils/Constants';
+import OverviewChart from './OverviewChart';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import Clock from './Clock';
 
 const styles = {
-    gridList: { width: '100%', height: 150, margin: 0 },
-    smallIcon: { width: 20, height: 20, zIndex: 1, padding:5 },
-    overviewLegend: { fontSize: 10, color: '#fff' },
-    legendContainer: { width: '100%', textAlign: 'center', position: 'absolute', bottom: 5 }
+    gridList: {width: '100%', height: 150, margin: 0},
+    smallIcon: {width: 20, height: 20, zIndex: 1, padding: 5},
+    overviewLegend: {fontSize: 10, color: '#fff'},
+    legendContainer: {width: '100%', textAlign: 'center', position: 'absolute', bottom: 5}
 };
-const messageBoxStyle = { textAlign: "center", color: "white" };
-const errorMessageStyle = { backgroundColor: "#FF5722", color: "white" };
-const successMessageStyle = { backgroundColor: "#4CAF50", color: "white" };
-const constants = { memory: "memory", cpu: "cpu", load: "load", down: "down", up: "up", na: "n/a" };
+const messageBoxStyle = {textAlign: "center", color: "white"};
+const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
+const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
+const constants = {memory: "memory", cpu: "cpu", load: "load", down: "down", up: "up", na: "n/a"};
 
 export default class WorkerThumbnail extends React.Component {
     constructor(props) {
@@ -64,6 +64,7 @@ export default class WorkerThumbnail extends React.Component {
         this.showError = this.showError.bind(this);
         this.showMessage = this.showMessage.bind(this);
     }
+
     componentWillMount() {
         let that = this;
         AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
@@ -73,6 +74,7 @@ export default class WorkerThumbnail extends React.Component {
                 });
             });
     }
+
     showError(message) {
         this.setState({
             messageStyle: errorMessageStyle,
@@ -90,7 +92,7 @@ export default class WorkerThumbnail extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({ worker: nextProps.worker })
+        this.setState({worker: nextProps.worker})
     }
 
     deleteWorker() {
@@ -98,23 +100,24 @@ export default class WorkerThumbnail extends React.Component {
         StatusDashboardAPIS.deleteWorkerByID(this.props.worker.workerId)
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
-                    that.setState({ open: false });
+                    that.setState({open: false});
                     that.showMessage("Worker '" + this.props.worker.workerId + "' is deleted successfully !!");
                     setTimeout(function () {
                         window.location.href = window.contextPath;
                     }, 1000)
                 }
                 else {
-                    that.setState({ open: false });
+                    that.setState({open: false});
                     that.showError("Worker '" + this.props.worker.workerId + "' is not deleted successfully !!");
                 }
             });
 
     }
+
     renderTime(lastUpdate) {
         if (lastUpdate === "#") {
             return (
-                <Clock lastUpdate={this.props.worker.lastUpdate} />
+                <Clock lastUpdate={this.props.worker.lastUpdate}/>
             )
         } else {
             return (
@@ -122,6 +125,7 @@ export default class WorkerThumbnail extends React.Component {
             )
         }
     }
+
     /**
      * Method which render delete worker button if permission is granted
      * @param workersList
@@ -132,19 +136,22 @@ export default class WorkerThumbnail extends React.Component {
             return (
                 <Tooltip id="tooltip-icon" title="Delete Worker">
                     <IconButton className={'btn-delete'} iconStyle={styles.smallIcon}
-                        style={{ zIndex: 1 }} onClick={() => { this.setState({ open: true }) }}>
+                                style={{zIndex: 1}} onClick={() => {
+                        this.setState({open: true})
+                    }}>
                         <Delete color="grey"/>
                     </IconButton>
                 </Tooltip>
             )
         } else {
             return (
-                <IconButton iconStyle={{ width: 20, height: 20, display: 'none' }} tooltip="Delete Worker"
-                    tooltipPosition="bottom-center" onClick={() => {
-                    }}><Delete color="grey" /></IconButton>
+                <IconButton iconStyle={{width: 20, height: 20, display: 'none'}} tooltip="Delete Worker"
+                            tooltipPosition="bottom-center" onClick={() => {
+                }}><Delete color="grey"/></IconButton>
             )
         }
     }
+
     renderGridTile() {
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
@@ -152,7 +159,7 @@ export default class WorkerThumbnail extends React.Component {
             if (this.props.worker.statusMessage == null) {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={98} style={styles.gridList}>
-                        <h2 style={{ textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>
+                        <h2 style={{textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>
                             Worker is not reachable!</h2>
                     </GridList>
                 </div>;
@@ -161,10 +168,10 @@ export default class WorkerThumbnail extends React.Component {
             } else {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={98} style={styles.gridList}>
-                        <h2 style={{ textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>
+                        <h2 style={{textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>
                             Worker is not reachable!
-                            <br />
-                            <text style={{ textAlign: 'center', fontSize: 12, color: '#dedede' }}>
+                            <br/>
+                            <text style={{textAlign: 'center', fontSize: 12, color: '#dedede'}}>
                                 {this.props.worker.statusMessage}
                             </text>
                         </h2>
@@ -176,8 +183,8 @@ export default class WorkerThumbnail extends React.Component {
             //statistics disabled workers
         } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>
-                <Link style={{ textDecoration: 'none' }}
-                    to={window.contextPath + '/worker/' + this.props.worker.workerId}>
+                <Link style={{textDecoration: 'none'}}
+                      to={window.contextPath + '/worker/' + this.props.worker.workerId}>
                     <GridList cols={2} cellHeight={98} style={styles.gridList}>
                         <GridTile>
                             <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
@@ -190,9 +197,9 @@ export default class WorkerThumbnail extends React.Component {
                             </div>
                         </GridTile>
                         <GridTile>
-                            <div className="grid-tile-h1" style={{ marginTop: 30 }}><h1
+                            <div className="grid-tile-h1" style={{marginTop: 30}}><h1
                                 className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
-                                <h1 style={{ display: 'inline' }}> | </h1>
+                                <h1 style={{display: 'inline'}}> | </h1>
                                 <h1 className="inactive-apps">
                                     {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
                                 </h1>
@@ -267,16 +274,16 @@ export default class WorkerThumbnail extends React.Component {
 
             if (this.props.worker.serverDetails.osName === "windows") {
                 loadAvg = <h4 style={{margin: 0}}>N/A in Windows</h4>;
-                loadTrendImg = <div />;
+                loadTrendImg = <div/>;
             } else {
                 loadAvg = <h1>{this.props.worker.serverDetails.workerMetrics.loadAverage}</h1>;
-                loadTrendImg = loadTrend === constants.up ? <TrendUp style={{ color: 'red' }} /> :
-                    <TrendDown style={{ color: 'green' }} />
+                loadTrendImg = loadTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                    <TrendDown style={{color: 'green'}}/>
             }
             gridTiles =
                 <div>
-                    <Link style={{ textDecoration: 'none' }}
-                        to={window.contextPath + '/worker/' + this.props.worker.workerId}>
+                    <Link style={{textDecoration: 'none'}}
+                          to={window.contextPath + '/worker/' + this.props.worker.workerId}>
                         <GridList className={'node-overview'} cols={4} cellHeight={98} style={styles.gridList}>
                             <GridTile>
                                 <OverviewChart
@@ -305,8 +312,10 @@ export default class WorkerThumbnail extends React.Component {
                             </GridTile>
 
                             <GridTile>
-                                <div className="grid-tile-h1" style={{display: 'flex',
-                                    alignItems: 'center', height: '100%'}}>
+                                <div className="grid-tile-h1" style={{
+                                    display: 'flex',
+                                    alignItems: 'center', height: '100%'
+                                }}>
                                     {loadAvg}</div>
                                 <div style={styles.legendContainer}>
                                     <Typography style={styles.overviewLegend} align={'center'}>
@@ -368,7 +377,7 @@ export default class WorkerThumbnail extends React.Component {
             >Yes</Button>,
             <Button
                 onClick={() => {
-                    this.setState({ open: false })
+                    this.setState({open: false})
                 }}
                 className="btn-default"
             >NO</Button>,
@@ -382,38 +391,42 @@ export default class WorkerThumbnail extends React.Component {
                     modal={true}
                     open={this.state.open}
                     onRequestClose={() => {
-                        this.setState({ open: false })
+                        this.setState({open: false})
                     }}>
                     {"Do you want to delete worker '" + this.state.workerID + "' ?"}
                 </Dialog>
 
-                <GridTile style={{ background: 'black'}}>
-                    <div style={{display: 'flex', alignItems: 'center', background: titleBg,
-                        position: 'absolute', bottom: 0, width: '100%'}}>
+                <GridTile style={{background: 'black'}}>
+                    <div style={{
+                        display: 'flex', alignItems: 'center', background: titleBg,
+                        position: 'absolute', bottom: 0, width: '100%'
+                    }}>
                         <IconButton><CircleBorder
-                            color={items[2]} /></IconButton>
+                            color={items[2]}/></IconButton>
                         <div>
                             <Typography className={'node-title'}>
                                 {this.state.workerID}</Typography>
                             <Typography className={'node-last-update'}>
                                 <span>Last Updated: {this.renderTime(items[1])}
-                                    <div style={{ float: 'right', display: 'inline' }}><strong>{items[3]}</strong>
+                                    <div style={{float: 'right', display: 'inline'}}><strong>{items[3]}</strong>
                                     </div>
                                 </span>
                             </Typography>
                         </div>
                     </div>
-                    <CardActions style={{ position: 'absolute', right: 0,
-                        display: 'inline', height: 20, padding: 5 }}>
+                    <CardActions style={{
+                        position: 'absolute', right: 0,
+                        display: 'inline', height: 20, padding: 5
+                    }}>
                         {this.renderDeleteWorker()}
                     </CardActions>
                     {items[0]}
                 </GridTile>
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle} open={this.state.showMsg}
-                    message={this.state.message} autoHideDuration={4000}
-                    onRequestClose={() => {
-                        this.setState({ showMsg: false, message: "" })
-                    }} />
+                          message={this.state.message} autoHideDuration={4000}
+                          onRequestClose={() => {
+                              this.setState({showMsg: false, message: ""})
+                          }}/>
             </div>
         );
     }
