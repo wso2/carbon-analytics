@@ -27,6 +27,7 @@ import org.wso2.carbon.sp.jobmanager.core.appcreator.DeployableSiddhiQueryGroup;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SPSiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
+import org.wso2.carbon.sp.jobmanager.core.bean.ZooKeeperConfig;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
@@ -77,7 +78,9 @@ public class SiddhiTopologyCreatorTestCase {
         String zooKeeperURL = "localhost:2181";
         DeploymentConfig deploymentConfig = new DeploymentConfig();
         deploymentConfig.setBootstrapURLs(bootstrapSeverURL);
-        deploymentConfig.setZooKeeperURLs(zooKeeperURL);
+        ZooKeeperConfig zooKeeperConfig = new ZooKeeperConfig();
+        zooKeeperConfig.setZooKeeperURLs(zooKeeperURL);
+        deploymentConfig.setZooKeeperConfig(zooKeeperConfig);
         ServiceDataHolder.setDeploymentConfig(deploymentConfig);
         count = new AtomicInteger(0);
         errorAssertionCount = new AtomicInteger(0);

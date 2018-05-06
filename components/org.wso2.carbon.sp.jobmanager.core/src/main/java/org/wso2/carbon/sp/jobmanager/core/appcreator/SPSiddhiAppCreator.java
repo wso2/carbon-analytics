@@ -23,6 +23,7 @@ import kafka.utils.ZkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.sp.jobmanager.core.bean.ZooKeeperConfig;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.OutputStreamDataHolder;
@@ -114,12 +115,14 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         int timeout = 120;
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
         String[] bootstrapServerURLs = bootstrapServerURL.replaceAll("\\s+", "").split(",");
-        String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
+        ZooKeeperConfig zooKeeperConfig = ServiceDataHolder.getDeploymentConfig().getZooKeeperConfig();
+        String zooKeeperServerURL = zooKeeperConfig.getZooKeeperURLs();
         String[] zooKeeperServerURLs = zooKeeperServerURL.replaceAll("\\s+", "").split(",");
 
         boolean isSecureKafkaCluster = false;
         SafeZkClient safeZkClient = new SafeZkClient();
-        ZkUtils zkUtils = safeZkClient.createZkClient(zooKeeperServerURLs, isSecureKafkaCluster);
+        ZkUtils zkUtils = safeZkClient.createZkClient(zooKeeperServerURLs, isSecureKafkaCluster,
+                zooKeeperConfig.getSessionTimeout(), zooKeeperConfig.getConnectionTimeout());
 
         Properties topicConfig = new Properties();
         for (Map.Entry<String, Integer> entry : topicParallelismMap.entrySet()) {
