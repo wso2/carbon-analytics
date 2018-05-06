@@ -73,7 +73,7 @@ export default class HeapMemory extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize: 12,
+                legendTextSize: 10,
                 legendTitleSize: 12
             },
             tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",

@@ -63,7 +63,8 @@ public class SQLConstants {
     public static final String INTEGER_TEMPLATE = "%d";
     public static final String SQL_WHERE = "WHERE";
     public static final String WHITESPACE = " ";
-    public static final String SEPARATOR = ", ";
+    public static final String SEPARATOR = ",";
+    public static final String SEPARATOR_REGEX = ",";
     public static final String TUPLE_SEPARATOR = ",%n";
     public static final String QUESTION_MARK = "?";
     public static final String PERCENTAGE_MARK = "%";
@@ -80,6 +81,7 @@ public class SQLConstants {
     public static final String COLUMN_TIMESTAMP = "TIMESTAMP";
     public static final String COLUMN_AGG_TIMESTAMP = "AGG_TIMESTAMP";
     public static final String COLUMN_VALUE = "VALUE";
+    public static final String COLUMN_NAME = "NAME";
     public static final String COLUMN_M1_RATE = "M1_RATE";
     
     //sql expressions

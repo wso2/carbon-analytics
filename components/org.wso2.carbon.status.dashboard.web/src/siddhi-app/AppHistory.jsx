@@ -168,7 +168,7 @@ export default class AppSpecific extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize: 12,
+                legendTextSize: 10,
                 legendTitleSize: 12
             }
         };
@@ -205,7 +205,7 @@ export default class AppSpecific extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize: 12,
+                legendTextSize: 10,
                 legendTitleSize: 12
             }
         };
@@ -243,7 +243,7 @@ export default class AppSpecific extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize: 12,
+                legendTextSize: 10,
                 legendTitleSize: 12
             }
         };

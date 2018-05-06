@@ -48,6 +48,7 @@ import java.util.Map;
 
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_AGG_TIMESTAMP;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_M1_RATE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_NAME;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_TIMESTAMP;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_VALUE;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.EXPR_SUM_FROM_M1_RATE;
@@ -68,6 +69,7 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_WORKER_ID;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SEPARATOR;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SEPARATOR_REGEX;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.STRING_TEMPLATE;
 
 /**
@@ -85,12 +87,11 @@ public class StatusDashboardMetricsDBHandler {
     private String selectWorkerMetricsQuery;
     private String selectWorkerAggregatedMetricsQuery;
     private String selectAppComponentList;
-    private String selectAppComponentMetrics;
     private String selectWorkerAggregatedThroughputQuery;
     private String selectWorkerThroughputQuery;
     private String selectAppComponentHistory;
     private String selectAppComponentAggregatedHistory;
-    private HikariDataSource dataSource = null;
+    private HikariDataSource dataSource;
     private Map<String, Map<String, String>> workerAttributeTypeMap;
     private QueryManager metricsQueryManager;
     
@@ -114,8 +115,6 @@ public class StatusDashboardMetricsDBHandler {
                         SELECT_WORKER_AGGREGATE_THROUGHPUT_QUERY);
                 selectAppComponentList = metricsQueryManager.getQuery(SQLConstants.
                         SELECT_COMPONENT_LIST);
-                selectAppComponentMetrics = metricsQueryManager.getQuery(SQLConstants.
-                        SELECT_COMPONENT_METRICS);
                 selectAppComponentHistory = metricsQueryManager.getQuery(SQLConstants.
                         SELECT_COMPONENT_METRICS_HISTORY);
                 recordSelectAggregatedAppMetricsQuery = metricsQueryManager.getQuery(SQLConstants.
@@ -222,7 +221,7 @@ public class StatusDashboardMetricsDBHandler {
         String tableName = typeTableColumn.get(metricsType);
         Map<String, String> tableAggColumn = DBTableUtils.getInstance().loadAggMetricsAllValueSelection();
         Map<String, String> tableColumn = DBTableUtils.getInstance().loadAggRowMetricsAllValueSelection();
-        String componentName = "org.wso2.siddhi.SiddhiApps." + appName + PACKAGE_NAME_SEPARATOR + "Siddhi" +
+        String componentName = APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR + "Siddhi" +
                 PACKAGE_NAME_SEPARATOR + componentType + PACKAGE_NAME_SEPARATOR + componentId +
                 PACKAGE_NAME_SEPARATOR + metricsType;
         String resolvedSelectWorkerMetricsHistoryQuery = resolveTableName
@@ -259,9 +258,9 @@ public class StatusDashboardMetricsDBHandler {
                     .replace(PLACEHOLDER_NAME, QUESTION_MARK)
                     .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                     .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK);
-            Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + "." + PERCENTAGE_MARK,
-                    currentTimeMilli - timeInterval, currentTimeMilli};
-            List<List<Object>> list = select(resolvedQuery, "NAME", tableName, parameters);
+            Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR +
+                    PERCENTAGE_MARK, currentTimeMilli - timeInterval, currentTimeMilli};
+            List<List<Object>> list = select(resolvedQuery, COLUMN_NAME, tableName, parameters);
             if (!list.isEmpty()) {
                 for (Object app : list) {
                     subComponentsList.add((String) ((ArrayList) app).get(0));
@@ -317,7 +316,7 @@ public class StatusDashboardMetricsDBHandler {
                         String.format(STRING_TEMPLATE + STRING_TEMPLATE + STRING_TEMPLATE
                                 , componentEntry.getKey(), PACKAGE_NAME_SEPARATOR, PERCENTAGE_MARK),
                         currentTimeMilli - timeInterval, currentTimeMilli};
-                String[] columnList = columnListString.split(SEPARATOR);
+                String[] columnList = columnListString.split(SEPARATOR_REGEX);
                 List<List<Object>> selectionRecent =
                         select(resolvedRecentQuery, columnListString, tableEntry, recentQueryParameters);
                 List<Object> selection = new ArrayList<>();
@@ -325,8 +324,9 @@ public class StatusDashboardMetricsDBHandler {
                     selection = selectionRecent.get(selectionRecent.size() - 1);
                 }
                 String[] componentElements = ((String) componentEntry.getKey()).replace("org.wso2.siddhi" +
-                        ".SiddhiApps" +
-                        "." + appName + ".Siddhi.", "").split("\\.", 2);
+                        PACKAGE_NAME_SEPARATOR + "SiddhiApps" + PACKAGE_NAME_SEPARATOR + appName
+                        + PACKAGE_NAME_SEPARATOR + "Siddhi" + PACKAGE_NAME_SEPARATOR, "")
+                        .split("\\.", 2);
                 String metricType = tableMetricsMap.get(tableEntry).toLowerCase();
                 if ((selection != null) && (!selection.isEmpty())) {
                     Attribute attribute;
@@ -517,7 +517,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param timeInterval   time interval that needed to be taken.
      * @param metricTypeName metrics type name ex: memory,cpu
      * @param currentTime    current time in milliseconds.
-     * @return List<List                               <                               Object>> of metrics data because charts needed in that format
+     * @return List<List< Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerMetrics(String workerId, long timeInterval, String metricTypeName, long
             currentTime) {
@@ -538,7 +538,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param timeInterval   time interval that needed to be taken.
      * @param metricTypeName metrics type name ex: memory,cpu
      * @param currentTime    current time in milliseconds.
-     * @return List<List                               <                               Object>> of metrics data because charts needed in that format
+     * @return List<List<Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerAggregatedMetrics(String workerId, long timeInterval, String metricTypeName, long
             currentTime) {
@@ -560,7 +560,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param workerId     source id of the metrics
      * @param timeInterval time interval that metrics needed to be taken.
      * @param currentTime  current time
-     * @return List<List                                                               <                                                               Object>> of metrics data because charts needed in that format
+     * @return List<List<Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerThroughput(String workerId, long timeInterval, long currentTime) {
         String resolvedSelectWorkerThroughputQuery = resolveTableName(selectWorkerThroughputQuery,
@@ -582,7 +582,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param workerId     source id of the metrics
      * @param timeInterval time interval that metrics needed to be taken.
      * @param currentTime  current time
-     * @return List<List < Object>> of metrics data because charts needed in that format
+     * @return List<List   <   Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerAggregatedThroughput(String workerId, long timeInterval, long currentTime) {
         long aggregationTime = DBTableUtils.getAggregation(timeInterval);
@@ -663,7 +663,7 @@ public class StatusDashboardMetricsDBHandler {
         List<List<Object>> tuple = new ArrayList<>();
         List<Object> row;
         PreparedStatement stmt = null;
-        String[] columnLabels = columns.split(SEPARATOR);
+        String[] columnLabels = columns.split(SEPARATOR_REGEX);
         try {
             stmt = conn.prepareStatement(query);
             setDynamicValuesToStatement(stmt, parameters);
