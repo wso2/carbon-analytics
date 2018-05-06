@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.bean.ZooKeeperConfig;
+import org.wso2.carbon.sp.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.OutputStreamDataHolder;
@@ -116,7 +117,14 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
         String[] bootstrapServerURLs = bootstrapServerURL.replaceAll("\\s+", "").split(",");
         ZooKeeperConfig zooKeeperConfig = ServiceDataHolder.getDeploymentConfig().getZooKeeperConfig();
-        String zooKeeperServerURL = zooKeeperConfig.getZooKeeperURLs();
+        String zooKeeperServerURL;
+        if (zooKeeperConfig != null) {
+            zooKeeperServerURL = zooKeeperConfig.getZooKeeperURLs();
+        } else {
+            zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
+            zooKeeperConfig = new ZooKeeperConfig();
+        }
+
         String[] zooKeeperServerURLs = zooKeeperServerURL.replaceAll("\\s+", "").split(",");
 
         boolean isSecureKafkaCluster = false;
