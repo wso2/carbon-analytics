@@ -192,7 +192,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             });
 
             // check the validity of the connections and drop if invalid
-            function checkConnectionValidityBeforeElementDrop() { //TODO: streams can be connected to streams?
+            function checkConnectionValidityBeforeElementDrop() {
                 _jsPlumb.bind('beforeDrop', function (connection) {
                     var connectionValidity = false;
                     var target = connection.targetId;
@@ -243,11 +243,58 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     }
                     else if (targetElement.hasClass(constants.JOIN)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
-                        || sourceElement.hasClass(constants.AGGREGATION || sourceElement.hasClass(constants.TRIGGER)
-                            || sourceElement.hasClass(constants.WINDOW)))) {
+                        || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.TRIGGER)
+                            || sourceElement.hasClass(constants.WINDOW))) {
                             alert("Invalid Connection");
                         } else {
-                            connectionValidity = true;
+                            var sourceElementObject =
+                                self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId);
+                            if (sourceElementObject !== undefined) {
+                                var connectedElementSourceType = sourceElementObject.type;
+                            } else {
+                                console.log("Cannot find the source element connected to join query");
+                            }
+                            var joinQuery = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
+                            var queryInput = joinQuery.getQueryInput();
+                            if (queryInput === undefined) {
+                                connectionValidity = true;
+                            } else {
+                                var firstConnectedElement = queryInput.getFirstConnectedElement();
+                                var secondConnectedElement = queryInput.getSecondConnectedElement();
+                                if (firstConnectedElement === undefined && secondConnectedElement === undefined) {
+                                    connectionValidity = true;
+                                } else if (firstConnectedElement !== undefined
+                                    && secondConnectedElement !== undefined) {
+                                    connectionValidity = false;
+                                    alert("Only two input elements are allowed to connect in join query!");
+                                } else if (firstConnectedElement !== undefined
+                                    && secondConnectedElement === undefined) {
+                                    var firstElementType = firstConnectedElement.type;
+                                    if (firstElementType === 'stream' || firstElementType === 'trigger') {
+                                        connectionValidity = true;
+                                    } else if (connectedElementSourceType === 'stream'
+                                        || connectedElementSourceType === 'trigger') {
+                                        connectionValidity = true;
+                                    } else {
+                                        connectionValidity = false;
+                                        alert("At least one connected input element in join query should be a stream " +
+                                            "or a trigger!");
+                                    }
+                                } else if (firstConnectedElement === undefined
+                                    && secondConnectedElement !== undefined) {
+                                    var secondElementType = secondConnectedElement.type;
+                                    if (secondElementType === 'stream' || secondElementType === 'trigger') {
+                                        connectionValidity = true;
+                                    } else if (connectedElementSourceType === 'stream'
+                                        || connectedElementSourceType === 'trigger') {
+                                        connectionValidity = true;
+                                    } else {
+                                        connectionValidity = false;
+                                        alert("At least one connected input element in join query should be a stream " +
+                                            "or a trigger!");
+                                    }
+                                }
+                            }
                         }
                     }
                     else if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
@@ -352,20 +399,35 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
                         if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
-                            if (model.getQueryInput() === '') {
-                                var queryInputOptions = {};
-                                _.set(queryInputOptions, 'joinWith', '');
-                                _.set(queryInputOptions, 'left', '');
-                                _.set(queryInputOptions, 'joinType', '');
-                                _.set(queryInputOptions, 'right', '');
-                                _.set(queryInputOptions, 'on', '');
-                                _.set(queryInputOptions, 'within', '');
-                                _.set(queryInputOptions, 'per', '');
-                                var queryInputObject = new JoinQueryInput(queryInputOptions);
-                                model.setQueryInput(queryInputObject);
-                            } else {
-                                //TODO: check whether one stream/trigger is connected in join with another definition of any type
-                                //model.getQueryInput().setFrom(connectedElementName);
+                            var queryInput = model.getQueryInput();
+
+                            var sourceElementObject =
+                                self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId);
+                            var connectedElement = undefined;
+                            if (sourceElementObject !== undefined) {
+                                var connectedElementSourceName = (sourceElementObject.element).getName();
+                                var connectedElementSourceType = sourceElementObject.type;
+                                connectedElement = {
+                                    name: connectedElementSourceName,
+                                    type: connectedElementSourceType
+                                };
+
+                                if (queryInput === undefined) {
+                                    var joinQueryInput = new JoinQueryInput();
+                                    joinQueryInput.setFirstConnectedElement(connectedElement);
+                                    model.setQueryInput(joinQueryInput);
+                                } else {
+                                    var firstConnectedElement = queryInput.getFirstConnectedElement();
+                                    var secondConnectedElement = queryInput.getSecondConnectedElement();
+                                    if (firstConnectedElement === undefined) {
+                                        queryInput.setFirstConnectedElement(connectedElement);
+                                    } else if (secondConnectedElement === undefined) {
+                                        queryInput.setSecondConnectedElement(connectedElement);
+                                    } else {
+                                        console.log("Error: First and second input elements aer already filled in " +
+                                            "join query!");
+                                    }
+                                }
                             }
                         }
                     }
@@ -567,13 +629,31 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             return;
                         }
                         if (targetElement.hasClass(constants.JOIN)) {
-                            // model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
-                            // if (model !== undefined) {
-                            //     streams = model.getFrom();
-                            //     var removedStream = streams.indexOf(sourceId);
-                            //     streams.splice(removedStream, 1);
-                            //     model.setFrom(streams);
-                            // }
+                            model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
+                            var queryInput = model.getQueryInput();
+                            var sourceElementObject =
+                                self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId);
+                            if (sourceElementObject !== undefined) {
+                                var disconnectedElementSourceName = (sourceElementObject.element).getName();
+                                if (queryInput === undefined) {
+                                    console.log("Join query output is undefined!");
+                                    return;
+                                }
+                                var firstConnectedElement = queryInput.getFirstConnectedElement();
+                                var secondConnectedElement = queryInput.getSecondConnectedElement();
+                                if (firstConnectedElement === undefined && secondConnectedElement === undefined) {
+                                    console.log("firstConnectedElement and secondConnectedElement are undefined!");
+                                } else if (firstConnectedElement !== undefined
+                                    && firstConnectedElement.name === disconnectedElementSourceName) {
+                                    queryInput.setFirstConnectedElement(undefined);
+                                } else if (secondConnectedElement !== undefined
+                                    && secondConnectedElement.name === disconnectedElementSourceName) {
+                                    queryInput.setSecondConnectedElement(undefined);
+                                }else {
+                                    console.log("Error: Disconnected source name not found in join query!");
+                                }
+                            }
+                            return;
                         }
                     }
 
@@ -583,6 +663,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             var disconnectedStreamName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
                                 .getName();
                             model.getQueryInput().removeConnectedElementName(disconnectedStreamName);
+                            return;
                         }
                         else if (targetElement.hasClass(constants.PARTITION)) {
                             model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);

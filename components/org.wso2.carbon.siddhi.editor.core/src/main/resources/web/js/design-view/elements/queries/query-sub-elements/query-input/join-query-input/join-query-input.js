@@ -37,35 +37,38 @@ define(
                 within: '', // If joinWith == aggregation
                 per: '' // If joinWith == aggregation
             */
+            /*
+            *  firstConnectedElement and secondConnectedElement stores data as follows.
+            *  These will hold a connected element to the join query(front end use only).
+            *  {
+            *       name: '',
+            *       type: ''
+            *  }
+            * */
             this.type = 'join';
-            //TODO: remove this connectedElementNameList when sending the json to backend
-            this.connectedElementNameList = []; // This will hold all the connected streams to the join query(front end use only)
-            this.joinWith = options.joinWith;
-            this.left = options.left;
-            this.joinType = options.joinType;
-            this.right = options.right;
-            this.on = options.on;
-            this.within = options.within;
-            this.per = options.per;
-        };
-
-        JoinQueryInput.prototype.addConnectedElementName = function (connectedElementName) {
-            this.connectedElementNameList.push(connectedElementName);
-        };
-
-        JoinQueryInput.prototype.removeConnectedElementName = function (connectedElementName) {
-            var index = this.connectedElementNameList.indexOf(connectedElementName);
-            if (index > -1) {
-                this.connectedElementNameList.splice(index, 1);
+            if (options !== undefined) {
+                this.firstConnectedElement = options.firstConnectedElement;
+                this.secondConnectedElement = options.secondConnectedElement;
+                this.joinWith = options.joinWith;
+                this.left = options.left;
+                this.joinType = options.joinType;
+                this.right = options.right;
+                this.on = options.on;
+                this.within = options.within;
+                this.per = options.per;
             }
-        };
-
-        JoinQueryInput.prototype.getConnectedElementNameList = function () {
-            return this.connectedElementNameList;
         };
 
         JoinQueryInput.prototype.getType = function () {
             return this.type;
+        };
+
+        JoinQueryInput.prototype.getFirstConnectedElement = function () {
+            return this.firstConnectedElement;
+        };
+
+        JoinQueryInput.prototype.getSecondConnectedElement = function () {
+            return this.secondConnectedElement;
         };
 
         JoinQueryInput.prototype.getJoinWith = function () {
@@ -96,8 +99,12 @@ define(
             return this.per;
         };
 
-        JoinQueryInput.prototype.setConnectedElementNameList = function (connectedElementNameList) {
-            this.connectedElementNameList = connectedElementNameList;
+        JoinQueryInput.prototype.setFirstConnectedElement = function (firstConnectedElement) {
+            this.firstConnectedElement = firstConnectedElement;
+        };
+
+        JoinQueryInput.prototype.setSecondConnectedElement = function (secondConnectedElement) {
+            this.secondConnectedElement = secondConnectedElement;
         };
 
         JoinQueryInput.prototype.setJoinWith = function (joinWith) {
