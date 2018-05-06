@@ -284,11 +284,26 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     }
                 }
 
+                // setting the previously user entered data for select section
+                var selectStartValue = {
+                    select: editorSelect.getValue().select
+                };
+                // if the user has activated the group by field in the form, then the new frm will also activate the
+                // group by field
+                if (editorSelect.getValue().groupBy !== undefined) {
+                    _.set(selectStartValue, 'groupBy', "");
+                }
+                _.set(selectScheme, 'startval', selectStartValue);
                 $('#form-aggregation-select').empty();
                 editorSelect = new JSONEditor($('#form-aggregation-select')[0], selectScheme);
+
+                // setting the previously user entered data for aggregate section
+                var aggregateStartValue = {
+                    aggregateByTimePeriod: editorAggregate.getValue().aggregateByTimePeriod
+                };
+                _.set(aggregateScheme, 'startval', aggregateStartValue);
                 $('#form-aggregation-aggregate').empty();
                 editorAggregate = new JSONEditor($('#form-aggregation-aggregate')[0], aggregateScheme);
-                editorAggregate.setValue({aggregateByTimePeriod: editorAggregate.getValue().aggregateByTimePeriod});
             });
 
             formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
