@@ -36,8 +36,8 @@ const styles = {button: {margin: 12, backgroundColor: '#f17b31', fontSize: 10}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 const latencyMetadata = {
-    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', '75th Percentile', '95th Percentile', '99th Percentile', '99.9th Percentile',
-        'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
+    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', '75th Percentile', '95th Percentile',
+        '99th Percentile', '99.9th Percentile', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
     types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
         'linear', 'linear', 'linear']
 };
@@ -330,9 +330,10 @@ export default class ComponentHistory extends React.Component {
             === ComponentType.SINK_MAPPERS) {
             return <div/>;
         }
-        else if ((this.state.componentType === ComponentType.STREAMS || this.state.componentType
-                === ComponentType.TRIGGER
-                || this.state.componentType === ComponentType.TABLES || this.state.componentType === ComponentType.SOURCES
+        else if ((this.state.componentType === ComponentType.STREAMS ||
+                this.state.componentType === ComponentType.TRIGGER
+                || this.state.componentType === ComponentType.TABLES ||
+                this.state.componentType === ComponentType.SOURCES
                 || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
             return (
                 <Card><CardHeader title="Throughput(events/second)"/><Divider/>

@@ -86,10 +86,12 @@ export default class WorkerOverview extends React.Component {
             sessionInvalid: false,
             clustersList: {},
             managerClusterList: {},
-            pInterval: window.localStorage.getItem("pInterval") != null ? parseInt(window.localStorage.getItem("pInterval")) : 5,
+            pInterval: window.localStorage.getItem("pInterval") != null ?
+                parseInt(window.localStorage.getItem("pInterval")) : 5,
             currentTime: '',
             interval: '',
-            enableAutoSync: window.localStorage.getItem("enableAutoSync") != null ? ((window.localStorage.getItem("enableAutoSync")) === 'true') : false,
+            enableAutoSync: window.localStorage.getItem("enableAutoSync") != null ?
+                ((window.localStorage.getItem("enableAutoSync")) === 'true') : false,
             isApiCalled: false,
             counter: 0,
             hasManagerPermission: false,
@@ -172,7 +174,8 @@ export default class WorkerOverview extends React.Component {
                     this.setState({
                         managerClusterList: response.data,
                         isApiCalled: true,
-                        statusMessage: !WorkerOverview.hasNodes(this.state.managerClusterList) ? "Currently there are no nodes to display" : ''
+                        statusMessage: !WorkerOverview.hasNodes(this.state.managerClusterList) ?
+                            "Currently there are no nodes to display" : ''
                     });
                 } else {
                     console.log("manager connection failed")
@@ -355,7 +358,8 @@ export default class WorkerOverview extends React.Component {
      */
     renderWorkers(workersList, managerList) {
 
-        if (this.state.isApiCalled && !WorkerOverview.hasNodes(this.state.clustersList) && !WorkerOverview.hasNodes(this.state.managerClusterList)) {
+        if (this.state.isApiCalled && !WorkerOverview.hasNodes(this.state.clustersList) &&
+            !WorkerOverview.hasNodes(this.state.managerClusterList)) {
             if (this.state.hasViewPermission) {
                 return (
                     <div style={styles.background}>
@@ -395,7 +399,8 @@ export default class WorkerOverview extends React.Component {
                     </div>
                 );
             }
-        } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList)) && (WorkerOverview.hasNodes(this.state.managerClusterList)))) {
+        } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList))
+                && (WorkerOverview.hasNodes(this.state.managerClusterList)))) {
             return (
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
@@ -457,7 +462,8 @@ export default class WorkerOverview extends React.Component {
                     })}
                 </div>
             );
-        } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList))) && (!WorkerOverview.hasNodes(this.state.managerClusterList))) {
+        } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList))) &&
+            (!WorkerOverview.hasNodes(this.state.managerClusterList))) {
             return (
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
@@ -500,7 +506,8 @@ export default class WorkerOverview extends React.Component {
                 </div>
             );
 
-        } else if (this.state.isApiCalled && (WorkerOverview.hasNodes(this.state.managerClusterList)) && (!WorkerOverview.hasNodes(this.state.clustersList))) {
+        } else if (this.state.isApiCalled && (WorkerOverview.hasNodes(this.state.managerClusterList)) &&
+            (!WorkerOverview.hasNodes(this.state.clustersList))) {
             return (
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>

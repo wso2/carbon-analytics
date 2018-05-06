@@ -101,8 +101,10 @@ export default class NonHeapMemory extends React.Component {
                 </div>
             );
         }
-        let data1 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed);
-        let intY = DashboardUtils.initCombinedYDomain(this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed);
+        let data1 = DashboardUtils
+            .getCombinedChartList(this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed);
+        let intY = DashboardUtils
+            .initCombinedYDomain(this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmMemoryNonHeapCommitted);
         let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryNonHeapCommitted, intY);
         let data3 = DashboardUtils.getCombinedChartList(data2, this.state.jvmMemoryNonHeapMax);

@@ -97,8 +97,10 @@ export default class JVMGarbageCOllector extends React.Component {
                 </div>
             );
         }
-        let data1 = DashboardUtils.getCombinedChartList(this.state.jvmGcPsMarksweepCount, this.state.jvmGcPsMarksweepTime);
-        let intY = DashboardUtils.initCombinedYDomain(this.state.jvmGcPsMarksweepCount, this.state.jvmGcPsMarksweepTime);
+        let data1 = DashboardUtils
+            .getCombinedChartList(this.state.jvmGcPsMarksweepCount, this.state.jvmGcPsMarksweepTime);
+        let intY = DashboardUtils
+            .initCombinedYDomain(this.state.jvmGcPsMarksweepCount, this.state.jvmGcPsMarksweepTime);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmGcPsScavengeCount);
         let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmGcPsScavengeCount, intY);
         let data = DashboardUtils.getCombinedChartList(data2, this.state.jvmGcPsScavengeTime);

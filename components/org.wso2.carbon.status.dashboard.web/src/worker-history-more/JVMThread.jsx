@@ -96,7 +96,8 @@ export default class JVMThread extends React.Component {
             gridColor: '#f2f2f2',
             xAxisTickCount: this.state.tickCount
         };
-        if (this.state.count.length === 0 && this.state.daemonCount.length === 0 && this.state.jvmThreadsBlockedCount.length === 0) {
+        if (this.state.count.length === 0 && this.state.daemonCount.length === 0 &&
+            this.state.jvmThreadsBlockedCount.length === 0) {
             return (
                 <div style={{paddingLeft: 10}}>
                     <Card>

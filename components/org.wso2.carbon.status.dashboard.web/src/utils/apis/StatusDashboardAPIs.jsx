@@ -184,7 +184,8 @@ export default class StatusDashboardAPIS {
      * @param appName
      */
     static getChildAppDetails(managerId, appName) {
-        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName + '/child-apps')
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName +
+            '/child-apps')
     }
 
     /**
@@ -201,6 +202,7 @@ export default class StatusDashboardAPIS {
      * @param appName
      */
     static getKafkaDetails(managerId, appName) {
-        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName + '/child-apps/' + 'transport')
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName +
+            '/child-apps/' + 'transport')
     }
 }

@@ -100,8 +100,10 @@ export default class JVMOTotalMemory extends React.Component {
             );
         }
 
-        let data3 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryTotalCommitted, this.state.jvmMemoryTotalInit);
-        let y3 = DashboardUtils.initCombinedYDomain(this.state.jvmMemoryTotalInit, this.state.jvmMemoryTotalCommitted);
+        let data3 = DashboardUtils
+            .getCombinedChartList(this.state.jvmMemoryTotalCommitted, this.state.jvmMemoryTotalInit);
+        let y3 = DashboardUtils
+            .initCombinedYDomain(this.state.jvmMemoryTotalInit, this.state.jvmMemoryTotalCommitted);
         let data4 = DashboardUtils.getCombinedChartList(data3, this.state.jvmMemoryTotalMax);
         let y4 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryTotalMax, y3);
         let data = DashboardUtils.getCombinedChartList(data4, this.state.jvmMemoryTotalUsed);

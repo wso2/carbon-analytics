@@ -25,8 +25,8 @@ import ChartCard from '../common/ChartCard';
 import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
 
 const memoryMetadata = {
-    names: ['Time', 'Free Physical Memory', 'Total Physical Memory', 'Total Committed', 'Total Init', 'Total Max', 'Total Used', 'Pool Size',
-        'Committed Virtual Memory'],
+    names: ['Time', 'Free Physical Memory', 'Total Physical Memory', 'Total Committed', 'Total Init',
+        'Total Max', 'Total Used', 'Pool Size', 'Committed Virtual Memory'],
     types: ['time', 'linear', 'linear']
 };
 

@@ -34,7 +34,6 @@ import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardRuntimeException;
 import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -47,6 +46,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_AGG_TIMESTAMP;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_M1_RATE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_TIMESTAMP;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_VALUE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.EXPR_SUM_FROM_M1_RATE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.EXPR_SUM_FROM_STRING;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_COUNTER;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_GAUGE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_HISTOGRAM;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_METER;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_TIMER;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PACKAGE_NAME_SEPARATOR;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PERCENTAGE_MARK;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_AGGREGATION_COMPONENT_COLOUM;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_AGGREGATION_TIME;
@@ -56,6 +67,8 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_WORKER_ID;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SEPARATOR;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.STRING_TEMPLATE;
 
 /**
  * This class represents key database operations related to metrics data.
@@ -64,11 +77,11 @@ public class StatusDashboardMetricsDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardMetricsDBHandler.class);
     private static final String DATASOURCE_ID = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
             .getMetricsDatasourceName();
-    private static final String[] METRICS_TABLE_NAMES = {"METRIC_COUNTER", "METRIC_GAUGE", "METRIC_HISTOGRAM",
-            "METRIC_METER", "METRIC_TIMER"};
+    private static final String[] METRICS_TABLE_NAMES = {METRICS_TABLE_METRIC_COUNTER, METRICS_TABLE_METRIC_GAUGE,
+            METRICS_TABLE_METRIC_HISTOGRAM, METRICS_TABLE_METRIC_METER, METRICS_TABLE_METRIC_TIMER};
     private static final String APP_NAME_PREFIX = "org.wso2.siddhi.SiddhiApps.";
     private String selectAppMetricsQuery;
-    private String recordSelectAgregatedAppMetricsQuery;
+    private String recordSelectAggregatedAppMetricsQuery;
     private String selectWorkerMetricsQuery;
     private String selectWorkerAggregatedMetricsQuery;
     private String selectAppComponentList;
@@ -105,11 +118,11 @@ public class StatusDashboardMetricsDBHandler {
                         SELECT_COMPONENT_METRICS);
                 selectAppComponentHistory = metricsQueryManager.getQuery(SQLConstants.
                         SELECT_COMPONENT_METRICS_HISTORY);
-                recordSelectAgregatedAppMetricsQuery = metricsQueryManager.getQuery(SQLConstants.
+                recordSelectAggregatedAppMetricsQuery = metricsQueryManager.getQuery(SQLConstants.
                         SELECT_APP_AGG_METRICS_HISTORY);
                 selectAppComponentAggregatedHistory = metricsQueryManager.getQuery(SQLConstants.
                         SELECT_COMPONENT_AGG_METRICS_HISTORY);
-            } catch (SQLException | ConfigurationException | IOException | QueryMappingNotAvailableException e) {
+            } catch (SQLException | ConfigurationException | QueryMappingNotAvailableException e) {
                 throw new StatusDashboardRuntimeException("Error initializing connection. ", e);
             } finally {
                 if (conn != null) {
@@ -180,8 +193,8 @@ public class StatusDashboardMetricsDBHandler {
         Map<String, String> typeTableColumn = DBTableUtils.getInstance().loadMetricsTypeSelection();
         String tableName = typeTableColumn.get(metricsType);
         Map<String, String> tableColumn = DBTableUtils.getInstance().loadMetricsAllValueSelection();
-        String componentName = APP_NAME_PREFIX + appName + ".Siddhi." + componentType + "." +
-                componentId + "" + "." + metricsType;
+        String componentName = APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR + "Siddhi" + PACKAGE_NAME_SEPARATOR
+                + componentType + PACKAGE_NAME_SEPARATOR + componentId + PACKAGE_NAME_SEPARATOR + metricsType;
         String resolvedSelectWorkerMetricsHistoryQuery = resolveTableName(selectAppComponentHistory, tableName);
         String resolvedQuery = resolvedSelectWorkerMetricsHistoryQuery.replace(SQLConstants.PLACEHOLDER_BEGIN_TIME,
                 QUESTION_MARK).replace(PLACEHOLDER_NAME, QUESTION_MARK).replace
@@ -209,8 +222,9 @@ public class StatusDashboardMetricsDBHandler {
         String tableName = typeTableColumn.get(metricsType);
         Map<String, String> tableAggColumn = DBTableUtils.getInstance().loadAggMetricsAllValueSelection();
         Map<String, String> tableColumn = DBTableUtils.getInstance().loadAggRowMetricsAllValueSelection();
-        String componentName = "org.wso2.siddhi.SiddhiApps." + appName + ".Siddhi." +
-                componentType + "." + componentId + "" + "." + metricsType;
+        String componentName = "org.wso2.siddhi.SiddhiApps." + appName + PACKAGE_NAME_SEPARATOR + "Siddhi" +
+                PACKAGE_NAME_SEPARATOR + componentType + PACKAGE_NAME_SEPARATOR + componentId +
+                PACKAGE_NAME_SEPARATOR + metricsType;
         String resolvedSelectWorkerMetricsHistoryQuery = resolveTableName
                 (selectAppComponentAggregatedHistory, tableName);
         String resolvedQuery = resolvedSelectWorkerMetricsHistoryQuery
@@ -292,22 +306,18 @@ public class StatusDashboardMetricsDBHandler {
             List<String> componentsTableList = (List<String>) componentEntry.getValue();
             for (String tableEntry : componentsTableList) {
                 String columnListString = tableColumn.get(tableEntry);
-                String resolvedSelectWorkerMetricsQuery = resolveTableName(selectAppComponentMetrics, tableEntry);
                 String resolvedSelectWorkerRecentMetricsQuery = resolveTableName(selectAppComponentHistory,
                         tableEntry);
-                String resolvedQuery = resolvedSelectWorkerMetricsQuery.replace(PLACEHOLDER_NAME,
-                        QUESTION_MARK).replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace
-                        (PLACEHOLDER_COLUMNS, columnListString);
                 String resolvedRecentQuery = resolvedSelectWorkerRecentMetricsQuery
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK).replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                         .replace(PLACEHOLDER_COLUMNS, columnListString)
                         .replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK);
                 Object[] recentQueryParameters = new Object[] {carbonId,
-                        String.format("%s%s%s", (String) componentEntry.getKey(), ".", PERCENTAGE_MARK),
+                        String.format(STRING_TEMPLATE + STRING_TEMPLATE + STRING_TEMPLATE
+                                , componentEntry.getKey(), PACKAGE_NAME_SEPARATOR, PERCENTAGE_MARK),
                         currentTimeMilli - timeInterval, currentTimeMilli};
-                //String[] resolvedQueryParameters = new String[] {carbonId, (String) componentEntry.getKey()};
-                String[] columnList = columnListString.split(",");
+                String[] columnList = columnListString.split(SEPARATOR);
                 List<List<Object>> selectionRecent =
                         select(resolvedRecentQuery, columnListString, tableEntry, recentQueryParameters);
                 List<Object> selection = new ArrayList<>();
@@ -392,49 +402,41 @@ public class StatusDashboardMetricsDBHandler {
             timeInterval, String appName, long currentTime) {
         switch (metricsType) {
             case "memory": {
-                String tableName = "METRIC_GAUGE";
-                String columnsOrSelectExpressions = "SUM(CAST(result.VALUE as DECIMAL(22,2)))";
-                String resultLabel = "VALUE";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                        columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                        EXPR_SUM_FROM_STRING).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK)
                         .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
-                        .replace(PLACEHOLDER_RESULT, resultLabel)
-                        .replace(PLACEHOLDER_TABLE_NAME, tableName);
-                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + "." + PERCENTAGE_MARK,
-                        currentTime - timeInterval, currentTime};
-                return selectAppMemory(resolvedQueryTable, tableName, parameters, "TIMESTAMP");
+                        .replace(PLACEHOLDER_RESULT, COLUMN_VALUE)
+                        .replace(PLACEHOLDER_TABLE_NAME, METRICS_TABLE_METRIC_GAUGE);
+                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR +
+                        PERCENTAGE_MARK, currentTime - timeInterval, currentTime};
+                return selectAppMemory(resolvedQueryTable, METRICS_TABLE_METRIC_GAUGE, parameters,
+                        COLUMN_TIMESTAMP);
             }
             case "throughput": {
-                String tableName = "METRIC_METER";
-                String columnsLabels = "TIMESTAMP,M1_RATE";
-                String columnsOrSelectExpressions = "SUM(result.M1_RATE)";
-                String resultLabel = "M1_RATE";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                        columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                        EXPR_SUM_FROM_M1_RATE).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK).replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
-                        .replace(PLACEHOLDER_RESULT, resultLabel)
-                        .replace(PLACEHOLDER_TABLE_NAME, tableName);
-                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + "." + PERCENTAGE_MARK,
-                        currentTime - timeInterval, currentTime};
-                return select(resolvedQueryTable, columnsLabels, tableName, parameters);
+                        .replace(PLACEHOLDER_RESULT, COLUMN_M1_RATE)
+                        .replace(PLACEHOLDER_TABLE_NAME, METRICS_TABLE_METRIC_METER);
+                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR +
+                        PERCENTAGE_MARK, currentTime - timeInterval, currentTime};
+                return select(resolvedQueryTable, COLUMN_TIMESTAMP + SEPARATOR + COLUMN_M1_RATE,
+                        METRICS_TABLE_METRIC_METER, parameters);
             }
             case "latency": {
-                String tableName = "METRIC_TIMER";
-                String columnsLabels = "TIMESTAMP,M1_RATE";
-                String columnsOrSelectExpressions = "SUM(result.M1_RATE)";
-                String resultLabel = "M1_RATE";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                        columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                        EXPR_SUM_FROM_M1_RATE).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK).replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
-                        .replace(PLACEHOLDER_RESULT, resultLabel)
-                        .replace(PLACEHOLDER_TABLE_NAME, tableName);
-                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + "." + PERCENTAGE_MARK,
-                        currentTime - timeInterval, currentTime};
-                return select(resolvedQueryTable, columnsLabels, tableName, parameters);
+                        .replace(PLACEHOLDER_RESULT, COLUMN_M1_RATE)
+                        .replace(PLACEHOLDER_TABLE_NAME, METRICS_TABLE_METRIC_TIMER);
+                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR +
+                        PERCENTAGE_MARK, currentTime - timeInterval, currentTime};
+                return select(resolvedQueryTable, COLUMN_TIMESTAMP + SEPARATOR + COLUMN_M1_RATE
+                        , METRICS_TABLE_METRIC_TIMER, parameters);
             }
             default: {
                 logger.error("Invalid parameters type: " + removeCRLFCharacters(workerId) + ":"
@@ -458,55 +460,47 @@ public class StatusDashboardMetricsDBHandler {
         long aggregationTime = DBTableUtils.getAggregation(timeInterval);
         switch (metricsType) {
             case "memory": {
-                String tableName = "METRIC_GAUGE";
-                String columnsOrSelectExpressions = "SUM(CAST(result.VALUE as DECIMAL(22,2)))";
-                String resultLabel = "VALUE";
-                String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery
+                String tableName = METRICS_TABLE_METRIC_GAUGE;
+                String resolvedQueryTable = recordSelectAggregatedAppMetricsQuery
                         .replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                                columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                                EXPR_SUM_FROM_STRING).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK)
                         .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
-                        .replace(PLACEHOLDER_RESULT, resultLabel)
+                        .replace(PLACEHOLDER_RESULT, COLUMN_VALUE)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName)
                         .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
-                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + "." + PERCENTAGE_MARK,
-                        currentTime - timeInterval, currentTime};
-                return selectAppMemory(resolvedQueryTable, tableName, parameters, "AGG_TIMESTAMP");
+                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR
+                        + PERCENTAGE_MARK, currentTime - timeInterval, currentTime};
+                return selectAppMemory(resolvedQueryTable, tableName, parameters, COLUMN_AGG_TIMESTAMP);
             }
             case "throughput": {
-                String tableName = "METRIC_METER";
-                String columnsLabels = "AGG_TIMESTAMP,M1_RATE";
-                String columnsOrSelectExpressions = "SUM(result.M1_RATE)";
-                String resultLabel = "M1_RATE";
-                String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery
+                String resolvedQueryTable = recordSelectAggregatedAppMetricsQuery
                         .replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                                columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                                EXPR_SUM_FROM_M1_RATE).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK).replace
                                 (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
-                                QUESTION_MARK).replace(PLACEHOLDER_RESULT, resultLabel)
-                        .replace(PLACEHOLDER_TABLE_NAME, tableName)
+                                QUESTION_MARK).replace(PLACEHOLDER_RESULT, COLUMN_M1_RATE)
+                        .replace(PLACEHOLDER_TABLE_NAME, METRICS_TABLE_METRIC_METER)
                         .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
-                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + "." + PERCENTAGE_MARK,
-                        currentTime - timeInterval, currentTime};
-                return select(resolvedQueryTable, columnsLabels, tableName, parameters);
+                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR
+                        + PERCENTAGE_MARK, currentTime - timeInterval, currentTime};
+                return select(resolvedQueryTable, COLUMN_AGG_TIMESTAMP + SEPARATOR + COLUMN_M1_RATE
+                        , METRICS_TABLE_METRIC_METER, parameters);
             }
             case "latency": {
-                String tableName = "METRIC_TIMER";
-                String columnsLabels = "AGG_TIMESTAMP,M1_RATE";
-                String columnsOrSelectExpressions = "SUM(result.M1_RATE)";
-                String resultLabel = "M1_RATE";
-                String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery
+                String resolvedQueryTable = recordSelectAggregatedAppMetricsQuery
                         .replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                                columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                                EXPR_SUM_FROM_M1_RATE).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK).replace
                                 (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
-                                QUESTION_MARK).replace(PLACEHOLDER_RESULT, resultLabel)
-                        .replace(PLACEHOLDER_TABLE_NAME, tableName)
+                                QUESTION_MARK).replace(PLACEHOLDER_RESULT, COLUMN_M1_RATE)
+                        .replace(PLACEHOLDER_TABLE_NAME, METRICS_TABLE_METRIC_TIMER)
                         .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
-                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + "." + PERCENTAGE_MARK,
-                        currentTime - timeInterval, currentTime};
-                return select(resolvedQueryTable, columnsLabels, tableName, parameters);
+                Object[] parameters = new Object[] {workerId, APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR
+                        + PERCENTAGE_MARK, currentTime - timeInterval, currentTime};
+                return select(resolvedQueryTable, COLUMN_AGG_TIMESTAMP + SEPARATOR + COLUMN_M1_RATE,
+                        METRICS_TABLE_METRIC_TIMER, parameters);
             }
             default: {
                 logger.error("Invalid parameters type: " + removeCRLFCharacters(workerId) + ":"
@@ -523,11 +517,12 @@ public class StatusDashboardMetricsDBHandler {
      * @param timeInterval   time interval that needed to be taken.
      * @param metricTypeName metrics type name ex: memory,cpu
      * @param currentTime    current time in milliseconds.
-     * @return List<List   <   Object>> of metrics data because charts needed in that format
+     * @return List<List                               <                               Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerMetrics(String workerId, long timeInterval, String metricTypeName, long
             currentTime) {
-        String resolvedSelectWorkerMetricsQuery = resolveTableName(selectWorkerMetricsQuery, "METRIC_GAUGE");
+        String resolvedSelectWorkerMetricsQuery = resolveTableName(selectWorkerMetricsQuery,
+                METRICS_TABLE_METRIC_GAUGE);
         String resolvedQuery = resolvedSelectWorkerMetricsQuery.replace(SQLConstants.PLACEHOLDER_BEGIN_TIME,
                 QUESTION_MARK).replace(PLACEHOLDER_NAME, QUESTION_MARK)
                 .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
@@ -543,13 +538,13 @@ public class StatusDashboardMetricsDBHandler {
      * @param timeInterval   time interval that needed to be taken.
      * @param metricTypeName metrics type name ex: memory,cpu
      * @param currentTime    current time in milliseconds.
-     * @return List<List   <   Object>> of metrics data because charts needed in that format
+     * @return List<List                               <                               Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerAggregatedMetrics(String workerId, long timeInterval, String metricTypeName, long
             currentTime) {
         long aggregationTime = DBTableUtils.getAggregation(timeInterval);
         String resolvedSelectWorkerMetricsQuery = resolveTableName(
-                selectWorkerAggregatedMetricsQuery, "METRIC_GAUGE");
+                selectWorkerAggregatedMetricsQuery, METRICS_TABLE_METRIC_GAUGE);
         String resolvedQuery = resolvedSelectWorkerMetricsQuery.replace(SQLConstants.PLACEHOLDER_BEGIN_TIME,
                 QUESTION_MARK).replace(PLACEHOLDER_NAME, QUESTION_MARK)
                 .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
@@ -565,19 +560,20 @@ public class StatusDashboardMetricsDBHandler {
      * @param workerId     source id of the metrics
      * @param timeInterval time interval that metrics needed to be taken.
      * @param currentTime  current time
-     * @return List<List               <               Object>> of metrics data because charts needed in that format
+     * @return List<List                                                               <                                                               Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerThroughput(String workerId, long timeInterval, long currentTime) {
         String resolvedSelectWorkerThroughputQuery = resolveTableName(selectWorkerThroughputQuery,
-                "METRIC_METER");
+                METRICS_TABLE_METRIC_METER);
         String resolvedQuery = resolvedSelectWorkerThroughputQuery
-                .replace(SQLConstants.PLACEHOLDER_COLUMNS, "SUM(result.M1_RATE)")
+                .replace(SQLConstants.PLACEHOLDER_COLUMNS, EXPR_SUM_FROM_M1_RATE)
                 .replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                 .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                 .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
-                .replace(PLACEHOLDER_RESULT, "M1_RATE");
+                .replace(PLACEHOLDER_RESULT, COLUMN_M1_RATE);
         Object[] parameters = new Object[] {workerId, currentTime - timeInterval, currentTime};
-        return select(resolvedQuery, "TIMESTAMP,M1_RATE", "METRIC_METER", parameters);
+        return select(resolvedQuery, COLUMN_TIMESTAMP + SEPARATOR + COLUMN_M1_RATE,
+                METRICS_TABLE_METRIC_METER, parameters);
     }
     
     /**
@@ -586,21 +582,22 @@ public class StatusDashboardMetricsDBHandler {
      * @param workerId     source id of the metrics
      * @param timeInterval time interval that metrics needed to be taken.
      * @param currentTime  current time
-     * @return List<List               <               Object>> of metrics data because charts needed in that format
+     * @return List<List < Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerAggregatedThroughput(String workerId, long timeInterval, long currentTime) {
         long aggregationTime = DBTableUtils.getAggregation(timeInterval);
         String resolvedSelectWorkerThroughputQuery = resolveTableName(selectWorkerAggregatedThroughputQuery,
-                "METRIC_METER");
+                METRICS_TABLE_METRIC_METER);
         String resolvedQuery = resolvedSelectWorkerThroughputQuery
-                .replace(SQLConstants.PLACEHOLDER_COLUMNS, "SUM(result.M1_RATE)")
+                .replace(SQLConstants.PLACEHOLDER_COLUMNS, EXPR_SUM_FROM_M1_RATE)
                 .replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                 .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                 .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
-                .replace(PLACEHOLDER_RESULT, "M1_RATE")
+                .replace(PLACEHOLDER_RESULT, COLUMN_M1_RATE)
                 .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
         Object[] parameters = new Object[] {workerId, currentTime - timeInterval, currentTime};
-        return select(resolvedQuery, "AGG_TIMESTAMP,M1_RATE", "METRIC_METER", parameters);
+        return select(resolvedQuery, COLUMN_AGG_TIMESTAMP + SEPARATOR + COLUMN_M1_RATE,
+                METRICS_TABLE_METRIC_METER, parameters);
     }
     
     /**
@@ -610,7 +607,7 @@ public class StatusDashboardMetricsDBHandler {
      * @return the selected object.
      */
     private List<List<Object>> selectAppMemory(String query, String tableName, Object[] parameters,
-                                               String timesStampLable) {
+                                               String timesStampLabel) {
         Map<String, String> attributesTypeMap = workerAttributeTypeMap.get(tableName);
         Connection conn = this.getConnection();
         ResultSet rs = null;
@@ -623,10 +620,10 @@ public class StatusDashboardMetricsDBHandler {
             rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
                 row = new ArrayList<>();
-                row.add(DBTableUtils.getInstance().fetchData(rs, timesStampLable, attributesTypeMap.get
-                        (timesStampLable), metricsQueryManager));
-                row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, "VALUE",
-                        attributesTypeMap.get("VALUE"), metricsQueryManager)));
+                row.add(DBTableUtils.getInstance().fetchData(rs, timesStampLabel, attributesTypeMap.get
+                        (timesStampLabel), metricsQueryManager));
+                row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, COLUMN_VALUE,
+                        attributesTypeMap.get(COLUMN_VALUE), metricsQueryManager)));
                 tuple.add(row);
             }
         } catch (SQLException e) {
@@ -666,7 +663,7 @@ public class StatusDashboardMetricsDBHandler {
         List<List<Object>> tuple = new ArrayList<>();
         List<Object> row;
         PreparedStatement stmt = null;
-        String[] columnLabels = columns.split(",");
+        String[] columnLabels = columns.split(SEPARATOR);
         try {
             stmt = conn.prepareStatement(query);
             setDynamicValuesToStatement(stmt, parameters);
@@ -674,7 +671,7 @@ public class StatusDashboardMetricsDBHandler {
             while (rs.next()) {
                 row = new ArrayList<>();
                 for (String columnLabel : columnLabels) {
-                    if (columnLabel.equalsIgnoreCase("VALUE")) {
+                    if (columnLabel.equalsIgnoreCase(COLUMN_VALUE)) {
                         row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(
                                 rs, columnLabel, attributesTypeMap.get(columnLabel), metricsQueryManager)));
                     } else {
@@ -716,7 +713,7 @@ public class StatusDashboardMetricsDBHandler {
      * @return the selected object.
      */
     private List<List<Object>> selectGauge(String query, boolean isAggregated, Object[] parameters) {
-        Map<String, String> attributesTypeMap = workerAttributeTypeMap.get("METRIC_GAUGE");
+        Map<String, String> attributesTypeMap = workerAttributeTypeMap.get(METRICS_TABLE_METRIC_GAUGE);
         Connection conn = this.getConnection();
         ResultSet rs = null;
         List<List<Object>> tuple = new ArrayList<>();
@@ -726,21 +723,20 @@ public class StatusDashboardMetricsDBHandler {
             stmt = conn.prepareStatement(query);
             setDynamicValuesToStatement(stmt, parameters);
             rs = DBHandler.getInstance().select(stmt);
-            String timestampCol = "TIMESTAMP";
+            String timestampCol = COLUMN_TIMESTAMP;
             if (isAggregated) {
-                timestampCol = "AGG_TIMESTAMP";
+                timestampCol = COLUMN_AGG_TIMESTAMP;
             }
             while (rs.next()) {
                 row = new ArrayList<>();
                 row.add(DBTableUtils.getInstance().fetchData(rs, timestampCol, attributesTypeMap.get
-                        ("TIMESTAMP"), metricsQueryManager));
-                row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, "VALUE",
-                        attributesTypeMap.get
-                                ("VALUE"), metricsQueryManager)));
+                        (COLUMN_TIMESTAMP), metricsQueryManager));
+                row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, COLUMN_VALUE,
+                        attributesTypeMap.get(COLUMN_VALUE), metricsQueryManager)));
                 tuple.add(row);
             }
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table '" + "METRIC_GAUGE" + "': "
+            throw new RDBMSTableException("Error retrieving records from table '" + METRICS_TABLE_METRIC_GAUGE + "': "
                     + e.getMessage() + " in " + DATASOURCE_ID, e);
         } finally {
             

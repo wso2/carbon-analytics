@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.status.dashboard.core.dbhandler;
 
 import org.wso2.carbon.config.ConfigurationException;
@@ -39,10 +38,10 @@ import java.util.Map;
  */
 public class QueryManager {
 
-    private Map<String, String> queries = new HashMap<>();
+    private Map<String, String> queries;
 
     public QueryManager(String databaseType, String databaseVersion) throws
-            QueryMappingNotAvailableException, ConfigurationException, IOException {
+            QueryMappingNotAvailableException, ConfigurationException{
         queries = readConfigs(databaseType, databaseVersion);
     }
 

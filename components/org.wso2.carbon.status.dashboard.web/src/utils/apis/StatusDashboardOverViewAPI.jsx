@@ -54,7 +54,8 @@ export default class StatusDashboardOverViewAPI {
      * @param appName
      */
     static getComponents(workerID, appName) {
-        return StatusDashboardOverViewAPI.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName + '/components');
+        return StatusDashboardOverViewAPI.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName +
+            '/components');
     }
 
     /**
@@ -87,8 +88,8 @@ export default class StatusDashboardOverViewAPI {
      * @param statEnable
      */
     static enableSiddhiAppStats(workerID, appName, statEnable) {
-        return StatusDashboardOverViewAPI.getHTTPClient().put('/' + workerID + '/siddhi-apps/' + appName + '/statistics/'
-            , statEnable);
+        return StatusDashboardOverViewAPI.getHTTPClient().put('/' + workerID + '/siddhi-apps/' + appName +
+            '/statistics/', statEnable);
     }
 
     /**

@@ -97,9 +97,12 @@ export default class AppSpecific extends React.Component {
                     throughputAll: response.data[0].throughput.data,
                     memory: response.data[0].memory.data,
                     isApiWaiting: false,
-                    tickCountTp: (response.data[0].throughput.data.length > 20) ? 10 : response.data[0].throughput.data.length,
-                    tickCountLt: (response.data[0].latency.data.length > 20) ? 10 : response.data[0].latency.data.length,
-                    tickCountMem: (response.data[0].memory.data.length > 20) ? 10 : response.data[0].memory.data.length,
+                    tickCountTp: (response.data[0].throughput.data.length > 20) ? 10 :
+                        response.data[0].throughput.data.length,
+                    tickCountLt: (response.data[0].latency.data.length > 20) ? 10 :
+                        response.data[0].latency.data.length,
+                    tickCountMem: (response.data[0].memory.data.length > 20) ? 10 :
+                        response.data[0].memory.data.length,
                 });
             }).catch((error) => {
             let message;

@@ -34,6 +34,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_COUNTER;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_GAUGE;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_HISTOGRAM;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_METER;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_TIMER;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_Q;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
@@ -59,11 +64,11 @@ public class DBTableUtils {
     public static long getAggregation(long interval) {
         if (interval <= 3600000) { //less than 6 hours
             return interval / 60000;
-        } else if (interval > 3600000 && interval <= 21600000) { //6 hours
+        } else if (interval <= 21600000) { //6 hours
             return 5; // 5 mins
-        } else if (interval > 21600000 && interval <= 86400000) { //24 hours
+        } else if (interval <= 86400000) { //24 hours
             return 60; // 1hour
-        } else if (interval > 86400000 && interval <= 604800000) { // 1week
+        } else if (interval <= 604800000) { // 1week
             return 360;  // 6 hours
         } else {
             return 1440; // 1day
@@ -72,10 +77,10 @@ public class DBTableUtils {
 
     public Map<String, String> loadMetricsTypeSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put("memory", "METRIC_GAUGE");
-        attributeSelection.put("throughput", "METRIC_METER");
-        attributeSelection.put("latency", "METRIC_TIMER");
-        attributeSelection.put("events", "METRIC_HISTOGRAM");
+        attributeSelection.put("memory", METRICS_TABLE_METRIC_GAUGE);
+        attributeSelection.put("throughput", METRICS_TABLE_METRIC_METER);
+        attributeSelection.put("latency", METRICS_TABLE_METRIC_TIMER);
+        attributeSelection.put("events", METRICS_TABLE_METRIC_HISTOGRAM);
         return attributeSelection;
     }
 
@@ -159,46 +164,46 @@ public class DBTableUtils {
 
     public Map<String, String> loadMetricsValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
-        attributeSelection.put("METRIC_GAUGE", "TIMESTAMP,VALUE");
-        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,M1_RATE");
-        attributeSelection.put("METRIC_METER", "TIMESTAMP,M1_RATE");
-        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,M1_RATE");
+        attributeSelection.put(METRICS_TABLE_METRIC_COUNTER, "TIMESTAMP,COUNT");
+        attributeSelection.put(METRICS_TABLE_METRIC_GAUGE, "TIMESTAMP,VALUE");
+        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "TIMESTAMP,M1_RATE");
+        attributeSelection.put(METRICS_TABLE_METRIC_METER, "TIMESTAMP,M1_RATE");
+        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "TIMESTAMP,M1_RATE");
         return attributeSelection;
     }
 
     public Map<String, String> loadMetricsAllValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
-        attributeSelection.put("METRIC_GAUGE", "TIMESTAMP,VALUE");
-        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
-        attributeSelection.put("METRIC_METER", "TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
-        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
+        attributeSelection.put(METRICS_TABLE_METRIC_COUNTER, "TIMESTAMP,COUNT");
+        attributeSelection.put(METRICS_TABLE_METRIC_GAUGE, "TIMESTAMP,VALUE");
+        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
+        attributeSelection.put(METRICS_TABLE_METRIC_METER, "TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
+        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
     }
 
     public Map<String, String> loadAggRowMetricsAllValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put("METRIC_COUNTER", "AGG_TIMESTAMP,COUNT");
-        attributeSelection.put("METRIC_GAUGE", "AGG_TIMESTAMP,VALUE");
-        attributeSelection.put("METRIC_HISTOGRAM", "AGG_TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
-        attributeSelection.put("METRIC_METER", "AGG_TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
-        attributeSelection.put("METRIC_TIMER", "AGG_TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
+        attributeSelection.put(METRICS_TABLE_METRIC_COUNTER, "AGG_TIMESTAMP,COUNT");
+        attributeSelection.put(METRICS_TABLE_METRIC_GAUGE, "AGG_TIMESTAMP,VALUE");
+        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "AGG_TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
+        attributeSelection.put(METRICS_TABLE_METRIC_METER, "AGG_TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
+        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "AGG_TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
     }
 
     public Map<String, String> loadAggMetricsAllValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put("METRIC_COUNTER", "AVG(COUNT) as COUNT");
-        attributeSelection.put("METRIC_GAUGE", "AVG(CAST(VALUE as DECIMAL(22,2))) as VALUE");
-        attributeSelection.put("METRIC_HISTOGRAM", "AVG(COUNT) as COUNT,AVG(MAX) as MAX, AVG(MEAN) as MEAN, " +
+        attributeSelection.put(METRICS_TABLE_METRIC_COUNTER, "AVG(COUNT) as COUNT");
+        attributeSelection.put(METRICS_TABLE_METRIC_GAUGE, "AVG(CAST(VALUE as DECIMAL(22,2))) as VALUE");
+        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "AVG(COUNT) as COUNT,AVG(MAX) as MAX, AVG(MEAN) as MEAN, " +
                 "AVG(MIN) as MIN, AVG(STDDEV) as STDDEV, AVG(P75) as P75, AVG(P95) as P95, AVG(P99) as P99," +
                 "AVG(P999) as P999");
-        attributeSelection.put("METRIC_METER", "AVG(COUNT) as COUNT,AVG(MEAN_RATE) as MEAN_RATE,AVG(M1_RATE) " +
+        attributeSelection.put(METRICS_TABLE_METRIC_METER, "AVG(COUNT) as COUNT,AVG(MEAN_RATE) as MEAN_RATE,AVG(M1_RATE) " +
                 "as M1_RATE,AVG(M5_RATE) as M5_RATE,AVG(M15_RATE) as M15_RATE");
-        attributeSelection.put("METRIC_TIMER", "AVG(COUNT) as COUNT,AVG(MAX) as MAX, AVG(MEAN) as MEAN, AVG(MIN) as" +
+        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "AVG(COUNT) as COUNT,AVG(MAX) as MAX, AVG(MEAN) as MEAN, AVG(MIN) as" +
                 " MIN, AVG(STDDEV) as STDDEV, AVG(P75) as P75, AVG(P95) as P95, AVG(P99) as P99, AVG(P999) as P999, " +
                 "AVG(MEAN_RATE) as MEAN_RATE, AVG(M1_RATE) as M1_RATE, AVG(M5_RATE) as M5_RATE," +
                 " AVG(M15_RATE) as M15_RATE");
@@ -277,11 +282,11 @@ public class DBTableUtils {
         attributesTimerTable.put("DURATION_UNIT", stringType);
 
         Map<String, Map<String, String>> attributesTypeMaps = new HashMap<>();
-        attributesTypeMaps.put("METRIC_COUNTER", attributesCounterTable);
-        attributesTypeMaps.put("METRIC_GAUGE", attributesGaugeTable);
-        attributesTypeMaps.put("METRIC_HISTOGRAM", attributesHistogramTable);
-        attributesTypeMaps.put("METRIC_METER", attributesMeterTable);
-        attributesTypeMaps.put("METRIC_TIMER", attributesTimerTable);
+        attributesTypeMaps.put(METRICS_TABLE_METRIC_COUNTER, attributesCounterTable);
+        attributesTypeMaps.put(METRICS_TABLE_METRIC_GAUGE, attributesGaugeTable);
+        attributesTypeMaps.put(METRICS_TABLE_METRIC_HISTOGRAM, attributesHistogramTable);
+        attributesTypeMaps.put(METRICS_TABLE_METRIC_METER, attributesMeterTable);
+        attributesTypeMaps.put(METRICS_TABLE_METRIC_TIMER, attributesTimerTable);
         return attributesTypeMaps;
     }
 

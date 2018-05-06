@@ -86,8 +86,10 @@ export default class AuthManager {
                         expires: AuthManager.calculateExpiryTime(validityPeriod),
                     });
                     // If rememberMe, set refresh token into a persistent cookie else session cookie.
-                    const refreshTokenValidityPeriod = AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
-                    AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
+                    const refreshTokenValidityPeriod =
+                        AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
+                    AuthManager
+                        .setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -131,7 +133,8 @@ export default class AuthManager {
                     });
                     // If rememberMe, set refresh token into a persistent cookie else session cookie.
                     const refreshTokenValidityPeriod = rememberMe ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
-                    AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
+                    AuthManager
+                        .setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));

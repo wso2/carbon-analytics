@@ -69,7 +69,8 @@ export default class FileDescriptor extends React.Component {
             gridColor: '#f2f2f2',
             xAxisTickCount: this.state.tickCount
         };
-        if (this.state.jvmOsFileDescriptorOpenCount.length === 0 && this.state.jvmOsFileDescriptorMaxCount.length === 0) {
+        if (this.state.jvmOsFileDescriptorOpenCount.length === 0 &&
+            this.state.jvmOsFileDescriptorMaxCount.length === 0) {
             return (
                 <div style={{paddingLeft: 10}}>
                     <Card>
@@ -86,7 +87,8 @@ export default class FileDescriptor extends React.Component {
                 </div>
             );
         }
-        let intY = DashboardUtils.initCombinedYDomain(this.state.jvmOsFileDescriptorOpenCount, this.state.jvmOsFileDescriptorMaxCount);
+        let intY = DashboardUtils
+            .initCombinedYDomain(this.state.jvmOsFileDescriptorOpenCount, this.state.jvmOsFileDescriptorMaxCount);
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={DashboardUtils.getCombinedChartList(this.state.jvmOsFileDescriptorOpenCount,

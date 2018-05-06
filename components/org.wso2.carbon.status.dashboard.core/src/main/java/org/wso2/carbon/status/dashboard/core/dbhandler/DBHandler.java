@@ -16,7 +16,6 @@
  *  under the License.
  *
  */
-
 package org.wso2.carbon.status.dashboard.core.dbhandler;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -123,8 +122,8 @@ public class DBHandler {
     /**
      * Create table query.
      *
-     * @param conn
-     * @param ps
+     * @param conn the connection
+     * @param ps the prepared statement
      * @throws RDBMSTableException
      */
     public void createTable(Connection conn, PreparedStatement ps) throws RDBMSTableException {
