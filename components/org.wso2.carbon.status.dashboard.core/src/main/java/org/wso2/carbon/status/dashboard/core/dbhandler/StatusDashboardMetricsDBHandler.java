@@ -335,7 +335,7 @@ public class StatusDashboardMetricsDBHandler {
                         attribute = new Attribute(columnList[1], humanReadableByteCount((double) selection.get(1),
                                 true));
                     } else {
-                        attribute = new Attribute(columnList[1], NumberFormat.getIntegerInstance().
+                        attribute = new Attribute(columnList[1], NumberFormat.getNumberInstance().
                                 format(selection.get(1)));
                     }
                     attribute.setRecentValues(selectionRecent);

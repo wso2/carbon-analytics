@@ -43,7 +43,7 @@ const latencyMetadata = {
 };
 const latencyLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
+    charts: [
         {type: 'area', y: 'Max', fill: '#50B432', style: {markRadius: 2}},
         {type: 'area', y: 'Mean', fill: '#f17b31', style: {markRadius: 2}},
         {type: 'area', y: 'Min', fill: '#8c51a5', style: {markRadius: 2}},
@@ -100,7 +100,7 @@ const tpMetadata = {
 
 const tpLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
+    charts: [
         {type: 'area', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
         {type: 'area', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},
         {type: 'area', y: 'M5 Rate', fill: '#8c51a5', style: {markRadius: 2}},

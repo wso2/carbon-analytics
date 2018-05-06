@@ -166,7 +166,7 @@ public class DBTableUtils {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put(METRICS_TABLE_METRIC_COUNTER, "TIMESTAMP,COUNT");
         attributeSelection.put(METRICS_TABLE_METRIC_GAUGE, "TIMESTAMP,VALUE");
-        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "TIMESTAMP,M1_RATE");
+        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "TIMESTAMP,MEAN");
         attributeSelection.put(METRICS_TABLE_METRIC_METER, "TIMESTAMP,M1_RATE");
         attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "TIMESTAMP,M1_RATE");
         return attributeSelection;
@@ -176,9 +176,9 @@ public class DBTableUtils {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put(METRICS_TABLE_METRIC_COUNTER, "TIMESTAMP,COUNT");
         attributeSelection.put(METRICS_TABLE_METRIC_GAUGE, "TIMESTAMP,VALUE");
-        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
-        attributeSelection.put(METRICS_TABLE_METRIC_METER, "TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
-        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
+        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "TIMESTAMP,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
+        attributeSelection.put(METRICS_TABLE_METRIC_METER, "TIMESTAMP,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
+        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "TIMESTAMP,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
     }
@@ -187,9 +187,9 @@ public class DBTableUtils {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put(METRICS_TABLE_METRIC_COUNTER, "AGG_TIMESTAMP,COUNT");
         attributeSelection.put(METRICS_TABLE_METRIC_GAUGE, "AGG_TIMESTAMP,VALUE");
-        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "AGG_TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
-        attributeSelection.put(METRICS_TABLE_METRIC_METER, "AGG_TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
-        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "AGG_TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
+        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "AGG_TIMESTAMP,MEAN,MAX,MIN,STDDEV,P75,P95,P99,P999");
+        attributeSelection.put(METRICS_TABLE_METRIC_METER, "AGG_TIMESTAMP,M1_RATE,MEAN_RATE,M5_RATE,M15_RATE");
+        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "AGG_TIMESTAMP,MEAN,MAX,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
     }
@@ -198,12 +198,12 @@ public class DBTableUtils {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put(METRICS_TABLE_METRIC_COUNTER, "AVG(COUNT) as COUNT");
         attributeSelection.put(METRICS_TABLE_METRIC_GAUGE, "AVG(CAST(VALUE as DECIMAL(22,2))) as VALUE");
-        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "AVG(COUNT) as COUNT,AVG(MAX) as MAX, AVG(MEAN) as MEAN, " +
+        attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "AVG(MAX) as MAX, AVG(MEAN) as MEAN, " +
                 "AVG(MIN) as MIN, AVG(STDDEV) as STDDEV, AVG(P75) as P75, AVG(P95) as P95, AVG(P99) as P99," +
                 "AVG(P999) as P999");
-        attributeSelection.put(METRICS_TABLE_METRIC_METER, "AVG(COUNT) as COUNT,AVG(MEAN_RATE) as MEAN_RATE,AVG(M1_RATE) " +
+        attributeSelection.put(METRICS_TABLE_METRIC_METER, "AVG(MEAN_RATE) as MEAN_RATE,AVG(M1_RATE) " +
                 "as M1_RATE,AVG(M5_RATE) as M5_RATE,AVG(M15_RATE) as M15_RATE");
-        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "AVG(COUNT) as COUNT,AVG(MAX) as MAX, AVG(MEAN) as MEAN, AVG(MIN) as" +
+        attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "AVG(MAX) as MAX, AVG(MEAN) as MEAN, AVG(MIN) as" +
                 " MIN, AVG(STDDEV) as STDDEV, AVG(P75) as P75, AVG(P95) as P95, AVG(P99) as P99, AVG(P999) as P999, " +
                 "AVG(MEAN_RATE) as MEAN_RATE, AVG(M1_RATE) as M1_RATE, AVG(M5_RATE) as M5_RATE," +
                 " AVG(M15_RATE) as M15_RATE");
