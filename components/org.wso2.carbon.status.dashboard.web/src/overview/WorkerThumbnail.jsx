@@ -132,7 +132,7 @@ export default class WorkerThumbnail extends React.Component {
             return (
                 <Tooltip id="tooltip-icon" title="Delete Worker">
                     <IconButton className={'btn-delete'} iconStyle={styles.smallIcon}
-                        style={{ zIndex: 1 }} onClick={() => { this.setState({ open: true }) }}>
+                                style={{ zIndex: 1 }} onClick={() => { this.setState({ open: true }) }}>
                         <Delete color="grey"/>
                     </IconButton>
                 </Tooltip>
@@ -140,15 +140,15 @@ export default class WorkerThumbnail extends React.Component {
         } else {
             return (
                 <IconButton iconStyle={{ width: 20, height: 20, display: 'none' }} tooltip="Delete Worker"
-                    tooltipPosition="bottom-center" onClick={() => {
-                    }}><Delete color="grey" /></IconButton>
+                            tooltipPosition="bottom-center" onClick={() => {
+                }}><Delete color="grey" /></IconButton>
             )
         }
     }
     renderGridTile() {
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
-        if (this.props.worker.serverDetails.clusterID == null && this.props.worker.statusMessage !=="Please add the node manually.") {
+        if (this.props.worker.serverDetails.clusterID == null) {
             if (this.props.worker.statusMessage == null) {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={98} style={styles.gridList}>
@@ -164,7 +164,7 @@ export default class WorkerThumbnail extends React.Component {
                         <h2 style={{ textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>
                             Worker is not reachable!
                             <br />
-                            <text style={{ textAlign: 'center', fontSize: 12, color: 'white' }}>
+                            <text style={{ textAlign: 'center', fontSize: 12, color: '#dedede' }}>
                                 {this.props.worker.statusMessage}
                             </text>
                         </h2>
@@ -174,10 +174,10 @@ export default class WorkerThumbnail extends React.Component {
                 color = 'red';
             }
             //statistics disabled workers
-        } else if (!this.props.worker.serverDetails.isStatsEnabled && this.props.worker.statusMessage !=="Please add the node manually." ) {
+        } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>
                 <Link style={{ textDecoration: 'none' }}
-                    to={window.contextPath + '/worker/' + this.props.worker.workerId}>
+                      to={window.contextPath + '/worker/' + this.props.worker.workerId}>
                     <GridList cols={2} cellHeight={98} style={styles.gridList}>
                         <GridTile>
                             <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
@@ -189,13 +189,9 @@ export default class WorkerThumbnail extends React.Component {
                                 }}>{this.props.worker.statusMessage}</h4>
                             </div>
                         </GridTile>
-                        <GridTile title="Siddhi Apps" titlePosition="bottom"
-                                  titleStyle={{fontSize: 10, textAlign: 'center'}}>
-                            <div className="grid-tile-h1" style={{marginTop: 50}}><h1
                         <GridTile>
                             <div className="grid-tile-h1" style={{ marginTop: 30 }}><h1
                                 className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
-                                <h1 style={{display: 'inline'}}> |</h1>
                                 <h1 style={{ display: 'inline' }}> | </h1>
                                 <h1 className="inactive-apps">
                                     {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
@@ -229,38 +225,6 @@ export default class WorkerThumbnail extends React.Component {
                     color = 'red'
                 }
             }
-
-        } else if(this.props.worker.statusMessage ==="Please add the node manually."){
-            gridTiles = <div>
-                <Link style={{ textDecoration: 'none' }} to={window.contextPath + '/add-worker'}>
-                    <GridList cols={1} cellHeight={180} style={styles.gridList}>
-                        <GridTile>
-                            <h4 style={{
-                                textAlign: 'center',
-                                color: 'white',
-                                padding: 50
-                            }}> Node id is {this.props.worker.nodeId}</h4>
-                            <h4 style={{
-                                textAlign: 'center',
-                                color: 'white',
-                                padding: 50
-                            }}>Node id is {this.props.worker.nodeId} <br/>Please add the node manually.</h4>
-                        </GridTile>
-                        {/*<GridTile title="Siddhi Apps" titlePosition="bottom"*/}
-                        {/*titleStyle={{ fontSize: 10, textAlign: 'center' }}>*/}
-                        {/*<div className="grid-tile-h1" style={{ marginTop: 50 }}><h1*/}
-                        {/*className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>*/}
-                        {/*<h1 style={{ display: 'inline' }}> |</h1>*/}
-                        {/*<h1 className="inactive-apps">*/}
-                        {/*{this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}*/}
-                        {/*</h1>*/}
-                        {/*</div>*/}
-                        {/*</GridTile>*/}
-                    </GridList>
-                </Link>
-            </div>;
-            lastUpdated = "#";
-
         } else {
             //handling trend for cpu, memory and load average
             let cpuTrend, memoryTrend, loadTrend, loadAvg, loadTrendImg;
@@ -312,7 +276,7 @@ export default class WorkerThumbnail extends React.Component {
             gridTiles =
                 <div>
                     <Link style={{ textDecoration: 'none' }}
-                        to={window.contextPath + '/worker/' + this.props.worker.workerId}>
+                          to={window.contextPath + '/worker/' + this.props.worker.workerId}>
                         <GridList className={'node-overview'} cols={4} cellHeight={98} style={styles.gridList}>
                             <GridTile>
                                 <OverviewChart
@@ -446,12 +410,11 @@ export default class WorkerThumbnail extends React.Component {
                     {items[0]}
                 </GridTile>
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle} open={this.state.showMsg}
-                    message={this.state.message} autoHideDuration={4000}
-                    onRequestClose={() => {
-                        this.setState({ showMsg: false, message: "" })
-                    }} />
+                          message={this.state.message} autoHideDuration={4000}
+                          onRequestClose={() => {
+                              this.setState({ showMsg: false, message: "" })
+                          }} />
             </div>
         );
     }
-
 }

@@ -20,30 +20,29 @@
 import React from "react";
 import { Link } from "react-router-dom";
 //Material UI
-import { CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar } from "material-ui";
+import { CardActions, Button, IconButton, Snackbar, Tooltip, Typography } from "material-ui-next";
+import {Dialog, GridList, GridTile} from "material-ui";
+
 import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
-import Delete from "material-ui/svg-icons/action/delete";
-import TrendDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
-import TrendUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
+
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import { HttpStatus } from '../utils/Constants';
-import OverviewChart from "./OverviewChart";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import Clock from "./Clock";
 
-const styles = { gridList: { width: '100%', height: 200 }, smallIcon: { width: 20, height: 20, zIndex: 1 } };
+const styles = {
+    gridList: {width: '100%', height: 150, margin: 0},
+    smallIcon: {width: 20, height: 20, zIndex: 1, padding: 5},
+    overviewLegend: {fontSize: 10, color: '#fff'},
+    legendContainer: {width: '100%', textAlign: 'center', position: 'absolute', bottom: 5},
+     };
 const messageBoxStyle = { textAlign: "center", color: "white" };
 const errorMessageStyle = { backgroundColor: "#FF5722", color: "white" };
 const successMessageStyle = { backgroundColor: "#4CAF50", color: "white" };
-const constants = { memory: "memory", cpu: "cpu", load: "load", down: "down", up: "up", na: "n/a" };
-
 
 export default class DistributedViewResourceNodeThumbnail extends React.Component {
     constructor(props) {
         super(props);
-
         this.state = {
             warning: '',
             showMsg: '',
@@ -55,9 +54,7 @@ export default class DistributedViewResourceNodeThumbnail extends React.Componen
         };
         this.showError = this.showError.bind(this);
         this.showMessage = this.showMessage.bind(this);
-
     }
-
 
     componentWillMount() {
         let that = this;
@@ -101,83 +98,56 @@ export default class DistributedViewResourceNodeThumbnail extends React.Componen
     }
 
     renderGridTile() {
-
-        console.log("poppy"+this.state.worker);
-
         let gridTiles, lastUpdated, color, haStatus;
-     //   if (this.props.worker.statusMessage === "Please add the node manually.") {
 
             gridTiles = <div>
                 <Link style={{ textDecoration: 'none' }} to={window.contextPath + '/add-worker'}>
-                    <GridList cols={1} cellHeight={180} style={styles.gridList}>
+                    <GridList cols={1} cellHeight={98} style={styles.gridList}>
                         <GridTile>
                             <h4 style={{
                                 textAlign: 'center',
                                 color: 'white',
-                                padding: 50
+                                padding: 20
                             }}>Please add the node manually.</h4>
                         </GridTile>
-                        {/*<GridTile title="Siddhi Apps" titlePosition="bottom"*/}
-                                  {/*titleStyle={{ fontSize: 10, textAlign: 'center' }}>*/}
-                            {/*<div className="grid-tile-h1" style={{ marginTop: 50 }}><h1*/}
-                                {/*className="active-apps">{this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>*/}
-                                {/*<h1 style={{ display: 'inline' }}> |</h1>*/}
-                                {/*<h1 className="inactive-apps">*/}
-                                    {/*{this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}*/}
-                                {/*</h1>*/}
-                            {/*</div>*/}
-                        {/*</GridTile>*/}
+
                     </GridList>
                 </Link>
             </div>;
             lastUpdated = "#";
             color='red';
-            // if (this.props.worker.serverDetails.clusterID === "Non Clusters") {
-            //     if (this.props.worker.serverDetails.runningStatus === "Reachable") {
-            //         color = 'green'
-            //     } else {
-            //         color = 'red'
-            //     }
-            // } else {
-            //     if (this.props.worker.serverDetails.runningStatus === "Reachable") {
-            //         if (this.props.worker.serverDetails.haStatus === "Active") {
-            //             color = 'green';
-            //             haStatus = 'Active'
-            //         } else if (this.props.worker.serverDetails.haStatus === "Passive") {
-            //             color = 'grey';
-            //             haStatus = 'Passive'
-            //         }
-            //     } else {
-            //         color = 'red'
-            //     }
-            // }
-       // }
+
         return [gridTiles, lastUpdated, color, haStatus];
     }
 
     render() {
         let items = this.renderGridTile();
-
-        {console.log("am here!!!")}
-
+        let titleBg = items[2] === 'red' ? '#570404' : '#424242';
 
         return (
             <div>
-                <GridTile
-                    //todo: this should be nodeId
-                     title={this.props.worker.nodeId}
-                    subtitle=
-                        {<span>Last Updated: {this.renderTime(items[1])}
-                            <div style={{ float: 'right', display: 'inline' }}><strong>{items[3]}</strong></div>
-                    </span>}
-                    actionIcon={<IconButton><CircleBorder
-                        color={items[2]} /></IconButton>}
-                    actionPosition="left"
-                    style={{ background: 'black' }}
-                    titleBackground={items[2] === 'red' ? '#570404' : '#424242'}
-                >
-                    <CardActions style={{ boxSizing: 'border-box', float: 'right', display: 'inline', height: 20 }}>
-
+                <GridTile style={{background: 'black'}}>
+                    <div style={{
+                        display: 'flex', alignItems: 'center', background: titleBg,
+                        position: 'absolute', bottom: 0, width: '100%'
+                    }}>
+                        <IconButton><CircleBorder
+                            color={items[2]}/></IconButton>
+                        <div>
+                            <Typography className={'node-title'}>
+                                {this.props.worker.nodeId}</Typography>
+                            <Typography className={'node-last-update'}>
+                                <span>Last Updated: {this.renderTime(items[1])}
+                                    <div style={{float: 'right', display: 'inline'}}><strong>{items[3]}</strong>
+                                    </div>
+                                </span>
+                            </Typography>
+                        </div>
+                    </div>
+                    <CardActions style={{
+                        position: 'absolute', right: 0,
+                        display: 'inline', height: 20, padding: 5
+                    }}>
                     </CardActions>
                     {items[0]}
                 </GridTile>
