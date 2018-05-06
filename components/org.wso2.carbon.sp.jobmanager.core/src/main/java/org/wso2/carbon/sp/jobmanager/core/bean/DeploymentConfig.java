@@ -40,6 +40,10 @@ public class DeploymentConfig implements Serializable {
     private String datasource;
     @Element(description = "bootstrap urls for Kafka", required = true)
     private String bootstrapURLs;
+    /**
+     * @deprecated zooKeeperURLs is moved to {@link ZooKeeperConfig} bean
+     */
+    @Deprecated
     @Element(description = "ZooKeeper urls of Kafka cluster", required = true)
     private String zooKeeperURLs;
     @Element(description = "ZooKeeper configurations", required = true)
