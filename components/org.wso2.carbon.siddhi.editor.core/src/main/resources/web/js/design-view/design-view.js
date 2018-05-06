@@ -168,7 +168,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
                 setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
                 appData.addPatternQuery(patternQueryObject);
             });
-            _.forEach(configurationData.siddhiAppConfig.windowFilterProjectionQueryList, function(windowFilterProjectionQuery){
+            _.forEach(configurationData.siddhiAppConfig.windowFilterProjectionQueryList,
+                function(windowFilterProjectionQuery){
                 var queryObject = new Query(windowFilterProjectionQuery);
                 var windowFilterProjectionQueryInput =
                     new WindowFilterProjectionQueryInput(windowFilterProjectionQuery.queryInput);

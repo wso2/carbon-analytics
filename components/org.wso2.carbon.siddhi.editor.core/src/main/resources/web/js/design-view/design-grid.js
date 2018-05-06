@@ -481,7 +481,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             }
 
                             if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
-                                || sourceElement.hasClass(constants.WINDOW)) {
+                                || sourceElement.hasClass(constants.WINDOW_QUERY)) {
                                 model = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(sourceId);
                             }

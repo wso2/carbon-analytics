@@ -169,6 +169,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var select = [];
+                var possibleUserDefinedSelectTypeValues = [];
                 if (clickedElement.getSelect() === undefined) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
@@ -187,6 +188,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 } else if (clickedElement.getSelect().getValue() === '*') {
                     select = '*';
+                    for (var i = 0; i < outputElementAttributesList.length; i++) {
+                        var attr = {
+                            expression: undefined,
+                            as: outputElementAttributesList[i].getName()
+                        };
+                        possibleUserDefinedSelectTypeValues.push(attr);
+                    }
                 } else if (!(clickedElement.getSelect().getValue() === '*')) {
                     var selectedAttributes = clickedElement.getSelect().getValue();
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
@@ -251,7 +259,25 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 }
 
-                var fillQueryInputWith = savedQueryInput;
+                var fillQueryInputWith = self.formUtils.cleanJSONObject(savedQueryInput);
+                /*
+                * test whether filter and window queries has their unique elements. For an example if a filter is added
+                * the filter field should be activated. If a window is added window fields should be activated.
+                * NOTE: this check is only essential when a form is opened for a query for the first time. After that
+                * query type is changed according to the user input. So the required fields are already activated and
+                * filled.
+                * */
+                if ($(element).parent().hasClass(constants.FILTER)) {
+                    if (fillQueryInputWith.filter === undefined && fillQueryInputWith.postWindowFilter === undefined) {
+                        _.set(fillQueryInputWith, 'filter.filter', '');
+                    }
+                } else if ($(element).parent().hasClass(constants.WINDOW_QUERY)) {
+                    if (fillQueryInputWith.window === undefined) {
+                        _.set(fillQueryInputWith, 'window.functionName', '');
+                        _.set(fillQueryInputWith, 'window.parameters', '');
+                    }
+                }
+
                 var fillQuerySelectWith = {
                     select : select,
                     groupBy : groupBy,
@@ -259,6 +285,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         having : having
                     }
                 };
+                fillQuerySelectWith = self.formUtils.cleanJSONObject(fillQuerySelectWith);
                 var fillQueryOutputWith = {
                     orderBy : orderBy,
                     limit: {
@@ -269,6 +296,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     },
                     output: queryOutput
                 };
+                fillQueryOutputWith = self.formUtils.cleanJSONObject(fillQueryOutputWith);
 
                 var inputSchema;
                 if (inputElementType === 'window'){
@@ -299,9 +327,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 propertyOrder: 2,
                                 type: "object",
                                 title: "Filter",
-                                required: true,
                                 properties: {
                                     filter: {
+                                        required: true,
                                         title: "Condition",
                                         type: "string",
                                         minLength: 1
@@ -338,7 +366,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 propertyOrder: 2,
                                 type: "object",
                                 title: "Filter",
-                                required: true,
                                 properties: {
                                     filter: {
                                         required: true,
@@ -364,6 +391,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         type: "array",
                                         format: "table",
                                         title: "Parameters",
+                                        minItems: 1,
                                         items: {
                                             type: "object",
                                             title: 'Attribute',
@@ -464,7 +492,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
                 });
-                var editorSelect = new JSONEditor($('#form-query-select')[0], {
+                var selectScheme = {
                     schema: {
                         required: true,
                         options: {
@@ -494,6 +522,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 format: "table",
                                 title: "Group By Attributes",
                                 uniqueItems: true,
+                                minItems: 1,
                                 items: {
                                     type: "object",
                                     title: 'Attribute',
@@ -501,8 +530,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         attribute: {
                                             type: 'string',
                                             title: 'Attribute Name',
-                                            enum: possibleGroupByAttributes,
-                                            default: ""
+                                            enum: possibleGroupByAttributes
                                         }
                                     }
                                 }
@@ -530,6 +558,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 uniqueItems: true,
                                 options: {
                                     disable_array_add: true,
+                                    disable_array_delete: true
                                 },
                                 items: {
                                     title: "Value Set",
@@ -552,7 +581,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 title: "Select All Attributes",
                                 template: '*'
                             }
-
                         }
                     },
                     startval: fillQuerySelectWith,
@@ -563,11 +591,44 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     disable_array_delete_all_rows: true,
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
-                });
+                };
+                var editorSelect = new JSONEditor($('#form-query-select')[0], selectScheme);
+                var selectNode = editorSelect.getEditor('root.select');
                 //disable fields that can not be changed
-                for (var i = 0; i < outputElementAttributesList.length; i++) {
-                    editorSelect.getEditor('root.select.' + i + '.as').disable();
+                if (!(selectNode.getValue() === "*")) {
+                    for (var i = 0; i < outputElementAttributesList.length; i++) {
+                        editorSelect.getEditor('root.select.' + i + '.as').disable();
+                    }
                 }
+
+                editorSelect.watch('root.select', function () {
+                    var oldSelectValue = editorSelect.getValue().select;
+                    var newSelectValue = selectNode.getValue();
+                    if (oldSelectValue === "*" && newSelectValue !== "*") {
+                        if (select === "*") {
+                            fillQuerySelectWith = {
+                                select: possibleUserDefinedSelectTypeValues,
+                                groupBy: editorSelect.getValue().groupBy,
+                                postFilter: editorSelect.getValue().postFilter
+                            };
+                        } else {
+                            fillQuerySelectWith = {
+                                select: select,
+                                groupBy: editorSelect.getValue().groupBy,
+                                postFilter: editorSelect.getValue().postFilter
+                            };
+                        }
+                        fillQuerySelectWith = self.formUtils.cleanJSONObject(fillQuerySelectWith);
+                        selectScheme.startval = fillQuerySelectWith;
+                        $('#form-query-select').empty();
+                        editorSelect = new JSONEditor($('#form-query-select')[0], selectScheme);
+                        //disable fields that can not be changed
+                        for (var i = 0; i < outputElementAttributesList.length; i++) {
+                            editorSelect.getEditor('root.select.' + i + '.as').disable();
+                        }
+                    }
+                });
+
                 var editorOutput = new JSONEditor($('#form-query-output')[0], {
                     schema: {
                         required: true,
@@ -583,6 +644,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 format: "table",
                                 title: "Order By Attributes",
                                 uniqueItems: true,
+                                minItems: 1,
                                 items: {
                                     type: "object",
                                     title: 'Attribute',
@@ -591,8 +653,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                             required: true,
                                             type: 'string',
                                             title: 'Attribute Name',
-                                            enum: possibleGroupByAttributes,
-                                            default: ""
+                                            enum: possibleGroupByAttributes
                                         },
                                         order: {
                                             required: true,
@@ -613,7 +674,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         required: true,
                                         title: "Number of Events per Output",
                                         type: "number",
-                                        minLength: 1
+                                        minimum: 0
                                     }
                                 }
                             },
@@ -810,6 +871,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 // 'Submit' button action
                 var submitButtonElement = $('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
+
+                    var inputErrors = editorInput.validate();
+                    var selectErrors = editorSelect.validate();
+                    var outputErrors = editorOutput.validate();
+                    if(inputErrors.length || selectErrors.length || outputErrors.length) {
+                        return;
+                    }
+
                     self.gridContainer.removeClass('disabledbutton');
                     self.toolPaletteContainer.removeClass('disabledbutton');
 
