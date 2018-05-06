@@ -81,7 +81,6 @@ export default class ManagerThumbnail extends React.Component {
             isApiCalled: false,
             sessionInvalid: false,
             isError: false,
-            //TODO: ONLY FOR TESTING
             resourceClustersList: {}
         };
         this.deleteManager = this.deleteManager.bind(this);
