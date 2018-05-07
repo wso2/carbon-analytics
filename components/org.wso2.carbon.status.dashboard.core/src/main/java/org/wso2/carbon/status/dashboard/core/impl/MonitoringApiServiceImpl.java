@@ -164,8 +164,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 managerList.parallelStream().forEach(manager -> {
                     try {
                         feign.Response resourceResponse = WorkerServiceFactory.getWorkerHttpsClient(
-                                PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(
-                                        manager.getPort())), this.getUsername(), this.getPassword()).getClusterNodeDetails();
+                                PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager
+                                        .getPort())), this.getUsername(), this.getPassword()).getClusterNodeDetails();
                         if (resourceResponse.status() == 200) {
                             Reader inputStream = resourceResponse.body().asReader();
                             List<ResourceClusterInfo> clusterInfos = gson.fromJson(
@@ -2127,8 +2127,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     }
 
     @Override
-    public Response getClusterResourceNodeDetails(String managerId, String username) throws NotFoundException, IOException {
-        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
+    public Response getClusterResourceNodeDetails(String managerId, String username)
+            throws NotFoundException, IOException {
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(
+                Constants.PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
         if (isAuthorized) {
             String[] hostPort = managerId.split(Constants.WORKER_KEY_GENERATOR);
             if (hostPort.length == 2) {
