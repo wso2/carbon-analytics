@@ -423,7 +423,7 @@ public class StatusDashboardDBHandler {
     public WorkerGeneralDetails selectWorkerGeneralDetails(String workerId) {
         String columnNames = WorkerGeneralDetails.getColumnLabeles();
         List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_DETAILS_TABLE,
-                new String[]{workerId});
+                new String[] {workerId});
         if (!row.isEmpty()) {
             WorkerGeneralDetails details = new WorkerGeneralDetails();
             try {
@@ -446,7 +446,7 @@ public class StatusDashboardDBHandler {
     public String selectWorkerCarbonID(String workerId) {
         String columnNames = "CARBONID";
         List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_DETAILS_TABLE,
-                new String[]{workerId});
+                new String[] {workerId});
         if (row.size() > 0) {
             return (String) row.get(0);
         } else {
@@ -463,7 +463,7 @@ public class StatusDashboardDBHandler {
     public NodeConfigurationDetails selectWorkerConfigurationDetails(String workerId) {
         String columnNames = NodeConfigurationDetails.getColumnLabeles();
         List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_CONFIG_TABLE,
-                new String[]{workerId});
+                new String[] {workerId});
         if (!row.isEmpty()) {
             NodeConfigurationDetails details = new NodeConfigurationDetails();
             try {
