@@ -2130,8 +2130,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     @Override
     public Response getClusterResourceNodeDetails(String managerId, String username)
             throws NotFoundException, IOException {
-        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(
-                Constants.PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
+        boolean isAuthorized = permissionProvider.hasPermission(username,
+                new Permission(Constants.PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
         if (isAuthorized) {
             String[] hostPort = managerId.split(Constants.WORKER_KEY_GENERATOR);
             if (hostPort.length == 2) {
@@ -2139,7 +2139,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 try {
                     feign.Response resourceResponse = WorkerServiceFactory.getWorkerHttpsClient(
                             PROTOCOL + nodeURIBody, this.getUsername(), this.getPassword()).getClusterNodeDetails();
-
                     if (resourceResponse.status() == 200) {
                         Reader inputStream = resourceResponse.body().asReader();
                         List<ResourceClusterInfo> clusterInfos = gson.fromJson(inputStream,
@@ -2161,30 +2160,34 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                         if ((workerResponse != null) && (workerResponse.status() == 200)) {
                                             Long timeInMillis = System.currentTimeMillis();
                                             String responseBody = workerResponse.body().toString();
-                                            ServerDetails serverDetails = gson.fromJson(responseBody, ServerDetails.class);
+                                            ServerDetails serverDetails = gson.fromJson(
+                                                    responseBody, ServerDetails.class);
                                             String message = serverDetails.getMessage();
                                             if (message == null || message.isEmpty()) {
                                                 workerOverview.setStatusMessage("Success");
                                             } else {
                                                 workerOverview.setStatusMessage(message);
                                             }
-                                            feign.Response activeSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
-                                                    PROTOCOL + generateURLHostPort(worker.getHost(), String.valueOf(
-                                                            worker.getPort())), getUsername(), getPassword()).getSiddhiApps(true);
-                                            String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
+                                            feign.Response activeSiddiAppsResponse = WorkerServiceFactory
+                                                    .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(
+                                                            worker.getHost(), String.valueOf(worker.getPort())),
+                                                            getUsername(), getPassword()).getSiddhiApps(true);
+                                            String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body()
+                                                    .toString();
                                             List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody,
-                                                    new TypeToken<List<String>>() {
-                                                    }.getType());
+                                                    new TypeToken<List<String>>() {}.getType());
                                             feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory
-                                                    .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(worker.getHost(),
-                                                            String.valueOf(worker.getPort())), getUsername(),
-                                                            getPassword()).getSiddhiApps(false);
-                                            String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
+                                                    .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(
+                                                            worker.getHost(), String.valueOf(worker.getPort())),
+                                                            getUsername(), getPassword()).getSiddhiApps(false);
+                                            String inactiveSiddiAppsResponseBody =
+                                                    inactiveSiddiAppsResponse.body().toString();
                                             List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody,
                                                     new TypeToken<List<String>>() {
                                                     }.getType());
                                             serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
-                                            WorkerMetricsSnapshot snapshot = new WorkerMetricsSnapshot(serverDetails, timeInMillis);
+                                            WorkerMetricsSnapshot snapshot = new WorkerMetricsSnapshot(
+                                                    serverDetails, timeInMillis);
                                             WorkerStateHolder.addMetrics(worker.getWorkerId(), snapshot);
                                             workerOverview.setLastUpdate(timeInMillis);
                                             workerOverview.setWorkerId(worker.getWorkerId());
@@ -2205,7 +2208,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         for (WorkerOverview overview : resourceClusterList) {
                             alreadyExistingResourceNodeNodeId.add(overview.getNodeId());
                         }
-
                         for (ResourceClusterInfo clusterInfo : clusterInfos) {
                             if (!alreadyExistingResourceNodeNodeId.contains(clusterInfo.getNodeId())) {
                                 WorkerOverview workerOverview = new WorkerOverview();
