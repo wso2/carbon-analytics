@@ -164,7 +164,7 @@ public class SiddhiMetricsAPITestcase {
         Assert.assertTrue(workerMetrics.getProcessCPU() > 0);
         Assert.assertTrue(workerMetrics.getSystemCPU() > 0);
         Assert.assertTrue(workerMetrics.getTotalMemory() > 0);
-        Assert.assertTrue(workerStatistics.getClusterID().equalsIgnoreCase("Non Clusters"));
+        Assert.assertTrue(workerStatistics.getClusterID().equalsIgnoreCase("Single Node Deployments"));
         Assert.assertTrue(workerStatistics.getRunningStatus().equalsIgnoreCase("Reachable"));
         Assert.assertTrue(workerStatistics.isStatsEnabled());
         Assert.assertTrue(!workerStatistics.isInSync());
