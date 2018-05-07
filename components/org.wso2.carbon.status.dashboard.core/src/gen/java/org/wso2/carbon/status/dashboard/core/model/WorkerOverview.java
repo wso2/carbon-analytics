@@ -24,6 +24,7 @@ package org.wso2.carbon.status.dashboard.core.model;
  */
 public class WorkerOverview {
     private String workerId;
+    private String nodeId;
     private Long lastUpdate;
     private String statusMessage;
     private ServerDetails serverDetails;
@@ -64,4 +65,11 @@ public class WorkerOverview {
         this.statusMessage = statusMessage;
     }
 
+    public String getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
+    }
 }

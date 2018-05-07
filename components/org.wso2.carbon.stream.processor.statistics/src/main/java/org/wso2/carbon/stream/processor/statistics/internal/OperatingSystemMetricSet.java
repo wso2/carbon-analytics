@@ -172,7 +172,7 @@ public class OperatingSystemMetricSet {
         NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
         if (nodeInfo.getMode().compareTo(DeploymentMode.SINGLE_NODE) == 0) {
-            workerStatistics.setClusterID("Non Clusters");
+            workerStatistics.setClusterID("Single Node Deployments");
             workerStatistics.setLastSyncTime("n/a");
             workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
         } else {
@@ -184,7 +184,6 @@ public class OperatingSystemMetricSet {
                 workerStatistics.setInSync(nodeInfo.isInSync());
                 workerStatistics.setLastSyncTime(dateFormatter.format(new Date(nodeInfo.getLastSyncedTimestamp())));
             }
-
         }
     }
 

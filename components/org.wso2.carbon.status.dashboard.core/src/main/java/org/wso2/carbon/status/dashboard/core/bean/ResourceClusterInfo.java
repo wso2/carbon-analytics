@@ -17,20 +17,37 @@
  *
  */
 
-package org.wso2.carbon.sp.jobmanager.core.api;
-
-import org.wso2.msf4j.Request;
-
-import javax.ws.rs.core.Response;
+package org.wso2.carbon.status.dashboard.core.bean;
 
 /**
- * Auto generated class from Swagger to MSF4J.
+ * Bean class that contains resource cluster information.
  */
+public class ResourceClusterInfo {
+    private String nodeId;
+    private String httpHost;
+    private String httpPort;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-        date = "2018-02-03T14:53:27.713Z")
-public abstract class WorkersApiService {
-    public abstract Response getWorkers(Request request) throws NotFoundException;
+    public String getNodeId() {
+        return nodeId;
+    }
 
-    public abstract Response getClusteredWorkerNodeDetails(Request request) throws NotFoundException;
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public String getHost() {
+        return httpHost;
+    }
+
+    public void setHost(String httpHost) {
+        this.httpHost = httpHost;
+    }
+
+    public String getPort() {
+        return httpPort;
+    }
+
+    public void setPort(String httpPort) {
+        this.httpPort = httpPort;
+    }
 }

@@ -67,7 +67,7 @@ public interface WorkerServiceStub {
 
     //APIS related to distributed view
     @Headers("Content-Type: application/json")
-    @RequestLine("GET /runTime")
+    @RequestLine("GET nodeDetails/runTime")
     Response getRunTime();
 
     @Headers("Content-Type: application/json")
@@ -94,4 +94,7 @@ public interface WorkerServiceStub {
     @RequestLine("GET /managers/kafkaDetails/{appName}")
     Response getKafkaDetails(@Param("appName") String appName);
 
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /resourceClusterWorkers/clusteredWorkerNodeDetails")
+    Response getClusterNodeDetails();
 }
