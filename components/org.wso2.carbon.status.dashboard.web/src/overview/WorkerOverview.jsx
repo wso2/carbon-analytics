@@ -581,25 +581,46 @@ export default class WorkerOverview extends React.Component {
                     <h3 style={styles.h3}>Distributed Deployments</h3>
 
                     {Object.keys(managerList).map((id, workerList) => {
-                        return (
-                            <div>
-                                <h3 style={styles.h3}>Group Id: {id}</h3>
-                                <Divider inset={true} style={styles.divider}/>
-                                <h3 style={styles.h3Title}>Managers</h3>
-                                <h3 style={styles.h3}>{id}</h3>
-                                <Divider inset={true} style={styles.divider}/>
-                                <div style={styles.root}>
-                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
-                                        {managerList[id].map((worker) => {
-                                            return (
-                                                <ManagerThumbnail worker={worker}
-                                                                  currentTime={new Date().getTime()}/>
-                                            )
-                                        })}
-                                    </GridList>
+                        if (id !== " ") {
+                            return (
+                                <div>
+                                    <Divider inset={true} style={styles.divider}/>
+                                    <h3 style={styles.h3Title}>Group Id : {id}</h3>
+                                    <h4 style={styles.h3Title}>Managers</h4>
+                                    <div style={{
+                                        display: 'flex', flexWrap: 'wrap', marginTop: '-200px', marginLeft: '-90px',
+                                        width: '90%', height: '100%', padding: '200px'
+                                    }}>
+                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                            {managerList[id].map((worker) => {
+                                                return (
+                                                    <ManagerThumbnail worker={worker}
+                                                                      currentTime={new Date().getTime()}/>
+                                                )
+                                            })}
+
+                                        </GridList>
+                                    </div>
                                 </div>
-                            </div>
-                        )
+                            )
+                        } else {
+                            return (
+                                <div style={{height: '100%'}}>
+                                    <h3 style={styles.h3}>Managers</h3>
+                                    <Divider inset={true} style={styles.divider}/>
+                                    <div style={styles.root}>
+                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                            {managerList[id].map((worker) => {
+                                                return (
+                                                    <ManagerThumbnail worker={worker}
+                                                                      currentTime={new Date().getTime()}/>
+                                                )
+                                            })}
+                                        </GridList>
+                                    </div>
+                                </div>
+                            )
+                        }
                     })}
                 </div>
             );
