@@ -1682,7 +1682,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             if (groupedManagers.get(Constants.NEVER_REACHED) == null) {
                                 List<ManagerOverView> managers = new ArrayList<>();
                                 managers.add(managerOverView);
-                                groupedManagers.put(clusterInfo.getGroupId(), managers);
+                                groupedManagers.put(Constants.NEVER_REACHED, managers);
                             } else {
                                 List existing = groupedManagers.get(Constants.NEVER_REACHED);
                                 existing.add(managerOverView);
@@ -1703,7 +1703,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             } else {
                                 List<ManagerOverView> managers = new ArrayList<>();
                                 managers.add(managerOverView);
-                                groupedManagers.put(lastSnapshot.getClusterInfo().getGroupId(), managers);
+                                groupedManagers.put(Constants.NOT_REACHABLE_ID, managers);
                             }
                         } else {
                             ManagerOverView managerOverView = new ManagerOverView();
@@ -1718,7 +1718,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             if (groupedManagers.get(Constants.NEVER_REACHED) == null) {
                                 List<ManagerOverView> managers = new ArrayList<>();
                                 managers.add(managerOverView);
-                                groupedManagers.put(clusterInfo.getGroupId(), managers);
+                                groupedManagers.put(Constants.NEVER_REACHED, managers);
                             } else {
                                 List existing = groupedManagers.get(Constants.NEVER_REACHED);
                                 existing.add(managerOverView);

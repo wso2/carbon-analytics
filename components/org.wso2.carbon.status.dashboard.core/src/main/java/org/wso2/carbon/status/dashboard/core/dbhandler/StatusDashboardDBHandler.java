@@ -76,9 +76,10 @@ public class StatusDashboardDBHandler {
     private static final String WORKER_CONFIG_TABLE = "WORKERS_CONFIGURATION";
     private static final String MANAGER_CONFIG_TABLE = "MANAGER_CONFIGURATION";
     private static boolean isConfigTableCreated = false;
+    private static boolean isManagerConfigTableCreated = false;
     private static boolean isGeneralTableCreated = false;
     private QueryManager statusDashboardQueryManager;
-    
+
     public StatusDashboardDBHandler() {
         dataSource = MonitoringDataHolder.getInstance().getDashboardDataSource();
         Connection conn = null;
@@ -109,7 +110,7 @@ public class StatusDashboardDBHandler {
                     "dashboard. Please check database is available");
         }
     }
-    
+
     private void createWorkerConfigurationDB() {
         Connection conn = this.getConnection();
         PreparedStatement stmt = null;
@@ -139,13 +140,13 @@ public class StatusDashboardDBHandler {
             }
         }
     }
-    
+
     private void createManagerConfigurationDB() {
         Connection conn = this.getConnection();
         PreparedStatement stmt = null;
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, MANAGER_CONFIG_TABLE);
         String resolvedTableCreateQuery = createTableQuery.replace(PLACEHOLDER_TABLE_NAME, MANAGER_CONFIG_TABLE);
-        if (!isConfigTableCreated && (!DBHandler.getInstance().isTableExist(conn, resolved))) {
+        if (!isManagerConfigTableCreated && (!DBHandler.getInstance().isTableExist(conn, resolved))) {
             Map<String, String> attributesList = DBTableUtils.getInstance().loadManagerConfigTableTuples
                     (statusDashboardQueryManager);
             String resolvedTuples = String.format(
@@ -158,7 +159,7 @@ public class StatusDashboardDBHandler {
             try {
                 stmt = conn.prepareStatement(resolvedTableCreateQuery);
                 stmt.execute();
-                isConfigTableCreated = true;
+                isManagerConfigTableCreated = true;
             } catch (SQLException e) {
                 logger.error("Error occurred while creating table, please create manually ." + MANAGER_CONFIG_TABLE, e);
             } finally {
@@ -167,7 +168,7 @@ public class StatusDashboardDBHandler {
             }
         }
     }
-    
+
     private void creteDetailsDB() {
         Connection conn = this.getConnection();
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_DETAILS_TABLE);
@@ -218,7 +219,7 @@ public class StatusDashboardDBHandler {
             }
         }
     }
-    
+
     /**
      * Resolve the table names in the queries.
      *
@@ -228,7 +229,7 @@ public class StatusDashboardDBHandler {
     private String resolveTableName(String query, String tableName) {
         return query.replace(PLACEHOLDER_TABLE_NAME, tableName);
     }
-    
+
     /**
      * Returns a connection instance.
      *
@@ -237,7 +238,7 @@ public class StatusDashboardDBHandler {
     private Connection getConnection() {
         return DBHandler.getInstance().getConnection(dataSource);
     }
-    
+
     /**
      * Method which can be used to clear up and ephemeral SQL connectivity artifacts.
      *
@@ -257,11 +258,11 @@ public class StatusDashboardDBHandler {
             }
         }
     }
-    
+
     /**
      * Method which can be used to close the prepared statement.
      */
-    
+
     private void closePreparedStatement(PreparedStatement statement) {
         try {
             if (statement != null) {
@@ -271,7 +272,7 @@ public class StatusDashboardDBHandler {
             logger.debug("Error occurred while closing the statement.", e);
         }
     }
-    
+
     /**
      * Method which is used to insert the worker configuration details to database.
      *
@@ -288,9 +289,9 @@ public class StatusDashboardDBHandler {
         } catch (RDBMSTableException e) {
             throw new RDBMSTableException("Error inserting worker configuration details, " + e.getMessage(), e);
         }
-        
+
     }
-    
+
     /**
      * Method which is used to insert the worker configuration details to database.
      *
@@ -306,7 +307,7 @@ public class StatusDashboardDBHandler {
             throw new RDBMSTableException("Error inserting worker general details." + e.getMessage(), e);
         }
     }
-    
+
     /**
      * Method which is used to insert the manager configuration details to database.
      *
@@ -322,10 +323,10 @@ public class StatusDashboardDBHandler {
         } catch (RDBMSTableException e) {
             throw new RDBMSTableException("Error while inserting the data. " + e.getMessage(), e);
         }
-        
+
     }
-    
-    
+
+
     /**
      * Insert manager data manager db.
      *
@@ -354,7 +355,7 @@ public class StatusDashboardDBHandler {
             cleanupConnection(conn);
         }
     }
-    
+
     /**
      * Delete workers data to worker db.
      *
@@ -364,7 +365,7 @@ public class StatusDashboardDBHandler {
     public boolean deleteWorkerGeneralDetails(String workerId) {
         return this.delete(workerId, generateConditionWorkerID(QUESTION_MARK), WORKER_DETAILS_TABLE);
     }
-    
+
     /**
      * Delete workers data to worker db.
      *
@@ -374,7 +375,7 @@ public class StatusDashboardDBHandler {
     public boolean deleteWorkerConfiguration(String workerId) {
         return delete(workerId, generateConditionWorkerID(QUESTION_MARK), WORKER_CONFIG_TABLE);
     }
-    
+
     /**
      * Delete manager data to manager db.
      *
@@ -384,7 +385,7 @@ public class StatusDashboardDBHandler {
     public boolean deleteManagerConfiguration(String managerId) {
         return delete(managerId, generateConditionManagerID(QUESTION_MARK), MANAGER_CONFIG_TABLE);
     }
-    
+
     /**
      * Delete workers data to worker db.
      *
@@ -410,15 +411,15 @@ public class StatusDashboardDBHandler {
             cleanupConnection(conn);
         }
     }
-    
-    
+
+
     /**
      * Select worker from the worker DB.
      *
      * @param workerId condition of the selection.
      * @return list of object.
      */
-    
+
     public WorkerGeneralDetails selectWorkerGeneralDetails(String workerId) {
         String columnNames = WorkerGeneralDetails.getColumnLabeles();
         List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_DETAILS_TABLE,
@@ -435,7 +436,7 @@ public class StatusDashboardDBHandler {
             return null;
         }
     }
-    
+
     /**
      * Select worker from the worker DB.
      *
@@ -452,7 +453,7 @@ public class StatusDashboardDBHandler {
             return null;
         }
     }
-    
+
     /**
      * Select worker from the worker DB.
      *
@@ -475,7 +476,7 @@ public class StatusDashboardDBHandler {
             return null;
         }
     }
-    
+
     /**
      * Select worker from the worker DB.
      *
@@ -527,7 +528,7 @@ public class StatusDashboardDBHandler {
         }
         return row;
     }
-    
+
     /**
      * Select worker from the worker DB.
      *
@@ -553,7 +554,7 @@ public class StatusDashboardDBHandler {
                 row.setWorkerId((String) DBTableUtils.getInstance().fetchData(rs, "WORKERID",
                         attributesTypes.get("WORKERID"), statusDashboardQueryManager));
                 workerConfigurationDetails.add(row);
-                
+
             }
             stmt.close();
             rs.close();
@@ -572,7 +573,7 @@ public class StatusDashboardDBHandler {
         }
         return workerConfigurationDetails;
     }
-    
+
     /**
      * select managers in the database.
      */
@@ -609,7 +610,7 @@ public class StatusDashboardDBHandler {
         }
         return workerConfigurationDetails;
     }
-    
+
     /**
      * Generated thw worker ID condition.
      *
@@ -619,7 +620,7 @@ public class StatusDashboardDBHandler {
     private String generateConditionWorkerID(String workerIdPlaceHolder) {
         return WORKERID_EXPRESSION.replace(WORKERID_PLACEHOLDER, workerIdPlaceHolder);
     }
-    
+
     /**
      * Generated thw worker ID condition.
      *
