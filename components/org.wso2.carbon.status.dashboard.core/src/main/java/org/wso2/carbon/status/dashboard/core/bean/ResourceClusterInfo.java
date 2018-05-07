@@ -22,7 +22,6 @@ package org.wso2.carbon.status.dashboard.core.bean;
 /**
  * Bean class that contains resource cluster information.
  */
-
 public class ResourceClusterInfo {
     private String nodeId;
     private String http_host;

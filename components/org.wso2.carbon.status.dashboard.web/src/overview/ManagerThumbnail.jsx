@@ -255,10 +255,9 @@ export default class ManagerThumbnail extends React.Component {
                     }
                 })
             );
-        } else {
         }
-
     }
+
 
 
     static hasNodes(clusters) {
