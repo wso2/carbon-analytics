@@ -20,7 +20,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 //Material UI
-import { CardActions, Button, IconButton, Snackbar, Tooltip, Typography } from "material-ui-next";
+import {Button, CardActions, IconButton, Snackbar, Tooltip, Typography} from "material-ui-next";
 import {Dialog, GridList, GridTile} from "material-ui";
 import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
 import Delete from 'material-ui/svg-icons/action/delete';
@@ -194,16 +194,18 @@ export default class ManagerThumbnail extends React.Component {
             return (
                 <Tooltip id="tooltip-icon" title="Delete Manager">
                     <IconButton className={'btn-delete'} iconStyle={styles.smallIcon}
-                                style={{ zIndex: 1 }} onClick={() => { this.setState({ open: true }) }}>
+                                style={{zIndex: 1}} onClick={() => {
+                        this.setState({open: true})
+                    }}>
                         <Delete color="grey"/>
                     </IconButton>
                 </Tooltip>
             )
         } else {
             return (
-                <IconButton iconStyle={{ width: 20, height: 20, display: 'none' }} tooltip="Delete Manager"
+                <IconButton iconStyle={{width: 20, height: 20, display: 'none'}} tooltip="Delete Manager"
                             tooltipPosition="bottom-center" onClick={() => {
-                }}><Delete color="grey" /></IconButton>
+                }}><Delete color="grey"/></IconButton>
             )
         }
     }
@@ -235,7 +237,8 @@ export default class ManagerThumbnail extends React.Component {
                                                 return (
                                                     <div>
                                                         <DistributedViewResourceNodeThumbnail worker={worker}
-                                                                                              currentTime={new Date().getTime()}/>
+                                                                                              currentTime={new Date()
+                                                                                                  .getTime()}/>
                                                     </div>
                                                 )
                                             } else {
@@ -258,7 +261,6 @@ export default class ManagerThumbnail extends React.Component {
     }
 
 
-
     static hasNodes(clusters) {
         for (let prop in clusters) {
             if (clusters.hasOwnProperty(prop)) {
@@ -277,7 +279,7 @@ export default class ManagerThumbnail extends React.Component {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={98} style={styles.gridList}>
                         <h2 style={{textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>Manager is not
-                            reachable!</h2>
+                                                                                                    reachable!</h2>
                     </GridList>
                 </div>;
                 lastUpdated = "N/A";
