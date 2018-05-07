@@ -169,7 +169,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         if (resourceResponse.status() == 200) {
                             Reader inputStream = resourceResponse.body().asReader();
                             List<ResourceClusterInfo> clusterInfos = gson.fromJson(
-                                    inputStream, new TypeToken<List<ResourceClusterInfo>>() {}.getType());
+                                    inputStream, new TypeToken<List<ResourceClusterInfo>>() {
+                                    }.getType());
                             for (ResourceClusterInfo clusterInfo : clusterInfos) {
                                 String nodeId = clusterInfo.getNodeId();
                                 ResourceClusteredWorkerNode.add(nodeId);
@@ -177,13 +178,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         }
                     } catch (feign.RetryableException e) {
                         if (logger.isDebugEnabled()) {
-                            logger.warn(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.", e);
-                        } else {
-                            logger.warn(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.");
+                            logger.debug(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.", e);
                         }
+                        logger.warn(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.");
 
                     } catch (IOException e) {
-                        logger.warn(e.getMessage());
+                        logger.warn("Error occured while getting the response " + e.getMessage());
                     }
                 });
             }
@@ -271,7 +271,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 workerOverview.setWorkerId(worker.getWorkerId());
                                 workerOverview.setServerDetails(lastSnapshot.getServerDetails());
                                 if (groupedWorkers.get(lastSnapshot.getServerDetails().getClusterId()) != null) {
-                                    groupedWorkers.get(lastSnapshot.getServerDetails().getClusterId()).add(workerOverview);
+                                    groupedWorkers.get(lastSnapshot.getServerDetails().getClusterId())
+                                            .add(workerOverview);
                                 } else {
                                     List<WorkerOverview> workers = new ArrayList<>();
                                     workers.add(workerOverview);
@@ -2142,7 +2143,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     if (resourceResponse.status() == 200) {
                         Reader inputStream = resourceResponse.body().asReader();
                         List<ResourceClusterInfo> clusterInfos = gson.fromJson(inputStream,
-                                new TypeToken<List<ResourceClusterInfo>>() {}.getType());
+                                new TypeToken<List<ResourceClusterInfo>>() {
+                                }.getType());
                         Map<String, List<WorkerOverview>> totalResourceClusterDetails = new HashMap<>();
                         List<WorkerOverview> resourceClusterList = new ArrayList<>();
                         List<NodeConfigurationDetails> storedWorkerList = dashboardStore.selectAllWorkers();
