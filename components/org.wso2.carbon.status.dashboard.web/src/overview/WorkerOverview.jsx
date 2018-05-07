@@ -454,7 +454,7 @@ export default class WorkerOverview extends React.Component {
                     <h3 style={styles.h3}>Distributed Deployments</h3>
 
                     {Object.keys(managerList).map((id, workerList) => {
-                        if (id !== " ") {
+                        if (id !== "Never Reached" && id !== "Not-Reachable") {
                             return (
                                 <div>
                                     <Divider inset={true} style={styles.divider}/>
@@ -478,7 +478,6 @@ export default class WorkerOverview extends React.Component {
                             )
                         } else {
                             return (
-
                                 <div style={{height: '100%'}}>
                                     <h3 style={styles.h3}>Managers</h3>
                                     <Divider inset={true} style={styles.divider}/>
@@ -581,7 +580,7 @@ export default class WorkerOverview extends React.Component {
                     <h3 style={styles.h3}>Distributed Deployments</h3>
 
                     {Object.keys(managerList).map((id, workerList) => {
-                        if (id !== " ") {
+                        if (id !== "Never Reached" && id !== "Not-Reachable") {
                             return (
                                 <div>
                                     <Divider inset={true} style={styles.divider}/>
