@@ -46,6 +46,10 @@ public class Constants {
     public static final String KAFKA_SINK = "sink";
     public static final String KAFKA_SINK_TOPIC = "topic";
 
+    public static final String HTTP_HOST = "http_host";
+    public static final String HTTP_PORT = "http_port";
+    public static final String NODE_ID = "nodeId";
+
     private Constants() {
         //preventing initialization
     }
