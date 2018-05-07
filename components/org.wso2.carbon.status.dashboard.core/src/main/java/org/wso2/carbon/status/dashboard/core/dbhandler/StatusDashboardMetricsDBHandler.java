@@ -323,8 +323,7 @@ public class StatusDashboardMetricsDBHandler {
                 if (selectionRecent.size() > 0) {
                     selection = selectionRecent.get(selectionRecent.size() - 1);
                 }
-                String[] componentElements = ((String) componentEntry.getKey()).replace("org.wso2.siddhi" +
-                        PACKAGE_NAME_SEPARATOR + "SiddhiApps" + PACKAGE_NAME_SEPARATOR + appName
+                String[] componentElements = ((String) componentEntry.getKey()).replace(APP_NAME_PREFIX + appName
                         + PACKAGE_NAME_SEPARATOR + "Siddhi" + PACKAGE_NAME_SEPARATOR, "")
                         .split("\\.", 2);
                 String metricType = tableMetricsMap.get(tableEntry).toLowerCase();
@@ -517,7 +516,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param timeInterval   time interval that needed to be taken.
      * @param metricTypeName metrics type name ex: memory,cpu
      * @param currentTime    current time in milliseconds.
-     * @return List<List< Object>> of metrics data because charts needed in that format
+     * @return List<List<Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerMetrics(String workerId, long timeInterval, String metricTypeName, long
             currentTime) {
@@ -582,7 +581,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param workerId     source id of the metrics
      * @param timeInterval time interval that metrics needed to be taken.
      * @param currentTime  current time
-     * @return List<List   <   Object>> of metrics data because charts needed in that format
+     * @return List<List<Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerAggregatedThroughput(String workerId, long timeInterval, long currentTime) {
         long aggregationTime = DBTableUtils.getAggregation(timeInterval);

@@ -29,8 +29,8 @@ public class ApiResponseMessage {
     public static final String NOT_FOUND = "not-found";
     public static final String SUCCESS = "success";
 
-    String type;
-    String message;
+    private String type;
+    private String message;
 
     public ApiResponseMessage(String type, String message) {
         this.type = type;

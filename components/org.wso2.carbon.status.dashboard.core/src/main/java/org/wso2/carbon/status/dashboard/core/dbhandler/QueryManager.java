@@ -27,9 +27,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,14 +35,14 @@ import java.util.Map;
  * Holds the database queries.
  */
 public class QueryManager {
-
+    
     private Map<String, String> queries;
-
+    
     public QueryManager(String databaseType, String databaseVersion) throws
-            QueryMappingNotAvailableException, ConfigurationException{
+            QueryMappingNotAvailableException, ConfigurationException {
         queries = readConfigs(databaseType, databaseVersion);
     }
-
+    
     private Map<String, String> readConfigs(String databaseType, String databaseVersion) throws ConfigurationException,
             QueryMappingNotAvailableException {
         try {
@@ -70,14 +68,14 @@ public class QueryManager {
         }
         return queries;
     }
-
+    
     public String getQuery(String key) {
         if (!queries.containsKey(key)) {
             throw new RuntimeException("Unable to find the configuration entry for the key: " + key);
         }
         return queries.get(key);
     }
-
+    
     private DeploymentConfigs readYamlContent(InputStream yamlContent) {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor
                 (DeploymentConfigs.class, DeploymentConfigs.class.getClassLoader()));

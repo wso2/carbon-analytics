@@ -28,22 +28,22 @@ import java.util.List;
 public class ComponentMetrics {
     private String name;
     private List<MetricElement> metrics = new ArrayList<>();
-
+    
     public ComponentMetrics() {
     }
-
+    
     public String getName() {
         return name;
     }
-
+    
     public void setName(String name) {
         this.name = name;
     }
-
+    
     public List<MetricElement> getMetrics() {
         return metrics;
     }
-
+    
     public void addMetrics(MetricElement metricsEle) {
         boolean isNew = true;
         for (MetricElement metricElement : metrics) {

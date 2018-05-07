@@ -45,7 +45,7 @@ import java.util.List;
 )
 public class DashboardInitConfigComponent {
     private static final Logger logger = LoggerFactory.getLogger(DashboardInitConfigComponent.class);
-
+    
     @Activate
     protected void start(BundleContext bundleContext) {
         if (logger.isDebugEnabled()) {
@@ -62,9 +62,9 @@ public class DashboardInitConfigComponent {
         } catch (ConfigurationException e) {
             logger.error("Error in reading configuration from the deployment.YML", e);
         }
-
+        
     }
-
+    
     @Deactivate
     protected void stop() {
         if (logger.isDebugEnabled()) {
@@ -72,7 +72,7 @@ public class DashboardInitConfigComponent {
         }
         MonitoringDataHolder.getInstance().setStatusDashboardDeploymentConfigs(null);
     }
-
+    
     /**
      * Defauld and deployment Query merger.
      *
@@ -95,38 +95,38 @@ public class DashboardInitConfigComponent {
                     deploymentQueries.getPollingInterval() == null ? defaultQueries.getPollingInterval()
                             : deploymentQueries.getPollingInterval();
             resolvedConfiguration.setPollingInterval(pollingInterval);
-
+            
             String metricsDatasourceName = deploymentQueries.getMetricsDatasourceName() == null ?
                     defaultQueries.getMetricsDatasourceName()
                     : deploymentQueries.getMetricsDatasourceName();
             resolvedConfiguration.setMetricsDatasourceName(metricsDatasourceName);
-
+            
             String dashboardDatasourceName = deploymentQueries.getDashboardDatasourceName() == null ?
                     defaultQueries.getDashboardDatasourceName()
                     : deploymentQueries.getDashboardDatasourceName();
             resolvedConfiguration.setDashboardDatasourceName(dashboardDatasourceName);
-
+            
             int connectionTimeout = deploymentQueries.getWorkerConnectionConfigurations().getConnectionTimeOut() ==
                     null ? defaultQueries.getWorkerConnectionConfigurations().getConnectionTimeOut()
                     : deploymentQueries.getWorkerConnectionConfigurations().getConnectionTimeOut();
-
+            
             int readTimeOut = deploymentQueries.getWorkerConnectionConfigurations().getReadTimeOut() == null ?
                     defaultQueries.getWorkerConnectionConfigurations().getReadTimeOut()
                     : deploymentQueries.getWorkerConnectionConfigurations().getReadTimeOut();
-
+            
             resolvedConfiguration.setWorkerConnectionConfigurations(connectionTimeout, readTimeOut);
-
+            
             List<String> sysAdminRoles = deploymentQueries.getSysAdminRoles();
-
+            
             List<String> developerRoles = deploymentQueries.getDeveloperRoles();
-
+            
             List<String> viewerRoles = deploymentQueries.getViewerRoles();
             if (sysAdminRoles == null) {
                 resolvedConfiguration.setSysAdminRoles(new ArrayList<>());
             } else {
                 resolvedConfiguration.setSysAdminRoles(sysAdminRoles);
             }
-
+            
             if (developerRoles == null) {
                 resolvedConfiguration.setDeveloperRoles(new ArrayList<>());
             } else {
@@ -139,10 +139,10 @@ public class DashboardInitConfigComponent {
             }
             return resolvedConfiguration;
         }
-
-
+        
+        
     }
-
+    
     @Reference(
             name = "org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent",
             service = DatasourceServiceComponent.class,
@@ -154,9 +154,9 @@ public class DashboardInitConfigComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DatasourceServiceComponent");
         }
-
+        
     }
-
+    
     public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");
