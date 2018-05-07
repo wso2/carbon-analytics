@@ -37,14 +37,12 @@ import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI
 import WorkerThumbnail from "./WorkerThumbnail";
 import DistributedViewResourceNodeThumbnail from "./DistributedViewResourceNodeThumbnail";
 
-const style = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex: 1}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 const constants = {memory: "memory", cpu: "cpu", load: "load", down: "down", up: "up", na: "n/a"};
 
 const styles = {
-
     gridList: {width: '100%', height: 150, margin: 0},
     smallIcon: {width: 20, height: 20, zIndex: 1, padding: 5},
     overviewLegend: {fontSize: 10, color: '#fff'},
@@ -56,7 +54,6 @@ const styles = {
         backgroundColor: '#222222',
         width: '100%'
     },
-    //gridList: {width: '90%', height: '100%', padding: 40},
     h3: {color: 'white', marginLeft: '4%', backgroundColor: '#222222'},
     h3Title: {color: '#C0C0C0', marginLeft: '4%', backgroundColor: '#222222'},
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
@@ -195,16 +192,18 @@ export default class ManagerThumbnail extends React.Component {
     renderDeleteManager() {
         if (this.state.hasPermission) {
             return (
-                <IconButton iconStyle={style.smallIcon} tooltip="Delete Manager" style={{zIndex: 1}}
-                            tooltipPosition="bottom-center" onClick={() => {
-                    this.setState({open: true})
-                }}><Delete color="grey"/></IconButton>
+                <Tooltip id="tooltip-icon" title="Delete Manager">
+                    <IconButton className={'btn-delete'} iconStyle={styles.smallIcon}
+                                style={{ zIndex: 1 }} onClick={() => { this.setState({ open: true }) }}>
+                        <Delete color="grey"/>
+                    </IconButton>
+                </Tooltip>
             )
         } else {
             return (
-                <IconButton iconStyle={{width: 20, height: 20, display: 'none'}} tooltip="Delete Worker"
+                <IconButton iconStyle={{ width: 20, height: 20, display: 'none' }} tooltip="Delete Manager"
                             tooltipPosition="bottom-center" onClick={() => {
-                }}><Delete color="grey"/></IconButton>
+                }}><Delete color="grey" /></IconButton>
             )
         }
     }
@@ -230,7 +229,7 @@ export default class ManagerThumbnail extends React.Component {
                                     backgroundColor: '#222222'
                                 }}>
 
-                                    <GridList cols={3} padding={50} cellHeight={300} style={style.gridList}>
+                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                         {workersList[id].map((worker) => {
                                             if (worker.statusMessage === "Please add the node manually.") {
                                                 return (
@@ -276,7 +275,7 @@ export default class ManagerThumbnail extends React.Component {
         if (this.props.worker.clusterInfo.groupId === " ") {
             if (this.props.worker.statusMessage == null) {
                 gridTiles = <div>
-                    <GridList cols={1} cellHeight={98} style={style.gridList}>
+                    <GridList cols={1} cellHeight={98} style={styles.gridList}>
                         <h2 style={{textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>Manager is not
                             reachable!</h2>
                     </GridList>
@@ -285,7 +284,7 @@ export default class ManagerThumbnail extends React.Component {
                 color = 'red';
             } else {
                 gridTiles = <div>
-                    <GridList cols={1} cellHeight={98} style={style.gridList}>
+                    <GridList cols={1} cellHeight={98} style={styles.gridList}>
                         <h2 style={{textAlign: 'center', color: 'white', padding: 15}}>Manager is not reachable!
                             <br/>
                             <text style={{textAlign: 'center', fontSize: 12, color: '#dedede'}}>
@@ -300,7 +299,7 @@ export default class ManagerThumbnail extends React.Component {
             //statistics disabled workers
         } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>
-                <GridList cols={2} cellHeight={98} style={style.gridList}>
+                <GridList cols={2} cellHeight={98} style={styles.gridList}>
                     <GridTile>
                         <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
                             <h4 style={{
@@ -586,10 +585,7 @@ export default class ManagerThumbnail extends React.Component {
                           onRequestClose={() => {
                               this.setState({showMsg: false, message: ""})
                           }}/>
-                <div style={{
-                    width: '200%', height: '200%', display: 'flex',
-                    flexWrap: 'wrap'
-                }}>
+                <div>
 
                     {this.renderWorkers(this.state.resourceClustersList)}
                 </div>

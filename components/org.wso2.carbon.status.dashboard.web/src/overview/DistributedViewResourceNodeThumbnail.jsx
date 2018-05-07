@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -20,8 +20,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 //Material UI
-import { CardActions, Button, IconButton, Snackbar, Tooltip, Typography } from "material-ui-next";
-import {Dialog, GridList, GridTile} from "material-ui";
+import { CardActions, IconButton, Snackbar, Tooltip, Typography } from "material-ui-next";
+import {GridList, GridTile} from "material-ui";
 
 import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
 

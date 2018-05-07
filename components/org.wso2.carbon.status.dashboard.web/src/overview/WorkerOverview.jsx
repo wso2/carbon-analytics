@@ -448,7 +448,8 @@ export default class WorkerOverview extends React.Component {
                                     <Divider inset={true} style={styles.divider}/>
                                     <h3 style={styles.h3Title}>Group Id : {id}</h3>
                                     <h4 style={styles.h3Title}>Managers</h4>
-                                    <div style={{display:'flex',flexWrap:'wrap',marginTop:'-200px',marginLeft:'-90px',width:'90%',height:'100%',padding:'200px'}}>
+                                    <div style={{display:'flex',flexWrap:'wrap',marginTop:'-200px',marginLeft:'-90px',
+                                        width:'90%',height:'100%',padding:'200px'}}>
                                         <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                             {managerList[id].map((worker) => {
                                                 return (
@@ -466,7 +467,7 @@ export default class WorkerOverview extends React.Component {
 
                                 <div style={{height:'100%'}}>
                                     <h3 style={styles.h3}>Managers</h3>
-                                    <Divider inset={true} style={{width: '90%'}}/>
+                                    <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
                                         <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                             {managerList[id].map((worker) => {
@@ -509,7 +510,7 @@ export default class WorkerOverview extends React.Component {
                                 <div>
                                     <h3 style={styles.h3}>HA Deployments</h3>
                                     <h3 style={styles.h3Title}>{id}</h3>
-                                    <Divider inset={true} style={{width: '90%'}}/>
+                                    <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
                                         <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                             {workersList[id].map((worker) => {
@@ -527,7 +528,7 @@ export default class WorkerOverview extends React.Component {
                             return (
                                 <div>
                                     <h3 style={styles.h3}>{id}</h3>
-                                    <Divider inset={true} style={{width: '90%'}}/>
+                                    <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
                                         <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
                                             {workersList[id].map((worker) => {
@@ -567,7 +568,7 @@ export default class WorkerOverview extends React.Component {
                         return (
                             <div>
                                 <h3 style={styles.h3}>Group Id: {id}</h3>
-                                <Divider inset={true} style={{width: '90%'}}/>
+                                <Divider inset={true} style={styles.divider}/>
                                 <h3 style={styles.h3Title}>Managers</h3>
                                 <h3 style={styles.h3}>{id}</h3>
                                 <Divider inset={true} style={styles.divider}/>
