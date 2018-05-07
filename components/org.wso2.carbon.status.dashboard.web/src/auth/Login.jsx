@@ -2,7 +2,7 @@
  *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
- *  Version 2.0 (the "License"); you may not use this file except
+ *  Version 2.0 (the 'License'); you may not use this file except
  *  in compliance with the License.
  *  You may obtain a copy of the License at
  *
@@ -10,24 +10,24 @@
  *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
- *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
  *  under the License.
  *
  */
 
-import {Checkbox, RaisedButton, Snackbar, TextField} from "material-ui";
-import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
-import Qs from "qs";
-import React, {Component} from "react";
-import {Redirect} from "react-router-dom";
-import PropTypes from "prop-types";
+import {Checkbox, RaisedButton, Snackbar, TextField} from 'material-ui';
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+import Qs from 'qs';
+import React, {Component} from 'react';
+import {Redirect} from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 
-import AuthManager from "./utils/AuthManager";
-import FormPanel from "../common/FormPanel";
-import Header from "../common/Header";
+import AuthManager from './utils/AuthManager';
+import FormPanel from '../common/FormPanel';
+import Header from '../common/Header';
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const titleStyle = {textAlign: 'center', marginTop: 50, color: '#9c9898'};
@@ -39,8 +39,10 @@ const buttonStyle = {marginLeft: '35%', width: '40%'};
 const styles = {
     messageBox: {textAlign: 'center', color: 'white'},
     errorMessage: {backgroundColor: '#333333', color: 'white', border: '2px solid #e74c3c'},
-    cookiePolicy: {padding: '10px', backgroundColor: '#fcf8e3', fontFamily: muiTheme.fontFamily,
-        border: '1px solid #faebcc', color: '#8a6d3b'},
+    cookiePolicy: {
+        padding: '10px', backgroundColor: '#fcf8e3', fontFamily: muiTheme.fontFamily,
+        border: '1px solid #faebcc', color: '#8a6d3b'
+    },
     cookiePolicyAnchor: {fontWeight: 'bold', color: '#8a6d3b'}
 };
 
@@ -65,7 +67,7 @@ export default class Login extends Component {
         this.authenticate = this.authenticate.bind(this);
     }
 
-    componentWillMount(){
+    componentWillMount() {
         if (AuthManager.isRememberMeSet() && !AuthManager.isLoggedIn()) {
             AuthManager.authenticateWithRefreshToken()
                 .then(() => this.setState({authenticated: true}));
@@ -144,12 +146,12 @@ export default class Login extends Component {
                                 });
                             }}
                         />
-                        <br />
+                        <br/>
                         <TextField
                             fullWidth
-                            type="password"
-                            autoComplete="off"
-                            floatingLabelText={"Password"}
+                            type='password'
+                            autoComplete='off'
+                            floatingLabelText={'Password'}
                             floatingLabelFocusStyle={{color: '#f17b31'}}
                             underlineFocusStyle={{borderColor: '#f17b31'}}
                             //style={textField}
@@ -161,9 +163,9 @@ export default class Login extends Component {
                                 });
                             }}
                         />
-                        <br />
+                        <br/>
                         <Checkbox
-                            label={"Remember Me"}
+                            label={'Remember Me'}
                             checked={this.state.rememberMe}
                             iconStyle={{fill: '#f17b31'}}
                             onCheck={(e, checked) => {
@@ -173,38 +175,38 @@ export default class Login extends Component {
                             }}
                             style={{'margin': '30px 0'}}
                         />
-                        <br />
+                        <br/>
                         <RaisedButton
-                            type="submit"
+                            type='submit'
                             disabled={this.state.username === '' || this.state.password === ''}
-                            label={"Login"}
+                            label={'Login'}
                             style={buttonStyle}
                             backgroundColor='#f17b31'
-                            disabledBackgroundColor="rgb(51, 51, 51)"
+                            disabledBackgroundColor='rgb(51, 51, 51)'
                         />
-                        <br />
-                        <br />
+                        <br/>
+                        <br/>
                         <div style={styles.cookiePolicy}>
                             <div>
                                 After a successful sign in, we use a cookie in your browser to track your session.&nbsp;
                                 You can refer our&nbsp;
                                 <a
                                     style={styles.cookiePolicyAnchor}
-                                    href="/policies/cookie-policy"
-                                    target="_blank"
+                                    href='/policies/cookie-policy'
+                                    target='_blank'
                                 >
                                     Cookie Policy
                                 </a> for more details.
                             </div>
                         </div>
-                        <br />
+                        <br/>
                         <div style={styles.cookiePolicy}>
                             <div>
                                 By signing in, you agree to our&nbsp;
                                 <a
                                     style={styles.cookiePolicyAnchor}
-                                    href="/policies/privacy-policy"
-                                    target="_blank">
+                                    href='/policies/privacy-policy'
+                                    target='_blank'>
                                     Privacy Policy
                                 </a>.
                             </div>
@@ -213,7 +215,7 @@ export default class Login extends Component {
                     <Snackbar
                         message={this.state.error}
                         open={this.state.showError}
-                        autoHideDuration="4000"
+                        autoHideDuration='4000'
                         contentStyle={styles.messageBox}
                         bodyStyle={styles.errorMessage}
                         onRequestClose={() => this.setState({error: '', showError: false})}

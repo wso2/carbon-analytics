@@ -49,7 +49,7 @@ import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMoreMetricsHistory;
-import org.wso2.carbon.status.dashboard.core.bean.WorkerResponce;
+import org.wso2.carbon.status.dashboard.core.bean.WorkerResponse;
 import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
@@ -79,6 +79,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.HOUR;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.PROTOCOL;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_COMMITTED;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_INIT;
@@ -388,7 +389,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             if (type == null) {
                 if ((more != null) && more) {
                     WorkerMoreMetricsHistory history = new WorkerMoreMetricsHistory();
-                    if (timeInterval <= 3600000) {
+                    if (timeInterval <= HOUR) {
                         history.setJvmClassLoadingLoadedCurrent(metricStore.selectWorkerMetrics(carbonId, timeInterval,
                                 Constants.WORKER_JVM_CLASS_LOADING_LOADED_CURRENT, System.currentTimeMillis()));
                         history.setJvmClassLoadingLoadedTotal(metricStore.selectWorkerMetrics(carbonId, timeInterval,
@@ -576,7 +577,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     return Response.ok().entity(jsonString).build();
                 } else {
                     WorkerMetricsHistory workerMetricsHistory = new WorkerMetricsHistory();
-                    if (timeInterval <= 3600000) {
+                    if (timeInterval <= HOUR) {
                         List<List<Object>> workerThroughput = metricStore.selectWorkerThroughput(carbonId,
                                 timeInterval, System.currentTimeMillis());
                         List<List<Object>> workerMemoryUsed = metricStore.selectWorkerMetrics(carbonId, timeInterval,
@@ -836,7 +837,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     carbonId = getCarbonID(workerId);
                 }
                 long timeInterval = period != null ? parsePeriod(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
-                if (timeInterval <= 3600000) {
+                if (timeInterval <= HOUR) {
                     SiddhiAppMetricsHistory siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
                     List<List<Object>> memory = metricStore.selectAppOverallMetrics("memory", carbonId,
                             timeInterval, appName,
@@ -948,6 +949,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             if (logger.isDebugEnabled()) {
                 logger.warn(removeCRLFCharacters(workerId) + " Unnable to reach worker.", e);
             } else {
+                // if e include large log is pringting continously.
                 logger.warn(removeCRLFCharacters(workerId) + " Unnable to reach worker.");
             }
             return workerId + " Unnable to reach worker. Caused by: " + e.getMessage();
@@ -1207,7 +1209,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             long timeInterval = period != null ? parsePeriod(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
             Map<String, List<List<Object>>> componentHistory = new HashMap<>();
             // || ("Microsoft SQL Server").equalsIgnoreCase(dbType)
-            if ((timeInterval <= 3600000)) {
+            if ((timeInterval <= HOUR)) {
                 switch (componentType.toLowerCase()) {
                     case "streams": {
                         String metricsType = "throughput";
@@ -1393,7 +1395,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
             int status = 404;
             if (hostPort.length == 2) {
-                WorkerResponce workerResponce = new WorkerResponce();
+                WorkerResponse workerResponce = new WorkerResponse();
                 String uri = generateURLHostPort(hostPort[0], hostPort[1]);
                 try {
                     feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
@@ -1494,7 +1496,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
                     } catch (RDBMSTableException e) {
                         logger.warn("Worker " + removeCRLFCharacters(workerID) +
-                                " currently not active. Retry to reach " + "later");
+                                " currently not active. Retry to reach " + "later", e);
                     }
                     workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: "

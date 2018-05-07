@@ -16,7 +16,6 @@
  *  under the License.
  *
  */
-
 package org.wso2.carbon.status.dashboard.core.dbhandler;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -37,15 +36,15 @@ import java.sql.SQLException;
 public class DBHandler {
     private static final Logger logger = LoggerFactory.getLogger(DBHandler.class);
     private static DBHandler instance = new DBHandler();
-
+    
     private DBHandler() {
-
+    
     }
-
+    
     public static DBHandler getInstance() {
         return instance;
     }
-
+    
     /**
      * Initialize the db connection.
      *
@@ -65,8 +64,8 @@ public class DBHandler {
             throw new RDBMSTableException("Error initializing connection.", e);
         }
     }
-
-
+    
+    
     /**
      * Insert node data node db.
      *
@@ -82,12 +81,12 @@ public class DBHandler {
             try {
                 stmt.close();
             } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
+                logger.error("Error closing statement due to " + e.getMessage() + " in insert.", e);
                 //ignore
             }
         }
     }
-
+    
     /**
      * Delete nodes data to node db.
      *
@@ -102,29 +101,29 @@ public class DBHandler {
             throw new RDBMSTableException(" Error while processing the delete operation.", e);
         }
     }
-
+    
     /**
      * Select node from the node DB.
      *
      * @return list of object.
      */
-
+    
     ResultSet select(PreparedStatement stmt) {
         ResultSet rs;
         try {
             rs = stmt.executeQuery();
-
+            
         } catch (SQLException e) {
             throw new RDBMSTableException("Error retrieving records from table", e);
         }
         return rs;
     }
-
+    
     /**
      * Create table query.
      *
-     * @param conn
-     * @param ps
+     * @param conn the connection
+     * @param ps the prepared statement
      * @throws RDBMSTableException
      */
     public void createTable(Connection conn, PreparedStatement ps) throws RDBMSTableException {
@@ -135,7 +134,7 @@ public class DBHandler {
             throw new RDBMSTableException("Unable to create table.", e);
         }
     }
-
+    
     /**
      * Method for checking whether or not the given table (which reflects the current event table instance) exists.
      *
@@ -151,7 +150,7 @@ public class DBHandler {
         } catch (SQLException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Table  assumed to not exist since its existence check resulted "
-                        + "in exception ");
+                        + "in exception ", e);
             }
             return false;
         }

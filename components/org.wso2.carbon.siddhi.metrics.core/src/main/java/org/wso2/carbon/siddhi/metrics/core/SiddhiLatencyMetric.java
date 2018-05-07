@@ -36,20 +36,20 @@ public class SiddhiLatencyMetric implements LatencyTracker {
     private ThreadLocal<Timer> execLatencyTimer;
     private ThreadLocal<Timer.Context> context;
     private String latencyTrackerId;
-
+    
     public SiddhiLatencyMetric(String latencyTrackerId, MetricService metricService, boolean isStatisticEnabled) {
         this.latencyTrackerId = latencyTrackerId;
         Timer timer = metricService.timer(this.latencyTrackerId, INFO);
         SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(this.latencyTrackerId, OFF);
         execLatencyTimer = new ThreadLocal<Timer>() {
             protected Timer initialValue() {
-            if (isStatisticEnabled) {
-                SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(SiddhiLatencyMetric.this.latencyTrackerId,
-                        INFO);
-            } else {
-                SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(SiddhiLatencyMetric.this.latencyTrackerId,
-                        OFF);
-            }
+                if (isStatisticEnabled) {
+                    SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel
+                            (SiddhiLatencyMetric.this.latencyTrackerId, INFO);
+                } else {
+                    SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel
+                            (SiddhiLatencyMetric.this.latencyTrackerId, OFF);
+                }
                 return timer;
             }
         };
@@ -58,9 +58,9 @@ public class SiddhiLatencyMetric implements LatencyTracker {
                 return null;
             }
         };
-
+        
     }
-
+    
     /**
      * This is called when the processing of the event is started. This is called at
      * ProcessStreamReceiver#receive before the event is passed into process chain.
@@ -72,7 +72,7 @@ public class SiddhiLatencyMetric implements LatencyTracker {
         }
         context.set(execLatencyTimer.get().start());
     }
-
+    
     /**
      * This is called to when the processing of an event is finished. This is called at two places,
      * 1. OutputRateLimiter#sendToCallBacks - When the event is processed and by the full chain and emitted out.
@@ -86,7 +86,7 @@ public class SiddhiLatencyMetric implements LatencyTracker {
             context.set(null);
         }
     }
-
+    
     /**
      * @return Name of the latency tracker.
      */
@@ -94,5 +94,5 @@ public class SiddhiLatencyMetric implements LatencyTracker {
     public String getName() {
         return latencyTrackerId;
     }
-
+    
 }
