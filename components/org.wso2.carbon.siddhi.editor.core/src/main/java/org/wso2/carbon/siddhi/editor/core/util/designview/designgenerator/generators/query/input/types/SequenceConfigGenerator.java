@@ -18,354 +18,281 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.SequenceQueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.AndOrSequenceEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.CountingSequenceEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.SequenceQueryEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.NotAndSequenceEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.NotForSequenceEventConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.countingsequence.CountingPatternCountingSequence;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.countingsequence.CountingSequenceConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.event.countingsequence.MinMaxCountingSequenceValue;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConditionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.state.*;
 import org.wso2.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
+import org.wso2.siddhi.query.api.expression.constant.TimeConstant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Generates SequenceQueryConfig with given Siddhi elements
+ * Generates PatternQueryConfig with given Siddhi elements
  */
 public class SequenceConfigGenerator {
     private String siddhiAppString;
 
-    private boolean isEvery = false;
-    private boolean isFirstStateElementTraversed = false;
-    private String firstWithinStatement = "";
+    private List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
+    private List<String> existingEventReferences = new ArrayList<>();
+    // Indexes of the 'conditions' list members, whose event references have not been given
+    private List<Integer> eventReferenceAbsentConditionIndexes = new ArrayList<>();
 
-    private boolean isEveryStateToggled = false;
-    private boolean isNotForExist = false;
-    private int notForIndex = -1;
-    private int sequenceElementsCount = 0;
-
-    private List<String> withins = new ArrayList<>();
-
-
-    private List<SequenceQueryEventConfig> events = new ArrayList<>();
+    private List<String> logicComponents = new ArrayList<>();
 
     public SequenceConfigGenerator(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
     }
 
     /**
-     * Gets a SequenceQueryConfig object, from the given Siddhi Query InputStream object
-     * @param queryInputStream      Siddhi Query InputStream object
-     * @return                      SequenceQueryConfig object
+     * Generates a PatternQueryConfig object, from the QueryInputStream object
+     * @param queryInputStream      Siddhi Query InputStream
+     * @return                      PatternSequenceQueryConfig object
      */
-    public SequenceQueryConfig getSequenceQueryConfig(InputStream queryInputStream) {
-        addEvent(((StateInputStream) queryInputStream).getStateElement());
-        // Penetrate NotFor within
-        if (isNotForExist) {
-            withins.add(notForIndex, firstWithinStatement);
-            withins.remove(0);
-        }
-
-        // Add Within
-        for (int i = 0; i < events.size(); i++) {
-            events.get(i).setWithin(withins.get(i));
-        }
-
-        // Add Every
-        if (isEvery) {
-            events.get(0).setForEvery(true);
-        }
-
-        return new SequenceQueryConfig(events);
+    public PatternSequenceConfig getPatternQueryConfig(InputStream queryInputStream) {
+        traversePatternElements(((StateInputStream) queryInputStream).getStateElement());
+        String logic = replaceLogicEventReferences(String.join(" -> ", logicComponents));
+        return new PatternSequenceConfig(
+                QueryInputType.PATTERN.toString(),
+                conditions,
+                logic);
     }
 
     /**
-     * Adds EventConfig objects generated from the given StateElement object, in a recursive manner
-     * @param stateElement      Siddhi StateElement object, that holds data about a Sequence query's element
+     * Traverses through the given StateElement object. Adds relevant Configs, when Pattern Elements are met
+     * @param stateElement      Siddhi StateElement object, consisting elements of the Pattern
      */
-    private void addEvent(StateElement stateElement) {
-        if (!isFirstStateElementTraversed) {
-            if (stateElement.getWithin() != null) {
-                // This is the first ever element that has 'within'
-                firstWithinStatement = ConfigBuildingUtilities.getDefinition(stateElement.getWithin(), siddhiAppString);
-                isFirstStateElementTraversed = true;
-            }
-        }
-        if (stateElement.getWithin() != null) {
-            withins.add(ConfigBuildingUtilities.getDefinition(stateElement.getWithin(), siddhiAppString));
-        }
+    private void traversePatternElements(StateElement stateElement) {
         if (stateElement instanceof NextStateElement) {
-            addEvent(((NextStateElement) stateElement).getStateElement());
-            addEvent(((NextStateElement) stateElement).getNextStateElement());
+            traversePatternElements(((NextStateElement) stateElement).getStateElement());
+            traversePatternElements(((NextStateElement) stateElement).getNextStateElement());
         } else if (stateElement instanceof EveryStateElement){
-            // Only the first Element of Sequence can fall into this. Otherwise a compilation error would have occurred
-            isEvery = true;
-            isEveryStateToggled = true; // TODO: 4/20/18 confirm
-            addEvent(((EveryStateElement) stateElement).getStateElement());
-            isEveryStateToggled = false; // TODO: 4/20/18 confirm
+            addPatternElementConfig(generateEveryPatternElementConfig((EveryStateElement) stateElement));
         } else {
-            // This is a single element
-            sequenceElementsCount++;
-            events.add(generateSequenceEventConfig(stateElement));
+            addPatternElementConfig(generatePatternEventConfig(stateElement));
         }
     }
 
     /**
-     * Returns the type of Sequence Event Config to generate, from the given Siddhi StateElement object
-     * @param stateElement      Siddhi StateElement object, that holds data about a Sequence query's element
-     * @return                  Type of Sequence Event Config to generate
+     * Adds all the ConditionConfigs, and the Logic Component of the given PatternElementConfig object,
+     * to the relevant lists
+     * @param patternElementConfig        PatternElementConfig object, representing an element in the Pattern
      */
-    private EventConfigType getEventConfigType(StateElement stateElement) {
+    private void addPatternElementConfig(PatternElementConfig patternElementConfig) {
+        conditions.addAll(patternElementConfig.conditionConfigs);
+        logicComponents.add(patternElementConfig.logicComponent);
+    }
+
+    /**
+     * Gets type of the Pattern Element, with the given StateElement object
+     * @param stateElement      Siddhi StateElement object, which contains data related to an element in the Pattern
+     * @return                  Type of the Pattern Element
+     */
+    private ElementType getElementType(StateElement stateElement) {
         if (stateElement instanceof CountStateElement) {
-            return EventConfigType.COUNTING;
+            return ElementType.COUNTING;
         } else if (stateElement instanceof LogicalStateElement) {
             LogicalStateElement logicalStateElement = (LogicalStateElement) stateElement;
             String logicalStateElementType = logicalStateElement.getType().name();
 
             if ((logicalStateElement.getStreamStateElement1() instanceof AbsentStreamStateElement) &&
-                    (logicalStateElementType.equalsIgnoreCase(AndOrEventConfigType.AND.toString()))) {
-                return EventConfigType.NOT_AND;
-            } else if (logicalStateElementType.equalsIgnoreCase(AndOrEventConfigType.AND.toString()) ||
-                    logicalStateElementType.equalsIgnoreCase(AndOrEventConfigType.OR.toString())) {
-                return EventConfigType.AND_OR;
+                    (logicalStateElementType.equalsIgnoreCase(AndOrElementEventType.AND.toString()))) {
+                return ElementType.NOT_AND;
+            } else if (logicalStateElementType.equalsIgnoreCase(AndOrElementEventType.AND.toString()) ||
+                    logicalStateElementType.equalsIgnoreCase(AndOrElementEventType.OR.toString())) {
+                return ElementType.AND_OR;
             }
             throw new IllegalArgumentException("Event config type for StateElement is unknown");
         } else if (stateElement instanceof AbsentStreamStateElement) {
-            notForIndex = sequenceElementsCount;
-            isNotForExist = true;
-            return EventConfigType.NOT_FOR;
+            return ElementType.NOT_FOR;
         }
         throw new IllegalArgumentException("Event config type for StateElement is unknown");
     }
 
     /**
-     * Generates an Event Config object for a Sequence Query's element, from the given Siddhi State Element object
-     * @param stateElement      Siddhi StateElement object, that holds data about a Sequence query's element
-     * @return                  Event Config object of a Sequence Query's element
+     * Generates Config object for a Pattern's element, from the given Siddhi StateElement object
+     * @param stateElement          Siddhi StateElement object, that holds data about a Pattern query's element
+     * @return                      Config object of a Pattern Query's element
      */
-    private SequenceQueryEventConfig generateSequenceEventConfig(StateElement stateElement) {
-        switch (getEventConfigType(stateElement)) {
+    private PatternElementConfig generatePatternEventConfig(StateElement stateElement) {
+        switch (getElementType(stateElement)) {
             case COUNTING:
-                // Single element without within statement todo in a nice way
-                if (!isEveryStateToggled && (stateElement.getWithin() == null)) {
-                    withins.add("");
-                }
-                return generateCountSequenceEventConfig((CountStateElement) stateElement);
+                return generateCountPatternElementConfig((CountStateElement) stateElement);
             case NOT_AND:
-                // Single element without within statement todo in a nice way
-                if (!isEveryStateToggled && (stateElement.getWithin() == null)) {
-                    withins.add("");
-                }
-                return generateNotAndEventConfig((LogicalStateElement) stateElement);
+                return generateNotAndPatternElementConfig((LogicalStateElement) stateElement);
             case AND_OR:
-                // Single element without within statement todo in a nice way
-                if (!isEveryStateToggled && (stateElement.getWithin() == null)) {
-                    withins.add("");
-                }
-                return generateAndOrEventConfig((LogicalStateElement) stateElement);
+                return generateAndOrPatternElementConfig((LogicalStateElement) stateElement);
             case NOT_FOR:
-                return generateNotForEventConfig((AbsentStreamStateElement) stateElement);
+                return generateNotForPatternElementConfig((AbsentStreamStateElement) stateElement);
             default:
-                throw new IllegalArgumentException("Unknown type: " + getEventConfigType(stateElement) +
+                throw new IllegalArgumentException("Unknown type: " + getElementType(stateElement) +
                         " for generating Event Config");
         }
     }
 
-//    /**
-//     * Generates an Event Config object for a Sequence Query's element which has 'every' keyword,
-//     * from the given Siddhi EveryStateElement object
-//     * @param everyStateElement     Siddhi EveryStateElement object, which represents a Sequence Query's element
-//     *                              with 'every' keyword
-//     * @return                      Event Config object of a Sequence Query's 'every' element
-//     */
-//    private SequenceQueryEventConfig generateEverySequenceEventConfig(EveryStateElement everyStateElement) {
-//        SequenceQueryEventConfig sequenceQueryEventConfig =
-//                generateSequenceEventConfig(everyStateElement.getStateElement());
-//         // Set 'within'
-//        if (everyStateElement.getWithin() != null) {
-//            sequenceQueryEventConfig.setWithin(
-//                    ConfigBuildingUtilities.getDefinition(everyStateElement.getWithin(), siddhiAppString));
-//        }
-//
-//        sequenceQueryEventConfig.setForEvery(true);
-//        return sequenceQueryEventConfig;
-//    }
-
     /**
-     * Generates an Event Config object for a Sequence Query's element with a single 'and' or 'or' keyword,
-     * from the given Siddhi LogicalStateElement object
-     * @param logicalStateElement       Siddhi LogicStateElement object, which represents a Sequence Query's element
-     *                                  with a single 'and' or 'or' keyword
-     * @return                          Event Config object of an 'and' or 'or' Element
+     * Generates PatternElementConfig object, for a Pattern element that has the 'every' keyword
+     * @param everyStateElement     Siddhi EveryStateElement object,
+     *                              which contains a Pattern element with the 'every' keyword
+     * @return                      PatternElementConfig object
      */
-    private AndOrSequenceEventConfig generateAndOrEventConfig(LogicalStateElement logicalStateElement) {
-        AndOrSequenceEventConfig andOrSequenceEventConfig = new AndOrSequenceEventConfig();
-
-        // Set Left Stream elements
-        StreamStateElementConfig leftStreamStateElementConfig =
-                generateStreamStateElementConfig(logicalStateElement.getStreamStateElement1());
-        andOrSequenceEventConfig.setLeftStreamEventReference(leftStreamStateElementConfig.streamReference);
-        andOrSequenceEventConfig.setLeftStreamName(leftStreamStateElementConfig.streamName);
-        andOrSequenceEventConfig.setLeftStreamFilter(leftStreamStateElementConfig.streamFilter);
-
-        // 'and' or 'or'
-        andOrSequenceEventConfig.setConnectedWith(logicalStateElement.getType().name());
-
-        // Set Right Stream elements
-        StreamStateElementConfig rightStreamStateElementConfig =
-                generateStreamStateElementConfig(logicalStateElement.getStreamStateElement2());
-        andOrSequenceEventConfig.setRightStreamEventReference(rightStreamStateElementConfig.streamReference);
-        andOrSequenceEventConfig.setRightStreamName(rightStreamStateElementConfig.streamName);
-        andOrSequenceEventConfig.setRightStreamFilter(rightStreamStateElementConfig.streamFilter);
-
-        // Set Within
-        if (logicalStateElement.getWithin() != null) {
-            andOrSequenceEventConfig.setWithin(
-                    ConfigBuildingUtilities.getDefinition(logicalStateElement.getWithin(), siddhiAppString));
-        }
-
-        return andOrSequenceEventConfig;
+    private PatternElementConfig generateEveryPatternElementConfig(EveryStateElement everyStateElement) {
+        PatternElementConfig patternElementConfig = generatePatternEventConfig(everyStateElement.getStateElement());
+        patternElementConfig.logicComponent =
+                String.join(" ", "every", patternElementConfig.logicComponent, generateWithinString(everyStateElement.getWithin()));
+        return patternElementConfig;
     }
 
     /**
-     * Generates an Event Config object for a Sequence Query's element with 'not' and 'for' keywords,
-     * from the given Siddhi AbsentStreamStateElement object
-     * @param absentStreamStateElement      Siddhi LogicStateElement object, which represents a Sequence Query's element
-     *                                      with 'not' and 'for' keywords
-     * @return                              Event Config object of a 'not for' Element
+     * Generates PatternElementConfig object, for a Pattern element, which is a Count element
+     * @param countStateElement     Siddhi CountStateElement object
+     * @return                      PatternElementConfig object
      */
-    private NotForSequenceEventConfig generateNotForEventConfig(AbsentStreamStateElement absentStreamStateElement) {
-        StreamStateElementConfig streamStateElementConfig = generateStreamStateElementConfig(absentStreamStateElement);
+    private PatternElementConfig generateCountPatternElementConfig(CountStateElement countStateElement) {
+        ElementEventConfig elementEventConfig =
+                generateElementEventConfig(countStateElement.getStreamStateElement());
 
-        NotForSequenceEventConfig notForSequenceEventConfig = new NotForSequenceEventConfig();
-        notForSequenceEventConfig.setStreamName(streamStateElementConfig.streamName);
-        notForSequenceEventConfig.setFilter(streamStateElementConfig.streamFilter);
-        notForSequenceEventConfig.setForDuration(
-                ConfigBuildingUtilities.getDefinition(
-                        absentStreamStateElement.getWaitingTime(), siddhiAppString));
-        notForSequenceEventConfig.setWithin(streamStateElementConfig.within);
+        PatternElementConfig patternElementConfig = new PatternElementConfig();
+        patternElementConfig.conditionConfigs.add(
+                new PatternSequenceConditionConfig(
+                        elementEventConfig.reference,
+                        elementEventConfig.streamName,
+                        elementEventConfig.filter));
 
-        // Set Within
-        if (absentStreamStateElement.getWithin() != null) {
-            notForSequenceEventConfig.setWithin(
-                    ConfigBuildingUtilities.getDefinition(absentStreamStateElement.getWithin(), siddhiAppString));
-        }
+        patternElementConfig.logicComponent =
+                String.join(
+                        " ",
+                        elementEventConfig.reference,
+                        "<" + countStateElement.getMinCount() + ":" + countStateElement.getMaxCount() + ">",
+                        generateWithinString(countStateElement.getWithin()));
 
-        return notForSequenceEventConfig;
+        return patternElementConfig;
     }
 
     /**
-     * Generates an Event Config object for a Sequence Query's element with 'not' and 'and' keywords,
-     * from the given Siddhi LogicalStateElement object
-     * @param logicalStateElement           Siddhi LogicStateElement object, which represents a Sequence Query's element
-     *                                      with 'not' and 'and' keywords
-     * @return                              Event Config object of a 'not and' Element
+     * Generates PatternElementConfig object, for a Pattern element, which is an 'and or' element
+     * @param logicalStateElement       Siddhi LogicalStateElement object
+     * @return                          PatternElementConfig object
      */
-    private NotAndSequenceEventConfig generateNotAndEventConfig(LogicalStateElement logicalStateElement) {
-        NotAndSequenceEventConfig notAndSequenceEventConfig = new NotAndSequenceEventConfig();
+    private PatternElementConfig generateAndOrPatternElementConfig(LogicalStateElement logicalStateElement) {
+        PatternElementConfig patternElementConfig = new PatternElementConfig();
 
-        // Set Left Stream elements
-        StreamStateElementConfig leftStreamStateElementConfig =
-                generateStreamStateElementConfig(logicalStateElement.getStreamStateElement1());
-        notAndSequenceEventConfig.setLeftStreamName(leftStreamStateElementConfig.streamName);
-        notAndSequenceEventConfig.setLeftStreamFilter(leftStreamStateElementConfig.streamFilter);
+        ElementEventConfig firstElementEventConfig =
+                generateElementEventConfig(logicalStateElement.getStreamStateElement1());
+        patternElementConfig.conditionConfigs.add(
+                new PatternSequenceConditionConfig(
+                        firstElementEventConfig.reference,
+                        firstElementEventConfig.streamName,
+                        firstElementEventConfig.filter));
 
-        // Set Right Stream elements
-        StreamStateElementConfig rightStreamStateElementConfig =
-                generateStreamStateElementConfig(logicalStateElement.getStreamStateElement2());
-        notAndSequenceEventConfig.setRightStreamEventReference(rightStreamStateElementConfig.streamReference);
-        notAndSequenceEventConfig.setRightStreamName(rightStreamStateElementConfig.streamName);
-        notAndSequenceEventConfig.setRightStreamFilter(rightStreamStateElementConfig.streamFilter);
+        ElementEventConfig secondElementEventConfig =
+                generateElementEventConfig(logicalStateElement.getStreamStateElement2());
+        patternElementConfig.conditionConfigs.add(
+                new PatternSequenceConditionConfig(
+                        secondElementEventConfig.reference,
+                        secondElementEventConfig.streamName,
+                        secondElementEventConfig.filter));
 
-        // Set Within
-        if (logicalStateElement.getWithin() != null) {
-            notAndSequenceEventConfig.setWithin(
-                    ConfigBuildingUtilities.getDefinition(logicalStateElement.getWithin(), siddhiAppString));
-        }
+        patternElementConfig.logicComponent =
+                String.join(
+                        " ",
+                        firstElementEventConfig.reference,
+                        logicalStateElement.getType().name().toLowerCase(),
+                        secondElementEventConfig.reference,
+                        generateWithinString(logicalStateElement.getWithin()));
 
-        return notAndSequenceEventConfig;
+        return patternElementConfig;
     }
 
     /**
-     * Generates an Event Config object for a Counting Sequence Query's element,
-     * from the given Siddhi CountStateElement object
-     * @param countStateElement             Siddhi CountStateElement object, which represents a Sequence Query's element
-     * @return                              Event Config object of a Counting Sequence Element
+     * Generates PatternElementConfig object, for a Pattern element, which is an 'not for' element
+     * @param absentStreamStateElement      Siddhi AbsentStreamStateElement object
+     * @return                              PatternElementConfig object
      */
-    private CountingSequenceEventConfig generateCountSequenceEventConfig(CountStateElement countStateElement) {
-        CountingSequenceEventConfig countingSequenceEventConfig =
-                generateCountSequenceEventConfig(countStateElement.getStreamStateElement());
+    private PatternElementConfig generateNotForPatternElementConfig(AbsentStreamStateElement absentStreamStateElement) {
+        ElementEventConfig elementEventConfig = generateElementEventConfig(absentStreamStateElement);
 
-        // Set CountingSequence
-        CountingSequenceConfig countingSequence;
-        if (countStateElement.getMinCount() == 0 && countStateElement.getMaxCount() == 1) {
-            countingSequence =
-                    new CountingPatternCountingSequence(CountingPatternCountingSequenceType.ZERO_OR_ONE.toString());
-        } else if (countStateElement.getMinCount() == 0 && countStateElement.getMaxCount() == -1) {
-            countingSequence =
-                    new CountingPatternCountingSequence(CountingPatternCountingSequenceType.ZERO_OR_MORE.toString());
-        } else if (countStateElement.getMinCount() == 1 && countStateElement.getMaxCount() == -1) {
-            countingSequence =
-                    new CountingPatternCountingSequence(CountingPatternCountingSequenceType.ONE_OR_MORE.toString());
-        } else {
-            countingSequence = new MinMaxCountingSequenceValue(
-                    String.valueOf(countStateElement.getMinCount()),
-                    String.valueOf(countStateElement.getMaxCount()));
-        }
-        countingSequenceEventConfig.setCountingSequence(countingSequence);
+        PatternElementConfig patternElementConfig = new PatternElementConfig();
+        patternElementConfig.conditionConfigs.add(
+                new PatternSequenceConditionConfig(
+                        elementEventConfig.reference,
+                        elementEventConfig.streamName,
+                        elementEventConfig.filter));
 
-        // Set Within
-        if (countStateElement.getWithin() != null) {
-            countingSequenceEventConfig.setWithin(
-                    ConfigBuildingUtilities.getDefinition(countStateElement.getWithin(), siddhiAppString));
-        }
-
-        return countingSequenceEventConfig;
+        patternElementConfig.logicComponent =
+                String.join(
+                        " ",
+                        "not",
+                        elementEventConfig.reference,
+                        "for",
+                        ConfigBuildingUtilities.getDefinition(
+                                absentStreamStateElement.getWaitingTime(), siddhiAppString));
+        return patternElementConfig;
     }
 
     /**
-     * Generates an Event Config object, from the given Siddhi StreamStateElement object
-     * @param streamStateElement        Siddhi StreamStateElement object, which represents State of a Stream
-     * @return                          Incomplete Event Config object of a StreamStateElement
+     * Generates PatternElementConfig object, for a Pattern element, which is an 'not and' element
+     * @param logicalStateElement       Siddhi LogicalStateElement object
+     * @return                          PatternElementConfig object
      */
-    private CountingSequenceEventConfig generateCountSequenceEventConfig(StreamStateElement streamStateElement) {
-        StreamStateElementConfig streamStateElementConfig = generateStreamStateElementConfig(streamStateElement);
+    private PatternElementConfig generateNotAndPatternElementConfig(LogicalStateElement logicalStateElement) {
+        PatternElementConfig patternElementConfig = new PatternElementConfig();
 
-        CountingSequenceEventConfig countingSequenceEventConfig = new CountingSequenceEventConfig();
-        countingSequenceEventConfig.setEventReference(streamStateElementConfig.streamReference);
-        countingSequenceEventConfig.setStreamName(streamStateElementConfig.streamName);
-        countingSequenceEventConfig.setFilter(streamStateElementConfig.streamFilter);
-        countingSequenceEventConfig.setWithin(streamStateElementConfig.within);
+        ElementEventConfig firstElementEventConfig =
+                generateElementEventConfig(logicalStateElement.getStreamStateElement1());
+        patternElementConfig.conditionConfigs.add(
+                new PatternSequenceConditionConfig(
+                        firstElementEventConfig.reference,
+                        firstElementEventConfig.streamName,
+                        firstElementEventConfig.filter));
 
-        return countingSequenceEventConfig;
+        ElementEventConfig secondElementEventConfig =
+                generateElementEventConfig(logicalStateElement.getStreamStateElement2());
+        patternElementConfig.conditionConfigs.add(
+                new PatternSequenceConditionConfig(
+                        secondElementEventConfig.reference,
+                        secondElementEventConfig.streamName,
+                        secondElementEventConfig.filter));
+
+        patternElementConfig.logicComponent =
+                String.join(
+                        " ",
+                        "not",
+                        firstElementEventConfig.reference,
+                        "and",
+                        secondElementEventConfig.reference,
+                        generateWithinString(logicalStateElement.getWithin()));
+
+        return patternElementConfig;
     }
 
     /**
-     * Generates a Stream State Element Config object, from the given Siddhi StreamStateElement object
-     * @param streamStateElement        Siddhi StreamStateElement object, which represents State of a Stream
-     * @return                          Stream State Config object, which contains Stream State data
+     * Generates Config for an event of a Pattern element, from the given Siddhi StreamStateElement object
+     * @param streamStateElement        Siddhi StreamStateElement object,
+     *                                  which has information about an event of a Pattern element
+     * @return                          ElementEventConfig object
      */
-    private StreamStateElementConfig generateStreamStateElementConfig(StreamStateElement streamStateElement) {
+    private ElementEventConfig generateElementEventConfig(StreamStateElement streamStateElement) {
         BasicSingleInputStream basicSingleInputStream = streamStateElement.getBasicSingleInputStream();
 
-        StreamStateElementConfig streamStateElementConfig = new StreamStateElementConfig();
-        streamStateElementConfig.streamReference = basicSingleInputStream.getStreamReferenceId();
-        streamStateElementConfig.streamName = basicSingleInputStream.getStreamId();
+        ElementEventConfig elementEventConfig = new ElementEventConfig();
+        elementEventConfig.reference =
+                acceptOrPlaceHoldEventReference(basicSingleInputStream.getStreamReferenceId());
+        elementEventConfig.streamName = basicSingleInputStream.getStreamId();
 
         // Set Filter
         if (basicSingleInputStream.getStreamHandlers().size() == 1) {
             if (basicSingleInputStream.getStreamHandlers().get(0) instanceof Filter) {
                 String filterExpression = ConfigBuildingUtilities
                         .getDefinition(basicSingleInputStream.getStreamHandlers().get(0), siddhiAppString);
-                streamStateElementConfig.streamFilter =
+                elementEventConfig.filter =
                         filterExpression.substring(1, filterExpression.length() - 1).trim();
             } else {
                 throw new IllegalArgumentException("Unknown type of stream handler in BasicSingleInputStream");
@@ -375,39 +302,110 @@ public class SequenceConfigGenerator {
                     "Failed to convert more than one stream handlers within a BasicSingleInputStream");
         }
 
-        // Set Within
-        if (streamStateElement.getWithin() != null) {
-            streamStateElementConfig.within =
-                    ConfigBuildingUtilities.getDefinition(streamStateElement.getWithin(), siddhiAppString);
-        }
-
-        return streamStateElementConfig;
+        return elementEventConfig;
     }
 
     /**
-     * Config for a Siddhi Stream State Element
+     * Accepts and returns the given event reference when not null,
+     * otherwise returns a placeholder, which will be later replaced by a generated event reference
+     * @param eventReference        Reference provided for the event, or null when not provided
+     * @return                      Provided reference, or a placeholder when not provided
      */
-    private class StreamStateElementConfig {
+    private String acceptOrPlaceHoldEventReference(String eventReference) {
+        if (eventReference != null) {
+            // Event reference is present
+            existingEventReferences.add(eventReference);
+            return eventReference;
+        }
+        // Event reference is not present. Add and keep the index, for generating Event reference later
+        eventReferenceAbsentConditionIndexes.add(conditions.size());
+        // Return placeholder with next placeholder number, for replacing later
+        return "${" + eventReferenceAbsentConditionIndexes.size() + "}";
+    }
+
+    /**
+     * Replaces placeholders in the given logic, with generated event references
+     * @param logicWithPlaceHolders     Logic of the Pattern, that has placeholders for event references
+     * @return                          Logic, replaced with generated event references
+     */
+    private String replaceLogicEventReferences(String logicWithPlaceHolders) {
+        Pattern pattern = Pattern.compile("\\$\\{([^$\\s]+)}");
+        Matcher matcher = pattern.matcher(logicWithPlaceHolders);
+
+        StringBuffer replacedLogic = new StringBuffer();
+        int placeholderCounter = 0;
+        while (matcher.find()) {
+            String eventReference = generateEventReference(Integer.parseInt(matcher.group(1)));
+            // Update relevant condition, for each index in eventReferenceAbsentConditionIndexes
+            conditions.get(eventReferenceAbsentConditionIndexes.get(placeholderCounter++)).setId(eventReference);
+            matcher.appendReplacement(replacedLogic, eventReference);
+        }
+        matcher.appendTail(replacedLogic);
+        return replacedLogic.toString();
+    }
+
+    /**
+     * Generates event reference with the given id of the placeholder
+     * @param conditionIndex        Index of the condition, whose event reference is absent
+     * @return                      Generated event reference
+     */
+    private String generateEventReference(int conditionIndex) {
+        String eventReference;
+        do {
+            eventReference = "e" + conditionIndex;
+            conditionIndex++;
+        } while (existingEventReferences.contains(eventReference));
+        existingEventReferences.add(eventReference);
+        return eventReference;
+    }
+
+    /**
+     * Generates the 'within' definition for the given within TimeConstant
+     * @param within        Siddhi TimeConstant object
+     * @return              Within definition
+     */
+    private String generateWithinString(TimeConstant within) {
+        if (within != null) {
+            return "within " + ConfigBuildingUtilities.getDefinition(within, siddhiAppString);
+        }
+        return "";
+    }
+
+    /**
+     * Contains ConditionConfig(s), and the relevant Logic Component, for a Pattern Element
+     * There will be two ConditionConfigs, if the element is 'NOT_AND', 'AND_OR' and 'NOT_FOR'
+     */
+    private class PatternElementConfig {
+        private List<PatternSequenceConditionConfig> conditionConfigs;
+        private String logicComponent;
+
+        private PatternElementConfig() {
+            conditionConfigs = new ArrayList<>();
+        }
+    }
+
+    /**
+     * Represents an Event, in a Pattern element
+     */
+    private class ElementEventConfig {
+        private String reference;
         private String streamName;
-        private String streamReference;
-        private String streamFilter;
-        private String within;
+        private String filter;
 
         /**
          * Constructs with default values
          */
-        private StreamStateElementConfig() {
+        private ElementEventConfig() {
             streamName = "";
-            streamReference = "";
-            streamFilter = "";
-            within = "";
+            reference = "";
+            filter = "";
         }
     }
 
     /**
-     * Event Config Type
+     * Type of a Pattern Element
      */
-    private enum EventConfigType {
+    private enum ElementType {
         COUNTING,
         NOT_AND,
         AND_OR,
@@ -415,18 +413,9 @@ public class SequenceConfigGenerator {
     }
 
     /**
-     * Counting Sequence's CountingPattern type
+     * Type of an event in an 'and or' Pattern element
      */
-    private enum CountingPatternCountingSequenceType {
-        ONE_OR_MORE, // +
-        ZERO_OR_MORE, // *
-        ZERO_OR_ONE // ?
-    }
-
-    /**
-     * And Or Event Config Type
-     */
-    private enum AndOrEventConfigType {
+    private enum AndOrElementEventType {
         AND,
         OR
     }

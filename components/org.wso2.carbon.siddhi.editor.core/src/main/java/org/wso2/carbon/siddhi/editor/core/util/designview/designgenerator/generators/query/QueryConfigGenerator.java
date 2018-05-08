@@ -57,7 +57,7 @@ public class QueryConfigGenerator {
 
         // Generate Select
         AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
-                new AttributesSelectionConfigGenerator(siddhiAppString, siddhiApp);
+                new AttributesSelectionConfigGenerator(siddhiAppString);
         AttributesSelectionConfig querySelectConfig =
                 attributesSelectionConfigGenerator
                         .generateAttributesSelectionConfig(query.getSelector().getSelectionList());
@@ -83,7 +83,7 @@ public class QueryConfigGenerator {
         // Get 'groupBy' list
         List<String> groupBy = new ArrayList<>();
         for (Variable variable : query.getSelector().getGroupByList()) {
-            groupBy.add(variable.getAttributeName());
+            groupBy.add(ConfigBuildingUtilities.getDefinition(variable, siddhiAppString));
         }
 
         // Get 'orderBy' list
