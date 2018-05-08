@@ -541,7 +541,12 @@ public class CodeGenerator {
                 .append(Constants.SPACE)
                 .append(getJoinType(join.getJoinType()))
                 .append(Constants.SPACE)
-                .append(getJoinElement(join.getRight()));
+                .append(getJoinElement(join.getRight()))
+                .append(Constants.NEW_LINE)
+                .append(Constants.TAB_SPACE)
+                .append(Constants.ON)
+                .append(Constants.SPACE)
+                .append(join.getOn());
 
         if (join.getJoinWith().equalsIgnoreCase("AGGREGATION")) {
             if (join.getWithin() == null || join.getWithin().isEmpty()) {
@@ -561,12 +566,6 @@ public class CodeGenerator {
                     .append(Constants.SPACE)
                     .append(join.getPer());
         }
-
-        joinStringBuilder.append(Constants.NEW_LINE)
-                .append(Constants.TAB_SPACE)
-                .append(Constants.ON)
-                .append(Constants.SPACE)
-                .append(join.getOn());
 
         return joinStringBuilder.toString();
     }
