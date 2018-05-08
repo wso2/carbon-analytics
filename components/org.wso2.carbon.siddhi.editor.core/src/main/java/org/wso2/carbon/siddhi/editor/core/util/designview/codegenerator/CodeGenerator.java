@@ -183,13 +183,13 @@ public class CodeGenerator {
         }
 
         StringBuilder streamStringBuilder = new StringBuilder();
-        streamStringBuilder.append(getAnnotationsAsString(stream.getAnnotationList()))
+        streamStringBuilder.append(getAnnotations(stream.getAnnotationList()))
                 .append(Constants.DEFINE_STREAM)
                 .append(Constants.SPACE)
                 .append(stream.getName())
                 .append(Constants.SPACE)
                 .append(Constants.OPEN_BRACKET)
-                .append(getAttributesAsString(stream.getAttributeList()))
+                .append(getAttributes(stream.getAttributeList()))
                 .append(Constants.CLOSE_BRACKET)
                 .append(Constants.SEMI_COLON);
 
@@ -210,14 +210,14 @@ public class CodeGenerator {
         }
 
         StringBuilder tableStringBuilder = new StringBuilder();
-        tableStringBuilder.append(getStoreAsString(table.getStore()))
-                .append(getAnnotationsAsString(table.getAnnotationList()))
+        tableStringBuilder.append(getStore(table.getStore()))
+                .append(getAnnotations(table.getAnnotationList()))
                 .append(Constants.DEFINE_TABLE)
                 .append(Constants.SPACE)
                 .append(table.getName())
                 .append(Constants.SPACE)
                 .append(Constants.OPEN_BRACKET)
-                .append(getAttributesAsString(table.getAttributeList()))
+                .append(getAttributes(table.getAttributeList()))
                 .append(Constants.CLOSE_BRACKET)
                 .append(Constants.SEMI_COLON);
 
@@ -240,18 +240,18 @@ public class CodeGenerator {
         }
 
         StringBuilder windowStringBuilder = new StringBuilder();
-        windowStringBuilder.append(getAnnotationsAsString(window.getAnnotationList()))
+        windowStringBuilder.append(getAnnotations(window.getAnnotationList()))
                 .append(Constants.DEFINE_WINDOW)
                 .append(Constants.SPACE)
                 .append(window.getName())
                 .append(Constants.SPACE)
                 .append(Constants.OPEN_BRACKET)
-                .append(getAttributesAsString(window.getAttributeList()))
+                .append(getAttributes(window.getAttributeList()))
                 .append(Constants.CLOSE_BRACKET)
                 .append(Constants.SPACE)
                 .append(window.getFunction())
                 .append(Constants.OPEN_BRACKET)
-                .append(getParameterListAsString(window.getParameters()))
+                .append(getParameterList(window.getParameters()))
                 .append(Constants.CLOSE_BRACKET);
 
         if (window.getOutputEventType() != null && !window.getOutputEventType().isEmpty()) {
@@ -292,7 +292,7 @@ public class CodeGenerator {
         }
 
         StringBuilder triggerStringBuilder = new StringBuilder();
-        triggerStringBuilder.append(getAnnotationsAsString(trigger.getAnnotationList()))
+        triggerStringBuilder.append(getAnnotations(trigger.getAnnotationList()))
                 .append(Constants.DEFINE_TRIGGER)
                 .append(Constants.SPACE)
                 .append(trigger.getName())
@@ -327,8 +327,8 @@ public class CodeGenerator {
         }
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
-        aggregationStringBuilder.append(getStoreAsString(aggregation.getStore()))
-                .append(getAnnotationsAsString(aggregation.getAnnotationList()))
+        aggregationStringBuilder.append(getStore(aggregation.getStore()))
+                .append(getAnnotations(aggregation.getAnnotationList()))
                 .append(Constants.DEFINE_AGGREGATION)
                 .append(Constants.SPACE)
                 .append(aggregation.getName())
@@ -339,10 +339,10 @@ public class CodeGenerator {
                 .append(aggregation.getFrom())
                 .append(Constants.NEW_LINE)
                 .append(Constants.TAB_SPACE)
-                .append(getQuerySelectAsString(aggregation.getSelect()))
+                .append(getQuerySelect(aggregation.getSelect()))
                 .append(Constants.NEW_LINE)
                 .append(Constants.TAB_SPACE)
-                .append(getQueryGroupByAsString(aggregation.getGroupBy()))
+                .append(getQueryGroupBy(aggregation.getGroupBy()))
                 .append(Constants.NEW_LINE)
                 .append(Constants.AGGREGATE_BY)
                 .append(Constants.SPACE)
@@ -398,34 +398,34 @@ public class CodeGenerator {
         }
 
         StringBuilder queryStringBuilder = new StringBuilder();
-        queryStringBuilder.append(getAnnotationsAsString(query.getAnnotationList()))
-                .append(getQueryInputAsString(query.getQueryInput()))
+        queryStringBuilder.append(getAnnotations(query.getAnnotationList()))
+                .append(getQueryInput(query.getQueryInput()))
                 .append(Constants.NEW_LINE)
-                .append(getQuerySelectAsString(query.getSelect()));
+                .append(getQuerySelect(query.getSelect()));
 
         if (query.getGroupBy() != null && !query.getGroupBy().isEmpty()) {
             queryStringBuilder.append(Constants.NEW_LINE)
-                    .append(getQueryGroupByAsString(query.getGroupBy()));
+                    .append(getQueryGroupBy(query.getGroupBy()));
         }
         if (query.getOrderBy() != null && !query.getOrderBy().isEmpty()) {
             queryStringBuilder.append(Constants.NEW_LINE)
-                    .append(getQueryOrderByAsString(query.getOrderBy()));
+                    .append(getQueryOrderBy(query.getOrderBy()));
         }
         if (query.getLimit() != 0) {
             queryStringBuilder.append(Constants.NEW_LINE)
-                    .append(getQueryLimitAsString(query.getLimit()));
+                    .append(getQueryLimit(query.getLimit()));
         }
         if (query.getHaving() != null && !query.getHaving().isEmpty()) {
             queryStringBuilder.append(Constants.NEW_LINE)
-                    .append(getQueryHavingAsString(query.getHaving()));
+                    .append(getQueryHaving(query.getHaving()));
         }
         if (query.getOutputRateLimit() != null && !query.getOutputRateLimit().isEmpty()) {
             queryStringBuilder.append(Constants.NEW_LINE)
-                    .append(getQueryOutputRateLimitAsString(query.getOutputRateLimit()));
+                    .append(getQueryOutputRateLimit(query.getOutputRateLimit()));
         }
 
         queryStringBuilder.append(Constants.NEW_LINE)
-                .append(getQueryOutputAsString(query.getQueryOutput()));
+                .append(getQueryOutput(query.getQueryOutput()));
 
         return queryStringBuilder.toString();
     }
@@ -442,7 +442,7 @@ public class CodeGenerator {
         return partitionStringBuilder.toString();
     }
 
-    private String getQueryInputAsString(QueryInputConfig queryInput) {
+    private String getQueryInput(QueryInputConfig queryInput) {
         if (queryInput == null) {
             throw new CodeGenerationException("Query Input Cannot Be Null");
         } else if (queryInput.getType() == null || queryInput.getType().isEmpty()) {
@@ -456,16 +456,14 @@ public class CodeGenerator {
             case "filter":
             case "projection":
                 WindowFilterProjectionConfig windowFilterProjectionQuery = (WindowFilterProjectionConfig) queryInput;
-                queryInputStringBuilder.append(getWindowFilterProjectionQueryInputAsString(windowFilterProjectionQuery));
+                queryInputStringBuilder.append(getWindowFilterProjectionQueryInput(windowFilterProjectionQuery));
                 break;
             case "join":
                 JoinConfig joinQuery = (JoinConfig) queryInput;
-                queryInputStringBuilder.append(getJoinQueryInputAsString(joinQuery));
+                queryInputStringBuilder.append(getJoinQueryInput(joinQuery));
                 break;
             case "pattern":
             case "sequence":
-//                PatternSequenceConfig sequenceQuery = (PatternSequenceConfig) queryInput;
-//                queryInputStringBuilder.append(getSequenceQueryInputAsString(sequenceQuery));
                 break;
             default:
                 throw new CodeGenerationException("Unidentified Query Input Type Has Been Given: " + queryInput.getType());
@@ -474,7 +472,7 @@ public class CodeGenerator {
         return queryInputStringBuilder.toString();
     }
 
-    private String getWindowFilterProjectionQueryInputAsString(WindowFilterProjectionConfig windowFilterProjection) {
+    private String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection) {
         if (windowFilterProjection == null) {
             throw new CodeGenerationException("The WindowFilterProjection Instance Is Null");
         } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
@@ -499,7 +497,7 @@ public class CodeGenerator {
                     .append(Constants.FULL_STOP)
                     .append(queryWindow.getFunction())
                     .append(Constants.OPEN_BRACKET)
-                    .append(getParameterListAsString(queryWindow.getParameters()))
+                    .append(getParameterList(queryWindow.getParameters()))
                     .append(Constants.CLOSE_BRACKET);
         }
 
@@ -512,7 +510,7 @@ public class CodeGenerator {
         return windowFilterProjectionStringBuilder.toString();
     }
 
-    private String getJoinQueryInputAsString(JoinConfig join) {
+    private String getJoinQueryInput(JoinConfig join) {
         if (join == null) {
             throw new CodeGenerationException("The given JoinConfig instance is null");
         } else if (join.getJoinWith() == null || join.getJoinType().isEmpty()) {
@@ -601,7 +599,7 @@ public class CodeGenerator {
                         .append(Constants.FULL_STOP)
                         .append(joinElement.getWindow().getFunction())
                         .append(Constants.OPEN_BRACKET)
-                        .append(getParameterListAsString(joinElement.getWindow().getParameters()))
+                        .append(getParameterList(joinElement.getWindow().getParameters()))
                         .append(Constants.CLOSE_BRACKET);
             } else {
                 throw new CodeGenerationException("The given " + joinElement.getType() + " cannot have a filter without a window");
@@ -618,7 +616,7 @@ public class CodeGenerator {
                     .append(Constants.FULL_STOP)
                     .append(joinElement.getWindow().getFunction())
                     .append(Constants.OPEN_BRACKET)
-                    .append(getParameterListAsString(joinElement.getWindow().getParameters()))
+                    .append(getParameterList(joinElement.getWindow().getParameters()))
                     .append(Constants.CLOSE_BRACKET);
         }
 
@@ -656,16 +654,16 @@ public class CodeGenerator {
         }
     }
 
-    private String getPatternQueryInputAsString(PatternSequenceConfig patternQuery) {
+    private String getPatternInput(PatternSequenceConfig patternQuery) {
         StringBuilder patternQueryStringBuilder = new StringBuilder();
         return patternQueryStringBuilder.toString();
     }
 
-    private String getSequenceQueryInputAsString(PatternSequenceConfig sequenceQuery) {
+    private String getSequenceInput(PatternSequenceConfig sequenceQuery) {
         return VOID_RETURN;
     }
 
-    private String getQuerySelectAsString(AttributesSelectionConfig attributesSelection) {
+    private String getQuerySelect(AttributesSelectionConfig attributesSelection) {
         if (attributesSelection == null) {
             throw new CodeGenerationException(" Attribute Selection Instance Cannot Be Null");
         }
@@ -682,7 +680,7 @@ public class CodeGenerator {
         switch (attributesSelection.getType().toUpperCase()) {
             case AttributeSelection.TYPE_USER_DEFINED:
                 UserDefinedSelectionConfig userDefinedSelection = (UserDefinedSelectionConfig) attributesSelection;
-                attributesSelectionStringBuilder.append(getUserDefinedSelectionAsString(userDefinedSelection));
+                attributesSelectionStringBuilder.append(getUserDefinedSelection(userDefinedSelection));
                 break;
             case AttributeSelection.TYPE_ALL:
                 attributesSelectionStringBuilder.append(Constants.ALL);
@@ -694,7 +692,7 @@ public class CodeGenerator {
         return attributesSelectionStringBuilder.toString();
     }
 
-    private String getUserDefinedSelectionAsString(UserDefinedSelectionConfig userDefinedSelection) {
+    private String getUserDefinedSelection(UserDefinedSelectionConfig userDefinedSelection) {
         // TODO: 4/23/18 Complete to get rid of duplicate code
         StringBuilder userDefinedSelectionStringBuilder = new StringBuilder();
 
@@ -726,7 +724,7 @@ public class CodeGenerator {
         return userDefinedSelectionStringBuilder.toString();
     }
 
-    private String getQueryGroupByAsString(List<String> groupByList) {
+    private String getQueryGroupBy(List<String> groupByList) {
         if (groupByList == null || groupByList.isEmpty()) {
             return VOID_RETURN;
         }
@@ -734,11 +732,11 @@ public class CodeGenerator {
         StringBuilder groupByListStringBuilder = new StringBuilder();
         groupByListStringBuilder.append(Constants.GROUP_BY)
                 .append(Constants.SPACE);
-        groupByListStringBuilder.append(getParameterListAsString(groupByList));
+        groupByListStringBuilder.append(getParameterList(groupByList));
         return groupByListStringBuilder.toString();
     }
 
-    private String getQueryOrderByAsString(List<QueryOrderByConfig> orderByList) {
+    private String getQueryOrderBy(List<QueryOrderByConfig> orderByList) {
         if (orderByList == null || orderByList.isEmpty()) {
             return VOID_RETURN;
         }
@@ -771,7 +769,7 @@ public class CodeGenerator {
         return orderByListStringBuilder.toString();
     }
 
-    private String getQueryLimitAsString(long limit) {
+    private String getQueryLimit(long limit) {
         if (limit != 0) {
             StringBuilder limitStringBuilder = new StringBuilder();
             limitStringBuilder.append(Constants.LIMIT)
@@ -782,7 +780,7 @@ public class CodeGenerator {
         return VOID_RETURN;
     }
 
-    private String getQueryHavingAsString(String having) {
+    private String getQueryHaving(String having) {
         if (having == null || having.isEmpty()) {
             return VOID_RETURN;
         }
@@ -793,7 +791,7 @@ public class CodeGenerator {
         return havingStringBuilder.toString();
     }
 
-    private String getQueryOutputRateLimitAsString(String outputRateLimit) {
+    private String getQueryOutputRateLimit(String outputRateLimit) {
         if (outputRateLimit == null || outputRateLimit.isEmpty()) {
             return VOID_RETURN;
         }
@@ -805,7 +803,7 @@ public class CodeGenerator {
         return outputRateLimitStringBuilder.toString();
     }
 
-    private String getQueryOutputAsString(QueryOutputConfig queryOutput) {
+    private String getQueryOutput(QueryOutputConfig queryOutput) {
         if (queryOutput == null) {
             throw new CodeGenerationException("The QueryOutputInstance Given Is Null");
         } else if (queryOutput.getType() == null || queryOutput.getType().isEmpty()) {
@@ -817,19 +815,19 @@ public class CodeGenerator {
         switch (queryOutput.getType().toLowerCase()) {
             case "insert":
                 InsertOutputConfig insertOutputConfig = (InsertOutputConfig) queryOutput.getOutput();
-                queryOutputStringBuilder.append(getQueryInsetOutputAsString(insertOutputConfig, queryOutput.getTarget()));
+                queryOutputStringBuilder.append(getInsetOutput(insertOutputConfig, queryOutput.getTarget()));
                 break;
             case "delete":
                 DeleteOutputConfig deleteOutputConfig = (DeleteOutputConfig) queryOutput.getOutput();
-                queryOutputStringBuilder.append(getQueryDeleteOutputAsString(deleteOutputConfig, queryOutput.getTarget()));
+                queryOutputStringBuilder.append(getDeleteOutput(deleteOutputConfig, queryOutput.getTarget()));
                 break;
             case "update":
                 UpdateInsertIntoOutputConfig updateIntoOutput = (UpdateInsertIntoOutputConfig) queryOutput.getOutput();
-                queryOutputStringBuilder.append(getQueryUpdateOutputAsString(queryOutput.getType(), updateIntoOutput, queryOutput.getTarget()));
+                queryOutputStringBuilder.append(getUpdateOutput(queryOutput.getType(), updateIntoOutput, queryOutput.getTarget()));
                 break;
             case "update_or_insert_into":
                 UpdateInsertIntoOutputConfig updateInsertIntoOutput = (UpdateInsertIntoOutputConfig) queryOutput.getOutput();
-                queryOutputStringBuilder.append(getQueryUpdateOutputAsString(queryOutput.getType(), updateInsertIntoOutput, queryOutput.getTarget()));
+                queryOutputStringBuilder.append(getUpdateOutput(queryOutput.getType(), updateInsertIntoOutput, queryOutput.getTarget()));
                 break;
             default:
                 throw new CodeGenerationException("Unidentified query output type: " + queryOutput.getType());
@@ -838,7 +836,7 @@ public class CodeGenerator {
         return queryOutputStringBuilder.toString();
     }
 
-    private String getQueryInsetOutputAsString(InsertOutputConfig insertOutput, String target) {
+    private String getInsetOutput(InsertOutputConfig insertOutput, String target) {
         if (insertOutput == null) {
             throw new CodeGenerationException("The InsertOutputConfig instance given is null");
         } else if (target == null || target.isEmpty()) {
@@ -877,7 +875,7 @@ public class CodeGenerator {
         return insertOutputStringBuilder.toString();
     }
 
-    private String getQueryDeleteOutputAsString(DeleteOutputConfig deleteOutput, String target) {
+    private String getDeleteOutput(DeleteOutputConfig deleteOutput, String target) {
         if (deleteOutput == null) {
             throw new CodeGenerationException("The given DeleteOutputConfig instance is null");
         } else if (deleteOutput.getOn() == null || deleteOutput.getOn().isEmpty()) {
@@ -922,7 +920,7 @@ public class CodeGenerator {
         return deleteOutputStringBuilder.toString();
     }
 
-    private String getQueryUpdateOutputAsString(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput, String target) {
+    private String getUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput, String target) {
         if (updateInsertIntoOutput == null) {
             throw new CodeGenerationException("The given UpdateInsertIntoOutputConfig is null");
         } else if (updateInsertIntoOutput.getSet() == null || updateInsertIntoOutput.getSet().isEmpty()) {
@@ -979,7 +977,7 @@ public class CodeGenerator {
         return updateInsertIntoOutputStringBuilder.toString();
     }
 
-    private String getAttributesAsString(List<AttributeConfig> attributes) {
+    private String getAttributes(List<AttributeConfig> attributes) {
         if (attributes == null || attributes.isEmpty()) {
             throw new CodeGenerationException("The attribute list given cannot be null/empty");
         }
@@ -1006,13 +1004,13 @@ public class CodeGenerator {
         return stringBuilder.toString();
     }
 
-    private String getAnnotationsAsString(List<AnnotationConfig> annotations) {
+    private String getAnnotations(List<AnnotationConfig> annotations) {
         // TODO: 4/18/18 Fill Once The Annotation Beans Are Complete
         StringBuilder annotationsStringBuilder = new StringBuilder();
         return annotationsStringBuilder.toString();
     }
 
-    private String getStoreAsString(StoreConfig store) {
+    private String getStore(StoreConfig store) {
         StringBuilder storeStringBuilder = new StringBuilder();
 
         if (store != null) {
@@ -1042,7 +1040,7 @@ public class CodeGenerator {
         return storeStringBuilder.toString();
     }
 
-    private String getParameterListAsString(List<String> parameters) {
+    private String getParameterList(List<String> parameters) {
         StringBuilder parametersStringBuilder = new StringBuilder();
 
         int parametersLeft = parameters.size();
