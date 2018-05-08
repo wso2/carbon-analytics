@@ -22,6 +22,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.factories.AttributesSelectionConfigFactory;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 import org.wso2.siddhi.query.api.expression.AttributeFunction;
@@ -35,11 +36,9 @@ import java.util.List;
  */
 public class AttributesSelectionConfigGenerator {
     private String siddhiAppString;
-    private SiddhiApp siddhiApp;
 
-    public AttributesSelectionConfigGenerator(String siddhiAppString, SiddhiApp siddhiApp) {
+    public AttributesSelectionConfigGenerator(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
-        this.siddhiApp = siddhiApp;
     }
 
     /**
@@ -51,7 +50,6 @@ public class AttributesSelectionConfigGenerator {
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
         AttributesSelectionConfigFactory attributesSelectionConfigFactory = new AttributesSelectionConfigFactory();
         if (!outputAttributes.isEmpty()) {
-            // ConfigBuildingUtilities.getDefinition(outputAttributes.get(0), siddhiAppString) TODO look into
             for (OutputAttribute outputAttribute : outputAttributes) {
                 selectedAttributes.add(generateSelectedAttributeConfig(outputAttribute));
             }
@@ -62,45 +60,15 @@ public class AttributesSelectionConfigGenerator {
     }
 
     /**
-     * Generates SelectedAttribute object, for the given OutputAttribute,
-     * which is a selection of a Siddhi Aggregation
-     * @param outputAttribute   A selected attribute
-     * @return                  SelectedAttribute object representation for the given selected attribute
+     * Generates SelectedAttribute object, for the given OutputAttribute, which is a selection of a Siddhi Attribute
+     * @param outputAttribute       A selected attribute
+     * @return                      SelectedAttribute object
      */
     private SelectedAttribute generateSelectedAttributeConfig(OutputAttribute outputAttribute) {
-        if (outputAttribute.getExpression() instanceof AttributeFunction) {
-            // Attribute is a Function
-            AttributeFunction attributeFunction = (AttributeFunction) (outputAttribute.getExpression());
-            if (attributeFunction.getParameters()[0] instanceof Variable) {
-                Variable attribute = (Variable)attributeFunction.getParameters()[0];
-                String attributeName = attribute.getAttributeName();
-                if (attribute.getStreamId() != null) {
-                    attributeName = attribute.getStreamId() + "." + attributeName;
-                }
-
-                return new SelectedAttribute(
-                        String.format("%s(%s)", attributeFunction.getName(), attributeName),
-                        outputAttribute.getRename());
-            } else {
-                throw new IllegalArgumentException("Parameter of the AttributeFunction is of unknown class");
-            }
-        } else if (outputAttribute.getExpression() instanceof Variable) {
-            // Attribute is a Variable
-            Variable expression = (Variable)(outputAttribute.getExpression());
-
-            String attributeName = expression.getAttributeName();
-            String attributeAlias = "";
-            if (expression.getStreamId() != null) {
-                attributeName = expression.getStreamId() + "." + attributeName;
-            }
-            if (outputAttribute.getRename() != null) {
-                attributeAlias = outputAttribute.getRename();
-            }
-
-            return new SelectedAttribute(attributeName, attributeAlias);
-        } else {
-            // TODO No select expression instanceof check was done for 'StringConstant', 'IntConstant' and stuff (subclasses of Expression class)
-            throw new IllegalArgumentException("Expression of the OutputAttribute is of unknown class");
+        String[] splitString = ConfigBuildingUtilities.getDefinition(outputAttribute, siddhiAppString).split(" as ");
+        if (splitString.length == 1) {
+            return new SelectedAttribute(splitString[0].trim(), "");
         }
+        return new SelectedAttribute(splitString[0].trim(), splitString[1].trim());
     }
 }
