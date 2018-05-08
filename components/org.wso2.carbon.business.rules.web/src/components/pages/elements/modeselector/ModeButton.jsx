@@ -88,4 +88,11 @@ export default class ModeButton extends Component {
     }
 }
 
-export default CreateButton;
+ModeButton.propTypes = {
+    mode: PropTypes.oneOf([
+        BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+        BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH,
+    ]).isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+};

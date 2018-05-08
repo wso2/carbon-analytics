@@ -201,4 +201,21 @@ export default class BusinessRule extends Component {
     }
 }
 
-export default BusinessRule;
+BusinessRule.propTypes = {
+    uuid: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    type: PropTypes.oneOf([
+        BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+        BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH,
+    ]).isRequired,
+    status: PropTypes.number.isRequired,
+    permissions: PropTypes.oneOf([
+        BusinessRulesConstants.USER_PERMISSIONS.MANAGER,
+        BusinessRulesConstants.USER_PERMISSIONS.VIEWER,
+        BusinessRulesConstants.USER_PERMISSIONS.NONE,
+        BusinessRulesConstants.USER_PERMISSIONS.UNSET,
+    ]).isRequired,
+    redeploy: PropTypes.func.isRequired,
+    showDeleteDialog: PropTypes.func.isRequired,
+    showDeploymentInfo: PropTypes.func.isRequired,
+};

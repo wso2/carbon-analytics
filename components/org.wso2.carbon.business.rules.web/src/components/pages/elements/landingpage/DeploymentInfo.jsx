@@ -153,4 +153,9 @@ export default class DeploymentInfo extends Component {
     }
 }
 
-export default DeploymentInfo;
+DeploymentInfo.propTypes = {
+    open: PropTypes.bool.isRequired,
+    onRequestClose: PropTypes.func.isRequired,
+    info: PropTypes.array.isRequired,
+    businessRule: PropTypes.object.isRequired, // TODO if possible, move this into the deploymentStatus object
+};
