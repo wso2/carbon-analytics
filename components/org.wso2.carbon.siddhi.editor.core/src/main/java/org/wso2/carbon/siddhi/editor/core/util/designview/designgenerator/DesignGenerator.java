@@ -29,9 +29,14 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationValue;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.ListAnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.SinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceMap;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.attributesselection.AttributesSelectionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.regexpatterns.CodeToDesignRegexPatterns;
@@ -56,7 +61,6 @@ import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.BasicSelector;
 import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.expression.Variable;
-import org.wso2.siddhi.query.api.expression.constant.TimeConstant;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
 import java.util.*;
@@ -70,7 +74,7 @@ public class DesignGenerator {
     private SiddhiApp siddhiApp;
     private SiddhiAppRuntime siddhiAppRuntime;
     private SiddhiAppConfig siddhiAppConfig;
-    private Map<String, Edge> edges;
+    private List<Edge> edges;
 
     /**
      * Gets EventFlow configuration for a given Siddhi app code string
@@ -87,7 +91,7 @@ public class DesignGenerator {
             throw new SiddhiAppCreationException(e.getMessage());
         }
         siddhiAppConfig = new SiddhiAppConfig();
-        edges = new HashMap<>();
+        edges = new ArrayList<>();
         loadAppNameAndDescription();
         loadTriggers();
         loadStreams();
@@ -100,11 +104,13 @@ public class DesignGenerator {
         loadFunctions();
         loadExecutionElements();
 
+        generateEdges();
+
 
 
         // TODO: 3/27/18 implement
 //        return null;
-        return new EventFlow(siddhiAppConfig, Collections.emptyList());
+        return new EventFlow(siddhiAppConfig, edges);
     }
 
     /**
@@ -254,13 +260,13 @@ public class DesignGenerator {
             if (aggregationDefinition.getSelector() instanceof BasicSelector) {
                 BasicSelector selector = (BasicSelector) aggregationDefinition.getSelector();
                 AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
-                        new AttributesSelectionConfigGenerator(siddhiAppString, siddhiApp);
+                        new AttributesSelectionConfigGenerator(siddhiAppString);
                 selectedAttributesConfig =
                         attributesSelectionConfigGenerator.generateAttributesSelectionConfig(
                                 selector.getSelectionList());
                 // Populate 'groupBy' list
                 for (Variable variable : selector.getGroupByList()) {
-                    groupBy.add(variable.getAttributeName());
+                    groupBy.add(ConfigBuildingUtilities.getDefinition(variable, siddhiAppString));
                 }
             } else {
                 throw new IllegalArgumentException("Selector of AggregationDefinition is not of class BasicSelector");
@@ -434,19 +440,12 @@ public class DesignGenerator {
 
     /* EDGES METHODS [START] */
 
-    private void generateEdges() {
-        // TODO: 3/29/18 implement
-    }
-
     /**
-     * Returns whether the edge has been already generated or not.
-     * An existing edge would have had the given childID as its parentID, and vice versa
-     * @param parentID  Parent ID of the current edge. Will be the Child ID of the duplicate edge, if it exists
-     * @param childID   Child ID of the current edge. Will be the Parent ID of the duplicate edge, if it exists
-     * @return          Whether the edge is duplicate or not
+     * Generates Edges, that represent connections within the elements of the Siddhi app
      */
-    private boolean isEdgeDuplicate(String parentID, String childID) {
-        return (edges.containsKey(DesignGeneratorHelper.generateEdgeID(childID, parentID)));
+    private void generateEdges() {
+        EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
+        edges = edgesGenerator.generateEdges();
     }
 
     /* EDGES METHODS [END] */

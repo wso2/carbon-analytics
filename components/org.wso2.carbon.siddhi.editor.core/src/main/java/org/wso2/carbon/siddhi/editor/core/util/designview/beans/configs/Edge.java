@@ -38,4 +38,24 @@ public class Edge {
         this.childID = childID;
         this.childType = childType;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getParentID() {
+        return parentID;
+    }
+
+    public NodeType getParentType() {
+        return parentType;
+    }
+
+    public String getChildID() {
+        return childID;
+    }
+
+    public NodeType getChildType() {
+        return childType;
+    }
 }
