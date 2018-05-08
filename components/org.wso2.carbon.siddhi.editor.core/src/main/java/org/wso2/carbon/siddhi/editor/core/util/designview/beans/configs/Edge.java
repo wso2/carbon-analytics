@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGeneratorHelper;
 
 /**
@@ -27,15 +27,35 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGenera
 public class Edge {
     private String id;
     private String parentID;
-    private NodeTypes parentType;
+    private NodeType parentType;
     private String childID;
-    private NodeTypes childType;
+    private NodeType childType;
 
-    public Edge(String parentID, NodeTypes parentType, String childID, NodeTypes childType) {
-        this.id = DesignGeneratorHelper.generateEdgeID(parentID, childID);
+    public Edge(String id, String parentID, NodeType parentType, String childID, NodeType childType) {
+        this.id = id;
         this.parentID = parentID;
         this.parentType = parentType;
         this.childID = childID;
         this.childType = childType;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getParentID() {
+        return parentID;
+    }
+
+    public NodeType getParentType() {
+        return parentType;
+    }
+
+    public String getChildID() {
+        return childID;
+    }
+
+    public NodeType getChildType() {
+        return childType;
     }
 }

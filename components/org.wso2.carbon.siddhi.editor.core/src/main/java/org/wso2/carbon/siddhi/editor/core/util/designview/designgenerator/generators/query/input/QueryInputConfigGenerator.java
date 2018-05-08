@@ -19,14 +19,9 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.JoinConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.PatternConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.SequenceConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.WindowFilterProjectionConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.*;
 import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.JoinInputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
@@ -58,24 +53,18 @@ public class QueryInputConfigGenerator {
                     .getWindowFilterProjectionQueryConfig(queryInputStream);
         } else if (queryInputType.equalsIgnoreCase(QueryInputType.JOIN.toString())) {
             return new JoinConfigGenerator().getJoinQueryConfig(queryInputStream, siddhiApp, siddhiAppString);
-        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString())) {
-            return new PatternConfigGenerator(siddhiAppString).getPatternQueryConfig(queryInputStream);
-        } else if (queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
-            return new SequenceConfigGenerator(siddhiAppString).getSequenceQueryConfig(queryInputStream);
-            // TODO: 4/9/18 implement for sequence
+        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString()) ||
+                queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
+            // TODO implement
+//            return new PatternSequenceConfigGenerator(siddhiAppString).getPatternQueryConfig(queryInputStream);
         }
-
-//        if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW_FILTER_PROJECTION.toString())) {
-//            return new WindowFilterProjectionConfigGenerator(siddhiAppString)
-//                    .getWindowFilterProjectionQueryConfig(queryInputStream);
-//        } else if (queryInputType.equalsIgnoreCase(QueryInputType.JOIN.toString())) {
-//            return new JoinConfigGenerator().getJoinQueryConfig(queryInputStream, siddhiApp, siddhiAppString);
-//        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString())) {
+//        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString())) { // TODO refactor this
 //            return new PatternConfigGenerator(siddhiAppString).getPatternQueryConfig(queryInputStream);
 //        } else if (queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
-//            return new SequenceConfigGenerator(siddhiAppString).getSequenceQueryConfig(queryInputStream);
-//            // TODO: 4/9/18 implement for sequence
+//            return new SequenceConfigGenerator(siddhiAppString).getPatternQueryConfig(queryInputStream);
+////            return new SequenceConfigGenerator(siddhiAppString).getSequenceQueryConfig(queryInputStream);
 //        }
+
         throw new IllegalArgumentException("Unknown type: " + queryInputType);
     }
 

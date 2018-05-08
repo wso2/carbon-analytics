@@ -50,7 +50,7 @@ public class SiddhiAppConfig {
 //    private List<> aggregations;
 //    private List<> functions;
 //    private List<> partitions;
-    private List<QueryConfig> queryList;
+    private List<QueryConfig> queryList; // TODO this will be removed
 
     private List<QueryConfig> windowFilterProjectionQueryList;
     private List<QueryConfig> joinQueryList;

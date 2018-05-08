@@ -16,22 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
+package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
-/**
- * Has types of nodes in design view, which are Siddhi app elements
- */
-public class NodeTypes {
-    public static final String STREAM = "stream";
-    public static final String SOURCE = "source";
-    public static final String SINK = "sink";
-    public static final String TABLE = "table";
-    public static final String WINDOW = "window";
-    public static final String TRIGGER = "trigger";
-
-    /**
-     * Avoids instantiation
-     */
-    private NodeTypes() {
-    }
+public class EveryStateElementConfig implements StateElementConfig {
 }
