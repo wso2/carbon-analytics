@@ -17,34 +17,25 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
-import SyntaxHighlighter from "react-syntax-highlighter";
+import React from 'react';
+import {Link, Redirect} from 'react-router-dom';
+import SyntaxHighlighter from 'react-syntax-highlighter';
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import { HttpStatus } from '../utils/Constants';
-import ComponentTable from "./ComponentTable";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import {HttpStatus} from '../utils/Constants';
+import ComponentTable from './ComponentTable';
 import VizG from 'react-vizgrammar';
-import Header from "../common/Header";
+import Header from '../common/Header';
 //Material UI
-import {GridList, GridTile} from "material-ui/GridList";
-import HomeButton from "material-ui/svg-icons/action/home";
-import {
-    Card,
-    CardHeader,
-    CardText,
-    Dialog,
-    Divider,
-    FlatButton,
-    Toggle,
-    Snackbar, RaisedButton
-} from "material-ui";
-import DashboardUtils from "../utils/DashboardUtils";
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import { Redirect } from 'react-router-dom';
-import Error403 from "../error-pages/Error403";
-import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
+import {GridList, GridTile} from 'material-ui/GridList';
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Card, CardHeader, CardText, Dialog, Divider, FlatButton, RaisedButton, Snackbar, Toggle} from 'material-ui';
+import DashboardUtils from '../utils/DashboardUtils';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import Error403 from '../error-pages/Error403';
+import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
+
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
     gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
@@ -54,9 +45,9 @@ const memoryLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Memory', fill: '#f17b31'}],
     gridColor: '#f2f2f2',
-    tipTimeFormat:"%M:%S %Z",
+    tipTimeFormat: "%M:%S %Z",
     style: {
-        tickLabelColor:'#f2f2f2',
+        tickLabelColor: '#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
         axisLabelColor: '#9c9898'
@@ -67,9 +58,9 @@ const latencyLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Latency', fill: '#f17b31'}],
     gridColor: '#f2f2f2',
-    tipTimeFormat:"%M:%S %Z",
+    tipTimeFormat: "%M:%S %Z",
     style: {
-        tickLabelColor:'#f2f2f2',
+        tickLabelColor: '#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
         axisLabelColor: '#9c9898'
@@ -80,9 +71,9 @@ const tpLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Throughput', fill: '#f17b31'}],
     gridColor: '#f2f2f2',
-    tipTimeFormat:"%M:%S %Z",
+    tipTimeFormat: "%M:%S %Z",
     style: {
-        tickLabelColor:'#f2f2f2',
+        tickLabelColor: '#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
         axisLabelColor: '#9c9898'
@@ -165,20 +156,20 @@ export default class WorkerSpecific extends React.Component {
 
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().SDID)
+        AuthenticationAPI.isUserAuthorized('metrics.manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasManagerPermission: response.data
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null){
-                if(error.response.status === 401){
+            if (error.response != null) {
+                if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
                         sessionInvalid: true
                     })
-                } else if(error.response.status === 403){
+                } else if (error.response.status === 403) {
                     message = "User Have No Manager Permission to view this page.";
                     this.setState({
                         hasManagerPermission: false
@@ -191,14 +182,14 @@ export default class WorkerSpecific extends React.Component {
                 })
             }
         });
-        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().SDID)
+        AuthenticationAPI.isUserAuthorized('viewer', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasViewerPermission: response.data
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
@@ -347,6 +338,7 @@ export default class WorkerSpecific extends React.Component {
             </GridTile>
         );
     }
+
     /**
      * Method which render metrics enable toggle button if permission is granted
      * @param workersList
@@ -376,7 +368,7 @@ export default class WorkerSpecific extends React.Component {
             )
         } else {
             return (
-                <div style={{float: 'right', padding: 20, paddingRight: 20,display:'none'}}>
+                <div style={{float: 'right', padding: 20, paddingRight: 20, display: 'none'}}>
                     <Toggle labelPosition="left"
                             label="Metrics"
                             labelStyle={{color: 'white'}}
@@ -461,11 +453,11 @@ export default class WorkerSpecific extends React.Component {
             />,
         ];
         let warningMessage;
-        if(!this.state.statsEnabled){
+        if (!this.state.statsEnabled) {
             warningMessage = <div>
                 Metrics are disabled!
             </div>
-        }else {
+        } else {
             warningMessage = <div/>
         }
         return (
@@ -483,7 +475,7 @@ export default class WorkerSpecific extends React.Component {
                     <div className="navigation-bar">
                         <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                   icon={<HomeButton color="black"/>}/></Link>
-                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
+                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id}>
                             <FlatButton label={this.state.workerID + " >"}/></Link>
                         <RaisedButton label={this.props.match.params.appName} disabled disabledLabelColor='white'
                                       disabledBackgroundColor='#f17b31'/>
@@ -493,7 +485,7 @@ export default class WorkerSpecific extends React.Component {
                             : {this.state.appName} </h2>
                     </div>
 
-                    <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '60%',fontSize:'20px'}}>
+                    <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '60%', fontSize: '20px'}}>
                         {warningMessage}
                     </div>
                     {this.renderToggle()}
@@ -504,8 +496,8 @@ export default class WorkerSpecific extends React.Component {
                     </GridList>
                 </div>
 
-                <div style={{padding: 10, paddingLeft: 40, width: '90%', height:'50%', backgroundColor: "#222222"}}>
-                    <Card style={{backgroundColor: "#282828", height:'50%'}}>
+                <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '50%', backgroundColor: "#222222"}}>
+                    <Card style={{backgroundColor: "#282828", height: '50%'}}>
                         <CardHeader title="Code View" subtitle={this.props.match.params.appName}
                                     titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
                         />
@@ -521,7 +513,7 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{width: '90%', marginLeft: 40}}>
                     <h3 style={{color: 'white'}}> Siddhi App Component Statistics</h3>
                     <ComponentTable id={this.props.match.params.id} appName={this.props.match.params.appName}
-                                    statsEnabled={this.state.statsEnabled} />
+                                    statsEnabled={this.state.statsEnabled}/>
                 </div>
 
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}

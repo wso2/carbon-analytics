@@ -21,7 +21,7 @@ package org.wso2.carbon.sp.jobmanager.core.model;
 import java.io.Serializable;
 
 /**
- * Represents a deployed child Siddhi app
+ * Represents a deployed child Siddhi app.
  */
 public class SiddhiAppHolder implements Serializable {
     private static final long serialVersionUID = 3345845929151967554L;

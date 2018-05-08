@@ -30,13 +30,14 @@ import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.sp.jobmanager.core.api.NotFoundException;
 import org.wso2.carbon.sp.jobmanager.core.api.WorkersApiService;
 import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
-import org.wso2.carbon.sp.jobmanager.core.internal.ManagerDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
-import org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 import org.wso2.msf4j.Request;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
@@ -45,7 +46,7 @@ import javax.ws.rs.core.Response;
  */
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2018-02-03T14:53:27.713Z")
+        date = "2018-02-03T14:53:27.713Z")
 @Component(service = WorkersApiService.class, immediate = true)
 
 public class WorkersApiServiceImpl extends WorkersApiService {
@@ -68,8 +69,21 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         }
     }
 
+    public Response getClusteredWorkerNodeDetails() {
+        Map<String, ResourceNode> clusteredWorkerList = ServiceDataHolder.getResourcePool().getResourceNodeMap();
+        List<Map<String,String>> resourceNodeDetailMap = new ArrayList<>();
+        for (Map.Entry<String, ResourceNode> resourceNodeEntry : clusteredWorkerList.entrySet()) {
+            Map<String,String> clusteredResourceNode = new HashMap<>();
+            clusteredResourceNode.put(Constants.HTTP_HOST,resourceNodeEntry.getValue().getHttpInterface().getHost());
+            clusteredResourceNode.put(Constants.HTTP_PORT,String.valueOf(resourceNodeEntry.getValue().getHttpInterface().getPort()));
+            clusteredResourceNode.put(Constants.NODE_ID, resourceNodeEntry.getValue().getId());
+            resourceNodeDetailMap.add(clusteredResourceNode);
+        }
+        return Response.ok().entity(resourceNodeDetailMap).build();
+    }
+
     /**
-     * This method is to retrieve the resource node details in the cluster
+     * This method is to retrieve number of the resource node in the cluster
      *
      * @param request
      * @return the count of the worker nodes in the resource cluster.
@@ -81,35 +95,51 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
-                                                                    MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the "
-                                                                                + "execution plan").build();
+                    + "execution plan").build();
         } else {
             return getResourceCluster();
         }
     }
 
+    /**
+     * This method retrieves the details of the clustered worker node details.
+     *
+     * @param request
+     * @return
+     * @throws NotFoundException
+     */
+
+    @Override
+    public Response getClusteredWorkerNodeDetails(Request request) throws NotFoundException {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the "
+                    + "execution plan").build();
+        } else {
+            return getClusteredWorkerNodeDetails();
+        }
+    }
+
     private PermissionProvider getPermissionProvider() {
-        return ManagerDataHolder.getInstance().getPermissionProvider();
+        return ServiceDataHolder.getPermissionProvider();
     }
 
     @Reference(
-            name = "org.wso2.carbon.sp.jobmanager.core.internal.services.DatasourceServiceComponent",
-            service = DatasourceServiceComponent.class,
+            name = "carbon.permission.provider",
+            service = PermissionProvider.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterServiceDatasource"
+            unbind = "unregisterPermissionProvider"
     )
-    public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) DatasourceServiceComponent");
-        }
+    protected void registerPermissionProvider(PermissionProvider permissionProvider) {
+        ServiceDataHolder.setPermissionProvider(permissionProvider);
     }
 
-    public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) DatasourceServiceComponent");
-        }
+    protected void unregisterPermissionProvider(PermissionProvider permissionProvider) {
+        ServiceDataHolder.setPermissionProvider(null);
     }
-
 }

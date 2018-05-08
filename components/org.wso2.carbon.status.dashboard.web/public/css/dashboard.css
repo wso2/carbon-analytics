@@ -49,13 +49,18 @@ body {
 }
 
 .grid-tile-h1 {
-    color: rgba(255,255,255,0.87);
+    color: rgba(255,255,255,0.57);
     text-align: center;
+}
+
+.grid-tile-h1 h4 {
+    font-weight: 500;
 }
 
 .floating-button {
     position: fixed;
     right: 100px;
+    z-index: 9;
 }
 
 .navigation-bar{
@@ -173,3 +178,114 @@ body {
     opacity: 1;
 }
 
+.deployed-apps-details {
+    color: white;
+    display: inline;
+}
+
+/*style sheet for kafka flow diagram*/
+
+.node rect {
+    stroke: #bbb;
+    fill: #333;
+    stroke-width: 2px;
+    height: 60px;
+}
+
+.node-content {height: 50px;
+    line-height: 30px;
+}
+
+.indicator {
+    height: 58px;
+    width: 15px;
+    float: left;
+    margin: 1px 20px 1px 1px;
+    background-color: blue
+}
+
+.nodeLabel {
+    font-size: 1em;
+    color: #fff;
+    margin-right: 10px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.hostPort {
+    font-size: 1em;
+    color: #696969;
+    font-weight: 400;
+    display: block;
+}
+
+.nodes .label {
+    text-align: left;
+    width: 500px;
+}
+
+.edgePath path {
+    stroke: #bbb;
+    stroke-width: 2px;
+    fill: none;
+}
+
+.topic-indicator {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: red;
+}
+
+.btn-primary {
+    background: #f17b31 !important;
+    color: #fff !important;
+    margin-right: 10px !important;
+}
+
+.btn-primary:hover {
+    background: #4e4e4e !important;
+}
+
+.btn-default {
+    background: none !important;
+    color: #fff !important;
+}
+
+.btn-default:hover {
+    background: #4e4e4e !important;
+}
+
+.floating-button button:hover {
+    background: #4e4e4e !important;
+}
+
+.btn-delete {
+    width: 21px !important;
+    height: 21px !important;
+}
+
+.btn-delete:hover svg {
+    fill: #aeaeae !important;
+}
+
+.node-overview p span {
+    padding: 0 5px;
+    font-size: 18px;
+}
+
+p.node-title {
+    font-size: 16px !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+}
+
+p.node-last-update {
+    font-size: 12px !important;
+    color: #dedede !important;
+}
+
+.node-wrapper {
+    min-width: 350px !important;
+}

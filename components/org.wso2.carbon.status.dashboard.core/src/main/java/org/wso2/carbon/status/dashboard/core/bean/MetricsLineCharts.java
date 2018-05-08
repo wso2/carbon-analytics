@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.bean;
 
 import java.util.ArrayList;
@@ -26,14 +27,14 @@ import java.util.List;
  */
 public class MetricsLineCharts {
     private List<List<Object>> data = new ArrayList<>();
-
+    
     public MetricsLineCharts() {
     }
-
+    
     public List<List<Object>> getData() {
         return data;
     }
-
+    
     public void setData(List<List<Object>> data) {
         this.data = data;
     }

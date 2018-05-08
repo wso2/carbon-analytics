@@ -16,50 +16,78 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.api;
 
-import org.wso2.carbon.status.dashboard.core.exception.DashboardException;
+import org.wso2.carbon.status.dashboard.core.model.Node;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
-import org.wso2.carbon.status.dashboard.core.model.Worker;
 
-import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.sql.SQLException;
+import javax.ws.rs.core.Response;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-09-11T07:55:11.886Z")
 public abstract class MonitoringApiService {
-    public abstract Response addWorker(Worker worker,String username) throws NotFoundException;
+    public abstract Response addWorker(Node worker, String username) throws NotFoundException;
 
-    public abstract Response deleteWorker(String id,String username) throws NotFoundException, SQLException;
+    public abstract Response addManager(Node manager, String username) throws NotFoundException;
+
+    public abstract Response deleteWorker(String id, String username) throws NotFoundException, SQLException;
+
+    public abstract Response deleteManager(String id, String username) throws NotFoundException, SQLException;
 
     public abstract Response enableSiddhiAppStats(String workerId, String appName, StatsEnable statEnable,
                                                   String username) throws NotFoundException;
 
-    public abstract Response getHADetails(String id,String username) throws NotFoundException;
+    public abstract Response getHADetails(String id, String username) throws NotFoundException;
 
-    public abstract Response getAllSiddhiApps(String id ,String period, String type,Integer pageName,String username) throws
-            NotFoundException;
+    public abstract Response getAllSiddhiApps(String id, String period, String type, Integer pageName,
+                                              String username) throws NotFoundException;
 
     public abstract Response getAllWorkers(String username) throws NotFoundException, SQLException;
 
-    public abstract Response getAppHistory(String id,String appName,String period,String type,String username) throws NotFoundException;
+    public abstract Response getAppHistory(String id, String appName, String period, String type,
+                                           String username) throws NotFoundException;
 
-    public abstract Response getComponentHistory(String id,String appName,String componentType,String componentId,String
-            period,String type,String username) throws NotFoundException;
+    public abstract Response getComponentHistory(String id, String appName, String componentType, String componentId,
+                                                 String period, String type, String username) throws NotFoundException;
 
-    public abstract Response getSiddhiAppDetails(String id,String appName,String username) throws NotFoundException;
+    public abstract Response getSiddhiAppDetails(String id, String appName, String username) throws NotFoundException;
 
-    public abstract Response getWorkerConfig(String id,String username) throws NotFoundException, SQLException;
+    public abstract Response getWorkerConfig(String id, String username) throws NotFoundException, SQLException;
 
     public abstract Response populateWorkerGeneralDetails(String id, String username) throws NotFoundException;
 
-    public abstract Response getWorkerHistory(String id,String period,String type,Boolean more,String username) throws
-            NotFoundException;
+    public abstract Response getWorkerHistory(String id, String period, String type, Boolean more, String username)
+            throws NotFoundException;
 
-    public abstract Response testConnection(String id,String username) throws NotFoundException;
+    public abstract Response testConnection(String id, String username) throws NotFoundException;
 
     public abstract Response getDashboardConfig(String username) throws NotFoundException;
 
-    public abstract Response getSiddhiAppComponents(String id,String appName,String username) throws NotFoundException;
+    public abstract Response getSiddhiAppComponents(String id, String appName,
+                                                    String username) throws NotFoundException;
 
-    public abstract Response getRolesByUsername(String username,String permisstionString);
+    public abstract Response getRolesByUsername(String username, String permisstionString);
+
+    public abstract Response getRuntimeEnv(String id, String username) throws NotFoundException;
+
+    public abstract Response getManagerHADetails(String id, String username) throws NotFoundException;
+
+    public abstract Response getSiddhiApps(String id, String username) throws NotFoundException, IOException;
+
+    public abstract Response getManagers(String username) throws NotFoundException, SQLException;
+
+    public abstract Response getManagerSiddhiAppTextView(String id, String appName,
+                                                         String username) throws NotFoundException;
+
+    public abstract Response getChildAppsDetails(String id, String appName,
+                                                 String username) throws NotFoundException, IOException;
+
+    public abstract Response getChildAppsTransportDetails(String id, String appName,
+                                                          String username) throws NotFoundException, IOException;
+
+    public abstract Response getClusterResourceNodeDetails(String id, String username)
+            throws NotFoundException, IOException;
 }

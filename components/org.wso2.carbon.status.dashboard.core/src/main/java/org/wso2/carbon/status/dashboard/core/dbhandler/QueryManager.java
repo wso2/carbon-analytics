@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -18,7 +17,6 @@
  */
 package org.wso2.carbon.status.dashboard.core.dbhandler;
 
-
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
@@ -29,10 +27,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,16 +35,16 @@ import java.util.Map;
  * Holds the database queries.
  */
 public class QueryManager {
-
-    private Map<String, String> queries = new HashMap<>();
-
+    
+    private Map<String, String> queries;
+    
     public QueryManager(String databaseType, String databaseVersion) throws
-            QueryMappingNotAvailableException, ConfigurationException, IOException {
+            QueryMappingNotAvailableException, ConfigurationException {
         queries = readConfigs(databaseType, databaseVersion);
     }
-
+    
     private Map<String, String> readConfigs(String databaseType, String databaseVersion) throws ConfigurationException,
-            QueryMappingNotAvailableException, IOException {
+            QueryMappingNotAvailableException {
         try {
             DeploymentConfigs deploymentConfigurations = MonitoringDataHolder.getInstance()
                     .getConfigProvider()
@@ -64,8 +59,8 @@ public class QueryManager {
             } else {
                 throw new RuntimeException("Unable to load queries.yaml file.");
             }
-            queries = QueryProvider.mergeMapping(databaseType, databaseVersion, (ArrayList<Queries>)componentQueries,
-                    (ArrayList<Queries>)deploymentQueries);
+            queries = QueryProvider.mergeMapping(databaseType, databaseVersion, componentQueries,
+                    deploymentQueries);
         } catch (ConfigurationException e) {
             throw new ConfigurationException("Unable to read queries.yaml configurations: " + e.getMessage(), e);
         } catch (QueryMappingNotAvailableException e) {
@@ -73,14 +68,14 @@ public class QueryManager {
         }
         return queries;
     }
-
+    
     public String getQuery(String key) {
         if (!queries.containsKey(key)) {
             throw new RuntimeException("Unable to find the configuration entry for the key: " + key);
         }
         return queries.get(key);
     }
-
+    
     private DeploymentConfigs readYamlContent(InputStream yamlContent) {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor
                 (DeploymentConfigs.class, DeploymentConfigs.class.getClassLoader()));

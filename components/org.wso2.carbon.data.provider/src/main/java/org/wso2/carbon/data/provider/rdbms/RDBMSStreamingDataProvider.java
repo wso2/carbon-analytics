@@ -34,7 +34,6 @@ import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.L
  * RDBMS streaming data provider instance.
  */
 @Component(
-        name = "rdbms-streaming-data-provider",
         service = DataProvider.class,
         immediate = true
 )

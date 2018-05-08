@@ -17,16 +17,17 @@
  */
 
 import React, {Component} from 'react';
-import Header from "../common/Header";
+import Header from '../common/Header';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import {Card, CardText, CardTitle, RaisedButton} from "material-ui";
-import {Link} from "react-router-dom";
-import FormPanel from "../common/FormPanel";
+import {Card, CardText, CardTitle, RaisedButton} from 'material-ui';
+import {Link} from 'react-router-dom';
+import FormPanel from '../common/FormPanel';
+
 const muiTheme = getMuiTheme(darkBaseTheme);
-const buttonStyle = {position: 'center', width: '15%', fontSize: '12px',backgroundColor:'#f17b31'};
+const buttonStyle = {position: 'center', width: '15%', fontSize: '12px', backgroundColor: '#f17b31'};
 const errorTitleStyles = {
     color: "#c7cad1",
     fontSize: 45
@@ -39,7 +40,7 @@ const errorMessageStyles = {
 
 const errorContainerStyles = {
     textAlign: "center",
-    marginTop:30
+    marginTop: 30
 };
 
 /**
@@ -49,9 +50,11 @@ class Error403 extends Component {
     render() {
         return <MuiThemeProvider muiTheme={muiTheme}>
             <Header/>
-            <Card style={{width:700,high:'100%',marginTop:'10%',marginLeft: '33%',backgroundColor:'#1a1a1a',
-                borderColor:'#f17b31',borderRadius:2,borderBottomColor:'#f17b31'}}>
-                <CardText  style={{borderBottom:'1px solid #AE5923',borderTop:'1px solid #AE5923'}}>
+            <Card style={{
+                width: 700, high: '100%', marginTop: '10%', marginLeft: '33%', backgroundColor: '#1a1a1a',
+                borderColor: '#f17b31', borderRadius: 2, borderBottomColor: '#f17b31'
+            }}>
+                <CardText style={{borderBottom: '1px solid #AE5923', borderTop: '1px solid #AE5923'}}>
                     <FormPanel title={""} width={650}>
                         <div style={errorContainerStyles}>
                             <i class="fw fw-security fw-inverse fw-5x"></i>
@@ -59,7 +62,7 @@ class Error403 extends Component {
                             <text style={errorMessageStyles}>You have no permission to access this page.</text>
                             <br/>
                             <br/>
-                            <Link to={`${window.contextPath}/logout`} >
+                            <Link to={`${window.contextPath}/logout`}>
                                 <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
                             </Link>
                         </div>
@@ -70,4 +73,5 @@ class Error403 extends Component {
         </MuiThemeProvider>;
     }
 }
+
 export default Error403;

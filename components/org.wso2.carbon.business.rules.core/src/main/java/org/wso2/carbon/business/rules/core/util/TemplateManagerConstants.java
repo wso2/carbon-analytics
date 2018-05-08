@@ -72,4 +72,7 @@ public class TemplateManagerConstants {
     // Directory locations
     private static final String CARBON_RUNTIME = Utils.getRuntimePath().toString();
     public static final String TEMPLATES_DIRECTORY = CARBON_RUNTIME + "/resources/businessRules/templates/";
+
+    public static final String ONE = "one";
+    public static final String MANY = "many";
 }

@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.sp.jobmanager.core.bean;
 
+package org.wso2.carbon.sp.jobmanager.core.bean;
 
 import org.wso2.carbon.config.annotation.Configuration;
 

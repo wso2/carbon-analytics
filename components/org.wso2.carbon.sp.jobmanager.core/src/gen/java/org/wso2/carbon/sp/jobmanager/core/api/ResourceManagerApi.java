@@ -39,7 +39,7 @@ import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the resourceManager API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2017-10-21T09:39:46.914Z")
+        date = "2017-10-21T09:39:46.914Z")
 public class ResourceManagerApi implements Microservice {
     private final ResourceManagerApiService delegate = ResourceManagerApiServiceFactory.getResourceManagerApi();
 
@@ -48,13 +48,12 @@ public class ResourceManagerApi implements Microservice {
 
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get the satus.",
-                                         notes = "Returns status of manager nodes cluster and the resourcepool.",
-                                         response = Deployment.class, tags = {"ResourceManager",})
+            notes = "Returns status of manager nodes cluster and the resourcepool.",
+            response = Deployment.class, tags = {"ResourceManager",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successful operation",
-                                                response = Deployment.class)})
-    public Response getDeployment()
-            throws NotFoundException {
+                    response = Deployment.class)})
+    public Response getDeployment() throws NotFoundException {
         return delegate.getDeployment();
     }
 
@@ -63,10 +62,10 @@ public class ResourceManagerApi implements Microservice {
     @Consumes({"application/json"})
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Register resource node and Updates Heartbeat.",
-                                         notes = "Resource nodes will call this endpoint to get them self registerd in "
-                                                 + "the resource pool. Once registered, consecetive calls for this "
-                                                 + "endpoints will be used as heartbeat from tose resource nodes.",
-                                         response = HeartbeatResponse.class, tags = {"ResourceManager",})
+            notes = "Resource nodes will call this endpoint to get them self registerd in "
+                    + "the resource pool. Once registered, consecetive calls for this "
+                    + "endpoints will be used as heartbeat from tose resource nodes.",
+            response = HeartbeatResponse.class, tags = {"ResourceManager",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Resource successfully added / Heartbeat "
                     + "updated.", response = HeartbeatResponse.class),
@@ -75,12 +74,9 @@ public class ResourceManagerApi implements Microservice {
                     + "leader).", response = HeartbeatResponse.class),
 
             @io.swagger.annotations.ApiResponse(code = 400, message = "Leader not found",
-                                                response = HeartbeatResponse.class)})
+                    response = HeartbeatResponse.class)})
     public Response updateHeartbeat(@ApiParam(value = "Node object that needs to be registered or update heartbeats "
-            + "as the resource.", required = true)
-                                            NodeConfig node
-    )
-            throws NotFoundException {
+            + "as the resource.", required = true) NodeConfig node) throws NotFoundException {
         return delegate.updateHeartbeat(node);
     }
 }

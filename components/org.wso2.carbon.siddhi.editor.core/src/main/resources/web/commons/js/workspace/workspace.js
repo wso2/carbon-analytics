@@ -501,7 +501,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     this._importFileDialog = new Dialogs.import_file_dialog(app);
                 }
                 this._importFileDialog.render();
-                this._importFileDialog.show();
             };
 
             this.exportFileExportDialog = function exportFileExportDialog() {

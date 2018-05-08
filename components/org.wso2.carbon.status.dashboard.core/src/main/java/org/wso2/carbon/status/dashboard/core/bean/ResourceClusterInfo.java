@@ -17,22 +17,37 @@
  *
  */
 
-package org.wso2.carbon.sp.jobmanager.core.exception;
+package org.wso2.carbon.status.dashboard.core.bean;
 
 /**
- * Exception class that is used for handling the validation of the parameters.
+ * Bean class that contains resource cluster information.
  */
-public class StatusDashboardValidationException extends Exception {
+public class ResourceClusterInfo {
+    private String nodeId;
+    private String httpHost;
+    private String httpPort;
 
-    public StatusDashboardValidationException(String message) {
-        super(message);
+    public String getNodeId() {
+        return nodeId;
     }
 
-    public StatusDashboardValidationException(String message, Throwable throwable) {
-        super(message, throwable);
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
     }
 
-    public StatusDashboardValidationException(Throwable throwable) {
-        super(throwable);
+    public String getHost() {
+        return httpHost;
+    }
+
+    public void setHost(String httpHost) {
+        this.httpHost = httpHost;
+    }
+
+    public String getPort() {
+        return httpPort;
+    }
+
+    public void setPort(String httpPort) {
+        this.httpPort = httpPort;
     }
 }

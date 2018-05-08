@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.internal;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -35,7 +36,7 @@ public class MonitoringDataHolder {
     private HikariDataSource dashboardDataSource;
     private RolesProvider rolesProvider;
     private PermissionProvider permissionProvider;
-    private DeploymentConfigs StatusDashboardDeploymentConfigs = new DeploymentConfigs();
+    private DeploymentConfigs statusDashboardDeploymentConfigs = new DeploymentConfigs();
     private AnalyticsHttpClientBuilderService clientBuilderService;
 
     private MonitoringDataHolder() {
@@ -102,11 +103,11 @@ public class MonitoringDataHolder {
     }
 
     public DeploymentConfigs getStatusDashboardDeploymentConfigs() {
-        return StatusDashboardDeploymentConfigs;
+        return statusDashboardDeploymentConfigs;
     }
 
-    public void setStatusDashboardDeploymentConfigs(DeploymentConfigs StatusDashboardDeploymentConfigs) {
-        this.StatusDashboardDeploymentConfigs = StatusDashboardDeploymentConfigs;
+    public void setStatusDashboardDeploymentConfigs(DeploymentConfigs statusDashboardDeploymentConfigs) {
+        this.statusDashboardDeploymentConfigs = statusDashboardDeploymentConfigs;
     }
 
     public AnalyticsHttpClientBuilderService getClientBuilderService() {

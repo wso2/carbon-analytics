@@ -16,18 +16,37 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.status.dashboard.core.factories;
 
-import org.wso2.carbon.status.dashboard.core.api.MonitoringApiService;
-import org.wso2.carbon.status.dashboard.core.impl.MonitoringApiServiceImpl;
+package org.wso2.carbon.status.dashboard.core.bean;
 
 /**
- * Factory class for stream processor dashboard apis.
+ * Siddhi app Component Bean class.
  */
-public class WorkersApiServiceFactory {
-    private static final MonitoringApiService service = new MonitoringApiServiceImpl();
+public class WorkerResponse {
+    private String message;
+    private int code;
 
-    public static MonitoringApiService getWorkersApi() {
-        return service;
+    public WorkerResponse(String message, int value) {
+        this.message = message;
+        this.code = value;
+    }
+
+    public WorkerResponse() {
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
     }
 }
