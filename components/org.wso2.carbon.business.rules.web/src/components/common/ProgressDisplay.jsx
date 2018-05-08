@@ -39,7 +39,7 @@ const styles = {
 };
 
 /**
- * Represents circular progress
+ * Represents the progress display, shown while loading a page
  */
 class ProgressDisplay extends React.Component {
     render() {
