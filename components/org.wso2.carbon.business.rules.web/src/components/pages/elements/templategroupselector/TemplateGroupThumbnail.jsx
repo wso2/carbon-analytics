@@ -16,13 +16,14 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Card, { CardContent } from 'material-ui/Card';
 import Avatar from 'material-ui/Avatar';
 // CSS
-import '../index.css';
+import '../../../../index.css';
 
 /**
  * Styles related to this component
@@ -31,35 +32,28 @@ const styles = {
     card: {
         width: 345,
         height: 200,
-        margin: 15
+        margin: 15,
     },
     avatarButton: {
         color: 'white',
         width: 55,
-        height: 55
-    }
+        height: 55,
+    },
 };
 
 /**
- * Represent each Template Group, that is shown as a thumbnail
+ * Represents Thumbnail of a Template Group
  */
-class TemplateGroup extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            name: props.name,
-            uuid: props.uuid,
-            description: props.description
-        };
-    }
-
+export default class TemplateGroupThumbnail extends Component {
     /**
-     * Generates initials to be shown in the avatar
+     * Generates initials for the avatar, with the given template group name
+     * @param {string} templateGroupName        Name of the template group
+     * @returns {string}                        Initials for the avatar
      */
-    generateAvatarInitials() {
+    generateAvatarInitials(templateGroupName) {
         let avatarInitials = '';
         // Contains words split by space
-        const splitWords = this.state.name.split(' ');
+        const splitWords = templateGroupName.split(' ');
 
         if (splitWords.length >= 2) {
             // Two letter initials
@@ -73,40 +67,45 @@ class TemplateGroup extends React.Component {
     }
 
     /**
-     * Generates style with a random backgroundColor, from an array of given colors
-     * @returns {{style: {backgroundColor: string}}}
+     * Generates a style with the given name, for the avatar
+     * @param {string} name         Name of the template group
+     * @returns {Object}            Style for the avatar
      */
-    generateAvatarColor() {
-        let colors = [
+    generateAvatarStyle(name) {
+        const colors = [
+            '#673AB7',
+            '#3F51B5',
+            '#2196F3',
             '#009688',
-            '#03A9F4',
-            '#EF6C00',
-            '#4527A0',
-            '#C51162',
+            '#4CAF50',
+            '#F44336',
+            '#E91E63',
         ];
-        // Put the random color to an object
-        let style = {
-            backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+        let charCodeSum = 0;
+        for (let i = 0; i < name.length; i++) {
+            charCodeSum += name.charCodeAt(i);
+        }
+        return {
+            backgroundColor: colors[charCodeSum % colors.length],
             width: 55,
-            height: 55
+            height: 55,
         };
-        return {style}
     }
 
     render() {
         return (
             <Card style={styles.card}>
                 <CardContent>
-                    <br/>
-                    <Avatar style={this.generateAvatarColor().style}>
-                        {this.generateAvatarInitials()}
+                    <br />
+                    <Avatar style={this.generateAvatarStyle(this.props.name)}>
+                        {this.generateAvatarInitials(this.props.name)}
                     </Avatar>
-                    <br/>
+                    <br />
                     <Typography type="headline" component="h2">
-                        {this.state.name}
+                        {this.props.name}
                     </Typography>
                     <Typography component="subheading" color="secondary">
-                        {this.state.description || ''}
+                        {this.props.description || ''}
                     </Typography>
                 </CardContent>
             </Card>
@@ -114,4 +113,11 @@ class TemplateGroup extends React.Component {
     }
 }
 
-export default TemplateGroup;
+TemplateGroupThumbnail.propTypes = {
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string,
+};
+
+TemplateGroupThumbnail.defaultProps = {
+    description: '',
+};

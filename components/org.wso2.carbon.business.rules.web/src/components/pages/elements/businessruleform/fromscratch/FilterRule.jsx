@@ -30,11 +30,11 @@ import TextField from 'material-ui/TextField';
 import { FormControl } from 'material-ui/Form';
 import Select from 'material-ui/Select';
 // App Components
-import Property from './Property';
+import Property from '../Property';
 // App Constants
-import BusinessRulesConstants from '../constants/BusinessRulesConstants';
+import BusinessRulesConstants from '../../../../../constants/BusinessRulesConstants';
 // CSS
-import '../index.css';
+import '../../../../../index.css';
 
 /**
  * Styles related to this component

@@ -19,7 +19,7 @@
 
 import React from 'react';
 import {Redirect} from 'react-router-dom';
-// App Utils
+// Auth Utils
 import AuthManager from '../../utils/AuthManager';
 
 /**

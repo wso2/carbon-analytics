@@ -22,7 +22,7 @@ import { CircularProgress } from 'material-ui/Progress';
 import { Typography } from 'material-ui';
 import Paper from 'material-ui/Paper';
 // CSS
-import '../index.css';
+import '../../index.css';
 
 /**
  * Styles related to this component
@@ -44,14 +44,14 @@ const styles = {
 class ProgressDisplay extends React.Component {
     render() {
         return (
-            <div>
+            <center>
                 <Paper style={styles.paper}>
-                    <CircularProgress size={50}/>
+                    <CircularProgress size={50} />
                     <Typography type="subheading">
                         Please wait
                     </Typography>
                 </Paper>
-            </div>
+            </center>
         );
     }
 }

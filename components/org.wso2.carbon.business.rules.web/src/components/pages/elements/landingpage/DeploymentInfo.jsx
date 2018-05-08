@@ -16,23 +16,25 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 // Material UI Components
 import Grid from 'material-ui/Grid';
 import Typography from 'material-ui/Typography';
-import Card, {CardContent} from 'material-ui/Card';
-import Dialog, {DialogContent, DialogTitle} from 'material-ui/Dialog';
+import Card, { CardContent } from 'material-ui/Card';
+import Dialog, { DialogContent, DialogTitle } from 'material-ui/Dialog';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
 import DoneIcon from 'material-ui-icons/Done';
 import RemoveIcon from 'material-ui-icons/Remove';
 import PriorityHighIcon from 'material-ui-icons/PriorityHigh';
 import Tooltip from 'material-ui/Tooltip';
+// App Utils
+import BusinessRulesUtilityFunctions from '../../../../utils/BusinessRulesUtilityFunctions';
 // App Constants
-import BusinessRulesConstants from '../constants/BusinessRulesConstants';
+import BusinessRulesConstants from '../../../../constants/BusinessRulesConstants';
 // CSS
-import '../index.css';
-import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
+import '../../../../index.css';
 
 /**
  * Styles related to this component
@@ -46,63 +48,65 @@ const styles = {
     card: {
         minWidth: 300,
         maxWidth: 360,
-        margin: 15
+        margin: 15,
     },
     chip: {
-        margin: 10
+        margin: 10,
     },
     deployedAvatar: {
         color: '#FFF',
-        backgroundColor: '#4CAF50'
+        backgroundColor: '#4CAF50',
     },
     notDeployedAvatar: {
         color: '#FFF',
-        backgroundColor: '#795548'
+        backgroundColor: '#795548',
     },
     unreachableAvatar: {
         color: '#FFF',
-        backgroundColor: '#F44336'
+        backgroundColor: '#F44336',
     },
-    spacing: '0'
+    spacing: '0',
 };
 
 /**
- * Displays deployment information of a business rule
+ * Represents the deployment information display of a business rule
  */
-class DeploymentInfo extends React.Component {
+export default class DeploymentInfo extends Component {
     /**
-     * Renders a node with URL and deployment status
-     * @param nodeURL
-     * @param status
+     * Renders a node that represents a Siddhi app and its status, in the node with the given Host and Port
+     * @param {string} hostAndPort      Host and the Port of the node
+     * @param {number} status           Number, which depicts the deployment status of the siddhi app
+     * @returns {Component}             Representation of a Siddhi app's deployment status
      */
-    static displayNode(nodeURL, status) {
+    static displayNode(hostAndPort, status) {
         let statusIcon;
         let avatarStyle;
         switch (status) {
-            case 1:
-                statusIcon = <DoneIcon/>;
+            case BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUSES.DEPLOYED:
+                statusIcon = <DoneIcon />;
                 avatarStyle = styles.deployedAvatar;
                 break;
-            case 0:
-                statusIcon = <RemoveIcon/>;
+            case BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUSES.NOT_DEPLOYED:
+                statusIcon = <RemoveIcon />;
                 avatarStyle = styles.notDeployedAvatar;
                 break;
             default:
-                statusIcon = <PriorityHighIcon/>;
+                statusIcon = <PriorityHighIcon />;
                 avatarStyle = styles.unreachableAvatar;
         }
         return (
             <Tooltip
                 id="tooltip-bottom"
-                title={BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUSES[status + 1]}
-                placement="bottom">
+                title={BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUS_TEXTS[status + 1]}
+                placement="bottom"
+            >
                 <Chip
                     avatar={
                         <Avatar style={avatarStyle}>
                             {statusIcon}
                         </Avatar>
                     }
-                    label={nodeURL}
+                    label={hostAndPort}
                     style={styles.chip}
                 />
             </Tooltip>);
@@ -124,16 +128,16 @@ class DeploymentInfo extends React.Component {
                             <Grid container style={styles.root}>
                                 <Grid item xs={12}>
                                     <Grid container justify="center" spacing={Number(styles.spacing)}>
-                                        {this.props.info.map((node) =>
+                                        {this.props.info.map(node =>
                                             (<Grid item key={node.nodeURL}>
                                                 <Card style={styles.card}>
                                                     <CardContent>
                                                         <Typography type="subheading">
                                                             {node.nodeURL}
                                                         </Typography>
-                                                        <br/>
+                                                        <br />
                                                         <div style={styles.root}>
-                                                            {Object.keys(node.siddhiAppStatuses).map((siddhiAppName) =>
+                                                            {Object.keys(node.siddhiAppStatuses).map(siddhiAppName =>
                                                                 (DeploymentInfo.displayNode(siddhiAppName,
                                                                     node.siddhiAppStatuses[siddhiAppName])))}
                                                         </div>

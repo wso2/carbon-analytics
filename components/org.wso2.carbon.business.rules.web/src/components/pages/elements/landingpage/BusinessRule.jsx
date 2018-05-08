@@ -16,21 +16,22 @@
  *  under the License.
  */
 
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 // Material UI Components
 import IconButton from 'material-ui/IconButton';
 import RefreshIcon from 'material-ui-icons/Refresh';
 import EditIcon from 'material-ui-icons/Edit';
 import DeleteIcon from 'material-ui-icons/Delete';
-import {TableCell, TableRow} from 'material-ui/Table';
+import { TableCell, TableRow } from 'material-ui/Table';
 import Tooltip from 'material-ui/Tooltip';
 import VisibilityIcon from 'material-ui-icons/Visibility';
 import DnsIcon from 'material-ui-icons/Dns';
 // App Constants
-import BusinessRulesConstants from '../constants/BusinessRulesConstants';
+import BusinessRulesConstants from '../../../../constants/BusinessRulesConstants';
 // CSS
-import '../index.css';
+import '../../../../index.css';
 
 /**
  * App context sans starting forward slash.
@@ -38,89 +39,81 @@ import '../index.css';
 const appContext = window.contextPath;
 
 /**
- * Represents each Business Rule, that is shown as a row, to view, edit, delete / re-deploy Business Rules
+ * Represents an available business rule with relevant actions, that is shown in the landing page
  */
-class BusinessRule extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            name: props.name,
-            uuid: props.uuid,
-            type: props.type,
-            status: props.status
-        };
-    }
-
+export default class BusinessRule extends Component {
     /**
-     * Handles onClick action of the 'Re-deploy' button
+     * Re-deploys the business rule
      */
     handleReDeployButtonClick() {
         this.props.redeploy(this.props.uuid);
     }
 
     /**
-     * Sends the API call for deleting this business rule
+     * Deletes the business rule
      */
     handleDeleteButtonClick() {
         this.props.showDeleteDialog(this.props.uuid);
     }
 
-    render() {
-        let deploymentStatus = BusinessRulesConstants.BUSINESS_RULE_STATUSES[Number(this.props.status)];
-        let retryDeployButton;
+    /**
+     * Returns the Retry Deploy button
+     * @returns {Element}       Retry Deploy button
+     */
+    displayRetryDeployButton() {
+        // TODO test this. Test what happens if 'null' is returned here, by manipulating React tree
         switch (this.props.status) {
-            case (1) : {
-                retryDeployButton =
-                    (<Tooltip id="tooltip-right" title="Deploy" placement="right-end">
-                        <IconButton color="primary" aria-label="Deploy"
-                                    onClick={() => this.handleReDeployButtonClick()}>
-                            <RefreshIcon/>
+            case 1: // TODO put into constants
+                return (
+                    <Tooltip id="tooltip-right" title="Deploy" placement="right-end">
+                        <IconButton
+                            color="primary"
+                            aria-label="Deploy"
+                            onClick={() => this.handleReDeployButtonClick()}
+                        >
+                            <RefreshIcon />
                         </IconButton>
                     </Tooltip>);
-                break;
-            }
-            case (2) : {
-                retryDeployButton =
-                    (<Tooltip id="tooltip-right" title="Re-Deploy" placement="right-end">
-                        <IconButton color="primary" aria-label="ReDeploy"
-                                    onClick={() => this.handleReDeployButtonClick()}>
-                            <RefreshIcon/>
+            case 2:
+            case 4:
+                return (
+                    <Tooltip id="tooltip-right" title="Re-Deploy" placement="right-end">
+                        <IconButton
+                            color="primary"
+                            aria-label="ReDeploy"
+                            onClick={() => this.handleReDeployButtonClick()}
+                        >
+                            <RefreshIcon />
                         </IconButton>
                     </Tooltip>);
-                break;
-            }
-            case (3) : {
-                retryDeployButton =
-                    (<Tooltip id="tooltip-right" title="Retry Un-deploy" placement="right-end">
-                        <IconButton color="primary" aria-label="RetryUndeploy"
-                                    onClick={() => this.handleReDeployButtonClick()}>
-                            <RefreshIcon/>
+            case 3:
+                return (
+                    <Tooltip id="tooltip-right" title="Retry Un-deploy" placement="right-end">
+                        <IconButton
+                            color="primary"
+                            aria-label="RetryUndeploy"
+                            onClick={() => this.handleReDeployButtonClick()}
+                        >
+                            <RefreshIcon />
                         </IconButton>
                     </Tooltip>);
-                break;
-            }
-            case (4) : {
-                retryDeployButton =
-                    (<Tooltip id="tooltip-right" title="Re-Deploy" placement="right-end">
-                        <IconButton color="primary" aria-label="ReDeploy"
-                                    onClick={() => this.handleReDeployButtonClick()}>
-                            <RefreshIcon/>
-                        </IconButton>
-                    </Tooltip>);
-                break;
-            }
+            default:
+                return null;
         }
+    }
 
-        // Display action buttons according to permissions
-        let actionButtonsCell;
-
-        if (this.props.permissions === 0) {
+    /**
+     * Returns Action Buttons of the business rule
+     * @returns {Component}     Action Buttons of the business rule
+     */
+    displayActionButtons() {
+        if (this.props.permissions === BusinessRulesConstants.USER_PERMISSIONS.MANAGER) {
             // Manager permissions
-            actionButtonsCell =
+            return (
                 <TableCell>
                     <Tooltip id="tooltip-right" title="Deployment Info" placement="right-end">
                         <IconButton aria-label="View" onClick={() => this.props.showDeploymentInfo(this.props.uuid)}>
-                            <DnsIcon/>
+                            <DnsIcon />
                         </IconButton>
                     </Tooltip>
                     &nbsp;
@@ -130,9 +123,10 @@ class BusinessRule extends React.Component {
                                 this.props.type.substr(1).toLowerCase()) + 'Form/' +
                             BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + '/templateGroup/businessRule/' +
                             this.props.uuid}
-                            style={{textDecoration: 'none'}}>
+                            style={{ textDecoration: 'none' }}
+                        >
                             <IconButton aria-label="View">
-                                <VisibilityIcon/>
+                                <VisibilityIcon />
                             </IconButton>
                         </Link>
                     </Tooltip>
@@ -144,28 +138,30 @@ class BusinessRule extends React.Component {
                             + 'Form/' +
                             BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT + '/templateGroup/businessRule/' +
                             this.props.uuid}
-                            style={{textDecoration: 'none'}}>
+                            style={{ textDecoration: 'none' }}
+                        >
                             <IconButton aria-label="Edit">
-                                <EditIcon/>
+                                <EditIcon />
                             </IconButton>
                         </Link>
                     </Tooltip>
                     &nbsp;
                     <Tooltip id="tooltip-right" title="Delete" placement="right-end">
                         <IconButton aria-label="Delete" onClick={() => this.handleDeleteButtonClick()}>
-                            <DeleteIcon/>
+                            <DeleteIcon />
                         </IconButton>
                     </Tooltip>
                     &nbsp;
-                    {retryDeployButton}
+                    {this.displayRetryDeployButton()}
                 </TableCell>
+            );
         } else {
-            // Viewer permissions only
-            actionButtonsCell =
+            // Viewer permissions
+            return (
                 <TableCell>
                     <Tooltip id="tooltip-right" title="Deployment Info" placement="right-end">
                         <IconButton aria-label="View" onClick={() => this.props.showDeploymentInfo(this.props.uuid)}>
-                            <DnsIcon/>
+                            <DnsIcon />
                         </IconButton>
                     </Tooltip>
                     &nbsp;
@@ -176,24 +172,32 @@ class BusinessRule extends React.Component {
                             'Form/' +
                             BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + '/templateGroup/businessRule/' +
                             this.props.uuid}
-                            style={{textDecoration: 'none'}}>
+                            style={{ textDecoration: 'none' }}
+                        >
                             <IconButton aria-label="View">
-                                <VisibilityIcon/>
+                                <VisibilityIcon />
                             </IconButton>
                         </Link>
                     </Tooltip>
                 </TableCell>
+            );
         }
+    }
+
+    render() {
+        const deploymentStatus = BusinessRulesConstants.BUSINESS_RULE_STATUSES[Number(this.props.status)];
 
         return (
             <TableRow>
                 <TableCell>
                     {this.props.name}
                 </TableCell>
-                <TableCell>{deploymentStatus}</TableCell>
-                {actionButtonsCell}
+                <TableCell>
+                    {deploymentStatus}
+                </TableCell>
+                {this.displayActionButtons()}
             </TableRow>
-        )
+        );
     }
 }
 

@@ -16,7 +16,7 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
@@ -28,7 +28,7 @@ import AccountCircle from 'material-ui-icons/AccountCircle';
 import HomeIcon from 'material-ui-icons/Home';
 import Menu, { MenuItem } from 'material-ui/Menu';
 import Logo from '../../images/wso2-logo.svg';
-// App Utilities
+// Auth Utilities
 import AuthManager from '../../utils/AuthManager';
 // CSS
 import '../../index.css';
@@ -48,7 +48,10 @@ const styles = {
  */
 const appContext = window.contextPath;
 
-class Header extends React.Component {
+/**
+ * Represents the Header
+ */
+export default class Header extends Component {
     constructor() {
         super();
         this.state = {
@@ -57,8 +60,8 @@ class Header extends React.Component {
     }
 
     /**
-     * Renders right side elements of the header
-     * @returns {*}
+     * Renders the right side elements of the header
+     * @returns {Element}       Div, containing right side elements of the header
      */
     renderRightLinks() {
         const homeButton = (
@@ -154,5 +157,3 @@ class Header extends React.Component {
         );
     }
 }
-
-export default Header;

@@ -16,7 +16,8 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
@@ -25,9 +26,9 @@ import List from 'material-ui-icons/List';
 import Create from 'material-ui-icons/Create';
 import Paper from 'material-ui/Paper';
 // App Constants
-import BusinessRulesConstants from '../constants/BusinessRulesConstants';
+import BusinessRulesConstants from '../../../../constants/BusinessRulesConstants';
 // CSS
-import '../index.css';
+import '../../../../index.css';
 
 /**
  * Styles related to this component
@@ -41,8 +42,8 @@ const styles = {
     },
     paper: {
         width: 300,
-        padding: 50
-    }
+        padding: 50,
+    },
 };
 
 /**
@@ -51,34 +52,25 @@ const styles = {
 const appContext = window.contextPath;
 
 /**
- * Represents a Create Button used in the Business Rule Creator, which will direct to
- * the specific create business rule page
+ * Represents a button which allows to select a mode for creating a business rule, that is,
+ * either 'from template' or 'from scratch'
  */
-class CreateButton extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            mode: props.mode,
-            text: props.text,
-            onClick: props.onClick
-        };
-    }
-
+export default class ModeButton extends Component {
     render() {
         let icon;
-        if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
-            icon = <List />
+        if (this.props.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
+            icon = <List />;
         } else {
-            icon = <Create />
+            icon = <Create />;
         }
 
         return (
             <Paper style={styles.paper}>
                 <Link
-                    to={appContext + "/templateGroupSelector/" + this.state.mode}
-                    style={{textDecoration: 'none'}}
+                    to={appContext + '/templateGroupSelector/' + this.props.mode}
+                    style={{ textDecoration: 'none' }}
                 >
-                    <Button fab style={styles.button} onClick={this.state.onClick}>
+                    <Button fab style={styles.button}>
                         {icon}
                     </Button>
                 </Link>
@@ -92,7 +84,7 @@ class CreateButton extends React.Component {
                     {this.props.description}
                 </Typography>
             </Paper>
-        )
+        );
     }
 }
 
