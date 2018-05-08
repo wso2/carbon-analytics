@@ -16,6 +16,8 @@
  *  under the License.
  */
 
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+
 class BusinessRulesUtilityFunctions {
     /**
      * Generates UUID for a given Business Rule name
@@ -39,6 +41,23 @@ class BusinessRulesUtilityFunctions {
                 return false;
         }
         return true;
+    }
+
+    /**
+     * Returns the error code (number) for displaying Error
+     * @param error     Error of an Axios Promise
+     */
+    static getErrorDisplayCode(error) {
+        let errorCode = BusinessRulesConstants.ERROR_CODES.UNKNOWN;
+        if (error.response != null) {
+            switch (error.response.status) {
+                case 401:
+                case 403:
+                case 500:
+                    errorCode = error.response.status;
+            }
+        }
+        return errorCode;
     }
 
     static generateguid () {

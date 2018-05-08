@@ -37,7 +37,7 @@ const BusinessRulesConstants = {
     // Business Rule from scratch property types
     BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT: 'inputData',
     BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT: 'outputData',
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS: 'ruleComponents',
+    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS: 'ruleComponents', // TODO refactor to object
     BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES: 'filterRules',
     BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_RULE_LOGIC: 'ruleLogic',
     BUSINESS_RULE_FROM_SCRATCH_RULE_PROPERTY_TYPE_OUTPUT_MAPPINGS: 'outputMappings',
@@ -57,6 +57,14 @@ const BusinessRulesConstants = {
     BUSINESS_RULE_STATUS_NOT_DEPLOYED: 0, // Tried only to save, and was successful
     SCRIPT_EXECUTION_ERROR: 7, // Script execution has been failed in the backend, due to the provided value(s)
 
+    // User Permissions
+    USER_PERMISSIONS: {
+        MANAGER: 0,
+        VIEWER: 1,
+        UNSET: -1,
+        NONE: -2
+    },
+
     // Business Rule deployment statuses
     BUSINESS_RULE_STATUSES: [
         'Deployed', // 0
@@ -68,7 +76,13 @@ const BusinessRulesConstants = {
     ],
 
     // Siddhi App deployment statuses
-    SIDDHI_APP_DEPLOYMENT_STATUSES: [
+    SIDDHI_APP_DEPLOYMENT_STATUSES: {
+        DEPLOYED: 1,
+        NOT_DEPLOYED: 0,
+        UNREACHABLE: -1,
+    },
+
+    SIDDHI_APP_DEPLOYMENT_STATUS_TEXTS: [
         'Unreachable', // -1
         'Not Deployed', // 0
         'Deployed' // 1
@@ -88,6 +102,11 @@ const BusinessRulesConstants = {
         'After deletion' // 5
         // Else, normal mode
     ],
+
+    ERROR_CODES: {
+        UNKNOWN: 0,
+        NONE: -1
+    },
 
     // URL for APIs
     BASE_URL: window.location.origin

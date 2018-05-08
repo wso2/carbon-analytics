@@ -19,8 +19,9 @@
 
 import Axios from 'axios';
 import Qs from 'qs';
-import {MediaType} from "../constants/AuthConstants";
-import AuthManager from "../utils/AuthManager";
+import {MediaType} from '../constants/AuthConstants';
+import AuthManager from '../utils/AuthManager';
+// App Utils
 import BusinessRulesUtilityFunctions from '../utils/BusinessRulesUtilityFunctions';
 
 /**

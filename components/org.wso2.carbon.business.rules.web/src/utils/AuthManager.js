@@ -36,19 +36,12 @@ const appContext = window.contextPath;
  * Authentication manager.
  */
 export default class AuthManager {
-
-
-
-
     /**
      * Delete user from the session cookie.
      */
     static clearUser() {
         AuthManager.deleteSessionCookie(SESSION_USER_COOKIE);
     }
-
-
-
 
     /**
      * Set session cookie.
@@ -180,7 +173,8 @@ export default class AuthManager {
                         expires: AuthManager.calculateExpiryTime(validityPeriod),
                     });
                     // If rememberMe, set refresh token into a persistent cookie, otherwise a session cookie
-                    const refreshTokenValidityPeriod = AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
+                    const refreshTokenValidityPeriod =
+                        AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
                     AuthManager.setCookie(RTK, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })
@@ -198,8 +192,9 @@ export default class AuthManager {
                 .getAccessTokenWithRefreshToken()
                 .then((response) => {
                     const { pID, lID, validityPeriod } = response.data;
-
-                    const username = AuthManager.isRememberMeSet() ? window.localStorage.getItem('username') : AuthManager.getUser().username;
+                    const username =
+                        AuthManager.isRememberMeSet() ? window.localStorage.getItem('username') :
+                            AuthManager.getUser().username;
                     AuthManager.setUser({
                         username: username,
                         SDID: pID,
@@ -207,7 +202,8 @@ export default class AuthManager {
                         expires: AuthManager.calculateExpiryTime(validityPeriod),
                     });
                     // If rememberMe, set refresh token into a persistent cookie else session cookie.
-                    const refreshTokenValidityPeriod = AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
+                    const refreshTokenValidityPeriod =
+                        AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
                     AuthManager.setCookie(RTK, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })

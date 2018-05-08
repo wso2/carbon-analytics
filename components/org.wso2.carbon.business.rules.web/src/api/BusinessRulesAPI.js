@@ -29,7 +29,7 @@ const appContext = window.contextPath;
 /**
  * Used to call APIs, related to Business Rules
  */
-class BusinessRulesAPICaller {
+class BusinessRulesAPI {
     constructor(url) {
         this.url = url;
     }
@@ -153,4 +153,4 @@ class BusinessRulesAPICaller {
     }
 }
 
-export default BusinessRulesAPICaller;
+export default BusinessRulesAPI;
