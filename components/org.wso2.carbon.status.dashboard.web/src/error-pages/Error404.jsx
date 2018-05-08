@@ -17,16 +17,17 @@
  */
 
 import React, {Component} from 'react';
-import Header from "../common/Header";
+import Header from '../common/Header';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import {Link} from "react-router-dom";
-import {Card, CardHeader, CardMedia, CardText, CardTitle, RaisedButton} from "material-ui";
-import FormPanel from "../common/FormPanel";
+import {Link} from 'react-router-dom';
+import {Card, CardHeader, CardMedia, CardText, CardTitle, RaisedButton} from 'material-ui';
+import FormPanel from '../common/FormPanel';
+
 const muiTheme = getMuiTheme(darkBaseTheme);
-const buttonStyle = {position: 'center',marginTop: 60, width: '15%', fontSize: '12px',backgroundColor:'#f17b31'};
+const buttonStyle = {position: 'center', marginTop: 60, width: '15%', fontSize: '12px', backgroundColor: '#f17b31'};
 const errorTitleStyles = {
     color: "#c7cad1",
     fontSize: 45
@@ -39,7 +40,7 @@ const errorMessageStyles = {
 
 const errorContainerStyles = {
     textAlign: "center",
-    marginTop:30
+    marginTop: 30
 };
 
 /**
@@ -49,15 +50,19 @@ class Error404 extends Component {
     render() {
         return <MuiThemeProvider muiTheme={muiTheme}>
             <Header/>
-            <Card style={{width:700,high:'100%',marginTop:'10%',marginLeft: '33%',backgroundColor:'#1a1a1a'
-                ,  position: 'center'}}>
-                <CardText  style={{borderBottom:'1px solid #AE5923',borderTop:'1px solid #AE5923'}}>
+            <Card style={{
+                width: 700, high: '100%', marginTop: '10%', marginLeft: '33%', backgroundColor: '#1a1a1a'
+                , position: 'center'
+            }}>
+                <CardText style={{borderBottom: '1px solid #AE5923', borderTop: '1px solid #AE5923'}}>
                     <FormPanel title={""} width={650}>
                         <div style={errorContainerStyles}>
                             <h1 style={errorTitleStyles}>
                                 Page Not Found!
                             </h1>
-                            <text style={errorMessageStyles}>The page you looking for was moved, renamed, <br/>removed or might never existed.</text>
+                            <text style={errorMessageStyles}>The page you looking for was moved, renamed, <br/>removed
+                                                             or might never existed.
+                            </text>
                             <Link to={window.contextPath}>
                                 <br/>
                                 <br/>
@@ -69,4 +74,5 @@ class Error404 extends Component {
         </MuiThemeProvider>;
     }
 }
+
 export default Error404;

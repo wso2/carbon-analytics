@@ -83,7 +83,7 @@ public class Constants {
     public static final String URL_PARAM_SPLITTER = "&";
     public static final String WORKER_METRIC_TYPE = "WORKER";
     public static final String SELECT_ALL_EXPRESSION = "*";
-    public static final String NON_CLUSTERS_ID = "Non Clusters";
+    public static final String NON_CLUSTERS_ID = "Single Node Deployment";
     public static final String NOT_REACHABLE_ID = "Not-Reachable";
     public static final String NEVER_REACHED = "Never Reached";
     public static final int DEFAULT_TIME_INTERVAL_MILLIS = 300000;
@@ -98,7 +98,9 @@ public class Constants {
     public static final String DATA_TYPE_LONG = "longType";
     public static final String DATA_TYPE_FLOAT = "floatType";
     public static final String DATA_TYPE_BOOL = "booleanType";
-
+    
+    public static final int HOUR = 3600000;
+    
     private Constants() {
         //preventing initialization
     }

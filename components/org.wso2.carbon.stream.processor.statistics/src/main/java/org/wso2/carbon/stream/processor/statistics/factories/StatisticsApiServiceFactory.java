@@ -20,12 +20,13 @@ package org.wso2.carbon.stream.processor.statistics.factories;
 
 import org.wso2.carbon.stream.processor.statistics.api.StatisticsApiService;
 import org.wso2.carbon.stream.processor.statistics.impl.StatisticsApiServiceImpl;
+
 /**
  * Siddhi Metrics API Service factory Class for expose statical data of a worker real-time.
  */
 public class StatisticsApiServiceFactory {
     private static final StatisticsApiService service = new StatisticsApiServiceImpl();
-
+    
     public static StatisticsApiService getStatisticsApi() {
         return service;
     }

@@ -17,10 +17,9 @@
  *
  */
 
-import Axios from "axios";
-
+import Axios from 'axios';
 import {MediaType} from '../Constants';
-import AuthManager from "../../auth/utils/AuthManager";
+import AuthManager from '../../auth/utils/AuthManager';
 
 /**
  * This should remove after fixing app by paralleling call workers
@@ -55,7 +54,8 @@ export default class StatusDashboardOverViewAPI {
      * @param appName
      */
     static getComponents(workerID, appName) {
-        return StatusDashboardOverViewAPI.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName + '/components');
+        return StatusDashboardOverViewAPI.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName +
+            '/components');
     }
 
     /**
@@ -88,8 +88,8 @@ export default class StatusDashboardOverViewAPI {
      * @param statEnable
      */
     static enableSiddhiAppStats(workerID, appName, statEnable) {
-        return StatusDashboardOverViewAPI.getHTTPClient().put('/' + workerID + '/siddhi-apps/' + appName + '/statistics/'
-            , statEnable);
+        return StatusDashboardOverViewAPI.getHTTPClient().put('/' + workerID + '/siddhi-apps/' + appName +
+            '/statistics/', statEnable);
     }
 
     /**
@@ -124,5 +124,14 @@ export default class StatusDashboardOverViewAPI {
     static getManagerList() {
         return StatusDashboardOverViewAPI.getHTTPClient().get('/manager');
     }
+
+    /**
+     * This method will return a list of managers real-time details.
+     */
+    static getResourceClusterNodes(managerId) {
+        return StatusDashboardOverViewAPI.getHTTPClient()
+            .get('/manager' + '/' + managerId + '/clusteredResourceNodeDetails');
+    }
+
 
 }

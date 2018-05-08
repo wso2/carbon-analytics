@@ -182,7 +182,6 @@ public class MonitoringRESTApi implements Microservice {
         return workersApi.getRuntimeEnv(id, getUserName(request));
     }
 
-
     /**
      * Delete worker from the status dashboard. PS. Do not delete metrics details.
      *
@@ -701,6 +700,29 @@ public class MonitoringRESTApi implements Microservice {
             throws NotFoundException, IOException {
         return workersApi.getChildAppsTransportDetails(id, appName, getUserName(request));
     }
+
+    @GET
+    @Path("/manager/{id}/clusteredResourceNodeDetails")
+
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get the summary details of all siddhi apps of a given manager.",
+            notes = "Retrieves the siddhi app summary details of manager with the "
+                    + "specified id.",
+            response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Summary successfully retrieved.",
+                    response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Summary not found.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class)})
+    public Response getClusterResourceNodeDetails(@Context Request request,
+                                                  @ApiParam(value = "ID of the Node.", required = true) @PathParam("id")
+                                                          String id) throws NotFoundException, IOException {
+        return workersApi.getClusterResourceNodeDetails(id, getUserName(request));
+    }
+
 
     private static String getUserName(Request request) {
         return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();

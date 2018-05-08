@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -20,34 +20,34 @@
 package org.wso2.carbon.status.dashboard.core.bean;
 
 /**
- * Siddhi app Component Bean class.
+ * Bean class that contains resource cluster information.
  */
-public class WorkerResponce {
-    private String message;
-    private int code;
+public class ResourceClusterInfo {
+    private String nodeId;
+    private String httpHost;
+    private String httpPort;
 
-
-    public WorkerResponce(String message, int value) {
-        this.message = message;
-        this.code = value;
+    public String getNodeId() {
+        return nodeId;
     }
 
-    public WorkerResponce() {
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
     }
 
-    public String getMessage() {
-        return message;
+    public String getHost() {
+        return httpHost;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setHost(String httpHost) {
+        this.httpHost = httpHost;
     }
 
-    public int getCode() {
-        return code;
+    public String getPort() {
+        return httpPort;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setPort(String httpPort) {
+        this.httpPort = httpPort;
     }
 }

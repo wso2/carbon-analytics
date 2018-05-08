@@ -25,40 +25,40 @@ public class WorkerMetrics {
     private double systemCPU;
     private double loadAverage;
     private double memoryUsage;
-
+    
     public WorkerMetrics() {
     }
-
+    
     public double getProcessCPU() {
         return processCPU;
     }
-
+    
     public void setProcessCPU(double processCPU) {
         this.processCPU = processCPU;
     }
-
+    
     public double getSystemCPU() {
         return systemCPU;
     }
-
+    
     public void setSystemCPU(double systemCPU) {
         this.systemCPU = systemCPU;
     }
-
+    
     public double getLoadAverage() {
         return loadAverage;
     }
-
+    
     public void setLoadAverage(double loadAverage) {
         this.loadAverage = loadAverage;
     }
-
+    
     public double getTotalMemory() {
         return memoryUsage;
     }
-
+    
     public void setTotalMemory(double memoryUsage) {
         this.memoryUsage = memoryUsage;
     }
-
+    
 }

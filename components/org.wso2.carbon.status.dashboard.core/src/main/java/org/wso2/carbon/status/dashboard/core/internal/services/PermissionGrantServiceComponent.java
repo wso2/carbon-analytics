@@ -55,10 +55,10 @@ public class PermissionGrantServiceComponent {
     private static final Logger logger = LoggerFactory.getLogger(PermissionGrantServiceComponent.class);
     private PermissionProvider permissionProvider;
     private IdPClient identityClient;
-
+    
     public PermissionGrantServiceComponent() {
     }
-
+    
     @Activate
     protected void start(BundleContext bundleContext) {
         if (logger.isDebugEnabled()) {
@@ -76,21 +76,21 @@ public class PermissionGrantServiceComponent {
             logger.error("error in getting admin.", e);
         }
     }
-
+    
     @Deactivate
     protected void stop() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Status dashboard permission grant service component is deactivated.");
         }
     }
-
+    
     private void initPermission() throws UnauthorizedException, IdPClientException {
         for (Permission permission : getAllPermission()) {
             if (!permissionProvider.isPermissionExists(permission)) {
                 permissionProvider.addPermission(permission);
             }
         }
-
+        
         List<Role> sysAdminRoles = MonitoringDataHolder.getInstance()
                 .getRolesProvider().getSysAdminRolesList(identityClient);
         if (!sysAdminRoles.isEmpty()) {
@@ -106,7 +106,7 @@ public class PermissionGrantServiceComponent {
                 permissionProvider.grantPermission(permission, role);
             }
         }
-
+        
         List<Role> devRoles = MonitoringDataHolder
                 .getInstance().getRolesProvider().getDeveloperRolesList(identityClient);
         if (!devRoles.isEmpty()) {
@@ -116,7 +116,7 @@ public class PermissionGrantServiceComponent {
                 }
             }
         }
-
+        
         List<Role> viwerRoles = MonitoringDataHolder
                 .getInstance().getRolesProvider().getViewerRolesList(identityClient);
         if (!viwerRoles.isEmpty()) {
@@ -127,7 +127,7 @@ public class PermissionGrantServiceComponent {
             }
         }
     }
-
+    
     /**
      * Build basic dashboard permission string.
      *
@@ -143,7 +143,7 @@ public class PermissionGrantServiceComponent {
                 Constants.PERMISSION_SUFFIX_VIEWER));
         return permissions;
     }
-
+    
     /**
      * Build basic dashboard permission string.
      *
@@ -153,7 +153,7 @@ public class PermissionGrantServiceComponent {
     private List<Permission> buildDashboardAdminPermissions(String permisstionString) {
         return getAllPermission();
     }
-
+    
     /**
      * Build basic dashboard permission string.
      *
@@ -168,7 +168,7 @@ public class PermissionGrantServiceComponent {
                 Constants.PERMISSION_SUFFIX_VIEWER));
         return permissions;
     }
-
+    
     /**
      * Build basic dashboard permission string.
      *
@@ -181,7 +181,7 @@ public class PermissionGrantServiceComponent {
                 Constants.PERMISSION_SUFFIX_VIEWER));
         return permissions;
     }
-
+    
     @Reference(
             name = "org.wso2.carbon.analytics.idp.client.core.api.IdPClient",
             service = IdPClient.class,
@@ -192,11 +192,11 @@ public class PermissionGrantServiceComponent {
     protected void setIdP(IdPClient client) {
         this.identityClient = client;
     }
-
+    
     protected void unsetIdP(IdPClient client) {
         this.identityClient = null;
     }
-
+    
     @Reference(
             name = "permission-manager",
             service = PermissionManager.class,
@@ -208,12 +208,12 @@ public class PermissionGrantServiceComponent {
         this.permissionProvider = permissionManager.getProvider();
         MonitoringDataHolder.getInstance().setPermissionProvider(this.permissionProvider);
     }
-
+    
     protected void unsetPermissionManager(PermissionManager permissionManager) {
         this.permissionProvider = null;
         MonitoringDataHolder.getInstance().setPermissionProvider(null);
     }
-
+    
     @Reference(
             name = "org.wso2.carbon.status.dashboard.core.internal.services.DashboardInitConfigComponent",
             service = DashboardInitConfigComponent.class,
@@ -225,9 +225,9 @@ public class PermissionGrantServiceComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DashboardInitConfigComponent");
         }
-
+        
     }
-
+    
     public void unregisterDashboardInitConfigComponent(DashboardInitConfigComponent serviceComponent) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DashboardInitConfigComponent");

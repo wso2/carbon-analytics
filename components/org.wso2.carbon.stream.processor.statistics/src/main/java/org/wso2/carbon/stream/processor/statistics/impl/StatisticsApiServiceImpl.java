@@ -26,6 +26,7 @@ import org.wso2.carbon.stream.processor.statistics.api.NotFoundException;
 import org.wso2.carbon.stream.processor.statistics.api.StatisticsApiService;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
+import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 import org.wso2.msf4j.Request;
 
 import javax.ws.rs.core.Response;
@@ -40,11 +41,11 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
     private static final String PERMISSION_APP_NAME = "SAPP";
     private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
     private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";
-
+    
     public StatisticsApiServiceImpl() {
         operatingSystemMetricSet.initConnection();
     }
-
+    
     /**
      * This will provide the realtime metrics such as cpu,load average and memory from the worker.
      *
@@ -65,11 +66,11 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
         try {
             String osMetricsJSON = gson.toJson(operatingSystemMetricSet.getMetrics());
             return Response.status(Response.Status.OK).entity(osMetricsJSON).build();
-        } catch (Exception e) {
+        } catch (MetricsConfigException e) {
             String message = e.getMessage();
             WorkerStatistics workerStatistics = operatingSystemMetricSet.getDefault();
-            if(("Wso2 Carbon metrics is not enabled.".equalsIgnoreCase(message)) ||
-               ("JMX reporter has been disabled at WSO2 carbon metrics.").equalsIgnoreCase(message)) {
+            if (("Wso2 Carbon metrics is not enabled.".equalsIgnoreCase(message)) ||
+                    ("JMX reporter has been disabled at WSO2 carbon metrics.").equalsIgnoreCase(message)) {
                 workerStatistics.setMessage(message);
                 String osMetricsJSON = gson.toJson(workerStatistics);
                 return Response.status(Response.Status.OK).entity(osMetricsJSON).build();
@@ -78,7 +79,7 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
             }
         }
     }
-
+    
     /**
      * Enable and disable the worker metrics remotely.
      *
@@ -86,7 +87,7 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
      * @return Statistics state of the worker.
      * @throws NotFoundException API may not be found.
      */
-    public Response enableStats(boolean statsEnable,Request request) throws NotFoundException {
+    public Response enableStats(boolean statsEnable, Request request) throws NotFoundException {
         if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
@@ -112,9 +113,9 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
             }
         }
     }
-
+    
     private static String getUserName(org.wso2.msf4j.Request request) {
-
+        
         Object username = request.getProperty("username");
         return username != null ? username.toString() : null;
     }

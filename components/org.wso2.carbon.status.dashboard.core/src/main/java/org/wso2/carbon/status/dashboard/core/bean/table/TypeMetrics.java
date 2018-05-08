@@ -30,22 +30,22 @@ import java.util.List;
 public class TypeMetrics {
     private String type;
     private List<ComponentMetrics> data = new ArrayList<>();
-
+    
     public TypeMetrics() {
     }
-
+    
     public String getType() {
         return type;
     }
-
+    
     public void setType(String type) {
         this.type = WordUtils.capitalize(type);
     }
-
+    
     public List<ComponentMetrics> getData() {
         return data;
     }
-
+    
     public void setData(ComponentMetrics dataElement) {
         boolean isNew = true;
         for (ComponentMetrics componentMetrics : data) {
