@@ -26,7 +26,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildi
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 import org.wso2.siddhi.query.api.expression.AttributeFunction;
+import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.expression.Variable;
+import org.wso2.siddhi.query.api.expression.constant.TimeConstant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +51,8 @@ public class AttributesSelectionConfigGenerator {
     public AttributesSelectionConfig generateAttributesSelectionConfig(List<OutputAttribute> outputAttributes) {
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
         AttributesSelectionConfigFactory attributesSelectionConfigFactory = new AttributesSelectionConfigFactory();
+
+
         if (!outputAttributes.isEmpty()) {
             for (OutputAttribute outputAttribute : outputAttributes) {
                 selectedAttributes.add(generateSelectedAttributeConfig(outputAttribute));
@@ -65,10 +69,39 @@ public class AttributesSelectionConfigGenerator {
      * @return                      SelectedAttribute object
      */
     private SelectedAttribute generateSelectedAttributeConfig(OutputAttribute outputAttribute) {
-        String[] splitString = ConfigBuildingUtilities.getDefinition(outputAttribute, siddhiAppString).split(" as ");
-        if (splitString.length == 1) {
-            return new SelectedAttribute(splitString[0].trim(), "");
+        String rename = "";
+        if (outputAttribute.getRename() != null) {
+            rename = outputAttribute.getRename();
         }
-        return new SelectedAttribute(splitString[0].trim(), splitString[1].trim());
+         String name = generateExpressionName(outputAttribute.getExpression());
+
+        return new SelectedAttribute(name, rename);
+
+//        String[] splitString = ConfigBuildingUtilities.getDefinition(outputAttribute, siddhiAppString).split(" as ");
+//        if (splitString.length == 1) {
+//            return new SelectedAttribute(splitString[0].trim(), "");
+//        }
+//        return new SelectedAttribute(splitString[0].trim(), splitString[1].trim());
+    }
+
+    private String generateExpressionName(Expression expression) {
+        if (expression instanceof Variable) {
+            Variable variable = (Variable) expression;
+            String attributeName = variable.getAttributeName();
+            if (variable.getStreamId() != null) {
+                attributeName = variable.getStreamId() + "." + attributeName;
+            }
+            return attributeName;
+        }
+        if (expression instanceof AttributeFunction) {
+            AttributeFunction attributeFunction = (AttributeFunction) expression;
+            List<String> parameterList = new ArrayList<>();
+            for (Expression parameter : attributeFunction.getParameters()) {
+                parameterList.add(generateExpressionName(parameter));
+            }
+            return String.format("%s(%s)", attributeFunction.getName(), String.join(" , ", parameterList));
+        }
+        // TODO add more
+        throw new IllegalArgumentException("Type of Expression is unknown");
     }
 }
