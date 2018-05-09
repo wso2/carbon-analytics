@@ -280,13 +280,19 @@ public class DesignGenerator {
             // For creating 'aggregate by time' object
             List<Duration> aggregationTimePeriodDurations = aggregationDefinition.getTimePeriod().getDurations();
 
+            // 'aggregateByAttribute'
+            String aggregateByAttribute = "";
+            if (aggregationDefinition.getAggregateAttribute() != null) {
+                aggregateByAttribute = aggregationDefinition.getAggregateAttribute().getAttributeName();
+            }
+
             siddhiAppConfig.add(new AggregationConfig(
                     aggregationDefinition.getId(),
                     aggregationDefinition.getId(),
                     aggregationDefinition.getBasicSingleInputStream().getStreamId(),
                     selectedAttributesConfig,
                     groupBy,
-                    aggregationDefinition.getAggregateAttribute().getAttributeName(),
+                    aggregateByAttribute,
                     new AggregateByTimePeriod(
                             (aggregationTimePeriodDurations.get(0)).name(),
                             (aggregationTimePeriodDurations.get(aggregationTimePeriodDurations.size() - 1)).name()),
