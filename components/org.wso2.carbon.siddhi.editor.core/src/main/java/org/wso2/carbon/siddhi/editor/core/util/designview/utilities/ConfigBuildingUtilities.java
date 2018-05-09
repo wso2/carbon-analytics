@@ -40,6 +40,10 @@ public class ConfigBuildingUtilities {
         int[] startIndex = siddhiElement.getQueryContextStartIndex();
         int[] endIndex = siddhiElement.getQueryContextEndIndex();
 
+        if (startIndex == null || endIndex == null) {
+            throw new IllegalArgumentException("Unable to get the definition of the SiddhiElement");
+        }
+
         int startLinePosition = ordinalIndexOf(startIndex[0], siddhiAppString);
         int endLinePosition = ordinalIndexOf(endIndex[0], siddhiAppString);
 
