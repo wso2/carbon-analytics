@@ -1711,7 +1711,7 @@
 
         <siddhi.io.tcp.version>2.0.7</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.0.0-M6</siddhi.io.email.version>
-        <siddhi.io.kafka.version>4.1.7</siddhi.io.kafka.version>
+        <siddhi.io.kafka.version>4.1.9</siddhi.io.kafka.version>
         <siddhi.io.http.version>1.0.4</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.0.6</siddhi.map.json.version>
