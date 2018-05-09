@@ -652,6 +652,15 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 }else {
                                     console.log("Error: Disconnected source name not found in join query!");
                                 }
+
+                                // if left or sources are created then remove data from those sources
+                                if (queryInput.getLeft() !== undefined
+                                    && queryInput.getLeft().getFrom() === disconnectedElementSourceName) {
+                                    queryInput.setLeft(undefined);
+                                } else if (queryInput.getRight() !== undefined
+                                    && queryInput.getRight().getFrom() === disconnectedElementSourceName) {
+                                    queryInput.setRight(undefined);
+                                }
                             }
                             return;
                         }
