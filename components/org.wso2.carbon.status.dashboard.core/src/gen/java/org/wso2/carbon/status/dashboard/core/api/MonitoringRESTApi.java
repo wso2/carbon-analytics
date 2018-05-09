@@ -642,7 +642,7 @@ public class MonitoringRESTApi implements Microservice {
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.",
             notes = "Retrieves the general text view and flow of a siddhi-app",
-            response = void.class, tags = {"Workers",})
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
                     response = void.class),
@@ -662,9 +662,9 @@ public class MonitoringRESTApi implements Microservice {
     @GET
     @Path("/manager/{id}/siddhi-apps/{appName}/child-apps")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.",
-            notes = "Retrieves the general text view and flow of a siddhi-app",
-            response = void.class, tags = {"Workers",})
+    @io.swagger.annotations.ApiOperation(value = "Get the child apps details.",
+            notes = "Retrieves child app details of a parent siddhi-app",
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
                     response = void.class),
@@ -683,9 +683,9 @@ public class MonitoringRESTApi implements Microservice {
     @GET
     @Path("/manager/{id}/siddhi-apps/{appName}/child-apps/transport")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.",
-            notes = "Retrieves the general text view and flow of a siddhi-app",
-            response = void.class, tags = {"Workers",})
+    @io.swagger.annotations.ApiOperation(value = "Get the transport details of each child apps",
+            notes = "Retrieves the transport details of each child siddhi-apps",
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
                     response = void.class),
@@ -705,8 +705,8 @@ public class MonitoringRESTApi implements Microservice {
     @Path("/manager/{id}/clusteredResourceNodeDetails")
 
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Get the summary details of all siddhi apps of a given manager.",
-            notes = "Retrieves the siddhi app summary details of manager with the "
+    @io.swagger.annotations.ApiOperation(value = "Get the resource cluster information of a given manager.",
+            notes = "Retrieves the resoource cluster summary details of manager with the "
                     + "specified id.",
             response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
