@@ -198,7 +198,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     title: "Aggregate By",
                     properties: {
                         aggregateByAttribute: {
-                            required: true,
                             type: "object",
                             title: "Aggregate by Attribute",
                             propertyOrder: 1,
@@ -254,7 +253,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     }
                 },
                 show_errors: "always",
-                disable_properties: true,
+                disable_properties: false,
                 display_required_only: true,
                 no_additional_properties: true
             };
@@ -327,8 +326,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 _.set(aggregationOptions, 'id', i);
                 _.set(aggregationOptions, 'name', editorInput.getValue().name);
                 _.set(aggregationOptions, 'from', editorInput.getValue().from);
-                _.set(aggregationOptions, 'aggregateByAttribute',
-                    editorAggregate.getValue().aggregateByAttribute.attribute);
 
                 var selectAttributeOptions = {};
                 if (editorSelect.getValue().select instanceof Array) {
@@ -351,6 +348,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     _.set(aggregationOptions, 'groupBy', groupByAttributes);
                 } else {
                     _.set(aggregationOptions, 'groupBy', undefined);
+                }
+
+                if (editorAggregate.getValue().aggregateByAttribute !== undefined
+                    && editorAggregate.getValue().aggregateByAttribute.attribute !== undefined) {
+                    _.set(aggregationOptions, 'aggregateByAttribute',
+                        editorAggregate.getValue().aggregateByAttribute.attribute);
+                } else {
+                    _.set(aggregationOptions, 'aggregateByAttribute', undefined);
                 }
 
                 var aggregateByTimePeriod = new AggregateByTimePeriod(editorAggregate.getValue().aggregateByTimePeriod);
@@ -596,7 +601,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     title: "Aggregate By",
                     properties: {
                         aggregateByAttribute: {
-                            required: true,
                             type: "object",
                             title: "Aggregate by Attribute",
                             propertyOrder: 1,
@@ -653,7 +657,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 },
                 startval: fillAggregate,
                 show_errors: "always",
-                disable_properties: true,
+                disable_properties: false,
                 display_required_only: true,
                 no_additional_properties: true
             };
@@ -720,7 +724,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 // update selected aggregation model
                 clickedElement.setName(configInput.name);
                 clickedElement.setFrom(configInput.from);
-                clickedElement.setAggregateByAttribute(configAggregate.aggregateByAttribute.attribute);
 
                 var selectAttributeOptions = {};
                 if (configSelect.select instanceof Array) {
@@ -743,6 +746,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     clickedElement.setGroupBy(groupByAttributes);
                 } else {
                     clickedElement.setGroupBy(undefined);
+                }
+
+                if (configAggregate.aggregateByAttribute !== undefined
+                    && configAggregate.aggregateByAttribute.attribute !== undefined) {
+                    clickedElement.setAggregateByAttribute(configAggregate.aggregateByAttribute.attribute);
+                } else {
+                    clickedElement.setAggregateByAttribute(undefined);
                 }
 
                 var aggregateByTimePeriod = new AggregateByTimePeriod(configAggregate.aggregateByTimePeriod);
