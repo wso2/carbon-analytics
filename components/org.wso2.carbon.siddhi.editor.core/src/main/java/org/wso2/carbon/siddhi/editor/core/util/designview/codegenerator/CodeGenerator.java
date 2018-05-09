@@ -147,26 +147,22 @@ public class CodeGenerator {
      * @return The Siddhi annotation representation of the name and the description
      */
     private String generateAppNameAndDescription(String appName, String appDescription) {
-        if (appName == null || appName.isEmpty()) {
-            throw new CodeGenerationException("The Siddhi App name is null");
+        StringBuilder appNameAndDescriptionStringBuilder = new StringBuilder();
+        if (appName != null && !appName.isEmpty()) {
+            appNameAndDescriptionStringBuilder.append(Constants.APP_NAME)
+                    .append(appName)
+                    .append(Constants.SINGLE_QUOTE)
+                    .append(Constants.CLOSE_BRACKET);
         }
-
-        StringBuilder appNameAndDescriptionBuilder = new StringBuilder();
-
-        appNameAndDescriptionBuilder.append(Constants.APP_NAME)
-                .append(appName)
-                .append(Constants.SINGLE_QUOTE)
-                .append(Constants.CLOSE_BRACKET);
-
         if (appDescription != null && !appDescription.isEmpty()) {
-            appNameAndDescriptionBuilder.append(Constants.NEW_LINE)
+            appNameAndDescriptionStringBuilder.append(Constants.NEW_LINE)
                     .append(Constants.APP_DESCRIPTION)
                     .append(appDescription)
                     .append(Constants.SINGLE_QUOTE)
                     .append(Constants.CLOSE_BRACKET);
         }
 
-        return appNameAndDescriptionBuilder.toString();
+        return appNameAndDescriptionStringBuilder.toString();
     }
 
     /**
@@ -256,15 +252,15 @@ public class CodeGenerator {
 
         if (window.getOutputEventType() != null && !window.getOutputEventType().isEmpty()) {
             windowStringBuilder.append(Constants.SPACE);
-            switch (window.getOutputEventType().toLowerCase()) {
+            switch (window.getOutputEventType().toUpperCase()) {
                 // TODO: 4/26/18 The cases must be constants and not free strings
-                case "current_events":
+                case "CURRENT_EVENTS":
                     windowStringBuilder.append(Constants.OUTPUT_CURRENT_EVENTS);
                     break;
-                case "expired_events":
+                case "EXPIRED_EVENTS":
                     windowStringBuilder.append(Constants.OUTPUT_EXPIRED_EVENTS);
                     break;
-                case "all_events":
+                case "ALL_EVENTS":
                     windowStringBuilder.append(Constants.OUTPUT_ALL_EVENTS);
                     break;
                 default:
@@ -318,8 +314,6 @@ public class CodeGenerator {
             throw new CodeGenerationException("The name of aggregation  is null");
         } else if (aggregation.getFrom() == null || aggregation.getFrom().isEmpty()) {
             throw new CodeGenerationException("The input stream for aggregation  is null");
-        } else if (aggregation.getAggregateByAttribute() == null || aggregation.getAggregateByAttribute().isEmpty()) {
-            throw new CodeGenerationException("The aggregate by attribute in aggregation  is null");
         } else if (aggregation.getAggregateByTimePeriod() == null) {
             throw new CodeGenerationException("The AggregateByTimePeriod instance is null");
         } else if (aggregation.getAggregateByTimePeriod().getMinValue() == null || aggregation.getAggregateByTimePeriod().getMinValue().isEmpty()) {
@@ -344,10 +338,16 @@ public class CodeGenerator {
                 .append(Constants.TAB_SPACE)
                 .append(getQueryGroupBy(aggregation.getGroupBy()))
                 .append(Constants.NEW_LINE)
-                .append(Constants.AGGREGATE_BY)
-                .append(Constants.SPACE)
-                .append(aggregation.getAggregateByAttribute())
-                .append(Constants.SPACE)
+                .append(Constants.AGGREGATE);
+
+        if (aggregation.getAggregateByAttribute() != null && !aggregation.getAggregateByAttribute().isEmpty()) {
+            aggregationStringBuilder.append(Constants.SPACE)
+                    .append(Constants.BY)
+                    .append(Constants.SPACE)
+                    .append(aggregation.getAggregateByAttribute());
+        }
+
+        aggregationStringBuilder.append(Constants.SPACE)
                 .append(Constants.EVERY)
                 .append(Constants.SPACE)
                 .append(aggregation.getAggregateByTimePeriod().getMinValue());
@@ -442,6 +442,12 @@ public class CodeGenerator {
         return partitionStringBuilder.toString();
     }
 
+    /**
+     * Converts a QueryInputConfig object to the input part of a Siddhi query
+     *
+     * @param queryInput The QueryInputConfig instance to be converted
+     * @return The query input string representation of the given QueryInputConfig object
+     */
     private String getQueryInput(QueryInputConfig queryInput) {
         if (queryInput == null) {
             throw new CodeGenerationException("Query Input Cannot Be Null");
@@ -451,19 +457,21 @@ public class CodeGenerator {
 
         StringBuilder queryInputStringBuilder = new StringBuilder();
 
-        switch (queryInput.getType().toLowerCase()) {
-            case "window":
-            case "filter":
-            case "projection":
+        switch (queryInput.getType().toUpperCase()) {
+            case "WINDOW":
+            case "FILTER":
+            case "PROJECTION":
                 WindowFilterProjectionConfig windowFilterProjectionQuery = (WindowFilterProjectionConfig) queryInput;
                 queryInputStringBuilder.append(getWindowFilterProjectionQueryInput(windowFilterProjectionQuery));
                 break;
-            case "join":
+            case "JOIN":
                 JoinConfig joinQuery = (JoinConfig) queryInput;
                 queryInputStringBuilder.append(getJoinQueryInput(joinQuery));
                 break;
-            case "pattern":
-            case "sequence":
+            case "PATTERN":
+            case "SEQUENCE":
+                PatternSequenceConfig patternSequence = (PatternSequenceConfig) queryInput;
+                queryInputStringBuilder.append(getPatternSequenceInput(patternSequence));
                 break;
             default:
                 throw new CodeGenerationException("Unidentified Query Input Type Has Been Given: " + queryInput.getType());
@@ -472,6 +480,12 @@ public class CodeGenerator {
         return queryInputStringBuilder.toString();
     }
 
+    /**
+     * Converts a WindowFilterProjectionConfig object to a query input of type window, filter or projection string
+     *
+     * @param windowFilterProjection The WindowFilterProjection object to be converted
+     * @return The window,filter or projection string representation of the given WindowFilterProjection object
+     */
     private String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection) {
         if (windowFilterProjection == null) {
             throw new CodeGenerationException("The WindowFilterProjection Instance Is Null");
@@ -510,6 +524,12 @@ public class CodeGenerator {
         return windowFilterProjectionStringBuilder.toString();
     }
 
+    /**
+     * Converts a JoinConfig object to a query input of type join as a string
+     *
+     * @param join The JoinConfig object to be converted
+     * @return The join input string representation of the given JoinConfig object
+     */
     private String getJoinQueryInput(JoinConfig join) {
         if (join == null) {
             throw new CodeGenerationException("The given JoinConfig instance is null");
@@ -568,6 +588,12 @@ public class CodeGenerator {
         return joinStringBuilder.toString();
     }
 
+    /**
+     * Converts a JoinElementConfig object to a Siddhi string representation of that object
+     *
+     * @param joinElement The JoinElementConfig to be converted
+     * @return The Siddhi string representation of the given JoinElementConfig object
+     */
     private String getJoinElement(JoinElementConfig joinElement) {
         if (joinElement == null) {
             throw new CodeGenerationException("The given JoinElementConfig instance given is null");
@@ -635,6 +661,13 @@ public class CodeGenerator {
         return joinElementStringBuilder.toString();
     }
 
+    /**
+     * Identifies the join type string given and returns the respective Siddhi code snippet for the
+     * given join type
+     *
+     * @param joinType The identifier for which join type the query has
+     * @return The Siddhi representation of the given join type
+     */
     private String getJoinType(String joinType) {
         if (joinType == null || joinType.isEmpty()) {
             throw new CodeGenerationException("The join type value given is null");
@@ -654,15 +687,22 @@ public class CodeGenerator {
         }
     }
 
-    private String getPatternInput(PatternSequenceConfig patternQuery) {
-        StringBuilder patternQueryStringBuilder = new StringBuilder();
-        return patternQueryStringBuilder.toString();
-    }
-
-    private String getSequenceInput(PatternSequenceConfig sequenceQuery) {
+    /**
+     * Converts a PatternSequenceConfig object to a Siddhi string representation of a pattern/sequence query input
+     *
+     * @param patternSequence The PatternSequenceConfig object to be converted
+     * @return The Siddhi string representation of the given PatternSequenceConfig instance
+     */
+    private String getPatternSequenceInput(PatternSequenceConfig patternSequence) {
         return VOID_RETURN;
     }
 
+    /**
+     * Converts a AttributesSelectionConfig object to the select section of a Siddhi query as a string
+     *
+     * @param attributesSelection The AttributeSelectionConfig object to be converted
+     * @return The string representation of the select part of a Siddhi query
+     */
     private String getQuerySelect(AttributesSelectionConfig attributesSelection) {
         if (attributesSelection == null) {
             throw new CodeGenerationException(" Attribute Selection Instance Cannot Be Null");
@@ -692,6 +732,12 @@ public class CodeGenerator {
         return attributesSelectionStringBuilder.toString();
     }
 
+    /**
+     * Converts a UserDefinedSelectionConfig object to the select part of a Siddhi query
+     *
+     * @param userDefinedSelection The UserDefinedSelectionConfig instance to be converted
+     * @return The string representation of the select part of a Siddhi query
+     */
     private String getUserDefinedSelection(UserDefinedSelectionConfig userDefinedSelection) {
         // TODO: 4/23/18 Complete to get rid of duplicate code
         StringBuilder userDefinedSelectionStringBuilder = new StringBuilder();
@@ -724,6 +770,12 @@ public class CodeGenerator {
         return userDefinedSelectionStringBuilder.toString();
     }
 
+    /**
+     * Converts a list of groupBy parameters
+     *
+     * @param groupByList
+     * @return
+     */
     private String getQueryGroupBy(List<String> groupByList) {
         if (groupByList == null || groupByList.isEmpty()) {
             return VOID_RETURN;
@@ -812,20 +864,20 @@ public class CodeGenerator {
 
         StringBuilder queryOutputStringBuilder = new StringBuilder();
 
-        switch (queryOutput.getType().toLowerCase()) {
-            case "insert":
+        switch (queryOutput.getType().toUpperCase()) {
+            case "INSERT":
                 InsertOutputConfig insertOutputConfig = (InsertOutputConfig) queryOutput.getOutput();
                 queryOutputStringBuilder.append(getInsetOutput(insertOutputConfig, queryOutput.getTarget()));
                 break;
-            case "delete":
+            case "DELETE":
                 DeleteOutputConfig deleteOutputConfig = (DeleteOutputConfig) queryOutput.getOutput();
                 queryOutputStringBuilder.append(getDeleteOutput(deleteOutputConfig, queryOutput.getTarget()));
                 break;
-            case "update":
+            case "UPDATE":
                 UpdateInsertIntoOutputConfig updateIntoOutput = (UpdateInsertIntoOutputConfig) queryOutput.getOutput();
                 queryOutputStringBuilder.append(getUpdateOutput(queryOutput.getType(), updateIntoOutput, queryOutput.getTarget()));
                 break;
-            case "update_or_insert_into":
+            case "UPDATE_OR_INSERT_INTO":
                 UpdateInsertIntoOutputConfig updateInsertIntoOutput = (UpdateInsertIntoOutputConfig) queryOutput.getOutput();
                 queryOutputStringBuilder.append(getUpdateOutput(queryOutput.getType(), updateInsertIntoOutput, queryOutput.getTarget()));
                 break;
@@ -849,16 +901,16 @@ public class CodeGenerator {
                 .append(Constants.SPACE);
 
         if (insertOutput.getEventType() != null && !insertOutput.getEventType().isEmpty()) {
-            switch (insertOutput.getEventType().toLowerCase()) {
-                case "current_events":
+            switch (insertOutput.getEventType().toUpperCase()) {
+                case "CURRENT_EVENTS":
                     insertOutputStringBuilder.append(Constants.CURRENT_EVENTS)
                             .append(Constants.SPACE);
                     break;
-                case "expired_events":
+                case "EXPIRED_EVENTS":
                     insertOutputStringBuilder.append(Constants.EXPIRED_EVENTS)
                             .append(Constants.SPACE);
                     break;
-                case "all_events":
+                case "ALL_EVENTS":
                     insertOutputStringBuilder.append(Constants.ALL_EVENTS)
                             .append(Constants.SPACE);
                     break;
@@ -895,14 +947,14 @@ public class CodeGenerator {
                     .append(Constants.NEW_LINE)
                     .append(Constants.TAB_SPACE)
                     .append(Constants.FOR);
-            switch (deleteOutput.getEventType().toLowerCase()) {
-                case "current_events":
+            switch (deleteOutput.getEventType().toUpperCase()) {
+                case "CURRENT_EVENTS":
                     deleteOutputStringBuilder.append(Constants.CURRENT_EVENTS);
                     break;
-                case "expired_events":
+                case "EXPIRED_EVENTS":
                     deleteOutputStringBuilder.append(Constants.EXPIRED_EVENTS);
                     break;
-                case "all_events":
+                case "ALL_EVENTS":
                     deleteOutputStringBuilder.append(Constants.ALL_EVENTS);
                     break;
                 default:
@@ -932,9 +984,9 @@ public class CodeGenerator {
         }
 
         StringBuilder updateInsertIntoOutputStringBuilder = new StringBuilder();
-        if (type.equals("update")) {
+        if (type.equalsIgnoreCase("UPDATE")) {
             updateInsertIntoOutputStringBuilder.append(Constants.UPDATE);
-        } else if (type.equals("update_or_insert_into")) {
+        } else if (type.equalsIgnoreCase("UPDATE_OR_INSERT_INTO")) {
             updateInsertIntoOutputStringBuilder.append(Constants.UPDATE_OR_INSERT_INTO);
         }
 
@@ -1125,6 +1177,8 @@ public class CodeGenerator {
         private static final String PER = "per";
         private static final String APP_NAME = "@App:name('";
         private static final String APP_DESCRIPTION = "@App:description('";
+        private static final String AGGREGATE = "aggregate";
+        private static final String BY = "by";
 
         private Constants() {
         }
