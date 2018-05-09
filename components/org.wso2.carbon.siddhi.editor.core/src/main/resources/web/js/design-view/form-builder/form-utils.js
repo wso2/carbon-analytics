@@ -68,13 +68,15 @@ define(['require', 'lodash'],
             for (var propertyName in objectElement) {
                 if (objectElement.hasOwnProperty(propertyName)
                     && (objectElement[propertyName] === null
-                        || (!_.isNumber(objectElement[propertyName]) && _.isEmpty(objectElement[propertyName]))
+                        || (!_.isNumber(objectElement[propertyName]) && !_.isBoolean(objectElement[propertyName])
+                            && _.isEmpty(objectElement[propertyName]))
                         || objectElement[propertyName] === undefined)) {
                     delete objectElement[propertyName];
                 } else if (objectElement.hasOwnProperty(propertyName)
                     && objectElement[propertyName] instanceof Object) {
                     self.cleanJSONObject(objectElement[propertyName]);
-                    if (objectElement.hasOwnProperty(propertyName) && _.isEmpty(objectElement[propertyName])) {
+                    if (objectElement.hasOwnProperty(propertyName) && !_.isBoolean(objectElement[propertyName])
+                        && _.isEmpty(objectElement[propertyName])) {
                         delete objectElement[propertyName];
                     }
                 }
