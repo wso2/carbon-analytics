@@ -471,13 +471,68 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     disable_array_reorder: true
                 });
 
-                var leftFromNode = editorInput.getEditor('root.left.input.from');
-                editorInput.watch('root.left.input', function () {
-                    var oldLeftSourceFromValue = editorInput.getValue().left.input.from;
-                    var newLeftSourceFromValue = leftFromNode.getValue();
-                    if (oldLeftSourceFromValue !== newLeftSourceFromValue) {
-                        _.set(inputSchema.properties, 'left', rightSchema);
-                        _.set(inputSchema.properties, 'right', leftSchema);
+                /*
+                * This function adds watch fields for the input section. Each time a new editorInput is created,
+                * this function needs to be called.
+                * */
+                function addWatchFieldsForInput() {
+                    editorInput.watch('root.left.input', function () {
+                        var leftFromNode = editorInput.getEditor('root.left.input.from');
+                        var oldLeftSourceFromValue = editorInput.getValue().left.input.from;
+                        var newLeftSourceFromValue = leftFromNode.getValue();
+                        interChangeSourceDataAndSchema(oldLeftSourceFromValue, newLeftSourceFromValue);
+                    });
+
+                    editorInput.watch('root.right.input', function () {
+                        var rightFromNode = editorInput.getEditor('root.right.input.from');
+                        var oldRightSourceFromValue = editorInput.getValue().right.input.from;
+                        var newRightSourceFromValue = rightFromNode.getValue();
+                        interChangeSourceDataAndSchema(oldRightSourceFromValue, newRightSourceFromValue);
+                    });
+
+                    // var leftIsUnidirectionalNode = editorInput.getEditor('root.left.isUnidirectional');
+                    // var rightIsUnidirectionalNode = editorInput.getEditor('root.right.isUnidirectional');
+                    //
+                    // editorInput.watch('root.right.isUnidirectional', function () {
+                    //     var newRightIsUnidirectionalValue = rightIsUnidirectionalNode.getValue();
+                    //     if (newRightIsUnidirectionalValue) {
+                    //         leftIsUnidirectionalNode.setValue(false);
+                    //     }
+                    // });
+                    //
+                    // editorInput.watch('root.left.isUnidirectional', function () {
+                    //     var newLeftIsUnidirectionalValue = leftIsUnidirectionalNode.getValue();
+                    //     if (newLeftIsUnidirectionalValue) {
+                    //         rightIsUnidirectionalNode.setValue(false);
+                    //     }
+                    // });
+                }
+
+                /*
+                * This function will swap the left and right sources data in the form.
+                * Right source values will be saved in the left source and vice versa.
+                * Since the input schema is changed, we have to reset the watch functions
+                * for the each left and right source changes.
+                * */
+                function interChangeSourceDataAndSchema(oldFromSourceValue, newFromSourceValue) {
+                    if (oldFromSourceValue !== newFromSourceValue) {
+                        var newLeftSchema =
+                            self.getJoinSourceSchema(secondInputElementType, secondInputElementName,
+                                firstInputElementName, constants.LEFT_SOURCE);
+                        var newRightSchema =
+                            self.getJoinSourceSchema(firstInputElementType, firstInputElementName,
+                                secondInputElementName, constants.RIGHT_SOURCE);
+                        _.set(inputSchema.properties, 'left', newLeftSchema);
+                        _.set(inputSchema.properties, 'right', newRightSchema);
+
+                        function swapValues(value1, value2) {
+                            var temporaryValue1= value1;
+                            value1 = value2;
+                            value2 = temporaryValue1;
+                        }
+
+                        swapValues(firstInputElementName, secondInputElementName);
+                        swapValues(firstInputElementType, secondInputElementType);
 
                         var newStartingValues = {
                             left: editorInput.getValue().right,
@@ -487,6 +542,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             within: editorInput.getValue().within,
                             per: editorInput.getValue().per
                         };
+
+                        newStartingValues = self.formUtils.cleanJSONObject(newStartingValues);
                         $('#form-query-input').empty();
                         editorInput = new JSONEditor($('#form-query-input')[0], {
                             schema: inputSchema,
@@ -499,39 +556,19 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             disable_array_delete_last_row: true,
                             disable_array_reorder: true
                         });
+                        // editorInput.setValue(newStartingValues);
+                        // /*
+                        // * When interchanging values of left and right sources, isUnidirectional gets true in both
+                        // * sources(if one of the source's isUnidirectional flag is already true). So in here for both
+                        // * sources starting values are set to false.
+                        // * */
+                        // editorInput.getEditor('root.left.isUnidirectional').setValue(false);
+                        // editorInput.getEditor('root.right.isUnidirectional').setValue(false);
+                        addWatchFieldsForInput();
                     }
-                });
+                }
 
-                var rightFromNode = editorInput.getEditor('root.right.input.from');
-                editorInput.watch('root.right.input', function () {
-                    var oldRightSourceFromValue = editorInput.getValue().right.input.from;
-                    var newRightSourceFromValue = rightFromNode.getValue();
-                    if (oldRightSourceFromValue !== newRightSourceFromValue) {
-                        _.set(inputSchema.properties, 'left', rightSchema);
-                        _.set(inputSchema.properties, 'right', leftSchema);
-
-                        var newStartingValues = {
-                            left: editorInput.getValue().right,
-                            joinType: editorInput.getValue().joinType,
-                            right: editorInput.getValue().left,
-                            on : editorInput.getValue().on,
-                            within: editorInput.getValue().within,
-                            per: editorInput.getValue().per
-                        };
-                        $('#form-query-input').empty();
-                        editorInput = new JSONEditor($('#form-query-input')[0], {
-                            schema: inputSchema,
-                            startval: newStartingValues,
-                            show_errors: "always",
-                            disable_properties: true,
-                            display_required_only: true,
-                            no_additional_properties: true,
-                            disable_array_delete_all_rows: true,
-                            disable_array_delete_last_row: true,
-                            disable_array_reorder: true
-                        });
-                    }
-                });
+                addWatchFieldsForInput();
 
                 var selectScheme = {
                     schema: {
