@@ -289,6 +289,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     var application = self.options.application;
                     var designView = new DesignView(self.options, application);
+                    this._designView = designView;
                     designView.renderToolPalette();
 
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
@@ -311,6 +312,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 "<span class=\"toggle-button-text\">Design View</span>");
                             console.log(JSON.stringify(designView.getConfigurationData()));
                         }
+                        // NOTE - This trigger should be always handled after the 'if' condition
+                        self.trigger("view-switch");
                     });
                 },
 
@@ -326,6 +329,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                 getSourceView: function () {
                     return this._sourceView;
+                },
+
+                getDesignView: function () {
+                    return this._designView;
                 },
 
                 getDebuggerWrapper: function () {

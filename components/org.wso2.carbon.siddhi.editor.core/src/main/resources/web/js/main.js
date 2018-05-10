@@ -105,11 +105,23 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
 
                     log.debug("start: rendering tab controller");
                     this.tabController.render();
+                    this.addViewSwitchListeners();
                     log.debug("end: rendering tab controller");
 
                     log.debug("start: rendering event simulator control");
                     this.eventSimulator.render();
                     log.debug("end: rendering event simulator control");
+                },
+
+                addViewSwitchListeners: function () {
+                    var self = this;
+                    _.forEach(this.tabController.getTabList(), function (tab) {
+                        if (tab.getTitle() !== "welcome-page") {
+                            tab.getSiddhiFileEditor().on("view-switch", function () {
+                                self.workspaceManager.updateUndoRedoMenus();
+                            });
+                        }
+                    });
                 },
 
                 getOperatingSystem: function(){
