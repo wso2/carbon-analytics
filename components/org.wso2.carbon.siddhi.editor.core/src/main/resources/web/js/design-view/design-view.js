@@ -245,8 +245,8 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             _.set(designViewGridOpts, 'container', this.designViewGridContainer);
             _.set(designViewGridOpts, 'configurationData', this.configurationData);
             _.set(designViewGridOpts, 'application', this.application);
-            var designViewGrid = new DesignViewGrid(designViewGridOpts);
-            designViewGrid.render();
+            this.designViewGrid = new DesignViewGrid(designViewGridOpts);
+            this.designViewGrid.render();
         };
 
         DesignView.prototype.getConfigurationData = function () {
