@@ -60,7 +60,7 @@ public class QueryConfigGenerator {
                 new AttributesSelectionConfigGenerator(siddhiAppString);
         AttributesSelectionConfig querySelectConfig =
                 attributesSelectionConfigGenerator
-                        .generateAttributesSelectionConfig(query.getSelector().getSelectionList());
+                        .generateAttributesSelectionConfig(query.getSelector());
 
         // Generate Output
         QueryOutputConfigGenerator queryOutputConfigGenerator = new QueryOutputConfigGenerator(siddhiAppString);

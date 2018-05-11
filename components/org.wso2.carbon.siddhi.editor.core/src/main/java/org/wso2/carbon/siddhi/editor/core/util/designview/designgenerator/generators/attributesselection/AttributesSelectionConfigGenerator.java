@@ -23,10 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.factories.AttributesSelectionConfigFactory;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
-import org.wso2.siddhi.query.api.expression.AttributeFunction;
-import org.wso2.siddhi.query.api.expression.Variable;
+import org.wso2.siddhi.query.api.execution.query.selection.Selector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,33 +39,52 @@ public class AttributesSelectionConfigGenerator {
     }
 
     /**
-     * Generates config object with the given list of selected attributes
-     * @param outputAttributes      List of selected attributes
-     * @return                      Config object with selected attributes
+     * Generates an AttributesSelectionConfig from the given Siddhi Selector
+     * @param selector      Siddhi Selector object
+     * @return              AttributesSelectionConfig object
      */
-    public AttributesSelectionConfig generateAttributesSelectionConfig(List<OutputAttribute> outputAttributes) {
-        List<SelectedAttribute> selectedAttributes = new ArrayList<>();
+    public AttributesSelectionConfig generateAttributesSelectionConfig(Selector selector) {
+        String selectString = extractSelectedAttributesString(selector);
         AttributesSelectionConfigFactory attributesSelectionConfigFactory = new AttributesSelectionConfigFactory();
-        if (!outputAttributes.isEmpty()) {
-            for (OutputAttribute outputAttribute : outputAttributes) {
-                selectedAttributes.add(generateSelectedAttributeConfig(outputAttribute));
-            }
-            return attributesSelectionConfigFactory.getAttributesSelectionConfig(selectedAttributes);
+        if (selectString.equals(AttributeSelection.VALUE_ALL)) {
+            // All attributes selection (*)
+            return attributesSelectionConfigFactory.getAttributesSelectionConfig(AttributeSelection.VALUE_ALL);
         }
-        // Empty outputAttributes after a successful compilation of Siddhi app means "select *"
-        return attributesSelectionConfigFactory.getAttributesSelectionConfig(AttributeSelection.VALUE_ALL);
+        // User defined selection
+        return attributesSelectionConfigFactory
+                .getAttributesSelectionConfig(generateSelectedAttributeList(selectString));
     }
 
     /**
-     * Generates SelectedAttribute object, for the given OutputAttribute, which is a selection of a Siddhi Attribute
-     * @param outputAttribute       A selected attribute
-     * @return                      SelectedAttribute object
+     * Extracts only the string of attributes selection, without the 'select' keyword
+     * @param selector      Siddhi Selector object
+     * @return              Attributes selection string
      */
-    private SelectedAttribute generateSelectedAttributeConfig(OutputAttribute outputAttribute) {
-        String[] splitString = ConfigBuildingUtilities.getDefinition(outputAttribute, siddhiAppString).split(" as ");
-        if (splitString.length == 1) {
-            return new SelectedAttribute(splitString[0].trim(), "");
+    private String extractSelectedAttributesString(Selector selector) {
+        final String SELECT = "select";
+        final String GROUP_BY = "group by";
+        final String HAVING = "having";
+        String completeSelectString = ConfigBuildingUtilities.getDefinition(selector, siddhiAppString);
+        String selectString = completeSelectString.split(GROUP_BY)[0].split(HAVING)[0];
+        String selectedCollection = selectString.split(SELECT)[1].replace("\n", "");
+        return selectedCollection.trim();
+    }
+
+    /**
+     * Generates a list of SelectedAttributes from the given string, of selected attributes separated by commas
+     * @param selectedAttributesString      Selected attributes separated by commas
+     * @return                              List of SelectedAttributes
+     */
+    private List<SelectedAttribute> generateSelectedAttributeList(String selectedAttributesString) {
+        List<SelectedAttribute> selectedAttributes = new ArrayList<>();
+        for (String selectedElement : selectedAttributesString.split(",")) {
+            String[] nameAndAlias = selectedElement.split("([a|A][s|S])");
+            if (nameAndAlias.length == 1) {
+                selectedAttributes.add(new SelectedAttribute(nameAndAlias[0].trim(), ""));
+            } else {
+                selectedAttributes.add(new SelectedAttribute(nameAndAlias[0].trim(), nameAndAlias[1].trim()));
+            }
         }
-        return new SelectedAttribute(splitString[0].trim(), splitString[1].trim());
+        return selectedAttributes;
     }
 }
