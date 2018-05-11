@@ -125,30 +125,25 @@ body {
 }
 
 .info-card{
-    background-color: #2f96b4;
+    background-color: #2f96b4 !important;
     width: 40%;
-    height: 50px;
-    margin-left: 30%;
-    text-align: center;
-    margin-top: 50px;
+    padding: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.add-button{
-    background-color: #9d9d9d;
-    width: 15%;
-    height: 50px;
-    margin-left: 43%;
-    text-align: center;
-    margin-top: 50px;
-    padding: 20px;
+.info-card svg {
+    padding-right: 10px;
 }
+
+.add-button:hover {
+    background-color: #4e4e4e !important;
+}
+
 .add-button-disabled{
     background-color: #222222;
-    width: 20%;
-    height: 50px;
-    margin-left: 40%;
     text-align: center;
-    margin-top: 50px;
     padding: 20px;
 }
 .worker-tooltip {
@@ -288,4 +283,10 @@ p.node-last-update {
 
 .node-wrapper {
     min-width: 350px !important;
+}
+
+.center-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
 }
