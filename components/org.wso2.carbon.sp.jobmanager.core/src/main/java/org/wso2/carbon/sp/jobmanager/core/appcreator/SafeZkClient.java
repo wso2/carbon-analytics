@@ -52,7 +52,7 @@ class SafeZkClient {
                 zkUtils = new ZkUtils(zkClient, new ZkConnection(zooKeeperServerUrl), isSecureKafkaCluster);
                 break;
             } catch (ZkTimeoutException e) {
-                log.error("Zookeeper server at " + zooKeeperServerUrl + " can not be reached.");
+                log.error("Zookeeper server at " + zooKeeperServerUrl + " can not be reached.", e);
             }
         }
         if (zkUtils != null) {
