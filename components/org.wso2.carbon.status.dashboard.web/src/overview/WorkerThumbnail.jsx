@@ -316,7 +316,8 @@ export default class WorkerThumbnail extends React.Component {
                             <GridTile>
                                 <div className="grid-tile-h1" style={{
                                     display: 'flex',
-                                    alignItems: 'center', height: '100%'
+                                    alignItems: 'center', height: '100%',
+                                    justifyContent: 'center'
                                 }}>
                                     {loadAvg}</div>
                                 <div style={styles.legendContainer}>
