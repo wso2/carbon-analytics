@@ -23,7 +23,7 @@ import {Link, Redirect} from 'react-router-dom';
 import {GridList, Toggle} from 'material-ui';
 import Info from 'material-ui/svg-icons/action/info';
 import HomeButton from 'material-ui/svg-icons/action/home';
-import {Button, Card, Divider} from 'material-ui-next';
+import {Button, Card, Divider, Typography} from 'material-ui-next';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 //App Components
 import WorkerThumbnail from './WorkerThumbnail';
@@ -46,9 +46,14 @@ const styles = {
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
-    background: {backgroundColor: '#222222'},
     divider: {backgroundColor: '#9E9E9E', width: '90%'},
-    navBtn: {color: '#fff', padding: '0 16px 0 12px', verticalAlign: 'middle'}
+    navBtn: {color: '#fff', padding: '0 16px 0 12px', verticalAlign: 'middle'},
+    alignCenter: {display: 'flex', alignItems: 'center'},
+    addBtn: {
+        backgroundColor: '#f17b31',
+        padding: 20,
+        color: '#fff'
+    }
 };
 const errorTitleStyles = {
     color: "#c7cad1",
@@ -232,9 +237,9 @@ export default class WorkerOverview extends React.Component {
     renderAddWorker() {
         if (this.state.hasManagerPermission) {
             return (
-                <div className="add-button">
-                    <Link to={window.contextPath + '/add-worker'}>
-                        <Button style={{marginTop: 10}}>
+                <div>
+                    <Link style={{textDecoration: 'none'}} to={window.contextPath + '/add-worker'}>
+                        <Button className={'add-button'} style={styles.addBtn}>
                             <ContentAdd/> Add New Node
                         </Button>
                     </Link>
@@ -350,13 +355,18 @@ export default class WorkerOverview extends React.Component {
             !WorkerOverview.hasNodes(this.state.managerClusterList)) {
             if (this.state.hasViewPermission) {
                 return (
-                    <div style={styles.background}>
-                        <div className="info-card" style={{backgroundColor: '#f17b31'}}>
-                            <Button
-                                style={{marginTop: 10, backgroundColor: '#f17b31'}}
-                            ><Info/> {this.state.statusMessage}</Button>
+                    <div>
+                        <div className="center-wrapper">
+                            <div className="info-card">
+                                <Typography style={styles.alignCenter}>
+                                    <Info/>
+                                    {this.state.statusMessage}
+                                </Typography>
+                            </div>
                         </div>
-                        {this.renderAddWorker()}
+                        <div className="center-wrapper">
+                            {this.renderAddWorker()}
+                        </div>
                     </div>
                 );
             } else {
