@@ -936,7 +936,9 @@ public class EditorMicroservice implements Microservice {
             CodeGenerator codeGenerator = CodeGeneratorSingleton.getInstance();
             String siddhiAppCode = codeGenerator.getSiddhiAppCode(eventFlow);
 
-            String encodedSiddhiAppString = new String(Base64.getEncoder().encode(siddhiAppCode.getBytes()));
+            String encodedSiddhiAppString =
+                    new String(Base64.getEncoder().encode(siddhiAppCode.getBytes(StandardCharsets.UTF_8)),
+                            StandardCharsets.UTF_8);
             return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(encodedSiddhiAppString)
