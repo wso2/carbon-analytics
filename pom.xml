@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.326-SNAPSHOT</version>
+    <version>2.0.327-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -1504,7 +1504,7 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.326-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>2.0.327-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.1.20</siddhi.version>
         <siddhi.bundle.version>4.1.20</siddhi.bundle.version>
 
@@ -1711,7 +1711,7 @@
 
         <siddhi.io.tcp.version>2.0.7</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.0.0-M6</siddhi.io.email.version>
-        <siddhi.io.kafka.version>4.1.7</siddhi.io.kafka.version>
+        <siddhi.io.kafka.version>4.1.9</siddhi.io.kafka.version>
         <siddhi.io.http.version>1.0.4</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.0.6</siddhi.map.json.version>
