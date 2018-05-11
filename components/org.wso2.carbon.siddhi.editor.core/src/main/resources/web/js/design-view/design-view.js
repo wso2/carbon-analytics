@@ -249,6 +249,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             this.designViewGrid.render();
         };
 
+        DesignView.prototype.autoAlign = function () {
+            if (!_.isUndefined(this.designViewGrid)) {
+                this.designViewGrid.autoAlignElements();
+            }
+        };
+
         DesignView.prototype.getConfigurationData = function () {
             return this.configurationData;
         };
