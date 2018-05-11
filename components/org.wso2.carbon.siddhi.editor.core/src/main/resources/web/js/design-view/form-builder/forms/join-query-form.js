@@ -490,22 +490,22 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         interChangeSourceDataAndSchema(oldRightSourceFromValue, newRightSourceFromValue);
                     });
 
-                    // var leftIsUnidirectionalNode = editorInput.getEditor('root.left.isUnidirectional');
-                    // var rightIsUnidirectionalNode = editorInput.getEditor('root.right.isUnidirectional');
-                    //
-                    // editorInput.watch('root.right.isUnidirectional', function () {
-                    //     var newRightIsUnidirectionalValue = rightIsUnidirectionalNode.getValue();
-                    //     if (newRightIsUnidirectionalValue) {
-                    //         leftIsUnidirectionalNode.setValue(false);
-                    //     }
-                    // });
-                    //
-                    // editorInput.watch('root.left.isUnidirectional', function () {
-                    //     var newLeftIsUnidirectionalValue = leftIsUnidirectionalNode.getValue();
-                    //     if (newLeftIsUnidirectionalValue) {
-                    //         rightIsUnidirectionalNode.setValue(false);
-                    //     }
-                    // });
+                    var leftIsUnidirectionalNode = editorInput.getEditor('root.left.isUnidirectional');
+                    var rightIsUnidirectionalNode = editorInput.getEditor('root.right.isUnidirectional');
+
+                    editorInput.watch('root.right.isUnidirectional', function () {
+                        var newRightIsUnidirectionalValue = rightIsUnidirectionalNode.getValue();
+                        if (newRightIsUnidirectionalValue) {
+                            leftIsUnidirectionalNode.setValue(false);
+                        }
+                    });
+
+                    editorInput.watch('root.left.isUnidirectional', function () {
+                        var newLeftIsUnidirectionalValue = leftIsUnidirectionalNode.getValue();
+                        if (newLeftIsUnidirectionalValue) {
+                            rightIsUnidirectionalNode.setValue(false);
+                        }
+                    });
                 }
 
                 /*
@@ -556,14 +556,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             disable_array_delete_last_row: true,
                             disable_array_reorder: true
                         });
-                        // editorInput.setValue(newStartingValues);
-                        // /*
-                        // * When interchanging values of left and right sources, isUnidirectional gets true in both
-                        // * sources(if one of the source's isUnidirectional flag is already true). So in here for both
-                        // * sources starting values are set to false.
-                        // * */
-                        // editorInput.getEditor('root.left.isUnidirectional').setValue(false);
-                        // editorInput.getEditor('root.right.isUnidirectional').setValue(false);
                         addWatchFieldsForInput();
                     }
                 }
