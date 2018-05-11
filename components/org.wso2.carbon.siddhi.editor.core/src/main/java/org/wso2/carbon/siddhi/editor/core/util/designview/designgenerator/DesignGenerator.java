@@ -262,8 +262,7 @@ public class DesignGenerator {
                 AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
                         new AttributesSelectionConfigGenerator(siddhiAppString);
                 selectedAttributesConfig =
-                        attributesSelectionConfigGenerator.generateAttributesSelectionConfig(
-                                selector.getSelectionList());
+                        attributesSelectionConfigGenerator.generateAttributesSelectionConfig(selector);
                 // Populate 'groupBy' list
                 for (Variable variable : selector.getGroupByList()) {
                     groupBy.add(ConfigBuildingUtilities.getDefinition(variable, siddhiAppString));
