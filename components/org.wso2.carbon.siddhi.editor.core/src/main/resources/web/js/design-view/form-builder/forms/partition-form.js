@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'jsplumb'],
-    function (require, log, $, _, jsPlumb) {
+define(['require', 'log', 'jquery', 'lodash'],
+    function (require, log, $, _) {
 
         /**
          * @class PartitionForm Creates a forms to collect data from a partition
@@ -29,6 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb'],
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.consoleListManager = options.application.outputController;
+                this.jsPlumbInstance = options.self.jsPlumbInstance;
             }
             this.gridContainer = $("#grid-container");
             this.toolPaletteContainer = $("#tool-palette-container");
@@ -44,7 +45,7 @@ define(['require', 'log', 'jquery', 'lodash', 'jsplumb'],
             var self = this;
             var id = $(element.target).parent().attr('id');
             var partition = self.configurationData.getSiddhiAppConfig().getPartition(id);
-            var connections = jsPlumb.getConnections(element);
+            var connections = self.jsPlumbInstance.getConnections(element);
             var connected= false;
             var connectedStream = null;
             $.each(connections, function (index, connection) {

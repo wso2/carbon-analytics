@@ -54,9 +54,8 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             this.application = options.application;
             this.consoleListManager = options.application.outputController;
             this.formUtils = new FormUtils(this.configurationData);
+            this.jsPlumbInstance = options.jsPlumbInstance;
         };
-
-        //TODO: input validation in forms
 
         /**
          * @function generate a tab in the output console to view the form
@@ -372,6 +371,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var partitionForm = new PartitionForm(formOptions);
             partitionForm.generatePropertiesForm(element, formConsole, formContainer);
         };

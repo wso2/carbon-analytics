@@ -15,10 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElements', 'dagre', 'edge',
+define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternQueryInput', 'queryOutput'],
 
-    function (require, log, $, _jsPlumb ,Backbone, _, DropElements, dagre, Edge, WindowFilterProjectionQueryInput,
+    function (require, log, $, Backbone, _, DropElements, dagre, Edge, WindowFilterProjectionQueryInput,
               JoinQueryInput, PatternQueryInput, QueryOutput) {
 
         var constants = {
@@ -54,6 +54,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             this.configurationData = this.options.configurationData;
             this.container = this.options.container;
             this.application = this.options.application;
+            this.jsPlumbInstance = options.jsPlumbInstance;
+            this.currentTabId = this.container.parent().parent().attr("id");
         };
 
         DesignGrid.prototype.render = function () {
@@ -65,6 +67,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             _.set(dropElementsOpts, 'container', self.container);
             _.set(dropElementsOpts, 'configurationData', self.configurationData);
             _.set(dropElementsOpts, 'application', self.application);
+            _.set(dropElementsOpts, 'jsPlumbInstance', self.jsPlumbInstance);
             _.set(dropElementsOpts, 'designGrid', self);
             this.dropElements = new DropElements(dropElementsOpts);
             this.canvas = $(self.container);
@@ -73,9 +76,9 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             /**
              * @description jsPlumb function opened
              */
-            _jsPlumb.ready(function() {
+            self.jsPlumbInstance.ready(function() {
 
-                _jsPlumb.importDefaults({
+                self.jsPlumbInstance.importDefaults({
                     PaintStyle: {
                         strokeWidth: 2,
                         stroke: 'darkblue',
@@ -96,7 +99,6 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     ConnectionsDetachable: false,
                     Connector: ["Bezier", {curviness: 50}]
                 });
-                _jsPlumb.setContainer($(self.container));
 
                 /**
                  * @function droppable method for the 'stream' & the 'query' objects
@@ -123,7 +125,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         ui.helper.remove();
                         $(droppedElement).draggable({containment: "parent"});
                         // Repaint to reposition all the elements that are on the canvas after the drop/addition of a new element on the canvas
-                        _jsPlumb.repaint(ui.helper);//TODO: check this
+                        self.jsPlumbInstance.repaint(ui.helper);//TODO: check this
 
                         // If the dropped Element is a Stream then->
                         if ($(droppedElement).hasClass('stream')) {
@@ -193,7 +195,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
             // check the validity of the connections and drop if invalid
             function checkConnectionValidityBeforeElementDrop() {
-                _jsPlumb.bind('beforeDrop', function (connection) {
+                self.jsPlumbInstance.bind('beforeDrop', function (connection) {
                     var connectionValidity = false;
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
@@ -204,22 +206,22 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     var sourceElement = $('#' + sourceId);
 
                     // avoid the expose of inner-streams outside the group
-                    if (sourceElement.hasClass(constants.STREAM) && _jsPlumb.getGroupFor(sourceId) !== undefined) {
-                        if (_jsPlumb.getGroupFor(sourceId) !== _jsPlumb.getGroupFor(targetId)) {
+                    if (sourceElement.hasClass(constants.STREAM) && self.jsPlumbInstance.getGroupFor(sourceId) !== undefined) {
+                        if (self.jsPlumbInstance.getGroupFor(sourceId) !== self.jsPlumbInstance.getGroupFor(targetId)) {
                             alert("Invalid Connection: Inner Streams are not exposed to outside");
                         } else {
                             connectionValidity = true;
                         }
                     }
-                    else if (targetElement.hasClass(constants.STREAM) && _jsPlumb.getGroupFor(targetId) !== undefined) {
-                        if (_jsPlumb.getGroupFor(targetId) !== _jsPlumb.getGroupFor(sourceId)) {
+                    else if (targetElement.hasClass(constants.STREAM) && self.jsPlumbInstance.getGroupFor(targetId) !== undefined) {
+                        if (self.jsPlumbInstance.getGroupFor(targetId) !== self.jsPlumbInstance.getGroupFor(sourceId)) {
                             alert("Invalid Connection: Inner Streams are not exposed to outside");
                         } else {
                             connectionValidity = true;
                         }
                     }
                     if (sourceElement.hasClass(constants.PARTITION)) {
-                        if ($(_jsPlumb.getGroupFor(targetId)).attr('id') !== sourceId) {
+                        if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') !== sourceId) {
                             alert("Invalid Connection: Connect to a partition query");
                         } else {
                             connectionValidity = true;
@@ -314,7 +316,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // Update the model when a connection is established and bind events for the connection
             function updateModelOnConnectionAttach() {
                 //TODO: whenever a annotation is changed, delete the entire annotation and save on it
-                _jsPlumb.bind('connection', function (connection) {
+                self.jsPlumbInstance.bind('connection', function (connection) {
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     var targetElement = $('#' + targetId);
@@ -451,7 +453,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             var partitionKeys = (model.getPartition('partition'));
                             partitionKeys['with'].push(newPartitionKey);
 
-                            var connectedQueries = _jsPlumb.getConnections({source: target});
+                            var connectedQueries = self.jsPlumbInstance.getConnections({source: target});
                             $.each(connectedQueries, function (index, connectedQuery) {
                                 var query = connectedQuery.targetId;
                                 var queryID = query.substr(0, query.indexOf('-'));
@@ -488,7 +490,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                     }
 
                     else if (sourceElement.hasClass(constants.PARTITION)) {
-                        var connectedStreams = _jsPlumb.getConnections({target: source});
+                        var connectedStreams = self.jsPlumbInstance.getConnections({target: source});
                         var streamID = null;
                         $.each(connectedStreams, function (index, connectedStream) {
                             var stream = connectedStream.sourceId;
@@ -598,7 +600,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
             // Update the model when a connection is detached
             function updateModelOnConnectionDetach() {
-                _jsPlumb.bind('connectionDetached', function (connection) {
+                self.jsPlumbInstance.bind('connectionDetached', function (connection) {
 
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
@@ -688,7 +690,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                                 var partitionKeysObj = {'with': partitionKeys};
                                 model.setPartition(partitionKeysObj);
 
-                                var connectedQueries = _jsPlumb.getConnections({source: target});
+                                var connectedQueries = self.jsPlumbInstance.getConnections({source: target});
                                 $.each(connectedQueries, function (index, connectedQuery) {
                                     var query = connectedQuery.targetId;
                                     var queryID = query.substr(0, query.indexOf('-'));
@@ -726,7 +728,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
                     else if (sourceElement.hasClass(constants.PARTITION)) {
 
-                        var connectedStreams = _jsPlumb.getConnections({target: source});
+                        var connectedStreams = self.jsPlumbInstance.getConnections({target: source});
                         var streamID = null;
                         $.each(connectedStreams, function (index, connectedStream) {
                             var stream = connectedStream.sourceId;
@@ -784,12 +786,12 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
 
             function addMemberToPartitionGroup(self) {
                 // TODO: isInner boolean should be set when adding to the partition.
-                _jsPlumb.bind('group:addMember', function (event) {
+                self.jsPlumbInstance.bind('group:addMember', function (event) {
                     if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                         || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
                         || $(event.el).hasClass(constants.STREAM)) {
 
-                        var connections = _jsPlumb.getConnections(event.el);
+                        var connections = self.jsPlumbInstance.getConnections(event.el);
                         //TODO: insert into can be connected to a outside(not inner) stream as well
                         if($(event.el).hasClass(constants.STREAM)) {
 
@@ -924,7 +926,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 var targetId = edge.getParentId();
                 var sourceId = edge.getChildId();
 
-                _jsPlumb.connect({
+                self.jsPlumbInstance.connect({
                     source: sourceId+'-out',
                     target: targetId+'-in'
                 });
@@ -936,6 +938,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
          */
         DesignGrid.prototype.autoAlignElements = function () {
             //TODO auto aligning does not support 'Partition'
+            var self = this;
             var g = new dagre.graphlib.Graph();
             g.setGraph({
                 rankdir: 'LR'
@@ -959,7 +962,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 var nodeID = n.id ;
                 g.setNode(nodeID, {width: 120, height: 80});
             }
-            var edges = _jsPlumb.getAllConnections();
+            var edges = self.jsPlumbInstance.getAllConnections();
             for (var i = 0; i < edges.length; i++) {
                 var connection = edges[i];
                 var target = connection.targetId;
@@ -976,7 +979,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                 $("#" + v).css("top", g.node(v).y + "px");
             });
 
-            _jsPlumb.repaintEverything();
+            self.jsPlumbInstance.repaintEverything();
             // edges = edges.slice(0);
             // for (var j = 0; j<edges.length ; j++){
             //     var source = edges[j].sourceId;

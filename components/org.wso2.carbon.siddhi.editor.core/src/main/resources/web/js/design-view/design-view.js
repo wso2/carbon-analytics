@@ -16,13 +16,13 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-palette', 'designViewGrid',
+define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid',
         'configurationData', 'appData', 'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation',
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'patternQueryInput',
         'patternQueryInputCounting', 'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd',
         'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource'],
-    function (require, log, _, $, _jsPlumb, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
+    function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindow, PatternQueryInput, PatternQueryInputCounting, PatternQueryInputAndOr,
               PatternQueryInputNotFor, PatternQueryInputNotAnd, Edge, QuerySelect, QueryOrderByValue, QueryOutput,
@@ -35,8 +35,9 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
          * @class DesignView  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view
          * @param application Application data
+         * @param jsPlumbInstance js plumb instance for the design grid
          */
-        var DesignView = function (options, application) {
+        var DesignView = function (options, application ,jsPlumbInstance) {
             var errorMessage1 = 'unable to find design view container in design-view.js';
             var errorMessage2 = 'unable to find application in design-view.js';
             if (!_.has(options, 'container')) {
@@ -52,6 +53,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             this._$parent_el = container;
             this.options = options;
             this.application = application;
+            this.jsPlumbInstance =jsPlumbInstance;
         };
 
         /**
@@ -245,6 +247,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             _.set(designViewGridOpts, 'container', this.designViewGridContainer);
             _.set(designViewGridOpts, 'configurationData', this.configurationData);
             _.set(designViewGridOpts, 'application', this.application);
+            _.set(designViewGridOpts, 'jsPlumbInstance', this.jsPlumbInstance);
             this.designViewGrid = new DesignViewGrid(designViewGridOpts);
             this.designViewGrid.render();
         };
@@ -270,7 +273,9 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'tool_palette/tool-pale
             // remove any child nodes from designViewGridContainer if exists
             this.designViewGridContainer.empty();
             // reset the jsPlumb common instance
-            _jsPlumb.reset();
+            if (this.jsPlumbInstance !== undefined) {
+                this.jsPlumbInstance.reset();
+            }
         };
 
         DesignView.prototype.showToolPalette = function () {

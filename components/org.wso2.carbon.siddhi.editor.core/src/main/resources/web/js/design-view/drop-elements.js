@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 'query', 'formBuilder'],
-    function (require, log, _, $, _jsPlumb, Partition, Stream, Query, FormBuilder) {
+define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder'],
+    function (require, log, _, $, Partition, Stream, Query, FormBuilder) {
 
         /**
          * @class DesignView
@@ -39,10 +39,12 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
             this.application = options.application;
             this.designGrid = options.designGrid;
             this.options = options;
+            this.jsPlumbInstance = options.jsPlumbInstance;
 
             var formBuilderOptions = {};
             _.set(formBuilderOptions, 'application', this.application);
             _.set(formBuilderOptions, 'configurationData', this.configurationData);
+            _.set(formBuilderOptions, 'jsPlumbInstance', this.jsPlumbInstance);
             _.set(formBuilderOptions, 'dropElements', this);
             this.formBuilder = new FormBuilder(formBuilderOptions);
         };
@@ -119,15 +121,15 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             $(self.container).append(finalElement);
 
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
             });
-            _jsPlumb.makeTarget(connection1, {
+            self.jsPlumbInstance.makeTarget(connection1, {
                 deleteEndpointsOnDetach:true,
                 anchor: 'Left'
             });
 
-            _jsPlumb.makeSource(connection2, {
+            self.jsPlumbInstance.makeSource(connection2, {
                 deleteEndpointsOnDetach : true,
                 anchor : 'Right'
             });
@@ -182,7 +184,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
             $("#tool-palette-container").removeClass("disabledbutton");
 
             // make the connection
-            _jsPlumb.connect({
+            self.jsPlumbInstance.connect({
                 source: queryId+'-out',
                 target: elementID+'-in'
             });
@@ -252,15 +254,15 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             $(self.container).append(finalElement);
 
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
             });
-            _jsPlumb.makeTarget(connection1, {
+            self.jsPlumbInstance.makeTarget(connection1, {
                 deleteEndpointsOnDetach:true,
                 anchor: 'Left'
             });
 
-            _jsPlumb.makeSource(connection2, {
+            self.jsPlumbInstance.makeSource(connection2, {
                 deleteEndpointsOnDetach : true,
                 anchor : 'Right'
             });
@@ -328,15 +330,15 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             $(self.container).append(finalElement);
 
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
             });
-            _jsPlumb.makeTarget(connection1, {
+            self.jsPlumbInstance.makeTarget(connection1, {
                 deleteEndpointsOnDetach:true,
                 anchor: 'Left'
             });
 
-            _jsPlumb.makeSource(connection2, {
+            self.jsPlumbInstance.makeSource(connection2, {
                 deleteEndpointsOnDetach : true,
                 anchor : 'Right'
             });
@@ -404,15 +406,15 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             $(self.container).append(finalElement);
 
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
             });
-            _jsPlumb.makeTarget(connection1, {
+            self.jsPlumbInstance.makeTarget(connection1, {
                 deleteEndpointsOnDetach:true,
                 anchor: 'Left'
             });
 
-            _jsPlumb.makeSource(connection2, {
+            self.jsPlumbInstance.makeSource(connection2, {
                 deleteEndpointsOnDetach : true,
                 anchor : 'Right'
             });
@@ -480,15 +482,15 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             $(self.container).append(finalElement);
 
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
             });
-            _jsPlumb.makeTarget(connection1, {
+            self.jsPlumbInstance.makeTarget(connection1, {
                 deleteEndpointsOnDetach:true,
                 anchor: 'Left'
             });
 
-            _jsPlumb.makeSource(connection2, {
+            self.jsPlumbInstance.makeSource(connection2, {
                 deleteEndpointsOnDetach : true,
                 anchor : 'Right'
             });
@@ -547,17 +549,17 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             $(self.container).append(finalElement);
 
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
             });
 
-            _jsPlumb.makeTarget(connectionIn, {
+            self.jsPlumbInstance.makeTarget(connectionIn, {
                 anchor: 'Left',
                 maxConnections: 1,
                 deleteEndpointsOnDetach: true
             });
 
-            _jsPlumb.makeSource(connectionOut, {
+            self.jsPlumbInstance.makeSource(connectionOut, {
                 anchor: 'Right',
                 uniqueEndpoint: true,
                 maxConnections: 1,
@@ -629,15 +631,15 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             $(self.container).append(finalElement);
 
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
             });
 
-            _jsPlumb.makeTarget(connection1, {
+            self.jsPlumbInstance.makeTarget(connection1, {
                 anchor: 'Left'
             });
 
-            _jsPlumb.makeSource(connection2, {
+            self.jsPlumbInstance.makeSource(connection2, {
                 anchor: 'Right',
                 maxConnections:1
             });
@@ -694,16 +696,16 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
 
             $(self.container).append(finalElement);
 
-            _jsPlumb.draggable(finalElement, {
-                containment: 'grid-container'
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
             });
 
-            _jsPlumb.makeTarget(connectionIn, {
+            self.jsPlumbInstance.makeTarget(connectionIn, {
                 anchor: 'Left',
                 maxConnections:2
             });
 
-            _jsPlumb.makeSource(connectionOut, {
+            self.jsPlumbInstance.makeSource(connectionOut, {
                 anchor: 'Right',
                 uniqueEndpoint: true,
                 maxConnections: 1
@@ -725,7 +727,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
             $(finalElement).draggable({
                 containment: "grid-container",
                 drag:function(){
-                    _jsPlumb.repaintEverything();
+                    self.jsPlumbInstance.repaintEverything();
                     // var connections = jsPlumb.getConnections(this);
                     // $.each( connections, function(index,connection){
                     //     jsPlumb.repaint(connection);
@@ -744,11 +746,11 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                 connectionIn = $('<div class="connectorInPart" >').attr('id', i + '-pc'+ x);
                 finalElement.append(connectionIn);
                 //
-                _jsPlumb.makeTarget(connectionIn, {
+                self.jsPlumbInstance.makeTarget(connectionIn, {
                     anchor: 'Left',
                     maxConnections : 1
                 });
-                _jsPlumb.makeSource(connectionIn, {
+                self.jsPlumbInstance.makeSource(connectionIn, {
                     anchor: 'Right'
                 });
 
@@ -759,7 +761,7 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
             });
 
             $(self.container).append(finalElement);
-            _jsPlumb.addGroup({
+            self.jsPlumbInstance.addGroup({
                 el: $('#' + i)[0],
                 id: i,
                 droppable:true,
@@ -843,9 +845,9 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                     self.configurationData.getSiddhiAppConfig().removePartition(elementId);
 
                 }
-                if(_jsPlumb.getGroupFor(newElement)){
+                if(self.jsPlumbInstance.getGroupFor(newElement)){
                     var queries = self.configurationData.getSiddhiAppConfig()
-                        .getPartition(_jsPlumb.getGroupFor(newElement).id).getQueries();
+                        .getPartition(self.jsPlumbInstance.getGroupFor(newElement).id).getQueries();
                     var removedQueryIndex = null;
                     $.each( queries , function (index, query) {
                         if(query.getId() === $(newElement).attr('id')){
@@ -854,11 +856,11 @@ define(['require', 'log', 'lodash', 'jquery', 'jsplumb', 'partition', 'stream', 
                     });
                     queries.splice(removedQueryIndex,1);
                     self.configurationData.getSiddhiAppConfig()
-                        .getPartition(_jsPlumb.getGroupFor(newElement).id).setQueries(queries);
-                    _jsPlumb.remove(newElement);
-                    _jsPlumb.removeFromGroup(newElement);
+                        .getPartition(self.jsPlumbInstance.getGroupFor(newElement).id).setQueries(queries);
+                    self.jsPlumbInstance.remove(newElement);
+                    self.jsPlumbInstance.removeFromGroup(newElement);
                 } else {
-                    _jsPlumb.remove(newElement);
+                    self.jsPlumbInstance.remove(newElement);
                 }
                 self.configurationData.getSiddhiAppConfig()
                     .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);

@@ -70,8 +70,22 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         log.error(errMsg);
                     }
 
-                    //use this line to assign dynamic id for canvas and pass the canvas id to initialize jsplumb
-                    canvasContainer.attr('id', 'canvasId1');
+                    /*
+                    * Use the below line to assign dynamic id for design grid container and pass the id to initialize
+                    * jsPlumb.
+                    *
+                    * NOTE: jsPlumb is loaded via the index.html as a common script for the entire program. When a new
+                    * tab is created, that tab is initialised with a dedicated jsPlumb instance.
+                    * */
+                    var designGridDynamicId = "design-grid-container-" + this._$parent_el.attr('id');
+                    var designViewGridContainer =
+                        this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
+                    designViewGridContainer.attr('id', designGridDynamicId);
+
+                    // initialise jsPlumb instance for design grid
+                    this.jsPlumbInstance = jsPlumb.getInstance({
+                        Container: designGridDynamicId
+                    });
 
                     var sourceDynamicId = sourceContainer.attr('id') + this._$parent_el.attr('id');
                     sourceContainer.attr("id", sourceDynamicId);
@@ -288,7 +302,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     console.log(this.JSONObject);
 
                     var application = self.options.application;
-                    var designView = new DesignView(self.options, application);
+                    var designView = new DesignView(self.options, application, this.jsPlumbInstance);
                     this._designView = designView;
                     designView.renderToolPalette();
 
