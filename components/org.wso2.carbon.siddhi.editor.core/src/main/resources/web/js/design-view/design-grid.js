@@ -577,7 +577,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                             events: {
                                 click: function () {
                                     if (confirm('Are you sure you want to remove the connection?')) {
-                                        _jsPlumb.detach(connectionObject);
+                                        self.jsPlumbInstance.deleteConnection(connectionObject);
                                     } else {
                                     }
                                 }
@@ -794,7 +794,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         if($(event.el).hasClass(constants.STREAM)) {
 
                         }
-                        var detachedElement = $(event.el).detach();
+                        var detachedElement = $(event.el).deleteConnection();
                         $(detachedElement).insertBefore($(event.group)[0].getEl());
                         self.autoAlignElements();
                         alert("bc");//TODO: add a proper error message and add align
@@ -815,7 +815,7 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
                         }
                     } else {
                         alert("Invalid element type dropped into partition!");
-                        var detachedElement = $(event.el).detach();
+                        var detachedElement = $(event.el).deleteConnection();
                         $(detachedElement).insertBefore($(event.group)[0].getEl());
                         self.autoAlignElements();
                     }
@@ -981,8 +981,8 @@ define(['require', 'log', 'jquery', 'jsplumb','backbone', 'lodash', 'dropElement
             // for (var j = 0; j<edges.length ; j++){
             //     var source = edges[j].sourceId;
             //     var target = edges[j].targetId;
-            //     _jsPlumb.detach(edges[j]);
-            //     _jsPlumb.connect({
+            //     self.jsPlumbInstance.deleteConnection(edges[j]);
+            //     self.jsPlumbInstance.connect({
             //         source: source,
             //         target: target
             //     });
