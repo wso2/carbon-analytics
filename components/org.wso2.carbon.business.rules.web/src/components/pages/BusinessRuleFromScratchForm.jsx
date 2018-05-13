@@ -1008,7 +1008,8 @@ export default class BusinessRuleFromScratchForm extends Component {
                                     <InputComponent
                                         mode={this.state.formMode}
                                         inputRuleTemplates={this.state.inputRuleTemplates}
-                                        getFields={streamDefinition => this.getFieldNamesAndTypes(streamDefinition)}
+                                        getFieldNamesAndTypes={streamDefinition =>
+                                            this.getFieldNamesAndTypes(streamDefinition)}
                                         getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
                                         selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
                                         handleInputRuleTemplateSelected={e =>
@@ -1027,7 +1028,8 @@ export default class BusinessRuleFromScratchForm extends Component {
                                         onUpdate={ruleComponents => this.updateRuleComponents(ruleComponents)} // TODO
                                         formMode={this.state.formMode}
                                         selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
-                                        getFields={streamDefinition => this.getFieldNamesAndTypes(streamDefinition)}
+                                        getFieldNamesAndTypes={streamDefinition =>
+                                            this.getFieldNamesAndTypes(streamDefinition)}
                                         getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
                                         // TODO look into the above one
                                         ruleComponents={this.state.businessRuleProperties.ruleComponents}
@@ -1038,7 +1040,6 @@ export default class BusinessRuleFromScratchForm extends Component {
                                     <OutputComponent
                                         mode={this.state.formMode}
                                         outputRuleTemplates={this.state.outputRuleTemplates}
-                                        getFields={streamDefinition => this.getFieldNamesAndTypes(streamDefinition)}
                                         getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
                                         selectedOutputRuleTemplate={this.state.selectedOutputRuleTemplate}
                                         selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}

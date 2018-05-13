@@ -84,7 +84,7 @@ class FilterComponent extends React.Component {
     }
 
     updateFilterRule(index, filterRule) {
-        const filterRules = this.props.ruleComponents.filterRules; // TODO 'ruleComponents' should be a prop
+        const filterRules = this.props.ruleComponents.filterRules;
         filterRules[index] = filterRule;
         this.updateRuleComponents(filterRules, this.props.ruleComponents.ruleLogic);
     }
@@ -112,7 +112,7 @@ class FilterComponent extends React.Component {
 
             // If an input rule template has been selected
             if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
-                exposedInputStreamFields = this.props.getFields( // TODO i stopped here. this's not found
+                exposedInputStreamFields = this.props.getFieldNamesAndTypes(
                     this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition);
             }
 
