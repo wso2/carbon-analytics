@@ -839,11 +839,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             var self = this;
 
             _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function(stream){
-
                 var streamId = stream.getId();
                 var streamName = stream.getName();
-                var mouseTop = parseInt(streamId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = parseInt(streamId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var array = streamId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
             });
 
@@ -851,8 +852,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var tableId = table.getId();
                 var tableName = table.getName();
-                var mouseTop = parseInt(tableId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = parseInt(tableId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var array = tableId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleTable(mouseTop, mouseLeft, true, tableId, tableName);
             });
 
@@ -860,8 +863,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var windowId = window.getId();
                 var windowName = window.getName();
-                var mouseTop = parseInt(windowId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = parseInt(windowId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var array = windowId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleWindow(mouseTop, mouseLeft, true, windowId, windowName);
             });
 
@@ -869,8 +874,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var triggerId = trigger.getId();
                 var triggerName = trigger.getName();
-                var mouseTop = parseInt(triggerId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = parseInt(triggerId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var array = triggerId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleTrigger(mouseTop, mouseLeft, true, triggerId, triggerName);
             });
 
@@ -878,8 +885,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var aggregationId = aggregation.getId();
                 var aggregationName = aggregation.getName();
-                var mouseTop = parseInt(aggregationId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = parseInt(aggregationId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var array = aggregationId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleAggregation(mouseTop, mouseLeft, true, aggregationId, aggregationName);
             });
 
@@ -887,8 +896,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var patternQueryId = patternQuery.getId();
                 var patternQueryName = "Pattern";
-                var mouseTop = parseInt(patternQueryId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = parseInt(patternQueryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var array = patternQueryId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
             });
 
@@ -907,17 +918,21 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     queryType = constants.WINDOW_QUERY;
                 }
 
-                var mouseTop = parseInt(queryId)*100  - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = parseInt(queryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
-                self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
-            });
+                    var array = queryId.split("-");
+                    var lastArrayEntry = parseInt(array[array.length - 1]);
+                    var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                    var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
+                    self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
+                });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().joinQueryList, function(joinQuery){
 
                 var joinQueryId = joinQuery.getId();
                 var joinQueryName = "Join";
-                var mouseTop = parseInt(joinQueryId)*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = parseInt(joinQueryId)*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var array = joinQueryId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
             });
             
@@ -1234,7 +1249,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
         DesignGrid.prototype.generateNextNewAgentId = function () {
             // TODO: Not finalized
             var newId = parseInt(this.newAgentId) +1;
-            return this.newAgentId = "" + newId + "";
+            this.newAgentId = "" + newId + "";
+            return this.currentTabId + "_element_" + this.newAgentId;
         };
 
         DesignGrid.prototype.getNewAgentId = function () {
