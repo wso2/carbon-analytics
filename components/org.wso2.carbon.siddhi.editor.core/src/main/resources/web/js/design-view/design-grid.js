@@ -186,11 +186,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         }
                     }
                 });
-
-                // auto align the diagram when the button is clicked
-                $('#auto-align').click(function(){ //TODO: add auto align function
-                    self.autoAlignElements();
-                });
             });
 
             // check the validity of the connections and drop if invalid
@@ -946,6 +941,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     target: targetId+'-in'
                 });
             });
+
+            // re-align the elements
+            self.autoAlignElements();
         };
 
         /**
@@ -962,14 +960,16 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 return {};
             });
             var nodes =[];
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.STREAM));
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.PROJECTION));
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.FILTER));
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.WINDOW_QUERY));
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.JOIN));
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.PATTERN));
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.WINDOW));
-            Array.prototype.push.apply(nodes,document.getElementsByClassName(constants.PARTITION));
+
+            var currentTabElement = document.getElementById(self.currentTabId);
+            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.STREAM));
+            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PROJECTION));
+            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.FILTER));
+            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.WINDOW_QUERY));
+            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.JOIN));
+            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PATTERN));
+            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.WINDOW));
+            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PARTITION));
 
             // var nodes = $(".ui-draggable");
             for (var i = 0; i < nodes.length; i++) {
