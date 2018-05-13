@@ -35,12 +35,12 @@ const BusinessRulesConstants = {
     BUSINESS_RULE_TYPE_SCRATCH: 'scratch',
 
     // Business Rule from scratch property types
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT: 'inputData',
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT: 'outputData',
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS: 'ruleComponents', // TODO refactor to object
-    BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES: 'filterRules',
-    BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_RULE_LOGIC: 'ruleLogic',
-    BUSINESS_RULE_FROM_SCRATCH_RULE_PROPERTY_TYPE_OUTPUT_MAPPINGS: 'outputMappings',
+    INPUT_DATA_KEY: 'inputData',
+    OUTPUT_DATA_KEY: 'outputData',
+    RULE_COMPONENTS_KEY: 'ruleComponents', // TODO refactor to object
+    FILTER_RULES_KEY: 'filterRules',
+    RULE_LOGIC_KEY: 'ruleLogic',
+    OUTPUT_MAPPINGS_KEY: 'outputMappings',
 
     BUSINESS_RULE_NAME_REGEX: /[a-zA-Z][a-zA-Z0-9\s_-]*/g,
 
