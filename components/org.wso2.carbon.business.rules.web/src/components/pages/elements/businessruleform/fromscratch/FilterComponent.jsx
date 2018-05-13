@@ -18,6 +18,7 @@
 
 import React from 'react';
 // Material UI Components
+import TextField from 'material-ui/TextField';
 import Typography from 'material-ui/Typography';
 import Collapse from 'material-ui/transitions/Collapse';
 import AppBar from 'material-ui/AppBar';
@@ -42,303 +43,196 @@ import '../../../../../index.css';
  * a button for adding filter rule
  */
 class FilterComponent extends React.Component {
-    updateFilterRuleAttribute(filterRuleIndex, value) {
-        const filterRule = this.props.filterRules[filterRuleIndex];
-        filterRule[0] = value;
-        this.updateFilterRule(filterRuleIndex, filterRule);
+    addFilterRule() {
+        let filterRules = this.props.ruleComponents.filterRules;
+        filterRules.push(['', '', '']);
+        const ruleLogic = this.autoGenerateRuleLogic(filterRules, this.props.ruleComponents.ruleLogic);
+        this.updateRuleComponents(filterRules, ruleLogic);
     }
 
-    updateFilterRuleOperator(filterRuleIndex, value) {
-        const filterRule = this.props.filterRules[filterRuleIndex];
-        filterRule[1] = value;
-        this.updateFilterRule(filterRuleIndex, filterRule);
-    }
-
-    updateFilterRuleAttributeOrValue(filterRuleIndex, value) {
-        const filterRule = this.props.filterRules[filterRuleIndex];
-        filterRule[2] = value;
-        this.updateFilterRule(filterRuleIndex, filterRule);
-    }
-
-    updateFilterRule(filterRuleIndex, filterRule) {
-        this.props.onFilterRuleChange(filterRuleIndex, filterRule);
-    }
-
-
-    render() {
-        let filterRulesToDisplay;
-        let filterRulesTableToDisplay;
-        let ruleLogicToDisplay;
-        let exposedInputStreamFields = null; // To display selectable field options to each filter rule
-
-        // If an input rule template has been selected
-        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
-            exposedInputStreamFields = this.props.getFields(
-                this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition);
+    autoGenerateRuleLogic(filterRules, ruleLogic) {
+        if (filterRules.length === 0) {
+            return '';
         }
+        if (ruleLogic !== '') {
+            // To avoid cases like '1 AND 2 AND 2', where 2 was deleted and inserted again
+            if (!this.getExistingFilterRuleNumbers(ruleLogic).includes(filterRules.length.toString())) {
+                return ruleLogic + ' AND ' + filterRules.length;
+            }
+            return ruleLogic;
+        }
+        // No rule logic is present
+        // Concatenate each filter rule numbers with AND and return
+        const numbers = [];
+        for (let i = 0; i < filterRules.length; i++) {
+            numbers.push(i + 1);
+        }
+        return numbers.join(' AND ');
+    }
 
-        filterRulesToDisplay =
-            this.props.businessRuleProperties
-                [BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS]
-                [BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES]
-                .map((filterRule, index) =>
-                    <FilterRule
-                        filterRule={this.props.filterRule}
-                        onAttributeChange={(index, value) => this.updateFilterRuleAttribute(index, value)}
-                        onOperatorChange={(index, value) => this.updateFilterRuleOperator(index, value)}
-                        onAttributeOrValueChange={(index, value) => this.updateFilterRuleAttributeOrValue(index, value)}
-                        // TODO i stopped here. move Update{filterPart} inside this component, if posible
+    getExistingFilterRuleNumbers(ruleLogic) {
+        const existingFilterRuleNumbers = [];
+        const regExp = /(\d+)/gm;
+        let matches;
+        while ((matches = regExp.exec(ruleLogic)) !== null) {
+            if (matches.index === regExp.lastIndex) {
+                regExp.lastIndex++;
+            }
+            existingFilterRuleNumbers.push(matches[1]);
+        }
+        return existingFilterRuleNumbers;
+    }
 
-                        key={index}
-                        mode={this.props.mode}
-                        filterRuleIndex={index}
-                        filterRule={filterRule}
-                        selectedInputRuleTemplate={this.props.selectedInputRuleTemplate}
-                        getFields={(streamDefinition) => this.props.getFields(streamDefinition)}
-                        getFieldNames={(streamDefinition) => this.props.getFieldNames(streamDefinition)}
-                        exposedInputStreamFields={exposedInputStreamFields}
-                        onAttributeChange={(filterRuleIndex, value) =>
-                            this.props.handleAttributeChange(filterRuleIndex, value)}
-                        onOperatorChange={(filterRuleIndex, value) =>
-                            this.props.handleOperatorChange(filterRuleIndex, value)}
-                        onAttributeOrValueChange={(filterRuleIndex, value) =>
-                            this.props.handleAttributeOrValueChange(filterRuleIndex, value)}
-                        handleRemoveFilterRule={() => this.props.handleRemoveFilterRule(index)}
-                    />
-                    {/*<FilterRule*/}
-                        {/*key={index}*/}
-                        {/*mode={this.props.mode}*/}
-                        {/*filterRuleIndex={index}*/}
-                        {/*filterRule={filterRule}*/}
-                        {/*selectedInputRuleTemplate={this.props.selectedInputRuleTemplate}*/}
-                        {/*getFields={(streamDefinition) => this.props.getFields(streamDefinition)}*/}
-                        {/*getFieldNames={(streamDefinition) => this.props.getFieldNames(streamDefinition)}*/}
-                        {/*exposedInputStreamFields={exposedInputStreamFields}*/}
-                        {/*onAttributeChange={(filterRuleIndex, value) =>*/}
-                            {/*this.props.handleAttributeChange(filterRuleIndex, value)}*/}
-                        {/*onOperatorChange={(filterRuleIndex, value) =>*/}
-                            {/*this.props.handleOperatorChange(filterRuleIndex, value)}*/}
-                        {/*onAttributeOrValueChange={(filterRuleIndex, value) =>*/}
-                            {/*this.props.handleAttributeOrValueChange(filterRuleIndex, value)}*/}
-                        {/*handleRemoveFilterRule={() => this.props.handleRemoveFilterRule(index)}*/}
-                    {/*/>);*/}
+    updateFilterRule(index, filterRule) {
+        const filterRules = this.props.ruleComponents.filterRules; // TODO 'ruleComponents' should be a prop
+        filterRules[index] = filterRule;
+        this.updateRuleComponents(filterRules, this.props.ruleComponents.ruleLogic);
+    }
 
-        // Display rule logic, when at least one filter rule is present
-        if (this.props.businessRuleProperties.ruleComponents.filterRules.length > 0) {
-            filterRulesTableToDisplay =
-                (<div style={{ width: '100%', overflowX: 'auto' }}>
+    deleteFilterRule(index) {
+        let filterRules = this.props.ruleComponents.filterRules;
+        filterRules.splice(index, 1);
+        this.updateRuleComponents(filterRules, this.props.ruleComponents.ruleLogic);
+    }
+
+    updateRuleLogic(ruleLogic) {
+        this.updateRuleComponents(this.props.ruleComponents.filterRules, ruleLogic);
+    }
+
+    updateRuleComponents(filterRules, ruleLogic) { // Updates Filter component
+        const ruleComponents = this.props.ruleComponents;
+        ruleComponents.filterRules = filterRules;
+        ruleComponents.ruleLogic = ruleLogic;
+        this.props.onUpdate(ruleComponents);
+    }
+
+    displayFilterRulesTable() {
+        if (this.props.ruleComponents.filterRules.length > 0) {
+            let exposedInputStreamFields = null; // To display selectable field options to each filter rule
+
+            // If an input rule template has been selected
+            if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
+                exposedInputStreamFields = this.props.getFields( // TODO i stopped here. this's not found
+                    this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition);
+            }
+
+            return (
+                <div style={{ width: '100%', overflowX: 'auto' }}>
                     <div style={{ width: '100%', minWidth: 560 }}>
                         <div style={{ float: 'left', width: '10%', height: 30 }}>
-                            <Typography/>
+                            <Typography />
                         </div>
                         <div style={{ float: 'left', width: '30%', height: 30 }}>
-                            <Typography type="caption">Attribute</Typography>
+                            <Typography type="caption">
+                                Attribute
+                            </Typography>
                         </div>
                         <div style={{ float: 'left', width: '20%', height: 30 }}>
-                            <center><Typography type="caption">Operator</Typography></center>
+                            <center>
+                                <Typography type="caption">
+                                    Operator
+                                </Typography>
+                            </center>
                         </div>
                         <div style={{ float: 'left', width: '30%', height: 30 }}>
-                            <Typography type="caption">Value/Attribute</Typography>
+                            <Typography type="caption">
+                                Value/Attribute
+                            </Typography>
                         </div>
                         <div style={{ float: 'left', width: '10%', height: 30 }}>
-                            <Typography/>
+                            <Typography />
                         </div>
-                        {filterRulesToDisplay}
+                        {this.props.ruleComponents[BusinessRulesConstants.FILTER_RULES_KEY].map((filterRule, index) =>
+                            (<FilterRule
+                                key={index}
+                                mode={this.props.formMode} // TODO refactor to 'disable', conditionally
+                                filterRuleIndex={index}
+                                filterRule={filterRule}
+                                exposedStreamDefinition={
+                                    this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition}
+                                getFieldNames={streamDefinition => this.props.getFieldNames(streamDefinition)}
+                                exposedInputStreamFields={exposedInputStreamFields}
+                                onUpdate={value => this.updateFilterRule(index, value)}
+                                onRemove={() => this.deleteFilterRule(index)}
+                            />))}
                     </div>
                 </div>);
+        }
+        return null;
+    }
 
-            ruleLogicToDisplay =
-                <Property
+    displayAddFilterButton() {
+        if (this.props.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW) {
+            return (
+                <IconButton
+                    color="primary"
+                    style={this.props.style.addFilterRuleButton}
+                    aria-label="Remove"
+                    onClick={() => this.addFilterRule()}
+                >
+                    <AddIcon />
+                </IconButton>);
+        }
+        return null;
+    }
+
+    displayRuleLogic() {
+        if (this.props.ruleComponents.filterRules.length > 0) {
+            return (
+                <TextField
+                    id="ruleLogic"
                     name="ruleLogic"
-                    fieldName="Rule Logic"
-                    description={
+                    label="Rule Logic"
+                    helperText={
                         (!this.props.ruleLogicWarn) ?
                             BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT :
                             (BusinessRulesMessages.RULE_LOGIC_WARNING +
-                                '. ' + BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT)
-                    }
-                    value={this.props.businessRuleProperties.ruleComponents.ruleLogic[0]}
-                    onValueChange={(e) => this.props.handleRuleLogicChange(e)}
-                    errorState={this.props.ruleLogicWarn}
-                    disabledState={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                                '. ' + BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT)}
+                    value={this.props.ruleComponents.ruleLogic}
+                    onChange={e => this.updateRuleLogic(e.target.value)}
+                    error={this.props.ruleLogicWarn} // TODO might improve this
+                    disabled={this.props.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
                     fullWidth
-                />
+                />);
         }
+        return null;
+    }
 
-        // View add filter button only in 'create' and 'edit' modes
-        let addFilterButton;
-        if (this.props.mode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW) {
-            addFilterButton =
-                <IconButton color="primary" style={this.props.style.addFilterRuleButton} aria-label="Remove"
-                            onClick={() => this.props.addFilterRule()}>
-                    <AddIcon/>
-                </IconButton>
+    displayExpandButton() {
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
+            return (
+                <IconButton onClick={() => this.props.toggleExpansion()}>
+                    <ExpandMoreIcon />
+                </IconButton>);
         }
+        return null;
+    }
 
+    render() {
         return (
             <div>
                 <AppBar position="static" color="default">
                     <Toolbar>
                         <Typography type="subheading">Filters</Typography>
-                        {(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) ?
-                            (<IconButton
-                                onClick={() => this.props.toggleExpansion()}
-                            >
-                                <ExpandMoreIcon/>
-                            </IconButton>) : ('')}
+                        {this.displayExpandButton()}
                     </Toolbar>
                 </AppBar>
                 <Paper>
                     <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
                         <div style={this.props.style.paperContainer}>
                             <br />
-                            {filterRulesTableToDisplay}
+                            {this.displayFilterRulesTable()}
                             <br />
-                            {addFilterButton}
+                            {this.displayAddFilterButton()}
                             <br />
                             <br />
-                            {ruleLogicToDisplay}
+                            {this.displayRuleLogic()}
                             <br />
                         </div>
                     </Collapse>
                 </Paper>
-            </div>
-        )
+            </div>);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // TODO OLD WORKING CODE BELOW
-    // render() {
-    //     let filterRulesToDisplay;
-    //     let filterRulesTableToDisplay;
-    //     let ruleLogicToDisplay;
-    //     let exposedInputStreamFields = null; // To display selectable field options to each filter rule
-    //
-    //     // If an input rule template has been selected
-    //     if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
-    //         exposedInputStreamFields = this.props.getFields(
-    //             this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition);
-    //     }
-    //
-    //     filterRulesToDisplay =
-    //         this.props.businessRuleProperties
-    //             [BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS]
-    //             [BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES]
-    //             .map((filterRule, index) =>
-    //                 <FilterRule
-    //                     key={index}
-    //                     mode={this.props.mode}
-    //                     filterRuleIndex={index}
-    //                     filterRule={filterRule}
-    //                     selectedInputRuleTemplate={this.props.selectedInputRuleTemplate}
-    //                     getFields={(streamDefinition) => this.props.getFields(streamDefinition)}
-    //                     getFieldNames={(streamDefinition) => this.props.getFieldNames(streamDefinition)}
-    //                     exposedInputStreamFields={exposedInputStreamFields}
-    //                     onAttributeChange={(filterRuleIndex, value) =>
-    //                         this.props.handleAttributeChange(filterRuleIndex, value)}
-    //                     onOperatorChange={(filterRuleIndex, value) =>
-    //                         this.props.handleOperatorChange(filterRuleIndex, value)}
-    //                     onAttributeOrValueChange={(filterRuleIndex, value) =>
-    //                         this.props.handleAttributeOrValueChange(filterRuleIndex, value)}
-    //                     handleRemoveFilterRule={() => this.props.handleRemoveFilterRule(index)}
-    //                 />);
-    //
-    //     // Display rule logic, when at least one filter rule is present
-    //     if (this.props.businessRuleProperties.ruleComponents.filterRules.length > 0) {
-    //         filterRulesTableToDisplay =
-    //             (<div style={{ width: '100%', overflowX: 'auto' }}>
-    //                 <div style={{ width: '100%', minWidth: 560 }}>
-    //                     <div style={{ float: 'left', width: '10%', height: 30 }}>
-    //                         <Typography/>
-    //                     </div>
-    //                     <div style={{ float: 'left', width: '30%', height: 30 }}>
-    //                         <Typography type="caption">Attribute</Typography>
-    //                     </div>
-    //                     <div style={{ float: 'left', width: '20%', height: 30 }}>
-    //                         <center><Typography type="caption">Operator</Typography></center>
-    //                     </div>
-    //                     <div style={{ float: 'left', width: '30%', height: 30 }}>
-    //                         <Typography type="caption">Value/Attribute</Typography>
-    //                     </div>
-    //                     <div style={{ float: 'left', width: '10%', height: 30 }}>
-    //                         <Typography/>
-    //                     </div>
-    //                     {filterRulesToDisplay}
-    //                 </div>
-    //             </div>);
-    //
-    //         ruleLogicToDisplay =
-    //             <Property
-    //                 name="ruleLogic"
-    //                 fieldName="Rule Logic"
-    //                 description={
-    //                     (!this.props.ruleLogicWarn) ?
-    //                         BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT :
-    //                         (BusinessRulesMessages.RULE_LOGIC_WARNING +
-    //                             '. ' + BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT)
-    //                 }
-    //                 value={this.props.businessRuleProperties.ruleComponents.ruleLogic[0]}
-    //                 onValueChange={(e) => this.props.handleRuleLogicChange(e)}
-    //                 errorState={this.props.ruleLogicWarn}
-    //                 disabledState={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
-    //                 fullWidth
-    //             />
-    //     }
-    //
-    //     // View add filter button only in 'create' and 'edit' modes
-    //     let addFilterButton;
-    //     if (this.props.mode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW) {
-    //         addFilterButton =
-    //             <IconButton color="primary" style={this.props.style.addFilterRuleButton} aria-label="Remove"
-    //                         onClick={() => this.props.addFilterRule()}>
-    //                 <AddIcon/>
-    //             </IconButton>
-    //     }
-    //
-    //     return (
-    //         <div>
-    //             <AppBar position="static" color="default">
-    //                 <Toolbar>
-    //                     <Typography type="subheading">Filters</Typography>
-    //                     {(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) ?
-    //                         (<IconButton
-    //                             onClick={() => this.props.toggleExpansion()}
-    //                         >
-    //                             <ExpandMoreIcon/>
-    //                         </IconButton>) : ('')}
-    //                 </Toolbar>
-    //             </AppBar>
-    //             <Paper>
-    //                 <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
-    //                     <div style={this.props.style.paperContainer}>
-    //                         <br />
-    //                         {filterRulesTableToDisplay}
-    //                         <br />
-    //                         {addFilterButton}
-    //                         <br />
-    //                         <br />
-    //                         {ruleLogicToDisplay}
-    //                         <br />
-    //                     </div>
-    //                 </Collapse>
-    //             </Paper>
-    //         </div>
-    //     )
-    // }
 }
 
 export default FilterComponent;

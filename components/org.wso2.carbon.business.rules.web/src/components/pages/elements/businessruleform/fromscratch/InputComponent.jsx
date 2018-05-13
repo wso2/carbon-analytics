@@ -78,7 +78,7 @@ class InputComponent extends React.Component {
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
             // To display input data properties
             let inputConfigurations = this.props.getPropertyComponents(
-                BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT, this.props.mode);
+                BusinessRulesConstants.INPUT_DATA_KEY, this.props.mode);
 
             inputDataPropertiesToDisplay =
                 (<div>

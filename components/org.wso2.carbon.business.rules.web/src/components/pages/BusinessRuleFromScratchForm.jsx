@@ -306,11 +306,11 @@ export default class BusinessRuleFromScratchForm extends Component {
         let unArrangedPropertiesFromTemplate = []; // To store values that are going to be used
 
         // Get properties from the rule templates
-        if (propertyType === BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT) {
+        if (propertyType === BusinessRulesConstants.INPUT_DATA_KEY) {
             if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedInputRuleTemplate)) {
                 unArrangedPropertiesFromTemplate = this.state.selectedInputRuleTemplate.properties;
             }
-        } else if (propertyType === BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT) {
+        } else if (propertyType === BusinessRulesConstants.OUTPUT_DATA_KEY) {
             if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedOutputRuleTemplate)) {
                 unArrangedPropertiesFromTemplate = this.state.selectedOutputRuleTemplate.properties;
             }
@@ -358,6 +358,7 @@ export default class BusinessRuleFromScratchForm extends Component {
         const regExp = /\(([^)]+)\)/;
         const matches = regExp.exec(streamDefinition);
         const fields = {};
+        // TODO null check for matches
         // Keep the field name and type, as each element in an array
         for (const field of matches[1].split(',')) {
             // Key: name, Value: type
@@ -384,6 +385,12 @@ export default class BusinessRuleFromScratchForm extends Component {
         }
     }
 
+    updateRuleComponents(ruleComponents) {
+        const state = this.state;
+        state.businessRuleProperties.ruleComponents = ruleComponents;
+        this.setState(state);
+    }
+
     // Filter Rule related functions todo organize
     updateFilterRule(filterRuleIndex, filterRuleArray) {
         const state = this.state;
@@ -399,9 +406,9 @@ export default class BusinessRuleFromScratchForm extends Component {
      */
     updateFilterRuleAttribute(filterRuleIndex, value) {
         // TODO refactor to object[variable]
-        const ruleComponentType = BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS;
+        const ruleComponentType = BusinessRulesConstants.RULE_COMPONENTS_KEY;
         const ruleComponentFilterRuleType =
-            BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES;
+            BusinessRulesConstants.FILTER_RULES_KEY;
 
         const state = this.state;
         state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex] =
@@ -418,9 +425,9 @@ export default class BusinessRuleFromScratchForm extends Component {
      * @param {string} value                Value of the Operator
      */
     updateFilterRuleOperator(filterRuleIndex, value) {
-        const ruleComponentType = BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS;
+        const ruleComponentType = BusinessRulesConstants.RULE_COMPONENTS_KEY;
         const ruleComponentFilterRuleType =
-            BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES;
+            BusinessRulesConstants.FILTER_RULES_KEY;
 
         const state = this.state;
         state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex] =
@@ -436,9 +443,9 @@ export default class BusinessRuleFromScratchForm extends Component {
      * @param {string} value                Value of the Attribute Or Value
      */
     updateFilterRuleAttributeOrValue(filterRuleIndex, value) {
-        const ruleComponentType = BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS;
+        const ruleComponentType = BusinessRulesConstants.RULE_COMPONENTS_KEY;
         const ruleComponentFilterRuleType =
-            BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES;
+            BusinessRulesConstants.FILTER_RULES_KEY;
 
         const state = this.state;
         state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex] =
@@ -619,7 +626,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                     if (Object.prototype.hasOwnProperty.call(state.selectedInputRuleTemplate.properties,
                         propertyKey)) {
                         state.businessRuleProperties[BusinessRulesConstants
-                            .BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT][propertyKey] =
+                            .INPUT_DATA_KEY][propertyKey] =
                             state.selectedInputRuleTemplate.properties[propertyKey].defaultValue;
                     }
                 }
@@ -652,7 +659,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                     if (Object.prototype.hasOwnProperty.call(state.selectedOutputRuleTemplate.properties,
                         propertyKey)) {
                         state.businessRuleProperties[BusinessRulesConstants
-                            .BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT][propertyKey] =
+                            .OUTPUT_DATA_KEY][propertyKey] =
                             state.selectedOutputRuleTemplate.properties[propertyKey.toString()].defaultValue;
                     }
                 }
@@ -733,8 +740,8 @@ export default class BusinessRuleFromScratchForm extends Component {
 
         for (const propertyType in businessRuleProperties) {
             if (Object.prototype.hasOwnProperty.call(businessRuleProperties, propertyType)) {
-                if (propertyType === BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT ||
-                    propertyType === BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT) {
+                if (propertyType === BusinessRulesConstants.INPUT_DATA_KEY ||
+                    propertyType === BusinessRulesConstants.OUTPUT_DATA_KEY) {
                     for (const propertyKey in businessRuleProperties[propertyType]) {
                         if (Object.prototype.hasOwnProperty.call(businessRuleProperties[propertyType], propertyKey)) {
                             errorStates[propertyType][propertyKey] = false;
@@ -803,15 +810,15 @@ export default class BusinessRuleFromScratchForm extends Component {
             if (Object.prototype.hasOwnProperty.call(this.state.businessRuleProperties, propertyType)) {
                 // Validation happens only for properties of type 'input' & 'output', not for 'ruleComponent'
                 // TODO the above statement seems no!
-                if (propertyType === BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT ||
-                    propertyType === BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT) {
+                if (propertyType === BusinessRulesConstants.INPUT_DATA_KEY ||
+                    propertyType === BusinessRulesConstants.OUTPUT_DATA_KEY) {
                     // If any 'inputData' or 'outputData' property type component is completely empty
                     if (BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleProperties[propertyType])) {
                         throw new FormSubmissionError(
                             fieldErrorStates,
                             'Invalid ' +
                             (propertyType ===
-                            BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT ?
+                            BusinessRulesConstants.INPUT_DATA_KEY ?
                                 'input' : 'output') + ' properties found');
                         // TODO maybe improve by highlight 'INPUT COMPONENT' as red!
                     } else {
@@ -821,7 +828,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                             if (Object.prototype.hasOwnProperty.call(
                                 this.state.businessRuleProperties[propertyType], propertyKey)) {
                                 if (propertyType !==
-                                    BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS) {
+                                    BusinessRulesConstants.RULE_COMPONENTS_KEY) {
                                     if (this.state.businessRuleProperties[propertyType][propertyKey] === '') {
                                         fieldErrorStates.properties[propertyType][propertyKey] = true;
                                         isAnyPropertyEmpty = true;
@@ -837,7 +844,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                         }
                     }
                 } else if (propertyType ===
-                    BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_RULE_PROPERTY_TYPE_OUTPUT_MAPPINGS) {
+                    BusinessRulesConstants.OUTPUT_MAPPINGS_KEY) {
                     if (BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleProperties[propertyType])) {
                         throw new FormSubmissionError(fieldErrorStates, 'Please provide valid Output Mappings');
                         // TODO more precise should be introduced
@@ -1014,57 +1021,19 @@ export default class BusinessRuleFromScratchForm extends Component {
                                     />
                                     <br />
                                     <FilterComponent
+                                        isExpanded={this.state.isFilterComponentExpanded}
+                                        toggleExpansion={() => this.toggleFilterComponentExpansion()}
                                         filterRules={this.state.businessRuleProperties.ruleComponents.filterRules}
-                                        onFilterRuleChange={
-                                            (index, filterRule) => this.updateFilterRule(index, filterRule)}
-                                        onRuleLogicChange={value => this.updateRuleLogic(value)}
-
-
-
-
-
-
-                                        mode={this.state.formMode}
+                                        onUpdate={ruleComponents => this.updateRuleComponents(ruleComponents)} // TODO
+                                        formMode={this.state.formMode}
                                         selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
                                         getFields={streamDefinition => this.getFieldNamesAndTypes(streamDefinition)}
                                         getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
-                                        businessRuleProperties={this.state.businessRuleProperties}
-                                        handleAttributeChange={(filterRuleIndex, value) =>
-                                            this.updateFilterRuleAttribute(filterRuleIndex, value)}
-                                        handleOperatorChange={(filterRuleIndex, value) =>
-                                            this.updateFilterRuleOperator(filterRuleIndex, value)}
-                                        handleAttributeOrValueChange={(filterRuleIndex, value) =>
-                                            this.updateFilterRuleAttributeOrValue(filterRuleIndex, value)}
-                                        handleRemoveFilterRule={index => this.removeFilterRule(index)}
-                                        handleRuleLogicChange={value => this.updateRuleLogic(value)}
-                                        addFilterRule={() => this.addFilterRule()}
-                                        onFilterRuleAddition={() => this.updateDefaultRuleLogic()}
-                                        ruleLogicWarn={this.getRuleLogicWarnStatus()}
-                                        isExpanded={this.state.isFilterComponentExpanded}
-                                        toggleExpansion={() => this.toggleFilterComponentExpansion()}
+                                        // TODO look into the above one
+                                        ruleComponents={this.state.businessRuleProperties.ruleComponents}
+                                        ruleLogicWarn={this.getRuleLogicWarnStatus()} // TODO might improve
                                         style={styles}
                                     />
-                                    {/*<FilterComponent*/}
-                                        {/*mode={this.state.formMode}*/}
-                                        {/*selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}*/}
-                                        {/*getFields={streamDefinition => this.getFieldNamesAndTypes(streamDefinition)}*/}
-                                        {/*getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}*/}
-                                        {/*businessRuleProperties={this.state.businessRuleProperties}*/}
-                                        {/*handleAttributeChange={(filterRuleIndex, value) =>*/}
-                                            {/*this.updateFilterRuleAttribute(filterRuleIndex, value)}*/}
-                                        {/*handleOperatorChange={(filterRuleIndex, value) =>*/}
-                                            {/*this.updateFilterRuleOperator(filterRuleIndex, value)}*/}
-                                        {/*handleAttributeOrValueChange={(filterRuleIndex, value) =>*/}
-                                            {/*this.updateFilterRuleAttributeOrValue(filterRuleIndex, value)}*/}
-                                        {/*handleRemoveFilterRule={index => this.removeFilterRule(index)}*/}
-                                        {/*handleRuleLogicChange={value => this.updateRuleLogic(value)}*/}
-                                        {/*addFilterRule={() => this.addFilterRule()}*/}
-                                        {/*onFilterRuleAddition={() => this.updateDefaultRuleLogic()}*/}
-                                        {/*ruleLogicWarn={this.getRuleLogicWarnStatus()}*/}
-                                        {/*isExpanded={this.state.isFilterComponentExpanded}*/}
-                                        {/*toggleExpansion={() => this.toggleFilterComponentExpansion()}*/}
-                                        {/*style={styles}*/}
-                                    {/*/>*/}
                                     <br />
                                     <OutputComponent
                                         mode={this.state.formMode}

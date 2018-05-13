@@ -213,7 +213,7 @@ class OutputComponent extends React.Component {
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) {
             // To display output data properties
             let outputDataConfigurations = this.props.getPropertyComponents(
-                BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT,
+                BusinessRulesConstants.OUTPUT_DATA_KEY,
                 this.props.mode);
 
             outputDataPropertiesToDisplay =
