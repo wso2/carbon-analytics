@@ -899,19 +899,19 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().windowFilterProjectionQueryList,
-                function(windowFilterProjectionQuery){
-                var queryId = windowFilterProjectionQuery.getId();
-                var queryName = "Query";
-                var querySubType = windowFilterProjectionQuery.getQueryInput().getType();
+                function (windowFilterProjectionQuery) {
+                    var queryId = windowFilterProjectionQuery.getId();
+                    var queryName = "Query";
+                    var querySubType = windowFilterProjectionQuery.getQueryInput().getType();
 
-                var queryType;
-                if (querySubType === 'projection') {
-                    queryType = constants.PROJECTION;
-                } else if (querySubType === 'filter') {
-                    queryType = constants.FILTER;
-                } else if (querySubType === 'window') {
-                    queryType = constants.WINDOW_QUERY;
-                }
+                    var queryType;
+                    if (querySubType === 'projection') {
+                        queryType = constants.PROJECTION;
+                    } else if (querySubType === 'filter') {
+                        queryType = constants.FILTER;
+                    } else if (querySubType === 'window') {
+                        queryType = constants.WINDOW_QUERY;
+                    }
 
                     var array = queryId.split("-");
                     var lastArrayEntry = parseInt(array[array.length - 1]);

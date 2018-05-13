@@ -113,6 +113,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     canvasContainer.removeClass('show-div').addClass('hide-div');
                     previewContainer.removeClass('show-div').addClass('hide-div');
+                    designContainer.removeClass('show-div').addClass('hide-div');
                     sourceContainer.removeClass('source-view-disabled').addClass('source-view-enabled');
                     tabContentContainer.removeClass('tab-content-default');
 
@@ -195,108 +196,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         "\"length\":4" +
                         "}" +
                         "}";
-                    // var JSONString = "{" +
-                    //     "  \"siddhiAppConfig\": {" +
-                    //     "    \"finalElementCount\": 4," +
-                    //     "    \"appName\": \"\"," +
-                    //     "    \"appDescription\": \"\"," +
-                    //     "    \"queryList\": []," +
-                    //     "    \"windowFilterProjectionQueryList\": []," +
-                    //     "    \"joinQueryList\": []," +
-                    //     "    \"patternQueryList\": []," +
-                    //     "    \"sequenceQueryList\": []," +
-                    //     "    \"sinkList\": []," +
-                    //     "    \"sourceList\": []," +
-                    //     "    \"streamList\": [" +
-                    //     "      {" +
-                    //     "        \"name\": \"InStream\"," +
-                    //     "        \"isInnerStream\": false," +
-                    //     "        \"attributeList\": [" +
-                    //     "          {" +
-                    //     "            \"name\": \"name\"," +
-                    //     "            \"type\": \"string\"" +
-                    //     "          }," +
-                    //     "          {" +
-                    //     "            \"name\": \"age\"," +
-                    //     "            \"type\": \"int\"" +
-                    //     "          }" +
-                    //     "        ]," +
-                    //     "        \"annotationList\": []," +
-                    //     "        \"id\": \"InStream\"" +
-                    //     "      }" +
-                    //     "    ]," +
-                    //     "    \"tableList\": [" +
-                    //     "      {" +
-                    //     "        \"name\": \"InTable\"," +
-                    //     "        \"attributeList\": [" +
-                    //     "          {" +
-                    //     "            \"name\": \"name\"," +
-                    //     "            \"type\": \"string\"" +
-                    //     "          }," +
-                    //     "          {" +
-                    //     "            \"name\": \"age\"," +
-                    //     "            \"type\": \"int\"" +
-                    //     "          }" +
-                    //     "        ]," +
-                    //     "        \"annotationList\": []," +
-                    //     "        \"id\": \"InTable\"" +
-                    //     "      }" +
-                    //     "    ]," +
-                    //     "    \"triggerList\": [" +
-                    //     "      {" +
-                    //     "        \"name\": \"InTrigger\"," +
-                    //     "        \"id\": \"InTrigger\"" +
-                    //     "      }" +
-                    //     "    ]," +
-                    //     "    \"windowList\": []," +
-                    //     "    \"aggregationList\": [" +
-                    //     "      {" +
-                    //     "        \"name\": \"InAggregation\"," +
-                    //     "        \"from\": \"InStream\"," +
-                    //     "        \"select\": {" +
-                    //     "          \"value\": [" +
-                    //     "            {" +
-                    //     "              \"expression\": \"name\"," +
-                    //     "              \"as\": \"name\"" +
-                    //     "            }," +
-                    //     "            {" +
-                    //     "              \"expression\": \"avg(age)\"," +
-                    //     "              \"as\": \"avgAge\"" +
-                    //     "            }" +
-                    //     "          ]," +
-                    //     "          \"type\": \"user_defined\"" +
-                    //     "        }," +
-                    //     "        \"groupBy\": [" +
-                    //     "          \"name\"" +
-                    //     "        ]," +
-                    //     "        \"aggregateByAttribute\": \"name\"," +
-                    //     "        \"aggregateByTimePeriod\": {" +
-                    //     "          \"minValue\": \"seconds\"," +
-                    //     "          \"maxValue\": \"years\"" +
-                    //     "        }," +
-                    //     "        \"annotationList\": [" +
-                    //     "          {" +
-                    //     "            \"value\": [" +
-                    //     "              {" +
-                    //     "                \"value\": \"AGG_TIMESTAMP\"," +
-                    //     "                \"isString\": true" +
-                    //     "              }," +
-                    //     "              {" +
-                    //     "                \"value\": \"name\"," +
-                    //     "                \"isString\": true" +
-                    //     "              }" +
-                    //     "            ]," +
-                    //     "            \"name\": \"PrimaryKey\"," +
-                    //     "            \"type\": \"LIST\"" +
-                    //     "          }" +
-                    //     "        ]," +
-                    //     "        \"id\": \"InAggregation\"" +
-                    //     "      }" +
-                    //     "    ]" +
-                    //     "  }," +
-                    //     "  \"edgeList\": []" +
-                    //     "}";
-                    //tODO: check the query icon in code to design
 
                     this.JSONObject = JSON.parse(JSONString);
                     console.log(this.JSONObject);
@@ -315,16 +214,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
                                 "<span class=\"toggle-button-text\">Source View</span>");
                             designView.renderDesignGrid(self.JSONObject);
-                            console.log(JSON.stringify(designView.getConfigurationData()));
+                            //console.log(JSON.stringify(designView.getConfigurationData()));
                             self.JSONObject = JSON.parse(JSON.stringify(designView.getConfigurationData()));
                         } else if (designContainer.is(':visible')) {
                             self.JSONObject = JSON.parse(JSON.stringify(designView.getConfigurationData()));
                             designContainer.hide();
+                            designView.emptyDesignViewGridContainer();
                             sourceContainer.show();
                             self._sourceView.editorResize();
                             toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
                                 "<span class=\"toggle-button-text\">Design View</span>");
-                            console.log(JSON.stringify(designView.getConfigurationData()));
+                            //console.log(JSON.stringify(designView.getConfigurationData()));
                         }
                         // NOTE - This trigger should be always handled after the 'if' condition
                         self.trigger("view-switch");
