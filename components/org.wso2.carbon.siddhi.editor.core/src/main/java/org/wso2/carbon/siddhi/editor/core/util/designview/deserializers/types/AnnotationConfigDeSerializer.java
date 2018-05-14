@@ -16,17 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.constants.query;
+package org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+
+import java.lang.reflect.Type;
 
 /**
- * Type of a Query's Input
+ * De-serializer for AnnotationConfig class
  */
-public enum QueryInputType {
-    WINDOW_FILTER_PROJECTION,
-    WINDOW,
-    FILTER,
-    PROJECTION,
-    JOIN,
-    PATTERN,
-    SEQUENCE
+public class AnnotationConfigDeSerializer implements JsonDeserializer {
+    private static final String TYPE = "type";
+
+    @Override
+    public Object deserialize(
+            JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
+        return null; // TODO: 5/14/18 Implement
+    }
 }
