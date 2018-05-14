@@ -429,7 +429,7 @@ public class PatternSequenceConfigGenerator {
 //        while (matcher.find()) {
 //            String eventReference = generateEventReference(Integer.parseInt(matcher.group(1)));
 //            // Update relevant condition, for each index in eventReferenceAbsentConditionIndexes
-//            conditions.get(eventReferenceAbsentConditionIndexes.get(placeholderCounter++)).setId(eventReference);
+//            conditions.get(eventReferenceAbsentConditionIndexes.get(placeholderCounter++)).setConditionId(eventReference);
 //            matcher.appendReplacement(replacedLogic, eventReference);
 //        }
 //        matcher.appendTail(replacedLogic);
