@@ -102,6 +102,12 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/patternQuery.png"
                 },
                 {
+                    id : "sequence-query",
+                    className : "sequence-query",
+                    title : "Sequence Query",
+                    icon : "/editor/images/sequenceQuery.png"
+                },
+                {
                     id : "partition",
                     className : "partition",
                     title : "Partition",

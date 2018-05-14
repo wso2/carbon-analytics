@@ -33,6 +33,7 @@ define(['require', 'elementUtils', 'lodash'],
             this.aggregationList = [];
             this.windowFilterProjectionQueryList = [];
             this.patternQueryList = [];
+            this.sequenceQueryList = [];
             this.joinQueryList = [];
             this.partitionList = [];
             // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
@@ -66,6 +67,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.addPatternQuery = function (patternQuery) {
             this.patternQueryList.push(patternQuery);
+        };
+
+        AppData.prototype.addSequenceQuery = function (sequenceQuery) {
+            this.sequenceQueryList.push(sequenceQuery);
         };
 
         AppData.prototype.addJoinQuery = function (joinQuery) {
@@ -102,6 +107,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.removePatternQuery = function (patternQueryId) {
             ElementUtils.prototype.removeElement(this.patternQueryList, patternQueryId);
+        };
+
+        AppData.prototype.removeSequenceQuery = function (sequenceQueryId) {
+            ElementUtils.prototype.removeElement(this.sequenceQueryList, sequenceQueryId);
         };
 
         AppData.prototype.removeJoinQuery = function (joinQueryId) {
@@ -142,6 +151,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.getPatternQuery = function (patternQueryId) {
             return ElementUtils.prototype.getElement(this.patternQueryList, patternQueryId);
+        };
+
+        AppData.prototype.getSequenceQuery = function (sequenceQueryId) {
+            return ElementUtils.prototype.getElement(this.sequenceQueryList, sequenceQueryId);
         };
 
         AppData.prototype.getJoinQuery = function (joinQueryId) {

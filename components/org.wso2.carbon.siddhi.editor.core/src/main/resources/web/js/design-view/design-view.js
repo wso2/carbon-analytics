@@ -21,13 +21,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'patternQueryInput',
         'patternQueryInputCounting', 'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd',
         'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
+        'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindow, PatternQueryInput, PatternQueryInputCounting, PatternQueryInputAndOr,
               PatternQueryInputNotFor, PatternQueryInputNotAnd, Edge, QuerySelect, QueryOrderByValue, QueryOutput,
               QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute,
-              JoinQueryInput, JoinQuerySource) {
+              JoinQueryInput, JoinQuerySource, PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition) {
 
         /**
          * @class DesignView
@@ -177,6 +178,20 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
                 patternQueryObject.setId(newIdBeginningPhrase + patternQueryObject.getId());
                 appData.addPatternQuery(patternQueryObject);
+            });
+            _.forEach(configurationData.siddhiAppConfig.sequenceQueryList, function(sequenceQuery){
+                var sequenceQueryObject = new Query(sequenceQuery);
+                var sequenceQueryInput = new PatternOrSequenceQueryInput(sequenceQuery.queryInput);
+                _.forEach(sequenceQuery.queryInput.conditionList, function(condition){
+                    var sequenceQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                    sequenceQueryInput.addCondition(sequenceQueryConditionObject);
+                });
+                sequenceQueryObject.setQueryInput(sequenceQueryInput);
+                setSelectForQuery(sequenceQueryObject, sequenceQuery.select);
+                setOrderByForQuery(sequenceQueryObject, sequenceQuery.orderBy);
+                setQueryOutputForQuery(sequenceQueryObject, sequenceQuery.queryOutput);
+                sequenceQueryObject.setId(newIdBeginningPhrase + sequenceQueryObject.getId());
+                appData.addSequenceQuery(sequenceQueryObject);
             });
             _.forEach(configurationData.siddhiAppConfig.windowFilterProjectionQueryList,
                 function(windowFilterProjectionQuery){

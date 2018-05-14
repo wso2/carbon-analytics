@@ -646,6 +646,84 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         };
 
         /**
+         * @function drop the sequenceQuery element on the canvas
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
+         * @param sequenceQueryName name of the sequenceQuery
+         */
+        DropElements.prototype.dropSequenceQuery = function (newAgent, i, top, left, isCodeToDesignMode,
+                                                             sequenceQueryName) {
+
+            /*
+             A text node division will be appended to the newAgent element so that the element name can be changed in
+             the text node and doesn't need to be appended to the newAgent Element every time the user changes it
+            */
+            var self= this;
+            var node = $('<div>' + sequenceQueryName + '</div>');
+            newAgent.append(node);
+            node.attr('id', i+"-nodeInitial");
+            node.attr('class', "sequenceQueryNameNode");
+
+            if(!isCodeToDesignMode) {
+                //add the new join query to the join query array
+                var sequenceQueryOptions = {};
+                _.set(sequenceQueryOptions, 'id', i);
+                var sequenceQuery = new Query(sequenceQueryOptions);
+                self.configurationData.getSiddhiAppConfig().addSequenceQuery(sequenceQuery);
+            }
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the SequenceQuery Element will
+             be displayed as an alert message
+            */
+            var settingsIconId = ""+ i + "-dropSequenceQuerySettingsId";
+            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+                'class="element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
+                'class="element-close-icon collapse">').append(prop);
+
+            var settingsIconElement = $('#'+settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForSequenceQueries(this);
+            });
+
+            var finalElement = newAgent;
+
+            /*
+             connection --> The connection anchor point is appended to the element
+             */
+            var connection1 = $('<div class="connectorInSequenceQuery">').attr('id', i+"-in" ).addClass('connection');
+            var connection2 = $('<div class="connectorOutSequenceQuery">').attr('id', i+"-out" ).addClass('connection');
+
+
+            finalElement.append(connection1);
+            finalElement.append(connection2);
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
+            });
+
+            self.jsPlumbInstance.makeTarget(connection1, {
+                anchor: 'Left'
+            });
+
+            self.jsPlumbInstance.makeSource(connection2, {
+                anchor: 'Right',
+                maxConnections:1
+            });
+        };
+
+        /**
          * @function draw the join query element on the canvas
          * @param newAgent new element
          * @param i id of the element

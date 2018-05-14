@@ -17,9 +17,10 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableForm', 'windowForm', 'aggregationForm',
-        'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm'],
+        'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
+        'sequenceQueryForm'],
     function (require, log, $, _, FormUtils, StreamForm, TableForm, WindowForm, AggregationForm, TriggerForm,
-              WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm) {
+              WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -40,6 +41,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             JOIN : 'joinQueryDrop',
             WINDOW_QUERY : 'windowQueryDrop',
             PATTERN : 'patternQueryDrop',
+            SEQUENCE : 'sequenceQueryDrop',
             PARTITION :'partitionDrop'
         };
 
@@ -342,6 +344,23 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             patternQueryForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
+        /**
+         * @function generate form for state machine
+         * @param element selected element(query)
+         */
+        FormBuilder.prototype.GeneratePropertiesFormForSequenceQueries = function (element) {
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            var sequenceQueryForm = new SequenceQueryForm(formOptions);
+            sequenceQueryForm.generatePropertiesForm(element, formConsole, formContainer);
+        };
+        
         /**
          * @function generate form for Join Query
          * @param element selected element(query)

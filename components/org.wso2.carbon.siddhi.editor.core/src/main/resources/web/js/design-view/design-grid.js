@@ -32,6 +32,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             JOIN : 'joinQueryDrop',
             WINDOW_QUERY : 'windowQueryDrop',
             PATTERN : 'patternQueryDrop',
+            SEQUENCE : 'sequenceQueryDrop',
             PARTITION :'partitionDrop'
         };
 
@@ -106,7 +107,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.canvas.droppable
                 ({
                     accept: '.stream, .table, .window, .trigger, .aggregation, .projection-query, .filter-query, ' +
-                    '.join-query, .window-query, .pattern-query, .partition',
+                    '.join-query, .window-query, .pattern-query, .sequence-query, .partition',
                     containment: 'grid-container',
 
                     /**
@@ -178,6 +179,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         // If the dropped Element is a Pattern Query then->
                         else if($(droppedElement).hasClass('pattern-query')) {
                             self.handlePatternQuery(mouseTop, mouseLeft, false, "Pattern");
+                        }
+
+                        // If the dropped Element is a Sequence Query then->
+                        else if($(droppedElement).hasClass('sequence-query')) {
+                            self.handleSequenceQuery(mouseTop, mouseLeft, false, "Sequence");
                         }
 
                         // If the dropped Element is a Partition then->
@@ -898,6 +904,17 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
             });
 
+            _.forEach(self.configurationData.getSiddhiAppConfig().sequenceQueryList, function(sequenceQuery){
+
+                var sequenceQueryId = sequenceQuery.getId();
+                var sequenceQueryName = "Sequence";
+                var array = sequenceQueryId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId);
+            });
+
             _.forEach(self.configurationData.getSiddhiAppConfig().windowFilterProjectionQueryList,
                 function (windowFilterProjectionQuery) {
                     var queryId = windowFilterProjectionQuery.getId();
@@ -969,6 +986,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.JOIN));
             Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PATTERN));
             Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.WINDOW));
+            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.SEQUENCE));
             Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PARTITION));
 
             // var nodes = $(".ui-draggable");
@@ -1234,7 +1252,33 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode) {
+        DesignGrid.prototype.handleSequenceQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, sequenceQueryName,
+                                                            sequenceQueryId) {
+            var self = this;
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.getNewAgentId();
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(sequenceQueryId !== undefined) {
+                    elementId = sequenceQueryId;
+                    self.generateNextNewAgentId();
+                } else {
+                    console.log("sequenceQueryId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.SEQUENCE);
+            self.canvas.append(newAgent);
+            // Drop the element instantly since its projections will be set only when the user requires it
+            self.dropElements.dropSequenceQuery(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
+                sequenceQueryName);
+            self.configurationData.getSiddhiAppConfig()
+                .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode, partitionId) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
