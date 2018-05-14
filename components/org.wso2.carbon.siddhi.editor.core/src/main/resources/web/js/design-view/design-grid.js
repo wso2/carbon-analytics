@@ -782,40 +782,40 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             function addMemberToPartitionGroup(self) {
                 // TODO: isInner boolean should be set when adding to the partition.
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
-                    if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
-                        || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
-                        || $(event.el).hasClass(constants.STREAM)) {
-
-                        var connections = self.jsPlumbInstance.getConnections(event.el);
-                        //TODO: insert into can be connected to a outside(not inner) stream as well
-                        if($(event.el).hasClass(constants.STREAM)) {
-
-                        }
-                        var detachedElement = $(event.el).deleteConnection();
-                        $(detachedElement).insertBefore($(event.group)[0].getEl());
-                        self.autoAlignElements();
-                        alert("bc");//TODO: add a proper error message and add align
-                        // TODO: stand alone inner stream form should not be displayed
-                        var partitionId = $(event.group).attr('id');
-                        var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
-                        var queries = partition.getQueries();
-                        if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
-                            || $(event.el).hasClass(constants.WINDOW_QUERY)) {
-                            queries.push(self.configurationData.getSiddhiAppConfig().getQuery($(event.el).attr('id')));
-                            //TODO: set isInner flag true
-                            partition.setQueries(queries);
-                        }
-                        else if ($(event.el).hasClass(constants.JOIN)) {
-                            queries.push(self.configurationData.getSiddhiAppConfig().getJoinQuery($(event.el)
-                                .attr('id')));
-                            partition.setQueries(queries);
-                        }
-                    } else {
-                        alert("Invalid element type dropped into partition!");
-                        var detachedElement = $(event.el).deleteConnection();
-                        $(detachedElement).insertBefore($(event.group)[0].getEl());
-                        self.autoAlignElements();
-                    }
+                    // if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
+                    //     || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
+                    //     || $(event.el).hasClass(constants.STREAM)) {
+                    //
+                    //     var connections = self.jsPlumbInstance.getConnections(event.el);
+                    //     //TODO: insert into can be connected to a outside(not inner) stream as well
+                    //     if($(event.el).hasClass(constants.STREAM)) {
+                    //
+                    //     }
+                    //     var detachedElement = $(event.el).detach();
+                    //     $(detachedElement).insertBefore($(event.group)[0].getEl());
+                    //     self.autoAlignElements();
+                    //     alert("bc");//TODO: add a proper error message and add align
+                    //     // TODO: stand alone inner stream form should not be displayed
+                    //     var partitionId = $(event.group).attr('id');
+                    //     var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+                    //     var queries = partition.getQueries();
+                    //     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
+                    //         || $(event.el).hasClass(constants.WINDOW_QUERY)) {
+                    //         queries.push(self.configurationData.getSiddhiAppConfig().getQuery($(event.el).attr('id')));
+                    //         //TODO: set isInner flag true
+                    //         partition.setQueries(queries);
+                    //     }
+                    //     else if ($(event.el).hasClass(constants.JOIN)) {
+                    //         queries.push(self.configurationData.getSiddhiAppConfig().getJoinQuery($(event.el)
+                    //             .attr('id')));
+                    //         partition.setQueries(queries);
+                    //     }
+                    // } else {
+                    //     alert("Invalid element type dropped into partition!");
+                    //     var detachedElement = $(event.el).detach();
+                    //     $(detachedElement).insertBefore($(event.group)[0].getEl());
+                    //     self.autoAlignElements();
+                    // }
                 });
             }
 
@@ -918,7 +918,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
-                });
+            });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().joinQueryList, function(joinQuery){
 
@@ -1226,7 +1226,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.PATTERN);
             self.canvas.append(newAgent);
-            // Drop the Table element. Inside this a it generates the table definition form.
+            // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropPatternQuery(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
                 patternQueryName);
             self.configurationData.getSiddhiAppConfig()
@@ -1236,10 +1236,23 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
         DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode) {
             var self = this;
-            var newAgent = $('<div>').attr('id', self.getNewAgentId()).addClass(constants.PARTITION);
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.getNewAgentId();
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(partitionId !== undefined) {
+                    elementId = partitionId;
+                    self.generateNextNewAgentId();
+                } else {
+                    console.log("partitionId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.PARTITION);
+            self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
-            //self.generateNextNewAgentId();
-            self.dropElements.dropPartition(newAgent, self.getNewAgentId(), mouseTop, mouseLeft, isCodeToDesignMode);
+            self.dropElements.dropPartition(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode);
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
