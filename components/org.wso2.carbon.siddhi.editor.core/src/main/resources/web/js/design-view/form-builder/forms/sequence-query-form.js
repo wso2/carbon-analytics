@@ -23,7 +23,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
               QueryOutputUpdateOrInsertInto, QueryWindow, QueryOrderByValue, PatternOrSequenceQueryCondition) {
 
         /**
-         * @class SequenceQueryForm Creates a forms to collect data from a join query
+         * @class SequenceQueryForm Creates a forms to collect data from a sequence query
          * @constructor
          * @param {Object} options Rendering options for the view
          */
@@ -39,13 +39,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         };
 
         /**
-         * @function generate the form for the join query
+         * @function generate the form for the sequence query
          * @param element selected element(query)
          * @param formConsole Console which holds the form
          * @param formContainer Container which holds the form
          */
         SequenceQueryForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Define Sequence Query </h3></div>' +
+                '<div class="define-sequence-query"></div>');
+            formContainer.append(propertyDiv);
             // The container and the tool palette are disabled to prevent the user from dropping any elements
             self.gridContainer.addClass('disabledbutton');
             self.toolPaletteContainer.addClass('disabledbutton');

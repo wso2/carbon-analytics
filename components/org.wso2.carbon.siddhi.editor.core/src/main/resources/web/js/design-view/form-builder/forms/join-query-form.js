@@ -50,6 +50,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          */
         JoinQueryForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Define Join Query </h3></div>' +
+                '<div class="define-join-query"></div>');
+            formContainer.append(propertyDiv);
             // The container and the tool palette are disabled to prevent the user from dropping any elements
             self.gridContainer.addClass('disabledbutton');
             self.toolPaletteContainer.addClass('disabledbutton');
@@ -79,17 +82,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var firstInputElementName = clickedElement.getQueryInput().getFirstConnectedElement().name;
                 var secondInputElementName = clickedElement.getQueryInput().getSecondConnectedElement().name;
-                // var leftSourceType = clickedElement.getQueryInput().getFirstConnectedElement().type;
-                // var rightSourceType = clickedElement.getQueryInput().getSecondConnectedElement().type;
 
                 // if left and right sources are defined then replace the element names with them. This first and
                 // left name order is used to define/display the left and right sources in the form.
                 if (clickedElement.getQueryInput().getLeft() !== undefined
                     && clickedElement.getQueryInput().getRight() !== undefined) {
                     firstInputElementName = clickedElement.getQueryInput().getLeft().getFrom();
-                    //leftSourceType = clickedElement.getQueryInput().getLeft().getType();
                     secondInputElementName = clickedElement.getQueryInput().getRight().getFrom();
-                    //rightSourceType = clickedElement.getQueryInput().getRight().getType();
                 }
 
                 var leftSourceSavedData = clickedElement.getQueryInput().getLeft();

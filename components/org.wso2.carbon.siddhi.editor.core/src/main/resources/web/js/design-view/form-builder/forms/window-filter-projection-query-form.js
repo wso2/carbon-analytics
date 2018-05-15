@@ -52,6 +52,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         WindowFilterProjectionQueryForm.prototype.generatePropertiesForm = function (element, formConsole,
                                                                                      formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Define Window/Filter/Projection Query </h3></div>' +
+                '<div class="define-windowFilterProjection-query"></div>');
+            formContainer.append(propertyDiv);
             // The container and the tool palette are disabled to prevent the user from dropping any elements
             self.gridContainer.addClass('disabledbutton');
             self.toolPaletteContainer.addClass('disabledbutton');

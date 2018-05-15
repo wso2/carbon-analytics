@@ -55,7 +55,7 @@ define(['require', 'elementUtils'],
             */
             if (options !== undefined) {
                 this.id = options.id;
-                this.windowName = options.name;
+                this.name = options.name;
                 this.function = options.function;
                 this.parameters = options.parameters;
                 this.outputEventType = options.outputEventType;
@@ -85,7 +85,7 @@ define(['require', 'elementUtils'],
         };
 
         Window.prototype.getName = function () {
-            return this.windowName;
+            return this.name;
         };
 
         Window.prototype.getAttributeList = function () {
@@ -113,7 +113,7 @@ define(['require', 'elementUtils'],
         };
 
         Window.prototype.setName = function (name) {
-            this.windowName = name;
+            this.name = name;
         };
 
         Window.prototype.setAttributeList = function (attributeList) {

@@ -326,7 +326,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var sourceId = source.substr(0, source.indexOf('-'));
                     var sourceElement = $('#' + sourceId);
 
-                    // create and add an ege to the edgeList
+                    // create and add an edge to the edgeList
 
                     var edgeId = ''+ targetId + '_' + sourceId + '';
                     var edgeInTheEdgeList = self.configurationData.getEdge(edgeId);
@@ -427,7 +427,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                     } else if (secondConnectedElement === undefined) {
                                         queryInput.setSecondConnectedElement(connectedElement);
                                     } else {
-                                        console.log("Error: First and second input elements aer already filled in " +
+                                        console.log("Error: First and second input elements are already filled in " +
                                             "join query!");
                                     }
                                 }
@@ -455,10 +455,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                             var connectedStreamName =
                                 self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             if (model.getQueryInput() === undefined) {
-                                var patternQueryInputOptions = {};
-                                _.set(patternQueryInputOptions, 'type', 'sequence');
+                                var sequenceQueryInputOptions = {};
+                                _.set(sequenceQueryInputOptions, 'type', 'sequence');
                                 var sequenceQueryInputObject =
-                                    new PatternOrSequenceQueryInput(patternQueryInputOptions);
+                                    new PatternOrSequenceQueryInput(sequenceQueryInputOptions);
                                 sequenceQueryInputObject.addConnectedElementName(connectedStreamName);
                                 model.setQueryInput(sequenceQueryInputObject);
                             } else {
@@ -695,8 +695,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                             return;
                         } else if (targetElement.hasClass(constants.SEQUENCE)) {
                             model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                            var disconnectedStreamName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
-                                .getName();
+                            var disconnectedStreamName =
+                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             model.getQueryInput().removeConnectedElementName(disconnectedStreamName);
                             return;
                         }
