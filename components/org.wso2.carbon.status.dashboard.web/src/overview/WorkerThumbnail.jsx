@@ -278,9 +278,9 @@ export default class WorkerThumbnail extends React.Component {
                 loadAvg = <h4 style={{margin: 0}}>N/A in Windows</h4>;
                 loadTrendImg = <div/>;
             } else {
-                loadAvg = <h1>{this.props.worker.serverDetails.workerMetrics.loadAverage}</h1>;
-                loadTrendImg = loadTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
-                    <TrendDown style={{color: 'green'}}/>
+                loadAvg = <h1 style={{margin: 0}}>{this.props.worker.serverDetails.workerMetrics.loadAverage}</h1>;
+                {loadTrendImg = loadTrend === constants.up ? <span style={{color: 'red'}}>˄</span> :
+                    <span style={{color: 'green'}}>˅</span>}
             }
             gridTiles =
                 <div>
@@ -316,7 +316,8 @@ export default class WorkerThumbnail extends React.Component {
                             <GridTile>
                                 <div className="grid-tile-h1" style={{
                                     display: 'flex',
-                                    alignItems: 'center', height: '100%'
+                                    alignItems: 'center', height: '100%',
+                                    justifyContent: 'center'
                                 }}>
                                     {loadAvg}</div>
                                 <div style={styles.legendContainer}>

@@ -743,7 +743,7 @@ public class CodeGenerator {
         StringBuilder userDefinedSelectionStringBuilder = new StringBuilder();
 
         if (userDefinedSelection == null || userDefinedSelection.getValue() == null || userDefinedSelection.getValue().isEmpty()) {
-            throw new CodeGenerationException("UserDefinedSelection Instance '" + userDefinedSelection.toString() + "' is null");
+            throw new CodeGenerationException("The given UserDefinedSelection instance is null");
         }
 
         int attributesLeft = userDefinedSelection.getValue().size();
@@ -867,7 +867,7 @@ public class CodeGenerator {
         switch (queryOutput.getType().toUpperCase()) {
             case "INSERT":
                 InsertOutputConfig insertOutputConfig = (InsertOutputConfig) queryOutput.getOutput();
-                queryOutputStringBuilder.append(getInsetOutput(insertOutputConfig, queryOutput.getTarget()));
+                queryOutputStringBuilder.append(getInsertOutput(insertOutputConfig, queryOutput.getTarget()));
                 break;
             case "DELETE":
                 DeleteOutputConfig deleteOutputConfig = (DeleteOutputConfig) queryOutput.getOutput();
@@ -888,7 +888,7 @@ public class CodeGenerator {
         return queryOutputStringBuilder.toString();
     }
 
-    private String getInsetOutput(InsertOutputConfig insertOutput, String target) {
+    private String getInsertOutput(InsertOutputConfig insertOutput, String target) {
         if (insertOutput == null) {
             throw new CodeGenerationException("The InsertOutputConfig instance given is null");
         } else if (target == null || target.isEmpty()) {
@@ -1073,11 +1073,11 @@ public class CodeGenerator {
                     .append(Constants.SPACE);
             Map<String, String> options = store.getOptions();
             int optionsLeft = options.size();
-            for (String key : options.keySet()) {
-                storeStringBuilder.append(key)
+            for (Map.Entry<String, String> entry : options.entrySet()) {
+                storeStringBuilder.append(entry.getKey())
                         .append(Constants.EQUALS)
                         .append(Constants.SINGLE_QUOTE)
-                        .append(options.get(key))
+                        .append(entry.getValue())
                         .append(Constants.SINGLE_QUOTE);
                 if (optionsLeft != 1) {
                     storeStringBuilder.append(Constants.COMMA)
@@ -1112,7 +1112,7 @@ public class CodeGenerator {
      * Contains all the generic string/char values that are needed by
      * the CodeGenerator class to build the entire Siddhi app string
      */
-    private class Constants {
+    private static class Constants {
         // TODO: 5/3/18 Change the name of the constants class to something else
         private static final char ALL = '*';
         private static final char CLOSE_BRACKET = ')';
