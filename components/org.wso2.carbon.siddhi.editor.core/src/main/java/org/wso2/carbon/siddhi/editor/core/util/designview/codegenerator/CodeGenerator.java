@@ -867,7 +867,7 @@ public class CodeGenerator {
         switch (queryOutput.getType().toUpperCase()) {
             case "INSERT":
                 InsertOutputConfig insertOutputConfig = (InsertOutputConfig) queryOutput.getOutput();
-                queryOutputStringBuilder.append(getInsetOutput(insertOutputConfig, queryOutput.getTarget()));
+                queryOutputStringBuilder.append(getInsertOutput(insertOutputConfig, queryOutput.getTarget()));
                 break;
             case "DELETE":
                 DeleteOutputConfig deleteOutputConfig = (DeleteOutputConfig) queryOutput.getOutput();
@@ -888,7 +888,7 @@ public class CodeGenerator {
         return queryOutputStringBuilder.toString();
     }
 
-    private String getInsetOutput(InsertOutputConfig insertOutput, String target) {
+    private String getInsertOutput(InsertOutputConfig insertOutput, String target) {
         if (insertOutput == null) {
             throw new CodeGenerationException("The InsertOutputConfig instance given is null");
         } else if (target == null || target.isEmpty()) {
