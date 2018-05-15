@@ -16,10 +16,11 @@
  * under the License.
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre', 'edge',
-        'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternQueryInput', 'queryOutput'],
+        'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternQueryInput', 'patternOrSequenceQueryInput',
+        'queryOutput'],
 
     function (require, log, $, Backbone, _, DropElements, dagre, Edge, WindowFilterProjectionQueryInput,
-              JoinQueryInput, PatternQueryInput, QueryOutput) {
+              JoinQueryInput, PatternQueryInput, PatternOrSequenceQueryInput, QueryOutput) {
 
         var constants = {
             STREAM : 'streamDrop',
@@ -228,7 +229,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                             connectionValidity = true;
                         }
                     }
-                    else if (targetElement.hasClass(constants.PATTERN)) {
+                    else if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
                         if(!(sourceElement.hasClass(constants.STREAM))) {
                             alert("Invalid Connection");
                         } else {
@@ -302,7 +303,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     }
                     else if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                         || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.PATTERN)
-                        || sourceElement.hasClass(constants.JOIN)) {
+                        || sourceElement.hasClass(constants.JOIN) || sourceElement.hasClass(constants.SEQUENCE)) {
                         if (!(targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                             || targetElement.hasClass(constants.WINDOW))) {
                             alert("Invalid Connection");
@@ -447,8 +448,21 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                             } else {
                                 model.getQueryInput().addConnectedElementName(connectedStreamName);
                             }
-                        }
-                        else if (targetElement.hasClass(constants.PARTITION)) {
+                        } else if (targetElement.hasClass(constants.SEQUENCE)) {
+                            model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
+                            var connectedStreamName =
+                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                            if (model.getQueryInput() === undefined) {
+                                var patternQueryInputOptions = {};
+                                _.set(patternQueryInputOptions, 'type', 'sequence');
+                                var sequenceQueryInputObject =
+                                    new PatternOrSequenceQueryInput(patternQueryInputOptions);
+                                sequenceQueryInputObject.addConnectedElementName(connectedStreamName);
+                                model.setQueryInput(sequenceQueryInputObject);
+                            } else {
+                                model.getQueryInput().addConnectedElementName(connectedStreamName);
+                            }
+                        } else if (targetElement.hasClass(constants.PARTITION)) {
                             model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
                             var newPartitionKey = {'stream': sourceId, 'property': undefined};
                             var partitionKeys = (model.getPartition('partition'));
@@ -530,7 +544,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                             || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.JOIN)
-                            || sourceElement.hasClass(constants.PATTERN)) {
+                            || sourceElement.hasClass(constants.PATTERN)
+                            || sourceElement.hasClass(constants.SEQUENCE)) {
 
                             if (targetElement.hasClass(constants.STREAM)) {
                                 connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(targetId)
@@ -549,12 +564,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 || sourceElement.hasClass(constants.WINDOW_QUERY)) {
                                 model = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(sourceId);
-                            }
-                            else if (sourceElement.hasClass(constants.JOIN)) {
+                            } else if (sourceElement.hasClass(constants.JOIN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getJoinQuery(sourceId);
-                            }
-                            if (sourceElement.hasClass(constants.PATTERN)) {
+                            } else if (sourceElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(sourceId);
+                            } else if (sourceElement.hasClass(constants.SEQUENCE)) {
+                                model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(sourceId);
                             }
 
                             if (model.getQueryOutput() === undefined) {
@@ -676,6 +691,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 .getName();
                             model.getQueryInput().removeConnectedElementName(disconnectedStreamName);
                             return;
+                        } else if (targetElement.hasClass(constants.SEQUENCE)) {
+                            model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
+                            var disconnectedStreamName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
+                                .getName();
+                            model.getQueryInput().removeConnectedElementName(disconnectedStreamName);
+                            return;
                         }
                         else if (targetElement.hasClass(constants.PARTITION)) {
                             model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
@@ -766,18 +787,19 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                             || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.JOIN)
-                            || sourceElement.hasClass(constants.PATTERN)) {
+                            || sourceElement.hasClass(constants.PATTERN)
+                            || sourceElement.hasClass(constants.SEQUENCE)) {
 
                             if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                                 || sourceElement.hasClass(constants.WINDOW)) {
                                 model = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(sourceId);
-                            }
-                            else if (sourceElement.hasClass(constants.JOIN)) {
+                            } else if (sourceElement.hasClass(constants.JOIN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getJoinQuery(sourceId);
-                            }
-                            else if (sourceElement.hasClass(constants.PATTERN)) {
+                            } else if (sourceElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(sourceId);
+                            } else if (sourceElement.hasClass(constants.SEQUENCE)) {
+                                model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(sourceId);
                             }
                             model.getQueryOutput().setTarget(undefined);
                         }

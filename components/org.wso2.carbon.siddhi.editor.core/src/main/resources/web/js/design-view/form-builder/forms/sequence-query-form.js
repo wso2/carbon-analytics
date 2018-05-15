@@ -73,6 +73,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             } else {
 
                 var inputStreamNames = clickedElement.getQueryInput().getConnectedElementNameList();
+                var conditionList = clickedElement.getQueryInput().getConditionList();
+                var logic = clickedElement.getQueryInput().getLogic();
                 var savedGroupByAttributes = clickedElement.getGroupBy();
                 var having = clickedElement.getHaving();
                 var savedOrderByAttributes = clickedElement.getOrderBy();
@@ -105,12 +107,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var inputElement =
                         self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(inputStreamName);
                     if (inputElement !== undefined) {
-                        var inputElementName = inputElement.getName();
                         if (inputElement.type === 'trigger') {
-                            possibleGroupByAttributes.push(inputElementName + '.triggered_time');
+                            possibleGroupByAttributes.push(inputStreamName + '.triggered_time');
                         } else {
                             _.forEach(inputElement.element.getAttributeList(), function (attribute) {
-                                possibleGroupByAttributes.push(inputElementName + "." + attribute.getName());
+                                possibleGroupByAttributes.push(inputStreamName + "." + attribute.getName());
                             });
                         }
                     }
@@ -221,7 +222,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var fillQueryInputWith = {
-
+                    conditions: conditionList,
+                    logic: {
+                        statement: logic
+                    }
                 };
                 fillQueryInputWith = self.formUtils.cleanJSONObject(fillQueryInputWith);
                 var fillQuerySelectWith = {
@@ -308,25 +312,30 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         type: 'object',
                         title: 'Query Input',
                         properties: {
-                            Conditions: {
+                            conditions: {
                                 type: 'array',
                                 title: 'Conditions',
                                 format: 'tabs',
                                 uniqueItems: true,
                                 required: true,
+                                minItems: 1,
                                 propertyOrder: 1,
                                 items: {
                                     type: 'object',
+                                    options: {
+                                        disable_properties: false
+                                    },
                                     title: 'condition',
                                     headerTemplate: "Condition" + "{{i1}}",
                                     properties: {
-                                        conditionID: {
+                                        conditionId: {
                                             type: 'string',
                                             title: 'Condition ID',
                                             required: true,
+                                            minLength: 1,
                                             propertyOrder: 1
                                         },
-                                        stream: {
+                                        streamName: {
                                             type: 'string',
                                             title: 'Stream',
                                             enum: inputStreamNames,
@@ -336,16 +345,25 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         filter: {
                                             type: 'string',
                                             title: 'Filter',
+                                            minLength: 1,
                                             propertyOrder: 3
                                         }
                                     }
                                 }
                             },
                             logic: {
-                                type: 'string',
+                                type: 'object',
                                 title: 'Logic',
                                 required: true,
-                                propertyOrder: 2
+                                propertyOrder: 2,
+                                properties: {
+                                    statement: {
+                                        type: 'string',
+                                        title: 'Statement',
+                                        minLength:1,
+                                        required: true
+                                    }
+                                }
                             }
                         }
                     },
@@ -758,6 +776,26 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var outputConfig = editorOutput.getValue();
                     
                     var queryInput = clickedElement.getQueryInput();
+
+                    queryInput.clearConditionList();
+                    _.forEach(inputConfig.conditions, function (condition) {
+                        var conditionObjectOptions = {};
+                        _.set(conditionObjectOptions, 'conditionId', condition.conditionId);
+                        _.set(conditionObjectOptions, 'streamName', condition.streamName);
+                        if (condition.filter !== undefined) {
+                            _.set(conditionObjectOptions, 'filter', condition.filter);
+                        } else {
+                            _.set(conditionObjectOptions, 'filter', undefined);
+                        }
+                        var conditionObject = new PatternOrSequenceQueryCondition(conditionObjectOptions);
+                        queryInput.addCondition(conditionObject);
+                    });
+
+                    if (inputConfig.logic !== undefined && inputConfig.logic.statement !== undefined) {
+                        queryInput.setLogic(inputConfig.logic.statement);
+                    } else {
+                        queryInput.setLogic(undefined);
+                    }
 
                     var selectAttributeOptions = {};
                     if (selectConfig.select instanceof Array) {
