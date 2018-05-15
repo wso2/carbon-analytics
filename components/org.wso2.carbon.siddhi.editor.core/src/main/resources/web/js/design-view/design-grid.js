@@ -16,11 +16,10 @@
  * under the License.
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre', 'edge',
-        'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternQueryInput', 'patternOrSequenceQueryInput',
-        'queryOutput'],
+        'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput'],
 
     function (require, log, $, Backbone, _, DropElements, dagre, Edge, WindowFilterProjectionQueryInput,
-              JoinQueryInput, PatternQueryInput, PatternOrSequenceQueryInput, QueryOutput) {
+              JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput) {
 
         var constants = {
             STREAM : 'streamDrop',
@@ -439,10 +438,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     if (sourceElement.hasClass(constants.STREAM)) {
                         if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                            var connectedStreamName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
-                                .getName();
+                            var connectedStreamName =
+                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             if (model.getQueryInput() === undefined) {
-                                var patternQueryInputObject = new PatternQueryInput();
+                                var patternQueryInputOptions = {};
+                                _.set(patternQueryInputOptions, 'type', 'pattern');
+                                var patternQueryInputObject =
+                                    new PatternOrSequenceQueryInput(patternQueryInputOptions);
                                 patternQueryInputObject.addConnectedElementName(connectedStreamName);
                                 model.setQueryInput(patternQueryInputObject);
                             } else {
@@ -687,8 +689,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     if (sourceElement.hasClass(constants.STREAM)) {
                         if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                            var disconnectedStreamName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
-                                .getName();
+                            var disconnectedStreamName =
+                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             model.getQueryInput().removeConnectedElementName(disconnectedStreamName);
                             return;
                         } else if (targetElement.hasClass(constants.SEQUENCE)) {

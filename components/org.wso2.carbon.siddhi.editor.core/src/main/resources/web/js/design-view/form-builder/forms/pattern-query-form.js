@@ -16,13 +16,11 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputCounting', 'patternQueryInputAndOr',
-        'patternQueryInputNotFor', 'patternQueryInputNotAnd', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindow', 'queryOrderByValue'],
-    function (require, log, $, _, Attribute, Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod,
-              QuerySelect, PatternQueryInputCounting, PatternQueryInputAndOr, PatternQueryInputNotFor,
-              PatternQueryInputNotAnd, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindow, QueryOrderByValue) {
+define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindow', 'queryOrderByValue',
+        'patternOrSequenceQueryCondition'],
+    function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
+              QueryOutputUpdateOrInsertInto, QueryWindow, QueryOrderByValue, PatternOrSequenceQueryCondition) {
 
         /**
          * @class PatternQueryForm Creates a forms to collect data from a pattern query
@@ -48,10 +46,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
          */
         PatternQueryForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            // The container and the tool palette are disabled to prevent the user from dropping any elements
-            self.gridContainer.addClass('disabledbutton');
-            self.toolPaletteContainer.addClass('disabledbutton');
-
+            var propertyDiv = $('<div id="property-header"><h3>Define Pattern Query </h3></div>' +
+                '<div class="define-pattern-query"></div>');
+            formContainer.append(propertyDiv);
             // The container and the tool palette are disabled to prevent the user from dropping any elements
             self.gridContainer.addClass('disabledbutton');
             self.toolPaletteContainer.addClass('disabledbutton');
@@ -67,8 +64,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
-            } else if (clickedElement.getQueryOutput() === '' || clickedElement.getQueryOutput().getTarget() === '') {
-                alert('Connect an output stream');
+            } else if (clickedElement.getQueryOutput() === undefined ||
+                clickedElement.getQueryOutput().getTarget() === undefined) {
+                alert('Connect an output element');
                 self.gridContainer.removeClass('disabledbutton');
                 self.toolPaletteContainer.removeClass('disabledbutton');
 
@@ -77,70 +75,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                 self.consoleListManager.hideAllConsoles();
             } else {
 
-                var savedQueryInputEventList = clickedElement.getQueryInput().getEventList();
-                var inputStreams = clickedElement.getQueryInput().getConnectedElementNameList();
-                var queryInput1 = [];
-                var queryInput2 = {};
-                var inputEvent;
-                _.forEach(savedQueryInputEventList, function (queryInputEvent) {
-                    var inputEventType = queryInputEvent.getType();
-                    if (inputEventType === "counting") {
-                        inputEvent = {
-                            inputType:"Counting Pattern Event",
-                            forEvery: queryInputEvent.getForEvery(),
-                            eventReference: queryInputEvent.getEventReference(),
-                            streamName: queryInputEvent.getStreamName(),
-                            filter: queryInputEvent.getFilter(),
-                            minCount: queryInputEvent.getMinCount(),
-                            maxCount: queryInputEvent.getMaxCount(),
-                            within: queryInputEvent.getWithin()
-                        };
-                        queryInput1.push(inputEvent);
-                    } else if (inputEventType === "andor") {
-                        inputEvent = {
-                            inputType:"And Or Event",
-                            forEvery: queryInputEvent.getForEvery(),
-                            leftEventReference:queryInputEvent.getLeftEventReference(),
-                            leftStreamName: queryInputEvent.getLeftStreamName(),
-                            leftFilter: queryInputEvent.getLeftFilter(),
-                            connectedWith: (queryInputEvent.getConnectedWith() === '')?
-                                'and' : queryInputEvent.getConnectedWith(),
-                            rightEventReference: queryInputEvent.getRightEventReference(),
-                            rightStreamName: queryInputEvent.getRightStreamName(),
-                            rightFilter: queryInputEvent.getRightFilter(),
-                            within: queryInputEvent.getWithin()
-                        };
-                        queryInput1.push(inputEvent);
-                    } else if (inputEventType === "notfor") {
-                        inputEvent = {
-                            inputType:"Not For Event",
-                            forEvery: queryInputEvent.getForEvery(),
-                            streamName: queryInputEvent.getStreamName(),
-                            filter: queryInputEvent.getFilter(),
-                            forDuration: queryInputEvent.getForDuration()
-                        };
-                        queryInput2 = inputEvent;
-                    } else if (inputEventType === "notand") {
-                        inputEvent = {
-                            inputType:"Not And Event",
-                            forEvery: queryInputEvent.getForEvery(),
-                            leftStreamName: queryInputEvent.getLeftStreamName(),
-                            leftFilter: queryInputEvent.getLeftFilter(),
-                            rightEventReference: queryInputEvent.getRightEventReference(),
-                            rightStreamName: queryInputEvent.getRightStreamName(),
-                            rightFilter: queryInputEvent.getRightFilter(),
-                            within: queryInputEvent.getWithin()
-                        };
-                        queryInput2 = inputEvent;
-                    }
-                });
-
-                var select = clickedElement.getSelect().getValue();
+                var inputStreamNames = clickedElement.getQueryInput().getConnectedElementNameList();
+                var conditionList = clickedElement.getQueryInput().getConditionList();
+                var logic = clickedElement.getQueryInput().getLogic();
                 var savedGroupByAttributes = clickedElement.getGroupBy();
                 var having = clickedElement.getHaving();
                 var savedOrderByAttributes = clickedElement.getOrderBy();
                 var limit = clickedElement.getLimit();
                 var outputRateLimit = clickedElement.getOutputRateLimit();
+                var outputElementName = clickedElement.getQueryOutput().getTarget();
 
                 var groupBy = [];
                 _.forEach(savedGroupByAttributes, function (savedGroupByAttribute) {
@@ -160,450 +103,351 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                 });
 
                 var possibleGroupByAttributes = [];
-                _.forEach(inputStreams, function (inputStreamName) {
-                    _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function (stream) {
-                        if (stream.getName() === inputStreamName) {
-                            _.forEach(stream.getAttributeList(), function (attribute) {
-                                possibleGroupByAttributes.push(attribute.getName());
+                var outputElementType = undefined;
+                var outputElementAttributesList = [];
+
+                _.forEach(inputStreamNames, function (inputStreamName) {
+                    var inputElement =
+                        self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(inputStreamName);
+                    if (inputElement !== undefined) {
+                        if (inputElement.type === 'trigger') {
+                            possibleGroupByAttributes.push(inputStreamName + '.triggered_time');
+                        } else {
+                            _.forEach(inputElement.element.getAttributeList(), function (attribute) {
+                                possibleGroupByAttributes.push(inputStreamName + "." + attribute.getName());
                             });
                         }
-                    });
+                    }
                 });
 
-                var savedQueryOutput = clickedElement.getQueryOutput();
-                var savedQueryOutputTarget = savedQueryOutput.getTarget();
-                var savedQueryOutputType = savedQueryOutput.getType();
-                var output = savedQueryOutput.getOutput();
-                var queryOutput;
-                if (savedQueryOutputTarget !== undefined && savedQueryOutputType!== undefined && output!== undefined) {
-                    if (savedQueryOutputType === "insert") {
-                        queryOutput = {
-                            output : {
-                                outputType: "Insert",
-                                insertTarget: savedQueryOutputTarget,
-                                eventType: (output.getEventType() === '')?'all':output.getEventType()
-                            }
-                        };
-                    } else if (savedQueryOutputType === "delete") {
-                        queryOutput = {
-                            output : {
-                                outputType : "Delete",
-                                deleteTarget: savedQueryOutputTarget,
-                                forEventType : (output.getForEventType() === '')?'all':output.getForEventType(),
-                                on : output.getOn()
-                            }
-                        };
-
-                    } else if (savedQueryOutputType === "update") {
-                        queryOutput = {
-                            output : {
-                                outputType : "Update",
-                                updateTarget: savedQueryOutputTarget,
-                                forEventType : (output.getForEventType() === '')?'all':output.getForEventType(),
-                                set: output.getSet(),
-                                on : output.getOn()
-                            }
-                        };
-                    } else if (savedQueryOutputType === "update_or_insert_into") {
-                        queryOutput = {
-                            output: {
-                                outputType: "Update or Insert Into",
-                                updateOrInsertIntoTarget: savedQueryOutputTarget,
-                                forEventType: (output.getForEventType() === '')?'all':output.getForEventType(),
-                                set: output.getSet(),
-                                on: output.getOn()
-                            }
-                        };
+                var outputElement =
+                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+                if (outputElement !== undefined) {
+                    if (outputElement.type !== undefined
+                        && (outputElement.type === 'stream' || outputElement.type === 'table'
+                            || outputElement.type === 'window')) {
+                        outputElementType = outputElement.type;
+                        if (outputElement.element !== undefined) {
+                            outputElementAttributesList = outputElement.element.getAttributeList();
+                        }
                     }
                 }
 
-                var fillWith = {
-                    queryInput : {
-                        queryInput1: queryInput1,
-                        queryInput2: queryInput2
-                    },
-                    querySelect : {
-                        select : select
-                    },
-                    groupBy : groupBy,
-                    having : having,
-                    orderBy : orderBy,
-                    limit : limit,
-                    outputRateLimit : outputRateLimit,
-                    queryOutput: queryOutput
-                };
+                var select = [];
+                var possibleUserDefinedSelectTypeValues = [];
+                if (clickedElement.getSelect() === undefined) {
+                    for (var i = 0; i < outputElementAttributesList.length; i++) {
+                        var attr = {
+                            expression: undefined,
+                            as: outputElementAttributesList[i].getName()
+                        };
+                        select.push(attr);
+                    }
+                } else if(clickedElement.getSelect().getValue() === undefined) {
+                    for (var i = 0; i < outputElementAttributesList.length; i++) {
+                        var attr = {
+                            expression: undefined,
+                            as: outputElementAttributesList[i].getName()
+                        };
+                        select.push(attr);
+                    }
+                } else if (clickedElement.getSelect().getValue() === '*') {
+                    select = '*';
+                    for (var i = 0; i < outputElementAttributesList.length; i++) {
+                        var attr = {
+                            expression: undefined,
+                            as: outputElementAttributesList[i].getName()
+                        };
+                        possibleUserDefinedSelectTypeValues.push(attr);
+                    }
+                } else if (!(clickedElement.getSelect().getValue() === '*')) {
+                    var selectedAttributes = clickedElement.getSelect().getValue();
+                    for (var i = 0; i < outputElementAttributesList.length; i++) {
+                        var expressionStatement = undefined;
+                        if (selectedAttributes[i] !== undefined && selectedAttributes[i].expression !== undefined) {
+                            expressionStatement = selectedAttributes[i].expression;
+                        }
+                        var attr = {
+                            expression: expressionStatement,
+                            as: outputElementAttributesList[i].getName()
+                        };
+                        select.push(attr);
+                    }
+                }
 
-                //TODO: check whether the left and right stream both are same in some occasions
-                var editor = new JSONEditor(formContainer[0], {
-                    schema: {
+                var savedQueryOutput = clickedElement.getQueryOutput();
+                if (savedQueryOutput !== undefined) {
+                    var savedQueryOutputTarget = savedQueryOutput.getTarget();
+                    var savedQueryOutputType = savedQueryOutput.getType();
+                    var output = savedQueryOutput.getOutput();
+                    var queryOutput;
+                    if ((savedQueryOutputTarget !== undefined)
+                        && (savedQueryOutputType !== undefined)
+                        && (output !== undefined)) {
+                        // getting the event tpe and pre load it
+                        var eventType;
+                        if (output.getEventType() === undefined) {
+                            eventType = 'all events';
+                        } else if (output.getEventType() === 'all_events') {
+                            eventType = 'all events';
+                        } else if (output.getEventType() === 'current_events') {
+                            eventType = 'current events';
+                        } else if (output.getEventType() === 'expired_events') {
+                            eventType = 'expired events';
+                        }
+                        if (savedQueryOutputType === "insert") {
+                            queryOutput = {
+                                insertTarget: savedQueryOutputTarget,
+                                eventType: eventType
+                            };
+                        } else if (savedQueryOutputType === "delete") {
+                            queryOutput = {
+                                deleteTarget: savedQueryOutputTarget,
+                                eventType: eventType,
+                                on: output.getOn()
+                            };
+                        } else if (savedQueryOutputType === "update") {
+                            queryOutput = {
+                                updateTarget: savedQueryOutputTarget,
+                                eventType: eventType,
+                                set: output.getSet(),
+                                on: output.getOn()
+                            };
+                        } else if (savedQueryOutputType === "update_or_insert_into") {
+                            queryOutput = {
+                                updateOrInsertIntoTarget: savedQueryOutputTarget,
+                                eventType: eventType,
+                                set: output.getSet(),
+                                on: output.getOn()
+                            };
+                        }
+                    }
+                }
+
+                var fillQueryInputWith = {
+                    conditions: conditionList,
+                    logic: {
+                        statement: logic
+                    }
+                };
+                fillQueryInputWith = self.formUtils.cleanJSONObject(fillQueryInputWith);
+                var fillQuerySelectWith = {
+                    select : select,
+                    groupBy : groupBy,
+                    postFilter: {
+                        having : having
+                    }
+                };
+                fillQuerySelectWith = self.formUtils.cleanJSONObject(fillQuerySelectWith);
+                var fillQueryOutputWith = {
+                    orderBy : orderBy,
+                    limit: {
+                        limit : limit
+                    },
+                    outputRateLimit: {
+                        outputRateLimit : outputRateLimit
+                    },
+                    output: queryOutput
+                };
+                fillQueryOutputWith = self.formUtils.cleanJSONObject(fillQueryOutputWith);
+
+                var outputSchema;
+                if (outputElementType === 'table') {
+                    outputSchema = {
+                        title: "Action",
+                        propertyOrder: 5,
+                        required: true,
+                        oneOf: [
+                            {
+                                $ref: "#/definitions/queryOutputInsertType",
+                                title: "Insert"
+                            },
+                            {
+                                $ref: "#/definitions/queryOutputDeleteType",
+                                title: "Delete"
+                            },
+                            {
+                                $ref: "#/definitions/queryOutputUpdateType",
+                                title: "Update"
+                            },
+                            {
+                                $ref: "#/definitions/queryOutputUpdateOrInsertIntoType",
+                                title: "Update Or Insert"
+                            }
+                        ]
+                    };
+                } else {
+                    outputSchema = {
+                        required: true,
+                        title: "Action",
+                        propertyOrder: 5,
                         type: "object",
-                        title: "Pattern Query",
                         properties: {
-                            queryInput: {
-                                propertyOrder: 1,
-                                type: "object",
-                                title: "Query Input",
+                            insert: {
                                 required: true,
-                                properties: {
-                                    queryInput1: {
-                                        title: "Query Input Type - Normal Types",
-                                        type: "array",
-                                        format: "array",
-                                        items: {
-                                            title: "Normal Query Input Type",
-                                            oneOf: [
-                                                {
-                                                    $ref: "#/definitions/queryInputCountingType",
-                                                    title: "Counting Pattern Type"
-                                                },
-                                                {
-                                                    $ref: "#/definitions/queryInputAndOrType",
-                                                    title: "Logical Pattern(And Or) Type"
-                                                }
-                                            ]
-                                        }
+                                title: "Operation",
+                                type: "string",
+                                template: "Insert"
+                            },
+                            insertTarget: {
+                                type: 'string',
+                                title: 'Into',
+                                template: savedQueryOutputTarget,
+                                required: true
+                            },
+                            eventType: {
+                                required: true,
+                                title: "For",
+                                type: "string",
+                                enum: ['current events', 'expired events', 'all events'],
+                                default: 'all events'
+                            }
+                        }
+                    };
+                }
+
+                $(formContainer).append('<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
+                    '<div id="form-query-select" class="col-md-4"></div>' +
+                    '<div id="form-query-output" class="col-md-4"></div></div>');
+
+                var editorInput = new JSONEditor($('#form-query-input')[0], {
+                    schema: {
+                        type: 'object',
+                        title: 'Query Input',
+                        properties: {
+                            conditions: {
+                                type: 'array',
+                                title: 'Conditions',
+                                format: 'tabs',
+                                uniqueItems: true,
+                                required: true,
+                                minItems: 1,
+                                propertyOrder: 1,
+                                items: {
+                                    type: 'object',
+                                    options: {
+                                        disable_properties: false
                                     },
-                                    queryInput2: {
-                                        type: "object",
-                                        title: "Query Input Type - Negation Events",
-                                        oneOf: [
-                                            {
-                                                $ref: "#/definitions/queryInputNotAndType",
-                                                title: "Logical Pattern(Not And) Type"
-                                            },
-                                            {
-                                                $ref: "#/definitions/queryInputNotForType",
-                                                title: "Logical Pattern(Not For) Type"
-                                            }
-                                        ]
+                                    title: 'condition',
+                                    headerTemplate: "Condition" + "{{i1}}",
+                                    properties: {
+                                        conditionId: {
+                                            type: 'string',
+                                            title: 'Condition ID',
+                                            required: true,
+                                            minLength: 1,
+                                            propertyOrder: 1
+                                        },
+                                        streamName: {
+                                            type: 'string',
+                                            title: 'Stream',
+                                            enum: inputStreamNames,
+                                            required: true,
+                                            propertyOrder: 2
+                                        },
+                                        filter: {
+                                            type: 'string',
+                                            title: 'Filter',
+                                            minLength: 1,
+                                            propertyOrder: 3
+                                        }
                                     }
                                 }
                             },
-                            querySelect: {
-                                propertyOrder: 3,
+                            logic: {
+                                type: 'object',
+                                title: 'Logic',
                                 required: true,
-                                type: "object",
-                                title: "Query Select",
+                                propertyOrder: 2,
                                 properties: {
-                                    select: {
-                                        title: "Query Select Type",
-                                        required: true,
-                                        oneOf: [
-                                            {
-                                                $ref: "#/definitions/querySelectUserDefined",
-                                                title: "User-Defined"
-                                            },
-                                            {
-                                                $ref: "#/definitions/querySelectAll",
-                                                title: "All"
-                                            }
-                                        ]
+                                    statement: {
+                                        type: 'string',
+                                        title: 'Statement',
+                                        minLength:1,
+                                        required: true
                                     }
                                 }
+                            }
+                        }
+                    },
+                    startval: fillQueryInputWith,
+                    show_errors: "always",
+                    disable_properties: true,
+                    display_required_only: true,
+                    no_additional_properties: true,
+                    disable_array_delete_all_rows: true,
+                    disable_array_delete_last_row: true,
+                    disable_array_reorder: true
+                });
+
+                var selectScheme = {
+                    schema: {
+                        required: true,
+                        options: {
+                            disable_properties: false
+                        },
+                        type: "object",
+                        title: "Query Select",
+                        properties: {
+                            select: {
+                                propertyOrder: 1,
+                                title: "Select",
+                                required: true,
+                                oneOf: [
+                                    {
+                                        $ref: "#/definitions/querySelectUserDefined",
+                                        title: "User Defined Attributes"
+                                    },
+                                    {
+                                        $ref: "#/definitions/querySelectAll",
+                                        title: "All Attributes"
+                                    }
+                                ]
                             },
                             groupBy: {
-                                propertyOrder: 4,
+                                propertyOrder: 2,
                                 type: "array",
                                 format: "table",
                                 title: "Group By Attributes",
                                 uniqueItems: true,
+                                minItems: 1,
                                 items: {
                                     type: "object",
-                                    title : 'Attribute',
+                                    title: 'Attribute',
                                     properties: {
                                         attribute: {
                                             type: 'string',
                                             title: 'Attribute Name',
-                                            enum: possibleGroupByAttributes,
-                                            default: ""
+                                            enum: possibleGroupByAttributes
                                         }
                                     }
                                 }
                             },
-                            having: {
-                                propertyOrder: 5,
-                                title: "Having",
-                                type: "string",
-                                minLength: 1
-                            },
-                            orderBy: {
-                                propertyOrder: 6,
-                                type: "array",
-                                format: "table",
-                                title: "Order By Attributes",
-                                uniqueItems: true,
-                                items: {
-                                    type: "object",
-                                    title : 'Attribute',
-                                    properties: {
-                                        attribute: {
-                                            required: true,
-                                            type: 'string',
-                                            title: 'Attribute Name',
-                                            enum: possibleGroupByAttributes,
-                                            default: ""
-                                        },
-                                        order: {
-                                            required: true,
-                                            type: "string",
-                                            title: "Order",
-                                            enum: ['asc', 'desc'],
-                                            default: 'asc'
-                                        }
-                                    }
-                                }
-                            },
-                            limit: {
-                                propertyOrder: 7,
-                                title: "Limit",
-                                type: "number",
-                                minLength: 1
-                            },
-                            outputRateLimit: {
-                                propertyOrder: 8,
-                                title: "Output Rate Limit",
-                                type: "string",
-                                minLength: 1
-                            },
-                            queryOutput: {
-                                propertyOrder: 9,
-                                required: true,
+                            postFilter: {
+                                propertyOrder: 3,
                                 type: "object",
-                                title: "Query Output Type",
+                                title: "Post Select Filter",
                                 properties: {
-                                    output: {
-                                        title: "Query Output Type",
+                                    having: {
                                         required: true,
-                                        oneOf: [
-                                            {
-                                                $ref: "#/definitions/queryOutputInsertType",
-                                                title: "Insert Type"
-                                            },
-                                            {
-                                                $ref: "#/definitions/queryOutputDeleteType",
-                                                title: "Delete Type"
-                                            },
-                                            {
-                                                $ref: "#/definitions/queryOutputUpdateType",
-                                                title: "Update Type"
-                                            },
-                                            {
-                                                $ref: "#/definitions/queryOutputUpdateOrInsertIntoType",
-                                                title: "Update Or Insert Into Type"
-                                            }
-                                        ]
+                                        title: "Condition",
+                                        type: "string",
+                                        minLength: 1
                                     }
                                 }
                             }
                         },
                         definitions: {
-                            queryInputCountingType: {
-                                title: "Counting Pattern Event",
-                                type: "object",
-                                properties: {
-                                    inputType: {
-                                        required: true,
-                                        title: "Input Type",
-                                        type: "string",
-                                        template: "Counting Pattern Event"
-                                    },
-                                    forEvery: {
-                                        required: true,
-                                        title: "For Every",
-                                        type: "boolean",
-                                        enum: [true, false],
-                                        default: false
-                                    },
-                                    eventReference: {
-                                        title: "Event Reference",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    streamName: {
-                                        type: 'string',
-                                        title: 'Stream Name',
-                                        enum: inputStreams,
-                                        required: true
-                                    },
-                                    filter: {
-                                        title: "Filter",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    minCount: {
-                                        title: "Min Count",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    maxCount: {
-                                        title: "Max Count",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    within: {
-                                        title: "Within",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-
-                            },
-                            queryInputAndOrType: {
-                                title: "And Or Event",
-                                type: "object",
-                                properties: {
-                                    inputType: {
-                                        required: true,
-                                        title: "Input Type",
-                                        type: "string",
-                                        template: "Logical And Or Event"
-                                    },
-                                    forEvery: {
-                                        required: true,
-                                        title: "For Every",
-                                        type: "boolean",
-                                        enum: [true, false],
-                                        default: false
-                                    },
-                                    leftEventReference: {
-                                        title: "Left Stream Event Reference",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    leftStreamName: {
-                                        type: 'string',
-                                        title: 'Left Stream Name',
-                                        enum: inputStreams,
-                                        required: true
-                                    },
-                                    leftFilter: {
-                                        title: "Left Stream Filter",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    connectedWith: {
-                                        title: "Connected With",
-                                        type: "string",
-                                        enum: ['and', 'or'],
-                                        default: 'and'
-                                    },
-                                    rightEventReference: {
-                                        title: "Right Stream Event Reference",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    rightStreamName: {
-                                        type: 'string',
-                                        title: 'Right Stream Name',
-                                        enum: inputStreams,
-                                        required: true
-                                    },
-                                    rightFilter: {
-                                        title: "Right Stream Filter",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    within: {
-                                        title: "Within",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            },
-                            queryInputNotForType: {
-                                title: "Not For Event",
-                                type: "object",
-                                properties: {
-                                    inputType: {
-                                        required: true,
-                                        title: "Input Type",
-                                        type: "string",
-                                        template: "Logical Not For Event"
-                                    },
-                                    forEvery: {
-                                        required: true,
-                                        title: "For Every",
-                                        type: "boolean",
-                                        enum: [true, false],
-                                        default: false
-                                    },
-                                    streamName: {
-                                        type: 'string',
-                                        title: 'Stream Name',
-                                        enum: inputStreams,
-                                        required: true
-                                    },
-                                    filter: {
-                                        title: "Filter",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    forDuration: {
-                                        required: true,
-                                        title: "Duration",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            },
-                            queryInputNotAndType: {
-                                title: "Not And Event",
-                                type: "object",
-                                properties: {
-                                    inputType: {
-                                        required: true,
-                                        title: "Input Type",
-                                        type: "string",
-                                        template: "Logical Not And Event"
-                                    },
-                                    forEvery: {
-                                        required: true,
-                                        title: "For Every",
-                                        type: "boolean",
-                                        enum: [true, false],
-                                        default: false
-                                    },
-                                    leftStreamName: {
-                                        type: 'string',
-                                        title: 'Left Stream Name',
-                                        enum: inputStreams,
-                                        required: true
-                                    },
-                                    leftFilter: {
-                                        title: "Left Stream Filter",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    rightEventReference: {
-                                        title: "Right Stream Event Reference",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    rightStreamName: {
-                                        type: 'string',
-                                        title: 'Right Stream Name',
-                                        enum: inputStreams,
-                                        required: true
-                                    },
-                                    rightFilter: {
-                                        title: "Right Stream Filter",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    within: {
-                                        title: "Within",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            },
                             querySelectUserDefined: {
                                 required: true,
                                 type: "array",
                                 format: "table",
-                                title: "User Defined",
+                                title: "Select Attributes",
                                 uniqueItems: true,
-                                minItems: 1,
+                                options: {
+                                    disable_array_add: true,
+                                    disable_array_delete: true
+                                },
                                 items: {
                                     title: "Value Set",
                                     type: "object",
@@ -622,61 +466,169 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                             },
                             querySelectAll: {
                                 type: "string",
-                                title: "All",
+                                title: "Select All Attributes",
                                 template: '*'
+                            }
+                        }
+                    },
+                    startval: fillQuerySelectWith,
+                    show_errors: "always",
+                    disable_properties: true,
+                    display_required_only: true,
+                    no_additional_properties: true,
+                    disable_array_delete_all_rows: true,
+                    disable_array_delete_last_row: true,
+                    disable_array_reorder: true
+                };
+                var editorSelect = new JSONEditor($('#form-query-select')[0], selectScheme);
+                var selectNode = editorSelect.getEditor('root.select');
+                //disable fields that can not be changed
+                if (!(selectNode.getValue() === "*")) {
+                    for (var i = 0; i < outputElementAttributesList.length; i++) {
+                        editorSelect.getEditor('root.select.' + i + '.as').disable();
+                    }
+                }
+
+                editorSelect.watch('root.select', function () {
+                    var oldSelectValue = editorSelect.getValue().select;
+                    var newSelectValue = selectNode.getValue();
+                    if (oldSelectValue === "*" && newSelectValue !== "*") {
+                        if (select === "*") {
+                            fillQuerySelectWith = {
+                                select: possibleUserDefinedSelectTypeValues,
+                                groupBy: editorSelect.getValue().groupBy,
+                                postFilter: editorSelect.getValue().postFilter
+                            };
+                        } else {
+                            fillQuerySelectWith = {
+                                select: select,
+                                groupBy: editorSelect.getValue().groupBy,
+                                postFilter: editorSelect.getValue().postFilter
+                            };
+                        }
+                        fillQuerySelectWith = self.formUtils.cleanJSONObject(fillQuerySelectWith);
+                        selectScheme.startval = fillQuerySelectWith;
+                        $('#form-query-select').empty();
+                        editorSelect = new JSONEditor($('#form-query-select')[0], selectScheme);
+                        //disable fields that can not be changed
+                        for (var i = 0; i < outputElementAttributesList.length; i++) {
+                            editorSelect.getEditor('root.select.' + i + '.as').disable();
+                        }
+                    }
+                });
+
+                var editorOutput = new JSONEditor($('#form-query-output')[0], {
+                    schema: {
+                        required: true,
+                        type: "object",
+                        title: "Query Output",
+                        options: {
+                            disable_properties: false
+                        },
+                        properties: {
+                            orderBy: {
+                                propertyOrder: 2,
+                                type: "array",
+                                format: "table",
+                                title: "Order By Attributes",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    type: "object",
+                                    title: 'Attribute',
+                                    properties: {
+                                        attribute: {
+                                            required: true,
+                                            type: 'string',
+                                            title: 'Attribute Name',
+                                            enum: possibleGroupByAttributes
+                                        },
+                                        order: {
+                                            required: true,
+                                            type: "string",
+                                            title: "Order",
+                                            enum: ['asc', 'desc'],
+                                            default: 'asc'
+                                        }
+                                    }
+                                }
                             },
+                            limit: {
+                                propertyOrder: 3,
+                                type: "object",
+                                title: "Limit",
+                                properties: {
+                                    limit: {
+                                        required: true,
+                                        title: "Number of Events per Output",
+                                        type: "number",
+                                        minimum: 0
+                                    }
+                                }
+                            },
+                            outputRateLimit: {
+                                propertyOrder: 4,
+                                type: "object",
+                                title: "Rate Limiting",
+                                properties: {
+                                    outputRateLimit: {
+                                        required: true,
+                                        title: "By Events/Time/Snapshot",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            },
+                            output: outputSchema
+                        },
+                        definitions: {
                             queryOutputInsertType: {
                                 required: true,
-                                title: "Insert",
+                                title: "Action",
                                 type: "object",
+                                options: {
+                                    disable_properties: true
+                                },
                                 properties: {
-                                    outputType: {
-                                        required: true,
-                                        title: "Output Type",
-                                        type: "string",
-                                        template: "Insert"
+                                    insertTarget: {
+                                        type: 'string',
+                                        title: 'Into',
+                                        template: savedQueryOutputTarget,
+                                        required: true
                                     },
                                     eventType: {
                                         required: true,
-                                        title: "For Every",
+                                        title: "For",
                                         type: "string",
-                                        enum: ['current', 'expired', 'all'],
-                                        default: 'all'
-                                    },
-                                    insertTarget: {
-                                        type: 'string',
-                                        title: 'Insert Into',
-                                        template: savedQueryOutputTarget,
-                                        required: true
+                                        enum: ['current events', 'expired events', 'all events'],
+                                        default: 'all events'
                                     }
                                 }
                             },
                             queryOutputDeleteType: {
                                 required: true,
-                                title: "Delete",
+                                title: "Action",
                                 type: "object",
+                                options: {
+                                    disable_properties: true
+                                },
                                 properties: {
-                                    outputType: {
-                                        required: true,
-                                        title: "Output Type",
-                                        type: "string",
-                                        template: "Delete"
-                                    },
                                     deleteTarget: {
                                         type: 'string',
-                                        title: 'Delete From',
+                                        title: 'From',
                                         template: savedQueryOutputTarget,
                                         required: true
                                     },
-                                    forEventType: {
-                                        title: "For Every",
+                                    eventType: {
+                                        title: "For",
                                         type: "string",
-                                        enum: ['current', 'expired', 'all'],
-                                        default: 'all'
+                                        enum: ['current events', 'expired events', 'all events'],
+                                        default: 'all events',
+                                        required: true
                                     },
                                     on: {
                                         type: 'string',
-                                        title: 'On',
+                                        title: 'On Condition',
                                         minLength: 1,
                                         required: true
                                     }
@@ -684,26 +636,24 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                             },
                             queryOutputUpdateType: {
                                 required: true,
-                                title: "Update",
+                                title: "Action",
                                 type: "object",
+                                options: {
+                                    disable_properties: true
+                                },
                                 properties: {
-                                    outputType: {
-                                        required: true,
-                                        title: "Output Type",
-                                        type: "string",
-                                        template: "Update"
-                                    },
                                     updateTarget: {
                                         type: 'string',
-                                        title: 'Update From',
+                                        title: 'From',
                                         template: savedQueryOutputTarget,
                                         required: true
                                     },
-                                    forEventType: {
-                                        title: "For Every",
+                                    eventType: {
+                                        title: "For",
                                         type: "string",
-                                        enum: ['current', 'expired', 'all'],
-                                        default: 'all'
+                                        enum: ['current events', 'expired events', 'all events'],
+                                        default: 'all events',
+                                        required: true
                                     },
                                     set: {
                                         required: true,
@@ -730,7 +680,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                                     },
                                     on: {
                                         type: 'string',
-                                        title: 'On',
+                                        title: 'On Condition',
                                         minLength: 1,
                                         required: true
                                     }
@@ -738,26 +688,24 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                             },
                             queryOutputUpdateOrInsertIntoType: {
                                 required: true,
-                                title: "Update or Insert Into",
+                                title: "Action",
                                 type: "object",
+                                options: {
+                                    disable_properties: true
+                                },
                                 properties: {
-                                    outputType: {
-                                        required: true,
-                                        title: "Output Type",
-                                        type: "string",
-                                        template: "Update or Insert Into"
-                                    },
                                     updateOrInsertIntoTarget: {
                                         type: 'string',
-                                        title: 'Update or Insert Into',
+                                        title: 'From/Into',
                                         template: savedQueryOutputTarget,
                                         required: true
                                     },
-                                    forEventType: {
-                                        title: "For Every",
+                                    eventType: {
+                                        title: "For",
                                         type: "string",
-                                        enum: ['current', 'expired', 'all'],
-                                        default: 'all'
+                                        enum: ['current events', 'expired events', 'all events'],
+                                        default: 'all events',
+                                        required: true
                                     },
                                     set: {
                                         required: true,
@@ -784,7 +732,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                                     },
                                     on: {
                                         type: 'string',
-                                        title: 'On',
+                                        title: 'On Condition',
                                         minLength: 1,
                                         required: true
                                     }
@@ -794,15 +742,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
 
                         }
                     },
+                    startval: fillQueryOutputWith,
                     show_errors: "always",
-                    startval: fillWith,
-                    disable_properties: false,
+                    disable_properties: true,
                     display_required_only: true,
                     no_additional_properties: true,
                     disable_array_delete_all_rows: true,
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
                 });
+
                 $(formContainer).append('<div id="form-submit"><button type="button" ' +
                     'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
@@ -810,6 +759,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                 // 'Submit' button action
                 var submitButtonElement = $('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
+
+                    var inputErrors = editorInput.validate();
+                    var selectErrors = editorSelect.validate();
+                    var outputErrors = editorOutput.validate();
+                    if(inputErrors.length || selectErrors.length || outputErrors.length) {
+                        return;
+                    }
+
                     self.gridContainer.removeClass('disabledbutton');
                     self.toolPaletteContainer.removeClass('disabledbutton');
 
@@ -817,112 +774,64 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                     self.consoleListManager.removeConsole(formConsole);
                     self.consoleListManager.hideAllConsoles();
 
-                    var config = editor.getValue();
-                    var patternQueryInput = clickedElement.getQueryInput();
-                    var newEventObject;
-                    patternQueryInput.clearEventList();
-                    if (config.queryInput.queryInput1 !== undefined) {
-                        _.forEach(config.queryInput.queryInput1, function (queryInputEvent) {
-                            if (queryInputEvent.inputType === "Counting Pattern Event") {
-                                newEventObject = new PatternQueryInputCounting(queryInputEvent);
-                                if (queryInputEvent.eventReference === undefined) {
-                                    newEventObject.setEventReference('');
-                                }
-                                if (queryInputEvent.filter === undefined) {
-                                    newEventObject.setFilter('');
-                                }
-                                if (queryInputEvent.minCount === undefined) {
-                                    newEventObject.setMinCount('');
-                                }
-                                if (queryInputEvent.maxCount === undefined) {
-                                    newEventObject.setMaxCount('');
-                                }
-                                if (queryInputEvent.within === undefined) {
-                                    newEventObject.setWithin('');
-                                }
-                            } else if (queryInputEvent.inputType === "Logical And Or Event") {
-                                newEventObject = new PatternQueryInputAndOr(queryInputEvent);
-                                if (queryInputEvent.leftEventReference === undefined) {
-                                    newEventObject.setLeftEventReference('');
-                                }
-                                if (queryInputEvent.leftFilter === undefined) {
-                                    newEventObject.setLeftFilter('');
-                                }
-                                if (queryInputEvent.rightEventReference === undefined) {
-                                    newEventObject.setRightEventReference('');
-                                }
-                                if (queryInputEvent.rightFilter === undefined) {
-                                    newEventObject.setRightFilter('');
-                                }
-                                if (queryInputEvent.within === undefined) {
-                                    newEventObject.setWithin('');
-                                }
-                            } else {
-                                console.log("Invalid input event type for pattern query received!")
-                            }
-                            patternQueryInput.addEvent(newEventObject);
-                        });
-                    }
+                    var inputConfig = editorInput.getValue();
+                    var selectConfig = editorSelect.getValue();
+                    var outputConfig = editorOutput.getValue();
+                    
+                    var queryInput = clickedElement.getQueryInput();
 
-                    if (config.queryInput.queryInput2 !== undefined
-                        && config.queryInput.queryInput2.inputType !== undefined) {
-                        if (config.queryInput.queryInput2.inputType === "Logical Not For Event") {
-                            newEventObject = new PatternQueryInputNotFor(config.queryInput.queryInput2);
-                            if (config.queryInput.queryInput2.filter === undefined) {
-                                newEventObject.setFilter('');
-                            }
-                        } else if (config.queryInput.queryInput2.inputType === "Logical Not And Event") {
-                            newEventObject = new PatternQueryInputNotAnd(config.queryInput.queryInput2);
-                            if (config.queryInput.queryInput2.leftFilter === undefined) {
-                                newEventObject.setLeftFilter('');
-                            }
-                            if (config.queryInput.queryInput2.rightEventReference === undefined) {
-                                newEventObject.setRightEventReference('');
-                            }
-                            if (config.queryInput.queryInput2.rightFilter === undefined) {
-                                newEventObject.setRightFilter('');
-                            }
-                            if (config.queryInput.queryInput2.within === undefined) {
-                                newEventObject.setWithin('');
-                            }
+                    queryInput.clearConditionList();
+                    _.forEach(inputConfig.conditions, function (condition) {
+                        var conditionObjectOptions = {};
+                        _.set(conditionObjectOptions, 'conditionId', condition.conditionId);
+                        _.set(conditionObjectOptions, 'streamName', condition.streamName);
+                        if (condition.filter !== undefined) {
+                            _.set(conditionObjectOptions, 'filter', condition.filter);
                         } else {
-                            console.log("Invalid input event type for pattern query received!")
+                            _.set(conditionObjectOptions, 'filter', undefined);
                         }
-                        patternQueryInput.addEvent(newEventObject);
+                        var conditionObject = new PatternOrSequenceQueryCondition(conditionObjectOptions);
+                        queryInput.addCondition(conditionObject);
+                    });
+
+                    if (inputConfig.logic !== undefined && inputConfig.logic.statement !== undefined) {
+                        queryInput.setLogic(inputConfig.logic.statement);
+                    } else {
+                        queryInput.setLogic(undefined);
                     }
 
                     var selectAttributeOptions = {};
-                    if (config.querySelect.select instanceof Array) {
+                    if (selectConfig.select instanceof Array) {
                         _.set(selectAttributeOptions, 'type', 'user_defined');
-                        _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
-                    } else if (config.querySelect.select === "*") {
+                        _.set(selectAttributeOptions, 'value', selectConfig.select);
+                    } else if (selectConfig.select === "*") {
                         _.set(selectAttributeOptions, 'type', 'all');
-                        _.set(selectAttributeOptions, 'value', editor.getValue().querySelect.select);
+                        _.set(selectAttributeOptions, 'value', selectConfig.select);
                     } else {
                         console.log("Value other than \"user_defined\" and \"all\" received!");
                     }
                     var selectObject = new QuerySelect(selectAttributeOptions);
                     clickedElement.setSelect(selectObject);
 
-                    if (config.groupBy !== undefined) {
+                    if (selectConfig.groupBy !== undefined) {
                         var groupByAttributes = [];
-                        _.forEach(config.groupBy, function (groupByAttribute) {
+                        _.forEach(selectConfig.groupBy, function (groupByAttribute) {
                             groupByAttributes.push(groupByAttribute.attribute);
                         });
                         clickedElement.setGroupBy(groupByAttributes);
                     } else {
-                        clickedElement.setGroupBy('');
+                        clickedElement.setGroupBy(undefined);
                     }
 
-                    if (config.having !== undefined) {
-                        clickedElement.setHaving(config.having);
+                    if (selectConfig.postFilter !== undefined && selectConfig.postFilter.having !== undefined) {
+                        clickedElement.setHaving(selectConfig.postFilter.having);
                     } else {
-                        clickedElement.setHaving('');
+                        clickedElement.setHaving(undefined);
                     }
 
                     clickedElement.clearOrderByValueList();
-                    if (config.orderBy !== undefined) {
-                        _.forEach(config.orderBy, function (orderByValue) {
+                    if (outputConfig.orderBy !== undefined) {
+                        _.forEach(outputConfig.orderBy, function (orderByValue) {
                             var orderByValueObjectOptions = {};
                             _.set(orderByValueObjectOptions, 'value', orderByValue.attribute);
                             _.set(orderByValueObjectOptions, 'order', orderByValue.order);
@@ -931,51 +840,56 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'patternQueryInputC
                         });
                     }
 
-                    if (config.limit !== undefined) {
-                        clickedElement.setLimit(config.limit);
+                    if (outputConfig.limit !== undefined && outputConfig.limit.limit !== undefined) {
+                        clickedElement.setLimit(outputConfig.limit.limit);
                     } else {
-                        clickedElement.setLimit('');
+                        clickedElement.setLimit(undefined);
                     }
 
-                    if (config.outputRateLimit !== undefined) {
-                        clickedElement.setOutputRateLimit(config.outputRateLimit);
+                    if (outputConfig.outputRateLimit !== undefined
+                        && outputConfig.outputRateLimit.outputRateLimit !== undefined) {
+                        clickedElement.setOutputRateLimit(outputConfig.outputRateLimit.outputRateLimit);
                     } else {
-                        clickedElement.setOutputRateLimit('');
+                        clickedElement.setOutputRateLimit(undefined);
                     }
 
-                    var patternQueryOutput = clickedElement.getQueryOutput();
+                    var queryOutput = clickedElement.getQueryOutput();
                     var outputObject;
                     var outputType;
-                    if (config.queryOutput.output !== undefined) {
-                        if (config.queryOutput.output.outputType === "Insert") {
+                    var outputTarget;
+                    if (outputConfig.output !== undefined) {
+                        if (outputConfig.output.insertTarget !== undefined) {
                             outputType = "insert";
-                            outputObject = new QueryOutputInsert(config.queryOutput.output);
-                            if (config.queryOutput.output.eventType === undefined) {
-                                outputObject.setEventType('');
-                            }
-                        } else if (config.queryOutput.output.outputType === "Delete") {
+                            outputTarget = outputConfig.output.insertTarget;
+                            outputObject = new QueryOutputInsert(outputConfig.output);
+                        } else if (outputConfig.output.deleteTarget !== undefined) {
                             outputType = "delete";
-                            outputObject = new QueryOutputDelete(config.queryOutput.output);
-                            if (config.queryOutput.output.forEventType === undefined) {
-                                outputObject.setForEventType('');
-                            }
-                        } else if (config.queryOutput.output.outputType === "Update") {
+                            outputTarget = outputConfig.output.deleteTarget;
+                            outputObject = new QueryOutputDelete(outputConfig.output);
+                        } else if (outputConfig.output.updateTarget !== undefined) {
                             outputType = "update";
-                            outputObject = new QueryOutputUpdate(config.queryOutput.output);
-                            if (config.queryOutput.output.forEventType === undefined) {
-                                outputObject.setForEventType('');
-                            }
-                        } else if (config.queryOutput.output.outputType === "Update or Insert Into") {
+                            outputTarget = outputConfig.output.updateTarget;
+                            outputObject = new QueryOutputUpdate(outputConfig.output);
+                        } else if (outputConfig.output.updateOrInsertIntoTarget !== undefined) {
                             outputType = "update_or_insert_into";
-                            outputObject = new QueryOutputUpdateOrInsertInto(config.queryOutput.output);
-                            if (config.queryOutput.output.forEventType === undefined) {
-                                outputObject.setForEventType('');
-                            }
+                            outputTarget = outputConfig.output.updateOrInsertIntoTarget;
+                            outputObject = new QueryOutputUpdateOrInsertInto(outputConfig.output);
                         } else {
-                            console.log("Invalid output type for pattern query received!")
+                            console.log("Invalid output type for query received!")
                         }
-                        patternQueryOutput.setOutput(outputObject);
-                        patternQueryOutput.setType(outputType);
+
+                        if (outputConfig.output.eventType === undefined) {
+                            outputObject.setEventType(undefined);
+                        } else if(outputConfig.output.eventType === "all events"){
+                            outputObject.setEventType('all_events');
+                        } else if(outputConfig.output.eventType === "current events"){
+                            outputObject.setEventType('current_events');
+                        } else if(outputConfig.output.eventType === "expired events"){
+                            outputObject.setEventType('expired_events');
+                        }
+                        queryOutput.setTarget(outputTarget);
+                        queryOutput.setOutput(outputObject);
+                        queryOutput.setType(outputType);
                     }
                 });
 

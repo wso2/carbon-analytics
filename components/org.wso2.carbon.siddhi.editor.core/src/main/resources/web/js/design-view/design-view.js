@@ -18,17 +18,15 @@
 
 define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid',
         'configurationData', 'appData', 'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation',
-        'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'patternQueryInput',
-        'patternQueryInputCounting', 'patternQueryInputAndOr', 'patternQueryInputNotFor', 'patternQueryInputNotAnd',
-        'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
+        'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'edge', 'querySelect',
+        'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
+        'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
         'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
-              QueryWindow, PatternQueryInput, PatternQueryInputCounting, PatternQueryInputAndOr,
-              PatternQueryInputNotFor, PatternQueryInputNotAnd, Edge, QuerySelect, QueryOrderByValue, QueryOutput,
-              QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute,
-              JoinQueryInput, JoinQuerySource, PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition) {
+              QueryWindow, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete,
+              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource,
+              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition) {
 
         /**
          * @class DesignView
@@ -155,22 +153,10 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             });
             _.forEach(configurationData.siddhiAppConfig.patternQueryList, function(patternQuery){
                 var patternQueryObject = new Query(patternQuery);
-                var patternQueryInput = new PatternQueryInput();
-                _.forEach(patternQuery.queryInput.eventList, function(event){
-                    var eventType = event.type;
-                    var patternQueryEventObject;
-                    if(eventType === "counting") {
-                        patternQueryEventObject = new PatternQueryInputCounting(event);
-                    } else if (eventType === "andor") {
-                        patternQueryEventObject = new PatternQueryInputAndOr(event);
-                    } else if (eventType === "notfor") {
-                        patternQueryEventObject = new PatternQueryInputNotFor(event);
-                    } else if (eventType === "notand") {
-                        patternQueryEventObject = new PatternQueryInputNotAnd(event);
-                    } else {
-                        console.log("Invalid event type received for pattern query input event");
-                    }
-                    patternQueryInput.addEvent(patternQueryEventObject);
+                var patternQueryInput = new PatternOrSequenceQueryInput(patternQuery.queryInput);
+                _.forEach(patternQuery.queryInput.conditionList, function(condition){
+                    var patternQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                    patternQueryInput.addCondition(patternQueryConditionObject);
                 });
                 patternQueryObject.setQueryInput(patternQueryInput);
                 setSelectForQuery(patternQueryObject, patternQuery.select);
