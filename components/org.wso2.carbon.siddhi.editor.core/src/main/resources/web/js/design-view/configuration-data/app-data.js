@@ -36,6 +36,8 @@ define(['require', 'elementUtils', 'lodash'],
             this.sequenceQueryList = [];
             this.joinQueryList = [];
             this.partitionList = [];
+            this.sourceList = [];
+            this.sinkList = [];
             // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
             this.finalElementCount = 0;
 
@@ -81,6 +83,14 @@ define(['require', 'elementUtils', 'lodash'],
             this.partitionList.push(partition);
         };
 
+        AppData.prototype.addSource = function (source) {
+            this.sourceList.push(source);
+        };
+
+        AppData.prototype.addSink = function (sink) {
+            this.sinkList.push(sink);
+        };
+
         AppData.prototype.removeStream = function (streamId) {
             ElementUtils.prototype.removeElement(this.streamList, streamId);
         };
@@ -119,6 +129,14 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.removePartition = function (partitionId) {
             ElementUtils.prototype.removeElement(this.partitionList, partitionId);
+        };
+
+        AppData.prototype.removeSource = function (sourceId) {
+            ElementUtils.prototype.removeElement(this.sourceList, sourceId);
+        };
+
+        AppData.prototype.removeSink = function (sinkId) {
+            ElementUtils.prototype.removeElement(this.sinkList, sinkId);
         };
 
         AppData.prototype.setFinalElementCount = function (finalElementCount) {
@@ -163,6 +181,14 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.getPartition = function (partitionId) {
             return ElementUtils.prototype.getElement(this.partitionList, partitionId);
+        };
+
+        AppData.prototype.getSource = function (sourceId) {
+            return ElementUtils.prototype.getElement(this.sourceList, sourceId);
+        };
+
+        AppData.prototype.getSink = function (sinkId) {
+            return ElementUtils.prototype.getElement(this.sinkList, sinkId);
         };
 
         AppData.prototype.getFinalElementCount = function () {
