@@ -44,10 +44,11 @@ define(
             *       name: '',
             *       type: ''
             *  }
+            *
+            *  This attributes will be deleted from the json when sending to backend.
             * */
             this.type = 'join';
             if (options !== undefined) {
-                //tODO : remove firstConnectedElement and secondConnectedElement when sending json to backend
                 this.firstConnectedElement = options.firstConnectedElement;
                 this.secondConnectedElement = options.secondConnectedElement;
                 this.joinWith = options.joinWith;

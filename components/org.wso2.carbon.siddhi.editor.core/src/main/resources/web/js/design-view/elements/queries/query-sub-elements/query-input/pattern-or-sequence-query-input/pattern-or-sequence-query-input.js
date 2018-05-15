@@ -44,8 +44,8 @@ define(['require', 'elementUtils'],
                 this.type = options.type;
                 this.logic = options.logic;
             }
-            // TODO: remove this connectedElementNameList when sending the json to backend
-            // This will hold all the connected streams to the pattern/sequence query(front end use only)
+            // This will hold all the connected streams to the pattern/sequence query(front end use only).
+            // This attribute will be deleted from the json when sending to backend.
             this.connectedElementNameList = [];
             this.conditionList = [];
 

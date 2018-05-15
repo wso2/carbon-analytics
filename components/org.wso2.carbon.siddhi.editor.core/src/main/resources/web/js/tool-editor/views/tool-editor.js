@@ -217,7 +217,33 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             //console.log(JSON.stringify(designView.getConfigurationData()));
                             self.JSONObject = JSON.parse(JSON.stringify(designView.getConfigurationData()));
                         } else if (designContainer.is(':visible')) {
+
+                            /**
+                             * This method removes unnecessary attributes from the json which is sent to backend.
+                             * Removed attributes are used only for front end use only.
+                             * */
+                            function removeUnnecessaryFieldsFromJSON(object) {
+                                _.forEach(object.siddhiAppConfig.patternQueryList, function(patternQuery){
+                                    if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
+                                        delete patternQuery.queryInput['connectedElementNameList'];
+                                    }
+                                });
+                                _.forEach(object.siddhiAppConfig.sequenceQueryList, function(sequenceQuery){
+                                    if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
+                                        delete sequenceQuery.queryInput['connectedElementNameList'];
+                                    }
+                                });
+                                _.forEach(object.siddhiAppConfig.joinQueryList, function(joinQuery){
+                                    if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
+                                        delete joinQuery.queryInput['firstConnectedElement'];
+                                    }
+                                    if (joinQuery.queryInput.hasOwnProperty('secondConnectedElement')) {
+                                        delete joinQuery.queryInput['secondConnectedElement'];
+                                    }
+                                });
+                            }
                             self.JSONObject = JSON.parse(JSON.stringify(designView.getConfigurationData()));
+                            removeUnnecessaryFieldsFromJSON(self.JSONObject);
                             designContainer.hide();
                             designView.emptyDesignViewGridContainer();
                             sourceContainer.show();
