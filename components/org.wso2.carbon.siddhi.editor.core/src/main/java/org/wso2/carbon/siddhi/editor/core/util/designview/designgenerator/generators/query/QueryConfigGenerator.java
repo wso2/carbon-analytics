@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Generates QueryConfig object out of given Siddhi elements
+ * Generator to create QueryConfig from Siddhi elements
  */
 public class QueryConfigGenerator {
     /**

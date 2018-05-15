@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection;
 
-// TODO: 4/5/18 class comment
+/**
+ * Represents selection of Siddhi attributes
+ */
 public abstract class AttributesSelectionConfig {
     private String type;
 

@@ -20,7 +20,9 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 import java.util.List;
 
-// TODO: 4/4/18 class comment
+/**
+ * Represents Siddhi Partition with element
+ */
 public class PartitionWith {
     private String type;
     private List<PartitionWithExpression> expressions;

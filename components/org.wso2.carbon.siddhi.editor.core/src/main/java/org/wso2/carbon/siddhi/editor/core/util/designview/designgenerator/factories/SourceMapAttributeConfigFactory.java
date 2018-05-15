@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Creates a SourceMapAttributeConfig object
+ * Factory to create a SourceMapAttributeConfig
  */
 public class SourceMapAttributeConfigFactory {
     public SourceMapAttribute getSourceMapAttributeConfig(List<String> values) {

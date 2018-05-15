@@ -18,8 +18,10 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
-// TODO: 4/5/18 class comment
-public class PartitionWithTypes {
-    public static final String VALUE = "value";
-    public static final String RANGE = "range";
+/**
+ * Partition With Types
+ */
+public enum PartitionWithTypes {
+    VALUE,
+    RANGE;
 }

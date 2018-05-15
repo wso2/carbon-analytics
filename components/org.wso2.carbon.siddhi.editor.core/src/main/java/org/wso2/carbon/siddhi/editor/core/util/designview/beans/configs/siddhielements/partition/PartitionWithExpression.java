@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition;
 
-// TODO: 4/4/18 class comment
+/**
+ * Represents Siddhi Partition with Expression
+ */
 public class PartitionWithExpression {
     private String condition;
     private String streamId;

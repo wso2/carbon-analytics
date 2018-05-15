@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection;
 
-// TODO: 4/5/18 class comment. Denotes the alias selection of a variable. This can be either fn(var) or var
+/**
+ * Represents a selected Siddhi Attribute
+ */
 public class SelectedAttribute {
     private String expression;
     private String as;

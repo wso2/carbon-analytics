@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 
 /**
- * Represents a select part of type 'all' of a Siddhi Query
+ * Represents complete selection of Siddhi Attributes
  */
 public class AllSelectionConfig extends AttributesSelectionConfig {
     private String value;

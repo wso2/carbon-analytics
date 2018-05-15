@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator for Edges, that connect Siddhi Elements - considered as Nodess
+ * Generator to create Edges, that connect Siddhi Elements - considered as Nodes
  */
 public class EdgesGenerator {
     private SiddhiAppConfig siddhiAppConfig;

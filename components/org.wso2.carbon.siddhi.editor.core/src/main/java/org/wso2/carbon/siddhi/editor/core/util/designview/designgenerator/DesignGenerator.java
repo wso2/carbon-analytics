@@ -67,7 +67,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * Generates Siddhi app elements for the design view
+ * Generator to create Config objects from Siddhi Code
  */
 public class DesignGenerator {
     private String siddhiAppString;

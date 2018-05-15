@@ -21,9 +21,9 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 import org.wso2.siddhi.query.api.SiddhiElement;
 
 /**
- * Has methods involved in to converting Siddhi elements to Design view Config objects
- */ // TODO: 4/8/18 find a nice name
-public class ConfigBuildingUtilities {
+ * Has methods involved in converting Siddhi elements to Design view Config objects
+ */
+public class ConfigBuildingUtilities { // TODO move entirely to DesignGeneratorHelper
     /**
      * Avoids Instantiation
      */
