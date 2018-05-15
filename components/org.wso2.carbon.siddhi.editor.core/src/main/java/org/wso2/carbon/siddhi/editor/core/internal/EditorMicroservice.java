@@ -52,13 +52,13 @@ import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
+import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.DeserializersRegisterer;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.CodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.singletons.CodeGeneratorSingleton;
 import org.wso2.carbon.siddhi.editor.core.util.designview.singletons.DesignGeneratorSingleton;
 //import org.wso2.carbon.siddhi.editor.core.util.eventflow.EventFlow;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.SiddhiAppMap;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
@@ -905,7 +905,7 @@ public class EditorMicroservice implements Microservice {
             DesignGenerator designGenerator = DesignGeneratorSingleton.getInstance();
             EventFlow eventFlow = designGenerator.getEventFlow(siddhiAppString);
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
             return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(gson.toJson(eventFlow))
@@ -931,7 +931,7 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getCodeView(String siddhiAppEventFlowJSON) {
         try {
-            Gson gson = new Gson();
+            Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
             EventFlow eventFlow = gson.fromJson(siddhiAppEventFlowJSON, EventFlow.class);
             CodeGenerator codeGenerator = CodeGeneratorSingleton.getInstance();
             String siddhiAppCode = codeGenerator.getSiddhiAppCode(eventFlow);

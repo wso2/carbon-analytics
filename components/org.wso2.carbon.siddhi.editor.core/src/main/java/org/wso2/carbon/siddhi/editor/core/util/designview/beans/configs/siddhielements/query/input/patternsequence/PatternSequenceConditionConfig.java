@@ -22,18 +22,18 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
  * Represents a Condition element of Pattern | Sequence QueryInputConfig
  */
 public class PatternSequenceConditionConfig {
-    private String id;
+    private String conditionId;
     private String streamName;
     private String filter;
 
-    public PatternSequenceConditionConfig(String id, String streamName, String filter) {
-        this.id = id;
+    public PatternSequenceConditionConfig(String conditionId, String streamName, String filter) {
+        this.conditionId = conditionId;
         this.streamName = streamName;
         this.filter = filter;
     }
 
-    public String getId() {
-        return id;
+    public String getConditionId() {
+        return conditionId;
     }
 
     public String getStreamName() {
@@ -44,8 +44,8 @@ public class PatternSequenceConditionConfig {
         return filter;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setConditionId(String conditionId) {
+        this.conditionId = conditionId;
     }
 
     public void setStreamName(String streamName) {
