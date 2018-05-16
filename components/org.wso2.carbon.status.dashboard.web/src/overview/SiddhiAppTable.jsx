@@ -312,7 +312,6 @@ export default class SiddhiAppTable extends React.Component {
                     <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right'}}
                           to={window.contextPath + "/siddhi-apps"}>
                         APP VIEW &nbsp;&nbsp; </Link>
-
                 </div>
             </div>
         )
@@ -414,11 +413,9 @@ export default class SiddhiAppTable extends React.Component {
                                 onChange={number => {
                                     this.managerCurrentPage = number;
                                     this.loadManagerData(number, this.state.managerAppList);
-                                    console.log("applist" + this.state.managerAppList)
                                 }}
                             />
                         </div>
-
                     </div>
                 </div>
             );
@@ -454,7 +451,6 @@ export default class SiddhiAppTable extends React.Component {
                                 onChange={number => {
                                     this.currentPage = number;
                                     this.loadData(number, this.state.appsList);
-                                    console.log("applist" + this.state.appsList)
                                 }}
                             />
                         </div>
@@ -495,7 +491,6 @@ export default class SiddhiAppTable extends React.Component {
                                 onChange={number => {
                                     this.managerCurrentPage = number;
                                     this.loadManagerData(number, this.state.managerAppList);
-                                    console.log("applist" + this.state.managerAppList)
                                 }}
                             />
                         </div>
@@ -575,7 +570,6 @@ export default class SiddhiAppTable extends React.Component {
                                 onChange={number => {
                                     this.currentPage = number;
                                     this.loadData(number, this.state.appsList);
-                                    console.log("applist" + this.state.appsList)
                                 }}
                             />
                         </div>
@@ -608,11 +602,9 @@ export default class SiddhiAppTable extends React.Component {
                                 onChange={number => {
                                     this.managerCurrentPage = number;
                                     this.loadManagerData(number, this.state.managerAppList);
-                                    console.log("applist" + this.state.managerAppList)
                                 }}
                             />
                         </div>
-
                     </div>
                 </div>
             );
@@ -649,7 +641,6 @@ export default class SiddhiAppTable extends React.Component {
                                 onChange={number => {
                                     this.currentPage = number;
                                     this.loadData(number, this.state.appsList);
-                                    console.log("applist" + this.state.appsList)
                                 }}
                             />
                         </div>
@@ -686,7 +677,6 @@ export default class SiddhiAppTable extends React.Component {
                             />
                         </div>
                     </div>
-
                 </div>
             );
 
@@ -754,13 +744,10 @@ export default class SiddhiAppTable extends React.Component {
                                 onChange={number => {
                                     this.managerCurrentPage = number;
                                     this.loadManagerData(number, this.state.managerAppList);
-                                    console.log("applist" + this.state.managerAppList)
                                 }}
                             />
                         </div>
                     </div>
-
-
                 </div>
             );
         } else {
