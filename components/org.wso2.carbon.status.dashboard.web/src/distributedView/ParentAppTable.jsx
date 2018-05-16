@@ -142,7 +142,7 @@ export default class ParentAppTable extends React.Component {
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Child App Status</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Worker Node</h3>
+                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Worker Node (http Interface)</h3>
                             </TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
