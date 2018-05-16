@@ -168,6 +168,7 @@ export default class ParentAppTable extends React.Component {
                         onChange={number => {
                             this.currentPage = number;
                             this.loadData(number, this.state.appsList);
+                            console.log("applist"+this.state.appsList)
                         }}
                     />
                 </div>
