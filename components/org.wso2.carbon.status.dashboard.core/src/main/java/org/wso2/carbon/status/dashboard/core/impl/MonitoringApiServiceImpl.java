@@ -2111,7 +2111,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 }
                             }
                         } catch (feign.RetryableException ex) {
-                            logger.error("Error ocurred while connecting the node " + worker.getWorkerId());
+                            logger.error("Error ocurred while connecting the node " + worker.getWorkerId(), ex);
                         } catch (IOException e) {
                             logger.error("error occurred while retrieving response ", e);
                         }
