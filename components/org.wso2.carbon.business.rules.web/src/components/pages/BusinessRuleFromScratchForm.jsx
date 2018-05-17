@@ -298,8 +298,8 @@ export default class BusinessRuleFromScratchForm extends Component {
 
     /**
      * Returns Property Components, for properties of the Business Rule
-     * @param {string} propertyType     Type of the Property
-     * @param {string} formMode         Mode of the Business Rule form
+     * @param {String} propertyType     Type of the Property
+     * @param {String} formMode         Mode of the Business Rule form
      * @returns {Component[]}           Property Components
      */
     getPropertyComponents(propertyType, formMode) {
@@ -335,8 +335,8 @@ export default class BusinessRuleFromScratchForm extends Component {
     }
 
     /**
-     * Gets field names of the given Stream Definition, as an array
-     * @param {string} streamDefinition     Stream Definition
+     * Gets names of the fields from the given Stream Definition, as an array
+     * @param {String} streamDefinition     Stream Definition
      * @returns {Array}                     Field names
      */
     getFieldNames(streamDefinition) {
@@ -351,7 +351,7 @@ export default class BusinessRuleFromScratchForm extends Component {
 
     /**
      * Gets the given Stream Definition's field names as keys, and types as values in an object
-     * @param {string} streamDefinition     Stream Definition
+     * @param {String} streamDefinition     Stream Definition
      * @returns {Object}                    Field names and types
      */
     getFieldNamesAndTypes(streamDefinition) {
@@ -369,40 +369,9 @@ export default class BusinessRuleFromScratchForm extends Component {
     }
 
     /**
-     * Shows the snackbar with the given message, or hides when no message is given
-     * @param {string} message       Snackbar message text
-     */
-    toggleSnackbar(message) {
-        if (message) {
-            this.setState({
-                displaySnackbar: true,
-                snackbarMessage: message,
-            });
-        } else {
-            this.setState({
-                displaySnackbar: false,
-            });
-        }
-    }
-
-    updateRuleComponents(ruleComponents) {
-        const state = this.state;
-        state.businessRuleProperties.ruleComponents = ruleComponents;
-        this.setState(state);
-    }
-
-    // Filter Rule related functions todo organize
-    updateFilterRule(filterRuleIndex, filterRuleArray) {
-        const state = this.state;
-        state.businessRuleProperties.ruleComponents.filterRules[filterRuleIndex] = filterRuleArray;
-        this.setState(state);
-    }
-
-    // TODO The following should be removed [start]--------------------------------
-    /**
-     * Updates the Attribute of the Filter Rule, that has the given index
-     * @param {number} filterRuleIndex      Index of the Filter rule, whose Attribute was modified
-     * @param {string} value                Value of the Attribute
+     * Gets default error states of the given business rule properties
+     * @param {Object} businessRuleProperties       Business Rule Properties object
+     * @returns {Object}                            Object that contains error states of business rule fields
      */
     updateFilterRuleAttribute(filterRuleIndex, value) {
         // TODO refactor to object[variable]
@@ -757,8 +726,11 @@ export default class BusinessRuleFromScratchForm extends Component {
     }
 
     /**
-     * Returns the Snackbar
-     * @returns {Component}     Snackbar Component
+     * Returns the Promise for submitting a business rule for creating/updating
+     * @param {Object} businessRuleObject       Business rule object to be submitted
+     * @param {boolean} deployStatus            Whether to deploy the business rule or not
+     * @param {boolean} isUpdate                Whether to update or create the business rule
+     * @returns {AxiosPromise}                  Promise to perform create/update with a business rule object
      */
     showSnackbar() {
         return (
@@ -855,15 +827,11 @@ export default class BusinessRuleFromScratchForm extends Component {
         return true;
     }
 
-    getSubmitPromise(businessRuleObject, deployStatus, isUpdate) {
-        if (isUpdate) {
-            return new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-                .updateBusinessRule(businessRuleObject.uuid, JSON.stringify(businessRuleObject), deployStatus);
-        }
-        return new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-            .createBusinessRule(JSON.stringify(businessRuleObject), deployStatus.toString());
-    }
-
+    /**
+     * Submits the entered properties of the business rule for saving
+     * @param {boolean} shouldDeploy        Whether to deploy the business rule or not
+     * @param {boolean} isUpdate            Whether to update or create the business rule
+     */
     submitBusinessRule(shouldDeploy, isUpdate) {
         this.setState({
             showSubmitButtons: false,

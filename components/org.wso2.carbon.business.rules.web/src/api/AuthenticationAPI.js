@@ -80,8 +80,8 @@ export default class AuthenticationAPI {
     /**
      * Login user.
      *
-     * @param {string} username Username
-     * @param {string} password Password
+     * @param {String} username Username
+     * @param {String} password Password
      * @param {boolean} rememberMe Remember me flag
      * @return {AxiosPromise} Axios promise
      */
@@ -104,7 +104,7 @@ export default class AuthenticationAPI {
     /**
      * Logout user.
      *
-     * @param {string} token Partial access token
+     * @param {String} token Partial access token
      * @return {AxiosPromise} Axios promise
      */
     static logout(token) {

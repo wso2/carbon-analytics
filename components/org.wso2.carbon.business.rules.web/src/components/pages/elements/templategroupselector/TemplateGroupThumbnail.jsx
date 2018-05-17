@@ -47,8 +47,8 @@ const styles = {
 export default class TemplateGroupThumbnail extends Component {
     /**
      * Generates initials for the avatar, with the given template group name
-     * @param {string} templateGroupName        Name of the template group
-     * @returns {string}                        Initials for the avatar
+     * @param {String} templateGroupName        Name of the template group
+     * @returns {String}                        Initials for the avatar
      */
     generateAvatarInitials(templateGroupName) {
         let avatarInitials = '';
@@ -68,7 +68,7 @@ export default class TemplateGroupThumbnail extends Component {
 
     /**
      * Generates a style with the given name, for the avatar
-     * @param {string} name         Name of the template group
+     * @param {String} name         Name of the template group
      * @returns {Object}            Style for the avatar
      */
     generateAvatarStyle(name) {

@@ -235,7 +235,7 @@ export default class BusinessRuleFromTemplateForm extends Component {
 
     /**
      * Shows the snackbar with the given message, or hides when no message is given
-     * @param {string} message       Snackbar message text
+     * @param {String} message       Snackbar message text
      */
     toggleSnackbar(message) {
         if (message) {
@@ -253,7 +253,7 @@ export default class BusinessRuleFromTemplateForm extends Component {
 
     /**
      * Returns Property Components, for properties of the Business Rule
-     * @param {string} formMode     Mode of the Business Rule form
+     * @param {String} formMode     Mode of the Business Rule form
      * @returns {Component[]}       Property Components
      */
     getPropertyComponents(formMode) {
@@ -324,8 +324,8 @@ export default class BusinessRuleFromTemplateForm extends Component {
 
     /**
      * Updates the value of the given property of the Business Rule
-     * @param {string} property      Property key
-     * @param {string} value         Property value
+     * @param {String} property      Property key
+     * @param {String} value         Property value
      */
     updatePropertyValue(property, value) {
         const state = this.state;
@@ -337,7 +337,7 @@ export default class BusinessRuleFromTemplateForm extends Component {
 
     /**
      * Loads properties for the selected Rule Template
-     * @param {string} templateGroupUUID        UUID of the Template Group to which, the Rule Template belongs to
+     * @param {String} templateGroupUUID        UUID of the Template Group to which, the Rule Template belongs to
      * @param {Object} event                    Event of the Rule Template selection
      */
     handleRuleTemplateSelected(templateGroupUUID, event) {

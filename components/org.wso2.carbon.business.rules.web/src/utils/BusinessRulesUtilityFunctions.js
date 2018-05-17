@@ -23,7 +23,7 @@ class BusinessRulesUtilityFunctions {
      * Generates UUID for a given Business Rule name
      *
      * @param businessRuleName
-     * @returns {string}
+     * @returns {String}
      */
     static generateBusinessRuleUUID(businessRuleName) {
         return businessRuleName.toLowerCase().split(' ').join('-')

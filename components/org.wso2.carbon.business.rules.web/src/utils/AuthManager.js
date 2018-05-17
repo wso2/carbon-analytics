@@ -46,8 +46,8 @@ export default class AuthManager {
     /**
      * Set session cookie.
      *
-     * @param {string} name Name of the cookie
-     * @param {string} value Value of the cookie
+     * @param {String} name Name of the cookie
+     * @param {String} value Value of the cookie
      * @param {number} expiresIn Number of milliseconds to expire the cookie
      */
     static setSessionCookie(name, value, expiresIn) {
@@ -63,8 +63,8 @@ export default class AuthManager {
     /**
      * Get session cookie by name.
      *
-     * @param {string} name Name of the cookie
-     * @returns {string} Content
+     * @param {String} name Name of the cookie
+     * @returns {String} Content
      */
     static getSessionCookie(name) {
         name = `${name}=`;
@@ -84,7 +84,7 @@ export default class AuthManager {
     /**
      * Delete session cookie by name.
      *
-     * @param {string} name Name of the cookie
+     * @param {String} name Name of the cookie
      */
     static deleteSessionCookie(name) {
         document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=' + appContext;
@@ -149,8 +149,8 @@ export default class AuthManager {
     /**
      * Authenticate the user and set the user into the session.
      *
-     * @param {string} username Username
-     * @param {string } password Password
+     * @param {String} username Username
+     * @param {String } password Password
      * @param {boolean} rememberMe Remember me flag
      * @returns {Promise} Promise
      */

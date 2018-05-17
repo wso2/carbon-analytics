@@ -130,7 +130,7 @@ export default class LandingPage extends Component {
 
     /**
      * Re-deploys the business rule, that has the given UUID
-     * @param {string} businessRuleUUID     UUID of the business rule
+     * @param {String} businessRuleUUID     UUID of the business rule
      */
     redeployBusinessRule(businessRuleUUID) {
         new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
@@ -147,7 +147,7 @@ export default class LandingPage extends Component {
 
     /**
      * Deletes the business rule, that has the given UUID
-     * @param {string} businessRuleUUID     UUID of the business rule
+     * @param {String} businessRuleUUID     UUID of the business rule
      */
     deleteBusinessRule(businessRuleUUID) {
         this.toggleDeleteDialog();
@@ -189,7 +189,7 @@ export default class LandingPage extends Component {
 
     /**
      * Displays the snackbar with the given message (if any), otherwise hides it
-     * @param {string} message      Snackbar message
+     * @param {String} message      Snackbar message
      */
     toggleSnackbar(message) {
         if (message) {
@@ -207,7 +207,7 @@ export default class LandingPage extends Component {
     /**
      * Displays the delete dialog for the business rule with the given UUID (if any),
      * otherwise hides it
-     * @param {string} businessRuleUUID     UUID of the business rule
+     * @param {String} businessRuleUUID     UUID of the business rule
      */
     toggleDeleteDialog(businessRuleUUID) {
         if (businessRuleUUID) {

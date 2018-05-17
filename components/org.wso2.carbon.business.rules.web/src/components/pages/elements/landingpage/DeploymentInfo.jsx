@@ -74,7 +74,7 @@ const styles = {
 export default class DeploymentInfo extends Component {
     /**
      * Renders a node that represents a Siddhi app and its status, in the node with the given Host and Port
-     * @param {string} hostAndPort      Host and the Port of the node
+     * @param {String} hostAndPort      Host and the Port of the node
      * @param {number} status           Number, which depicts the deployment status of the siddhi app
      * @returns {Component}             Representation of a Siddhi app's deployment status
      */
