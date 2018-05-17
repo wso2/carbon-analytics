@@ -176,7 +176,7 @@ export default class AutoCompleteProperty extends Component {
                     placeholder: '',
                     // TODO refactor "x ? x : '' " type of things to "x || '' "
                     value: (this.props.value) || '',
-                    onChange: (e, v) => this.props.onChange(v.newValue),
+                    onChange: (e, v) => this.props.onChange(v),
                 }}
             />
         );
