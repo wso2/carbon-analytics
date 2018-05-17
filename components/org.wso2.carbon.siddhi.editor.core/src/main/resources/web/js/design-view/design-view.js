@@ -241,8 +241,8 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          */
         DesignView.prototype.renderToolPalette = function () {
             var errMsg = '';
-            var toolPaletteContainer = this._$parent_el.find(_.get(this.options, 'design_view.tool_palette.container'))
-                .get(0);
+            var toolPaletteContainer =
+                this._$parent_el.find(_.get(this.options, 'design_view.tool_palette.container')).get(0);
             if (toolPaletteContainer === undefined) {
                 errMsg = 'unable to find tool palette container with selector: '
                     + _.get(this.options, 'design_view.tool_palette.container');

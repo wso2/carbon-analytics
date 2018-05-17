@@ -47,7 +47,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             _.set(formBuilderOptions, 'application', this.application);
             _.set(formBuilderOptions, 'configurationData', this.configurationData);
             _.set(formBuilderOptions, 'jsPlumbInstance', this.jsPlumbInstance);
-            _.set(formBuilderOptions, 'dropElements', this);
             this.formBuilder = new FormBuilder(formBuilderOptions);
         };
 

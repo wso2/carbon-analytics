@@ -152,53 +152,29 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     }
                     this._sourceView.editorResize();
 
-                    var JSONString = "{" +
-                        "\"siddhiAppConfig\": {" +
-                        "\"streamList\":{" +
-                        "\"0\":{ \"id\":\"1\"," +
-                        "\"name\":\"das\"," +
-                        "\"attributeList\":{\"0\":{\"name\":\"DA\",\"type\":\"string\"},\"length\":1}}," +
-                        "\"1\":{ \"id\":\"3\"," +
-                        "\"name\":\"asc\"," +
-                        "\"attributeList\":{\"0\":{\"name\":\"DA\",\"type\":\"string\"},\"length\":1}}," +
-                        "\"length\":2" +
-                        "}," +
-                        "\"windowFilterProjectionQueryList\":{\"0\":{\"id\":\"4\",\"queryInput\":{\"type\":\"projection\",\"from\":\"das\",\"filter\":\"\",\"window\":\"\"},\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"\",\"as\":\"\"}]},\"groupBy\":[],\"orderBy\":{\"0\":{\"value\":\"DA\",\"order\":\"desc\"},\"length\":1},\"limit\":12,\"having\":\"\",\"outputRateLimit\":\"\",\"queryOutput\":{\"type\":\"insert\",\"output\":{\"eventType\":\"all\"},\"target\":\"asc\"},\"annotationList\":{}},\"length\":1}," +
-                        "\"patternQueryList\":{" +
-                        "\"0\":{\"id\":\"2\"," +
-                        "\"queryInput\":{" +
-                        "\"type\":\"pattern\"," +
-                        "\"connectedElementNameList\":[\"asc\"]," +
-                        "\"eventList\":{\"0\":{\"type\":\"andor\",\"forEvery\":true,\"leftEventReference\":\"12\",\"leftStreamName\":\"asc\",\"leftFilter\":\"11\",\"connectedWith\":\"and\",\"rightEventReference\":\"13\",\"rightStreamName\":\"asc\",\"rightFilter\":\"14\",\"within\":\"15\"},\"1\":{\"type\":\"notfor\",\"forEvery\":true,\"streamName\":\"asc\",\"filter\":\"321\",\"forDuration\":\"123\"},\"length\":2}},\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"ewq\",\"as\":\"ewq\"}]},\"groupBy\":[],\"orderBy\":{\"0\":{\"value\":\"DA\",\"order\":\"desc\"},\"length\":1},\"limit\":45,\"having\":\"eq\",\"outputRateLimit\":\"ewq\",\"queryOutput\":{\"type\":\"delete\",\"output\":{\"eventType\":\"all\",\"on\":\"w\"},\"target\":\"asc\"},\"annotationList\":{}}," +
-                        "\"length\":1},"+
-                        "\"joinQueryList\":{}," +
-                        "\"partitionList\":{}," +
-                        "\"finalElementCount\":0" +
-                        "}," +
-                        "\"edgeList\":{" +
-                        "\"0\":{ \"id\":\"2_3\"," +
-                        "\"parentId\":\"2\"," +
-                        "\"parentType\":\"query\"," +
-                        "\"childId\":\"3\"," +
-                        "\"childType\":\"stream\"}," +
-                        "\"1\":{ \"id\":\"3_2\"," +
-                        "\"parentId\":\"3\"," +
-                        "\"parentType\":\"query\"," +
-                        "\"childId\":\"2\"," +
-                        "\"childType\":\"stream\"}," +
-                        "\"2\":{\"id\":\"4_1\"," +
-                        "\"parentId\":\"4\"," +
-                        "\"parentType\":\"query\"," +
-                        "\"childId\":\"1\"," +
-                        "\"childType\":\"stream\"}," +
-                        "\"3\":{\"id\":\"3_4\"," +
-                        "\"parentId\":\"3\"," +
-                        "\"parentType\":\"query\"," +
-                        "\"childId\":\"4\"," +
-                        "\"childType\":\"stream\"}," +
-                        "\"length\":4" +
-                        "}" +
-                        "}";
+                    var JSONString = "{\"siddhiAppConfig\":{\"streamList\":[{\"id\":\"view10_element_1\",\"name\":\"das\"," +
+                        "\"attributeList\":[{\"name\":\"DA\",\"type\":\"string\"}],\"annotationList\":[]},{\"id\":\"view10_element_3\"," +
+                        "\"name\":\"asc\",\"attributeList\":[{\"name\":\"DA\",\"type\":\"string\"}],\"annotationList\":[]}],\"tableList\":[]," +
+                        "\"windowList\":[],\"triggerList\":[],\"aggregationList\":[],\"windowFilterProjectionQueryList\":" +
+                        "[{\"id\":\"view10_element_4\",\"queryInput\":{\"type\":\"projection\",\"from\":\"das\",\"filter\":\"\",\"window\":{}}," +
+                        "\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"\",\"as\":\"\"}]},\"groupBy\":[]," +
+                        "\"limit\":12,\"having\":\"\",\"outputRateLimit\":\"\",\"queryOutput\":{\"type\":\"insert\",\"output\":" +
+                        "{\"eventType\":\"all\"},\"target\":\"asc\"},\"orderBy\":[{\"value\":\"DA\",\"order\":\"desc\"}],\"annotationList\":[]}]," +
+                        "\"patternQueryList\":[],\"sequenceQueryList\":[{\"id\":\"view10_element_5\",\"queryInput\":" +
+                        "{\"type\":\"sequence\",\"logic\":\"gerwg\",\"connectedElementNameList\":[\"das\",\"asc\"]," +
+                        "\"conditionList\":[{\"conditionId\":\"ferwgfre\",\"streamName\":\"das\"},{\"conditionId\":\"rewgrew\"," +
+                        "\"streamName\":\"asc\",\"filter\":\"kgk\"}]},\"select\":{\"type\":\"user_defined\"," +
+                        "\"value\":[{\"expression\":\"jkjgj\",\"as\":\"DA\"}]},\"queryOutput\":{\"type\":\"insert\"," +
+                        "\"output\":{\"eventType\":\"all_events\"},\"target\":\"asc\"},\"orderBy\":[],\"annotationList\":" +
+                        "[]}],\"joinQueryList\":[],\"partitionList\":[],\"finalElementCount\":4},\"edgeList\":[{\"id\":" +
+                        "\"view10_element_4_view10_element_1\",\"parentId\":\"view10_element_4\",\"parentType\":\"query\"," +
+                        "\"childId\":\"view10_element_1\",\"childType\":\"stream\"},{\"id\":\"view10_element_3_view10_element_4\"," +
+                        "\"parentId\":\"view10_element_3\",\"parentType\":\"query\",\"childId\":\"view10_element_4\",\"childType\":\"stream\"}," +
+                        "{\"id\":\"view10_element_5_view10_element_1\",\"parentId\":\"view10_element_5\",\"parentType\":" +
+                        "\"query\",\"childId\":\"view10_element_1\",\"childType\":\"stream\"},{\"id\":\"view10_element_3_view10_element_5\"" +
+                        ",\"parentId\":\"view10_element_3\",\"parentType\":\"query\",\"childId\":\"view10_element_5\"," +
+                        "\"childType\":\"stream\"},{\"id\":\"view10_element_5_view10_element_3\",\"parentId\":\"view10_element_5\"" +
+                        ",\"parentType\":\"query\",\"childId\":\"view10_element_3\",\"childType\":\"stream\"}]}";
 
                     this.JSONObject = JSON.parse(JSONString);
                     console.log(this.JSONObject);
@@ -260,7 +236,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             self._sourceView.editorResize();
                             toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
                                 "<span class=\"toggle-button-text\">Design View</span>");
-                            //console.log(JSON.stringify(designView.getConfigurationData()));
+                            console.log(JSON.stringify(designView.getConfigurationData()));
                         }
                         // NOTE - This trigger should be always handled after the 'if' condition
                         self.trigger("view-switch");
