@@ -29,7 +29,7 @@ import { IconButton } from 'material-ui';
 import Paper from 'material-ui/Paper';
 // App Components
 import Property from '../Property';
-import FilterRule from './FilterRule';
+import FilterRule from './filtercomponent/FilterRule';
 // App Utilities
 import BusinessRulesUtilityFunctions from '../../../../../utils/BusinessRulesUtilityFunctions';
 // App Constants
