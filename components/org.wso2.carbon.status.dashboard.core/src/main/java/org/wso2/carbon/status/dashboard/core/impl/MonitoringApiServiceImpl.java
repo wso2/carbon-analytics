@@ -2038,7 +2038,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @throws SQLException
      */
     @Override
-    public Response getSingleDeploymentSiddhiApps(String username) throws NotFoundException, SQLException {
+    public Response getSingleDeploymentSiddhiApps(String username) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(
                 Constants.PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -2135,7 +2135,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @throws SQLException
      */
     @Override
-    public Response getHASiddhiApps(String username) throws NotFoundException, SQLException {
+    public Response getHASiddhiApps(String username) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(
                 Constants.PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -2234,7 +2234,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
 
     @Override
-    public Response getAllManagersSiddhiApps(String username) throws NotFoundException, SQLException {
+    public Response getAllManagersSiddhiApps(String username) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(
                 Constants.PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
         if (isAuthorized) {
