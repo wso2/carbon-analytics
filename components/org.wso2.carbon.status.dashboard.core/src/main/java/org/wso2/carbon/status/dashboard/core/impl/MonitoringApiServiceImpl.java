@@ -2031,6 +2031,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Returns all the single deployment siddhi apps
+     *
      * @param username
      * @return
      * @throws NotFoundException
@@ -2127,6 +2128,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Returns all the HA Siddhi app details
+     *
      * @param username
      * @return
      * @throws NotFoundException
@@ -2224,6 +2226,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * Return all the siddhi apps that are deployed in the active manager nodes
+     *
      * @param username
      * @return
      * @throws NotFoundException

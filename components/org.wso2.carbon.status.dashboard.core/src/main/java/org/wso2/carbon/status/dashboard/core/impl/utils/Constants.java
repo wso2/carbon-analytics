@@ -100,9 +100,9 @@ public class Constants {
     public static final String DATA_TYPE_BOOL = "booleanType";
     public static final String ACTIVE_APP_STATUS = "active";
     public static final String PASSIVE_APP_STATUS = "passive";
-    
+
     public static final int HOUR = 3600000;
-    
+
     private Constants() {
         //preventing initialization
     }
