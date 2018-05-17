@@ -34,15 +34,8 @@ import {Link} from "react-router-dom";
 const dataConstants = {PAGE_LENGTH: 7};
 
 const styles = {
-    root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
-    gridList: {width: '90%', height: '100%', padding: 40},
     h3: {color: '#dedede', marginLeft: '2%', backgroundColor: '#222222'},
     h3Title: {color: '#C0C0C0', marginLeft: '2%', backgroundColor: '#222222', marginTop: '4%'},
-    titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
-    headerStyle: {height: 30, backgroundColor: '#242424'},
-    paper: {height: 50, width: 500, textAlign: 'center'},
-    background: {backgroundColor: '#222222'},
-    divider: {backgroundColor: '#9E9E9E', width: '90%'},
     navBtn: {color: '#fff', padding: '0 16px 0 12px', verticalAlign: 'middle'},
     alignCenter: {display: 'flex', alignItems: 'center'},
 };
