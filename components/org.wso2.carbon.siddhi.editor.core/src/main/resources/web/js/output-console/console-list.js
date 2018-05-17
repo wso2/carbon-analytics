@@ -244,7 +244,11 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 console.getHeader().remove();
                 console.remove();
                 this.trigger("console-removed", console);
-                this.hideConsoleComponents();
+
+                // setting the global console as the next active console
+                var nextConsole = this.getGlobalConsole();
+                this.setActiveConsole(nextConsole);
+                this.hideAllConsoles();
             },
             /**
              * set selected console

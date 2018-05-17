@@ -129,8 +129,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
                     }
                 }
                 // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                self.consoleListManager.removeFormConsole(formConsole);
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
