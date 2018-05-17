@@ -30,9 +30,10 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 this.application = options.application;
                 this.formUtils = options.formUtils;
                 this.consoleListManager = options.application.outputController;
+                var currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
-            this.gridContainer = $("#grid-container");
-            this.toolPaletteContainer = $("#tool-palette-container");
         };
 
         /**
@@ -46,10 +47,9 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
             var propertyDiv = $('<div id="property-header"><h3>Define Trigger </h3></div>' +
                 '<div id="define-trigger" class="define-trigger"></div>');
             formContainer.append(propertyDiv);
-            var triggerElement = $("#define-trigger")[0];
 
             // generate the form to define a trigger
-            var editor = new JSONEditor(triggerElement, {
+            var editor = new JSONEditor(formContainer[0], {
                 schema: {
                     type: "object",
                     title: "Trigger",
@@ -81,7 +81,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
             formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
 
             // 'Submit' button action
-            var submitButtonElement = $('#submit')[0];
+            var submitButtonElement = $(formContainer).find('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
@@ -108,8 +108,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
 
-                self.gridContainer.removeClass("disabledbutton");
-                self.toolPaletteContainer.removeClass("disabledbutton");
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
             });
             return editor.getValue().name;
         };
@@ -122,9 +122,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
          */
         TriggerForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            // The container and the tool palette are disabled to prevent the user from dropping any elements
-            self.gridContainer.addClass("disabledbutton");
-            self.toolPaletteContainer.addClass("disabledbutton");
+            self.designViewContainer.addClass('disableContainer');
+            self.toggleViewButton.addClass('disableContainer');
 
             var id = $(element).parent().attr('id');
             // retrieve the trigger information from the collection
@@ -168,12 +167,12 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 no_additional_properties: true,
                 startval: fillWith
             });
-            $(formContainer).append('<div id="form-submit"><button type="button" ' +
+            formContainer.append('<div id="form-submit"><button type="button" ' +
                 'class="btn btn-default">Submit</button></div>' +
                 '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
             // 'Submit' button action
-            var submitButtonElement = $('#form-submit')[0];
+            var submitButtonElement = $(formContainer).find('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
@@ -186,9 +185,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                     alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
-                // The container and the palette are disabled to prevent the user from dropping any elements
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
 
                 var config = editor.getValue();
 
@@ -205,10 +203,10 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $('#form-cancel')[0];
+            var cancelButtonElement = $(formContainer).find('#form-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);

@@ -31,9 +31,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 this.application = options.application;
                 this.formUtils = options.formUtils;
                 this.consoleListManager = options.application.outputController;
+                var currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
-            this.gridContainer = $("#grid-container");
-            this.toolPaletteContainer = $("#tool-palette-container");
         };
 
         /**
@@ -47,8 +48,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             var propertyDiv = $('<div id="property-header"><h3>Define Aggregation </h3></div>' +
                 '<div id="define-aggregation" class="define-aggregation"></div>');
             formContainer.append(propertyDiv);
-            var aggregationElement = $("#define-aggregation")[0];
-            $(aggregationElement).append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
+            formContainer.append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
                 '<div id="form-aggregation-select" class="col-md-4"></div>' +
                 '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
 
@@ -84,7 +84,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             }
 
             // generate the form to define a aggregation
-            var editorInput = new JSONEditor($('#form-aggregation-input')[0], {
+            var editorInput = new JSONEditor($(formContainer).find('#form-aggregation-input')[0], {
                 schema: {
                     type: "object",
                     title: "Aggregation Input",
@@ -191,7 +191,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 display_required_only: true,
                 no_additional_properties: true
             };
-            var editorSelect = new JSONEditor($('#form-aggregation-select')[0], selectScheme);
+            var editorSelect = new JSONEditor($(formContainer).find('#form-aggregation-select')[0], selectScheme);
             var aggregateScheme = {
                 schema: {
                     type: "object",
@@ -257,7 +257,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 display_required_only: true,
                 no_additional_properties: true
             };
-            var editorAggregate = new JSONEditor($('#form-aggregation-aggregate')[0], aggregateScheme);
+            var editorAggregate =
+                new JSONEditor($(formContainer).find('#form-aggregation-aggregate')[0], aggregateScheme);
 
             var fromNode = editorInput.getEditor('root.from');
             editorInput.watch('root.from',function() {
@@ -293,22 +294,22 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     _.set(selectStartValue, 'groupBy', "");
                 }
                 _.set(selectScheme, 'startval', selectStartValue);
-                $('#form-aggregation-select').empty();
-                editorSelect = new JSONEditor($('#form-aggregation-select')[0], selectScheme);
+                $(formContainer).find('#form-aggregation-select').empty();
+                editorSelect = new JSONEditor($(formContainer).find('#form-aggregation-select')[0], selectScheme);
 
                 // setting the previously user entered data for aggregate section
                 var aggregateStartValue = {
                     aggregateByTimePeriod: editorAggregate.getValue().aggregateByTimePeriod
                 };
                 _.set(aggregateScheme, 'startval', aggregateStartValue);
-                $('#form-aggregation-aggregate').empty();
-                editorAggregate = new JSONEditor($('#form-aggregation-aggregate')[0], aggregateScheme);
+                $(formContainer).find('#form-aggregation-aggregate').empty();
+                editorAggregate = new JSONEditor($(formContainer).find('#form-aggregation-aggregate')[0], aggregateScheme);
             });
 
             formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
 
             // 'Submit' button action
-            var submitButtonElement = $('#submit')[0];
+            var submitButtonElement = $(formContainer).find('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
                 var inputErrors = editorInput.validate();
                 var selectErrors = editorSelect.validate();
@@ -374,8 +375,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
 
-                self.gridContainer.removeClass("disabledbutton");
-                self.toolPaletteContainer.removeClass("disabledbutton");
+                // design view container and toggle view button are enabled
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
 
             });
             return editorInput.getValue().name;
@@ -389,9 +391,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
          */
         AggregationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            // The container and the tool palette are disabled to prevent the user from dropping any elements
-            self.gridContainer.addClass("disabledbutton");
-            self.toolPaletteContainer.addClass("disabledbutton");
+            // The design view container is disabled to prevent the user from dropping any elements
+            self.designViewContainer.addClass('disableContainer');
+            self.toggleViewButton.addClass('disableContainer');
 
             var id = $(element).parent().attr('id');
             // retrieve the aggregation information from the collection
@@ -451,7 +453,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 };
             }
 
-            $(formContainer).append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
+            formContainer.append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
                 '<div id="form-aggregation-select" class="col-md-4"></div>' +
                 '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
 
@@ -485,7 +487,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             }
 
             // generate the form to define a aggregation
-            var editorInput = new JSONEditor($('#form-aggregation-input')[0], {
+            var editorInput = new JSONEditor($(formContainer).find('#form-aggregation-input')[0], {
                 schema: {
                     type: "object",
                     title: "Aggregation Input",
@@ -594,7 +596,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 display_required_only: true,
                 no_additional_properties: true
             };
-            var editorSelect = new JSONEditor($('#form-aggregation-select')[0], selectScheme);
+            var editorSelect = new JSONEditor($(formContainer).find('#form-aggregation-select')[0], selectScheme);
             var aggregateScheme = {
                 schema: {
                     type: "object",
@@ -661,7 +663,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 display_required_only: true,
                 no_additional_properties: true
             };
-            var editorAggregate = new JSONEditor($('#form-aggregation-aggregate')[0], aggregateScheme);
+            var editorAggregate =
+                new JSONEditor($(formContainer).find('#form-aggregation-aggregate')[0], aggregateScheme);
 
             var fromNode = editorInput.getEditor('root.from');
             editorInput.watch('root.from',function() {
@@ -687,19 +690,20 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     }
                 }
 
-                $('#form-aggregation-select').empty();
-                editorSelect = new JSONEditor($('#form-aggregation-select')[0], selectScheme);
-                $('#form-aggregation-aggregate').empty();
-                editorAggregate = new JSONEditor($('#form-aggregation-aggregate')[0], aggregateScheme);
+                $(formContainer).find('#form-aggregation-select').empty();
+                editorSelect = new JSONEditor($(formContainer).find('#form-aggregation-select')[0], selectScheme);
+                $(formContainer).find('#form-aggregation-aggregate').empty();
+                editorAggregate =
+                    new JSONEditor($(formContainer).find('#form-aggregation-aggregate')[0], aggregateScheme);
                 editorAggregate.setValue({aggregateByTimePeriod: editorAggregate.getValue().aggregateByTimePeriod});
             });
 
-            $(formContainer).append('<div id="form-submit"><button type="button" ' +
+            formContainer.append('<div id="form-submit"><button type="button" ' +
                 'class="btn btn-default">Submit</button></div>' +
                 '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
             // 'Submit' button action
-            var submitButtonElement = $('#form-submit')[0];
+            var submitButtonElement = $(formContainer).find('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
                 var inputErrors = editorInput.validate();
                 var selectErrors = editorSelect.validate();
@@ -713,9 +717,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     alert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
                     return;
                 }
-                // The container and the palette are disabled to prevent the user from dropping any elements
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
 
                 var configInput = editorInput.getValue();
                 var configSelect = editorSelect.getValue();
@@ -764,16 +765,21 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 var textNode = $(element).parent().find('.aggregationNameNode');
                 textNode.html(configInput.name);
 
+                // design view container and toggle view button are enabled
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
+
                 // close the form aggregation
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $('#form-cancel')[0];
+            var cancelButtonElement = $(formContainer).find('#form-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
+                // design view container and toggle view button are enabled
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form aggregation
                 self.consoleListManager.removeConsole(formConsole);

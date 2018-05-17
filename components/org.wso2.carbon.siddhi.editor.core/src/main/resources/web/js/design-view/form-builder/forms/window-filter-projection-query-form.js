@@ -38,9 +38,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 this.application = options.application;
                 this.formUtils = options.formUtils;
                 this.consoleListManager = options.application.outputController;
+                var currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
-            this.gridContainer = $("#grid-container");
-            this.toolPaletteContainer = $("#tool-palette-container");
         };
 
         /**
@@ -55,17 +56,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             var propertyDiv = $('<div id="property-header"><h3>Define Window/Filter/Projection Query </h3></div>' +
                 '<div class="define-windowFilterProjection-query"></div>');
             formContainer.append(propertyDiv);
-            // The container and the tool palette are disabled to prevent the user from dropping any elements
-            self.gridContainer.addClass('disabledbutton');
-            self.toolPaletteContainer.addClass('disabledbutton');
+            self.designViewContainer.addClass('disableContainer');
+            self.toggleViewButton.addClass('disableContainer');
 
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQuery(id);
             if (clickedElement.getQueryInput() === undefined
                 || clickedElement.getQueryInput().getFrom() === undefined) {
                 alert('Connect an input element');
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
@@ -73,8 +73,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             } else if (clickedElement.getQueryOutput() === undefined ||
                 clickedElement.getQueryOutput().getTarget() === undefined) {
                 alert('Connect an output stream');
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
@@ -480,11 +480,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                $(formContainer).append('<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
+                formContainer.append('<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
                     '<div id="form-query-output" class="col-md-4"></div></div>');
 
-                var editorInput = new JSONEditor($('#form-query-input')[0], {
+                var editorInput = new JSONEditor($(formContainer).find('#form-query-input')[0], {
                     schema: inputSchema,
                     startval: fillQueryInputWith,
                     show_errors: "always",
@@ -595,7 +595,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
                 };
-                var editorSelect = new JSONEditor($('#form-query-select')[0], selectScheme);
+                var editorSelect = new JSONEditor($(formContainer).find('#form-query-select')[0], selectScheme);
                 var selectNode = editorSelect.getEditor('root.select');
                 //disable fields that can not be changed
                 if (!(selectNode.getValue() === "*")) {
@@ -623,8 +623,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                         fillQuerySelectWith = self.formUtils.cleanJSONObject(fillQuerySelectWith);
                         selectScheme.startval = fillQuerySelectWith;
-                        $('#form-query-select').empty();
-                        editorSelect = new JSONEditor($('#form-query-select')[0], selectScheme);
+                        $(formContainer).find('#form-query-select').empty();
+                        editorSelect = new JSONEditor($(formContainer).find('#form-query-select')[0], selectScheme);
                         //disable fields that can not be changed
                         for (var i = 0; i < outputElementAttributesList.length; i++) {
                             editorSelect.getEditor('root.select.' + i + '.as').disable();
@@ -632,7 +632,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 });
 
-                var editorOutput = new JSONEditor($('#form-query-output')[0], {
+                var editorOutput = new JSONEditor($(formContainer).find('#form-query-output')[0], {
                     schema: {
                         required: true,
                         type: "object",
@@ -867,12 +867,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     disable_array_reorder: true
                 });
 
-                $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                formContainer.append('<div id="form-submit"><button type="button" ' +
                     'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
                 // 'Submit' button action
-                var submitButtonElement = $('#form-submit')[0];
+                var submitButtonElement = $(formContainer).find('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
 
                     var inputErrors = editorInput.validate();
@@ -881,13 +881,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if(inputErrors.length || selectErrors.length || outputErrors.length) {
                         return;
                     }
-
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
 
                     var inputConfig = editorInput.getValue();
                     var selectConfig = editorSelect.getValue();
@@ -1030,10 +1023,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 // 'Cancel' button action
-                var cancelButtonElement = $('#form-cancel')[0];
+                var cancelButtonElement = $(formContainer).find('#form-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);
                     self.consoleListManager.hideAllConsoles();

@@ -38,8 +38,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             this.container = options.container;
             this.application = options.application;
             this.designGrid = options.designGrid;
-            this.options = options;
             this.jsPlumbInstance = options.jsPlumbInstance;
+            var currentTabId = this.application.tabController.activeTab.cid;
+            this.designViewContainer = $('#design-container-' + currentTabId);
+            this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
 
             var formBuilderOptions = {};
             _.set(formBuilderOptions, 'application', this.application);
@@ -178,10 +180,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
                 self.registerElementEventListeners(newAgent);
             }
-            // The container and the tool palette are disabled to prevent the user from dropping any elements
-            // before initializing a Stream Element
-            $("#grid-container").removeClass("disabledbutton");
-            $("#tool-palette-container").removeClass("disabledbutton");
+            // design view container and toggle view button are enabled
+            this.designViewContainer.removeClass('disableContainer');
+            this.toggleViewButton.removeClass('disableContainer');
 
             // make the connection
             self.jsPlumbInstance.connect({

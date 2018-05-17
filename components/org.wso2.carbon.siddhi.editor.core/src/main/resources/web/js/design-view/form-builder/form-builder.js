@@ -52,11 +52,13 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         var FormBuilder = function (options) {
             this.configurationData = options.configurationData;
-            this.dropElements = options.dropElements;
             this.application = options.application;
             this.consoleListManager = options.application.outputController;
             this.formUtils = new FormUtils(this.configurationData);
             this.jsPlumbInstance = options.jsPlumbInstance;
+            var currentTabId = this.application.tabController.activeTab.cid;
+            this.designViewContainer = $('#design-container-' + currentTabId);
+            this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
         };
 
         /**
@@ -129,8 +131,9 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
                 // close the form window
                 self.consoleListManager.removeConsole(formConsole);
                 self.consoleListManager.hideAllConsoles();
-                $("#grid-container").removeClass("disabledbutton");
-                $("#tool-palette-container").removeClass("disabledbutton");
+                // design view container and toggle view button are enabled
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
             });
             return formConsole;
         };

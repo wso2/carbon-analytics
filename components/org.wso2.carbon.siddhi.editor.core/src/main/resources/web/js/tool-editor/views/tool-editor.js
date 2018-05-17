@@ -70,6 +70,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         log.error(errMsg);
                     }
 
+                    var designViewDynamicId = "design-container-" + this._$parent_el.attr('id');
+                    designContainer.attr('id', designViewDynamicId);
+
                     /*
                     * Use the below line to assign dynamic id for design grid container and pass the id to initialize
                     * jsPlumb.
@@ -206,6 +209,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     designView.renderToolPalette();
 
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
+                    var toggleViewButtonDynamicId = "toggle-view-button-" + this._$parent_el.attr('id');
+                    toggleViewButton.attr('id', toggleViewButtonDynamicId);
+
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
                             sourceContainer.hide();

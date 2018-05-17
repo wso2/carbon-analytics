@@ -248,7 +248,7 @@ input {
     box-sizing: border-box;
 }
 
-.disabledbutton {
+.disableContainer {
     pointer-events: none;
     opacity: 0.4;
 }

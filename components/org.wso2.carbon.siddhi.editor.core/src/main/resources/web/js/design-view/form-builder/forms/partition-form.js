@@ -30,9 +30,10 @@ define(['require', 'log', 'jquery', 'lodash'],
                 this.application = options.application;
                 this.consoleListManager = options.application.outputController;
                 this.jsPlumbInstance = options.self.jsPlumbInstance;
+                var currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
-            this.gridContainer = $("#grid-container");
-            this.toolPaletteContainer = $("#tool-palette-container");
         };
 
         /**
@@ -58,8 +59,9 @@ define(['require', 'log', 'jquery', 'lodash'],
             });
             if(!(connected)){
                 alert('Connect a stream for partitioning');
-                self.gridContainer.removeClass('disabledbutton');
-                self.toolPaletteContainer.removeClass('disabledbutton');
+                // design view container and toggle view button are enabled
+                self.designViewContainer.removeClass('disableContainer');
+                self.toggleViewButton.removeClass('disableContainer');
             }
             else{
                 var fillWith= {};
@@ -73,8 +75,9 @@ define(['require', 'log', 'jquery', 'lodash'],
                     }
                 });
 
-                self.gridContainer.addClass('disabledbutton');
-                self.toolPaletteContainer.addClass('disabledbutton');
+                // design view container and toggle view button are enabled
+                self.designViewContainer.addClass('disableContainer');
+                self.toggleViewButton.addClass('disableContainer');
 
                 var editor = new JSONEditor(formContainer[0], {
                     ajax: true,
@@ -100,19 +103,13 @@ define(['require', 'log', 'jquery', 'lodash'],
                     startval: fillWith,
                     disable_properties: true
                 });
-                $(formContainer).append('<div id="form-submit"><button type="button" ' +
+                formContainer.append('<div id="form-submit"><button type="button" ' +
                     'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
 
                 // 'Submit' button action
-                var submitButtonElement = $('#form-submit')[0];
+                var submitButtonElement = $(formContainer).find('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
-
-                    // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
 
                     var config = editor.getValue();
                     $.each(partitionKeys, function ( index , key) {
@@ -126,10 +123,10 @@ define(['require', 'log', 'jquery', 'lodash'],
                     });
                 });
                 // 'Cancel' button action
-                var cancelButtonElement = $('#form-cancel')[0];
+                var cancelButtonElement = $(formContainer).find('#form-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    self.gridContainer.removeClass('disabledbutton');
-                    self.toolPaletteContainer.removeClass('disabledbutton');
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
 
                     // close the form window
                     self.consoleListManager.removeConsole(formConsole);

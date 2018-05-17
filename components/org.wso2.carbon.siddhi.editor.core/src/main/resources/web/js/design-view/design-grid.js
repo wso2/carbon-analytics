@@ -56,7 +56,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             this.container = this.options.container;
             this.application = this.options.application;
             this.jsPlumbInstance = options.jsPlumbInstance;
-            this.currentTabId = this.container.parent().parent().attr("id");
+            this.currentTabId = this.application.tabController.activeTab.cid;
+            this.designViewContainer = $('#design-container-' + this.currentTabId);
+            this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
         };
 
         DesignGrid.prototype.render = function () {
@@ -72,7 +74,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             _.set(dropElementsOpts, 'designGrid', self);
             this.dropElements = new DropElements(dropElementsOpts);
             this.canvas = $(self.container);
-            //TODO: once an element is dropped source view/ design view buttons should be disabled
 
             /**
              * @description jsPlumb function opened
@@ -126,7 +127,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         ui.helper.remove();
                         $(droppedElement).draggable({containment: "parent"});
                         // Repaint to reposition all the elements that are on the canvas after the drop/addition of a new element on the canvas
-                        self.jsPlumbInstance.repaint(ui.helper);//TODO: check this
+                        self.jsPlumbInstance.repaint(ui.helper);
 
                         // If the dropped Element is a Stream then->
                         if ($(droppedElement).hasClass('stream')) {
@@ -1055,11 +1056,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // The container and the toolbox are disabled to prevent the user from dropping any elements before
-                // initializing a Stream Element
-                self.canvas.addClass("disabledbutton");
-                $("#tool-palette-container").addClass("disabledbutton");
-                $("#output-console-activate-button").addClass("disabledbutton");
+                // design view container is disabled to prevent the user from dropping any elements before initializing
+                // a stream element
+                self.designViewContainer.addClass('disableContainer');
+                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(streamId !== undefined) {
                     elementId = streamId;
@@ -1085,11 +1085,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // The container and the toolbox are disabled to prevent the user from dropping any elements before
-                // initializing a Table Element
-                self.canvas.addClass("disabledbutton");
-                $("#tool-palette-container").addClass("disabledbutton");
-                $("#output-console-activate-button").addClass("disabledbutton");
+                // design view container is disabled to prevent the user from dropping any elements before initializing
+                // a stream element
+                self.designViewContainer.addClass('disableContainer');
+                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(tableId !== undefined) {
                     elementId = tableId;
@@ -1114,11 +1113,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // The container and the toolbox are disabled to prevent the user from dropping any elements before
-                // initializing a window Element
-                self.canvas.addClass("disabledbutton");
-                $("#tool-palette-container").addClass("disabledbutton");
-                $("#output-console-activate-button").addClass("disabledbutton");
+                // design view container is disabled to prevent the user from dropping any elements before initializing
+                // a stream element
+                self.designViewContainer.addClass('disableContainer');
+                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(windowId !== undefined) {
                     elementId = windowId;
@@ -1143,11 +1141,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // The container and the toolbox are disabled to prevent the user from dropping any elements before
-                // initializing a Trigger Element
-                self.canvas.addClass("disabledbutton");
-                $("#tool-palette-container").addClass("disabledbutton");
-                $("#output-console-activate-button").addClass("disabledbutton");
+                // design view container is disabled to prevent the user from dropping any elements before initializing
+                // a stream element
+                self.designViewContainer.addClass('disableContainer');
+                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(triggerId !== undefined) {
                     elementId = triggerId;
@@ -1173,11 +1170,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // The container and the toolbox are disabled to prevent the user from dropping any elements before
-                // initializing a Aggregation Element
-                self.canvas.addClass("disabledbutton");
-                $("#tool-palette-container").addClass("disabledbutton");
-                $("#output-console-activate-button").addClass("disabledbutton");
+                // design view container is disabled to prevent the user from dropping any elements before initializing
+                // a stream element
+                self.designViewContainer.addClass('disableContainer');
+                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(aggregationId !== undefined) {
                     elementId = aggregationId;
