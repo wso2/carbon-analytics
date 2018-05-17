@@ -137,7 +137,6 @@ export default class SiddhiAppTable extends React.Component {
             this.setState({
                 haAppData: sortedData
             });
-
         }
         this.setState({
             haAppList: response,
@@ -177,7 +176,6 @@ export default class SiddhiAppTable extends React.Component {
         let isInactive = (app.status === "inactive" || app.status === 'passive');
         let isWorker = (app.deployedNodeType === "Worker")
         return (
-
             <TableRow>
                 {isWorker ? (
                     <TableRowColumn style={{width: '400px'}}>
