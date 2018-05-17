@@ -407,7 +407,7 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{marginTop: '-2%', marginRight: '3%'}}>
+                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
                             <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
@@ -523,7 +523,7 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{marginTop: '-2%', marginRight: '3%'}}>
+                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
                             <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
@@ -584,7 +584,7 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{marginTop: '-2%', marginRight: '3%'}}>
+                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
                             <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
@@ -678,7 +678,7 @@ export default class WorkerOverview extends React.Component {
                         backgroundColor: '#222222'
                     }}>
                         Node Overview</Typography>
-                    <div style={{marginTop: '-2%', marginRight: '15%'}}>
+                    <div style={{marginTop: '-2%', marginRight: '6%'}}>
                         <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right'}}
                               to={window.contextPath}> &nbsp;&nbsp; NODE VIEW</Link>
 

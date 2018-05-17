@@ -650,7 +650,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{width: '90%', padding: '40px'}}>
+                    <div style={{ padding: '40px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
