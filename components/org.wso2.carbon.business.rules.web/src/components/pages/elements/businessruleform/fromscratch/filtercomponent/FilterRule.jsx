@@ -17,20 +17,15 @@
  */
 
 import React from 'react';
-import Autosuggest from 'react-autosuggest';
-import match from 'autosuggest-highlight/match';
-import parse from 'autosuggest-highlight/parse';
 // Material UI Components
 import IconButton from 'material-ui/IconButton';
 import ClearIcon from 'material-ui-icons/Clear';
 import { Input, Typography } from 'material-ui';
-import Paper from 'material-ui/Paper';
 import { MenuItem } from 'material-ui/Menu';
-import TextField from 'material-ui/TextField';
 import { FormControl } from 'material-ui/Form';
 import Select from 'material-ui/Select';
 // App Components
-import Property from '../../Property';
+import AutoCompleteProperty from './AutoCompleteProperty';
 // App Constants
 import BusinessRulesConstants from '../../../../../../constants/BusinessRulesConstants';
 // CSS
@@ -65,37 +60,6 @@ const styles = {
     },
     textField: {
         width: '100%',
-    }
-};
-
-/**
- * Styles related to autosuggest fields
- */
-const autoSuggestStyles = {
-    container: {
-        flexGrow: 1,
-        position: 'relative',
-        width: '100%',
-        height: 70,
-        float: 'left',
-    },
-    suggestionsContainerOpen: {
-        position: 'absolute',
-        marginTop: 1,
-        marginBottom: 3,
-        left: 0,
-        right: 0,
-    },
-    suggestion: {
-        display: 'block',
-    },
-    suggestionsList: {
-        margin: 0,
-        padding: 0,
-        listStyleType: 'none',
-    },
-    textField: {
-        width: '100%',
     },
 };
 
@@ -111,9 +75,6 @@ class FilterRule extends React.Component {
             suggestions: [],
         };
     }
-
-    // TODO under construction ------------------------------------
-    // TODO I STOPPED HERE - REVISED
 
     updateFilterRuleAttribute(value) {
         const filterRule = this.props.filterRule;
@@ -137,117 +98,17 @@ class FilterRule extends React.Component {
         this.props.onUpdate(value);
     }
 
-    // TODO -----------------------------------------
-
-    /* AutoSuggest related functions [START] */
-
-    returnSuggestionsAsLabels() {
-        return this.props.getFieldNames(this.props.exposedStreamDefinition).map(fieldName => ({ label: fieldName }));
-    }
-
-    renderInput(inputProps, mode) {
-        const { autoFocus, value, ref } = inputProps;
-        return (
-            <TextField
-                autoFocus={autoFocus}
-                style={autoSuggestStyles.textField}
-                value={value}
-                inputRef={ref}
-                InputProps={{ inputProps }}
-                disabled={mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
-            />);
-    }
-
-    renderSuggestion(suggestion, { query, isHighlighted }) {
-        const matches = match(suggestion.label, query);
-        const parts = parse(suggestion.label, matches);
-        return (
-            <MenuItem selected={isHighlighted} component="div">
-                <div>
-                    {parts.map((part, index) => {
-                        return part.highlight ?
-                            (<span key={String(index)} style={{ fontWeight: 300 }}>{part.text}</span>) :
-                            (<strong key={String(index)} style={{ fontWeight: 500 }}>
-                                {part.text}
-                            </strong>);
-                    })}
-                </div>
-            </MenuItem>);
-    }
-
-    renderSuggestionsContainer(options) {
-        const { containerProps, children } = options;
-        return (
-            <Paper
-                key={containerProps.key}
-                id={containerProps.id}
-                style={containerProps.style}
-                ref={containerProps.ref}
-                elevation={5}
-                square
-            >
-                {children}
-            </Paper>);
-    }
-
-    getSuggestionValue(suggestion) {
-        return suggestion.label;
-    }
-
-    getSuggestions(value) {
-        const inputValue = value.trim().toLowerCase();
-        const inputLength = inputValue.length;
-        let count = 0;
-        let suggestions = this.returnSuggestionsAsLabels();
-        return (
-            inputLength === 0 ? [] : suggestions.filter((suggestion) => {
-                const keep =
-                    count < 5 && suggestion.label.toLowerCase().slice(0, inputLength) === inputValue;
-                if (keep) {
-                    count += 1;
-                }
-                return keep;
-            }));
-    }
-
-    handleSuggestionsFetchRequested({ value }) {
-        this.setState({
-            suggestions: this.getSuggestions(value),
-        });
-    }
-
-    /* AutoSuggest related functions [END] */
-
     displayFilterRuleAttribute() {
-        if (this.props.exposedInputStreamFields && (this.props.exposedInputStreamFields != null)) {
-            return (
-                <Autosuggest
-                    theme={autoSuggestStyles}
-                    renderInputComponent={e => this.renderInput(e, this.props.mode)}
-                    suggestions={this.state.suggestions}
-                    onSuggestionsFetchRequested={e => this.handleSuggestionsFetchRequested(e)}
-                    renderSuggestionsContainer={this.renderSuggestionsContainer}
-                    getSuggestionValue={this.getSuggestionValue}
-                    renderSuggestion={this.renderSuggestion}
-                    inputProps={{
-                        autoFocus: true,
-                        autoSuggestStyles,
-                        placeholder: '',
-                        value: this.props.filterRule[0],
-                        onChange: (e, v) => this.updateFilterRuleAttribute(v),
-                    }}
-                />);
-        } else {
-            return (
-                <Property
-                    name="filterRuleAttribute"
-                    fieldName=""
-                    description=""
-                    value={this.props.filterRule[0]}
-                    onValueChange={(modifiedValue) => this.updateFilterRuleAttribute(modifiedValue)}
-                    disabledState={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
-                />);
-        }
+        return (
+            <AutoCompleteProperty
+                elements={this.props.getFieldNames(this.props.exposedStreamDefinition)} // TODO beautify this
+                onChange={v => this.updateFilterRuleAttribute(v)}
+                value={this.props.filterRule[0]}
+                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                // TODO do the disabled check only in the parent, and pass props
+                error={false} // TODO implement
+            />
+        );
     }
 
     displayFilterRuleOperator() {
@@ -268,22 +129,15 @@ class FilterRule extends React.Component {
 
     displayFilterRuleAttributeOrValue() {
         return (
-            <Autosuggest
-                theme={autoSuggestStyles}
-                renderInputComponent={e => this.renderInput(e, this.props.mode)}
-                suggestions={this.state.suggestions}
-                onSuggestionsFetchRequested={e => this.handleSuggestionsFetchRequested(e)}
-                renderSuggestionsContainer={this.renderSuggestionsContainer}
-                getSuggestionValue={this.getSuggestionValue}
-                renderSuggestion={this.renderSuggestion}
-                inputProps={{
-                    autoFocus: true,
-                    autoSuggestStyles,
-                    placeholder: '',
-                    value: this.props.filterRule[2],
-                    onChange: (e, v) => this.updateFilterRuleAttributeOrValue(v),
-                }}
-            />);
+            <AutoCompleteProperty
+                elements={this.props.getFieldNames(this.props.exposedStreamDefinition)} // TODO beautify this
+                onChange={v => this.updateFilterRuleAttributeOrValue(v)}
+                value={this.props.filterRule[2]}
+                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                // TODO do the disabled check only in the parent, and pass props
+                error={false} // TODO implement
+            />
+        );
     }
 
     displayDeleteButton() {
@@ -302,29 +156,32 @@ class FilterRule extends React.Component {
     }
 
     render() {
-        return (
-            <div style={{ width: '100%' }}>
-                <div style={{ float: 'left', width: '10%', height: 50 }}>
-                    <Typography type="subheading">
-                        {this.props.filterRuleIndex + 1}
-                    </Typography>
+        if (this.props.exposedInputStreamFields && (this.props.exposedInputStreamFields != null)) {
+            return (
+                <div style={{ width: '100%' }}>
+                    <div style={{ float: 'left', width: '10%', height: 50 }}>
+                        <Typography type="subheading">
+                            {this.props.filterRuleIndex + 1}
+                        </Typography>
+                    </div>
+                    <div style={{ float: 'left', width: '30%', height: 50 }}>
+                        {this.displayFilterRuleAttribute()}
+                    </div>
+                    <div style={{ float: 'left', width: '20%', height: 50 }}>
+                        <center>
+                            {this.displayFilterRuleOperator()}
+                        </center>
+                    </div>
+                    <div style={{ float: 'left', width: '30%', height: 50 }}>
+                        {this.displayFilterRuleAttributeOrValue()}
+                    </div>
+                    <div style={{ float: 'left', width: '10%', height: 50 }}>
+                        {this.displayDeleteButton()}
+                    </div>
                 </div>
-                <div style={{ float: 'left', width: '30%', height: 50 }}>
-                    {this.displayFilterRuleAttribute()}
-                </div>
-                <div style={{ float: 'left', width: '20%', height: 50 }}>
-                    <center>
-                        {this.displayFilterRuleOperator()}
-                    </center>
-                </div>
-                <div style={{ float: 'left', width: '30%', height: 50 }}>
-                    {this.displayFilterRuleAttributeOrValue()}
-                </div>
-                <div style={{ float: 'left', width: '10%', height: 50 }}>
-                    {this.displayDeleteButton()}
-                </div>
-            </div>
-        );
+            );
+        }
+        return null;
     }
 }
 
