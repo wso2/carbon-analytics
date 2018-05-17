@@ -93,7 +93,7 @@ export default class WorkerOverview extends React.Component {
             hasViewPermission: true,
             statusMessage: "Currently there are no nodes to display",
             isError: false,
-            btnColor:''
+            btnColor: ''
 
         };
         this.autoSync = this.autoSync.bind(this);
@@ -335,12 +335,12 @@ export default class WorkerOverview extends React.Component {
 
                 });
             }, parseInt(this.state.pInterval * 1000));
-            this.setState({interval: interval, enableAutoSync: true, btnColor:'red'});
+            this.setState({interval: interval, enableAutoSync: true, btnColor: 'red'});
             window.localStorage.setItem("enableAutoSync", true);
             window.localStorage.setItem("pInterval", this.state.pInterval)
         } else {
             clearInterval(this.state.interval);
-            this.setState({enableAutoSync: false,btnColor:'white'});
+            this.setState({enableAutoSync: false, btnColor: 'white'});
             window.localStorage.setItem("enableAutoSync", false)
         }
     }
@@ -406,18 +406,17 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{marginTop: '-2%', marginRight: '3%'}}>
-                            <IconButton onClick={() => {
+                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
+                            <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
                                 <Sync color={this.state.btnColor}/>
-                            </IconButton>
-                            <h3 style={{
-                                color: '#dedede',
-                                marginLeft: '25%',
-                                backgroundColor: '#222222',
-                                marginTop: '-20%'
-                            }}>Auto-Sync</h3>
+                                <h3 style={{
+                                    color: '#dedede',
+                                    backgroundColor: '#222222',
+                                }}><b>Auto-Sync</b></h3>
+                            </Button>
+
                         </div>
                     </div>
 
@@ -523,18 +522,16 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{marginTop: '-2%', marginRight: '3%'}}>
-                            <IconButton onClick={() => {
+                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
+                            <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
                                 <Sync color={this.state.btnColor}/>
-                            </IconButton>
-                            <h3 style={{
-                                color: '#dedede',
-                                marginLeft: '25%',
-                                backgroundColor: '#222222',
-                                marginTop: '-20%'
-                            }}>Auto-Sync</h3>
+                                <h3 style={{
+                                    color: '#dedede',
+                                    backgroundColor: '#222222',
+                                }}><b>Auto-Sync</b></h3>
+                            </Button>
                         </div>
                     </div>
 
@@ -586,18 +583,16 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{marginTop: '-2%', marginRight: '3%'}}>
-                            <IconButton onClick={() => {
+                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
+                            <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
                                 <Sync color={this.state.btnColor}/>
-                            </IconButton>
-                            <h3 style={{
-                                color: '#dedede',
-                                marginLeft: '25%',
-                                backgroundColor: '#222222',
-                                marginTop: '-20%'
-                            }}>Auto-Sync</h3>
+                                <h3 style={{
+                                    color: '#dedede',
+                                    backgroundColor: '#222222',
+                                }}><b>Auto-Sync</b></h3>
+                            </Button>
                         </div>
                     </div>
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
@@ -682,7 +677,7 @@ export default class WorkerOverview extends React.Component {
                         backgroundColor: '#222222'
                     }}>
                         Node Overview</Typography>
-                    <div style={{marginTop: '-2%', marginRight: '15%'}}>
+                    <div style={{marginTop: '-2%', marginRight: '6%'}}>
                         <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right'}}
                               to={window.contextPath}> &nbsp;&nbsp; NODE VIEW</Link>
 
