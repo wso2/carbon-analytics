@@ -972,7 +972,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
             });
-            
+
             _.forEach(self.configurationData.edgeList, function(edge){
 
                 var targetId = edge.getParentId();
@@ -992,63 +992,133 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
          * @function Auto align the diagram
          */
         DesignGrid.prototype.autoAlignElements = function () {
-            //TODO auto aligning does not support 'Partition'
             var self = this;
-            var g = new dagre.graphlib.Graph();
-            g.setGraph({
-                rankdir: 'LR'
-            });
-            g.setDefaultEdgeLabel(function () {
+
+            var graph = new dagre.graphlib.Graph({compound: true});
+            graph.setGraph({rankdir: "LR"});
+            graph.setDefaultEdgeLabel(function () {
                 return {};
             });
-            var nodes =[];
 
             var currentTabElement = document.getElementById(self.currentTabId);
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.STREAM));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PROJECTION));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.FILTER));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.WINDOW_QUERY));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.JOIN));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PATTERN));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.WINDOW));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.SEQUENCE));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PARTITION));
+            var nodes = [];
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.STREAM));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.TABLE));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.WINDOW));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.TRIGGER));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.AGGREGATION));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PROJECTION));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.FILTER));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.WINDOW_QUERY));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.JOIN));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PATTERN));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.SEQUENCE));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PARTITION));
 
-            // var nodes = $(".ui-draggable");
-            for (var i = 0; i < nodes.length; i++) {
-                var n = nodes[i];
-                var nodeID = n.id ;
-                g.setNode(nodeID, {width: 120, height: 80});
-            }
+            var graphJSON = [];
+            graphJSON.nodes = [];
+            graphJSON.edges = [];
+            graphJSON.groups = [];
+
+            var i = 0;
+            nodes.forEach(function (node) {
+                graph.setNode(node.id, {width: node.offsetWidth, height: node.offsetHeight});
+                graphJSON.nodes[i] = {
+                    id: node.id,
+                    width: node.offsetWidth,
+                    height: node.offsetHeight
+                };
+                i++;
+            });
+
+            i = 0;
             var edges = self.jsPlumbInstance.getAllConnections();
-            for (var i = 0; i < edges.length; i++) {
-                var connection = edges[i];
-                var target = connection.targetId;
-                var source = connection.sourceId;
-                var targetId= target.substr(0, target.indexOf('-'));
-                var sourceId= source.substr(0, source.indexOf('-'));
-                g.setEdge(sourceId, targetId);
-            }
-            // calculate the layout (i.e. node positions)
-            dagre.layout(g);
-            // Applying the calculated layout
-            g.nodes().forEach(function (v) {
-                $("#" + v).css("left", g.node(v).x + "px");
-                $("#" + v).css("top", g.node(v).y + "px");
+            edges.forEach(function (edge) {
+                var target = edge.targetId;
+                var source = edge.sourceId;
+                var targetId = target.substr(0, target.indexOf('-'));
+                var sourceId = source.substr(0, source.indexOf('-'));
+                graph.setEdge(sourceId, targetId);
+                graphJSON.edges[i] = {
+                    parent: sourceId,
+                    child: targetId
+                };
+                i++;
+            });
+
+            i = 0;
+            var groups = [];
+            Array.prototype.push.apply(groups, currentTabElement.getElementsByClassName(constants.PARTITION));
+            groups.forEach(function (partition) {
+                graphJSON.groups[i] = {
+                    id: null,
+                    children: []
+                };
+                graphJSON.groups[i].id = partition.id;
+
+                var c = 0;
+                var children = partition.childNodes;
+                children.forEach(function (child) {
+                    var className = child.className;
+                    if (className.includes(constants.STREAM) ||
+                        className.includes(constants.PROJECTION) ||
+                        className.includes(constants.FILTER) ||
+                        className.includes(constants.WINDOW_QUERY) ||
+                        className.includes(constants.JOIN) ||
+                        className.includes(constants.PATTERN) ||
+                        className.includes(constants.SEQUENCE)) {
+
+                        graph.setParent(child.id, partition.id);
+                        graphJSON.groups[i].children[c] = child.id;
+
+                        c++;
+                    }
+                });
+
+                i++;
+            });
+
+            dagre.layout(graph);
+
+            graph.nodes().forEach(function (nodeId) {
+                var node = graph.node(nodeId);
+                var $node = $("#" + nodeId);
+
+                var isInPartition = false;
+                var partitionId = -1;
+                graphJSON.groups.forEach(function (group) {
+                    group.children.forEach(function (child) {
+                        if (nodeId == child) {
+                            isInPartition = true;
+                            partitionId = group.id;
+                        }
+                    });
+                });
+
+                if (isInPartition) {
+                    var partitionNode = graph.node(partitionId);
+
+                    var partitionNodeLeft = partitionNode.x - (partitionNode.width / 2) + 20;
+                    var partitionNodeTop = partitionNode.y - (partitionNode.height / 2) + 20;
+
+                    var left = node.x - (node.width / 2) + 20 - partitionNodeLeft;
+                    var top = node.y - (node.height / 2) + 20 - partitionNodeTop;
+
+                    $node.css("left", left + "px");
+                    $node.css("top", top + "px");
+                } else {
+                    var left = node.x - (node.width / 2) + 20;
+                    var top = node.y - (node.height / 2) + 20;
+
+                    $node.css("left", left + "px");
+                    $node.css("top", top + "px");
+                }
+
+                $node.css("width", node.width + "px");
+                $node.css("height", node.height + "px");
             });
 
             self.jsPlumbInstance.repaintEverything();
-            // edges = edges.slice(0);
-            // for (var j = 0; j<edges.length ; j++){
-            //     var source = edges[j].sourceId;
-            //     var target = edges[j].targetId;
-            //     self.jsPlumbInstance.deleteConnection(edges[j]);
-            //     self.jsPlumbInstance.connect({
-            //         source: source,
-            //         target: target
-            //     });
-            //
-            // }
         };
 
         DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName) {
