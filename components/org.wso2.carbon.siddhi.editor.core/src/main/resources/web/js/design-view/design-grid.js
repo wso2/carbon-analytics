@@ -972,7 +972,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
             });
-            
+
             _.forEach(self.configurationData.edgeList, function(edge){
 
                 var targetId = edge.getParentId();
@@ -992,63 +992,164 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
          * @function Auto align the diagram
          */
         DesignGrid.prototype.autoAlignElements = function () {
-            //TODO auto aligning does not support 'Partition'
             var self = this;
-            var g = new dagre.graphlib.Graph();
-            g.setGraph({
-                rankdir: 'LR'
-            });
-            g.setDefaultEdgeLabel(function () {
+            // Create a new graph instance
+            var graph = new dagre.graphlib.Graph({compound: true});
+            // Sets the graph to grow from left to right
+            graph.setGraph({rankdir: "LR"});
+            // This sets the default edge label to `null` as edges/arrows in the design view will
+            // never have any labels/names to display on the screen
+            graph.setDefaultEdgeLabel(function () {
                 return {};
             });
-            var nodes =[];
 
+            // Obtain all the draggable UI elements and add them into the nodes[] array
             var currentTabElement = document.getElementById(self.currentTabId);
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.STREAM));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PROJECTION));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.FILTER));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.WINDOW_QUERY));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.JOIN));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PATTERN));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.WINDOW));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.SEQUENCE));
-            Array.prototype.push.apply(nodes,currentTabElement.getElementsByClassName(constants.PARTITION));
+            var nodes = [];
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.STREAM));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.TABLE));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.WINDOW));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.TRIGGER));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.AGGREGATION));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PROJECTION));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.FILTER));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.WINDOW_QUERY));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.JOIN));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PATTERN));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.SEQUENCE));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PARTITION));
 
-            // var nodes = $(".ui-draggable");
-            for (var i = 0; i < nodes.length; i++) {
-                var n = nodes[i];
-                var nodeID = n.id ;
-                g.setNode(nodeID, {width: 120, height: 80});
-            }
-            var edges = self.jsPlumbInstance.getAllConnections();
-            for (var i = 0; i < edges.length; i++) {
-                var connection = edges[i];
-                var target = connection.targetId;
-                var source = connection.sourceId;
-                var targetId= target.substr(0, target.indexOf('-'));
-                var sourceId= source.substr(0, source.indexOf('-'));
-                g.setEdge(sourceId, targetId);
-            }
-            // calculate the layout (i.e. node positions)
-            dagre.layout(g);
-            // Applying the calculated layout
-            g.nodes().forEach(function (v) {
-                $("#" + v).css("left", g.node(v).x + "px");
-                $("#" + v).css("top", g.node(v).y + "px");
+            // Create an empty JSON to store information of the given graph's nodes, egdes and groups.
+            var graphJSON = [];
+            graphJSON.nodes = [];
+            graphJSON.edges = [];
+            graphJSON.groups = [];
+
+            // For every node object in the nodes[] array
+            var i = 0;
+            nodes.forEach(function (node) {
+                // Add each node to the dagre graph object
+                graph.setNode(node.id, {width: node.offsetWidth, height: node.offsetHeight});
+                // Add each node information to the graphJSON object
+                graphJSON.nodes[i] = {
+                    id: node.id,
+                    width: node.offsetWidth,
+                    height: node.offsetHeight
+                };
+                i++;
             });
 
+            // For every edge in the jsplumb instance
+            i = 0;
+            var edges = self.jsPlumbInstance.getAllConnections();
+            edges.forEach(function (edge) {
+                // Get the source and target ID from each edge
+                var target = edge.targetId;
+                var source = edge.sourceId;
+                var targetId = target.substr(0, target.indexOf('-'));
+                var sourceId = source.substr(0, source.indexOf('-'));
+                // Set the edge to the dagre graph object
+                graph.setEdge(sourceId, targetId);
+                // Set the edge information to the graphJSON object
+                graphJSON.edges[i] = {
+                    parent: sourceId,
+                    child: targetId
+                };
+                i++;
+            });
+
+            // For every group/partition element
+            i = 0;
+            var groups = [];
+            Array.prototype.push.apply(groups, currentTabElement.getElementsByClassName(constants.PARTITION));
+            groups.forEach(function (partition) {
+                // Add the group information to the graphJSON obect
+                graphJSON.groups[i] = {
+                    id: null,
+                    children: []
+                };
+                graphJSON.groups[i].id = partition.id;
+
+                // Identify the children in each group/partition element
+                var c = 0;
+                var children = partition.childNodes;
+                children.forEach(function (child) {
+                    // If the children is of the following types, then only can they be considered as a child
+                    // of the group
+                    var className = child.className;
+                    if (className.includes(constants.STREAM) || className.includes(constants.PROJECTION) ||
+                        className.includes(constants.FILTER) || className.includes(constants.WINDOW_QUERY) ||
+                        className.includes(constants.JOIN) || className.includes(constants.PATTERN) ||
+                        className.includes(constants.SEQUENCE)) {
+                        // Set the child to it's respective group in the dagre graph object
+                        graph.setParent(child.id, partition.id);
+                        // Add the child information of each group to the graphJSON object
+                        graphJSON.groups[i].children[c] = child.id;
+                        c++;
+                    }
+                });
+
+                i++;
+            });
+
+            // This command tells dagre to calculate and finalize the final layout of how the
+            // nodes in the graph should be placed
+            dagre.layout(graph);
+
+            // Re-align the elements in the grid based on the graph layout given by dagre
+            graph.nodes().forEach(function (nodeId) {
+                // Get a dagre instance of the node of `nodeId`
+                var node = graph.node(nodeId);
+                // Get a JQuery instance of the node of `nodeId`
+                var $node = $("#" + nodeId);
+                // Identify if the node is in a partiton or not using the information
+                // in the graphJSON object
+                var isInPartition = false;
+                var partitionId = -1;
+                graphJSON.groups.forEach(function (group) {
+                    group.children.forEach(function (child) {
+                        if (nodeId == child) {
+                            isInPartition = true;
+                            partitionId = group.id;
+                        }
+                    });
+                });
+
+                // Note that dagre defines the left(x) & top(y) positions from the center of the element
+                // This has to be converted to the actual left and top position of a JQuery element
+                if (isInPartition) {
+                    // If the current node is in a partition, then that node must be added relative to the position
+                    // of it's parent partition
+                    var partitionNode = graph.node(partitionId);
+
+                    // Identify the left and top value
+                    var partitionNodeLeft = partitionNode.x - (partitionNode.width / 2) + 20;
+                    var partitionNodeTop = partitionNode.y - (partitionNode.height / 2) + 20;
+
+                    // Identify the node's left and top position relative to it's partition's top and left position
+                    var left = node.x - (node.width / 2) + 20 - partitionNodeLeft;
+                    var top = node.y - (node.height / 2) + 20 - partitionNodeTop;
+
+                    // Set the inner node's left and top position
+                    $node.css("left", left + "px");
+                    $node.css("top", top + "px");
+                } else {
+                    // If the node is not in a partition then it's left and top positions are obtained relative to
+                    // the entire grid
+                    var left = node.x - (node.width / 2) + 20;
+                    var top = node.y - (node.height / 2) + 20;
+                    // Set the node's left and top positions
+                    $node.css("left", left + "px");
+                    $node.css("top", top + "px");
+                }
+                // Resize the node with the new width and height defined by dagre
+                // The node size can only change for partition nodes
+                $node.css("width", node.width + "px");
+                $node.css("height", node.height + "px");
+            });
+
+            // Redraw the edges in jsplumb
             self.jsPlumbInstance.repaintEverything();
-            // edges = edges.slice(0);
-            // for (var j = 0; j<edges.length ; j++){
-            //     var source = edges[j].sourceId;
-            //     var target = edges[j].targetId;
-            //     self.jsPlumbInstance.deleteConnection(edges[j]);
-            //     self.jsPlumbInstance.connect({
-            //         source: source,
-            //         target: target
-            //     });
-            //
-            // }
         };
 
         DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName) {
