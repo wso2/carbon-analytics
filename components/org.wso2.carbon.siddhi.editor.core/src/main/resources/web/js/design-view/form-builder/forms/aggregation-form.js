@@ -372,8 +372,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 textNode.html(editorInput.getValue().name);
 
                 // close the form aggregation
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                self.consoleListManager.removeFormConsole(formConsole);
 
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
@@ -770,8 +769,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form aggregation
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                self.consoleListManager.removeFormConsole(formConsole);
             });
 
             // 'Cancel' button action
@@ -782,8 +780,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form aggregation
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                self.consoleListManager.removeFormConsole(formConsole);
             });
         };
 

@@ -62,8 +62,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                self.consoleListManager.removeFormConsole(formConsole);
             } else if (clickedElement.getQueryOutput() === undefined ||
                 clickedElement.getQueryOutput().getTarget() === undefined) {
                 alert('Connect an output element');
@@ -71,8 +70,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                self.consoleListManager.removeFormConsole(formConsole);
             } else {
 
                 var inputStreamNames = clickedElement.getQueryInput().getConnectedElementNameList();
@@ -884,6 +882,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setType(outputType);
                     }
+
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
+
+                    // close the form window
+                    self.consoleListManager.removeFormConsole(formConsole);
                 });
 
                 // 'Cancel' button action
@@ -892,8 +896,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
+                    self.consoleListManager.removeFormConsole(formConsole);
                 });
             }
         };

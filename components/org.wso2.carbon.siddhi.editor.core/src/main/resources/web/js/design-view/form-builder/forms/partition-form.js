@@ -121,6 +121,13 @@ define(['require', 'log', 'jquery', 'lodash'],
                             partitionKeys['with'].push(key);
                         }
                     });
+
+                    // design view container and toggle view button are enabled
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
+
+                    // close the form window
+                    self.consoleListManager.removeFormConsole(formConsole);
                 });
                 // 'Cancel' button action
                 var cancelButtonElement = $(formContainer).find('#form-cancel')[0];
@@ -129,8 +136,7 @@ define(['require', 'log', 'jquery', 'lodash'],
                     self.toggleViewButton.removeClass('disableContainer');
 
                     // close the form window
-                    self.consoleListManager.removeConsole(formConsole);
-                    self.consoleListManager.hideAllConsoles();
+                    self.consoleListManager.removeFormConsole(formConsole);
                 });
             }
         };

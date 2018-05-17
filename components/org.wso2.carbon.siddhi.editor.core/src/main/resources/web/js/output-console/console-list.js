@@ -110,7 +110,8 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 });
                 var activeTab = self.options.application.tabController.activeTab;
                 if (activeTab.getTitle() != "welcome-page") {
-                    if (activeTab.getSiddhiFileEditor().isInSourceView()) {
+                    if (activeTab.getSiddhiFileEditor().isInSourceView() !== undefined
+                        && activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                     } else {
                         //TODO: activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
@@ -229,6 +230,23 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 }
             },
             /**
+             * removes a form console
+             * @param {Console} console the form console instance
+             * @fires ConsoleList#console-removed
+             */
+            removeFormConsole: function (console) {
+                if (!_.includes(this._consoles, console)) {
+                    var errMsg = 'console : ' + console.id + 'is not part of this console list.';
+                    log.error(errMsg);
+                    throw errMsg;
+                }
+                _.remove(this._consoles, console);
+                console.getHeader().remove();
+                console.remove();
+                this.trigger("console-removed", console);
+                this.hideConsoleComponents();
+            },
+            /**
              * set selected console
              * @param {Console} console the console instance
              * @fires ConsoleList#active-console-changed
@@ -310,6 +328,15 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 _.each(this._consoles, function (console) {
                     if(console._type === type){
                         if (console._appName === title) {
+                            /*
+                            * If the user has closed the output console in a previous tab and switches back to the
+                            * design view of a tab(earlier a form was kept opened in the output console in this tab and
+                            * now it is hidden because user has closed the output console in the previous tab) now we
+                            * need to enable the output console.
+                            * */
+                            if (type === 'FORM') {
+                                self.showConsoleComponents();
+                            }
                             console.show(true);
                             self.setActiveConsole(console);
                             globalConsole._isActive = false;

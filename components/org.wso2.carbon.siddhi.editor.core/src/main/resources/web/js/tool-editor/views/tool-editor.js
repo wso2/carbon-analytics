@@ -214,6 +214,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
+                            if (application.tabController.getActiveTab().getFile().isDirty()) {
+                                alert("Please save the file before switching to the Design View");
+                                return;
+                            }
                             sourceContainer.hide();
                             designView.emptyDesignViewGridContainer();
                             designContainer.show();

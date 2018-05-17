@@ -188,8 +188,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 textNode.html(editor.getValue().name);
 
                 // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                self.consoleListManager.removeFormConsole(formConsole);
 
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
@@ -393,8 +392,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 textNode.html(config.name);
 
                 // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                self.consoleListManager.removeFormConsole(formConsole);
             });
 
             // 'Cancel' button action
@@ -404,8 +402,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form window
-                self.consoleListManager.removeConsole(formConsole);
-                self.consoleListManager.hideAllConsoles();
+                self.consoleListManager.removeFormConsole(formConsole);
             });
         };
 
