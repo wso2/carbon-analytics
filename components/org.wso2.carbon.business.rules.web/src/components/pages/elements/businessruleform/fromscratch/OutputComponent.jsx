@@ -16,7 +16,8 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Autosuggest from 'react-autosuggest';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
@@ -72,12 +73,20 @@ const autoSuggestStyles = {
     },
 };
 
+/**
+ * Styles related to this component
+ */
+const styles = {
+    errorText: {
+        color: '#ff1744',
+    },
+};
 
 /**
  * Represents the output component of the business rule from scratch form,
  * which will contain output rule template selection, output configurations and input-as-output mappings
  */
-class OutputComponent extends React.Component {
+export default class OutputComponent extends Component {
     constructor() {
         super();
         this.state = {
@@ -86,9 +95,11 @@ class OutputComponent extends React.Component {
         };
     }
 
+    /* AutoSuggestion related functions [BEGIN] */
+
     returnSuggestionsAsLabels() {
         return this.props.getFieldNames(this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition)
-            .map(fieldName => ({label: fieldName}));
+            .map(fieldName => ({ label: fieldName }));
     }
 
     renderInput(inputProps, mode) {
@@ -116,13 +127,12 @@ class OutputComponent extends React.Component {
                     {parts.map((part, index) => {
                         return part.highlight ? (
                             <span key={String(index)} style={{ fontWeight: 300 }}>
-                {part.text}
-              </span>
-                        ) : (
-                            <strong key={String(index)} style={{ fontWeight: 500 }}>
+                                {part.text}
+                            </span>) :
+                            (<strong key={String(index)} style={{ fontWeight: 500 }}>
                                 {part.text}
                             </strong>
-                        );
+                            );
                     })}
                 </div>
             </MenuItem>
@@ -155,11 +165,11 @@ class OutputComponent extends React.Component {
         const inputLength = inputValue.length;
         let count = 0;
 
-        let suggestions = this.returnSuggestionsAsLabels();
+        const suggestions = this.returnSuggestionsAsLabels();
 
         return inputLength === 0
             ? []
-            : suggestions.filter(suggestion => {
+            : suggestions.filter((suggestion) => {
                 const keep =
                     count < 5 && suggestion.label.toLowerCase().slice(0, inputLength) === inputValue;
 
@@ -175,31 +185,31 @@ class OutputComponent extends React.Component {
         this.setState({
             suggestions: this.getSuggestions(value),
         });
-    };
+    }
 
-    render() {
-        let outputRuleTemplatesToDisplay;
-        let outputDataPropertiesToDisplay;
-        let outputMappingsToDisplay;
+    /* AutoSuggestion related functions [END] */
 
-        // To display rule templates selection drop down
-        let outputRuleTemplateElements = this.props.outputRuleTemplates.map((outputRuleTemplate) =>
-            <MenuItem key={outputRuleTemplate.uuid} value={outputRuleTemplate.uuid}>
-                {outputRuleTemplate.name}
-            </MenuItem>
-        );
-        outputRuleTemplatesToDisplay =
-            (<FormControl
-                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}>
+    /**
+     * Displays Rule Template selection
+     * @returns {Component}     Select Component
+     */
+    displayRuleTemplateSelection() {
+        return (
+            <FormControl
+                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+            >
                 <InputLabel htmlFor="inputRuleTemplate">Rule Template</InputLabel>
                 <Select
                     value={(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) ?
                         this.props.selectedOutputRuleTemplate.uuid : ''
                     }
-                    onChange={(e) => this.props.handleOutputRuleTemplateSelected(e)}
-                    input={<Input id="inputRuleTemplate"/>}
+                    onChange={e => this.props.handleOutputRuleTemplateSelected(e)}
+                    input={<Input id="inputRuleTemplate" />}
                 >
-                    {outputRuleTemplateElements}
+                    {this.props.outputRuleTemplates.map(outputRuleTemplate =>
+                        (<MenuItem key={outputRuleTemplate.uuid} value={outputRuleTemplate.uuid}>
+                            {outputRuleTemplate.name}
+                        </MenuItem>))}
                 </Select>
                 <FormHelperText>
                     {(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) ?
@@ -207,120 +217,146 @@ class OutputComponent extends React.Component {
                         (BusinessRulesMessages.SELECT_RULE_TEMPLATE)
                     }
                 </FormHelperText>
-            </FormControl>);
+            </FormControl>
+        );
+    }
 
-        // If an output rule template has been selected
+    /**
+     * Returns output property configurations
+     * @returns {Element}       Property Components
+     */
+    displayProperties() {
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) {
-            // To display output data properties
-            let outputDataConfigurations = this.props.getPropertyComponents(
-                BusinessRulesConstants.OUTPUT_DATA_KEY,
-                this.props.mode);
-
-            outputDataPropertiesToDisplay =
-                (<div>
+            return (
+                <div>
                     <Typography type="subheading">
                         Configurations
                     </Typography>
-                    {outputDataConfigurations}
-                </div>);
-
-            // To display Output Mappings
-
-            // If an input rule template has been selected
-            if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
-                // Each field of the exposed output stream must be mapped with an available field of the exposed
-                // input stream
-                let exposedOutputStreamFieldNames =
-                    this.props.getFieldNames(
-                        this.props.selectedOutputRuleTemplate.templates[0].exposedStreamDefinition);
-
-                let outputMappingElementsToDisplay = exposedOutputStreamFieldNames.map((fieldName, index) =>
-                    <div key={index} style={{ width: '100%' }}>
-                        <Autosuggest
-                            theme={autoSuggestStyles}
-                            // renderInputComponent={this.renderInput}
-                            renderInputComponent={e => this.renderInput(e, this.props.mode)}
-                            suggestions={this.state.suggestions}
-                            onSuggestionsFetchRequested={e => this.handleSuggestionsFetchRequested(e)}
-                            renderSuggestionsContainer={this.renderSuggestionsContainer}
-                            getSuggestionValue={this.getSuggestionValue}
-                            renderSuggestion={this.renderSuggestion}
-                            inputProps={{
-                                autoFocus: true,
-                                autoSuggestStyles,
-                                placeholder: '',
-                                value: (this.props.businessRuleProperties.outputMappings[fieldName]) ?
-                                    (this.props.businessRuleProperties.outputMappings[fieldName]) : '',
-                                onChange: (e,v) => this.props.handleOutputMappingChange(v, fieldName),
-                            }}
-                        />
-                        <div style={{ float: 'left', width: '20%', height: 70 }}>
-                            <center>
-                                <Typography type="subheading">As</Typography>
-                            </center>
-                        </div>
-                        <div style={{ float: 'left', width: '40%', height: 70 }}>
-                            <Typography type="subheading">{fieldName}</Typography>
-                        </div>
-                    </div>
-                );
-
-                outputMappingsToDisplay =
-                    <div>
-                        <Typography type="subheading">
-                            Mappings
-                        </Typography>
-                        <br />
-                        <div style={{ width: '100%' }}>
-                            <div style={{ float: 'left', width: '40%', height: 30 }}>
-                                <Typography type="caption">Input</Typography>
-                            </div>
-                            <div style={{ float: 'left', width: '20%', height: 30 }}>
-                                <Typography />
-                            </div>
-                            <div style={{ float: 'left', width: '40%', height: 30 }}>
-                                <Typography type="caption">Output</Typography>
-                            </div>
-                            {outputMappingElementsToDisplay}
-                        </div>
-                    </div>
-            }
+                    {this.props.getPropertyComponents(BusinessRulesConstants.OUTPUT_DATA_KEY, this.props.mode)}
+                </div>
+            );
         }
+        return null;
+    }
 
+    /**
+     * Returns output mapping configurations
+     * @returns {Element}       Components for Output mapping
+     */
+    displayOutputMappings() {
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate) &&
+            !BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
+            const exposedOutputStreamFieldNames =
+                this.props.getFieldNames(
+                    this.props.selectedOutputRuleTemplate.templates[0].exposedStreamDefinition);
+
+            return (
+                <div>
+                    <Typography type="subheading">
+                        Mappings
+                    </Typography>
+                    <br />
+                    <div style={{ width: '100%' }}>
+                        <div style={{ float: 'left', width: '40%', height: 30 }}>
+                            <Typography type="caption">Input</Typography>
+                        </div>
+                        <div style={{ float: 'left', width: '20%', height: 30 }}>
+                            <Typography />
+                        </div>
+                        <div style={{ float: 'left', width: '40%', height: 30 }}>
+                            <Typography type="caption">Output</Typography>
+                        </div>
+                        {exposedOutputStreamFieldNames.map((fieldName) =>
+                            (<div key={fieldName} style={{ width: '100%' }}>
+                                <Autosuggest
+                                    theme={autoSuggestStyles}
+                                    // renderInputComponent={this.renderInput}
+                                    renderInputComponent={e => this.renderInput(e, this.props.mode)}
+                                    suggestions={this.state.suggestions}
+                                    onSuggestionsFetchRequested={e => this.handleSuggestionsFetchRequested(e)}
+                                    renderSuggestionsContainer={this.renderSuggestionsContainer}
+                                    getSuggestionValue={this.getSuggestionValue}
+                                    renderSuggestion={this.renderSuggestion}
+                                    inputProps={{
+                                        autoFocus: true,
+                                        autoSuggestStyles,
+                                        placeholder: '',
+                                        // TODO refactor below type of 'x ? x : ''' to 'x || '''
+                                        value: (this.props.businessRuleProperties.outputMappings[fieldName]) ?
+                                            (this.props.businessRuleProperties.outputMappings[fieldName]) : '',
+                                        onChange: (e, v) => this.props.handleOutputMappingChange(v, fieldName),
+                                    }}
+                                />
+                                <div style={{ float: 'left', width: '20%', height: 70 }}>
+                                    <center>
+                                        <Typography type="subheading">As</Typography>
+                                    </center>
+                                </div>
+                                <div style={{ float: 'left', width: '40%', height: 70 }}>
+                                    <Typography type="subheading">{fieldName}</Typography>
+                                </div>
+                            </div>))}
+                    </div>
+                </div>
+            );
+        }
+        return null;
+    }
+
+    render() {
         return (
             <div>
                 <AppBar position="static" color="default">
                     <Toolbar>
-                        <Typography type="subheading">Output</Typography>
+                        <Typography type="subheading" style={this.props.isErroneous ? styles.errorText : {}}>
+                            Output
+                        </Typography>
                         <IconButton
                             onClick={() => this.props.toggleExpansion()}
                         >
-                            <ExpandMoreIcon/>
+                            <ExpandMoreIcon />
                         </IconButton>
                     </Toolbar>
                 </AppBar>
                 <Paper>
                     <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
                         <div style={this.props.style.paperContainer}>
-                            <br/>
+                            <br />
                             <center>
-                                {outputRuleTemplatesToDisplay}
+                                {this.displayRuleTemplateSelection()}
                             </center>
-                            <br/>
-                            <br/>
-                            <br/>
-                            {outputDataPropertiesToDisplay}
-                            <br/>
-                            <br/>
-                            {outputMappingsToDisplay}
-                            <br/>
+                            <br />
+                            <br />
+                            <br />
+                            {this.displayProperties()}
+                            <br />
+                            <br />
+                            {this.displayOutputMappings()}
+                            <br />
                         </div>
                     </Collapse>
                 </Paper>
             </div>
-        )
-
+        );
     }
 }
 
-export default OutputComponent;
+OutputComponent.propTypes = {
+    getFieldNames: PropTypes.func.isRequired,
+    selectedInputRuleTemplate: PropTypes.object.isRequired,
+    mode: PropTypes.oneOf([
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE,
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT,
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW,
+    ]).isRequired,
+    selectedOutputRuleTemplate: PropTypes.object.isRequired,
+    handleOutputRuleTemplateSelected: PropTypes.func.isRequired,
+    outputRuleTemplates: PropTypes.arrayOf(PropTypes.object).isRequired,
+    getPropertyComponents: PropTypes.func.isRequired,
+    businessRuleProperties: PropTypes.object.isRequired,
+    handleOutputMappingChange: PropTypes.func.isRequired,
+    toggleExpansion: PropTypes.func.isRequired,
+    isExpanded: PropTypes.bool.isRequired,
+    isErroneous: PropTypes.bool.isRequired,
+    style: PropTypes.object.isRequired,
+};

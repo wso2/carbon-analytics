@@ -39,6 +39,15 @@ import BusinessRulesMessages from '../../../../../constants/BusinessRulesMessage
 import '../../../../../index.css';
 
 /**
+ * Styles related to this component
+ */
+const styles = {
+    errorText: {
+        color: '#ff1744', // TODO move these kind of common styles to an object
+    },
+};
+
+/**
  * Represents the filter component of business rules from scratch form, which contains filter rules, rule logic and
  * a button for adding filter rule
  */
@@ -183,14 +192,10 @@ class FilterComponent extends React.Component {
                     id="ruleLogic"
                     name="ruleLogic"
                     label="Rule Logic"
-                    helperText={
-                        (!this.props.ruleLogicWarn) ?
-                            BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT :
-                            (BusinessRulesMessages.RULE_LOGIC_WARNING +
-                                '. ' + BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT)}
+                    helperText={BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT}
                     value={this.props.ruleComponents.ruleLogic}
                     onChange={e => this.updateRuleLogic(e.target.value)}
-                    error={this.props.ruleLogicWarn} // TODO might improve this
+                    error={this.props.errorStates.ruleLogic}
                     disabled={this.props.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
                     fullWidth
                 />);
@@ -209,11 +214,14 @@ class FilterComponent extends React.Component {
     }
 
     render() {
+        // TODO Some message when no filters & on view mode
         return (
             <div>
                 <AppBar position="static" color="default">
                     <Toolbar>
-                        <Typography type="subheading">Filters</Typography>
+                        <Typography type="subheading" style={this.props.isErroneous ? styles.errorText : {}}>
+                            Filters
+                        </Typography>
                         {this.displayExpandButton()}
                     </Toolbar>
                 </AppBar>

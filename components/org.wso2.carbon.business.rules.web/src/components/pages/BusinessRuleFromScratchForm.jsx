@@ -21,7 +21,6 @@ import PropTypes from 'prop-types';
 // Material UI Components
 import Button from 'material-ui/Button';
 import TextField from 'material-ui/TextField';
-import Dialog, { DialogActions, DialogContent, DialogContentText, DialogTitle } from 'material-ui/Dialog';
 import { Typography } from 'material-ui';
 import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
@@ -44,7 +43,7 @@ import BusinessRulesMessages from '../../constants/BusinessRulesMessages';
 import BusinessRulesAPI from '../../api/BusinessRulesAPI';
 // CSS
 import '../../index.css';
-import FormSubmissionError from "../../utils/FormSubmissionError";
+import FormSubmissionError from '../../utils/FormSubmissionError';
 
 /**
  * Styles related to this component
@@ -245,7 +244,9 @@ export default class BusinessRuleFromScratchForm extends Component {
                                                             outputRuleTemplates,
                                                             selectedInputRuleTemplate,
                                                             selectedOutputRuleTemplate,
-                                                            businessRuleProperties: businessRule.properties,
+                                                            businessRuleProperties:
+                                                                this.unwrapBusinessRuleProperties(
+                                                                    businessRule.properties),
                                                             fieldErrorStates:
                                                                 this.getDefaultErrorStates(businessRule.properties),
                                                             hasLoaded: true,
@@ -325,8 +326,10 @@ export default class BusinessRuleFromScratchForm extends Component {
                     unArrangedPropertiesFromTemplate[property].description : ''}
                 value={(this.state.businessRuleProperties[propertyType][property]) ?
                     (this.state.businessRuleProperties[propertyType][property]) : ('')}
-                errorState={this.state.fieldErrorStates.properties[propertyType][property]}
-                // TODO ERROR HANDLING FOR ABOVE
+                errorState={
+                    !BusinessRulesUtilityFunctions.isEmpty(this.state.fieldErrorStates.properties[propertyType]) ?
+                        this.state.fieldErrorStates.properties[propertyType][property] : false}
+                // TODO ERROR HANDLING FOR ABOVE. The component should only render if that is not isEmpty
                 disabledState={formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
                 options={unArrangedPropertiesFromTemplate[property].options}
                 onValueChange={e => this.updatePropertyValue(property, propertyType, e)}
@@ -373,352 +376,36 @@ export default class BusinessRuleFromScratchForm extends Component {
      * @param {Object} businessRuleProperties       Business Rule Properties object
      * @returns {Object}                            Object that contains error states of business rule fields
      */
-    updateFilterRuleAttribute(filterRuleIndex, value) {
-        // TODO refactor to object[variable]
-        const ruleComponentType = BusinessRulesConstants.RULE_COMPONENTS_KEY;
-        const ruleComponentFilterRuleType =
-            BusinessRulesConstants.FILTER_RULES_KEY;
-
-        const state = this.state;
-        state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex] =
-            value + ' ' +
-            state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex].split(' ')[1]
-            + ' ' +
-            state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex].split(' ')[2];
-        this.setState(state);
-    }
-
-    /**
-     * Updates the Operator of the Filter Rule, that has the given index
-     * @param {number} filterRuleIndex      Index of the Filter rule, whose Operator was modified
-     * @param {string} value                Value of the Operator
-     */
-    updateFilterRuleOperator(filterRuleIndex, value) {
-        const ruleComponentType = BusinessRulesConstants.RULE_COMPONENTS_KEY;
-        const ruleComponentFilterRuleType =
-            BusinessRulesConstants.FILTER_RULES_KEY;
-
-        const state = this.state;
-        state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex] =
-            state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex].split(' ')[0]
-            + ' ' + value + ' ' +
-            state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex].split(' ')[2];
-        this.setState(state);
-    }
-
-    /**
-     * Updates the Attribute Or Value of the Filter Rule, that has the given index
-     * @param {number} filterRuleIndex      Index of the Filter rule, whose Attribute Or Value was modified
-     * @param {string} value                Value of the Attribute Or Value
-     */
-    updateFilterRuleAttributeOrValue(filterRuleIndex, value) {
-        const ruleComponentType = BusinessRulesConstants.RULE_COMPONENTS_KEY;
-        const ruleComponentFilterRuleType =
-            BusinessRulesConstants.FILTER_RULES_KEY;
-
-        const state = this.state;
-        state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex] =
-            state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex].split(' ')[0]
-            + ' ' +
-            state.businessRuleProperties[ruleComponentType][ruleComponentFilterRuleType][filterRuleIndex].split(' ')[1]
-            + ' ' + value;
-        this.setState(state);
-    }
-    // TODO ----------------------------------------------------------------------------------------
-
-    // END OF FILTER RULE FUNCTIONS
-
-    /**
-     * Updates the Rule Logic, with the given value
-     * @param {string} value        Rule Logic
-     */
-    updateRuleLogic(value) {
-        // TODO under construction
-        const state = this.state;
-        state.businessRuleProperties.ruleComponents.ruleLogic = value;
-        this.setState(state);
-
-        // const state = this.state;
-        // state.businessRuleProperties.ruleComponents.ruleLogic[0] = value;
-        // this.setState(state);
-    }
-
-    generateDefaultRuleLogic(filterRules, ruleLogic) {
-        if (this.state.businessRuleProperties.ruleComponents.filterRules.length === 0) {
-            return '';
-        }
-        if (ruleLogic === '') {
-            // No rule logic is present
-            // Concatenate each filter rule numbers with AND and return
-            const numbers = [];
-            for (let i = 0; i < filterRules.length; i++) {
-                numbers.push(i + 1);
-            }
-            return numbers.join(' AND ');
-        } else {
-            return ruleLogic + ' AND ' + filterRules.length;
-        }
-    }
-
-    /**
-     * Updates the Rule Logic, by concatenating the latest Rule Logic number with an 'AND'
-     */
-    updateDefaultRuleLogic() { // todo under reconstruction
-        const state = this.state;
-        state.businessRuleProperties.ruleComponents.ruleLogic =
-            this.generateDefaultRuleLogic(
-                state.businessRuleProperties.ruleComponents.filterRules,
-                state.businessRuleProperties.ruleComponents.ruleLogic);
-        this.setState(state);
-
-        // const state = this.state;
-        // const existingRuleLogic = state.businessRuleProperties.ruleComponents.ruleLogic[0];
-        // // If a rule logic is not present
-        // if (existingRuleLogic === '') {
-        //     // No rule logic is present
-        //     // Concatenate each filter rule numbers with AND and return
-        //     const numbers = [];
-        //     for (let i = 0; i < this.state.businessRuleProperties.ruleComponents.filterRules.length; i++) {
-        //         numbers.push(i + 1);
-        //     }
-        //     state.businessRuleProperties.ruleComponents.ruleLogic[0] = numbers.join(' AND ');
-        // } else {
-        //     state.businessRuleProperties.ruleComponents.ruleLogic[0] =
-        //         existingRuleLogic + ' AND ' +
-        //         this.state.businessRuleProperties.ruleComponents.filterRules.length;
-        // }
-        // if (this.state.businessRuleProperties.ruleComponents.filterRules.length === 0) {
-        //     state.businessRuleProperties.ruleComponents.ruleLogic[0] = '';
-        // }
-        // this.setState(state);
-    }
-
-    /**
-     * Adds a new Filter Rule
-     */
-    addFilterRule() {
-        // TODO modification in progress
-        const state = this.state;
-        state.businessRuleProperties.ruleComponents.filterRules.push(['', '', '']);
-        this.setState(state);
-        this.updateDefaultRuleLogic();
-
-        // const state = this.state;
-        // state.businessRuleProperties.ruleComponents.filterRules.push('  ');
-        // this.setState(state);
-        // this.updateDefaultRuleLogic();
-    }
-
-    /**
-     * Removes the Filter Rule that has the given index
-     * @param {number} index        Index of the Filter Rule
-     */
-    removeFilterRule(index) {
-        const state = this.state;
-        state.businessRuleProperties.ruleComponents.filterRules.splice(index, 1);
-        this.setState(state);
-        this.updateDefaultRuleLogic();
-    }
-
-    /**
-     * Get the status, whether to give a warning for the Rule Logic, or not
-     * @returns {boolean}       Status of the warning for the Rule Logic
-     */
-    getRuleLogicWarnStatus() {
-        // TODO under reconstruction
-        // If rule logic exists
-        if (this.state.businessRuleProperties.ruleComponents.ruleLogic !== '') {
-            const ruleLogic = this.state.businessRuleProperties.ruleComponents.ruleLogic[0];
-
-            // Get all the numbers, mentioned in the rule logic
-            const numberPattern = /\d+/g;
-            for (const number of ruleLogic.match(numberPattern)) {
-                // If a number exceeds the latest filter rule's number, a corresponding filter rule can not be found
-                if (number > this.state.businessRuleProperties.ruleComponents.filterRules.length) {
-                    return true;
-                }
-            }
-        }
-        return false;
-
-        // // If rule logic exists
-        // if (this.state.businessRuleProperties.ruleComponents.ruleLogic[0] &&
-        //     this.state.businessRuleProperties.ruleComponents.ruleLogic[0] != null &&
-        //     this.state.businessRuleProperties.ruleComponents.ruleLogic[0] !== '') {
-        //     const ruleLogic = this.state.businessRuleProperties.ruleComponents.ruleLogic[0];
-        //
-        //     // Get all the numbers, mentioned in the rule logic
-        //     const numberPattern = /\d+/g;
-        //     for (const number of ruleLogic.match(numberPattern)) {
-        //         // If a number exceeds the latest filter rule's number, a corresponding filter rule can not be found
-        //         if (number > this.state.businessRuleProperties.ruleComponents.filterRules.length) {
-        //             return true;
-        //         }
-        //     }
-        // }
-        // return false;
-    }
-
-    /**
-     * Toggles expansion of the Input Component
-     */
-    toggleInputComponentExpansion() {
-        this.setState({ isInputComponentExpanded: !this.state.isInputComponentExpanded });
-    }
-
-    /**
-     * Toggles expansion of the Filter Component
-     */
-    toggleFilterComponentExpansion() {
-        this.setState({ isFilterComponentExpanded: !this.state.isFilterComponentExpanded });
-    }
-
-    /**
-     * Toggles expansion of the Output Component
-     */
-    toggleOutputComponentExpansion() {
-        this.setState({ isOutputComponentExpanded: !this.state.isOutputComponentExpanded });
-    }
-
-    /**
-     * Updates the Input Rule Template selection
-     * @param {object} event        Selection event of the Input Rule Template
-     */
-    handleInputRuleTemplateSelected(event) {
-        const state = this.state;
-        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-            .getRuleTemplate(this.state.selectedTemplateGroup.uuid, event.target.value)
-            .then((response) => {
-                state.selectedInputRuleTemplate = response.data[2];
-                // Set default values as inputData values in state
-                for (const propertyKey in state.selectedInputRuleTemplate.properties) {
-                    if (Object.prototype.hasOwnProperty.call(state.selectedInputRuleTemplate.properties,
-                        propertyKey)) {
-                        state.businessRuleProperties[BusinessRulesConstants
-                            .INPUT_DATA_KEY][propertyKey] =
-                            state.selectedInputRuleTemplate.properties[propertyKey].defaultValue;
-                    }
-                }
-                state.fieldErrorStates = this.getDefaultErrorStates(state.businessRuleProperties);
-                state.hasLoaded = true;
-                state.errorCode = BusinessRulesConstants.ERROR_CODES.NONE;
-                this.setState(state);
-            })
-            .catch((error) => {
-                // Error in Loading Input Rule Template Properties
-                this.setState({
-                    hasLoaded: true,
-                    errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
-                });
-            });
-    }
-
-    /**
-     * Updates the Output Rule Template selection
-     * @param {object} event        Selection event of the Output Rule Template
-     */
-    handleOutputRuleTemplateSelected(event) {
-        const state = this.state;
-        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-            .getRuleTemplate(this.state.selectedTemplateGroup.uuid, event.target.value)
-            .then((response) => {
-                state.selectedOutputRuleTemplate = response.data[2];
-                // Set default values as outputData values in state
-                for (const propertyKey in state.selectedOutputRuleTemplate.properties) {
-                    if (Object.prototype.hasOwnProperty.call(state.selectedOutputRuleTemplate.properties,
-                        propertyKey)) {
-                        state.businessRuleProperties[BusinessRulesConstants
-                            .OUTPUT_DATA_KEY][propertyKey] =
-                            state.selectedOutputRuleTemplate.properties[propertyKey.toString()].defaultValue;
-                    }
-                }
-                state.fieldErrorStates = this.getDefaultErrorStates(state.businessRuleProperties);
-                state.hasLoaded = true;
-                state.errorCode = BusinessRulesConstants.ERROR_CODES.NONE;
-                this.setState(state);
-            })
-            .catch((error) => {
-                // Error in Loading Output Rule Template Properties
-                this.setState({
-                    hasLoaded: true,
-                    errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
-                });
-            });
-    }
-
-    /**
-     * Updates the Output Mapping (value As outputFieldName)
-     * @param {object} value                Value object of the AutoSuggest field's onChange action
-     * @param {string} outputFieldName      Name of the Output Field
-     */
-    updateOutputMapping(value, outputFieldName) {
-        const state = this.state;
-        state.businessRuleProperties.outputMappings[outputFieldName] = value.newValue;
-        this.setState(state);
-        this.resetErrorStates();
-    }
-
-    /**
-     * Updates the given property which is of the given type, with the given value
-     * @param {string} property         Name of the Property
-     * @param {string} propertyType     Type (sub-section) of the Property
-     * @param {string} value            Value of the Property
-     */
-    updatePropertyValue(property, propertyType, value) {
-        const state = this.state;
-        state.businessRuleProperties[propertyType][property] = value;
-        this.setState(state);
-        this.resetErrorStates();
-    }
-
-    /**
-     * Resets error states of all the properties of the Business Rule,
-     * if any of the field is currently having an error
-     */
-    resetErrorStates() {
-        if (this.state.isFieldErrorStatesDirty) {
-            this.setState({
-                isFieldErrorStatesDirty: false,
-                fieldErrorStates: this.getDefaultErrorStates(this.state.businessRuleProperties),
-            });
-        }
-    }
-
-    /**
-     * Handles onChange action of the business rule name text field
-     * @param {Object} event        OnChange event of the business rule name text field
-     */
-    handleBusinessRuleNameChange(event) {
-        const state = this.state;
-        state.businessRuleName = event.target.value;
-        state.businessRuleUUID = BusinessRulesUtilityFunctions.generateBusinessRuleUUID(event.target.value);
-        this.setState(state);
-        this.resetErrorStates();
-    }
-
     getDefaultErrorStates(businessRuleProperties) {
         const errorStates = {
             inputData: {},
             ruleComponents: {
                 filterRules: [],
-                ruleLogic: [''],
+                ruleLogic: false,
             },
             outputData: {},
             outputMappings: {},
+            // TODO calculate the below three
+            inputComponent: false,
+            filterComponent: false,
+            outputComponent: false,
         };
 
-        for (const propertyType in businessRuleProperties) {
-            if (Object.prototype.hasOwnProperty.call(businessRuleProperties, propertyType)) {
-                if (propertyType === BusinessRulesConstants.INPUT_DATA_KEY ||
-                    propertyType === BusinessRulesConstants.OUTPUT_DATA_KEY) {
-                    for (const propertyKey in businessRuleProperties[propertyType]) {
-                        if (Object.prototype.hasOwnProperty.call(businessRuleProperties[propertyType], propertyKey)) {
-                            errorStates[propertyType][propertyKey] = false;
-                        }
-                    }
-                }
+        // Input Data
+        for (const propertyKey in businessRuleProperties.inputData) {
+            if (Object.prototype.hasOwnProperty.call(businessRuleProperties.inputData, propertyKey)) {
+                errorStates.inputData[propertyKey] = false;
             }
         }
+        // Output Data
+        for (const propertyKey in businessRuleProperties.outputData) {
+            if (Object.prototype.hasOwnProperty.call(businessRuleProperties.outputData, propertyKey)) {
+                errorStates.outputData[propertyKey] = false;
+            }
+        }
+        // Rule Components
+        errorStates.ruleLogic = this.getRuleLogicErrorState(); // TODO filter rules
+
         return {
             businessRuleName: false,
             properties: errorStates,
@@ -732,23 +419,35 @@ export default class BusinessRuleFromScratchForm extends Component {
      * @param {boolean} isUpdate                Whether to update or create the business rule
      * @returns {AxiosPromise}                  Promise to perform create/update with a business rule object
      */
-    showSnackbar() {
-        return (
-            <Snackbar
-                autoHideDuration={3500}
-                open={this.state.displaySnackbar}
-                onRequestClose={() => this.toggleSnackbar()}
-                transition={<Slide direction={styles.snackbar.direction} />}
-                SnackbarContentProps={{
-                    'aria-describedby': 'snackbarMessage',
-                }}
-                message={
-                    <span id="snackbarMessage">
-                        {this.state.snackbarMessage}
-                    </span>
+    getSubmitPromise(businessRuleObject, deployStatus, isUpdate) {
+        if (isUpdate) {
+            return new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+                .updateBusinessRule(businessRuleObject.uuid, JSON.stringify(businessRuleObject), deployStatus);
+        }
+        return new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+            .createBusinessRule(JSON.stringify(businessRuleObject), deployStatus.toString());
+    }
+
+    /**
+     * Gets error state of the Rule Logic
+     * @returns {boolean}       Error state of the Rule Logic
+     */
+    getRuleLogicErrorState() {
+        // If rule logic exists
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleProperties.ruleComponents) &&
+            this.state.businessRuleProperties.ruleComponents.ruleLogic !== '') {
+            const ruleLogic = this.state.businessRuleProperties.ruleComponents.ruleLogic;
+
+            // Get all the numbers, mentioned in the rule logic
+            const numberPattern = /\d+/g;
+            for (const number of ruleLogic.match(numberPattern)) {
+                // If a number exceeds the latest filter rule's number, a corresponding filter rule can not be found
+                if (number > this.state.businessRuleProperties.ruleComponents.filterRules.length) {
+                    return true;
                 }
-            />
-        );
+            }
+        }
+        return false;
     }
 
     /**
@@ -778,52 +477,82 @@ export default class BusinessRuleFromScratchForm extends Component {
         }
 
         // Validate property type components
-        for (const propertyType in this.state.businessRuleProperties) {
-            if (Object.prototype.hasOwnProperty.call(this.state.businessRuleProperties, propertyType)) {
-                // Validation happens only for properties of type 'input' & 'output', not for 'ruleComponent'
-                // TODO the above statement seems no!
-                if (propertyType === BusinessRulesConstants.INPUT_DATA_KEY ||
-                    propertyType === BusinessRulesConstants.OUTPUT_DATA_KEY) {
-                    // If any 'inputData' or 'outputData' property type component is completely empty
-                    if (BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleProperties[propertyType])) {
-                        throw new FormSubmissionError(
-                            fieldErrorStates,
-                            'Invalid ' +
-                            (propertyType ===
-                            BusinessRulesConstants.INPUT_DATA_KEY ?
-                                'input' : 'output') + ' properties found');
-                        // TODO maybe improve by highlight 'INPUT COMPONENT' as red!
-                    } else {
-                        let isAnyPropertyEmpty = false;
-                        // If any property of the specific property type in invalid
-                        for (const propertyKey in this.state.businessRuleProperties[propertyType]) {
-                            if (Object.prototype.hasOwnProperty.call(
-                                this.state.businessRuleProperties[propertyType], propertyKey)) {
-                                if (propertyType !==
-                                    BusinessRulesConstants.RULE_COMPONENTS_KEY) {
-                                    if (this.state.businessRuleProperties[propertyType][propertyKey] === '') {
-                                        fieldErrorStates.properties[propertyType][propertyKey] = true;
-                                        isAnyPropertyEmpty = true;
-                                    }
-                                }
-                            } else {
-                                isAnyPropertyEmpty = true;
-                            }
-                        }
-                        if (isAnyPropertyEmpty) {
-                            throw new FormSubmissionError(fieldErrorStates,
-                                'Please fill in values for all the properties');
-                        }
-                    }
-                } else if (propertyType ===
-                    BusinessRulesConstants.OUTPUT_MAPPINGS_KEY) {
-                    if (BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleProperties[propertyType])) {
-                        throw new FormSubmissionError(fieldErrorStates, 'Please provide valid Output Mappings');
-                        // TODO more precise should be introduced
-                    }
+
+        // Input Data
+        if (BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleProperties.inputData)) {
+            fieldErrorStates.properties.inputComponent = true;
+            throw new FormSubmissionError(fieldErrorStates, 'Invalid Input data found');
+        }
+        let isAnyPropertyEmpty = false;
+        for (const propertyKey in this.state.businessRuleProperties.inputData) {
+            if (Object.prototype.hasOwnProperty.call(this.state.businessRuleProperties.inputData, propertyKey)) {
+                if (this.state.businessRuleProperties.inputData[propertyKey] === '') {
+                    fieldErrorStates.properties.inputData[propertyKey] = true;
+                    isAnyPropertyEmpty = true;
                 }
             }
         }
+        if (isAnyPropertyEmpty) {
+            fieldErrorStates.properties.inputComponent = true;
+            throw new FormSubmissionError(fieldErrorStates, 'Please fill in values for all Input data properties');
+        }
+
+        // Output Data
+        if (BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleProperties.outputData)) {
+            fieldErrorStates.properties.outputComponent = true;
+            throw new FormSubmissionError(fieldErrorStates, 'Invalid Output data found');
+        }
+        for (const propertyKey in this.state.businessRuleProperties.outputData) {
+            if (Object.prototype.hasOwnProperty.call(this.state.businessRuleProperties.outputData, propertyKey)) {
+                if (this.state.businessRuleProperties.outputData[propertyKey] === '') {
+                    fieldErrorStates.properties.outputData[propertyKey] = true;
+                    isAnyPropertyEmpty = true;
+                }
+            }
+        }
+        if (isAnyPropertyEmpty) {
+            fieldErrorStates.properties.outputComponent = true;
+            throw new FormSubmissionError(fieldErrorStates, 'Please fill in values for all Output data properties');
+        }
+
+        // Output Mappings
+        if (BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleProperties.outputMappings)) {
+            fieldErrorStates.properties.outputComponent = true;
+            throw new FormSubmissionError(fieldErrorStates, 'Invalid Output Mappings found');
+        }
+        // TODO output mapping validations
+        // todo make as conditional rendering
+        // todo since output mapping will be none until an output rule template is selected
+        for (const outputFieldName in this.state.businessRuleProperties.outputMappings) {
+            if (Object.prototype.hasOwnProperty.call(
+                this.state.businessRuleProperties.outputMappings, outputFieldName)) {
+                if (this.state.businessRuleProperties.outputMappings[outputFieldName] === '') {
+                    fieldErrorStates.properties.outputMappings[outputFieldName] = true;
+                    isAnyPropertyEmpty = true;
+                }
+            }
+        }
+
+        // Rule Components
+        if (BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleProperties.ruleComponents)) {
+            fieldErrorStates.properties.filterComponent = true;
+            throw new FormSubmissionError(fieldErrorStates, 'Invalid Rule Component data found');
+        }
+        if (this.state.businessRuleProperties.ruleComponents.filterRules.length > 0 &&
+            this.state.businessRuleProperties.ruleComponents.ruleLogic === '') {
+            fieldErrorStates.properties.filterComponent = true;
+            fieldErrorStates.properties.ruleComponents.ruleLogic = true;
+            throw new FormSubmissionError(
+                fieldErrorStates, 'Rule Logic can not be empty, with one or more Filter Rules');
+            // TODO what about something like 'BLAH BLAH' for rule logic
+        }
+        if (this.getRuleLogicErrorState()) {
+            fieldErrorStates.properties.filterComponent = true;
+            fieldErrorStates.properties.ruleComponents.ruleLogic = true;
+            throw new FormSubmissionError(
+                fieldErrorStates, 'Can not find Filter Rule(s) referred in Rule Logic');
+        }
+
         return true;
     }
 
@@ -849,7 +578,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                     templateGroupUUID: this.state.selectedTemplateGroup.uuid,
                     inputRuleTemplateUUID: this.state.selectedInputRuleTemplate.uuid,
                     outputRuleTemplateUUID: this.state.selectedOutputRuleTemplate.uuid,
-                    properties: this.state.businessRuleProperties,
+                    properties: this.wrapBusinessRuleProperties(this.state.businessRuleProperties),
                 };
 
                 this.getSubmitPromise(businessRuleObject, shouldDeploy, isUpdate)
@@ -885,8 +614,6 @@ export default class BusinessRuleFromScratchForm extends Component {
                     });
             }
         } catch (error) {
-            console.log('caught error')
-            console.log(error)
             this.setState({
                 showSubmitButtons: true,
                 isFieldErrorStatesDirty: true,
@@ -896,6 +623,315 @@ export default class BusinessRuleFromScratchForm extends Component {
         }
     }
 
+    /**
+     * Prepares the business rule properties object for submission
+     * @param {Object} businessRuleProperties       Business rule properties
+     * @returns {Object}                            Modified business rule properties, for submission
+     */
+    wrapBusinessRuleProperties(businessRuleProperties) {
+        const properties = JSON.parse(JSON.stringify(businessRuleProperties));
+        const filterRules = [];
+        for (const filterRule of properties.ruleComponents.filterRules) {
+            filterRules.push(filterRule.join(' '));
+        }
+        properties.ruleComponents = {
+            filterRules,
+            ruleLogic: [properties.ruleComponents.ruleLogic],
+        };
+        return properties;
+    }
+
+    /**
+     * Prepares the business rule properties object, to be able to be handled in the form
+     * @param {Object} businessRuleProperties       Business rule properties
+     * @returns {Object}                            Modified business rule properties, for handling in the form
+     */
+    unwrapBusinessRuleProperties(businessRuleProperties) {
+        // To avoid mutating the param object, as it is not referenced from the state
+        const properties = JSON.parse(JSON.stringify(businessRuleProperties));
+        // TODO handle saved with old implementation data
+        const filterRules = [];
+        for (const filterRule of properties.ruleComponents.filterRules) {
+            filterRules.push(filterRule.split(' '));
+        }
+        properties.ruleComponents = {
+            filterRules,
+            ruleLogic: properties.ruleComponents.ruleLogic[0],
+        };
+        return properties;
+    }
+
+    /**
+     * Handles onChange action of the business rule name text field
+     * @param {Object} event        OnChange event of the business rule name text field
+     */
+    handleBusinessRuleNameChange(event) {
+        const state = this.state;
+        state.businessRuleName = event.target.value;
+        state.businessRuleUUID = BusinessRulesUtilityFunctions.generateBusinessRuleUUID(event.target.value);
+        this.setState(state);
+        this.resetErrorStates();
+    }
+
+    /**
+     * Updates the Input Rule Template selection
+     * @param {Object} event        Selection event of the Input Rule Template
+     */
+    handleInputRuleTemplateSelected(event) {
+        const state = this.state;
+        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+            .getRuleTemplate(this.state.selectedTemplateGroup.uuid, event.target.value)
+            .then((response) => {
+                state.selectedInputRuleTemplate = response.data[2];
+                // Set default values as inputData values in state
+                for (const propertyKey in state.selectedInputRuleTemplate.properties) {
+                    if (Object.prototype.hasOwnProperty.call(state.selectedInputRuleTemplate.properties,
+                        propertyKey)) {
+                        state.businessRuleProperties[BusinessRulesConstants
+                            .INPUT_DATA_KEY][propertyKey] =
+                            state.selectedInputRuleTemplate.properties[propertyKey].defaultValue;
+                    }
+                }
+                state.fieldErrorStates = this.getDefaultErrorStates(state.businessRuleProperties);
+                state.hasLoaded = true;
+                state.errorCode = BusinessRulesConstants.ERROR_CODES.NONE;
+                this.setState(state);
+            })
+            .catch((error) => {
+                // Error in Loading Input Rule Template Properties
+                this.setState({
+                    hasLoaded: true,
+                    errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
+                });
+            });
+    }
+
+    /**
+     * Updates the Output Rule Template selection
+     * @param {Object} event        Selection event of the Output Rule Template
+     */
+    handleOutputRuleTemplateSelected(event) {
+        const state = this.state;
+        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+            .getRuleTemplate(this.state.selectedTemplateGroup.uuid, event.target.value)
+            .then((response) => {
+                state.selectedOutputRuleTemplate = response.data[2];
+                // Set default values as outputData values in state
+                for (const propertyKey in state.selectedOutputRuleTemplate.properties) {
+                    if (Object.prototype.hasOwnProperty.call(state.selectedOutputRuleTemplate.properties,
+                        propertyKey)) {
+                        state.businessRuleProperties[BusinessRulesConstants
+                            .OUTPUT_DATA_KEY][propertyKey] =
+                            state.selectedOutputRuleTemplate.properties[propertyKey.toString()].defaultValue;
+                    }
+                }
+                state.fieldErrorStates = this.getDefaultErrorStates(state.businessRuleProperties);
+                state.hasLoaded = true;
+                state.errorCode = BusinessRulesConstants.ERROR_CODES.NONE;
+                this.setState(state);
+            })
+            .catch((error) => {
+                // Error in Loading Output Rule Template Properties
+                this.setState({
+                    hasLoaded: true,
+                    errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
+                });
+            });
+    }
+
+    /**
+     * Updates RuleComponents
+     * @param {Object} ruleComponents       Modified 'ruleComponents' part
+     */
+    updateRuleComponents(ruleComponents) {
+        const state = this.state;
+        state.businessRuleProperties.ruleComponents = ruleComponents;
+        this.setState(state);
+        this.resetErrorStates();
+    }
+
+    /**
+     * Updates Output Mapping (value As outputFieldName)
+     * @param {Object} value                Value object of the AutoSuggest field's onChange action
+     * @param {String} outputFieldName      Name of the Output Field
+     */
+    updateOutputMapping(value, outputFieldName) {
+        const state = this.state;
+        state.businessRuleProperties.outputMappings[outputFieldName] = value.newValue;
+        this.setState(state);
+        this.resetErrorStates();
+    }
+
+    /**
+     * Updates the given property which is of the given type, with the given value
+     * @param {String} property         Name of the Property
+     * @param {String} propertyType     Type (sub-section) of the Property
+     * @param {String} value            Value of the Property
+     */
+    updatePropertyValue(property, propertyType, value) {
+        const state = this.state;
+        state.businessRuleProperties[propertyType][property] = value;
+        this.setState(state);
+        this.resetErrorStates();
+    }
+
+    /**
+     * Resets error states of all the properties of the business rule, if any of the field is currently having an error
+     */
+    resetErrorStates() {
+        if (this.state.isFieldErrorStatesDirty) {
+            this.setState({
+                isFieldErrorStatesDirty: false,
+                fieldErrorStates: this.getDefaultErrorStates(this.state.businessRuleProperties),
+            });
+        }
+    }
+
+    /**
+     * Displays content of the page
+     */
+    displayContent() {
+        if (this.state.hasLoaded) {
+            if (this.state.errorCode === BusinessRulesConstants.ERROR_CODES.NONE) {
+                return (
+                    <div>
+                        {this.displaySnackbar()}
+                        <Grid container spacing={24} style={styles.formRoot} justify="center">
+                            <Grid item xs={12} sm={7}>
+                                <Paper style={styles.formPaper}>
+                                    <center>
+                                        <Typography type="headline">
+                                            {this.state.selectedTemplateGroup.name}
+                                        </Typography>
+                                        <Typography type="subheading">
+                                            {this.state.selectedTemplateGroup.description ?
+                                                this.state.selectedTemplateGroup.description : ''}
+                                        </Typography>
+                                        <br />
+                                        {/* Business Rule Name */}
+                                        <TextField
+                                            id="businessRuleName"
+                                            name="businessRuleName"
+                                            label={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_NAME}
+                                            placeholder={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_DESCRIPTION}
+                                            value={this.state.businessRuleName}
+                                            onChange={e => this.handleBusinessRuleNameChange(e)}
+                                            disabled={(this.state.formMode !==
+                                                BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE)}
+                                            error={this.state.fieldErrorStates.businessRuleName}
+                                            required
+                                            fullWidth
+                                            margin="normal"
+                                        />
+                                    </center>
+                                    <br />
+                                    <br />
+                                    <InputComponent
+                                        mode={this.state.formMode}
+                                        isExpanded={this.state.isInputComponentExpanded}
+                                        isErroneous={
+                                            this.state.fieldErrorStates.properties ?
+                                                this.state.fieldErrorStates.properties.inputComponent : false}
+                                        inputRuleTemplates={this.state.inputRuleTemplates}
+                                        selectedRuleTemplate={this.state.selectedInputRuleTemplate}
+                                        getFieldNamesAndTypes={streamDefinition =>
+                                            this.getFieldNamesAndTypes(streamDefinition)}
+                                        getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
+                                        handleInputRuleTemplateSelected={e => this.handleInputRuleTemplateSelected(e)}
+                                        getPropertyComponents={(propertiesType, formMode) =>
+                                            this.getPropertyComponents(propertiesType, formMode)}
+                                        toggleExpansion={() => this.toggleInputComponentExpansion()}
+                                        style={styles}
+                                    />
+                                    <br />
+                                    <FilterComponent
+                                        isExpanded={this.state.isFilterComponentExpanded}
+                                        isErroneous={
+                                            this.state.fieldErrorStates.properties ?
+                                                this.state.fieldErrorStates.properties.filterComponent : false}
+                                        errorStates={
+                                            this.state.fieldErrorStates.properties ?
+                                                this.state.fieldErrorStates.properties.ruleComponents :
+                                                { ruleLogic: false }} // TODO impl for filter rules
+                                        toggleExpansion={() => this.toggleFilterComponentExpansion()}
+                                        filterRules={this.state.businessRuleProperties.ruleComponents.filterRules}
+                                        onUpdate={ruleComponents => this.updateRuleComponents(ruleComponents)} // TODO
+                                        formMode={this.state.formMode}
+                                        selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
+                                        getFieldNamesAndTypes={streamDefinition =>
+                                            this.getFieldNamesAndTypes(streamDefinition)}
+                                        getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
+                                        // TODO look into the above one
+                                        ruleComponents={this.state.businessRuleProperties.ruleComponents}
+                                        style={styles}
+                                    />
+                                    <br />
+                                    <OutputComponent
+                                        mode={this.state.formMode}
+                                        isErroneous={
+                                            this.state.fieldErrorStates.properties ?
+                                                this.state.fieldErrorStates.properties.outputComponent : false}
+                                        // TODO implement error state inside
+                                        outputRuleTemplates={this.state.outputRuleTemplates}
+                                        getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
+                                        selectedOutputRuleTemplate={this.state.selectedOutputRuleTemplate}
+                                        selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
+                                        handleOutputRuleTemplateSelected={e =>
+                                            this.handleOutputRuleTemplateSelected(e)}
+                                        handleOutputMappingChange={(value, fieldName) =>
+                                            this.updateOutputMapping(value, fieldName)}
+                                        getPropertyComponents={(propertiesType, formMode) =>
+                                            this.getPropertyComponents(propertiesType, formMode)}
+                                        businessRuleProperties={this.state.businessRuleProperties}
+                                        isExpanded={this.state.isOutputComponentExpanded}
+                                        toggleExpansion={() => this.toggleOutputComponentExpansion()}
+                                        style={styles}
+                                    />
+                                    <br />
+                                    <br />
+                                    <center>
+                                        {this.displaySubmitButtons()}
+                                    </center>
+                                </Paper>
+                            </Grid>
+                        </Grid>
+                    </div>
+                );
+            } else {
+                return <ErrorDisplay errorCode={this.state.errorCode} />;
+            }
+        } else {
+            return <ProgressDisplay />;
+        }
+    }
+
+    /**
+     * Returns the Snackbar
+     * @returns {Component}     Snackbar Component
+     */
+    displaySnackbar() {
+        return (
+            <Snackbar
+                autoHideDuration={3500}
+                open={this.state.displaySnackbar}
+                onRequestClose={() => this.toggleSnackbar()}
+                transition={<Slide direction={styles.snackbar.direction} />}
+                SnackbarContentProps={{
+                    'aria-describedby': 'snackbarMessage',
+                }}
+                message={
+                    <span id="snackbarMessage">
+                        {this.state.snackbarMessage}
+                    </span>
+                }
+            />
+        );
+    }
+
+    /**
+     * Returns Submit Buttons
+     * @returns {Element}       Submit Buttons
+     */
     displaySubmitButtons() {
         if (this.state.showSubmitButtons) {
             if (this.state.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW &&
@@ -936,108 +972,42 @@ export default class BusinessRuleFromScratchForm extends Component {
         return null;
     }
 
-    displayContent() {
-        if (this.state.hasLoaded) {
-            if (this.state.errorCode === BusinessRulesConstants.ERROR_CODES.NONE) {
-                return (
-                    <div>
-                        {this.showSnackbar()}
-                        <Grid container spacing={24} style={styles.formRoot} justify="center">
-                            <Grid item xs={12} sm={7}>
-                                <Paper style={styles.formPaper}>
-                                    <center>
-                                        <Typography type="headline">
-                                            {this.state.selectedTemplateGroup.name}
-                                        </Typography>
-                                        <Typography type="subheading">
-                                            {this.state.selectedTemplateGroup.description ?
-                                                this.state.selectedTemplateGroup.description : ''}
-                                        </Typography>
-                                        <br />
-                                        {/* Business Rule Name */}
-                                        <TextField
-                                            id="businessRuleName"
-                                            name="businessRuleName"
-                                            label={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_NAME}
-                                            placeholder={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_DESCRIPTION}
-                                            value={this.state.businessRuleName}
-                                            onChange={e => this.handleBusinessRuleNameChange(e)}
-                                            disabled={(this.state.formMode !==
-                                                BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE)}
-                                            error={this.state.fieldErrorStates.businessRuleName}
-                                            // TODO IMPLEMENT LOGIC FOR ERROR
-                                            required
-                                            fullWidth
-                                            margin="normal"
-                                        />
-                                    </center>
-                                    <br />
-                                    <br />
-                                    <InputComponent
-                                        mode={this.state.formMode}
-                                        inputRuleTemplates={this.state.inputRuleTemplates}
-                                        getFieldNamesAndTypes={streamDefinition =>
-                                            this.getFieldNamesAndTypes(streamDefinition)}
-                                        getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
-                                        selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
-                                        handleInputRuleTemplateSelected={e =>
-                                            this.handleInputRuleTemplateSelected(e)}
-                                        getPropertyComponents={(propertiesType, formMode) =>
-                                            this.getPropertyComponents(propertiesType, formMode)}
-                                        style={styles}
-                                        isExpanded={this.state.isInputComponentExpanded}
-                                        toggleExpansion={() => this.toggleInputComponentExpansion()}
-                                    />
-                                    <br />
-                                    <FilterComponent
-                                        isExpanded={this.state.isFilterComponentExpanded}
-                                        toggleExpansion={() => this.toggleFilterComponentExpansion()}
-                                        filterRules={this.state.businessRuleProperties.ruleComponents.filterRules}
-                                        onUpdate={ruleComponents => this.updateRuleComponents(ruleComponents)} // TODO
-                                        formMode={this.state.formMode}
-                                        selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
-                                        getFieldNamesAndTypes={streamDefinition =>
-                                            this.getFieldNamesAndTypes(streamDefinition)}
-                                        getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
-                                        // TODO look into the above one
-                                        ruleComponents={this.state.businessRuleProperties.ruleComponents}
-                                        ruleLogicWarn={this.getRuleLogicWarnStatus()} // TODO might improve
-                                        style={styles}
-                                    />
-                                    <br />
-                                    <OutputComponent
-                                        mode={this.state.formMode}
-                                        outputRuleTemplates={this.state.outputRuleTemplates}
-                                        getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
-                                        selectedOutputRuleTemplate={this.state.selectedOutputRuleTemplate}
-                                        selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
-                                        handleOutputRuleTemplateSelected={e =>
-                                            this.handleOutputRuleTemplateSelected(e)}
-                                        handleOutputMappingChange={(value, fieldName) =>
-                                            this.updateOutputMapping(value, fieldName)}
-                                        getPropertyComponents={(propertiesType, formMode) =>
-                                            this.getPropertyComponents(propertiesType, formMode)}
-                                        businessRuleProperties={this.state.businessRuleProperties}
-                                        isExpanded={this.state.isOutputComponentExpanded}
-                                        toggleExpansion={() => this.toggleOutputComponentExpansion()}
-                                        style={styles}
-                                    />
-                                    <br />
-                                    <br />
-                                    <center>
-                                        {this.displaySubmitButtons()}
-                                    </center>
-                                </Paper>
-                            </Grid>
-                        </Grid>
-                    </div>
-                );
-            } else {
-                return <ErrorDisplay errorCode={this.state.errorCode} />;
-            }
+    /**
+     * Shows the snackbar with the given message, or hides when no message is given
+     * @param {String} message       Snackbar message text
+     */
+    toggleSnackbar(message) {
+        if (message) {
+            this.setState({
+                displaySnackbar: true,
+                snackbarMessage: message,
+            });
         } else {
-            return <ProgressDisplay />;
+            this.setState({
+                displaySnackbar: false,
+            });
         }
+    }
+
+    /**
+     * Toggles expansion of the Input Component
+     */
+    toggleInputComponentExpansion() {
+        this.setState({ isInputComponentExpanded: !this.state.isInputComponentExpanded });
+    }
+
+    /**
+     * Toggles expansion of the Filter Component
+     */
+    toggleFilterComponentExpansion() {
+        this.setState({ isFilterComponentExpanded: !this.state.isFilterComponentExpanded });
+    }
+
+    /**
+     * Toggles expansion of the Output Component
+     */
+    toggleOutputComponentExpansion() {
+        this.setState({ isOutputComponentExpanded: !this.state.isOutputComponentExpanded });
     }
 
     render() {

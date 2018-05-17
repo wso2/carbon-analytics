@@ -16,7 +16,8 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Collapse from 'material-ui/transitions/Collapse';
@@ -40,129 +41,156 @@ import BusinessRulesMessages from '../../../../../constants/BusinessRulesMessage
 import '../../../../../index.css';
 
 /**
- * Represents the input component of the business rule from scratch form,
- * which will contain input rule template selection, input configurations and input exposed stream fields
+ * Styles related to this component
  */
-class InputComponent extends React.Component {
-    render() {
-        let inputRuleTemplatesToDisplay;
-        let inputDataPropertiesToDisplay;
-        let exposedInputStreamFieldsToDisplay;
+const styles = {
+    errorText: {
+        color: '#ff1744',
+    },
+};
 
-        // To display rule templates selection drop down
-        let inputRuleTemplateElements = this.props.inputRuleTemplates.map((inputRuleTemplate) =>
-            <MenuItem key={inputRuleTemplate.uuid} value={inputRuleTemplate.uuid}>
-                {inputRuleTemplate.name}
-            </MenuItem>
-        );
-        inputRuleTemplatesToDisplay =
-            (<FormControl disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}>
+/**
+ * Represents the input component of the business rule from scratch form
+ */
+export default class InputComponent extends Component {
+    /**
+     * Returns Input Rule Template selection
+     * @returns {Component}     Selection field
+     */
+    displayRuleTemplateSelection() {
+        return (
+            <FormControl disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}>
                 <InputLabel htmlFor="inputRuleTemplate">Rule Template</InputLabel>
                 <Select
-                    value={(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) ?
-                        (this.props.selectedInputRuleTemplate.uuid) : ('')}
-                    onChange={(e) => this.props.handleInputRuleTemplateSelected(e)}
-                    input={<Input id="inputRuleTemplate"/>}
+                    value={(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedRuleTemplate)) ?
+                        (this.props.selectedRuleTemplate.uuid) : ('')}
+                    onChange={e => this.props.handleInputRuleTemplateSelected(e)}
+                    input={<Input id="inputRuleTemplate" />}
                 >
-                    {inputRuleTemplateElements}
+                    {this.props.inputRuleTemplates.map(inputRuleTemplate =>
+                        (<MenuItem key={inputRuleTemplate.uuid} value={inputRuleTemplate.uuid}>
+                            {inputRuleTemplate.name}
+                        </MenuItem>))}
                 </Select>
                 <FormHelperText>
-                    {(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) ?
-                        this.props.selectedInputRuleTemplate.description :
+                    {(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedRuleTemplate)) ?
+                        this.props.selectedRuleTemplate.description :
                         (BusinessRulesMessages.SELECT_RULE_TEMPLATE)
                     }
                 </FormHelperText>
-            </FormControl>);
+            </FormControl>
+        );
+    }
 
-        // If an input rule template has been selected
-        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
-            // To display input data properties
-            let inputConfigurations = this.props.getPropertyComponents(
-                BusinessRulesConstants.INPUT_DATA_KEY, this.props.mode);
-
-            inputDataPropertiesToDisplay =
-                (<div>
+    /**
+     * Returns Properties
+     * @returns {Element}       Property Components
+     */
+    displayProperties() {
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedRuleTemplate)) {
+            return (
+                <div>
                     <Typography type="subheading">
                         Configurations
                     </Typography>
-                    {inputConfigurations}
-                </div>);
+                    {this.props.getPropertyComponents(BusinessRulesConstants.INPUT_DATA_KEY, this.props.mode)}
+                </div>
+            );
+        }
+        return null;
+    }
 
-            // Store as a 2 dimensional array of [fieldName, fieldType]s
-            let inputStreamFields =
-                this.props.getFieldNamesAndTypes(this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition);
-            let inputStreamFieldsToDisplay = [];
-            for (let field in inputStreamFields) {
-                if (Object.prototype.hasOwnProperty.call(inputStreamFields, field)) {
-                    inputStreamFieldsToDisplay.push([field, inputStreamFields[field]]);
-                }
-            }
+    /**
+     * Displays exposed stream fields
+     * @returns {Component}     Grid with the names and types of exposed stream fields
+     */
+    displayExposedStreamFields() {
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedRuleTemplate)) {
+            const inputStreamFields =
+                this.props.getFieldNamesAndTypes(this.props.selectedRuleTemplate.templates[0].exposedStreamDefinition);
 
-            // To display exposed input stream fields
-            let exposedInputStreamFieldElementsToDisplay =
-                (<List subheader style={this.props.style.root}>
-                    {inputStreamFieldsToDisplay.map(field => (
-                        <div key={field} style={this.props.style.listSection}>
-                            <ListItem button key={field[0]}>
-                                <ListItemText primary={field[0]} secondary={field[1]}/>
-                            </ListItem>
-                        </div>
-                    ))}
-                </List>);
-            exposedInputStreamFieldsToDisplay =
+            return (
                 <Grid item>
-                    <Paper style={{padding: 10}}>
+                    <Paper style={{ padding: 10 }}>
                         <Typography type="subheading">
                             Exposed stream fields
                         </Typography>
-                        <br/>
-                        {exposedInputStreamFieldElementsToDisplay}
+                        <br />
+                        {<List subheader style={this.props.style.root}>
+                            {Object.keys(inputStreamFields).map(field => (
+                                <div key={field} style={this.props.style.listSection}>
+                                    <ListItem button key={field}>
+                                        <ListItemText primary={field} secondary={inputStreamFields[field]} />
+                                    </ListItem>
+                                </div>
+                            ))}
+                        </List>}
                     </Paper>
                 </Grid>
+            );
         }
+        return null;
+    }
 
+    render() {
         return (
             <div>
                 <AppBar position="static" color="default">
                     <Toolbar>
-                        <Typography type="subheading">Input</Typography>
+                        <Typography type="subheading" style={this.props.isErroneous ? styles.errorText : {}}>
+                            Input
+                        </Typography>
                         <IconButton
                             onClick={() => this.props.toggleExpansion()}
                         >
-                            <ExpandMoreIcon/>
+                            <ExpandMoreIcon />
                         </IconButton>
                     </Toolbar>
                 </AppBar>
                 <Paper>
                     <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
                         <div style={this.props.style.paperContainer}>
-                            <br/>
+                            <br />
                             <center>
-                                {inputRuleTemplatesToDisplay}
+                                {this.displayRuleTemplateSelection()}
                             </center>
-                            <br/>
-                            <br/>
-                            <br/>
+                            <br />
+                            <br />
+                            <br />
                             <div>
-                                <Grid container spacing={40} styles={{flexGrow: 1}}>
+                                <Grid container spacing={40} styles={{ flexGrow: 1 }}>
                                     <Grid item xs={12} sm={8}>
                                         <div>
-                                            {inputDataPropertiesToDisplay}
+                                            {this.displayProperties()}
                                         </div>
                                     </Grid>
                                     <Grid item xs={12} sm={4}>
-                                        {exposedInputStreamFieldsToDisplay}
+                                        {this.displayExposedStreamFields()}
                                     </Grid>
                                 </Grid>
                             </div>
-                            <br/>
+                            <br />
                         </div>
                     </Collapse>
                 </Paper>
             </div>
-        )
-
+        );
     }
 }
 
-export default InputComponent;
+InputComponent.propTypes = {
+    mode: PropTypes.oneOf([
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE,
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT,
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW,
+    ]).isRequired,
+    selectedRuleTemplate: PropTypes.object.isRequired,
+    handleInputRuleTemplateSelected: PropTypes.func.isRequired,
+    inputRuleTemplates: PropTypes.array.isRequired,
+    getPropertyComponents: PropTypes.func.isRequired,
+    getFieldNamesAndTypes: PropTypes.func.isRequired,
+    style: PropTypes.object.isRequired,
+    isErroneous: PropTypes.bool.isRequired,
+    toggleExpansion: PropTypes.func.isRequired,
+    isExpanded: PropTypes.bool.isRequired,
+};
