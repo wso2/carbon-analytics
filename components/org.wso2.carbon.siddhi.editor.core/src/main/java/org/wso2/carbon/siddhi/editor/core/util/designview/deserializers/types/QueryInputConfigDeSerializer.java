@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 
@@ -45,8 +46,9 @@ public class QueryInputConfigDeSerializer implements JsonDeserializer {
                 queryInputType.equalsIgnoreCase(QueryInputType.FILTER.toString()) ||
                 queryInputType.equalsIgnoreCase(QueryInputType.PROJECTION.toString())) {
             return jsonDeserializationContext.deserialize(jsonObject, WindowFilterProjectionConfig.class);
+        } else if (queryInputType.equalsIgnoreCase(QueryInputType.JOIN.toString())) {
+            return jsonDeserializationContext.deserialize(jsonObject, JoinConfig.class);
         }
-        // TODO do for joins
         throw new JsonParseException("Unable to parse the QueryInputConfig JSON since its type is unknown");
     }
 }
