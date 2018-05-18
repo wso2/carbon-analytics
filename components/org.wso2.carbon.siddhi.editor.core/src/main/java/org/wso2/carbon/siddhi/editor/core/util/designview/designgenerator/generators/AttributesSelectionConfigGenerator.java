@@ -80,7 +80,7 @@ public class AttributesSelectionConfigGenerator {
         for (String selectedElement : selectedAttributesString.split(",")) {
             String[] nameAndAlias = selectedElement.split("([a|A][s|S])");
             if (nameAndAlias.length == 1) {
-                selectedAttributes.add(new SelectedAttribute(nameAndAlias[0].trim(), ""));
+                selectedAttributes.add(new SelectedAttribute(nameAndAlias[0].trim(), nameAndAlias[0].trim()));
             } else {
                 selectedAttributes.add(new SelectedAttribute(nameAndAlias[0].trim(), nameAndAlias[1].trim()));
             }
