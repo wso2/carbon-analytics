@@ -107,8 +107,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                  */
                 self.canvas.droppable
                 ({
-                    accept: '.stream, .table, .window, .trigger, .aggregation, .projection-query, .filter-query, ' +
-                    '.join-query, .window-query, .pattern-query, .sequence-query, .partition',
+                    accept: '.stream-drag, .table-drag, .window-drag, .trigger-drag, .aggregation-drag,' +
+                    '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
+                    '.pattern-query-drag, .sequence-query-drag, .partition-drag',
                     containment: 'grid-container',
 
                     /**
@@ -130,65 +131,65 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         self.jsPlumbInstance.repaint(ui.helper);
 
                         // If the dropped Element is a Stream then->
-                        if ($(droppedElement).hasClass('stream')) {
+                        if ($(droppedElement).hasClass('stream-drag')) {
                             self.handleStream(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Table then->
-                        if ($(droppedElement).hasClass('table')) {
+                        if ($(droppedElement).hasClass('table-drag')) {
                             self.handleTable(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Window(not window query) then->
-                        else if ($(droppedElement).hasClass('window')) {
+                        else if ($(droppedElement).hasClass('window-drag')) {
                             self.handleWindow(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Trigger then->
-                        else if ($(droppedElement).hasClass('trigger')) {
+                        else if ($(droppedElement).hasClass('trigger-drag')) {
                             self.handleTrigger(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Aggregation then->
-                        else if ($(droppedElement).hasClass('aggregation')) {
+                        else if ($(droppedElement).hasClass('aggregation-drag')) {
                             self.handleAggregation(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Projection Query then->
-                        else if ($(droppedElement).hasClass('projection-query')) {
+                        else if ($(droppedElement).hasClass('projection-query-drag')) {
                             self.handleWindowFilterProjectionQuery(constants.PROJECTION, mouseTop, mouseLeft, false,
                                 "Query");
                         }
 
                         // If the dropped Element is a Filter query then->
-                        else if ($(droppedElement).hasClass('filter-query')) {
+                        else if ($(droppedElement).hasClass('filter-query-drag')) {
                             self.handleWindowFilterProjectionQuery(constants.FILTER, mouseTop, mouseLeft, false,
                                 "Query");
                         }
 
                         // If the dropped Element is a Window Query then->
-                        else if ($(droppedElement).hasClass('window-query')) {
+                        else if ($(droppedElement).hasClass('window-query-drag')) {
                             self.handleWindowFilterProjectionQuery(constants.WINDOW_QUERY, mouseTop, mouseLeft, false,
                                 "Query");
                         }
 
                         // If the dropped Element is a Join Query then->
-                        else if ($(droppedElement).hasClass('join-query')) {
+                        else if ($(droppedElement).hasClass('join-query-drag')) {
                             self.handleJoinQuery(mouseTop, mouseLeft, false, "Join");
                         }
 
                         // If the dropped Element is a Pattern Query then->
-                        else if($(droppedElement).hasClass('pattern-query')) {
+                        else if($(droppedElement).hasClass('pattern-query-drag')) {
                             self.handlePatternQuery(mouseTop, mouseLeft, false, "Pattern");
                         }
 
                         // If the dropped Element is a Sequence Query then->
-                        else if($(droppedElement).hasClass('sequence-query')) {
+                        else if($(droppedElement).hasClass('sequence-query-drag')) {
                             self.handleSequenceQuery(mouseTop, mouseLeft, false, "Sequence");
                         }
 
                         // If the dropped Element is a Partition then->
-                        else if($(droppedElement).hasClass('partition')) {
+                        else if($(droppedElement).hasClass('partition-drag')) {
                             self.handlePartition(mouseTop, mouseLeft, false);
                         }
                     }

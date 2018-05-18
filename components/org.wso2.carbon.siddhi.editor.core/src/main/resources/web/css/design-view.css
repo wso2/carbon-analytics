@@ -22,6 +22,7 @@
 
 .design-view-container {
     height: 100%;
+    display: flex;
 }
 
 .toggle-controls-container {
@@ -49,9 +50,7 @@
 
 .grid-container {
     /* Temp */
-    float: left;
-    width: calc(100% - 75px);
-    height: 100%;
+    width: calc(100% - 80px);
     position: relative;
     overflow: scroll; /* This should be applied to design-view-container once the two dedicated sour view/design view buttons are removed */
     background: linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),

@@ -43,73 +43,73 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
             var definitionTools = [
                 {
                     id : "stream",
-                    className : "stream",
+                    className : "stream-drag",
                     title : "Stream",
                     icon : "/editor/images/stream.png"
                 },
                 {
                     id : "table",
-                    className : "table",
+                    className : "table-drag",
                     title : "Table",
                     icon : "/editor/images/table.png"
                 },
                 {
                     id : "window",
-                    className : "window",
+                    className : "window-drag",
                     title : "Window",
                     icon : "/editor/images/window.png"
                 },
                 {
                     id : "trigger",
-                    className : "trigger",
+                    className : "trigger-drag",
                     title : "Trigger",
                     icon : "/editor/images/trigger.png"
                 },
                 {
                     id : "aggregation",
-                    className : "aggregation",
+                    className : "aggregation-drag",
                     title : "Aggregation",
                     icon : "/editor/images/aggregation.png"
                 },
                 {
                     id : "projection-query",
-                    className : "projection-query",
+                    className : "projection-query-drag",
                     title : "Projection Query",
                     icon : "/editor/images/projectionQuery.png"
                 },
                 {
                     id : "filter-query",
-                    className : "filter-query",
+                    className : "filter-query-drag",
                     title : "Filter Query",
                     icon : "/editor/images/filterQuery.png"
                 },
                 {
                     id : "window-query",
-                    className : "window-query",
+                    className : "window-query-drag",
                     title : "Window Query",
                     icon : "/editor/images/windowQuery.png"
                 },
                 {
                     id : "join-query",
-                    className : "join-query",
+                    className : "join-query-drag",
                     title : "Join Query",
                     icon : "/editor/images/join.png"
                 },
                 {
                     id : "pattern-query",
-                    className : "pattern-query",
+                    className : "pattern-query-drag",
                     title : "Pattern Query",
                     icon : "/editor/images/patternQuery.png"
                 },
                 {
                     id : "sequence-query",
-                    className : "sequence-query",
+                    className : "sequence-query-drag",
                     title : "Sequence Query",
                     icon : "/editor/images/sequenceQuery.png"
                 },
                 {
                     id : "partition",
-                    className : "partition",
+                    className : "partition-drag",
                     title : "Partition",
                     icon : "/editor/images/patternQuery.png"
                 }
@@ -126,15 +126,10 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
 
         render: function () {
             var self = this;
-            var toolPaletteDiv = $('<div></div>');
-            this._$parent_el.append(toolPaletteDiv);
-            this.$el = toolPaletteDiv;
-
-            var parent = self.$el;
-            self.$el.addClass('non-user-selectable');
+            self._$parent_el.addClass('non-user-selectable');
 
             var groupDiv = $('<div></div>');
-            parent.append(groupDiv);
+            self._$parent_el.append(groupDiv);
             groupDiv.attr('id', "tool-group-elements");
             groupDiv.attr('class', "tool-group");
 
