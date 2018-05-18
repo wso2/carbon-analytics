@@ -472,46 +472,48 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                             } else {
                                 model.getQueryInput().addConnectedElementName(connectedElementName);
                             }
-                        } else if (targetElement.hasClass(constants.PARTITION)) {
-                            model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
-                            var newPartitionKey = {'stream': sourceId, 'property': undefined};
-                            var partitionKeys = (model.getPartition('partition'));
-                            partitionKeys['with'].push(newPartitionKey);
-
-                            var connectedQueries = self.jsPlumbInstance.getConnections({source: target});
-                            $.each(connectedQueries, function (index, connectedQuery) {
-                                var query = connectedQuery.targetId;
-                                var queryID = query.substr(0, query.indexOf('-'));
-                                var queryElement = $('#' + queryID);
-                                if (queryElement.hasClass(constants.PROJECTION)
-                                    || queryElement.hasClass(constants.FILTER)
-                                    || queryElement.hasClass(constants.WINDOW_QUERY)) {
-                                    model = self.configurationData.getSiddhiAppConfig().getQuery(queryID);
-                                    model.setFrom(sourceId);
-                                }
-                                else if (queryElement.hasClass(constants.JOIN)) {
-                                    model = self.configurationData.getSiddhiAppConfig().getJoinQuery(queryID);
-                                    var streams = model.getFrom();
-                                    if (streams === undefined) {
-                                        streams = [sourceId];
-                                    } else {
-                                        streams.push(sourceId);
-                                    }
-                                    model.setFrom(streams);
-                                }
-                                else if (queryElement.hasClass(constants.PATTERN)) {
-                                    model = self.configurationData.getSiddhiAppConfig().getPatternQuery(queryID);
-                                    var streams = model.getFrom();
-                                    if (streams === undefined) {
-                                        streams = [sourceId];
-                                    } else {
-                                        streams.push(sourceId);
-                                    }
-                                    model.setFrom(streams);
-                                }
-                            });
-
                         }
+                    }
+                    if (sourceElement.hasClass(constants.STREAM) && targetElement.hasClass(constants.PARTITION)) {
+                        model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
+                        var newPartitionKey = {'stream': sourceId, 'property': undefined};
+                        var partitionKeys = (model.getPartition('partition'));
+                        partitionKeys['with'].push(newPartitionKey);
+
+                        var connectedQueries = self.jsPlumbInstance.getConnections({source: target});
+                        $.each(connectedQueries, function (index, connectedQuery) {
+                            var query = connectedQuery.targetId;
+                            var queryID = query.substr(0, query.indexOf('-'));
+                            var queryElement = $('#' + queryID);
+                            if (queryElement.hasClass(constants.PROJECTION)
+                                || queryElement.hasClass(constants.FILTER)
+                                || queryElement.hasClass(constants.WINDOW_QUERY)) {
+                                model = self.configurationData.getSiddhiAppConfig().getQuery(queryID);
+                                model.setFrom(sourceId);
+                            }
+                            else if (queryElement.hasClass(constants.JOIN)) {
+                                model = self.configurationData.getSiddhiAppConfig().getJoinQuery(queryID);
+                                var streams = model.getFrom();
+                                if (streams === undefined) {
+                                    streams = [sourceId];
+                                } else {
+                                    streams.push(sourceId);
+                                }
+                                model.setFrom(streams);
+                            }
+                            else if (queryElement.hasClass(constants.PATTERN)) {
+                                model = self.configurationData.getSiddhiAppConfig().getPatternQuery(queryID);
+                                var streams = model.getFrom();
+                                if (streams === undefined) {
+                                    streams = [sourceId];
+                                } else {
+                                    streams.push(sourceId);
+                                }
+                                model.setFrom(streams);
+                            }
+                        });
+
+
                     }
 
                     else if (sourceElement.hasClass(constants.PARTITION)) {
@@ -712,54 +714,55 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                             model.getQueryInput().removeConnectedElementName(disconnectedElementName);
                             return;
                         }
-                        else if (targetElement.hasClass(constants.PARTITION)) {
-                            model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
-                            if (model !== undefined) {
-                                var removedPartitionKey = null;
-                                var partitionKeys = (model.getPartition().with);
-                                $.each(partitionKeys, function (index, key) {
-                                    if (key.stream === sourceId) {
-                                        removedPartitionKey = index;
-                                    }
-                                });
-                                partitionKeys.splice(removedPartitionKey, 1);
-                                var partitionKeysObj = {'with': partitionKeys};
-                                model.setPartition(partitionKeysObj);
+                    }
+                    if (sourceElement.hasClass(constants.STREAM) && targetElement.hasClass(constants.PARTITION)) {
+                        model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
+                        if (model !== undefined) {
+                            var removedPartitionKey = null;
+                            var partitionKeys = (model.getPartition().with);
+                            $.each(partitionKeys, function (index, key) {
+                                if (key.stream === sourceId) {
+                                    removedPartitionKey = index;
+                                }
+                            });
+                            partitionKeys.splice(removedPartitionKey, 1);
+                            var partitionKeysObj = {'with': partitionKeys};
+                            model.setPartition(partitionKeysObj);
 
-                                var connectedQueries = self.jsPlumbInstance.getConnections({source: target});
-                                $.each(connectedQueries, function (index, connectedQuery) {
-                                    var query = connectedQuery.targetId;
-                                    var queryID = query.substr(0, query.indexOf('-'));
-                                    var queryElement = $('#' + queryID);
-                                    if (queryElement.hasClass(constants.PROJECTION)
-                                        || queryElement.hasClass(constants.FILTER)
-                                        || queryElement.hasClass(constants.WINDOW_QUERY)) {
-                                        model = self.configurationData.getSiddhiAppConfig().getQuery(queryID);
-                                        if (model !== undefined) {
-                                            model.setFrom(undefined);
-                                        }
+                            var connectedQueries = self.jsPlumbInstance.getConnections({source: target});
+                            $.each(connectedQueries, function (index, connectedQuery) {
+                                var query = connectedQuery.targetId;
+                                var queryID = query.substr(0, query.indexOf('-'));
+                                var queryElement = $('#' + queryID);
+                                if (queryElement.hasClass(constants.PROJECTION)
+                                    || queryElement.hasClass(constants.FILTER)
+                                    || queryElement.hasClass(constants.WINDOW_QUERY)) {
+                                    model = self.configurationData.getSiddhiAppConfig().getQuery(queryID);
+                                    if (model !== undefined) {
+                                        model.setFrom(undefined);
                                     }
-                                    else if (queryElement.hasClass(constants.JOIN)) {
-                                        model = self.configurationData.getSiddhiAppConfig().getJoinQuery(queryID);
-                                        if (model !== undefined) {
-                                            streams = model.getFrom();
-                                            var removedStream = streams.indexOf(sourceId);
-                                            streams.splice(removedStream, 1);
-                                            model.setFrom(streams);
-                                        }
+                                }
+                                else if (queryElement.hasClass(constants.JOIN)) {
+                                    model = self.configurationData.getSiddhiAppConfig().getJoinQuery(queryID);
+                                    if (model !== undefined) {
+                                        streams = model.getFrom();
+                                        var removedStream = streams.indexOf(sourceId);
+                                        streams.splice(removedStream, 1);
+                                        model.setFrom(streams);
                                     }
-                                    else if (queryElement.hasClass(constants.PATTERN)) {
-                                        model = self.configurationData.getSiddhiAppConfig().getPatternQuery(queryID);
-                                        if (model !== undefined) {
-                                            streams = model.getFrom();
-                                            var removedStream = streams.indexOf(sourceId);
-                                            streams.splice(removedStream, 1);
-                                            model.setFrom(streams);
-                                        }
+                                }
+                                else if (queryElement.hasClass(constants.PATTERN)) {
+                                    model = self.configurationData.getSiddhiAppConfig().getPatternQuery(queryID);
+                                    if (model !== undefined) {
+                                        streams = model.getFrom();
+                                        var removedStream = streams.indexOf(sourceId);
+                                        streams.splice(removedStream, 1);
+                                        model.setFrom(streams);
                                     }
-                                });
-                            }
+                                }
+                            });
                         }
+
                     }
 
                     else if (sourceElement.hasClass(constants.PARTITION)) {
