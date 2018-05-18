@@ -77,8 +77,8 @@ public class WorkersApi implements Microservice {
 
     @GET
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Get the number worker nodes in the resource cluster.",
-            notes = "Retrieve number of worker nodes in the resource cluster",
+    @io.swagger.annotations.ApiOperation(value = "Get the details of worker nodes in the resource cluster.",
+            notes = "Retrieve details of worker nodes in the resource cluster",
             response = void.class, tags = {"Workers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Worker node details retrieved successfully.",

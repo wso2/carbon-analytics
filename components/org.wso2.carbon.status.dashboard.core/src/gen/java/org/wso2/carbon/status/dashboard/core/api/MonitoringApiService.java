@@ -90,4 +90,10 @@ public abstract class MonitoringApiService {
 
     public abstract Response getClusterResourceNodeDetails(String id, String username)
             throws NotFoundException, IOException;
+
+    public abstract Response getSingleDeploymentSiddhiApps(String username) throws NotFoundException, SQLException;
+
+    public abstract Response getHASiddhiApps(String username) throws NotFoundException, SQLException;
+
+    public abstract Response getAllManagersSiddhiApps(String username) throws NotFoundException, SQLException;
 }

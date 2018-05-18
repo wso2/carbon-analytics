@@ -61,6 +61,7 @@ body {
     position: fixed;
     right: 100px;
     z-index: 9;
+    bottom: 25px;
 }
 
 .navigation-bar{
@@ -69,9 +70,10 @@ body {
 }
 
 .toggle{
-    float: left;
+    float: right;
     width: 10%;
     margin-left: 3%;
+    margin-top: -1%;
 }
 
 .active-apps {

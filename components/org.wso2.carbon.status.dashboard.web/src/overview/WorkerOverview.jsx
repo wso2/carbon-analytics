@@ -23,7 +23,9 @@ import {Link, Redirect} from 'react-router-dom';
 import {GridList, Toggle} from 'material-ui';
 import Info from 'material-ui/svg-icons/action/info';
 import HomeButton from 'material-ui/svg-icons/action/home';
-import {Button, Card, Divider, Typography} from 'material-ui-next';
+import Sync from 'material-ui/svg-icons/notification/sync';
+import SyncDisabled from 'material-ui/svg-icons/notification/sync-disabled';
+import {Button, Card, Divider, IconButton, Tab, Typography} from 'material-ui-next';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 //App Components
 import WorkerThumbnail from './WorkerThumbnail';
@@ -91,7 +93,8 @@ export default class WorkerOverview extends React.Component {
             hasManagerPermission: false,
             hasViewPermission: true,
             statusMessage: "Currently there are no nodes to display",
-            isError: false
+            isError: false,
+            btnType: <SyncDisabled/>
 
         };
         this.autoSync = this.autoSync.bind(this);
@@ -333,12 +336,12 @@ export default class WorkerOverview extends React.Component {
 
                 });
             }, parseInt(this.state.pInterval * 1000));
-            this.setState({interval: interval, enableAutoSync: true});
+            this.setState({interval: interval, enableAutoSync: true, btnType:<Sync  color='red'/>});
             window.localStorage.setItem("enableAutoSync", true);
             window.localStorage.setItem("pInterval", this.state.pInterval)
         } else {
             clearInterval(this.state.interval);
-            this.setState({enableAutoSync: false});
+            this.setState({enableAutoSync: false,btnType:<SyncDisabled/>});
             window.localStorage.setItem("enableAutoSync", false)
         }
     }
@@ -400,19 +403,21 @@ export default class WorkerOverview extends React.Component {
         } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList)) &&
                 (WorkerOverview.hasNodes(this.state.managerClusterList)))) {
             return (
+
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle">
-                            <Toggle labelPosition="left"
-                                    label={<b>Auto Sync</b>}
-                                    labelStyle={{color: '#dedede', fontSize: 18}}
-                                    toggled={this.state.enableAutoSync}
-                                    onToggle={this.autoSync}
-                                    thumbStyle={{backgroundColor: 'grey'}}
-                                    thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                    trackSwitchedStyle={{backgroundColor: '#f17b31'}}>
-                            </Toggle>
+                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
+                            <Button style={styles.navBtn} onClick={() => {
+                                this.autoSync();
+                            }}>
+                                {this.state.btnType}
+                                <h3 style={{
+                                    color: '#dedede',
+                                    backgroundColor: '#222222',
+                                }}><b>Auto-Sync</b></h3>
+                            </Button>
+
                         </div>
                     </div>
 
@@ -420,7 +425,8 @@ export default class WorkerOverview extends React.Component {
                         if (id !== "Single Node Deployments" && id !== "Never Reached" && id !== " ") {
                             return (
                                 <div>
-                                    <h3 style={styles.h3}>HA Deployments</h3>
+                                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
+                                        Deployments</Typography>
                                     <Divider inset={true} style={styles.divider}/>
                                     <h3 style={styles.h3Title}>Group Id: {id}</h3>
                                     <div style={styles.root}>
@@ -440,7 +446,8 @@ export default class WorkerOverview extends React.Component {
                         } else {
                             return (
                                 <div>
-                                    <h3 style={styles.h3}>{id}</h3>
+                                    <Typography variant="headline" className={'app-title'}
+                                                style={styles.h3Title}>{id}</Typography>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'}
@@ -461,7 +468,8 @@ export default class WorkerOverview extends React.Component {
 
                     })}
 
-                    <h3 style={styles.h3}>Distributed Deployments</h3>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
+                        Deployments</Typography>
 
                     {Object.keys(managerList).map((id, workerList) => {
                         if (id !== "Never Reached" && id !== "Not-Reachable") {
@@ -515,16 +523,16 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle">
-                            <Toggle labelPosition="left"
-                                    label={<b>Auto Sync</b>}
-                                    labelStyle={{color: '#dedede', fontSize: 18}}
-                                    toggled={this.state.enableAutoSync}
-                                    onToggle={this.autoSync}
-                                    thumbStyle={{backgroundColor: 'grey'}}
-                                    thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                    trackSwitchedStyle={{backgroundColor: '#f17b31'}}>
-                            </Toggle>
+                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
+                            <Button style={styles.navBtn} onClick={() => {
+                                this.autoSync();
+                            }}>
+                                {this.state.btnType}
+                                <h3 style={{
+                                    color: '#dedede',
+                                    backgroundColor: '#222222',
+                                }}><b>Auto-Sync</b></h3>
+                            </Button>
                         </div>
                     </div>
 
@@ -532,7 +540,8 @@ export default class WorkerOverview extends React.Component {
                         if (id !== "Single Node Deployments" && id !== "Never Reached" && id !== " ") {
                             return (
                                 <div>
-                                    <h3 style={styles.h3}>HA Deployments</h3>
+                                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
+                                        Deployments</Typography>
                                     <h3 style={styles.h3Title}>{id}</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
@@ -575,19 +584,20 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle">
-                            <Toggle labelPosition="left"
-                                    label={<b>Auto Sync</b>}
-                                    labelStyle={{color: '#dedede', fontSize: 18}}
-                                    toggled={this.state.enableAutoSync}
-                                    onToggle={this.autoSync}
-                                    thumbStyle={{backgroundColor: 'grey'}}
-                                    thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                    trackSwitchedStyle={{backgroundColor: '#f17b31'}}>
-                            </Toggle>
+                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
+                            <Button style={styles.navBtn} onClick={() => {
+                                this.autoSync();
+                            }}>
+                                {this.state.btnType}
+                                <h3 style={{
+                                    color: '#dedede',
+                                    backgroundColor: '#222222',
+                                }}><b>Auto-Sync</b></h3>
+                            </Button>
                         </div>
                     </div>
-                    <h3 style={styles.h3}>Distributed Deployments</h3>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
+                        Deployments</Typography>
 
                     {Object.keys(managerList).map((id, workerList) => {
                         if (id !== "Never Reached" && id !== "Not-Reachable") {
@@ -660,6 +670,22 @@ export default class WorkerOverview extends React.Component {
                     <div className="navigation-bar">
                         <Button style={styles.navBtn}>
                             <HomeButton style={{paddingRight: 8, color: '#000'}}/>Overview</Button>
+                    </div>
+                    <Typography variant="display2" className={'node-title'} style={{
+                        marginTop: '2%',
+                        color: '#dedede',
+                        marginLeft: '4%',
+                        backgroundColor: '#222222'
+                    }}>
+                        Node Overview</Typography>
+                    <div style={{marginTop: '-2%', marginRight: '6%'}}>
+                        <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right'}}
+                              to={window.contextPath}> &nbsp;&nbsp; NODE VIEW</Link>
+
+                        <Link style={{textDecoration: 'none', color: '#dedede', float: 'right'}}
+                              to={window.contextPath + "/siddhi-apps"}>
+                            APP VIEW &nbsp;&nbsp;| </Link>
+
                     </div>
                     {this.renderWorkers(this.state.clustersList, this.state.managerClusterList)}
                 </div>

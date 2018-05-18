@@ -33,6 +33,7 @@ import WorkerSpecific from '../worker/WorkerSpecific';
 import Error404 from '../error-pages/Error404';
 import DistributedOverview from '../distributedView/DistributedViewOverview';
 import AppView from '../distributedView/AppView';
+import SiddhiAppTable from '../overview/SiddhiAppTable';
 
 /**
  * App context.
@@ -86,6 +87,7 @@ export default class SecuredRouter extends Component {
                 <Route exact path={appContext + '/worker/history/:id/more'} component={WorkerHistoryMore}/>
                 <Route exact path={appContext + '/:id/siddhi-apps'} component={DistributedOverview}/>
                 <Route exact path={appContext + '/:id/siddhi-apps/:appName'} component={AppView}/>
+                <Route exact path={appContext + '/siddhi-apps'} component={SiddhiAppTable}/>
                 <Route component={Error404}/>
             </Switch>
         );
