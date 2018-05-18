@@ -18,22 +18,12 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConditionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.state.*;
 import org.wso2.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
-import org.wso2.siddhi.query.api.expression.constant.TimeConstant;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import sun.security.krb5.Config;
 
 /**
  * Generates PatternQueryConfig with given Siddhi elements TODO implement
@@ -47,25 +37,27 @@ public class PatternSequenceConfigGenerator {
 
     private StateElementConfig generateStateElementConfig(StateElement stateElement) {
         if (stateElement instanceof CountStateElement) {
-            generateCountStateElementConfig((CountStateElement) stateElement);
+            generateStateElementConfig((CountStateElement) stateElement);
         } else if (stateElement instanceof LogicalStateElement) {
-            generateLogicalStateElementConfig((LogicalStateElement) stateElement);
+            generateStateElementConfig((LogicalStateElement) stateElement);
         } else if (stateElement instanceof StreamStateElement) {
-            generateStreamStateElementConfig((StreamStateElement) stateElement);
+            if (stateElement instanceof AbsentStreamStateElement) {
+                generateStateElementConfig((AbsentStreamStateElement) stateElement);
+            } else {
+                generateStateElementConfig((StreamStateElement) stateElement);
+            }
         } else if (stateElement instanceof EveryStateElement) {
-            generateEveryStateElementConfig((EveryStateElement) stateElement);
+            generateStateElementConfig((EveryStateElement) stateElement);
         } else if (stateElement instanceof NextStateElement) {
-            generateNextStateElementConfig((NextStateElement) stateElement);
-        } else if (stateElement instanceof AbsentStreamStateElement) {
-
+            generateStateElementConfig((NextStateElement) stateElement);
         }
         return null;
     }
 
-    private CountStateElementConfig generateCountStateElementConfig(CountStateElement countStateElement) {
+    private CountStateElementConfig generateStateElementConfig(CountStateElement countStateElement) {
         CountStateElementConfig countStateElementConfig = new CountStateElementConfig();
         countStateElementConfig.setStreamStateElement(
-                generateStreamStateElementConfig(countStateElement.getStreamStateElement()));
+                generateStateElementConfig(countStateElement.getStreamStateElement()));
         countStateElementConfig.setMinMaxCount(
                 "<" + countStateElement.getMinCount() + ":" + countStateElement.getMaxCount() + ">");
         countStateElementConfig.setWithin(
@@ -73,18 +65,18 @@ public class PatternSequenceConfigGenerator {
         return countStateElementConfig;
     }
 
-    private LogicalStateElementConfig generateLogicalStateElementConfig(LogicalStateElement logicalStateElement) {
+    private LogicalStateElementConfig generateStateElementConfig(LogicalStateElement logicalStateElement) {
         LogicalStateElementConfig logicalStateElementConfig = new LogicalStateElementConfig();
         logicalStateElementConfig.setStreamStateElement1(
-                generateStreamStateElementConfig(logicalStateElement.getStreamStateElement1()));
+                generateStateElementConfig(logicalStateElement.getStreamStateElement1()));
         logicalStateElementConfig.setStreamStateElement2(
-                generateStreamStateElementConfig(logicalStateElement.getStreamStateElement2()));
+                generateStateElementConfig(logicalStateElement.getStreamStateElement2()));
         logicalStateElementConfig.setWithin(
                 ConfigBuildingUtilities.getDefinition(logicalStateElement.getWithin(), siddhiAppString));
         return logicalStateElementConfig;
     }
 
-    private StreamStateElementConfig generateStreamStateElementConfig(StreamStateElement streamStateElement) {
+    private StreamStateElementConfig generateStateElementConfig(StreamStateElement streamStateElement) {
         BasicSingleInputStream basicSingleInputStream = streamStateElement.getBasicSingleInputStream();
 
         StreamStateElementConfig streamStateElementConfig = new StreamStateElementConfig();
@@ -113,20 +105,42 @@ public class PatternSequenceConfigGenerator {
         return streamStateElementConfig;
     }
 
-    private EveryStateElementConfig generateEveryStateElementConfig(EveryStateElement everyStateElement) {
+    private class basicSingleInputStreamConfig {
+        private String streamReferenceId;
+        private String streamName;
+        private String filter;
+    }
+
+    private AbsentStreamStateElementConfig generateStateElementConfig(
+            AbsentStreamStateElement absentStreamStateElement) {
+        AbsentStreamStateElementConfig absentStreamStateElementConfig = new AbsentStreamStateElementConfig();
+        absentStreamStateElementConfig.setWaitingTime(
+                ConfigBuildingUtilities.getDefinition(absentStreamStateElement.getWaitingTime(), siddhiAppString));
+        absentStreamStateElementConfig.setWithin(
+                ConfigBuildingUtilities.getDefinition(absentStreamStateElement.getWithin(), siddhiAppString));
+
+
+//        absentStreamStateElementConfig.setFilter();
+//        absentStreamStateElementConfig.setId();
+//        absentStreamStateElementConfig.setStreamName();
+        return absentStreamStateElementConfig;
+    }
+
+    private EveryStateElementConfig generateStateElementConfig(EveryStateElement everyStateElement) {
         EveryStateElementConfig everyStateElementConfig = new EveryStateElementConfig();
+        everyStateElementConfig.setStateElement(generateStateElementConfig(everyStateElement.getStateElement()));
+        everyStateElementConfig.setWithin(
+                ConfigBuildingUtilities.getDefinition(everyStateElement.getWithin(), siddhiAppString));
         return everyStateElementConfig;
     }
 
-    private NextStateElementConfig generateNextStateElementConfig(NextStateElement nextStateElement) {
+    private NextStateElementConfig generateStateElementConfig(NextStateElement nextStateElement) {
         NextStateElementConfig nextStateElementConfig = new NextStateElementConfig();
+        nextStateElementConfig.setStateElement(generateStateElementConfig(nextStateElement.getStateElement()));
+        nextStateElementConfig.setNextStateElement(generateStateElementConfig(nextStateElement.getNextStateElement()));
+        nextStateElementConfig.setWithin(
+                ConfigBuildingUtilities.getDefinition(nextStateElement.getWithin(), siddhiAppString));
         return nextStateElementConfig;
-    }
-
-    private AbsentStreamStateElementConfig generateAbsentStreamStateElementConfig(
-            AbsentStreamStateElement absentStreamStateElement) {
-        AbsentStreamStateElementConfig absentStreamStateElementConfig = new AbsentStreamStateElementConfig();
-        return absentStreamStateElementConfig;
     }
 
 

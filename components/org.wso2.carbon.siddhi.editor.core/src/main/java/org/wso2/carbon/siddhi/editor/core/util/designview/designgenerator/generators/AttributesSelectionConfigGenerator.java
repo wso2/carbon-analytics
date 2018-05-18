@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.attributesselection;
+package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generates AttributesSelectionConfig with given Siddhi elements
+ * Generates to create AttributesSelectionConfig with given Siddhi elements
  */
 public class AttributesSelectionConfigGenerator {
     private String siddhiAppString;

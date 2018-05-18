@@ -19,4 +19,22 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
 public class EveryStateElementConfig implements StateElementConfig {
+    private StateElementConfig stateElement;
+    private String within;
+
+    public StateElementConfig getStateElement() {
+        return stateElement;
+    }
+
+    public String getWithin() {
+        return within;
+    }
+
+    public void setStateElement(StateElementConfig stateElement) {
+        this.stateElement = stateElement;
+    }
+
+    public void setWithin(String within) {
+        this.within = within;
+    }
 }
