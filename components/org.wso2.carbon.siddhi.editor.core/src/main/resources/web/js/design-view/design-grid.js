@@ -234,7 +234,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         }
                     }
                     else if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
-                        if(!(sourceElement.hasClass(constants.STREAM))) {
+                        if(!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                             alert("Invalid Connection");
                         } else {
                             connectionValidity = true;
@@ -440,34 +440,37 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         }
                     }
 
-                    if (sourceElement.hasClass(constants.STREAM)) {
+                    if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER) ) {
+                        if (sourceElement.hasClass(constants.STREAM)) {
+                            connectedElementName =
+                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                        } else {
+                            connectedElementName =
+                                self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
+                        }
                         if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                            var connectedStreamName =
-                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             if (model.getQueryInput() === undefined) {
                                 var patternQueryInputOptions = {};
                                 _.set(patternQueryInputOptions, 'type', 'PATTERN');
                                 var patternQueryInputObject =
                                     new PatternOrSequenceQueryInput(patternQueryInputOptions);
-                                patternQueryInputObject.addConnectedElementName(connectedStreamName);
+                                patternQueryInputObject.addConnectedElementName(connectedElementName);
                                 model.setQueryInput(patternQueryInputObject);
                             } else {
-                                model.getQueryInput().addConnectedElementName(connectedStreamName);
+                                model.getQueryInput().addConnectedElementName(connectedElementName);
                             }
                         } else if (targetElement.hasClass(constants.SEQUENCE)) {
                             model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                            var connectedStreamName =
-                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             if (model.getQueryInput() === undefined) {
                                 var sequenceQueryInputOptions = {};
                                 _.set(sequenceQueryInputOptions, 'type', 'SEQUENCE');
                                 var sequenceQueryInputObject =
                                     new PatternOrSequenceQueryInput(sequenceQueryInputOptions);
-                                sequenceQueryInputObject.addConnectedElementName(connectedStreamName);
+                                sequenceQueryInputObject.addConnectedElementName(connectedElementName);
                                 model.setQueryInput(sequenceQueryInputObject);
                             } else {
-                                model.getQueryInput().addConnectedElementName(connectedStreamName);
+                                model.getQueryInput().addConnectedElementName(connectedElementName);
                             }
                         } else if (targetElement.hasClass(constants.PARTITION)) {
                             model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
@@ -691,18 +694,22 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         }
                     }
 
-                    if (sourceElement.hasClass(constants.STREAM)) {
+                    var disconnectedElementName;
+                    if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)) {
+                        if (sourceElement.hasClass(constants.STREAM)) {
+                            disconnectedElementName =
+                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                        } else {
+                            disconnectedElementName =
+                                self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
+                        }
                         if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                            var disconnectedStreamName =
-                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
-                            model.getQueryInput().removeConnectedElementName(disconnectedStreamName);
+                            model.getQueryInput().removeConnectedElementName(disconnectedElementName);
                             return;
                         } else if (targetElement.hasClass(constants.SEQUENCE)) {
                             model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                            var disconnectedStreamName =
-                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
-                            model.getQueryInput().removeConnectedElementName(disconnectedStreamName);
+                            model.getQueryInput().removeConnectedElementName(disconnectedElementName);
                             return;
                         }
                         else if (targetElement.hasClass(constants.PARTITION)) {
