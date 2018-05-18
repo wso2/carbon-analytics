@@ -26,19 +26,14 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationValue;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.ListAnnotationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceMap;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributeConfigListGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributesSelectionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.StreamDefinitionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.annotation.StreamTableAnnotationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.factories.AnnotationConfigFactory;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGeneratorHelper;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
@@ -97,12 +92,10 @@ public class DesignGenerator {
         loadAppNameAndDescription();
         loadTriggers();
         loadStreams();
-        // loadSources()
-        // loadSinks()
+        // TODO loadSources() loadSinks() loadFunctions()
         loadTables();
         loadWindows();
         loadAggregations();
-        // loadFunctions();
         loadExecutionElements();
     }
 
@@ -162,7 +155,7 @@ public class DesignGenerator {
         for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
             if (!isTriggerDefined(streamDefinition.getId(), siddhiApp)) {
                 siddhiAppConfig.add(
-                        new StreamDefinitionConfigGenerator(siddhiAppString)
+                        new StreamDefinitionConfigGenerator()
                                 .generateStreamConfig(streamDefinition, false));
             }
         }
@@ -172,7 +165,7 @@ public class DesignGenerator {
             for (AbstractDefinition abstractDefinition : abstractDefinitionMap.values()) {
                 if (abstractDefinition instanceof StreamDefinition) {
                     siddhiAppConfig.add(
-                            new StreamDefinitionConfigGenerator(siddhiAppString)
+                            new StreamDefinitionConfigGenerator()
                                     .generateStreamConfig((StreamDefinition) abstractDefinition, false));
                 } else {
                     throw new IllegalArgumentException("The partitioned inner stream definition map does not have an " +

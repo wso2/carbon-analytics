@@ -33,12 +33,6 @@ import java.util.List;
  * Generator to create Stream definition config
  */
 public class StreamDefinitionConfigGenerator {
-    private String siddhiAppString;
-
-    public StreamDefinitionConfigGenerator(String siddhiAppString) {
-        this.siddhiAppString = siddhiAppString;
-    }
-
     /**
      * Generates StreamConfig object, with given Siddhi StreamDefinition
      * @param streamDefinition  Siddhi StreamDefinition object
