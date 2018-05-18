@@ -28,8 +28,6 @@ import java.lang.reflect.Type;
  * De-serializer for AnnotationConfig class
  */
 public class AnnotationConfigDeSerializer implements JsonDeserializer {
-    private static final String TYPE = "type";
-
     @Override
     public Object deserialize(
             JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {

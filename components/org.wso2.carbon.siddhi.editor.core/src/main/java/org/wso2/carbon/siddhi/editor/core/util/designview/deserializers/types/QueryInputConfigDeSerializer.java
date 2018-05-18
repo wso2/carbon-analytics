@@ -41,13 +41,12 @@ public class QueryInputConfigDeSerializer implements JsonDeserializer {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonPrimitive jsonPrimitive = (JsonPrimitive) jsonObject.get(TYPE);
         String queryInputType = jsonPrimitive.getAsString();
-        if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW.toString())) {
-            return jsonDeserializationContext.deserialize(jsonObject, WindowFilterProjectionConfig.class);
-        } else if (queryInputType.equalsIgnoreCase(QueryInputType.FILTER.toString())) {
-            return jsonDeserializationContext.deserialize(jsonObject, WindowFilterProjectionConfig.class);
-        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PROJECTION.toString())) {
+        if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW.toString()) ||
+                queryInputType.equalsIgnoreCase(QueryInputType.FILTER.toString()) ||
+                queryInputType.equalsIgnoreCase(QueryInputType.PROJECTION.toString())) {
             return jsonDeserializationContext.deserialize(jsonObject, WindowFilterProjectionConfig.class);
         }
+        // TODO do for joins
         throw new JsonParseException("Unable to parse the QueryInputConfig JSON since its type is unknown");
     }
 }
