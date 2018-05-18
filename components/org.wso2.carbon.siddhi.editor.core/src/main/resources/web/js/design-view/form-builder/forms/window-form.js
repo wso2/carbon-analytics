@@ -168,14 +168,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 _.set(windowOptions, 'parameters', parameters);
                 if (editor.getValue().outputEventType !== undefined) {
                     if(editor.getValue().outputEventType === "all events"){
-                        _.set(windowOptions, 'outputEventType', 'all_events');
+                        _.set(windowOptions, 'outputEventType', 'ALL_EVENTS');
                     } else if(editor.getValue().outputEventType === "current events"){
-                        _.set(windowOptions, 'outputEventType', 'current_events');
+                        _.set(windowOptions, 'outputEventType', 'CURRENT_EVENTS');
                     } else if(editor.getValue().outputEventType === "expired events"){
-                        _.set(windowOptions, 'outputEventType', 'expired_events');
+                        _.set(windowOptions, 'outputEventType', 'EXPIRED_EVENTS');
                     }
                 } else {
-                    _.set(windowOptions, 'outputEventType', 'all_events');
+                    _.set(windowOptions, 'outputEventType', 'ALL_EVENTS');
                 }
                 var window = new Window(windowOptions);
                 _.forEach(editor.getValue().attributes, function (attribute) {
@@ -231,11 +231,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
             var savedOutputEventType = clickedElement.getOutputEventType();
             if (savedOutputEventType === undefined) {
                 outputEventType = 'all events';
-            } else if (savedOutputEventType === 'all_events') {
+            } else if (savedOutputEventType === 'ALL_EVENTS') {
                 outputEventType = 'all events';
-            } else if (savedOutputEventType === 'current_events') {
+            } else if (savedOutputEventType === 'CURRENT_EVENTS') {
                 outputEventType = 'current events';
-            } else if (savedOutputEventType === 'expired_events') {
+            } else if (savedOutputEventType === 'EXPIRED_EVENTS') {
                 outputEventType = 'expired events';
             }
             var fillWith = {
@@ -371,14 +371,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 clickedElement.setOutputEventType(config.outputEventType);
                 if (config.outputEventType !== undefined) {
                     if(config.outputEventType === "all events"){
-                        clickedElement.setOutputEventType('all_events');
+                        clickedElement.setOutputEventType('ALL_EVENTS');
                     } else if(config.outputEventType === "current events"){
-                        clickedElement.setOutputEventType('current_events');
+                        clickedElement.setOutputEventType('CURRENT_EVENTS');
                     } else if(config.outputEventType === "expired events"){
-                        clickedElement.setOutputEventType('expired_events');
+                        clickedElement.setOutputEventType('EXPIRED_EVENTS');
                     }
                 } else {
-                    clickedElement.setOutputEventType('all_events');
+                    clickedElement.setOutputEventType('ALL_EVENTS');
                 }
                 // removing all elements from attribute list
                 clickedElement.clearAttributeList();

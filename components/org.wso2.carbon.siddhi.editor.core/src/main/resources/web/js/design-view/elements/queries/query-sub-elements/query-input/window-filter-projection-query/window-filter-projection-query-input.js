@@ -28,7 +28,7 @@ define(
         var WindowFilterProjectionQueryInput = function (options) {
             /*
              Data storing structure as follows.
-                type*: 'window|filter|projection',
+                type*: 'WINDOW|FILTER|PROJECTION',
                 from*: '',
                 filter: '',
                 window: {

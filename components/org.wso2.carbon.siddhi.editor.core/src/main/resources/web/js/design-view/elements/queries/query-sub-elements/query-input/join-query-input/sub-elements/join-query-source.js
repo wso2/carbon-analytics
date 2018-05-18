@@ -28,7 +28,7 @@ define(
         var JoinSource = function (options) {
             /*
              Data storing structure as follows.
-                type*: 'stream|table|window|aggregation|trigger',
+                type*: 'STREAM|TABLE|WINDOW|AGGREGATION|TRIGGER',
                 from*: '',
                 filter: '', // If there is a filter, there must be a window for joins (the only exception is when type = window).
                 window: {

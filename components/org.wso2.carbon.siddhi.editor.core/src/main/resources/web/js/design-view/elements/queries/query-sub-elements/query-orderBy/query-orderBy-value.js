@@ -29,7 +29,7 @@ define(
             /*
              Data storing structure as follows
                 value*: '',
-                order: 'asc|desc'
+                order: 'ASC|DESC'
             */
             if (options !== undefined) {
                 this.value = options.value;

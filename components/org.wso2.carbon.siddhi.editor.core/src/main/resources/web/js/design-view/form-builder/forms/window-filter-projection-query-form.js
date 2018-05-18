@@ -151,14 +151,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(inputElementName);
                 if (inputElement !== undefined) {
                     if (inputElement.type !== undefined
-                        && (inputElement.type === 'stream' || inputElement.type === 'window')) {
+                        && (inputElement.type === 'STREAM' || inputElement.type === 'WINDOW')) {
                         inputElementType = inputElement.type;
                         if (inputElement.element !== undefined) {
                             _.forEach(inputElement.element.getAttributeList(), function (attribute) {
                                 possibleGroupByAttributes.push(attribute.getName());
                             });
                         }
-                    } else if (inputElement.type !== undefined && (inputElement.type === 'trigger')) {
+                    } else if (inputElement.type !== undefined && (inputElement.type === 'TRIGGER')) {
                         inputElementType = inputElement.type;
                         possibleGroupByAttributes.push('triggered_time');
                     }
@@ -168,8 +168,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
-                        && (outputElement.type === 'stream' || outputElement.type === 'table'
-                            || outputElement.type === 'window')) {
+                        && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
+                            || outputElement.type === 'WINDOW')) {
                         outputElementType = outputElement.type;
                         if (outputElement.element !== undefined) {
                             outputElementAttributesList = outputElement.element.getAttributeList();
@@ -232,32 +232,32 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         var eventType;
                         if (output.getEventType() === undefined) {
                             eventType = 'all events';
-                        } else if (output.getEventType() === 'all_events') {
+                        } else if (output.getEventType() === 'ALL_EVENTS') {
                             eventType = 'all events';
-                        } else if (output.getEventType() === 'current_events') {
+                        } else if (output.getEventType() === 'CURRENT_EVENTS') {
                             eventType = 'current events';
-                        } else if (output.getEventType() === 'expired_events') {
+                        } else if (output.getEventType() === 'EXPIRED_EVENTS') {
                             eventType = 'expired events';
                         }
-                        if (savedQueryOutputType === "insert") {
+                        if (savedQueryOutputType === "INSERT") {
                             queryOutput = {
                                 insertTarget: savedQueryOutputTarget,
                                 eventType: eventType
                             };
-                        } else if (savedQueryOutputType === "delete") {
+                        } else if (savedQueryOutputType === "DELETE") {
                             queryOutput = {
                                 deleteTarget: savedQueryOutputTarget,
                                 eventType: eventType,
                                 on: output.getOn()
                             };
-                        } else if (savedQueryOutputType === "update") {
+                        } else if (savedQueryOutputType === "UPDATE") {
                             queryOutput = {
                                 updateTarget: savedQueryOutputTarget,
                                 eventType: eventType,
                                 set: output.getSet(),
                                 on: output.getOn()
                             };
-                        } else if (savedQueryOutputType === "update_or_insert_into") {
+                        } else if (savedQueryOutputType === "UPDATE_OR_INSERT_INTO") {
                             queryOutput = {
                                 updateOrInsertIntoTarget: savedQueryOutputTarget,
                                 eventType: eventType,
@@ -308,7 +308,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 fillQueryOutputWith = self.formUtils.cleanJSONObject(fillQueryOutputWith);
 
                 var inputSchema;
-                if (inputElementType === 'window'){
+                if (inputElementType === 'WINDOW'){
                     inputSchema = {
                         type: "object",
                         title: "Query Input",
@@ -432,7 +432,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
                 var outputSchema;
-                if (outputElementType === 'table') {
+                if (outputElementType === 'TABLE') {
                     outputSchema = {
                         title: "Action",
                         propertyOrder: 5,
@@ -895,17 +895,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var type;
                     // change the query icon depending on the fields filled
                     if (inputConfig.window) {
-                        type = "window";
+                        type = "WINDOW";
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
                     } else if ((inputConfig.filter && inputConfig.filter.filter)
                         || (inputConfig.postWindowFilter && inputConfig.postWindowFilter.filter)) {
-                        type = "filter";
+                        type = "FILTER";
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
                     } else if (!((inputConfig.filter && inputConfig.filter.filter) || inputConfig.window
                         || (inputConfig.postWindowFilter && inputConfig.postWindowFilter.filter))) {
-                        type = "projection";
+                        type = "PROJECTION";
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.PROJECTION + ' jtk-draggable');
                     }
@@ -941,13 +941,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     var selectAttributeOptions = {};
                     if (selectConfig.select instanceof Array) {
-                        _.set(selectAttributeOptions, 'type', 'user_defined');
+                        _.set(selectAttributeOptions, 'type', 'USER_DEFINED');
                         _.set(selectAttributeOptions, 'value', selectConfig.select);
                     } else if (selectConfig.select === "*") {
-                        _.set(selectAttributeOptions, 'type', 'all');
+                        _.set(selectAttributeOptions, 'type', 'ALL');
                         _.set(selectAttributeOptions, 'value', selectConfig.select);
                     } else {
-                        console.log("Value other than \"user_defined\" and \"all\" received!");
+                        console.log("Value other than \"USER_DEFINED\" and \"ALL\" received!");
                     }
                     var selectObject = new QuerySelect(selectAttributeOptions);
                     clickedElement.setSelect(selectObject);
@@ -998,19 +998,19 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var outputTarget;
                     if (outputConfig.output !== undefined) {
                         if (outputConfig.output.insertTarget !== undefined) {
-                            outputType = "insert";
+                            outputType = "INSERT";
                             outputTarget = outputConfig.output.insertTarget;
                             outputObject = new QueryOutputInsert(outputConfig.output);
                         } else if (outputConfig.output.deleteTarget !== undefined) {
-                            outputType = "delete";
+                            outputType = "DELETE";
                             outputTarget = outputConfig.output.deleteTarget;
                             outputObject = new QueryOutputDelete(outputConfig.output);
                         } else if (outputConfig.output.updateTarget !== undefined) {
-                            outputType = "update";
+                            outputType = "UPDATE";
                             outputTarget = outputConfig.output.updateTarget;
                             outputObject = new QueryOutputUpdate(outputConfig.output);
                         } else if (outputConfig.output.updateOrInsertIntoTarget !== undefined) {
-                            outputType = "update_or_insert_into";
+                            outputType = "UPDATE_OR_INSERT_INTO";
                             outputTarget = outputConfig.output.updateOrInsertIntoTarget;
                             outputObject = new QueryOutputUpdateOrInsertInto(outputConfig.output);
                         } else {
@@ -1020,11 +1020,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         if (outputConfig.output.eventType === undefined) {
                             outputObject.setEventType(undefined);
                         } else if(outputConfig.output.eventType === "all events"){
-                            outputObject.setEventType('all_events');
+                            outputObject.setEventType('ALL_EVENTS');
                         } else if(outputConfig.output.eventType === "current events"){
-                            outputObject.setEventType('current_events');
+                            outputObject.setEventType('CURRENT_EVENTS');
                         } else if(outputConfig.output.eventType === "expired events"){
-                            outputObject.setEventType('expired_events');
+                            outputObject.setEventType('EXPIRED_EVENTS');
                         }
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setOutput(outputObject);

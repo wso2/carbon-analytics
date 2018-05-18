@@ -33,7 +33,7 @@ define(['require', 'elementUtils'],
                 from*: ‘’,
                 select*: [
                     {
-                        type*: 'user_defined',
+                        type*: 'USER_DEFINED',
                         value*: [
                             {
                                 expression*: '',
@@ -42,7 +42,7 @@ define(['require', 'elementUtils'],
                             ...
                         ]
                         << or >>
-                        type*: 'all',
+                        type*: 'ALL',
                         value*: '*'
                     }
                 ],
@@ -56,13 +56,13 @@ define(['require', 'elementUtils'],
                 annotationList: [
                     {
                         name: ‘’,
-                        type: ‘value’,
+                        type: ‘VALUE’,
                         value: [‘value1’,’value2’]
                     },
                     and|or
                     {
                         name: ‘’
-                        type: ‘keyValue’,
+                        type: ‘KEY_VALUE’,
                         value: {‘option’:’value’}
                     }
                 ]

@@ -99,13 +99,13 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 var queryOutputObject = new QueryOutput(queryOutput);
                 var queryOutputType = queryOutput.type;
                 var output;
-                if(queryOutputType === "insert") {
+                if(queryOutputType === "INSERT") {
                     output = new QueryOutputInsert(queryOutput.output);
-                } else if (queryOutputType === "delete") {
+                } else if (queryOutputType === "DELETE") {
                     output = new QueryOutputDelete(queryOutput.output);
-                } else if (queryOutputType === "update") {
+                } else if (queryOutputType === "UPDATE") {
                     output = new QueryOutputUpdate(queryOutput.output);
-                } else if (queryOutputType === "update_or_insert_into") {
+                } else if (queryOutputType === "UPDATE_OR_INSERT_INTO") {
                     output = new QueryOutputUpdateOrInsertInto(queryOutput.output);
                 } else {
                     console.log("Invalid query output type received!");

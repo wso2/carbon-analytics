@@ -38,17 +38,17 @@ define(['require', 'elementUtils'],
                 ],
                 function*: ‘time|length|timeBatch|lengthBatch...’,
                 parameters*: ['value1',...],
-                outputEventType: ‘current_events|expired_events|all_events’,
+                outputEventType: ‘CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS’,
                 annotationList: [
                     {
                         name: ‘’,
-                        type: ‘value’,
+                        type: ‘VALUE’,
                         value: [‘value1’,’value2’]
                     },
                     and|or
                     {
                         name: ‘’
-                        type: ‘keyValue’,
+                        type: ‘KEY_VALUE’,
                         value: {‘option’:’value’}
                     }
                 ]

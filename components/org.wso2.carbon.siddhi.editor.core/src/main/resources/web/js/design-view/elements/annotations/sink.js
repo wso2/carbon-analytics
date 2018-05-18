@@ -35,12 +35,12 @@ define(
                     type*: ‘’,
                     options: {Key-Value Pair JSON},
                     payload: {
-                        type*: ‘map’,
+                        type*: ‘MAP’,
                         value*: {Key-Value Pair JSON}
                     }
                     << or  >>
                     payload: {
-                        type*: 'single',
+                        type*: 'SINGLE',
                         value*: ''
                     }
                 }

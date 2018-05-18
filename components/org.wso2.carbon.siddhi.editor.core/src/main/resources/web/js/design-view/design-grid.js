@@ -115,7 +115,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     /**
                      *
                      * @param e --> original event object fired/ normalized by jQuery
-                     * @param ui --> object that contains additional info added by jQuery depending on which interaction was used
+                     * @param ui --> object that contains additional info added by jQuery depending on which
+                     * interaction was used
                      * @helper clone
                      */
 
@@ -124,10 +125,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         var mouseLeft = e.pageX - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                         // Clone the element in the toolbox in order to drop the clone on the canvas
                         var droppedElement = ui.helper.clone();
-                        // To further manipulate the jsplumb element, remove the jquery UI clone helper as jsPlumb doesn't support it
+                        // To further manipulate the jsplumb element, remove the jquery UI clone helper as jsPlumb
+                        // doesn't support it
                         ui.helper.remove();
                         $(droppedElement).draggable({containment: "parent"});
-                        // Repaint to reposition all the elements that are on the canvas after the drop/addition of a new element on the canvas
+                        // Repaint to reposition all the elements that are on the canvas after the drop/addition of a
+                        // new element on the canvas
                         self.jsPlumbInstance.repaint(ui.helper);
 
                         // If the dropped Element is a Stream then->
@@ -275,10 +278,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 } else if (firstConnectedElement !== undefined
                                     && secondConnectedElement === undefined) {
                                     var firstElementType = firstConnectedElement.type;
-                                    if (firstElementType === 'stream' || firstElementType === 'trigger') {
+                                    if (firstElementType === 'STREAM' || firstElementType === 'TRIGGER') {
                                         connectionValidity = true;
-                                    } else if (connectedElementSourceType === 'stream'
-                                        || connectedElementSourceType === 'trigger') {
+                                    } else if (connectedElementSourceType === 'STREAM'
+                                        || connectedElementSourceType === 'TRIGGER') {
                                         connectionValidity = true;
                                     } else {
                                         connectionValidity = false;
@@ -288,10 +291,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 } else if (firstConnectedElement === undefined
                                     && secondConnectedElement !== undefined) {
                                     var secondElementType = secondConnectedElement.type;
-                                    if (secondElementType === 'stream' || secondElementType === 'trigger') {
+                                    if (secondElementType === 'STREAM' || secondElementType === 'TRIGGER') {
                                         connectionValidity = true;
-                                    } else if (connectedElementSourceType === 'stream'
-                                        || connectedElementSourceType === 'trigger') {
+                                    } else if (connectedElementSourceType === 'STREAM'
+                                        || connectedElementSourceType === 'TRIGGER') {
                                         connectionValidity = true;
                                     } else {
                                         connectionValidity = false;
@@ -383,13 +386,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 .getWindowFilterProjectionQuery(targetId);
                             var type;
                             if (targetElement.hasClass(constants.PROJECTION)) {
-                                type = 'projection';
+                                type = 'PROJECTION';
                             }
                             else if (targetElement.hasClass(constants.FILTER)) {
-                                type = 'filter';
+                                type = 'FILTER';
                             }
                             if (targetElement.hasClass(constants.WINDOW_QUERY)) {
-                                type = 'window';
+                                type = 'WINDOW';
                             }
                             if (model.getQueryInput() === undefined) {
                                 var queryInputOptions = {};
@@ -444,7 +447,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             if (model.getQueryInput() === undefined) {
                                 var patternQueryInputOptions = {};
-                                _.set(patternQueryInputOptions, 'type', 'pattern');
+                                _.set(patternQueryInputOptions, 'type', 'PATTERN');
                                 var patternQueryInputObject =
                                     new PatternOrSequenceQueryInput(patternQueryInputOptions);
                                 patternQueryInputObject.addConnectedElementName(connectedStreamName);
@@ -458,7 +461,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             if (model.getQueryInput() === undefined) {
                                 var sequenceQueryInputOptions = {};
-                                _.set(sequenceQueryInputOptions, 'type', 'sequence');
+                                _.set(sequenceQueryInputOptions, 'type', 'SEQUENCE');
                                 var sequenceQueryInputObject =
                                     new PatternOrSequenceQueryInput(sequenceQueryInputOptions);
                                 sequenceQueryInputObject.addConnectedElementName(connectedStreamName);
@@ -948,11 +951,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var querySubType = windowFilterProjectionQuery.getQueryInput().getType();
 
                     var queryType;
-                    if (querySubType === 'projection') {
+                    if (querySubType === 'PROJECTION') {
                         queryType = constants.PROJECTION;
-                    } else if (querySubType === 'filter') {
+                    } else if (querySubType === 'FILTER') {
                         queryType = constants.FILTER;
-                    } else if (querySubType === 'window') {
+                    } else if (querySubType === 'WINDOW') {
                         queryType = constants.WINDOW_QUERY;
                     }
 

@@ -93,13 +93,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var rightSourceSavedData = clickedElement.getQueryInput().getRight();
                 var joinType = clickedElement.getQueryInput().getJoinType();
                 if (joinType !== undefined) {
-                    if (joinType === "join") {
+                    if (joinType === "JOIN") {
                         joinType = "join";
-                    } else if (joinType === "left_outer") {
+                    } else if (joinType === "LEFT_OUTER") {
                         joinType = "left outer";
-                    } else if (joinType === "right_outer") {
+                    } else if (joinType === "RIGHT_OUTER") {
                         joinType = "right outer";
-                    } else if (joinType === "full_outer") {
+                    } else if (joinType === "FULL_OUTER") {
                         joinType = "full outer";
                     }
                 }
@@ -142,7 +142,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(secondInputElementName);
                 if (firstInputElement !== undefined && secondInputElement !== undefined) {
 
-                    if (firstInputElement.type !== undefined && firstInputElement.type === 'trigger') {
+                    if (firstInputElement.type !== undefined && firstInputElement.type === 'TRIGGER') {
                         firstInputElementType = firstInputElement.type;
                         possibleGroupByAttributes.push(firstInputElementName + '.triggered_time');
                     } else if (firstInputElement.type !== undefined) {
@@ -154,7 +154,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                     }
 
-                    if (secondInputElement.type !== undefined && secondInputElement.type === 'trigger'){
+                    if (secondInputElement.type !== undefined && secondInputElement.type === 'TRIGGER'){
                         secondInputElementType = secondInputElement.type;
                         possibleGroupByAttributes.push(secondInputElementName + '.triggered_time');
                     }  else if (secondInputElement.type !== undefined) {
@@ -171,8 +171,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
-                        && (outputElement.type === 'stream' || outputElement.type === 'table'
-                            || outputElement.type === 'window')) {
+                        && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
+                            || outputElement.type === 'WINDOW')) {
                         outputElementType = outputElement.type;
                         if (outputElement.element !== undefined) {
                             outputElementAttributesList = outputElement.element.getAttributeList();
@@ -235,32 +235,32 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         var eventType;
                         if (output.getEventType() === undefined) {
                             eventType = 'all events';
-                        } else if (output.getEventType() === 'all_events') {
+                        } else if (output.getEventType() === 'ALL_EVENTS') {
                             eventType = 'all events';
-                        } else if (output.getEventType() === 'current_events') {
+                        } else if (output.getEventType() === 'CURRENT_EVENTS') {
                             eventType = 'current events';
-                        } else if (output.getEventType() === 'expired_events') {
+                        } else if (output.getEventType() === 'EXPIRED_EVENTS') {
                             eventType = 'expired events';
                         }
-                        if (savedQueryOutputType === "insert") {
+                        if (savedQueryOutputType === "INSERT") {
                             queryOutput = {
                                 insertTarget: savedQueryOutputTarget,
                                 eventType: eventType
                             };
-                        } else if (savedQueryOutputType === "delete") {
+                        } else if (savedQueryOutputType === "DELETE") {
                             queryOutput = {
                                 deleteTarget: savedQueryOutputTarget,
                                 eventType: eventType,
                                 on: output.getOn()
                             };
-                        } else if (savedQueryOutputType === "update") {
+                        } else if (savedQueryOutputType === "UPDATE") {
                             queryOutput = {
                                 updateTarget: savedQueryOutputTarget,
                                 eventType: eventType,
                                 set: output.getSet(),
                                 on: output.getOn()
                             };
-                        } else if (savedQueryOutputType === "update_or_insert_into") {
+                        } else if (savedQueryOutputType === "UPDATE_OR_INSERT_INTO") {
                             queryOutput = {
                                 updateOrInsertIntoTarget: savedQueryOutputTarget,
                                 eventType: eventType,
@@ -364,7 +364,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 _.set(fillQueryInputWith, 'right', self.rightSourceStartValues);
 
                 // add within and per clauses to input schema if one of the input element is an aggregation
-                if (firstInputElementType === "aggregation" || secondInputElementType === "aggregation") {
+                if (firstInputElementType === "AGGREGATION" || secondInputElementType === "AGGREGATION") {
                     var withinSchema = {
                         propertyOrder: 5,
                         type: "object",
@@ -398,7 +398,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var outputSchema;
-                if (outputElementType === 'table') {
+                if (outputElementType === 'TABLE') {
                     outputSchema = {
                         title: "Action",
                         propertyOrder: 5,
@@ -1065,16 +1065,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     queryInput.setRight(rightSource);
                     
                     var joinWithType = undefined;
-                    if (firstInputElementType === "table" || secondInputElementType === "table") {
-                        joinWithType = "table";
-                    } else if (firstInputElementType === "window" || secondInputElementType === "window") {
-                        joinWithType = "window";
-                    } else if (firstInputElementType === "aggregation" || secondInputElementType === "aggregation") {
-                        joinWithType = "aggregation";
-                    } else if (firstInputElementType === "trigger" || secondInputElementType === "trigger") {
-                        joinWithType = "trigger";
-                    } else if (firstInputElementType === "stream" && secondInputElementType === "stream") {
-                        joinWithType = "stream";
+                    if (firstInputElementType === "TABLE" || secondInputElementType === "TABLE") {
+                        joinWithType = "TABLE";
+                    } else if (firstInputElementType === "WINDOW" || secondInputElementType === "WINDOW") {
+                        joinWithType = "WINDOW";
+                    } else if (firstInputElementType === "AGGREGATION" || secondInputElementType === "AGGREGATION") {
+                        joinWithType = "AGGREGATION";
+                    } else if (firstInputElementType === "TRIGGER" || secondInputElementType === "TRIGGER") {
+                        joinWithType = "TRIGGER";
+                    } else if (firstInputElementType === "STREAM" && secondInputElementType === "STREAM") {
+                        joinWithType = "STREAM";
                     } else {
                         console.log("Unknown join with type received!")
                     }
@@ -1107,13 +1107,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     var selectAttributeOptions = {};
                     if (selectConfig.select instanceof Array) {
-                        _.set(selectAttributeOptions, 'type', 'user_defined');
+                        _.set(selectAttributeOptions, 'type', 'USER_DEFINED');
                         _.set(selectAttributeOptions, 'value', selectConfig.select);
                     } else if (selectConfig.select === "*") {
-                        _.set(selectAttributeOptions, 'type', 'all');
+                        _.set(selectAttributeOptions, 'type', 'ALL');
                         _.set(selectAttributeOptions, 'value', selectConfig.select);
                     } else {
-                        console.log("Value other than \"user_defined\" and \"all\" received!");
+                        console.log("Value other than \"USER_DEFINED\" and \"ALL\" received!");
                     }
                     var selectObject = new QuerySelect(selectAttributeOptions);
                     clickedElement.setSelect(selectObject);
@@ -1164,19 +1164,19 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var outputTarget;
                     if (outputConfig.output !== undefined) {
                         if (outputConfig.output.insertTarget !== undefined) {
-                            outputType = "insert";
+                            outputType = "INSERT";
                             outputTarget = outputConfig.output.insertTarget;
                             outputObject = new QueryOutputInsert(outputConfig.output);
                         } else if (outputConfig.output.deleteTarget !== undefined) {
-                            outputType = "delete";
+                            outputType = "DELETE";
                             outputTarget = outputConfig.output.deleteTarget;
                             outputObject = new QueryOutputDelete(outputConfig.output);
                         } else if (outputConfig.output.updateTarget !== undefined) {
-                            outputType = "update";
+                            outputType = "UPDATE";
                             outputTarget = outputConfig.output.updateTarget;
                             outputObject = new QueryOutputUpdate(outputConfig.output);
                         } else if (outputConfig.output.updateOrInsertIntoTarget !== undefined) {
-                            outputType = "update_or_insert_into";
+                            outputType = "UPDATE_OR_INSERT_INTO";
                             outputTarget = outputConfig.output.updateOrInsertIntoTarget;
                             outputObject = new QueryOutputUpdateOrInsertInto(outputConfig.output);
                         } else {
@@ -1186,11 +1186,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         if (outputConfig.output.eventType === undefined) {
                             outputObject.setEventType(undefined);
                         } else if(outputConfig.output.eventType === "all events"){
-                            outputObject.setEventType('all_events');
+                            outputObject.setEventType('ALL_EVENTS');
                         } else if(outputConfig.output.eventType === "current events"){
-                            outputObject.setEventType('current_events');
+                            outputObject.setEventType('CURRENT_EVENTS');
                         } else if(outputConfig.output.eventType === "expired events"){
-                            outputObject.setEventType('expired_events');
+                            outputObject.setEventType('EXPIRED_EVENTS');
                         }
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setOutput(outputObject);
@@ -1225,8 +1225,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @param savedJoinSourceData saved data related to join
          * @returns fullJoinSchema join source schema
          */
-        JoinQueryForm.prototype.getJoinSourceSchema = function (sourceType, sourceName, secondarySourceName,
-                                                                sourceSide, savedJoinSourceData) {
+        JoinQueryForm.prototype.getJoinSourceSchema = function (sourceType, sourceName, secondarySourceName, sourceSide,
+                                                                savedJoinSourceData) {
             var self = this;
             var fullJoinSchema = {};
             // starting values for the join source
@@ -1296,9 +1296,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
             };
 
-            if (sourceType === "window") {
+            if (sourceType === "WINDOW") {
                 fullJoinSchema = commonJoinSourceSchema;
-            } else if (sourceType === "stream" || sourceType === "trigger") {
+            } else if (sourceType === "STREAM" || sourceType === "TRIGGER") {
                 var filterWithWindowSchema = {
                     propertyOrder: 2,
                     type: "object",
@@ -1356,7 +1356,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 }
 
-            } else if (sourceType === "table" || sourceType === "aggregation") {
+            } else if (sourceType === "TABLE" || sourceType === "AGGREGATION") {
                 var filterSchema = {
                     propertyOrder: 2,
                     type: "object",

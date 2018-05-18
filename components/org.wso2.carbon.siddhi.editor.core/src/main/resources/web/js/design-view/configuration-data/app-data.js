@@ -215,15 +215,15 @@ define(['require', 'elementUtils', 'lodash'],
                     if (element.getId() === elementId) {
                         var type = '';
                         if (list === streamList) {
-                            type = 'stream';
+                            type = 'STREAM';
                         } else if (list === tableList) {
-                            type = 'table';
+                            type = 'TABLE';
                         } else if (list === windowList) {
-                            type = 'window';
+                            type = 'WINDOW';
                         } else if (list === aggregationList) {
-                            type = 'aggregation';
+                            type = 'AGGREGATION';
                         } else if (list === triggerList) {
-                            type = 'trigger';
+                            type = 'TRIGGER';
                         }
                         requestedElement = {
                             type: type,
@@ -256,15 +256,15 @@ define(['require', 'elementUtils', 'lodash'],
                     if (element.getName().toUpperCase() === elementName.toUpperCase()) {
                         var type = '';
                         if (list === streamList) {
-                            type = 'stream';
+                            type = 'STREAM';
                         } else if (list === tableList) {
-                            type = 'table';
+                            type = 'TABLE';
                         } else if (list === windowList) {
-                            type = 'window';
+                            type = 'WINDOW';
                         } else if (list === aggregationList) {
-                            type = 'aggregation';
+                            type = 'AGGREGATION';
                         } else if (list === triggerList) {
-                            type = 'trigger';
+                            type = 'TRIGGER';
                         }
                         requestedElement = {
                             type: type,

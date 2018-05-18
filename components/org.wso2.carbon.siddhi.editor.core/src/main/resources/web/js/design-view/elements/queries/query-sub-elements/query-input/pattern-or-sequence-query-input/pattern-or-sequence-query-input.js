@@ -28,7 +28,7 @@ define(['require', 'elementUtils'],
         var PatternOrSequenceQueryInput = function (options) {
             /*
              Data storing structure as follows.
-                type*: 'pattern|sequence',
+                type*: 'PATTERN|SEQUENCE',
                 connectedElementList: [],
                 conditionList*: [
                     {

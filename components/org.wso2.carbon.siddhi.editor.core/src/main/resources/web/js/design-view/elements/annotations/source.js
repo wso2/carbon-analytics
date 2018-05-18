@@ -35,12 +35,12 @@ define(
                     type*: ‘’,
                     options: {Key-Value Pair JSON},
                     attributes: {
-                        type*: ‘map’
+                        type*: ‘MAP’
                         value*: {Key-Value Pair JSON}
                     }
                     << or >>
                     attributes: {
-                        type*: ‘list’
+                        type*: ‘LIST’
                         value*: ['value1',...]
                     }
                 }

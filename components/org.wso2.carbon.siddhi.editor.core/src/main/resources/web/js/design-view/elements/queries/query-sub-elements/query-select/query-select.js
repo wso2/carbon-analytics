@@ -28,7 +28,7 @@ define(
         var QuerySelect = function (options) {
             /*
              Data storing structure as follows
-                type*: 'user_defined',
+                type*: 'USER_DEFINED',
                 value*: [
                     {
                         expression*: '',
@@ -37,7 +37,7 @@ define(
                     ...
                 ]
                 << or >>
-                type*: 'all',
+                type*: 'ALL',
                 value*: '*'
             */
             if (options !== undefined) {

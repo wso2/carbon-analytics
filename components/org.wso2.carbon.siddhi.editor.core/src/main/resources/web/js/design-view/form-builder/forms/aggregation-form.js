@@ -65,7 +65,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             var firstPossibleSource =
                 self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(firstPossibleSourceName);
             if (firstPossibleSource !== undefined) {
-                if (firstPossibleSource.type !== undefined && (firstPossibleSource.type === 'stream')) {
+                if (firstPossibleSource.type !== undefined && (firstPossibleSource.type === 'STREAM')) {
                     var timestampAttributeFound = false;
                     if (firstPossibleSource.element !== undefined) {
                         _.forEach(firstPossibleSource.element.getAttributeList(), function (attribute) {
@@ -78,7 +78,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     if (!timestampAttributeFound) {
                         possibleGroupByAttributes.push('timestamp');
                     }
-                } else if (firstPossibleSource.type !== undefined && (firstPossibleSource.type === 'trigger')) {
+                } else if (firstPossibleSource.type !== undefined && (firstPossibleSource.type === 'TRIGGER')) {
                     possibleGroupByAttributes.push('triggered_time');
                 }
             }
@@ -266,7 +266,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 var inputElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(fromValue);
                 ElementUtils.prototype.removeAllElements(possibleGroupByAttributes);
                 if (inputElement !== undefined) {
-                    if (inputElement.type !== undefined && (inputElement.type === 'stream')) {
+                    if (inputElement.type !== undefined && (inputElement.type === 'STREAM')) {
                         var timestampAttributeFound = false;
                         if (inputElement.element !== undefined) {
                             _.forEach(inputElement.element.getAttributeList(), function (attribute) {
@@ -279,7 +279,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         if (!timestampAttributeFound) {
                             possibleGroupByAttributes.push('timestamp');
                         }
-                    } else if (inputElement.type !== undefined && (inputElement.type === 'trigger')) {
+                    } else if (inputElement.type !== undefined && (inputElement.type === 'TRIGGER')) {
                         possibleGroupByAttributes.push('triggered_time');
                     }
                 }
@@ -288,7 +288,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 var selectStartValue = {
                     select: editorSelect.getValue().select
                 };
-                // if the user has activated the group by field in the form, then the new frm will also activate the
+                // if the user has activated the group by field in the form, then the new form will also activate the
                 // group by field
                 if (editorSelect.getValue().groupBy !== undefined) {
                     _.set(selectStartValue, 'groupBy', "");
@@ -330,13 +330,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
 
                 var selectAttributeOptions = {};
                 if (editorSelect.getValue().select instanceof Array) {
-                    _.set(selectAttributeOptions, 'type', 'user_defined');
+                    _.set(selectAttributeOptions, 'type', 'USER_DEFINED');
                     _.set(selectAttributeOptions, 'value', editorSelect.getValue().select);
                 } else if (editorSelect.getValue().select === "*") {
-                    _.set(selectAttributeOptions, 'type', 'all');
+                    _.set(selectAttributeOptions, 'type', 'ALL');
                     _.set(selectAttributeOptions, 'value', editorSelect.getValue().select);
                 } else {
-                    console.log("Value other than \"user_defined\" and \"all\" received!");
+                    console.log("Value other than \"USER_DEFINED\" and \"ALL\" received!");
                 }
                 var selectObject = new QuerySelect(selectAttributeOptions);
                 _.set(aggregationOptions, 'select', selectObject);
@@ -467,7 +467,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             var possibleGroupByAttributes = [];
             var savedSource = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(from);
             if (savedSource !== undefined) {
-                if (savedSource.type !== undefined && (savedSource.type === 'stream')) {
+                if (savedSource.type !== undefined && (savedSource.type === 'STREAM')) {
                     var timestampAttributeFound = false;
                     if (savedSource.element !== undefined) {
                         _.forEach(savedSource.element.getAttributeList(), function (attribute) {
@@ -480,7 +480,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     if (!timestampAttributeFound) {
                         possibleGroupByAttributes.push('timestamp');
                     }
-                } else if (savedSource.type !== undefined && (savedSource.type === 'trigger')) {
+                } else if (savedSource.type !== undefined && (savedSource.type === 'TRIGGER')) {
                     possibleGroupByAttributes.push('triggered_time');
                 }
             }
@@ -671,7 +671,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 var inputElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(fromValue);
                 ElementUtils.prototype.removeAllElements(possibleGroupByAttributes);
                 if (inputElement !== undefined) {
-                    if (inputElement.type !== undefined && (inputElement.type === 'stream')) {
+                    if (inputElement.type !== undefined && (inputElement.type === 'STREAM')) {
                         var timestampAttributeFound = false;
                         if (inputElement.element !== undefined) {
                             _.forEach(inputElement.element.getAttributeList(), function (attribute) {
@@ -684,7 +684,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         if (!timestampAttributeFound) {
                             possibleGroupByAttributes.push('timestamp');
                         }
-                    } else if (inputElement.type !== undefined && (inputElement.type === 'trigger')) {
+                    } else if (inputElement.type !== undefined && (inputElement.type === 'TRIGGER')) {
                         possibleGroupByAttributes.push('triggered_time');
                     }
                 }
@@ -710,8 +710,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 if(inputErrors.length || selectErrors.length || aggregateErrors.length) {
                     return;
                 }
-                var isAggregationNameUsed = self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name,
-                    clickedElement.getId());
+                var isAggregationNameUsed =
+                    self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name, clickedElement.getId());
                 if(isAggregationNameUsed) {
                     alert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
                     return;
@@ -727,13 +727,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
 
                 var selectAttributeOptions = {};
                 if (configSelect.select instanceof Array) {
-                    _.set(selectAttributeOptions, 'type', 'user_defined');
+                    _.set(selectAttributeOptions, 'type', 'USER_DEFINED');
                     _.set(selectAttributeOptions, 'value', configSelect.select);
                 } else if (configSelect.select === "*") {
-                    _.set(selectAttributeOptions, 'type', 'all');
+                    _.set(selectAttributeOptions, 'type', 'ALL');
                     _.set(selectAttributeOptions, 'value', configSelect.select);
                 } else {
-                    console.log("Value other than \"user_defined\" and \"all\" received!");
+                    console.log("Value other than \"USER_DEFINED\" and \"ALL\" received!");
                 }
                 var selectObject = new QuerySelect(selectAttributeOptions);
                 clickedElement.setSelect(selectObject);

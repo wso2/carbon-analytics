@@ -36,7 +36,7 @@ define(['require', 'elementUtils'],
                 orderBy: [
                     {
                         value*: '',
-                        order: 'asc|desc'
+                        order: 'ASC|DESC'
                     },
                     ...
                 ],

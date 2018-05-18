@@ -28,10 +28,10 @@ define(
         var JoinQueryInput = function (options) {
             /*
              Data storing structure as follows.
-                type*: 'join',
-                joinWith*: 'stream|table|window|aggregation|trigger',
+                type*: 'JOIN',
+                joinWith*: 'STREAM|TABLE|WINDOW|AGGREGATION|TRIGGER',
                 left*: {Join Element JSON},
-                joinType*: 'join|left_outer|right_outer|full_outer',
+                joinType*: 'JOIN|LEFT_OUTER|RIGHT_OUTER|FULL_OUTER',
                 right*: {Join Element JSON},
                 on: '',
                 within: '', // If joinWith == aggregation
@@ -47,7 +47,7 @@ define(
             *
             *  This attributes will be deleted from the json when sending to backend.
             * */
-            this.type = 'join';
+            this.type = 'JOIN';
             if (options !== undefined) {
                 this.firstConnectedElement = options.firstConnectedElement;
                 this.secondConnectedElement = options.secondConnectedElement;

@@ -40,13 +40,13 @@ define(['require', 'elementUtils'],
                 annotationList: [
                     {
                         name: ‘’,
-                        type: ‘value’,
+                        type: ‘VALUE’,
                         value: [‘value1’,’value2’]
                     },
                     and|or
                     {
                         name: ‘’
-                        type: ‘keyValue’,
+                        type: ‘KEY_VALUE’,
                         value: {‘option’:’value’}
                     }
                 ]
