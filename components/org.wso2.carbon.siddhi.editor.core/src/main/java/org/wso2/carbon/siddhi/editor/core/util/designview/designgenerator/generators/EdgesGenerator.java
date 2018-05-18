@@ -75,7 +75,10 @@ public class EdgesGenerator {
                                     ((JoinConfig) (query.getQueryInput())).getRight().getFrom()).getId(),
                             query.getId()));
             // Edge from Query element
-            edges.add(generateEdge(query.getId(), query.getQueryOutput().getTarget()));
+            edges.add(
+                    generateEdge(
+                            query.getId(),
+                            getElementWithStreamName(query.getQueryOutput().getTarget()).getId()));
         }
         // TODO: 3/29/18 implement other edges
         return edges;
