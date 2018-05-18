@@ -19,11 +19,10 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.output;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.*;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateInsertIntoOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute.SetAttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.DeleteOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.InsertOutputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.OLD_REMOVE.UpdateOrInsertIntoOutputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.OLD_REMOVE.UpdateOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryOutputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.execution.query.output.stream.*;
@@ -74,7 +73,7 @@ public class QueryOutputConfigGenerator {
     private QueryOutputConfig generateUpdateOutputConfig(UpdateStream updateStream) {
         return new QueryOutputConfig(
                 QueryOutputType.UPDATE.toString(),
-                new UpdateOutputConfig(
+                new UpdateInsertIntoOutputConfig(
                         updateStream.getOutputEventType().name(),
                         generateSetAttributeConfigsList(updateStream.getUpdateSet().getSetAttributeList()),
                         ConfigBuildingUtilities.getDefinition(updateStream.getOnUpdateExpression(), siddhiAppString)),
@@ -84,7 +83,7 @@ public class QueryOutputConfigGenerator {
     private QueryOutputConfig generateUpdateOrInsertIntoOutputConfig(UpdateOrInsertStream updateOrInsertStream) {
         return new QueryOutputConfig(
                 QueryOutputType.UPDATE_OR_INSERT_INTO.toString(),
-                new UpdateOrInsertIntoOutputConfig(
+                new UpdateInsertIntoOutputConfig(
                         updateOrInsertStream.getOutputEventType().name(),
                         generateSetAttributeConfigsList(updateOrInsertStream.getUpdateSet().getSetAttributeList()),
                         ConfigBuildingUtilities.getDefinition(

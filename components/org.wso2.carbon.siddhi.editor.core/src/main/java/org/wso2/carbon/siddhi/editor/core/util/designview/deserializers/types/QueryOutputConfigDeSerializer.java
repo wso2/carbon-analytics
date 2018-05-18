@@ -27,8 +27,7 @@ import com.google.gson.JsonPrimitive;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.DeleteOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.InsertOutputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.OLD_REMOVE.UpdateOrInsertIntoOutputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.OLD_REMOVE.UpdateOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateInsertIntoOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryOutputType;
 
 import java.lang.reflect.Type;
@@ -56,13 +55,13 @@ public class QueryOutputConfigDeSerializer implements JsonDeserializer {
         } else if (queryOutputType.equalsIgnoreCase(QueryOutputType.UPDATE.toString())) {
             return new QueryOutputConfig(
                     queryOutputType,
-                    jsonDeserializationContext.deserialize(jsonObject.get(OUTPUT), UpdateOutputConfig.class),
+                    jsonDeserializationContext.deserialize(jsonObject.get(OUTPUT), UpdateInsertIntoOutputConfig.class),
                     target);
         } else if (queryOutputType.equalsIgnoreCase(QueryOutputType.UPDATE_OR_INSERT_INTO.toString())) {
             return new QueryOutputConfig(
                     queryOutputType,
                     jsonDeserializationContext.deserialize(
-                            jsonObject.get(OUTPUT), UpdateOrInsertIntoOutputConfig.class),
+                            jsonObject.get(OUTPUT), UpdateInsertIntoOutputConfig.class),
                     target);
         } else if (queryOutputType.equalsIgnoreCase(QueryOutputType.DELETE.toString())) {
             return new QueryOutputConfig(
