@@ -92,6 +92,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                     };
                 } else {
+                    var savedParameterValues = clickedElement.getQueryInput().getWindow().getParameters();
+                    var parameters = [];
+                    _.forEach(savedParameterValues, function (savedParameterValue) {
+                        var parameterObject = {
+                            parameter: savedParameterValue
+                        };
+                        parameters.push(parameterObject);
+                    });
                     savedQueryInput = {
                         input: {
                             from : clickedElement.getQueryInput().getFrom()
@@ -101,7 +109,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         },
                         window : {
                             functionName: clickedElement.getQueryInput().getWindow().getFunction(),
-                            parameters: clickedElement.getQueryInput().getWindow().getParameters()
+                            parameters: parameters
                         },
                         postWindowFilter: {
                             filter : clickedElement.getQueryInput().getPostWindowFilter()
@@ -913,7 +921,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (inputConfig.window !== undefined) {
                         var windowOptions = {};
                         _.set(windowOptions, 'function', inputConfig.window.functionName);
-                        _.set(windowOptions, 'parameters', inputConfig.window.parameters);
+                        var parameters = [];
+                        _.forEach(inputConfig.window.parameters, function (parameter) {
+                            parameters.push(parameter.parameter);
+                        });
+                        _.set(windowOptions, 'parameters', parameters);
                         var queryWindow = new QueryWindow(windowOptions);
                         queryInput.setWindow(queryWindow);
                     } else {

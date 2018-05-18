@@ -983,7 +983,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (inputConfig.left.window !== undefined) {
                         var windowOptions = {};
                         _.set(windowOptions, 'function', inputConfig.left.window.functionName);
-                        _.set(windowOptions, 'parameters', inputConfig.left.window.parameters);
+                        var parameters = [];
+                        _.forEach(inputConfig.left.window.parameters, function (parameter) {
+                            parameters.push(parameter.parameter);
+                        });
+                        _.set(windowOptions, 'parameters', parameters);
                         var queryWindow = new QueryWindow(windowOptions);
                         _.set(leftSourceOptions, 'window', queryWindow);
                     } else if (inputConfig.left.filterWithWindow !== undefined
@@ -991,7 +995,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         && inputConfig.left.filterWithWindow.parameters !== undefined) {
                         var windowOptions = {};
                         _.set(windowOptions, 'function', inputConfig.left.filterWithWindow.functionName);
-                        _.set(windowOptions, 'parameters', inputConfig.left.filterWithWindow.parameters);
+                        var parameters = [];
+                        _.forEach(inputConfig.left.filterWithWindow.parameters, function (parameter) {
+                            parameters.push(parameter.parameter);
+                        });
+                        _.set(windowOptions, 'parameters', parameters);
                         var queryWindow = new QueryWindow(windowOptions);
                         _.set(leftSourceOptions, 'window', queryWindow);
                     } else {
@@ -1031,7 +1039,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (inputConfig.right.window !== undefined) {
                         var windowOptions = {};
                         _.set(windowOptions, 'function', inputConfig.right.window.functionName);
-                        _.set(windowOptions, 'parameters', inputConfig.right.window.parameters);
+                        var parameters = [];
+                        _.forEach(inputConfig.right.window.parameters, function (parameter) {
+                            parameters.push(parameter.parameter);
+                        });
+                        _.set(windowOptions, 'parameters', parameters);
                         var queryWindow = new QueryWindow(windowOptions);
                         _.set(rightSourceOptions, 'window', queryWindow);
                     } else if (inputConfig.right.filterWithWindow !== undefined
@@ -1039,7 +1051,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         && inputConfig.right.filterWithWindow.parameters !== undefined) {
                         var windowOptions = {};
                         _.set(windowOptions, 'function', inputConfig.right.filterWithWindow.functionName);
-                        _.set(windowOptions, 'parameters', inputConfig.right.filterWithWindow.parameters);
+                        var parameters = [];
+                        _.forEach(inputConfig.right.filterWithWindow.parameters, function (parameter) {
+                            parameters.push(parameter.parameter);
+                        });
+                        _.set(windowOptions, 'parameters', parameters);
                         var queryWindow = new QueryWindow(windowOptions);
                         _.set(rightSourceOptions, 'window', queryWindow);
                     } else {
@@ -1328,8 +1344,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (savedJoinSourceData.getWindow() !== undefined) {
                         _.set(fillSourceWith, 'filterWithWindow.functionName',
                             savedJoinSourceData.getWindow().getFunction());
-                        _.set(fillSourceWith, 'filterWithWindow.parameters',
-                            savedJoinSourceData.getWindow().getParameters());
+                        var savedParameterValues = savedJoinSourceData.getWindow().getParameters();
+                        var parameters = [];
+                        _.forEach(savedParameterValues, function (savedParameterValue) {
+                            var parameterObject = {
+                                parameter: savedParameterValue
+                            };
+                            parameters.push(parameterObject);
+                        });
+                        _.set(fillSourceWith, 'filterWithWindow.parameters', parameters);
                     }
                 }
 
@@ -1387,7 +1410,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     _.set(fillSourceWith, 'filter.filter', savedJoinSourceData.getFilter());
                     if (savedJoinSourceData.getWindow() !== undefined) {
                         _.set(fillSourceWith, 'window.functionName', savedJoinSourceData.getWindow().getFunction());
-                        _.set(fillSourceWith, 'window.parameters', savedJoinSourceData.getWindow().getParameters());
+                        var savedParameterValues = savedJoinSourceData.getWindow().getParameters();
+                        var parameters = [];
+                        _.forEach(savedParameterValues, function (savedParameterValue) {
+                            var parameterObject = {
+                                parameter: savedParameterValue
+                            };
+                            parameters.push(parameterObject);
+                        });
+                        _.set(fillSourceWith, 'window.parameters', parameters);
                     }
                 }
             } else {
