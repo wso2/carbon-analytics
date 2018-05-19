@@ -185,8 +185,8 @@ export default class AutoCompleteProperty extends Component {
 
 AutoCompleteProperty.propTypes = {
     elements: PropTypes.arrayOf(PropTypes.string).isRequired,
-    disabled: PropTypes.bool,
-    error: PropTypes.bool,
-    value: PropTypes.string,
+    disabled: PropTypes.bool.isRequired,
+    error: PropTypes.bool.isRequired,
+    value: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
 };
