@@ -16,7 +16,8 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 // Material UI Components
 import IconButton from 'material-ui/IconButton';
 import ClearIcon from 'material-ui-icons/Clear';
@@ -36,7 +37,7 @@ import '../../../../../../index.css';
  */
 const styles = {
     deployButton: {
-        color: '#EF6C00'
+        color: '#EF6C00',
     },
     container: {
         flexGrow: 1,
@@ -67,7 +68,7 @@ const styles = {
  * Represents a Filter Rule, which is specified in a Business Rule from scratch, that has exactly 4 elements :
  * FilterRuleNumber, Attribute, Operator and AttributeOrvalue
  */
-class FilterRule extends React.Component {
+export default class FilterRule extends Component {
     constructor() {
         super();
         this.state = {
@@ -118,8 +119,8 @@ class FilterRule extends React.Component {
             >
                 <Select
                     value={this.props.filterRule[1]}
-                    onChange={(e) => this.updateFilterRuleOperator(e.target.value)}
-                    input={<Input id={"operator"}/>}
+                    onChange={e => this.updateFilterRuleOperator(e.target.value)}
+                    input={<Input id={'operator'} />}
                 >
                     {BusinessRulesConstants.BUSINESS_RULE_FILTER_RULE_OPERATORS.map(operator =>
                         (<MenuItem key={operator} name={operator} value={operator}>{operator}</MenuItem>))}
@@ -185,4 +186,17 @@ class FilterRule extends React.Component {
     }
 }
 
-export default FilterRule;
+FilterRule.propTypes = {
+    filterRule: PropTypes.arrayOf(PropTypes.string).isRequired,
+    onUpdate: PropTypes.func.isRequired,
+    getFieldNames: PropTypes.func.isRequired,
+    exposedStreamDefinition: PropTypes.string.isRequired,
+    mode: PropTypes.oneOf([
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE,
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT,
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW,
+    ]).isRequired,
+    onRemove: PropTypes.func.isRequired,
+    exposedInputStreamFields: PropTypes.object.isRequired,
+    filterRuleIndex: PropTypes.number.isRequired,
+};
