@@ -77,28 +77,49 @@ export default class FilterRule extends Component {
         };
     }
 
+    /**
+     * Updates the Attribute of the filter rule
+     * @param {String} value        Attribute of the filter rule
+     */
     updateFilterRuleAttribute(value) {
         const filterRule = this.props.filterRule;
         filterRule[0] = value.newValue;
         this.updateFilterRule(filterRule);
     }
 
+    /**
+     * Updates the Operator of the filter rule
+     * @param {String} value        Operator of the filter rule
+     */
     updateFilterRuleOperator(value) {
         const filterRule = this.props.filterRule;
         filterRule[1] = value;
         this.updateFilterRule(filterRule);
     }
 
+
+    /**
+     * Updates the AttributeOrValue of the filter rule
+     * @param {String} value        AttributeOrValue of the filter rule
+     */
     updateFilterRuleAttributeOrValue(value) {
         const filterRule = this.props.filterRule;
         filterRule[2] = value.newValue;
         this.updateFilterRule(filterRule);
     }
 
+    /**
+     * Updates the filter rule
+     * @param {Array} value        The array which contains Attribute, Operator and AttributeOrValue of the filter rule
+     */
     updateFilterRule(value) {
         this.props.onUpdate(value);
     }
 
+    /**
+     * Returns the input field for Attribute of the filter rule
+     * @returns {Component}         Auto complete input
+     */
     displayFilterRuleAttribute() {
         return (
             <AutoCompleteProperty
@@ -112,6 +133,10 @@ export default class FilterRule extends Component {
         );
     }
 
+    /**
+     * Returns the input field for Operator of the filter rule
+     * @returns {Component}         Drop down input
+     */
     displayFilterRuleOperator() {
         return (
             <FormControl
@@ -128,6 +153,10 @@ export default class FilterRule extends Component {
             </FormControl>);
     }
 
+    /**
+     * Returns the input field for AttributeOrValue of the filter rule
+     * @returns {Component}         Auto complete input
+     */
     displayFilterRuleAttributeOrValue() {
         return (
             <AutoCompleteProperty
@@ -141,6 +170,10 @@ export default class FilterRule extends Component {
         );
     }
 
+    /**
+     * Returns the Delete button
+     * @returns {Component}         Delete button
+     */
     displayDeleteButton() {
         if (this.props.mode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW) {
             return (
