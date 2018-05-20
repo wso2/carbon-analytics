@@ -16,7 +16,8 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 // Material UI Components
 import TextField from 'material-ui/TextField';
 import Typography from 'material-ui/Typography';
@@ -51,9 +52,9 @@ const styles = {
  * Represents the filter component of business rules from scratch form, which contains filter rules, rule logic and
  * a button for adding filter rule
  */
-class FilterComponent extends React.Component {
+export default class FilterComponent extends Component {
     addFilterRule() {
-        let filterRules = this.props.ruleComponents.filterRules;
+        const filterRules = this.props.ruleComponents.filterRules;
         filterRules.push(['', '', '']);
         const ruleLogic = this.autoGenerateRuleLogic(filterRules, this.props.ruleComponents.ruleLogic);
         this.updateRuleComponents(filterRules, ruleLogic);
@@ -99,7 +100,7 @@ class FilterComponent extends React.Component {
     }
 
     deleteFilterRule(index) {
-        let filterRules = this.props.ruleComponents.filterRules;
+        const filterRules = this.props.ruleComponents.filterRules;
         filterRules.splice(index, 1);
         this.updateRuleComponents(filterRules, this.props.ruleComponents.ruleLogic);
     }
@@ -160,6 +161,9 @@ class FilterComponent extends React.Component {
                                 exposedStreamDefinition={
                                     this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition}
                                 getFieldNames={streamDefinition => this.props.getFieldNames(streamDefinition)}
+                                elements={
+                                    this.props.getFieldNames(
+                                        this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition)}
                                 exposedInputStreamFields={exposedInputStreamFields}
                                 onUpdate={value => this.updateFilterRule(index, value)}
                                 onRemove={() => this.deleteFilterRule(index)}
@@ -243,4 +247,20 @@ class FilterComponent extends React.Component {
     }
 }
 
-export default FilterComponent;
+FilterComponent.propTypes = {
+    ruleComponents: PropTypes.object.isRequired,
+    onUpdate: PropTypes.func.isRequired,
+    getFieldNamesAndTypes: PropTypes.func.isRequired,
+    selectedInputRuleTemplate: PropTypes.object.isRequired,
+    formMode: PropTypes.oneOf([
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE,
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT,
+        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW,
+    ]).isRequired,
+    getFieldNames: PropTypes.func.isRequired,
+    style: PropTypes.object.isRequired,
+    errorStates: PropTypes.object.isRequired,
+    toggleExpansion: PropTypes.func.isRequired,
+    isErroneous: PropTypes.bool.isRequired,
+    isExpanded: PropTypes.bool.isRequired,
+};

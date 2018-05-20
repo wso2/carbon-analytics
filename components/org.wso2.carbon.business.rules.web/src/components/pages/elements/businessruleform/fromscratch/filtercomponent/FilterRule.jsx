@@ -102,7 +102,7 @@ export default class FilterRule extends Component {
     displayFilterRuleAttribute() {
         return (
             <AutoCompleteProperty
-                elements={this.props.getFieldNames(this.props.exposedStreamDefinition)} // TODO beautify this
+                elements={this.props.elements}
                 onChange={v => this.updateFilterRuleAttribute(v)}
                 value={this.props.filterRule[0]}
                 disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
@@ -131,7 +131,7 @@ export default class FilterRule extends Component {
     displayFilterRuleAttributeOrValue() {
         return (
             <AutoCompleteProperty
-                elements={this.props.getFieldNames(this.props.exposedStreamDefinition)} // TODO beautify this
+                elements={this.props.elements}
                 onChange={v => this.updateFilterRuleAttributeOrValue(v)}
                 value={this.props.filterRule[2]}
                 disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
@@ -187,6 +187,7 @@ export default class FilterRule extends Component {
 }
 
 FilterRule.propTypes = {
+    elements: PropTypes.arrayOf(PropTypes.string).isRequired,
     filterRule: PropTypes.arrayOf(PropTypes.string).isRequired,
     onUpdate: PropTypes.func.isRequired,
     getFieldNames: PropTypes.func.isRequired,

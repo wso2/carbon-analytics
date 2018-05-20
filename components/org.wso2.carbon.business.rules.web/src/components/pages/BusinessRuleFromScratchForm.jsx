@@ -861,7 +861,6 @@ export default class BusinessRuleFromScratchForm extends Component {
                                         getFieldNamesAndTypes={streamDefinition =>
                                             this.getFieldNamesAndTypes(streamDefinition)}
                                         getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
-                                        // TODO look into the above one
                                         ruleComponents={this.state.businessRuleProperties.ruleComponents}
                                         style={styles}
                                     />
