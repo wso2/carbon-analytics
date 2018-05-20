@@ -245,6 +245,7 @@ for t in "$CARBON_HOME"/repository/components/lib/*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
 done
+CARBON_CLASSPATH="$CARBON_CLASSPATH":$(find "$CARBON_HOME"/repository/components/plugins -name 'lucene_[0-9]*.*[0-9]*.*[0-9]*.*wso2v[0-9].jar')
 for t in "$CARBON_HOME"/repository/components/plugins/*.jar
 do
     CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
