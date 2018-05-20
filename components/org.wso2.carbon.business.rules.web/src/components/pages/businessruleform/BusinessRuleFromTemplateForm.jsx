@@ -32,20 +32,20 @@ import { MenuItem } from 'material-ui/Menu';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
 // App Components
-import Property from './elements/businessruleform/Property';
-import Header from '../common/Header';
-import ProgressDisplay from '../common/ProgressDisplay';
-import ErrorDisplay from './elements/error/ErrorDisplay';
+import Property from './elements/Property';
+import Header from '../../common/Header';
+import ProgressDisplay from '../../common/ProgressDisplay';
+import ErrorDisplay from '../../common/error/ErrorDisplay';
 // App Utilities
-import BusinessRulesUtilityFunctions from '../../utils/BusinessRulesUtilityFunctions';
-import FormSubmissionError from "../../utils/FormSubmissionError";
+import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
+import FormSubmissionError from "../../../utils/FormSubmissionError";
 // App Constants
-import BusinessRulesConstants from '../../constants/BusinessRulesConstants';
-import BusinessRulesMessages from '../../constants/BusinessRulesMessages';
+import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
+import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
 // App APIs
-import BusinessRulesAPI from '../../api/BusinessRulesAPI';
+import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // CSS
-import '../../index.css';
+import '../../../index.css';
 
 /**
  * Styles related to this component

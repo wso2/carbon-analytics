@@ -23,18 +23,18 @@ import { Link } from 'react-router-dom';
 import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 // App Components
-import TemplateGroupThumbnail from './elements/templategroupselector/TemplateGroupThumbnail';
-import ProgressDisplay from '../common/ProgressDisplay';
-import ErrorDisplay from './elements/error/ErrorDisplay';
-import Header from '../common/Header';
+import TemplateGroupThumbnail from './TemplateGroupThumbnail';
+import ProgressDisplay from '../../common/ProgressDisplay';
+import ErrorDisplay from '../../common/error/ErrorDisplay';
+import Header from '../../common/Header';
 // App APIs
-import BusinessRulesAPI from '../../api/BusinessRulesAPI';
+import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // App Constants
-import BusinessRulesConstants from '../../constants/BusinessRulesConstants';
+import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 // App Utilities
-import BusinessRulesUtilityFunctions from '../../utils/BusinessRulesUtilityFunctions';
+import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
 // CSS
-import '../../index.css';
+import '../../../index.css';
 
 /**
  * Styles related to this component

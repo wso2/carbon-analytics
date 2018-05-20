@@ -21,12 +21,12 @@ import React, { Component } from 'react';
 import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 // App Constants
-import BusinessRulesConstants from '../../constants/BusinessRulesConstants';
+import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 // App Components
-import Header from '../common/Header';
-import CreateButton from './elements/modeselector/ModeButton';
+import Header from '../../common/Header';
+import CreateButton from './ModeButton';
 // CSS
-import '../../index.css';
+import '../../../index.css';
 
 /**
  * Styles related to this component

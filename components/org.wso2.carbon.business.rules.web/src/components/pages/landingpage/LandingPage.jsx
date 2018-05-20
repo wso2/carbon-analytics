@@ -28,18 +28,18 @@ import Paper from 'material-ui/Paper';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
 // App Components
-import BusinessRule from './elements/landingpage/BusinessRule';
-import DeploymentInfo from './elements/landingpage/DeploymentInfo';
-import Header from '../common/Header';
-import ProgressDisplay from '../common/ProgressDisplay';
-import ErrorDisplay from './elements/error/ErrorDisplay';
+import BusinessRule from './elements/BusinessRule';
+import DeploymentInfo from './elements/DeploymentInfo';
+import Header from '../../common/Header';
+import ProgressDisplay from '../../common/ProgressDisplay';
+import ErrorDisplay from '../../common/error/ErrorDisplay';
 // App Constants
-import BusinessRulesMessages from '../../constants/BusinessRulesMessages';
-import BusinessRulesConstants from '../../constants/BusinessRulesConstants';
+import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
+import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 // App APIs
-import BusinessRulesAPI from '../../api/BusinessRulesAPI';
+import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // CSS
-import '../../index.css';
+import '../../../index.css';
 import BusinessRulesUtilityFunctions from '../../utils/BusinessRulesUtilityFunctions';
 
 /**

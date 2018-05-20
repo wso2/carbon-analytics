@@ -26,9 +26,9 @@ import List from 'material-ui-icons/List';
 import Create from 'material-ui-icons/Create';
 import Paper from 'material-ui/Paper';
 // App Constants
-import BusinessRulesConstants from '../../../../constants/BusinessRulesConstants';
+import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 // CSS
-import '../../../../index.css';
+import '../../../index.css';
 
 /**
  * Styles related to this component

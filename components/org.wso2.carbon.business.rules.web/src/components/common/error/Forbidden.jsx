@@ -21,7 +21,7 @@ import React from 'react';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 // CSS
-import '../../../../index.css';
+import '../../../index.css';
 
 /**
  * Styles related to this component

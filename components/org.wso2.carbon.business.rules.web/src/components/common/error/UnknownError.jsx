@@ -21,7 +21,7 @@ import React from 'react';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 // CSS
-import '../../../../index.css';
+import '../../../index.css';
 
 /**
  * Styles related to this component
@@ -35,21 +35,21 @@ const styles = {
 };
 
 /**
- * Represents an Internal Server Error message display
+ * Represents an Unknown Error message display
  */
-class InternalServerError extends React.Component {
+class UnknownError extends React.Component {
     render() {
         return (
             <Paper style={styles.paper}>
                 <Typography type="title">
-                    Internal Server Error
+                    Unknown Error
                 </Typography>
                 <Typography type="subheading">
-                    The server has failed to process your request
+                    Something went wrong while processing your request
                 </Typography>
             </Paper>
         );
     }
 }
 
-export default InternalServerError;
+export default UnknownError;

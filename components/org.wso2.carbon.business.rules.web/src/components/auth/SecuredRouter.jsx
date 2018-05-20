@@ -22,11 +22,11 @@ import Qs from 'qs';
 import { Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
 // App Components
-import BusinessRulesManager from '../pages/LandingPage';
-import TemplateGroupSelector from '../pages/TemplateGroupSelector';
-import BusinessRuleFromTemplateForm from '../pages/BusinessRuleFromTemplateForm';
-import BusinessRuleFromScratchForm from '../pages/BusinessRuleFromScratchForm';
-import BusinessRuleCreator from '../pages/ModeSelector';
+import BusinessRulesManager from '../pages/landingpage/LandingPage';
+import TemplateGroupSelector from '../pages/templategroupselector/TemplateGroupSelector';
+import BusinessRuleFromTemplateForm from '../pages/businessruleform/BusinessRuleFromTemplateForm';
+import BusinessRuleFromScratchForm from '../pages/businessruleform/BusinessRuleFromScratchForm';
+import BusinessRuleCreator from '../pages/modeselector/ModeSelector';
 // Auth Utilities
 import AuthManager from '../../utils/AuthManager';
 // Custom Theme

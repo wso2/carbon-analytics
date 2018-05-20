@@ -23,7 +23,7 @@ import Typography from 'material-ui/Typography';
 import Card, { CardContent } from 'material-ui/Card';
 import Avatar from 'material-ui/Avatar';
 // CSS
-import '../../../../index.css';
+import '../../../index.css';
 
 /**
  * Styles related to this component
