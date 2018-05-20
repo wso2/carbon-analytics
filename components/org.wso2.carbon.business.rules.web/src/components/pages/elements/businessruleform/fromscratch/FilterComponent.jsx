@@ -53,20 +53,37 @@ const styles = {
  * a button for adding filter rule
  */
 export default class FilterComponent extends Component {
-    addFilterRule() {
-        const filterRules = this.props.ruleComponents.filterRules;
-        filterRules.push(['', '', '']);
-        const ruleLogic = this.autoGenerateRuleLogic(filterRules, this.props.ruleComponents.ruleLogic);
-        this.updateRuleComponents(filterRules, ruleLogic);
+    /**
+     * Gets numbers of filter rules, that are mentioned in the given rule logic
+     * @param {String} ruleLogic        Rule Logic
+     * @returns {Array}                 Filter rule numbers contained by the rule logic
+     */
+    getMentionedFilterRuleNumbers(ruleLogic) {
+        const existingFilterRuleNumbers = [];
+        const regExp = /(\d+)/gm;
+        let matches;
+        while ((matches = regExp.exec(ruleLogic)) !== null) {
+            if (matches.index === regExp.lastIndex) {
+                regExp.lastIndex++;
+            }
+            existingFilterRuleNumbers.push(matches[1]);
+        }
+        return existingFilterRuleNumbers;
     }
 
+    /**
+     * Returns auto generated rule logic, with the given list of filter rules, and the existing rule logic
+     * @param {Array} filterRules       Available filter rules
+     * @param {String} ruleLogic        Existing rule logic
+     * @returns {String}                Auto generated rule logic
+     */
     autoGenerateRuleLogic(filterRules, ruleLogic) {
         if (filterRules.length === 0) {
             return '';
         }
         if (ruleLogic !== '') {
             // To avoid cases like '1 AND 2 AND 2', where 2 was deleted and inserted again
-            if (!this.getExistingFilterRuleNumbers(ruleLogic).includes(filterRules.length.toString())) {
+            if (!this.getMentionedFilterRuleNumbers(ruleLogic).includes(filterRules.length.toString())) {
                 return ruleLogic + ' AND ' + filterRules.length;
             }
             return ruleLogic;
@@ -80,35 +97,51 @@ export default class FilterComponent extends Component {
         return numbers.join(' AND ');
     }
 
-    getExistingFilterRuleNumbers(ruleLogic) {
-        const existingFilterRuleNumbers = [];
-        const regExp = /(\d+)/gm;
-        let matches;
-        while ((matches = regExp.exec(ruleLogic)) !== null) {
-            if (matches.index === regExp.lastIndex) {
-                regExp.lastIndex++;
-            }
-            existingFilterRuleNumbers.push(matches[1]);
-        }
-        return existingFilterRuleNumbers;
+    /**
+     * Adds a new filter rule
+     */
+    addFilterRule() {
+        const filterRules = this.props.ruleComponents.filterRules;
+        filterRules.push(['', '', '']);
+        const ruleLogic = this.autoGenerateRuleLogic(filterRules, this.props.ruleComponents.ruleLogic);
+        this.updateRuleComponents(filterRules, ruleLogic);
     }
 
+    /**
+     * Updates the filter rule that has the given index, with the given filterRule object
+     * @param {number} index        Index of the filter rule to be updated
+     * @param {Array} filterRule    An array, whose members are Attribute, Operator and AttributeOrValue
+     *                              of a filter rule
+     */
     updateFilterRule(index, filterRule) {
         const filterRules = this.props.ruleComponents.filterRules;
         filterRules[index] = filterRule;
         this.updateRuleComponents(filterRules, this.props.ruleComponents.ruleLogic);
     }
 
+    /**
+     * Deletes the filter rule that has the given index
+     * @param {number} index        Index of the filter rule to be deleted
+     */
     deleteFilterRule(index) {
         const filterRules = this.props.ruleComponents.filterRules;
         filterRules.splice(index, 1);
         this.updateRuleComponents(filterRules, this.props.ruleComponents.ruleLogic);
     }
 
+    /**
+     * Updates the rule logic with the given value
+     * @param {String} ruleLogic    Value of rule logic
+     */
     updateRuleLogic(ruleLogic) {
         this.updateRuleComponents(this.props.ruleComponents.filterRules, ruleLogic);
     }
 
+    /**
+     * Updates the 'ruleComponents' object
+     * @param {Array} filterRules       Array of filter rules, to be contained by 'ruleComponents'
+     * @param {String} ruleLogic        Rule logic, to be contained by 'ruleComponents'
+     */
     updateRuleComponents(filterRules, ruleLogic) { // Updates Filter component
         const ruleComponents = this.props.ruleComponents;
         ruleComponents.filterRules = filterRules;
@@ -116,6 +149,10 @@ export default class FilterComponent extends Component {
         this.props.onUpdate(ruleComponents);
     }
 
+    /**
+     * Returns the table which contains filter rules
+     * @returns {Element}       Div, containing the table that has filter rules TODO rfctr Elements to HTMLElement/XMLEl
+     */
     displayFilterRulesTable() {
         if (this.props.ruleComponents.filterRules.length > 0) {
             let exposedInputStreamFields = null; // To display selectable field options to each filter rule
@@ -174,6 +211,10 @@ export default class FilterComponent extends Component {
         return null;
     }
 
+    /**
+     * Returns the Add Filter button
+     * @returns {Component}     Add Filter button
+     */
     displayAddFilterButton() {
         if (this.props.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW) {
             return (
@@ -189,6 +230,10 @@ export default class FilterComponent extends Component {
         return null;
     }
 
+    /**
+     * Returns the input field, which contains rule logic
+     * @returns {Component}     TextField that contains the rule logic
+     */
     displayRuleLogic() {
         if (this.props.ruleComponents.filterRules.length > 0) {
             return (
@@ -207,6 +252,10 @@ export default class FilterComponent extends Component {
         return null;
     }
 
+    /**
+     * Returns the expand button
+     * @returns {Component}     Expand button
+     */
     displayExpandButton() {
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
             return (
