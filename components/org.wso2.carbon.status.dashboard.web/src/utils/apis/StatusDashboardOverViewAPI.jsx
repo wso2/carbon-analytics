@@ -133,5 +133,17 @@ export default class StatusDashboardOverViewAPI {
             .get('/manager' + '/' + managerId + '/clusteredResourceNodeDetails');
     }
 
+    static getSingleNodeDeploymentSiddhiAppSummary(){
+        return StatusDashboardOverViewAPI.getHTTPClient().get('/siddhi-apps/single-deployment-apps');
+    }
+
+    static getHASiddhiAppSummary(){
+        return StatusDashboardOverViewAPI.getHTTPClient().get('/siddhi-apps/ha-apps');
+    }
+
+    static getManagerSiddhiAppSummary(){
+        return StatusDashboardOverViewAPI.getHTTPClient().get('/manager/siddhi-apps');
+    }
+
 
 }
