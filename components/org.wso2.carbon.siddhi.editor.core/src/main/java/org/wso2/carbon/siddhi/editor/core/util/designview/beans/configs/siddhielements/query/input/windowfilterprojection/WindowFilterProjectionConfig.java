@@ -20,7 +20,6 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryWindowConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 
 /**
  * Represents a Window | Filter | Projection QueryInputConfig, for Siddhi Query

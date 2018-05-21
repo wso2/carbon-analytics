@@ -18,10 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
@@ -39,59 +36,42 @@ import java.util.List;
  * Contains elements of a Siddhi app
  */
 public class SiddhiAppConfig {
-    private int finalElementCount;
+    private int finalElementCount = 0;
 
-    private String appName;
-    private String appDescription;
+    private String appName = "";
+    private String appDescription = "";
 
-    // private List<TriggerConfig> triggerList;
-    // private List<TriggerConfig> streamList;
+    private List<QueryConfig> windowFilterProjectionQueryList = new ArrayList<>();
+    private List<QueryConfig> joinQueryList = new ArrayList<>();
+    private List<QueryConfig> patternQueryList = new ArrayList<>();
+    private List<QueryConfig> sequenceQueryList = new ArrayList<>();
 
-//    private List<> aggregations;
-//    private List<> functions;
-//    private List<> partitions;
-    private List<QueryConfig> queryList; // TODO this will be removed
-
-    private List<QueryConfig> windowFilterProjectionQueryList;
-    private List<QueryConfig> joinQueryList;
-    private List<QueryConfig> patternQueryList;
-    private List<QueryConfig> sequenceQueryList;
-
-    private List<SinkConfig> sinkList;
-    private List<SourceConfig> sourceList;
-    private List<StreamConfig> streamList;
-    private List<TableConfig> tableList;
-    private List<TriggerConfig> triggerList;
-    private List<WindowConfig> windowList;
-    private List<AggregationConfig> aggregationList;
+    private List<SinkConfig> sinkList = new ArrayList<>();
+    private List<SourceConfig> sourceList = new ArrayList<>();
+    private List<StreamConfig> streamList = new ArrayList<>();
+    private List<TableConfig> tableList = new ArrayList<>();
+    private List<TriggerConfig> triggerList = new ArrayList<>();
+    private List<WindowConfig> windowList = new ArrayList<>();
+    private List<AggregationConfig> aggregationList = new ArrayList<>();
     // TODO: 3/27/18 Other {Element}Lists
 
-    // TODO: 3/28/18 For restricting unnecessary instantiation
+    /**
+     * Returns Id for the next element id, after incrementing the final element count
+     * @return      Id for the element
+     */
+    private String generateNextElementId() {
+        return String.valueOf(++finalElementCount);
+    }
 
-
-    public SiddhiAppConfig() {
-        finalElementCount = 0;
-        appName = "";
-        appDescription = "";
-//        aggregations = new ArrayList<>();
-//        functions = new ArrayList<>();
-//        partitions = new ArrayList<>();
-        queryList = new ArrayList<>(); // todo This won't be there
-
-        windowFilterProjectionQueryList = new ArrayList<>();
-        joinQueryList = new ArrayList<>();
-        patternQueryList = new ArrayList<>();
-        sequenceQueryList = new ArrayList<>();
-
-
-
-        sinkList = new ArrayList<>();
-        sourceList = new ArrayList<>();
-        streamList = new ArrayList<>();
-        tableList = new ArrayList<>();
-        triggerList = new ArrayList<>();
-        windowList = new ArrayList<>();
-        aggregationList = new ArrayList<>();
+    /**
+     * Adds a given generic type Siddhi ElementConfig, to the given list of the same generic type
+     * @param elementList       List reference to which, the given element config should be added
+     * @param elementConfig     Siddhi ElementConfig object
+     * @param <T>               Type of the Siddhi ElementConfig object and the list
+     */
+    private <T> void addElement(List<T> elementList, T elementConfig) {
+        ((SiddhiElementConfig) elementConfig).setId(generateNextElementId());
+        elementList.add(elementConfig);
     }
 
     public void setAppName(String appName) {
@@ -103,59 +83,47 @@ public class SiddhiAppConfig {
     }
 
     public void add(SinkConfig sinkConfig) {
-        sinkList.add(sinkConfig);
-        finalElementCount++;
+        addElement(sinkList, sinkConfig);
     }
 
     public void add(SourceConfig sourceConfig) {
-        sourceList.add(sourceConfig);
-        finalElementCount++;
+        addElement(sourceList, sourceConfig);
     }
 
     public void add(StreamConfig streamConfig) {
-        streamList.add(streamConfig);
-        finalElementCount++;
+        addElement(streamList, streamConfig);
     }
 
     public void add(TableConfig tableConfig) {
-        tableList.add(tableConfig);
-        finalElementCount++;
+        addElement(tableList, tableConfig);
     }
 
     public void add(TriggerConfig triggerConfig) {
-        triggerList.add(triggerConfig);
-        finalElementCount++;
+        addElement(triggerList, triggerConfig);
     }
 
     public void add(WindowConfig windowConfig) {
-        windowList.add(windowConfig);
-        finalElementCount++;
+        addElement(windowList, windowConfig);
     }
 
     public void add(AggregationConfig aggregationConfig) {
-        aggregationList.add(aggregationConfig);
-        finalElementCount++;
+        addElement(aggregationList, aggregationConfig);
     }
 
     public void add(QueryConfig queryConfig) {
         // Categorize QueryConfig from its Input, and add QueryConfig to the relevant list
         QueryInputConfig queryInputConfig = queryConfig.getQueryInput();
         if (queryInputConfig instanceof WindowFilterProjectionConfig) {
-            windowFilterProjectionQueryList.add(queryConfig);
+            addElement(windowFilterProjectionQueryList, queryConfig);
         } else if (queryInputConfig instanceof JoinConfig) {
-            joinQueryList.add(queryConfig);
+            addElement(joinQueryList, queryConfig);
         } else if (queryInputConfig instanceof PatternQueryConfig) {
-            patternQueryList.add(queryConfig);
+            addElement(patternQueryList, queryConfig);
         } else if (queryInputConfig instanceof SequenceQueryConfig) {
-            sequenceQueryList.add(queryConfig);
+            addElement(sequenceQueryList, queryConfig);
         } else {
             throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
         }
-        finalElementCount++;
-    }
-
-    public int getFinalElementCount() {
-        return finalElementCount;
     }
 
     public String getAppName() {
@@ -192,10 +160,6 @@ public class SiddhiAppConfig {
 
     public List<AggregationConfig> getAggregationList() {
         return aggregationList;
-    }
-
-    public List<QueryConfig> getQueryList() {
-        return queryList;
     }
 
     public List<QueryConfig> getWindowFilterProjectionQueryList() {

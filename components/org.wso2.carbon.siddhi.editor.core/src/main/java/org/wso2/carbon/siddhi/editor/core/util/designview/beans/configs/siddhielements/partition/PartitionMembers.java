@@ -20,7 +20,9 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 import java.util.List;
 
-// TODO: 4/4/18 class comment
+/**
+ * Represents Members of Siddhi Partition
+ */
 public class PartitionMembers {
     private List<String> queryIds;
     private List<String> innerStreamIds;

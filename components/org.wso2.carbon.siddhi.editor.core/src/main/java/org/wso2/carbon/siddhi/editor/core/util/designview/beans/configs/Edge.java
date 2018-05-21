@@ -19,23 +19,22 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
-import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGeneratorHelper;
 
 /**
  * Represents a connection between two Siddhi app design view elements
  */
 public class Edge {
     private String id;
-    private String parentID;
+    private String parentId;
     private NodeType parentType;
-    private String childID;
+    private String childId;
     private NodeType childType;
 
-    public Edge(String id, String parentID, NodeType parentType, String childID, NodeType childType) {
+    public Edge(String id, String parentId, NodeType parentType, String childId, NodeType childType) {
         this.id = id;
-        this.parentID = parentID;
+        this.parentId = parentId;
         this.parentType = parentType;
-        this.childID = childID;
+        this.childId = childId;
         this.childType = childType;
     }
 
@@ -43,16 +42,16 @@ public class Edge {
         return id;
     }
 
-    public String getParentID() {
-        return parentID;
+    public String getParentId() {
+        return parentId;
     }
 
     public NodeType getParentType() {
         return parentType;
     }
 
-    public String getChildID() {
-        return childID;
+    public String getChildId() {
+        return childId;
     }
 
     public NodeType getChildType() {

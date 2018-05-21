@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Creates a SinkMapPayloadConfig object
+ * Factory to create SinkMapPayloadConfig
  */
 public class SinkMapPayloadConfigFactory {
     public SinkMapPayload getMapAttributeConfig(List<String> values) {

@@ -23,7 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import java.util.List;
 
 /**
- * todo class comment
+ * Represents Siddhi Update Or Insert Into Query's output
  */
 public class UpdateInsertIntoOutputConfig extends OutputConfig {
     private List<SetAttributeConfig> set;

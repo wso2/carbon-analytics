@@ -24,11 +24,18 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 public abstract class SiddhiElementConfig {
     private String id;
 
+    public SiddhiElementConfig() {
+    }
+
     public SiddhiElementConfig(String id) {
         this.id = id;
     }
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

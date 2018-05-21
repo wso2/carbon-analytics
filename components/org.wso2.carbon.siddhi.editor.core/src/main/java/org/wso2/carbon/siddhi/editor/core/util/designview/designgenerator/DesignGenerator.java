@@ -26,30 +26,17 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationValue;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.ListAnnotationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.SinkConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceMap;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributeConfigListGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.attributesselection.AttributesSelectionConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributesSelectionConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.StreamDefinitionConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.annotation.StreamTableAnnotationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.regexpatterns.CodeToDesignRegexPatterns;
-import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGeneratorHelperException;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.factories.AnnotationConfigFactory;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGeneratorHelper;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
-import org.wso2.siddhi.core.stream.input.source.Source;
-import org.wso2.siddhi.core.stream.output.sink.Sink;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.aggregation.TimePeriod.Duration;
 import org.wso2.siddhi.query.api.annotation.Annotation;
@@ -64,10 +51,9 @@ import org.wso2.siddhi.query.api.expression.Variable;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
- * Generates Siddhi app elements for the design view
+ * Generator to create Config objects from Siddhi Code
  */
 public class DesignGenerator {
     private String siddhiAppString;
@@ -92,25 +78,25 @@ public class DesignGenerator {
         }
         siddhiAppConfig = new SiddhiAppConfig();
         edges = new ArrayList<>();
+
+        loadElements();
+        loadEdges();
+
+        return new EventFlow(siddhiAppConfig, edges);
+    }
+
+    /**
+     * Loads generated SiddhiElementConfigs into SiddhiAppConfig object
+     */
+    private void loadElements() {
         loadAppNameAndDescription();
         loadTriggers();
         loadStreams();
-
-        // loadSources();
-
+        // TODO loadSources() loadSinks() loadFunctions()
         loadTables();
         loadWindows();
         loadAggregations();
-        loadFunctions();
         loadExecutionElements();
-
-        generateEdges();
-
-
-
-        // TODO: 3/27/18 implement
-//        return null;
-        return new EventFlow(siddhiAppConfig, edges);
     }
 
     /**
@@ -168,7 +154,9 @@ public class DesignGenerator {
     private void loadStreams() {
         for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
             if (!isTriggerDefined(streamDefinition.getId(), siddhiApp)) {
-                siddhiAppConfig.add(generateStreamConfig(streamDefinition, false));
+                siddhiAppConfig.add(
+                        new StreamDefinitionConfigGenerator()
+                                .generateStreamConfig(streamDefinition, false));
             }
         }
         // Inner Streams
@@ -176,7 +164,9 @@ public class DesignGenerator {
                 siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
             for (AbstractDefinition abstractDefinition : abstractDefinitionMap.values()) {
                 if (abstractDefinition instanceof StreamDefinition) {
-                    siddhiAppConfig.add(generateStreamConfig((StreamDefinition) abstractDefinition, true));
+                    siddhiAppConfig.add(
+                            new StreamDefinitionConfigGenerator()
+                                    .generateStreamConfig((StreamDefinition) abstractDefinition, false));
                 } else {
                     throw new IllegalArgumentException("The partitioned inner stream definition map does not have an " +
                             "instance of class 'StreamDefinition'");
@@ -189,25 +179,29 @@ public class DesignGenerator {
      * Loads Sources from the SiddhiAppRuntime
      */
     private void loadSources() {
-        for (List<Source> source : siddhiAppRuntime.getSources()) {
-            generateSourceOptions(source.get(0).getStreamDefinition().toString());
-            // source.get(0); // this is a source config
-            siddhiAppConfig.add(new SourceConfig(
-                    null,
-                    null,
-                    null,
-                    null)); // TODO: 3/28/18 new SourceConfig()
-        }
+//        for (List<Source> source : siddhiAppRuntime.getSources()) {
+//            generateSourceOptions(source.get(0).getStreamDefinition().toString());
+//            // source.get(0); // this is a source config
+//            siddhiAppConfig.add(new SourceConfig(
+//                    null,
+//                    null,
+//                    null,
+//                    null));
+//        }
+        // TODO implement
+        throw new IllegalArgumentException("Unable to generate source configs");
     }
 
     /**
      * Loads Sinks from the SiddhiAppRuntime
      */
     private void loadSinks() {
-        for (List<Sink> sink : siddhiAppRuntime.getSinks()) {
-            // sink.get(0); // this is a sink config
-            siddhiAppConfig.add(new SinkConfig(null, null, null, null)); // TODO: 3/28/18 new SinkConfig()
-        }
+//        for (List<Sink> sink : siddhiAppRuntime.getSinks()) {
+//            // sink.get(0); // this is a sink config
+//            siddhiAppConfig.add(new SinkConfig(null, null, null, null));
+//        }
+        // TODO implement
+        throw new IllegalArgumentException("Unable to generate sink configs");
     }
 
     /**
@@ -217,12 +211,12 @@ public class DesignGenerator {
         for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
             List<AnnotationConfig> annotationConfigs = new ArrayList<>();
             for (Annotation annotation : tableDefinition.getAnnotations()) {
-                annotationConfigs.add(generateStreamOrTableAnnotationConfig(annotation));
+                annotationConfigs.add(new StreamTableAnnotationConfigGenerator().generateAnnotationConfig(annotation));
             }
             siddhiAppConfig.add(new TableConfig(
                     tableDefinition.getId(),
                     tableDefinition.getId(),
-                    generateAttributeConfigs(tableDefinition.getAttributeList()),
+                    new AttributeConfigListGenerator().generateAttributeConfigList(tableDefinition.getAttributeList()),
                     null, // TODO: 3/29/18 store
                     annotationConfigs));
         }
@@ -241,7 +235,8 @@ public class DesignGenerator {
             siddhiAppConfig.add(new WindowConfig(
                     windowDefinition.getId(),
                     windowDefinition.getId(),
-                    generateAttributeConfigs(windowDefinition.getAttributeList()),
+//                    generateAttributeConfigs(windowDefinition.getAttributeList()),
+                    new AttributeConfigListGenerator().generateAttributeConfigList(windowDefinition.getAttributeList()),
                     windowDefinition.getWindow().getName(),
                     parameters,
                     windowDefinition.getOutputEventType().name(),
@@ -273,7 +268,7 @@ public class DesignGenerator {
 
             List<AnnotationConfig> annotationList = new ArrayList<>();
             for (Annotation annotation : aggregationDefinition.getAnnotations()) {
-                annotationList.add(generateStreamOrTableAnnotationConfig(annotation));
+                annotationList.add(new StreamTableAnnotationConfigGenerator().generateAnnotationConfig(annotation));
             }
 
             // For creating 'aggregate by time' object
@@ -301,7 +296,8 @@ public class DesignGenerator {
     }
 
     private void loadFunctions() {
-        // TODO: 3/28/18 implement 
+        // TODO: 3/28/18 implement
+        throw new IllegalArgumentException("Unable to generate function configs");
     }
 
     /**
@@ -310,148 +306,27 @@ public class DesignGenerator {
     private void loadExecutionElements() {
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
-                addQueryConfig((Query) executionElement);
+                siddhiAppConfig.add(
+                        new QueryConfigGenerator()
+                                .generateQueryConfig((Query) executionElement, siddhiAppString, siddhiApp));
             } else if (executionElement instanceof Partition) {
-                addPartitionConfig((Partition) executionElement);
+                // TODO: 3/28/18 implement
+                throw new IllegalArgumentException("Unable to generate partition configs");
             } else {
-                throw new IllegalArgumentException("Unable create configuration for execution element");
+                throw new IllegalArgumentException("Unable create config for execution element of type unknown");
             }
         }
-
-        // TODO: 3/28/18 implement
     }
 
-    /* EXECUTIONAL ELEMENTS [START] */
 
-    /**
-     * Adds config for the given query, in SiddhiAppConfig
-     * @param query     Siddhi query
-     */
-    private void addQueryConfig(Query query) {
-        QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator();
-        QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig(query, siddhiAppString, siddhiApp);
-        siddhiAppConfig.add(queryConfig);
-    }
-
-    /**
-     * Adds config for the given partition, in SiddhiAppConfig
-     * @param partition     Siddhi partition
-     */
-    private void addPartitionConfig(Partition partition) {
-        // TODO: 3/28/18 implement
-    }
-    /* EXECUTIONAL ELEMENTS [END] */
-
-    /* HELPER METHODS [START] */
-
-    /**
-     * Generates StreamConfig object, with given Siddhi StreamDefinition
-     * @param streamDefinition  Siddhi StreamDefinition object
-     * @param isInnerStream     Whether the stream is an inner stream
-     * @return                  StreamConfig object
-     */
-    private StreamConfig generateStreamConfig(StreamDefinition streamDefinition, boolean isInnerStream) {
-        List<AttributeConfig> attributeConfigs = new ArrayList<>();
-        for (Attribute attribute : streamDefinition.getAttributeList()) {
-            attributeConfigs.add(new AttributeConfig(attribute.getName(), attribute.getType().name()));
-        }
-        List<AnnotationConfig> annotationConfigs = new ArrayList<>();
-        for (Annotation annotation : streamDefinition.getAnnotations()) {
-            annotationConfigs.add(generateStreamOrTableAnnotationConfig(annotation));
-        }
-        return new StreamConfig(streamDefinition.getId(),
-                streamDefinition.getId(),
-                isInnerStream,
-                attributeConfigs,
-                annotationConfigs);
-    }
-
-    /**
-     * Gets the AnnotationConfig of the given Annotation, that belongs to a stream
-     * @param annotation    Siddhi Annotation, that belongs to a stream
-     */ // TODO: 4/2/18 Find a good name for the method
-    private AnnotationConfig generateStreamOrTableAnnotationConfig(Annotation annotation) {
-        Map<String, AnnotationValue> annotationElements = new HashMap<>();
-        List<AnnotationValue> annotationValues = new ArrayList<>();
-        for (Element element : annotation.getElements()) {
-            if (null == element.getKey()) {
-                annotationValues.add(
-                        new AnnotationValue(element.getValue(), DesignGeneratorHelper.isStringValue(element)));
-            } else {
-                annotationElements.put(
-                        element.getKey(),
-                        new AnnotationValue(element.getValue(), DesignGeneratorHelper.isStringValue(element)));
-            }
-        }
-        if (annotationElements.isEmpty() && annotationValues.isEmpty()) {
-            // No elements inside the annotation. Consider as an empty ListAnnotationConfig
-            return new ListAnnotationConfig(annotation.getName(), new ArrayList<>(0));
-        }
-        AnnotationConfigFactory annotationConfigFactory = new AnnotationConfigFactory();
-        if (annotationElements.isEmpty()) {
-            return annotationConfigFactory.getAnnotationConfig(annotation.getName(), annotationValues);
-        }
-        return annotationConfigFactory.getAnnotationConfig(annotation.getName(), annotationElements);
-    }
-
-    /**
-     * Generates list of AttributeConfigs, with given List of Siddhi Attributes
-     * @param attributes    List of Siddhi Attribute objects
-     * @return              List of AttributeConfig objects
-     */
-    private List<AttributeConfig> generateAttributeConfigs(List<Attribute> attributes) {
-        List<AttributeConfig> attributeConfigs = new ArrayList<>();
-        for (Attribute attribute : attributes) {
-            attributeConfigs.add(new AttributeConfig(attribute.getName(), attribute.getType().name()));
-        }
-        return attributeConfigs;
-    }
-
-    // TODO: 4/6/18 comment
-    private Map<String, String> generateSourceOptions(String streamDefinition) {
-        Pattern sourceAnnotationContentPattern = Pattern.compile(CodeToDesignRegexPatterns.SOURCE_ANNOTATION_CONTENT);
-        String sourceAnnotationContent;
-        try {
-            sourceAnnotationContent =
-                    DesignGeneratorHelper.getRegexMatches(streamDefinition, sourceAnnotationContentPattern).get(0);
-        } catch (DesignGeneratorHelperException e) {
-            throw new IllegalArgumentException("No content found in the Source annotation", e);
-        }
-
-        // Extract content in 'map' annotation
-        Pattern mapAnnotationContentPattern =
-                Pattern.compile(CodeToDesignRegexPatterns.SOURCE_SINK_MAP_ANNOTATION_CONTENT);
-        String mapAnnotationContent;
-        try {
-            mapAnnotationContent =
-                    DesignGeneratorHelper.getRegexMatches(sourceAnnotationContent, mapAnnotationContentPattern).get(0);
-        } catch (DesignGeneratorHelperException e) {
-            throw new IllegalArgumentException(
-                    "No content found in the Map annotation in:" + sourceAnnotationContent, e);
-        }
-        SourceMap sourceMap = generateSourceMap(mapAnnotationContent);
-
-        // TODO: 4/6/18 implement
-        return null;
-    }
-
-    // TODO: 4/6/18 comment
-    private SourceMap generateSourceMap(String mapAnnotationContent) {
-        // TODO: 4/6/18 implement
-        return null;
-    }
 
     /* HELPER METHODS [END] */
 
-    /* EDGES METHODS [START] */
-
     /**
-     * Generates Edges, that represent connections within the elements of the Siddhi app
+     * Loads generated Edges that represent connections between SiddhiElementConfigs, into SiddhiAppConfig object
      */
-    private void generateEdges() {
+    private void loadEdges() {
         EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
         edges = edgesGenerator.generateEdges();
     }
-
-    /* EDGES METHODS [END] */
 }

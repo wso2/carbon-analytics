@@ -23,7 +23,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-// TODO: 4/4/18 class comment
+/**
+ * Represents Siddhi Partition
+ */
 public class PartitionConfig extends SiddhiElementConfig {
     private PartitionMembers members;
     private PartitionWith partitionWith;

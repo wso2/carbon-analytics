@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types;
 
-// TODO: 4/11/18 class comment
+/**
+ * Represents Siddhi Query's output
+ */
 public abstract class OutputConfig {
     private String eventType;
 

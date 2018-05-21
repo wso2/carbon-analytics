@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types;
 
-// TODO: 4/4/18 class comment
+/**
+ * Represents Siddhi Insert Query's output
+ */
 public class InsertOutputConfig extends OutputConfig {
     public InsertOutputConfig() {
     }
