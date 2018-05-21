@@ -77,61 +77,66 @@ public class CodeGenerator {
 
         siddhiAppStringBuilder.append(generateAppNameAndDescription(siddhiApp.getAppName(), siddhiApp.getAppDescription()))
                 .append(Constants.NEW_LINE)
-                .append(Constants.NEW_LINE)
-                .append("-- Streams")
                 .append(Constants.NEW_LINE);
-        for (StreamConfig stream : siddhiApp.getStreamList()) {
-            siddhiAppStringBuilder.append(generateStreamString(stream))
-                    .append(Constants.NEW_LINE);
-        }
-        siddhiAppStringBuilder.append(Constants.NEW_LINE);
-
-        siddhiAppStringBuilder.append("-- Tables").append(Constants.NEW_LINE);
-        for (TableConfig table : siddhiApp.getTableList()) {
-            siddhiAppStringBuilder.append(generateTableString(table))
-                    .append(Constants.NEW_LINE);
-        }
-        siddhiAppStringBuilder.append(Constants.NEW_LINE);
-
-        siddhiAppStringBuilder.append("-- Windows").append(Constants.NEW_LINE);
-        for (WindowConfig window : siddhiApp.getWindowList()) {
-            siddhiAppStringBuilder.append(generateWindowString(window))
-                    .append(Constants.NEW_LINE);
-        }
-        siddhiAppStringBuilder.append(Constants.NEW_LINE);
-
-        siddhiAppStringBuilder.append("-- Triggers").append(Constants.NEW_LINE);
-        for (TriggerConfig trigger : siddhiApp.getTriggerList()) {
-            siddhiAppStringBuilder.append(generateTriggerString(trigger))
-                    .append(Constants.NEW_LINE);
-        }
-        siddhiAppStringBuilder.append(Constants.NEW_LINE);
-
-        siddhiAppStringBuilder.append("-- Aggregations").append(Constants.NEW_LINE);
-        for (AggregationConfig aggregation : siddhiApp.getAggregationList()) {
-            siddhiAppStringBuilder.append(generateAggregationString(aggregation))
-                    .append(Constants.NEW_LINE);
-        }
-        siddhiAppStringBuilder.append(Constants.NEW_LINE);
 
         // TODO source and sink should be somehow connected to a stream over here
-//        for (SourceConfig source : siddhiApp.getSourceList()) {
-//            siddhiAppStringBuilder.append(generateSourceString(source));
-//        }
-//
-//        for (SinkConfig sink : siddhiApp.getSinkList()) {
-//            siddhiAppStringBuilder.append(generateSinkString(sink));
-//        }
+        if (!siddhiApp.getStreamList().isEmpty()) {
+            siddhiAppStringBuilder.append("-- Streams")
+                    .append(Constants.NEW_LINE);
+            for (StreamConfig stream : siddhiApp.getStreamList()) {
+                siddhiAppStringBuilder.append(generateStreamString(stream))
+                        .append(Constants.NEW_LINE);
+            }
+            siddhiAppStringBuilder.append(Constants.NEW_LINE);
+        }
 
-        siddhiAppStringBuilder.append("-- Queries").append(Constants.NEW_LINE);
-        for (QueryConfig query : siddhiApp.getWindowFilterProjectionQueryList()) {
-            siddhiAppStringBuilder.append(generateQueryString(query));
+        if (!siddhiApp.getTableList().isEmpty()) {
+            siddhiAppStringBuilder.append("-- Tables").append(Constants.NEW_LINE);
+            for (TableConfig table : siddhiApp.getTableList()) {
+                siddhiAppStringBuilder.append(generateTableString(table))
+                        .append(Constants.NEW_LINE);
+            }
+            siddhiAppStringBuilder.append(Constants.NEW_LINE);
         }
-        for (QueryConfig query : siddhiApp.getJoinQueryList()) {
-            siddhiAppStringBuilder.append(generateQueryString(query));
+
+        if (!siddhiApp.getWindowList().isEmpty()) {
+            siddhiAppStringBuilder.append("-- Windows").append(Constants.NEW_LINE);
+            for (WindowConfig window : siddhiApp.getWindowList()) {
+                siddhiAppStringBuilder.append(generateWindowString(window))
+                        .append(Constants.NEW_LINE);
+            }
+            siddhiAppStringBuilder.append(Constants.NEW_LINE);
         }
-        siddhiAppStringBuilder.append(Constants.NEW_LINE);
-        siddhiAppStringBuilder.append(Constants.NEW_LINE);
+
+        if (!siddhiApp.getTriggerList().isEmpty()) {
+            siddhiAppStringBuilder.append("-- Triggers").append(Constants.NEW_LINE);
+            for (TriggerConfig trigger : siddhiApp.getTriggerList()) {
+                siddhiAppStringBuilder.append(generateTriggerString(trigger))
+                        .append(Constants.NEW_LINE);
+            }
+            siddhiAppStringBuilder.append(Constants.NEW_LINE);
+        }
+
+        if (!siddhiApp.getAggregationList().isEmpty()) {
+            siddhiAppStringBuilder.append("-- Aggregations").append(Constants.NEW_LINE);
+            for (AggregationConfig aggregation : siddhiApp.getAggregationList()) {
+                siddhiAppStringBuilder.append(generateAggregationString(aggregation))
+                        .append(Constants.NEW_LINE);
+            }
+            siddhiAppStringBuilder.append(Constants.NEW_LINE);
+        }
+
+        if (!siddhiApp.getWindowFilterProjectionQueryList().isEmpty() || !siddhiApp.getJoinQueryList().isEmpty() ||
+                !siddhiApp.getPatternQueryList().isEmpty() || !siddhiApp.getSequenceQueryList().isEmpty()) {
+            siddhiAppStringBuilder.append("-- Queries").append(Constants.NEW_LINE);
+            for (QueryConfig query : siddhiApp.getWindowFilterProjectionQueryList()) {
+                siddhiAppStringBuilder.append(generateQueryString(query));
+            }
+            for (QueryConfig query : siddhiApp.getJoinQueryList()) {
+                siddhiAppStringBuilder.append(generateQueryString(query));
+            }
+            siddhiAppStringBuilder.append(Constants.NEW_LINE);
+        }
 
         // TODO: 4/23/18 Add the partitions loop
 
