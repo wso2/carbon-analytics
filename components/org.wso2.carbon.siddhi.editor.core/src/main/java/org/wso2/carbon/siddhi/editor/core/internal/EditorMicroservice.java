@@ -908,7 +908,7 @@ public class EditorMicroservice implements Microservice {
             Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
             return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(gson.toJson(eventFlow))
+                    .entity(gson.toJson(eventFlow).replace("\\\"", "\\\\\\\""))
                     .build();
         } catch (SiddhiAppCreationException e) {
             log.error("Unable to generate design view", e);
