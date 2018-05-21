@@ -635,7 +635,8 @@ public class CodeGenerator {
             } else {
                 throw new CodeGenerationException("The given " + joinElement.getType() + " cannot have a filter without a window");
             }
-        } else if (!joinElement.getWindow().isEmpty()) {
+        } else if (!joinElement.getType().equalsIgnoreCase("WINDOW") &&
+                joinElement.getWindow() != null && !joinElement.getWindow().isEmpty()) {
             if (joinElement.getWindow().getFunction() == null || joinElement.getWindow().getFunction().isEmpty()) {
                 throw new CodeGenerationException("The 'function' of the given window in the join query is null");
             } else if (joinElement.getWindow().getParameters() == null) {
