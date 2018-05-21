@@ -22,6 +22,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
               JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput) {
 
         var constants = {
+            SOURCE: 'sourceDrop',
+            SINK: 'sinkDrop',
             STREAM : 'streamDrop',
             TABLE : 'tableDrop',
             WINDOW :'windowDrop',
@@ -109,7 +111,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 ({
                     accept: '.stream-drag, .table-drag, .window-drag, .trigger-drag, .aggregation-drag,' +
                     '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
-                    '.pattern-query-drag, .sequence-query-drag, .partition-drag',
+                    '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag',
                     containment: 'grid-container',
 
                     /**
@@ -132,6 +134,16 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         // Repaint to reposition all the elements that are on the canvas after the drop/addition of a
                         // new element on the canvas
                         self.jsPlumbInstance.repaint(ui.helper);
+
+                        // If the dropped Element is a Source annotation then->
+                        if ($(droppedElement).hasClass('source-drag')) {
+                            self.handleSourceAnnotation(mouseTop, mouseLeft, false);
+                        }
+
+                        // If the dropped Element is a Sink annotation then->
+                        if ($(droppedElement).hasClass('sink-drag')) {
+                            self.handleSinkAnnotation(mouseTop, mouseLeft, false);
+                        }
 
                         // If the dropped Element is a Stream then->
                         if ($(droppedElement).hasClass('stream-drag')) {
@@ -229,6 +241,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     if (sourceElement.hasClass(constants.PARTITION)) {
                         if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') !== sourceId) {
                             alert("Invalid Connection: Connect to a partition query");
+                        } else {
+                            connectionValidity = true;
+                        }
+                    }
+                    else if (sourceElement.hasClass(constants.SOURCE) || sourceElement.hasClass(constants.SINK)) {
+                        if (!targetElement.hasClass(constants.STREAM)) {
+                            alert("Invalid Connection: Connect to a stream");
                         } else {
                             connectionValidity = true;
                         }
@@ -878,6 +897,26 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
         DesignGrid.prototype.drawGraphFromAppData = function () {
             var self = this;
 
+            _.forEach(self.configurationData.getSiddhiAppConfig().sourceList, function(source){
+                var sourceId = source.getId();
+                var sourceName = source.getName();
+                var array = sourceId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handleSourceAnnotation(mouseTop, mouseLeft, true, sourceId, sourceName);
+            });
+
+            _.forEach(self.configurationData.getSiddhiAppConfig().sinkList, function(sink){
+                var sinkId = sink.getId();
+                var sinkName = sink.getName();
+                var array = sinkId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handleSinkAnnotation(mouseTop, mouseLeft, true, sinkId, sinkName);
+            });
+            
             _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function(stream){
                 var streamId = stream.getId();
                 var streamName = stream.getName();
@@ -1020,6 +1059,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             // Obtain all the draggable UI elements and add them into the nodes[] array
             var currentTabElement = document.getElementById(self.currentTabId);
             var nodes = [];
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.SOURCE));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.SINK));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.STREAM));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.TABLE));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.WINDOW));
@@ -1166,6 +1207,66 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             self.jsPlumbInstance.repaintEverything();
         };
 
+        DesignGrid.prototype.handleSourceAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sourceId, 
+                                                                sourceName) {
+            var self = this;
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.getNewAgentId();
+                // design view container is disabled to prevent the user from dropping any elements before initializing
+                // a source element
+                self.designViewContainer.addClass('disableContainer');
+                self.toggleViewButton.addClass('disableContainer');
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(sourceId !== undefined) {
+                    elementId = sourceId;
+                    self.generateNextNewAgentId();
+                } else {
+                    console.log("sourceId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.SOURCE);
+            self.canvas.append(newAgent);
+            // Drop the source element. Inside this a it generates the source definition form.
+            self.dropElements.dropSource(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
+                false, sourceName);
+            self.configurationData.getSiddhiAppConfig()
+                .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handleSinkAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sinkId,
+                                                              sinkName) {
+            var self = this;
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.getNewAgentId();
+                // design view container is disabled to prevent the user from dropping any elements before initializing
+                // a sink element
+                self.designViewContainer.addClass('disableContainer');
+                self.toggleViewButton.addClass('disableContainer');
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(sinkId !== undefined) {
+                    elementId = sinkId;
+                    self.generateNextNewAgentId();
+                } else {
+                    console.log("sinkId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.SINK);
+            self.canvas.append(newAgent);
+            // Drop the sink element. Inside this a it generates the sink definition form.
+            self.dropElements.dropSink(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
+                false, sinkName);
+            self.configurationData.getSiddhiAppConfig()
+                .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+        
         DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName) {
             var self = this;
             var elementId;

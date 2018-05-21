@@ -165,18 +165,6 @@
     box-sizing: border-box;
 }
 
-.connectorInStream {
-    float: left;
-    margin-top: -33%;
-    margin-left: -13px;
-}
-
-.connectorOutStream {
-    float: right;
-    margin-top: -33%;
-    margin-right: -13px;
-}
-
 /*
     Element Divisions added as classes when the element is appended
 */
@@ -284,7 +272,8 @@ td {
 }
 
 .connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation,
-.connectorOutQuery, .connectorOutPatternQuery, .connectorOutSequenceQuery, .connectorOutJoinQuery {
+.connectorOutQuery, .connectorOutPatternQuery, .connectorOutSequenceQuery, .connectorOutJoinQuery, .connectorOutSource,
+.connectorOutSink {
     float: right;
     margin-top: -33%;
     margin-right: -13px;

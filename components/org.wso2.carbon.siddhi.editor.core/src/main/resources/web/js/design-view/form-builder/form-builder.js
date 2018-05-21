@@ -18,9 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableForm', 'windowForm', 'aggregationForm',
         'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
-        'sequenceQueryForm'],
+        'sequenceQueryForm', 'sourceForm', 'sinkForm'],
     function (require, log, $, _, FormUtils, StreamForm, TableForm, WindowForm, AggregationForm, TriggerForm,
-              WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm) {
+              WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
+              SourceForm, SinkForm) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -31,6 +32,8 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         JSONEditor.plugins.selectize.enable = true;
 
         var constants = {
+            SOURCE: 'sourceDrop',
+            SINK: 'sinkDrop',
             STREAM : 'streamDrop',
             TABLE : 'tableDrop',
             WINDOW :'windowDrop',
@@ -103,27 +106,31 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(consoleOptions, 'consoleOptions', options);
             var formConsole = this.consoleListManager.newFormConsole(consoleOptions);
             $(formConsole).on( "close-button-in-form-clicked", function() {
-                if(elementType === constants.STREAM) {
+                if(elementType === constants.SOURCE) {
+                    if(self.configurationData.getSiddhiAppConfig().getSource(elementId) === undefined) {
+                        $("#"+elementId).remove();
+                    }
+                } else if(elementType === constants.SINK) {
+                    if(self.configurationData.getSiddhiAppConfig().getSink(elementId) === undefined) {
+                        $("#"+elementId).remove();
+                    }
+                } else if(elementType === constants.STREAM) {
                     if(self.configurationData.getSiddhiAppConfig().getStream(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
-                }
-                if(elementType === constants.TABLE) {
+                } else if(elementType === constants.TABLE) {
                     if(self.configurationData.getSiddhiAppConfig().getTable(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
-                }
-                if(elementType === constants.WINDOW) {
+                } else if(elementType === constants.WINDOW) {
                     if(self.configurationData.getSiddhiAppConfig().getWindow(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
-                }
-                if(elementType === constants.TRIGGER) {
+                } else if(elementType === constants.TRIGGER) {
                     if(self.configurationData.getSiddhiAppConfig().getTrigger(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
-                }
-                if(elementType === constants.AGGREGATION) {
+                } else if(elementType === constants.AGGREGATION) {
                     if(self.configurationData.getSiddhiAppConfig().getAggregation(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
@@ -137,6 +144,76 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             return formConsole;
         };
 
+        /**
+         * @function generate the form to define the source once it is dropped on the canvas
+         * @param i id for the element
+         * @returns user given source name
+         */
+        FormBuilder.prototype.DefineSource = function (i) {
+            var self = this;
+            var formConsole = this.createTabForForm(i, constants.SOURCE);
+            var formContainer = formConsole.getContentContainer();
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            var sourceForm = new SourceForm(formOptions);
+            return sourceForm.generateDefineForm(i, formConsole, formContainer);
+        };
+
+        /**
+         * @function generate the property window for an existing source
+         * @param element selected element(source)
+         */
+        FormBuilder.prototype.GeneratePropertiesFormForSources = function (element) {
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            var sourceForm = new SourceForm(formOptions);
+            sourceForm.generatePropertiesForm(element, formConsole, formContainer);
+        };
+
+        /**
+         * @function generate the form to define the sink once it is dropped on the canvas
+         * @param i id for the element
+         * @returns user given sink name
+         */
+        FormBuilder.prototype.DefineSink = function (i) {
+            var self = this;
+            var formConsole = this.createTabForForm(i, constants.SINK);
+            var formContainer = formConsole.getContentContainer();
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            var sinkForm = new SinkForm(formOptions);
+            return sinkForm.generateDefineForm(i, formConsole, formContainer);
+        };
+
+        /**
+         * @function generate the property window for an existing sink
+         * @param element selected element(sink)
+         */
+        FormBuilder.prototype.GeneratePropertiesFormForSinks = function (element) {
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            var sinkForm = new SinkForm(formOptions);
+            sinkForm.generatePropertiesForm(element, formConsole, formContainer);
+        };
+        
         /**
          * @function generate the form to define the stream once it is dropped on the canvas
          * @param i id for the element

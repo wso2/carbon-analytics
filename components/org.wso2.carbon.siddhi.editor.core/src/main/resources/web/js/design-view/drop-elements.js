@@ -51,6 +51,131 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         };
 
         /**
+         * @function drop the source element on the canvas
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
+         * @param sourceName name of the source
+         */
+        DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
+
+            var self= this;
+            if(!isCodeToDesignMode) {
+                self.formBuilder.DefineSource(i);
+            }
+            var node = $('<div>' + sourceName + '</div>');
+            newAgent.append(node);
+            node.attr('id', i+"-nodeInitial");
+            node.attr('class', "sourceNameNode");
+
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the Source Element will
+             be displayed as an alert message
+            */
+            var settingsIconId = ""+ i + "-dropSourceSettingsId";
+            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+                'class="element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
+                'class="element-close-icon collapse">').append(prop);
+
+            var settingsIconElement = $('#'+settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForSources(this);
+            });
+
+            var finalElement = newAgent;
+
+            /*
+             connection --> The connection anchor point is appended to the element
+             */
+            var connection = $('<div class="connectorOutSource">').attr('id', i+"-out" ).addClass('connection');
+
+            finalElement.append(connection);
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
+            });
+
+            self.jsPlumbInstance.makeSource(connection, {
+                deleteEndpointsOnDetach : true,
+                anchor : 'Right',
+                maxConnections: 1
+            });
+        };
+        
+        /**
+         * @function drop the sink element on the canvas
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
+         * @param sinkName name of the sink
+         */
+        DropElements.prototype.dropSink = function (newAgent, i, top, left, isCodeToDesignMode, sinkName) {
+            
+            var self= this;
+            if(!isCodeToDesignMode) {
+                self.formBuilder.DefineSink(i);
+            }
+            var node = $('<div>' + sinkName + '</div>');
+            newAgent.append(node);
+            node.attr('id', i+"-nodeInitial");
+            node.attr('class', "sinkNameNode");
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the Sink Element will
+             be displayed as an alert message
+            */
+            var settingsIconId = ""+ i + "-dropSinkSettingsId";
+            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+                'class="element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
+                'class="element-close-icon collapse">').append(prop);
+
+            var settingsIconElement = $('#'+settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForSinks(this);
+            });
+
+            var finalElement = newAgent;
+
+            /*
+             connection --> The connection anchor point is appended to the element
+             */
+            var connection = $('<div class="connectorOutSink">').attr('id', i+"-out" ).addClass('connection');
+            
+            finalElement.append(connection);
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
+            });
+
+            self.jsPlumbInstance.makeSource(connection, {
+                deleteEndpointsOnDetach : true,
+                anchor : 'Right',
+                maxConnections: 1
+            });
+        };
+        
+        /**
          * @function drop the stream element on the canvas
          * @param newAgent new element
          * @param i id of the element

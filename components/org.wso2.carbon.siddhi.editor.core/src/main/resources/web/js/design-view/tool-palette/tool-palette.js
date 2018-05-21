@@ -42,6 +42,18 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
 
             var definitionTools = [
                 {
+                    id : "source",
+                    className : "source-drag",
+                    title : "Source",
+                    icon : "/editor/images/source.png"
+                },
+                {
+                    id : "sink",
+                    className : "sink-drag",
+                    title : "Sink",
+                    icon : "/editor/images/sink.png"
+                },
+                {
                     id : "stream",
                     className : "stream-drag",
                     title : "Stream",

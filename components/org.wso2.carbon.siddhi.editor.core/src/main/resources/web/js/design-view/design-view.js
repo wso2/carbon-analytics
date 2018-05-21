@@ -21,12 +21,12 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
-        'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition'],
+        'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceAnnotation', 'sinkAnnotation'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindow, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete,
               QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource,
-              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition) {
+              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceAnnotation, SinkAnnotation) {
 
         /**
          * @class DesignView
@@ -114,6 +114,16 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 query.setQueryOutput(queryOutputObject);
             }
 
+            _.forEach(configurationData.siddhiAppConfig.sourceList, function(source){
+                var sourceObject = new SourceAnnotation(source);
+                sourceObject.setId(newIdBeginningPhrase + sourceObject.getId());
+                appData.addSource(sourceObject);
+            });
+            _.forEach(configurationData.siddhiAppConfig.sinkList, function(sink){
+                var sinkObject = new SinkAnnotation(sink);
+                sinkObject.setId(newIdBeginningPhrase + sinkObject.getId());
+                appData.addSink(sinkObject);
+            });
             _.forEach(configurationData.siddhiAppConfig.streamList, function(stream){
                 var streamObject = new Stream(stream);
                 //addAnnotationsForElement(stream, streamObject);
