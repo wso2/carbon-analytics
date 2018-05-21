@@ -46,6 +46,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
 
     private CircularBuffer<ConsoleLogEvent> circularBuffer;
     private static final int BUFFER_SIZE = 10;
+    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
 
     /**
      * Creates an instance of EditorConsoleAppender.
@@ -60,7 +61,6 @@ public final class EditorConsoleAppender extends AbstractAppender {
     private EditorConsoleAppender(final String name, final Filter filter,
                                   final Layout<? extends Serializable> layout, final boolean ignoreExceptions) {
         super(name, filter, layout, ignoreExceptions);
-
         activateOptions();
     }
 
@@ -88,7 +88,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
                                                        @PluginAttribute("ignoreExceptions") final String ignore,
                                                        @PluginAttribute("buffSize") final String buffSize) {
         if (name == null) {
-            LOGGER.error("No name provided for EditorConsoleAppender");
+                LOGGER.error("No name provided for EditorConsoleAppender");
             return null;
         } else {
             if (layout == null) {
@@ -119,18 +119,12 @@ public final class EditorConsoleAppender extends AbstractAppender {
         consoleLogEvent.setFqcn(logEvent.getLoggerName());
         consoleLogEvent.setLevel(logEvent.getLevel().name());
         consoleLogEvent.setMessage(getEncodedString(logEvent.getMessage().getFormattedMessage()));
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
         String dateString = formatter.format(logEvent.getTimeMillis());
         consoleLogEvent.setTimeStamp(dateString);
         if (logEvent.getThrown() != null) {
             consoleLogEvent.setStacktrace(getStacktrace(logEvent.getThrown()));
         }
         return consoleLogEvent;
-    }
-
-    public void close() {
-        // do we need to do anything here. I hope we do not need to reset the queue
-        // as it might still be exposed to others
     }
 
     private String getStacktrace(Throwable e) {
