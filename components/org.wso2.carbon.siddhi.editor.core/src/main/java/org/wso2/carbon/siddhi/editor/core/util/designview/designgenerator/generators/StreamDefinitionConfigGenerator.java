@@ -42,7 +42,7 @@ public class StreamDefinitionConfigGenerator {
     public StreamConfig generateStreamConfig(StreamDefinition streamDefinition, boolean isInnerStream) {
         List<AttributeConfig> attributeConfigs = new ArrayList<>();
         for (Attribute attribute : streamDefinition.getAttributeList()) {
-            attributeConfigs.add(new AttributeConfig(attribute.getName(), attribute.getType().name()));
+            attributeConfigs.add(new AttributeConfig(attribute.getName(), attribute.getType().name().toLowerCase()));
         }
         List<AnnotationConfig> annotationConfigs = new ArrayList<>();
         for (Annotation annotation : streamDefinition.getAnnotations()) {

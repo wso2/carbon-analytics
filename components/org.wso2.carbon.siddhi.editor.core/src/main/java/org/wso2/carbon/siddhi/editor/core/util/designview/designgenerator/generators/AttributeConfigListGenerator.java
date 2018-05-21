@@ -36,7 +36,7 @@ public class AttributeConfigListGenerator {
     public List<AttributeConfig> generateAttributeConfigList(List<Attribute> attributes) {
         List<AttributeConfig> attributeConfigs = new ArrayList<>();
         for (Attribute attribute : attributes) {
-            attributeConfigs.add(new AttributeConfig(attribute.getName(), attribute.getType().name()));
+            attributeConfigs.add(new AttributeConfig(attribute.getName(), attribute.getType().name().toLowerCase()));
         }
         return attributeConfigs;
     }

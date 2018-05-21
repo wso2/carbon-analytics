@@ -40,7 +40,6 @@ import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.aggregation.TimePeriod.Duration;
 import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.definition.*;
 import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
@@ -288,8 +287,9 @@ public class DesignGenerator {
                     groupBy,
                     aggregateByAttribute,
                     new AggregateByTimePeriod(
-                            (aggregationTimePeriodDurations.get(0)).name(),
-                            (aggregationTimePeriodDurations.get(aggregationTimePeriodDurations.size() - 1)).name()),
+                            (aggregationTimePeriodDurations.get(0)).name().toLowerCase(),
+                            (aggregationTimePeriodDurations.get(aggregationTimePeriodDurations.size() - 1))
+                                    .name().toLowerCase()),
                     null, // TODO: 4/6/18 store
                     annotationList));
         }
