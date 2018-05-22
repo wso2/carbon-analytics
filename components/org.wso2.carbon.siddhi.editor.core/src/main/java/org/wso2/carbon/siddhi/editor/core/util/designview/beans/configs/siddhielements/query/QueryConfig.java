@@ -19,7 +19,6 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
@@ -38,7 +37,7 @@ public class QueryConfig extends SiddhiElementConfig {
     private String having;
     private String outputRateLimit;
     private QueryOutputConfig queryOutput;
-    private List<AnnotationConfig> annotationList;
+    private List<String> annotationList;
 
     public QueryConfig(String id,
                        QueryInputConfig queryInput,
@@ -49,7 +48,7 @@ public class QueryConfig extends SiddhiElementConfig {
                        String having,
                        String outputRateLimit,
                        QueryOutputConfig queryOutput,
-                       List<AnnotationConfig> annotationList) {
+                       List<String> annotationList) {
         super(id);
         this.queryInput = queryInput;
         this.select = select;
@@ -126,11 +125,11 @@ public class QueryConfig extends SiddhiElementConfig {
         this.queryOutput = queryOutput;
     }
 
-    public List<AnnotationConfig> getAnnotationList() {
+    public List<String> getAnnotationList() {
         return annotationList;
     }
 
-    public void setAnnotationList(List<AnnotationConfig> annotationList) {
+    public void setAnnotationList(List<String> annotationList) {
         this.annotationList = annotationList;
     }
 }

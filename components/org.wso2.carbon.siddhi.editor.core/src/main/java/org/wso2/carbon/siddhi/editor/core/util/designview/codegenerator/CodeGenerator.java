@@ -27,7 +27,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
@@ -1062,7 +1061,7 @@ public class CodeGenerator {
         return stringBuilder.toString();
     }
 
-    private String getAnnotations(List<AnnotationConfig> annotations) {
+    private String getAnnotations(List<String> annotations) {
         // TODO: 4/18/18 Fill Once The Annotation Beans Are Complete
         StringBuilder annotationsStringBuilder = new StringBuilder();
         return annotationsStringBuilder.toString();

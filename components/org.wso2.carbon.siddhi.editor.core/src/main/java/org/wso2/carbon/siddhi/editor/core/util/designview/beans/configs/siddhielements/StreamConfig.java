@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
-
 import java.util.List;
 
 /**
@@ -29,13 +27,13 @@ public class StreamConfig extends SiddhiElementConfig {
     private String name;
     private boolean isInnerStream;
     private List<AttributeConfig> attributeList;
-    private List<AnnotationConfig> annotationList;
+    private List<String> annotationList;
 
     public StreamConfig(String id,
                         String name,
                         boolean isInnerStream,
                         List<AttributeConfig> attributeList,
-                        List<AnnotationConfig> annotationList) {
+                        List<String> annotationList) {
         super(id);
         this.name = name;
         this.isInnerStream = isInnerStream;
@@ -55,7 +53,7 @@ public class StreamConfig extends SiddhiElementConfig {
         return attributeList;
     }
 
-    public List<AnnotationConfig> getAnnotationList() {
+    public List<String> getAnnotationList() {
         return annotationList;
     }
 }

@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
-
 import java.util.List;
 
 /**
@@ -28,9 +26,9 @@ import java.util.List;
 public class TriggerConfig extends SiddhiElementConfig {
     private String name;
     private String at;
-    private List<AnnotationConfig> annotationList;
+    private List<String> annotationList;
 
-    public TriggerConfig(String id, String name, String at, List<AnnotationConfig> annotationList) {
+    public TriggerConfig(String id, String name, String at, List<String> annotationList) {
         super(id);
         this.name = name;
         this.at = at;
@@ -45,7 +43,7 @@ public class TriggerConfig extends SiddhiElementConfig {
         return at;
     }
 
-    public List<AnnotationConfig> getAnnotationList() {
+    public List<String> getAnnotationList() {
         return annotationList;
     }
 }

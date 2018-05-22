@@ -20,8 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.annotation.StreamTableAnnotationConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.annotation.AnnotationConfigGenerator;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
@@ -44,9 +43,9 @@ public class StreamDefinitionConfigGenerator {
         for (Attribute attribute : streamDefinition.getAttributeList()) {
             attributeConfigs.add(new AttributeConfig(attribute.getName(), attribute.getType().name().toLowerCase()));
         }
-        List<AnnotationConfig> annotationConfigs = new ArrayList<>();
+        List<String> annotationConfigs = new ArrayList<>();
         for (Annotation annotation : streamDefinition.getAnnotations()) {
-            annotationConfigs.add(new StreamTableAnnotationConfigGenerator().generateAnnotationConfig(annotation));
+            annotationConfigs.add(new AnnotationConfigGenerator().generateAnnotationConfig(annotation));
         }
         return new StreamConfig(streamDefinition.getId(),
                 streamDefinition.getId(),

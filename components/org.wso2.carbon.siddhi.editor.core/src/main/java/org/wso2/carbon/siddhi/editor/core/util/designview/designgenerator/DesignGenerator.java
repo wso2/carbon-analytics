@@ -25,12 +25,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregateByTimePeriod;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributeConfigListGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributesSelectionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.StreamDefinitionConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.annotation.StreamTableAnnotationConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.annotation.AnnotationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
@@ -127,6 +126,8 @@ public class DesignGenerator {
                 at = triggerDefinition.getAt();
             }
 
+            List<String> annotationConfigs = new ArrayList<>();
+
             siddhiAppConfig.add(new TriggerConfig(
                     triggerDefinition.getId(),
                     triggerDefinition.getId(),
@@ -208,9 +209,9 @@ public class DesignGenerator {
      */
     private void loadTables() {
         for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
-            List<AnnotationConfig> annotationConfigs = new ArrayList<>();
+            List<String> annotationConfigs = new ArrayList<>();
             for (Annotation annotation : tableDefinition.getAnnotations()) {
-                annotationConfigs.add(new StreamTableAnnotationConfigGenerator().generateAnnotationConfig(annotation));
+                annotationConfigs.add(new AnnotationConfigGenerator().generateAnnotationConfig(annotation));
             }
             siddhiAppConfig.add(new TableConfig(
                     tableDefinition.getId(),
@@ -265,9 +266,9 @@ public class DesignGenerator {
                 throw new IllegalArgumentException("Selector of AggregationDefinition is not of class BasicSelector");
             }
 
-            List<AnnotationConfig> annotationList = new ArrayList<>();
+            List<String> annotationList = new ArrayList<>();
             for (Annotation annotation : aggregationDefinition.getAnnotations()) {
-                annotationList.add(new StreamTableAnnotationConfigGenerator().generateAnnotationConfig(annotation));
+                annotationList.add(new AnnotationConfigGenerator().generateAnnotationConfig(annotation));
             }
 
             // For creating 'aggregate by time' object

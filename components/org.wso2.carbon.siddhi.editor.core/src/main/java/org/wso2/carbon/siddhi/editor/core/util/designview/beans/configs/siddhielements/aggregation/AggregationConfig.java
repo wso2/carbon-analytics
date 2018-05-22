@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
@@ -36,7 +35,7 @@ public class AggregationConfig extends SiddhiElementConfig {
     private String aggregateByAttribute;
     private AggregateByTimePeriod aggregateByTimePeriod;
     private StoreConfig store;
-    private List<AnnotationConfig> annotationList;
+    private List<String> annotationList;
 
     public AggregationConfig(String id,
                              String name,
@@ -46,7 +45,7 @@ public class AggregationConfig extends SiddhiElementConfig {
                              String aggregateByAttribute,
                              AggregateByTimePeriod aggregateByTimePeriod,
                              StoreConfig store,
-                             List<AnnotationConfig> annotationList) {
+                             List<String> annotationList) {
         super(id);
         this.name = name;
         this.from = from;
@@ -86,7 +85,7 @@ public class AggregationConfig extends SiddhiElementConfig {
         return store;
     }
 
-    public List<AnnotationConfig> getAnnotationList() {
+    public List<String> getAnnotationList() {
         return annotationList;
     }
 }

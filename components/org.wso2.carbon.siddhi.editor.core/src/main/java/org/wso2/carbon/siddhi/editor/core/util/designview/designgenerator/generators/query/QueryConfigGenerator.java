@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.annotation.AnnotationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
@@ -114,7 +113,7 @@ public class QueryConfigGenerator {
         }
 
         // Get annotation list
-        List<AnnotationConfig> annotationList = new ArrayList<>(); // TODO: 4/20/18 implement list population
+        List<String> annotationList = new ArrayList<>(); // TODO: 4/20/18 implement list population
 
         return new QueryConfig(
                 queryId,
