@@ -21,12 +21,12 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
-        'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation'],
+        'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindow, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete,
               QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource,
-              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation) {
+              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation) {
 
         /**
          * @class DesignView
@@ -117,11 +117,15 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             _.forEach(configurationData.siddhiAppConfig.sourceList, function(source){
                 var sourceObject = new SourceOrSinkAnnotation(source);
                 sourceObject.setId(newIdBeginningPhrase + sourceObject.getId());
+                var mapperObject = new MapAnnotation(source.map);
+                sourceObject.setMap(mapperObject);
                 appData.addSource(sourceObject);
             });
             _.forEach(configurationData.siddhiAppConfig.sinkList, function(sink){
                 var sinkObject = new SourceOrSinkAnnotation(sink);
                 sinkObject.setId(newIdBeginningPhrase + sinkObject.getId());
+                var mapperObject = new MapAnnotation(sink.map);
+                sinkObject.setMap(mapperObject);
                 appData.addSink(sinkObject);
             });
             _.forEach(configurationData.siddhiAppConfig.streamList, function(stream){

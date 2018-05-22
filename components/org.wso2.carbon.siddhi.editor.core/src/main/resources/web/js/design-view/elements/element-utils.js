@@ -50,7 +50,7 @@ define(
          * @param elementId Id of the element to be removed.
          */
         ElementUtils.prototype.removeElement = function (array, elementId) {
-            array.every(function(element){
+            array.forEach(function(element){
                 if (element.id === elementId) {
                     var index = array.indexOf(element);
                     if (index > -1) {
