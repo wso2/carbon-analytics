@@ -53,6 +53,7 @@ public class SiddhiAppConfig {
     private List<TriggerConfig> triggerList = new ArrayList<>();
     private List<WindowConfig> windowList = new ArrayList<>();
     private List<AggregationConfig> aggregationList = new ArrayList<>();
+    private List<FunctionConfig> functionList = new ArrayList<>();
     // TODO: 3/27/18 Other {Element}Lists
 
     /**
@@ -126,6 +127,10 @@ public class SiddhiAppConfig {
         }
     }
 
+    public void add(FunctionConfig functionConfig) {
+        addElement(functionList, functionConfig);
+    }
+
     public String getAppName() {
         return appName;
     }
@@ -176,5 +181,9 @@ public class SiddhiAppConfig {
 
     public List<QueryConfig> getSequenceQueryList() {
         return sequenceQueryList;
+    }
+
+    public List<FunctionConfig> getFunctionList() {
+        return functionList;
     }
 }
