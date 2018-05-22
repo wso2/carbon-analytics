@@ -204,7 +204,6 @@ export default class WorkerSpecificCharts extends React.Component {
         }
         else {
             yLimit = DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
-            console.log(yLimit)
         }
         return (
             <GridTile className="container" title="CPU Usage" titlePosition="top" titleBackground='#303030'>

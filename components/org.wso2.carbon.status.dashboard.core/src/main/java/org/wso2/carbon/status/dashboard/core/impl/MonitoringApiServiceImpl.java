@@ -85,7 +85,6 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TYPE_LATENCY;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TYPE_MEMORY;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TYPE_THROUGHPUT;
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TYPE_THROUGHPUT_COUNT;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.HOUR;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.PROTOCOL;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_COMMITTED;
@@ -1503,8 +1502,14 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     workerDBHandler.insertWorkerConfiguration(workerConfigData);
                 } catch (RDBMSTableException e) {
                     logger.error("Error occured while inserting the Worker due to " + e.getMessage(), e);
-                    return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                            "Error occured while inserting the Worker due to " + e.getMessage())).build();
+                    if (e.getMessage().contains("Unique index or primary key violation")) {
+                        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                                "Duplicate Worker. " + worker.getHost() + ":" +
+                                        String.valueOf(worker.getPort()) + " already exists")).build();
+                    } else {
+                        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                                "Error occured while inserting the Worker due to " + e.getMessage())).build();
+                    }
                 }
                 //This part to be sucess is optional at this level
                 String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),

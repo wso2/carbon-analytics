@@ -76,13 +76,12 @@ public class DBHandler {
             stmt.execute();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error while inserting node.", e);
+            throw new RDBMSTableException("Error while inserting node:" + e.getMessage(), e);
         } finally {
             try {
                 stmt.close();
             } catch (SQLException e) {
                 logger.error("Error closing statement due to " + e.getMessage() + " in insert.", e);
-                //ignore
             }
         }
     }
