@@ -76,6 +76,7 @@ export default class ComponentTable extends React.Component {
                         <TableRow>
                             <TableHeaderColumn style={styles.header}>Type</TableHeaderColumn>
                             <TableHeaderColumn style={styles.header}>Name</TableHeaderColumn>
+                            <TableHeaderColumn style={styles.header}>Total Events(events)</TableHeaderColumn>
                             <TableHeaderColumn style={styles.header}>Metric Type</TableHeaderColumn>
                             <TableHeaderColumn style={styles.header}>Value</TableHeaderColumn>
                         </TableRow>
@@ -95,10 +96,11 @@ export default class ComponentTable extends React.Component {
                 <TableHeader displaySelectAll={false}
                              adjustForCheckbox={false}>
                     <TableRow>
-                        <TableHeaderColumn style={styles.header}>Type</TableHeaderColumn>
-                        <TableHeaderColumn style={styles.header}>Name</TableHeaderColumn>
-                        <TableHeaderColumn style={styles.header}>Metric Type</TableHeaderColumn>
-                        <TableHeaderColumn style={styles.header}>Value</TableHeaderColumn>
+                        <TableHeaderColumn style={{color: '#dedede', width: '25%'}}>Type</TableHeaderColumn>
+                        <TableHeaderColumn style={{color: '#dedede', width: '25%'}}>Name</TableHeaderColumn>
+                        <TableHeaderColumn style={{color: '#dedede', width: '11.4%'}}>Total Events(events)</TableHeaderColumn>
+                        <TableHeaderColumn style={{color: '#dedede', width: '19.25%'}}>Metric Type</TableHeaderColumn>
+                        <TableHeaderColumn style={{color: '#dedede'}}>Value</TableHeaderColumn>
                     </TableRow>
                 </TableHeader>
                 <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
@@ -123,7 +125,15 @@ export default class ComponentTable extends React.Component {
                                                                style={{backgroundColor: '#131313', cursor: 'pointer'}}>
                                                         <TableRow style={styles.tableRow}>
                                                             <TableRowColumn
-                                                                style={{width: '33.33%'}}>{components.name}</TableRowColumn>
+                                                                style={{
+                                                                    width: '33.33%',
+                                                                    borderLeft: '1px solid white'
+                                                                }}>{components.name}</TableRowColumn>
+                                                            <TableRowColumn
+                                                                style={{
+                                                                    width: '15%',
+                                                                    borderLeft: '1px solid white'
+                                                                }}>{components.totalEvents}</TableRowColumn>
                                                             <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
                                                                 {components.metrics.map((metric, index) => {
                                                                     if (index + 1 === components.metrics.length) {
@@ -189,11 +199,14 @@ export default class ComponentTable extends React.Component {
                                                                                                                     </div>
                                                                                                                 </Link>
                                                                                                             </div>
-
                                                                                                         </TableRowColumn>
-                                                                                                    </TableRow></TableBody></Table>}
+                                                                                                    </TableRow>
+                                                                                                </TableBody>
+                                                                                            </Table>}
                                                                                         </TableRowColumn>
-                                                                                    </TableRow></TableBody></Table>
+                                                                                    </TableRow>
+                                                                                </TableBody>
+                                                                            </Table>
                                                                         )
                                                                     }
                                                                     return (
@@ -253,15 +266,20 @@ export default class ComponentTable extends React.Component {
                                                                                                         </div>
                                                                                                     </Link>
                                                                                                 </div>
-
                                                                                             </TableRowColumn>
-                                                                                        </TableRow></TableBody></Table>}
+                                                                                        </TableRow>
+                                                                                    </TableBody>
+                                                                                    </Table>}
                                                                                 </TableRowColumn>
-                                                                            </TableRow></TableBody></Table>
+                                                                            </TableRow>
+                                                                        </TableBody>
+                                                                        </Table>
                                                                     )
                                                                 })}
                                                             </TableRowColumn>
-                                                        </TableRow></TableBody></Table>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                </Table>
                                             )
                                         }
                                         return (
@@ -275,7 +293,15 @@ export default class ComponentTable extends React.Component {
                                                            style={{backgroundColor: '#131313', cursor: 'pointer'}}>
                                                     <TableRow style={styles.rowColumn}>
                                                         <TableRowColumn
-                                                            style={{width: '33.33%'}}>{components.name}</TableRowColumn>
+                                                            style={{
+                                                                width: '33.33%',
+                                                                borderLeft: '1px solid white'
+                                                            }}>{components.name}</TableRowColumn>
+                                                        <TableRowColumn
+                                                            style={{
+                                                                width: '15%',
+                                                                borderLeft: '1px solid white'
+                                                            }}>{components.totalEvents}</TableRowColumn>
                                                         <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
                                                             {components.metrics.map((metric, index) => {
                                                                 if (index + 1 === components.metrics.length) {
@@ -337,9 +363,13 @@ export default class ComponentTable extends React.Component {
                                                                                                 </div>
 
                                                                                             </TableRowColumn>
-                                                                                        </TableRow></TableBody></Table>}
+                                                                                        </TableRow>
+                                                                                    </TableBody>
+                                                                                    </Table>}
                                                                                 </TableRowColumn>
-                                                                            </TableRow></TableBody></Table>
+                                                                            </TableRow>
+                                                                        </TableBody>
+                                                                        </Table>
                                                                     )
                                                                 }
                                                                 return (
@@ -396,9 +426,10 @@ export default class ComponentTable extends React.Component {
                                                                                                 </div>
                                                                                             </Link>
                                                                                         </div>
-
                                                                                     </TableRowColumn>
-                                                                                </TableRow></TableBody></Table>}
+                                                                                </TableRow>
+                                                                                </TableBody>
+                                                                                </Table>}
                                                                             </TableRowColumn>
                                                                         </TableRow>
                                                                     </TableBody></Table>
