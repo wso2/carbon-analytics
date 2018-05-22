@@ -95,6 +95,7 @@ public class DesignGenerator {
         loadWindows();
         loadAggregations();
         loadExecutionElements();
+        loadFunctions();
     }
 
     /**
@@ -296,9 +297,19 @@ public class DesignGenerator {
         }
     }
 
+    /**
+     * Loads Functions from the siddhi app
+     */
     private void loadFunctions() {
-        // TODO: 3/28/18 implement
-        throw new IllegalArgumentException("Unable to generate function configs");
+        for (Map.Entry<String, FunctionDefinition> functionDefinition :
+                siddhiApp.getFunctionDefinitionMap().entrySet()) {
+            siddhiAppConfig.add(
+                    new FunctionConfig(
+                            functionDefinition.getKey(),
+                            functionDefinition.getValue().getLanguage(),
+                            functionDefinition.getValue().getReturnType().toString(),
+                            functionDefinition.getValue().getBody()));
+        }
     }
 
     /**
