@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 
 // TODO: 4/20/18 Check Everywhere for null values
+// TODO: 5/22/18 Refactor code to make the class smaller, use seperate helper and constant classes 
 
 /**
  * Used to convert an EventFlow object to a Siddhi app string
@@ -128,7 +129,7 @@ public class CodeGenerator {
 
         if (!siddhiApp.getFunctionList().isEmpty()) {
             siddhiAppStringBuilder.append("-- Functions").append(Constants.NEW_LINE);
-            for (FunctionConfig function: siddhiApp.getFunctionList()) {
+            for (FunctionConfig function : siddhiApp.getFunctionList()) {
                 siddhiAppStringBuilder.append(generateFunctionString(function)).append(Constants.NEW_LINE);
             }
             siddhiAppStringBuilder.append(Constants.NEW_LINE);
@@ -1108,44 +1109,57 @@ public class CodeGenerator {
     }
 
     private String getAnnotations(List<String> annotations) {
-        // TODO: 4/18/18 Fill Once The Annotation Beans Are Complete
+        if (annotations.isEmpty()) {
+            return VOID_RETURN;
+        }
+
         StringBuilder annotationsStringBuilder = new StringBuilder();
+        for (String annotation : annotations) {
+            annotationsStringBuilder.append(annotation)
+                    .append(Constants.NEW_LINE);
+        }
+
         return annotationsStringBuilder.toString();
     }
 
     private String getStore(StoreConfig store) {
+        if (store == null) {
+            return VOID_RETURN;
+        }
+
         StringBuilder storeStringBuilder = new StringBuilder();
 
-        if (store != null) {
-            storeStringBuilder.append(Constants.STORE)
-                    .append(store.getType())
+        storeStringBuilder.append(Constants.STORE)
+                .append(store.getType())
+                .append(Constants.SINGLE_QUOTE)
+                .append(Constants.COMMA)
+                .append(Constants.SPACE);
+        Map<String, String> options = store.getOptions();
+        int optionsLeft = options.size();
+        for (Map.Entry<String, String> entry : options.entrySet()) {
+            storeStringBuilder.append(entry.getKey())
+                    .append(Constants.EQUALS)
                     .append(Constants.SINGLE_QUOTE)
-                    .append(Constants.COMMA)
-                    .append(Constants.SPACE);
-            Map<String, String> options = store.getOptions();
-            int optionsLeft = options.size();
-            for (Map.Entry<String, String> entry : options.entrySet()) {
-                storeStringBuilder.append(entry.getKey())
-                        .append(Constants.EQUALS)
-                        .append(Constants.SINGLE_QUOTE)
-                        .append(entry.getValue())
-                        .append(Constants.SINGLE_QUOTE);
-                if (optionsLeft != 1) {
-                    storeStringBuilder.append(Constants.COMMA)
-                            .append(Constants.SPACE);
-                }
-                optionsLeft--;
+                    .append(entry.getValue())
+                    .append(Constants.SINGLE_QUOTE);
+            if (optionsLeft != 1) {
+                storeStringBuilder.append(Constants.COMMA)
+                        .append(Constants.SPACE);
             }
-            storeStringBuilder.append(Constants.CLOSE_BRACKET)
-                    .append(Constants.NEW_LINE);
+            optionsLeft--;
         }
+        storeStringBuilder.append(Constants.CLOSE_BRACKET)
+                .append(Constants.NEW_LINE);
 
         return storeStringBuilder.toString();
     }
 
     private String getParameterList(List<String> parameters) {
-        StringBuilder parametersStringBuilder = new StringBuilder();
+        if (parameters.isEmpty()) {
+            return VOID_RETURN;
+        }
 
+        StringBuilder parametersStringBuilder = new StringBuilder();
         int parametersLeft = parameters.size();
         for (String parameter : parameters) {
             parametersStringBuilder.append(parameter);
