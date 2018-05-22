@@ -45,7 +45,16 @@ public class AnnotationConfigGenerator {
             }
         }
 
-        annotationConfig.append(String.join(", ", elements));
+        List<String> innerAnnotations = new ArrayList<>();
+        for (Annotation innerAnnotation : annotation.getAnnotations()) {
+            innerAnnotations.add(generateAnnotationConfig(innerAnnotation));
+        }
+
+        annotationConfig.append(
+                String.join(
+                        ", ",
+                        String.join(", ", elements),
+                        String.join(", ", innerAnnotations)));
         annotationConfig.append(")");
 
         return annotationConfig.toString();

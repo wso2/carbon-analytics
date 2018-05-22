@@ -25,10 +25,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregateByTimePeriod;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributeConfigListGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributesSelectionConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.StreamDefinitionConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.annotation.AnnotationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
@@ -36,6 +34,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildi
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
+import org.wso2.siddhi.core.stream.input.source.Source;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.aggregation.TimePeriod.Duration;
 import org.wso2.siddhi.query.api.annotation.Annotation;
@@ -90,7 +89,8 @@ public class DesignGenerator {
         loadAppNameAndDescription();
         loadTriggers();
         loadStreams();
-        // TODO loadSources() loadSinks() loadFunctions()
+        // TODO loadSources() loadSinks()
+        loadSources();
         loadTables();
         loadWindows();
         loadAggregations();
@@ -190,6 +190,13 @@ public class DesignGenerator {
 //                    null));
 //        }
         // TODO implement
+        for (List<Source> sourceList : siddhiAppRuntime.getSources()) {
+//            SourceSinkConfig sourceConfig = new SourceSinkConfigGenerator().generateSourceConfig(source);
+            for (Source source : sourceList) {
+                SourceSinkConfig sourceConfig = new SourceSinkConfigGenerator().generateSourceConfig(source);
+            }
+        }
+
         throw new IllegalArgumentException("Unable to generate source configs");
     }
 
