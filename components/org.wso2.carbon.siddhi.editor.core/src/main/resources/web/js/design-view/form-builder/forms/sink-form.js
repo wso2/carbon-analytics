@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation'],
-    function (require, log, $, _, SinkAnnotation, MapAnnotation) {
+define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation'],
+    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation) {
 
         /**
          * @class SinkForm Creates a forms to collect data from a sink
@@ -101,12 +101,52 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                             propertyOrder: 3,
                             title: "Map Annotation",
                             type: "object",
-                            options: {
-                                disable_properties: true
-                            },
                             properties: {
-                                annotationValues: {
+                                annotationType: {
                                     required: true,
+                                    propertyOrder: 1,
+                                    type: "object",
+                                    title: "Annotation Type",
+                                    options: {
+                                        disable_properties: true
+                                    },
+                                    properties: {
+                                        name: {
+                                            type: "string",
+                                            title: "Name",
+                                            required: true,
+                                            minLength: 1
+                                        }
+                                    }
+                                },
+                                annotationOptions: {
+                                    propertyOrder: 2,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Mapper Options",
+                                    uniqueItems: true,
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: 'Option key-value pair',
+                                        properties: {
+                                            key: {
+                                                title: 'Key',
+                                                type: "string",
+                                                required: true,
+                                                minLength: 1
+                                            },
+                                            value: {
+                                                title: 'Value',
+                                                type: "string",
+                                                required: true,
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                },
+                                attributeValues: {
+                                    propertyOrder: 3,
                                     title: "Attributes Type",
                                     oneOf: [
                                         {
@@ -114,8 +154,8 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                                             title: "Enter Attributes as key/value pairs"
                                         },
                                         {
-                                            $ref: "#/definitions/listValues",
-                                            title: "Enter Attributes as a list"
+                                            $ref: "#/definitions/singleValue",
+                                            title: "Enter a single Attribute"
                                         }
                                     ]
                                 }
@@ -149,23 +189,16 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                                 }
                             }
                         },
-                        listValues: {
+                        singleValue: {
                             required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Map Options",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    value: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
+                            type: "object",
+                            title: "Map Option",
+                            properties: {
+                                value: {
+                                    title: 'Value',
+                                    type: "string",
+                                    required: true,
+                                    minLength: 1
                                 }
                             }
                         }
@@ -192,8 +225,65 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                 // add the new out sink to the sink array
                 var sinkOptions = {};
                 _.set(sinkOptions, 'id', i);
+                _.set(sinkOptions, 'annotationType', 'SINK');
                 _.set(sinkOptions, 'type', editor.getValue().annotationType.name);
-                var sink = new SinkAnnotation(sinkOptions);
+
+                var annotationOptions = {};
+                if(editor.getValue().annotationOptions !== undefined) {
+                    _.forEach(editor.getValue().annotationOptions, function (option) {
+                        annotationOptions[option.key] = option.value;
+                    });
+                    _.set(sinkOptions, 'options', annotationOptions);
+                } else {
+                    _.set(sinkOptions, 'options', undefined);
+                }
+
+                if (editor.getValue().map !== undefined) {
+
+                    var mapperOptions = {};
+                    _.set(mapperOptions, 'type', editor.getValue().map.annotationType.name);
+
+                    var mapperAnnotationOptions = {};
+                    if(editor.getValue().map.annotationOptions !== undefined) {
+                        _.forEach(editor.getValue().map.annotationOptions, function (option) {
+                            mapperAnnotationOptions[option.key] = option.value;
+                        });
+                        _.set(mapperOptions, 'options', annotationOptions);
+                    } else {
+                        _.set(mapperOptions, 'options', undefined);
+                    }
+
+                    var mapperAttributeValues = {};
+                    if (editor.getValue().map.attributeValues !== undefined) {
+                        // if attributeValues[0] is defined then mapper annotations values are saved as a map.
+                        // Otherwise saved as a single value.
+                        if (editor.getValue().map.attributeValues[0] !== undefined) {
+                            _.forEach(editor.getValue().map.attributeValues, function (attributeValue) {
+                                mapperAttributeValues[attributeValue.key] = attributeValue.value;
+                            });
+                            var attributes = {
+                                type: "MAP",
+                                value: mapperAttributeValues
+                            };
+                            _.set(mapperOptions, 'attributes', attributes);
+                        } else {
+                            var mapperAttributeValue = editor.getValue().map.attributeValues.value;
+                            var attributes = {
+                                type: "SINGLE",
+                                value: mapperAttributeValue
+                            };
+                            _.set(mapperOptions, 'attributes', attributes);
+                        }
+                        var mapperObject = new MapAnnotation(mapperOptions);
+                        _.set(sinkOptions, 'map', mapperObject);
+                    } else {
+                        _.set(mapperOptions, 'attributes', undefined);
+                    }
+                } else {
+                    _.set(sinkOptions, 'map', undefined);
+                }
+
+                var sink = new SourceOrSinkAnnotation(sinkOptions);
                 self.configurationData.getSiddhiAppConfig().addSink(sink);
 
                 // close the form window
@@ -223,13 +313,76 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
             }
-            var name = clickedElement.getName();
-            var attributes = clickedElement.getAttributeList();
+            var type = clickedElement.getType();
+            var savedSinkOptions = clickedElement.getOptions();
+            var map = clickedElement.getMap();
+
+            var sinkOptionsArray = [];
+            if (savedSinkOptions !== undefined) {
+                for (var key in savedSinkOptions) {
+                    if (savedSinkOptions.hasOwnProperty(key)) {
+                        sinkOptionsArray.push({
+                            key: key,
+                            value: savedSinkOptions[key]
+                        });
+                    }
+                }
+            }
+
+            var mapperType;
+            var mapperOptionsArray = [];
+            var mapperAttributesArray = [];
+            if (map !== undefined) {
+                mapperType = map.getType();
+
+                var savedMapperOptions = map.getOptions();
+                if (savedMapperOptions !== undefined) {
+                    for (var key in savedMapperOptions) {
+                        if (savedMapperOptions.hasOwnProperty(key)) {
+                            mapperOptionsArray.push({
+                                key: key,
+                                value: savedMapperOptions[key]
+                            });
+                        }
+                    }
+                }
+
+                var savedMapperAttributes = map.getAttributes();
+                if (savedMapperAttributes !== undefined) {
+                    if (savedMapperAttributes.type === 'MAP') {
+                        for (var key in savedMapperAttributes.value) {
+                            if (savedMapperAttributes.value.hasOwnProperty(key)) {
+                                mapperAttributesArray.push({
+                                    key: key,
+                                    value: savedMapperAttributes.value[key]
+                                });
+                            }
+                        }
+                    } else if (savedMapperAttributes.type === 'SINGLE') {
+                        mapperAttributesArray = {
+                            value: savedMapperAttributes.value
+                        };
+                    } else {
+                        console.log("Unknown mapper attribute type detected!")
+                    }
+                }
+            }
 
             var fillWith = {
-                name : name,
-                attributes : attributes
+                annotationType: {
+                    name: type
+                },
+                annotationOptions : sinkOptionsArray,
+                map: {
+                    annotationType: {
+                        name: mapperType
+                    },
+                    annotationOptions : mapperOptionsArray,
+                    attributeValues: mapperAttributesArray
+                }
             };
+            fillWith = self.formUtils.cleanJSONObject(fillWith);
+
             // generate the form to define a sink
             var editor = new JSONEditor(formContainer[0], {
                 schema: {
@@ -245,7 +398,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                                 disable_properties: true
                             },
                             properties: {
-                                annotationType: {
+                                name: {
                                     type: "string",
                                     title: "Name",
                                     required: true,
@@ -283,12 +436,52 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                             propertyOrder: 3,
                             title: "Map Annotation",
                             type: "object",
-                            options: {
-                                disable_properties: true
-                            },
                             properties: {
-                                annotationValues: {
+                                annotationType: {
                                     required: true,
+                                    propertyOrder: 1,
+                                    type: "object",
+                                    title: "Annotation Type",
+                                    options: {
+                                        disable_properties: true
+                                    },
+                                    properties: {
+                                        name: {
+                                            type: "string",
+                                            title: "Name",
+                                            required: true,
+                                            minLength: 1
+                                        }
+                                    }
+                                },
+                                annotationOptions: {
+                                    propertyOrder: 2,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Mapper Options",
+                                    uniqueItems: true,
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: 'Option key-value pair',
+                                        properties: {
+                                            key: {
+                                                title: 'Key',
+                                                type: "string",
+                                                required: true,
+                                                minLength: 1
+                                            },
+                                            value: {
+                                                title: 'Value',
+                                                type: "string",
+                                                required: true,
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                },
+                                attributeValues: {
+                                    propertyOrder: 3,
                                     title: "Attributes Type",
                                     oneOf: [
                                         {
@@ -296,8 +489,8 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                                             title: "Enter Attributes as key/value pairs"
                                         },
                                         {
-                                            $ref: "#/definitions/listValues",
-                                            title: "Enter Attributes as a list"
+                                            $ref: "#/definitions/singleValue",
+                                            title: "Enter a single Attribute"
                                         }
                                     ]
                                 }
@@ -331,29 +524,22 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                                 }
                             }
                         },
-                        listValues: {
+                        singleValue: {
                             required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Map Options",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    value: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
+                            type: "object",
+                            title: "Map Option",
+                            properties: {
+                                value: {
+                                    title: 'Value',
+                                    type: "string",
+                                    required: true,
+                                    minLength: 1
                                 }
                             }
                         }
                     }
                 },
-                startVal: fillWith,
+                startval: fillWith,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
@@ -374,14 +560,65 @@ define(['require', 'log', 'jquery', 'lodash', 'sinkAnnotation', 'mapAnnotation']
                     return;
                 }
 
+                var config = editor.getValue();
+                clickedElement.setType(config.annotationType.name);
+
+                var annotationOptions = {};
+                if(config.annotationOptions !== undefined) {
+                    _.forEach(config.annotationOptions, function (option) {
+                        annotationOptions[option.key] = option.value;
+                    });
+                    clickedElement.setOptions(annotationOptions);
+                } else {
+                    clickedElement.setOptions(undefined);
+                }
+
+                if (config.map !== undefined) {
+                    var mapperOptions = {};
+                    _.set(mapperOptions, 'type', config.map.annotationType.name);
+
+                    var mapperAnnotationOptions = {};
+                    if(config.map.annotationOptions !== undefined) {
+                        _.forEach(config.map.annotationOptions, function (option) {
+                            mapperAnnotationOptions[option.key] = option.value;
+                        });
+                        _.set(mapperOptions, 'options', annotationOptions);
+                    } else {
+                        _.set(mapperOptions, 'options', undefined);
+                    }
+                    if (config.map.attributeValues !== undefined) {
+                        // if attributeValues[0] is defined then mapper annotations values are saved as a map.
+                        // Otherwise saved as a single value.
+                        if (config.map.attributeValues[0] !== undefined) {
+                            var mapperAttributesValues = {};
+                            _.forEach(config.map.attributeValues, function (attributeValue) {
+                                mapperAttributesValues[attributeValue.key] = attributeValue.value;
+                            });
+                            var attributes = {
+                                type: "MAP",
+                                value: mapperAttributesValues
+                            };
+                            _.set(mapperOptions, 'attributes', attributes);
+                        } else {
+                            var mapperAttributesValue = config.map.attributeValues.value;
+                            var attributes = {
+                                type: "SINGLE",
+                                value: mapperAttributesValue
+                            };
+                            _.set(mapperOptions, 'attributes', attributes);
+                        }
+                    } else {
+                        _.set(mapperOptions, 'attributes', undefined);
+                    }
+
+                    var mapperObject = new MapAnnotation(mapperOptions);
+                    clickedElement.setMap(mapperObject);
+                } else {
+                    clickedElement.setMap(undefined);
+                }
+
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
-
-                var config = editor.getValue();
-
-                // update selected sink model
-                clickedElement.setName(config.name);
-                // removing all elements from attribute list
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);

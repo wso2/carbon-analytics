@@ -20,15 +20,16 @@ define(
     function () {
 
         /**
-         * @class Source
+         * @class SourceOrSinkAnnotation
          * @constructor
-         * @class Source  Creates a Source
+         * @class SourceOrSinkAnnotation  Creates a Source Or Sink Annotation
          * @param {Object} options Rendering options for the view
          */
-        var Source = function (options) {
+        var SourceOrSinkAnnotation = function (options) {
             /*
              Data storing structure as follows
                 id*: ‘’,
+                annotationType*: 'SOURCE | SINK',
                 type*: ‘’,
                 options: {Key-Value Pair JSON},
                 map: {
@@ -47,44 +48,53 @@ define(
             */
             if (options !== undefined) {
                 this.id = options.id;
+                this.annotationType = options.annotationType;
                 this.type = options.type;
                 this.options = options.options;
                 this.map = options.map;
             }
         };
 
-        Source.prototype.getId = function () {
+        SourceOrSinkAnnotation.prototype.getId = function () {
             return this.id;
         };
 
-        Source.prototype.getType = function () {
+        SourceOrSinkAnnotation.prototype.getAnnotationType = function () {
+            return this.annotationType;
+        };
+
+        SourceOrSinkAnnotation.prototype.getType = function () {
             return this.type;
         };
 
-        Source.prototype.getOptions = function () {
+        SourceOrSinkAnnotation.prototype.getOptions = function () {
             return this.options;
         };
 
-        Source.prototype.getMap = function () {
+        SourceOrSinkAnnotation.prototype.getMap = function () {
             return this.map;
         };
 
-        Source.prototype.setId = function (id) {
+        SourceOrSinkAnnotation.prototype.setId = function (id) {
             this.id = id;
         };
 
-        Source.prototype.setType = function (type) {
+        SourceOrSinkAnnotation.prototype.setAnnotationType = function (annotationType) {
+            this.annotationType = annotationType;
+        };
+
+        SourceOrSinkAnnotation.prototype.setType = function (type) {
             this.type = type;
         };
 
-        Source.prototype.setOptions = function (options) {
+        SourceOrSinkAnnotation.prototype.setOptions = function (options) {
             this.options = options;
         };
 
-        Source.prototype.setMap = function (map) {
+        SourceOrSinkAnnotation.prototype.setMap = function (map) {
             this.map = map;
         };
 
-        return Source;
+        return SourceOrSinkAnnotation;
 
     });

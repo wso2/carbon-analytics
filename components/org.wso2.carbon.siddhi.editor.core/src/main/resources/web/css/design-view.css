@@ -72,6 +72,14 @@
     background-color: #fff;
 }
 
+.sourceDrop{
+    background-image: url("../images/source.png");
+}
+
+.sinkDrop{
+    background-image: url("../images/sink.png");
+}
+
 .streamDrop {
     background-image: url("../images/stream.png");
 }
@@ -121,7 +129,7 @@
 */
 
 .streamDrop, .tableDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
-.windowQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop {
+.windowQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop, .sourceDrop, .sinkDrop {
     border-radius: 0.5em;
     opacity: 0.8;
     width: 60px;
@@ -307,14 +315,12 @@ td {
 }
 
 .aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
-.partitionNameNode, .patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode {
-    float: right;
+.partitionNameNode, .patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode {
     width: inherit;
     height: inherit;
     background-color: transparent;
     border: 1px solid transparent;
     margin-top: -10px;
-    margin-right: -3px;
     font-weight: bolder;
 }
 

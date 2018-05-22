@@ -21,12 +21,12 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
-        'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceAnnotation', 'sinkAnnotation'],
+        'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindow, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete,
               QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource,
-              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceAnnotation, SinkAnnotation) {
+              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation) {
 
         /**
          * @class DesignView
@@ -115,12 +115,12 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             }
 
             _.forEach(configurationData.siddhiAppConfig.sourceList, function(source){
-                var sourceObject = new SourceAnnotation(source);
+                var sourceObject = new SourceOrSinkAnnotation(source);
                 sourceObject.setId(newIdBeginningPhrase + sourceObject.getId());
                 appData.addSource(sourceObject);
             });
             _.forEach(configurationData.siddhiAppConfig.sinkList, function(sink){
-                var sinkObject = new SinkAnnotation(sink);
+                var sinkObject = new SourceOrSinkAnnotation(sink);
                 sinkObject.setId(newIdBeginningPhrase + sinkObject.getId());
                 appData.addSink(sinkObject);
             });

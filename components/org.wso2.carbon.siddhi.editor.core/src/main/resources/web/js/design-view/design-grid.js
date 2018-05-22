@@ -137,12 +137,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                         // If the dropped Element is a Source annotation then->
                         if ($(droppedElement).hasClass('source-drag')) {
-                            self.handleSourceAnnotation(mouseTop, mouseLeft, false);
+                            self.handleSourceAnnotation(mouseTop, mouseLeft, false, "Source");
                         }
 
                         // If the dropped Element is a Sink annotation then->
                         if ($(droppedElement).hasClass('sink-drag')) {
-                            self.handleSinkAnnotation(mouseTop, mouseLeft, false);
+                            self.handleSinkAnnotation(mouseTop, mouseLeft, false, "Sink");
                         }
 
                         // If the dropped Element is a Stream then->
@@ -899,22 +899,22 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
             _.forEach(self.configurationData.getSiddhiAppConfig().sourceList, function(source){
                 var sourceId = source.getId();
-                var sourceName = source.getName();
+                var sourceName = "Source";
                 var array = sourceId.split("-");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
-                self.handleSourceAnnotation(mouseTop, mouseLeft, true, sourceId, sourceName);
+                self.handleSourceAnnotation(mouseTop, mouseLeft, true, sourceName, sourceId);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().sinkList, function(sink){
                 var sinkId = sink.getId();
-                var sinkName = sink.getName();
+                var sinkName = "Sink";
                 var array = sinkId.split("-");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
-                self.handleSinkAnnotation(mouseTop, mouseLeft, true, sinkId, sinkName);
+                self.handleSinkAnnotation(mouseTop, mouseLeft, true, sinkName, sinkId);
             });
             
             _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function(stream){
@@ -1207,8 +1207,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             self.jsPlumbInstance.repaintEverything();
         };
 
-        DesignGrid.prototype.handleSourceAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sourceId, 
-                                                                sourceName) {
+        DesignGrid.prototype.handleSourceAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sourceName,
+                                                                sourceId) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -1230,15 +1230,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.SOURCE);
             self.canvas.append(newAgent);
             // Drop the source element. Inside this a it generates the source definition form.
-            self.dropElements.dropSource(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
-                false, sourceName);
+            self.dropElements.dropSource(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, sourceName);
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        DesignGrid.prototype.handleSinkAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sinkId,
-                                                              sinkName) {
+        DesignGrid.prototype.handleSinkAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sinkName,
+                                                              sinkId) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -1260,8 +1259,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.SINK);
             self.canvas.append(newAgent);
             // Drop the sink element. Inside this a it generates the sink definition form.
-            self.dropElements.dropSink(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
-                false, sinkName);
+            self.dropElements.dropSink(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, sinkName);
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);

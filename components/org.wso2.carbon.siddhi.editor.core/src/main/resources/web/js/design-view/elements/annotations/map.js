@@ -31,14 +31,19 @@ define(
                 type*: ‘’,
                 options: {Key-Value Pair JSON},
                 attributes: {
-                    type*: ‘map’
+                    type*: ‘MAP’
                     value*: {Key-Value Pair JSON}
                 }
                 << or >>
                 attributes: {
-                    type*: ‘list’
+                    type*: ‘LIST’
                     value*: ['value1',...]
-                }
+                } NOTE: LIST value is applicable to source annotation only.
+                << or  >>
+                payload: {
+                    type*: 'SINGLE',
+                    value*: ''
+                } // NOTE : SINGLE value is applicable to sink annotation only.
             */
             if (options !== undefined) {
                 this.type = options.type;
