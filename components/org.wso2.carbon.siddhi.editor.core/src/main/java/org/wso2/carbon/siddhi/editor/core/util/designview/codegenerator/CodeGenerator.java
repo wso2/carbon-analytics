@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
@@ -125,6 +126,15 @@ public class CodeGenerator {
             siddhiAppStringBuilder.append(Constants.NEW_LINE);
         }
 
+        if (!siddhiApp.getFunctionList().isEmpty()) {
+            siddhiAppStringBuilder.append("-- Functions").append(Constants.NEW_LINE);
+            for (FunctionConfig function: siddhiApp.getFunctionList()) {
+                siddhiAppStringBuilder.append(generateFunctionString(function)).append(Constants.NEW_LINE);
+            }
+            siddhiAppStringBuilder.append(Constants.NEW_LINE);
+        }
+
+        // TODO seperate these out into different IF conditions.
         if (!siddhiApp.getWindowFilterProjectionQueryList().isEmpty() || !siddhiApp.getJoinQueryList().isEmpty() ||
                 !siddhiApp.getPatternQueryList().isEmpty() || !siddhiApp.getSequenceQueryList().isEmpty()) {
             siddhiAppStringBuilder.append("-- Queries").append(Constants.NEW_LINE);
@@ -364,6 +374,42 @@ public class CodeGenerator {
         aggregationStringBuilder.append(Constants.SEMI_COLON);
 
         return aggregationStringBuilder.toString();
+    }
+
+    private String generateFunctionString(FunctionConfig function) {
+        if (function == null) {
+            throw new CodeGenerationException("The given FunctionConfig instance is null");
+        } else if (function.getName() == null || function.getName().isEmpty()) {
+            throw new CodeGenerationException("The given function name is empty");
+        } else if (function.getScriptType() == null || function.getScriptType().isEmpty()) {
+            throw new CodeGenerationException("The given function script type is empty");
+        } else if (function.getReturnType() == null || function.getReturnType().isEmpty()) {
+            throw new CodeGenerationException("The given function return type is empty");
+        } else if (function.getBody() == null || function.getBody().isEmpty()) {
+            throw new CodeGenerationException("The given function body is empty");
+        }
+
+        StringBuilder functionStringBuilder = new StringBuilder();
+        functionStringBuilder.append(Constants.DEFINE_FUNCTION)
+                .append(Constants.SPACE)
+                .append(function.getName())
+                .append(Constants.OPEN_SQUARE_BRACKET)
+                .append(function.getScriptType())
+                .append(Constants.CLOSE_SQUARE_BRACKET)
+                .append(Constants.SPACE)
+                .append(Constants.RETURN)
+                .append(Constants.SPACE)
+                .append(function.getReturnType())
+                .append(Constants.SPACE)
+                .append(Constants.OPEN_CURLY_BRACKET)
+                .append(Constants.NEW_LINE)
+                .append(Constants.TAB_SPACE)
+                .append(function.getBody().trim())
+                .append(Constants.NEW_LINE)
+                .append(Constants.CLOSE_CURLY_BRACKET)
+                .append(Constants.SEMI_COLON);
+
+        return functionStringBuilder.toString();
     }
 
     /**
@@ -1123,13 +1169,14 @@ public class CodeGenerator {
         private static final char CLOSE_BRACKET = ')';
         private static final char CLOSE_SQUARE_BRACKET = ']';
         private static final char COMMA = ',';
-        private static final char DOUBLE_QUOTE = '\"';
         private static final char EQUALS = '=';
         private static final char FULL_STOP = '.';
         private static final char HASH = '#';
         private static final char NEW_LINE = '\n';
         private static final char OPEN_BRACKET = '(';
         private static final char OPEN_SQUARE_BRACKET = '[';
+        private static final char OPEN_CURLY_BRACKET = '{';
+        private static final char CLOSE_CURLY_BRACKET = '}';
         private static final char SEMI_COLON = ';';
         private static final char SINGLE_QUOTE = '\'';
         private static final char SPACE = ' ';
@@ -1142,6 +1189,7 @@ public class CodeGenerator {
         private static final String DEFINE_WINDOW = "define window";
         private static final String DEFINE_TRIGGER = "define trigger";
         private static final String DEFINE_AGGREGATION = "define aggregation";
+        public static final String DEFINE_FUNCTION = "define function";
 
         // TODO: 5/2/18 combine 'OUTPUT_<VALUE>_EVENTS' with 'OUTPUT + SPACE + <VALUE>_EVENTS'
         private static final String OUTPUT_CURRENT_EVENTS = "output current events";
@@ -1156,10 +1204,15 @@ public class CodeGenerator {
         private static final String SELECT = "select";
         private static final String AT = "at";
         private static final String AS = "as";
+
+        // TODO: 5/22/18 Combine GROUP_BY & ORDER_BY with GROUP + BY & ORDER + BY
         private static final String GROUP_BY = "group by";
+        private static final String GROUP = "group";
         private static final String ORDER_BY = "order by";
-        private static final String AGGREGATE_BY = "aggregate by";
+        private static final String ORDER = "order";
+
         private static final String EVERY = "every";
+        private static final String RETURN = "return";
         private static final String LIMIT = "limit";
         private static final String WINDOW = "window";
         private static final String STORE = "@store(type='";
