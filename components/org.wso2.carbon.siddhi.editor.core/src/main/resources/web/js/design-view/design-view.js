@@ -21,12 +21,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
-        'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation'],
+        'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation',
+        'functionDefinition'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindow, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete,
               QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource,
-              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation) {
+              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation,
+              FunctionDefinition) {
 
         /**
          * @class DesignView
@@ -164,6 +166,11 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriodSubElement);
                 aggregationObject.setId(newIdBeginningPhrase + aggregationObject.getId());
                 appData.addAggregation(aggregationObject);
+            });
+            _.forEach(configurationData.siddhiAppConfig.functionList, function(functionJSON){
+                var functionObject = new FunctionDefinition(functionJSON);
+                functionObject.setId(newIdBeginningPhrase + functionObject.getId());
+                appData.addFunction(functionObject);
             });
             _.forEach(configurationData.siddhiAppConfig.patternQueryList, function(patternQuery){
                 var patternQueryObject = new Query(patternQuery);

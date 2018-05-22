@@ -31,6 +31,7 @@ define(['require', 'elementUtils', 'lodash'],
             this.windowList = [];
             this.triggerList = [];
             this.aggregationList = [];
+            this.functionList = [];
             this.windowFilterProjectionQueryList = [];
             this.patternQueryList = [];
             this.sequenceQueryList = [];
@@ -61,6 +62,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.addAggregation = function (aggregation) {
             this.aggregationList.push(aggregation);
+        };
+
+        AppData.prototype.addFunction = function (functionObject) {
+            this.functionList.push(functionObject);
         };
 
         AppData.prototype.addWindowFilterProjectionQuery = function (windowFilterProjectionQuery) {
@@ -109,6 +114,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.removeAggregation = function (aggregationId) {
             ElementUtils.prototype.removeElement(this.aggregationList, aggregationId);
+        };
+
+        AppData.prototype.removeFunction = function (functionId) {
+            ElementUtils.prototype.removeElement(this.functionList, functionId);
         };
 
         AppData.prototype.removeWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
@@ -163,6 +172,10 @@ define(['require', 'elementUtils', 'lodash'],
             return ElementUtils.prototype.getElement(this.aggregationList, aggregationId);
         };
 
+        AppData.prototype.getFunction = function (functionId) {
+            return ElementUtils.prototype.getElement(this.functionList, functionId);
+        };
+
         AppData.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
             return ElementUtils.prototype.getElement(this.windowFilterProjectionQueryList, windowFilterProjectionQueryId);
         };
@@ -207,8 +220,9 @@ define(['require', 'elementUtils', 'lodash'],
             var tableList = self.tableList;
             var windowList = self.windowList;
             var aggregationList = self.aggregationList;
+            var functionList = self.functionList;
             var triggerList = self.triggerList;
-            var lists = [streamList, tableList, windowList, aggregationList, triggerList];
+            var lists = [streamList, tableList, windowList, aggregationList, functionList, triggerList];
 
             _.forEach(lists, function (list) {
                 _.forEach(list, function (element) {
@@ -222,6 +236,8 @@ define(['require', 'elementUtils', 'lodash'],
                             type = 'WINDOW';
                         } else if (list === aggregationList) {
                             type = 'AGGREGATION';
+                        } else if (list === functionList) {
+                            type = 'FUNCTION';
                         } else if (list === triggerList) {
                             type = 'TRIGGER';
                         }
@@ -248,8 +264,9 @@ define(['require', 'elementUtils', 'lodash'],
             var tableList = self.tableList;
             var windowList = self.windowList;
             var aggregationList = self.aggregationList;
+            var functionList = self.functionList;
             var triggerList = self.triggerList;
-            var listNames = [streamList, tableList, windowList, aggregationList, triggerList];
+            var listNames = [streamList, tableList, windowList, aggregationList, functionList, triggerList];
 
             _.forEach(listNames, function (list) {
                 _.forEach(list, function (element) {
@@ -263,6 +280,8 @@ define(['require', 'elementUtils', 'lodash'],
                             type = 'WINDOW';
                         } else if (list === aggregationList) {
                             type = 'AGGREGATION';
+                        } else if (list === functionList) {
+                            type = 'FUNCTION';
                         } else if (list === triggerList) {
                             type = 'TRIGGER';
                         }

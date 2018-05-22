@@ -111,7 +111,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 ({
                     accept: '.stream-drag, .table-drag, .window-drag, .trigger-drag, .aggregation-drag,' +
                     '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
-                    '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag',
+                    '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag, ' +
+                    '.function-drag',
                     containment: 'grid-container',
 
                     /**

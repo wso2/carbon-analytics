@@ -84,6 +84,12 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     icon : "/editor/images/aggregation.png"
                 },
                 {
+                    id : "function",
+                    className : "function-drag",
+                    title : "Function",
+                    icon : "/editor/images/function.png"
+                },
+                {
                     id : "projection-query",
                     className : "projection-query-drag",
                     title : "Projection Query",
