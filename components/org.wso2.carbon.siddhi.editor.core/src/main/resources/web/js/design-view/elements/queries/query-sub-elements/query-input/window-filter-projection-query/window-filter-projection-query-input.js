@@ -39,7 +39,7 @@ define(
                 postWindowFilter: ''
             */
             if (options !== undefined) {
-                this.type = (options.type).toUpperCase();
+                this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.from = options.from;
                 this.filter = options.filter;
                 this.window = options.window;

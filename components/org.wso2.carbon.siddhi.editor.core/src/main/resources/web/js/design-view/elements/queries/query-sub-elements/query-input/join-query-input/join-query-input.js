@@ -51,9 +51,9 @@ define(
             if (options !== undefined) {
                 this.firstConnectedElement = options.firstConnectedElement;
                 this.secondConnectedElement = options.secondConnectedElement;
-                this.joinWith = (options.joinWith).toUpperCase();
+                this.joinWith = (options.joinWith !== undefined) ? (options.joinWith).toUpperCase() : undefined;
                 this.left = options.left;
-                this.joinType = (options.joinType).toUpperCase();
+                this.joinType = (options.joinType !== undefined) ? (options.joinType).toUpperCase() : undefined;
                 this.right = options.right;
                 this.on = options.on;
                 this.within = options.within;

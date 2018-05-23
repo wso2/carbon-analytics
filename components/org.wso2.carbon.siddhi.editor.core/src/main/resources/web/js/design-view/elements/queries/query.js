@@ -40,7 +40,7 @@ define(['require', 'elementUtils'],
                     },
                     ...
                 ],
-                limit: <integer|long>,
+                limit: <long>,
                 having: '',
                 outputRateLimit: ''
                 queryOutput*: {Query Output JSON},

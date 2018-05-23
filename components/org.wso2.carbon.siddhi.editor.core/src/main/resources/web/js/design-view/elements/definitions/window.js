@@ -58,7 +58,8 @@ define(['require', 'elementUtils'],
                 this.name = options.name;
                 this.function = options.function;
                 this.parameters = options.parameters;
-                this.outputEventType = (options.outputEventType).toUpperCase();
+                this.outputEventType
+                    = (options.outputEventType !== undefined)? (options.outputEventType).toUpperCase() : undefined;
             }
             this.attributeList = [];
             this.annotationList =  [];

@@ -98,7 +98,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 _.forEach(savedOrderByAttributes, function (savedOrderByValue) {
                     var orderByValueObject = {
                         attribute: savedOrderByValue.getValue(),
-                        order: savedOrderByValue.getOrder()
+                        order: (savedOrderByValue.getOrder()).toLowerCase()
                     };
                     orderBy.push(orderByValueObject);
                 });
@@ -828,7 +828,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         _.forEach(outputConfig.orderBy, function (orderByValue) {
                             var orderByValueObjectOptions = {};
                             _.set(orderByValueObjectOptions, 'value', orderByValue.attribute);
-                            _.set(orderByValueObjectOptions, 'order', orderByValue.order);
+                            _.set(orderByValueObjectOptions, 'order', (orderByValue.order).toUpperCase());
                             var orderByValueObject = new QueryOrderByValue(orderByValueObjectOptions);
                             clickedElement.addOrderByValue(orderByValueObject);
                         });

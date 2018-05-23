@@ -33,7 +33,7 @@ define(
             */
             if (options !== undefined) {
                 this.value = options.value;
-                this.order = (options.order).toUpperCase();
+                this.order = (options.order !== undefined) ? (options.order).toUpperCase() : undefined;
             }
         };
 

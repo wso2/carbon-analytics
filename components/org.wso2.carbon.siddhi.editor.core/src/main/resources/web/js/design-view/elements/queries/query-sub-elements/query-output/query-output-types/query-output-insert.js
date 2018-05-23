@@ -31,7 +31,7 @@ define(
                 eventType: 'CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS'
             */
             if (options !== undefined) {
-                this.eventType = (options.eventType).toUpperCase();
+                this.eventType = (options.eventType !== undefined) ? (options.eventType).toUpperCase() : undefined;
             }
         };
 

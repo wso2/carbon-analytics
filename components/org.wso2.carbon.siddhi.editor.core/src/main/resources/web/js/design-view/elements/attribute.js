@@ -35,7 +35,7 @@ define(
             */
             if (options !== undefined) {
                 this.name = options.name;
-                this.type = (options.type).toUpperCase();
+                this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
             }
         };
 

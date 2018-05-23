@@ -38,12 +38,15 @@ define(
                 as: '',
                 isUnidirectional: true|false // Only one 'isUnidirectional' value can be true at a time (either left definition|right definition|none)
             */
-            this.type = (options.type).toUpperCase();
-            this.from = options.from;
-            this.filter = options.filter;
-            this.window = options.window;
-            this.as = options.as;
-            this.isUnidirectional = options.isUnidirectional;
+            if (options !== undefined) {
+                this.type
+                    = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
+                this.from = options.from;
+                this.filter = options.filter;
+                this.window = options.window;
+                this.as = options.as;
+                this.isUnidirectional = options.isUnidirectional;
+            }
         };
 
         JoinSource.prototype.getType = function () {

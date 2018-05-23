@@ -41,7 +41,7 @@ define(['require', 'elementUtils'],
                 logic*: ''
             */
             if (options !== undefined) {
-                this.type = (options.type).toUpperCase();
+                this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.logic = options.logic;
             }
             // This will hold all the connected streams to the pattern/sequence query(front end use only).

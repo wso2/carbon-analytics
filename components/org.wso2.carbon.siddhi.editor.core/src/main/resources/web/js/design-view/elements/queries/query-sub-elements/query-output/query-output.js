@@ -33,7 +33,7 @@ define(
                 target*: ''
             */
             if (options !== undefined) {
-                this.type = (options.type).toUpperCase();
+                this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.output = options.output;
                 this.target = options.target;
             }

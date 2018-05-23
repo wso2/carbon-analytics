@@ -48,7 +48,8 @@ define(
             */
             if (options !== undefined) {
                 this.id = options.id;
-                this.annotationType = (options.annotationType).toUpperCase();
+                this.annotationType
+                    = (options.annotationType !== undefined)? (options.annotationType).toUpperCase() : undefined;
                 this.type = options.type;
                 this.options = options.options;
                 this.map = options.map;

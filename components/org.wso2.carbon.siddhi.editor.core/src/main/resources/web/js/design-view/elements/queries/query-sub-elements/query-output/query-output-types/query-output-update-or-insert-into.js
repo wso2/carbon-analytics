@@ -39,7 +39,7 @@ define(
                 on*: ''
             */
             if (options !== undefined) {
-                this.eventType = (options.eventType).toUpperCase();
+                this.eventType = (options.eventType !== undefined) ? (options.eventType).toUpperCase() : undefined;
                 this.set = options.set;
                 this.on = options.on;
             }
