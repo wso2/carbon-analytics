@@ -24,7 +24,7 @@ export default class FormSubmissionError extends Error {
      * Constructs a FormSubmissionError with the given states of the fields after the error,
      * and the remaining params including the message
      * @param {object} fieldErrorStates     Object containing States of the form fields after the error
-     * @param {params} params               Rest of the params, including the error message todo
+     * @param {params} params               Rest of the params, including the error message
      */
     constructor(fieldErrorStates, ...params) {
         // Pass remaining arguments to the parent constructor
