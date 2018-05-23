@@ -44,9 +44,9 @@ import java.text.SimpleDateFormat;
 @Plugin(name = "EditorConsole", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE, printObject = true)
 public final class EditorConsoleAppender extends AbstractAppender {
 
-    private CircularBuffer<ConsoleLogEvent> circularBuffer;
     private static final int BUFFER_SIZE = 10;
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
+    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
+    private CircularBuffer<ConsoleLogEvent> circularBuffer;
 
     /**
      * Creates an instance of EditorConsoleAppender.
