@@ -32,8 +32,8 @@ define(
                 maxValue: '' // Max value is added if the user wants to define a range of timestamps
             */
             if (options !== undefined) {
-                this.minValue = options.minValue;
-                this.maxValue = options.maxValue;
+                this.minValue = (options.minValue).toUpperCase();
+                this.maxValue = (options.maxValue).toUpperCase();
             }
         };
 

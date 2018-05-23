@@ -359,10 +359,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     _.set(aggregationOptions, 'aggregateByAttribute', undefined);
                 }
 
-                var aggregateByTimePeriod = new AggregateByTimePeriod(editorAggregate.getValue().aggregateByTimePeriod);
-                if (editorAggregate.getValue().aggregateByTimePeriod.maxValue === undefined) {
-                    aggregateByTimePeriod.setMaxValue(undefined);
+                var aggregateByTimePeriodOptions = {};
+                _.set(aggregateByTimePeriodOptions, 'minValue',
+                    (editorAggregate.getValue().aggregateByTimePeriod.minValue).toUpperCase());
+                if (editorAggregate.getValue().aggregateByTimePeriod.maxValue !== undefined) {
+                    _.set(aggregateByTimePeriodOptions, 'maxValue',
+                        (editorAggregate.getValue().aggregateByTimePeriod.maxValue).toUpperCase());
+                } else {
+                    _.set(aggregateByTimePeriodOptions, 'minValue', undefined);
                 }
+                var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                 _.set(aggregationOptions, 'aggregateByTimePeriod', aggregateByTimePeriod);
 
                 var aggregation = new Aggregation(aggregationOptions);
@@ -440,7 +446,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         attribute : aggregateByAttribute
                     },
                     aggregateByTimePeriod : {
-                        minValue: aggregateByTimePeriod.getMinValue()
+                        minValue: (aggregateByTimePeriod.getMinValue()).toLowerCase()
                     }
                 };
             } else {
@@ -448,7 +454,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     aggregateByAttribute: {
                         attribute : aggregateByAttribute
                     },
-                    aggregateByTimePeriod : aggregateByTimePeriod
+                    aggregateByTimePeriod : {
+                        minValue: (aggregateByTimePeriod.getMinValue()).toLowerCase(),
+                        maxValue: (aggregateByTimePeriod.getMaxValue()).toLowerCase()
+                    }
                 };
             }
 
@@ -755,10 +764,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     clickedElement.setAggregateByAttribute(undefined);
                 }
 
-                var aggregateByTimePeriod = new AggregateByTimePeriod(configAggregate.aggregateByTimePeriod);
-                if (configAggregate.aggregateByTimePeriod.maxValue === undefined) {
-                    aggregateByTimePeriod.setMaxValue(undefined);
+                var aggregateByTimePeriodOptions = {};
+                _.set(aggregateByTimePeriodOptions, 'minValue',
+                    (configAggregate.aggregateByTimePeriod.minValue).toUpperCase());
+                if (configAggregate.aggregateByTimePeriod.maxValue !== undefined) {
+                    _.set(aggregateByTimePeriodOptions, 'maxValue',
+                        (configAggregate.aggregateByTimePeriod.maxValue).toUpperCase());
+                } else {
+                    _.set(aggregateByTimePeriodOptions, 'minValue', undefined);
                 }
+                var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                 clickedElement.setAggregateByTimePeriod(aggregateByTimePeriod);
 
                 var textNode = $(element).parent().find('.aggregationNameNode');

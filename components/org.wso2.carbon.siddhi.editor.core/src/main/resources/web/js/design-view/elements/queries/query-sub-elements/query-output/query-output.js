@@ -33,7 +33,7 @@ define(
                 target*: ''
             */
             if (options !== undefined) {
-                this.type = options.type;
+                this.type = (options.type).toUpperCase();
                 this.output = options.output;
                 this.target = options.target;
             }
@@ -53,7 +53,7 @@ define(
         };
 
         QueryOutput.prototype.setType = function (type) {
-            this.type = type;
+            this.type = type.toUpperCase();
         };
 
         QueryOutput.prototype.setOutput = function (output) {

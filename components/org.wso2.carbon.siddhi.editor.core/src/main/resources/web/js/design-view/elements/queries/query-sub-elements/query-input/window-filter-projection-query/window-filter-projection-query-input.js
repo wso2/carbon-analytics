@@ -39,7 +39,7 @@ define(
                 postWindowFilter: ''
             */
             if (options !== undefined) {
-                this.type = options.type;
+                this.type = (options.type).toUpperCase();
                 this.from = options.from;
                 this.filter = options.filter;
                 this.window = options.window;
@@ -68,7 +68,7 @@ define(
         };
 
         WindowFilterProjectionQueryInput.prototype.setType = function (type) {
-            this.type = type;
+            this.type = type.toUpperCase();
         };
 
         WindowFilterProjectionQueryInput.prototype.setFrom = function (from) {

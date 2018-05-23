@@ -33,7 +33,7 @@ define(
             */
             if (options !== undefined) {
                 this.value = options.value;
-                this.order = options.order;
+                this.order = (options.order).toUpperCase();
             }
         };
 
@@ -50,7 +50,7 @@ define(
         };
 
         QueryOrderBy.prototype.setOrder = function (order) {
-            this.order = order;
+            this.order = order.toUpperCase();
         };
 
         return QueryOrderBy;

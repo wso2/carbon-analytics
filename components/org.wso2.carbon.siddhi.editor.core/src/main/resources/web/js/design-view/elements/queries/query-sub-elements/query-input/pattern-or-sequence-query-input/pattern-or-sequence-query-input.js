@@ -41,7 +41,7 @@ define(['require', 'elementUtils'],
                 logic*: ''
             */
             if (options !== undefined) {
-                this.type = options.type;
+                this.type = (options.type).toUpperCase();
                 this.logic = options.logic;
             }
             // This will hold all the connected streams to the pattern/sequence query(front end use only).
@@ -87,7 +87,7 @@ define(['require', 'elementUtils'],
         };
 
         PatternOrSequenceQueryInput.prototype.setType = function (type) {
-            this.type = type;
+            this.type = type.toUpperCase();
         };
 
         PatternOrSequenceQueryInput.prototype.setConnectedElementNameList = function (connectedElementNameList) {

@@ -197,7 +197,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                 log.error(errorMessage);
             }
             var name = clickedElement.getName();
-            var attributes = clickedElement.getAttributeList();
+            var savedAttributes = clickedElement.getAttributeList();
+            var attributes = [];
+            _.forEach(savedAttributes, function (savedAttribute) {
+                var attributeObject = {
+                    name: savedAttribute.getName(),
+                    type: (savedAttribute.getType()).toLowerCase()
+                };
+                attributes.push(attributeObject);
+            });
 
             var fillWith = {
                 name : name,

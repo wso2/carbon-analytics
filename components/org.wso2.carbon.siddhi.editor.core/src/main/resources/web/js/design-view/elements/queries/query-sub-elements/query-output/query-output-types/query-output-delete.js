@@ -32,7 +32,7 @@ define(
                 on*: ''
             */
             if (options !== undefined) {
-                this.eventType = options.eventType;
+                this.eventType = (options.eventType).toUpperCase();
                 this.on = options.on;
             }
         };
@@ -46,7 +46,7 @@ define(
         };
 
         QueryOutputDelete.prototype.setEventType = function (eventType) {
-            this.eventType = eventType;
+            this.eventType = eventType.toUpperCase();
         };
 
         QueryOutputDelete.prototype.setOn = function (on) {

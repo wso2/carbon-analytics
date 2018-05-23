@@ -215,7 +215,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 log.error(errorMessage);
             }
             var name = clickedElement.getName();
-            var attributes = clickedElement.getAttributeList();
+            var savedAttributes = clickedElement.getAttributeList();
+            var attributes = [];
+            _.forEach(savedAttributes, function (savedAttribute) {
+                var attributeObject = {
+                    name: savedAttribute.getName(),
+                    type: (savedAttribute.getType()).toLowerCase()
+                };
+                attributes.push(attributeObject);
+            });
             var functionName = clickedElement.getFunction();
             var savedParameterValues = clickedElement.getParameters();
 

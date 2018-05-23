@@ -39,7 +39,7 @@ define(
                 on*: ''
             */
             if (options !== undefined) {
-                this.eventType = options.eventType;
+                this.eventType = (options.eventType).toUpperCase();
                 this.set = options.set;
                 this.on = options.on;
             }
@@ -58,7 +58,7 @@ define(
         };
 
         QueryOutputUpdate.prototype.setEventType = function (eventType) {
-            this.eventType = eventType;
+            this.eventType = eventType.toUpperCase();
         };
 
         QueryOutputUpdate.prototype.setSet = function (set) {

@@ -41,7 +41,7 @@ define(
                 value*: '*'
             */
             if (options !== undefined) {
-                this.type = options.type;
+                this.type = (options.type).toUpperCase();
                 this.value = options.value;
             }
         };
@@ -55,7 +55,7 @@ define(
         };
 
         QuerySelect.prototype.setType = function (type) {
-            this.type = type;
+            this.type = type.toUpperCase();
         };
 
         QuerySelect.prototype.setValue = function (value) {

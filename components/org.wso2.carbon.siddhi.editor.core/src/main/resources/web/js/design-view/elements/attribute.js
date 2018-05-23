@@ -35,7 +35,7 @@ define(
             */
             if (options !== undefined) {
                 this.name = options.name;
-                this.type = options.type;
+                this.type = (options.type).toUpperCase();
             }
         };
 
@@ -52,7 +52,7 @@ define(
         };
 
         Attribute.prototype.setType = function (type) {
-            this.type = type;
+            this.type = type.toUpperCase();
         };
 
         return Attribute;
