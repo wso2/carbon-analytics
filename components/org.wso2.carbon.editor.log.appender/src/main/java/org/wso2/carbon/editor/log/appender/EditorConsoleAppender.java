@@ -46,7 +46,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
 
     private CircularBuffer<ConsoleLogEvent> circularBuffer;
     private static final int BUFFER_SIZE = 10;
-    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
 
     /**
      * Creates an instance of EditorConsoleAppender.
@@ -119,7 +119,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
         consoleLogEvent.setFqcn(logEvent.getLoggerName());
         consoleLogEvent.setLevel(logEvent.getLevel().name());
         consoleLogEvent.setMessage(getEncodedString(logEvent.getMessage().getFormattedMessage()));
-        String dateString = formatter.format(logEvent.getTimeMillis());
+        String dateString = dateFormatter.format(logEvent.getTimeMillis());
         consoleLogEvent.setTimeStamp(dateString);
         if (logEvent.getThrown() != null) {
             consoleLogEvent.setStacktrace(getStacktrace(logEvent.getThrown()));
