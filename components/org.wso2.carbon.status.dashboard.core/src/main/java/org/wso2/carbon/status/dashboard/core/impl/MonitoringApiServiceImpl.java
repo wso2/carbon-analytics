@@ -1219,9 +1219,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore.selectAppComponentsHistory(carbonId,
                                 appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
                                 componentType, componentId, false));
-//                        componentHistory.put(METRICS_TYPE_THROUGHPUT_COUNT, metricStore.selectAppComponentsHistory
-//                                (carbonId, appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
-//                                        componentType, componentId, true));
                         break;
                     }
                     case "trigger": {
