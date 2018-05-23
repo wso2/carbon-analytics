@@ -88,7 +88,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
                                                        @PluginAttribute("ignoreExceptions") final String ignore,
                                                        @PluginAttribute("buffSize") final String buffSize) {
         if (name == null) {
-                LOGGER.error("No name provided for EditorConsoleAppender");
+            LOGGER.error("No name provided for EditorConsoleAppender");
             return null;
         } else {
             if (layout == null) {
