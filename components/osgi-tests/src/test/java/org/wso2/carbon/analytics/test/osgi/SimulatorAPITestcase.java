@@ -52,17 +52,17 @@ public class SimulatorAPITestcase {
     private final String DEFAULT_USER_NAME = "admin";
     private final String DEFAULT_PASSWORD = "admin";
 
-    private static final String validSingleEventConfig = "{\n" +
+    private static final String VALID_SINGLE_EVENT_CONFIG = "{\n" +
             "  \"streamName\": \"CountStream\",\n" +
             "  \"siddhiAppName\": \"ReceiveAndCount\",\n" +
             "  \"data\": ['Customer1', 26, 'USA', 15 ]\n" +
             "}";
-    private static final String inValidSingleEventConfig = "{\n" +
+    private static final String IN_VALID_SINGLE_EVENT_CONFIG = "{\n" +
             "  \"streamName\": \"CountStream\",\n" +
             "  \"data\": ['Customer1', 26, 'USA', 15 ]\n" +
             "}";
 
-    private static final String validFeedEventConfig = "{\"properties\":{\"simulationName\":\"FeedSimulation\"," +
+    private static final String VALID_FEED_EVENT_CONFIG = "{\"properties\":{\"simulationName\":\"FeedSimulation\"," +
             "\"startTimestamp\":\"\",\"endTimestamp\":\"\",\"noOfEvents\":\"\",\"description\":\"\"," +
             "\"timeInterval\":\"1000\"},\"sources\":[{\"siddhiAppName\":\"ReceiveAndCount\",\"streamName\":" +
             "\"CountStream\",\"timestampInterval\":\"1000\",\"simulationType\":\"CSV_SIMULATION\",\"fileName\":" +
@@ -115,7 +115,7 @@ public class SimulatorAPITestcase {
         String contentType = "text/plain";
         String method = "POST";
         logger.info("Simulation REST API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, contentType,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(VALID_SINGLE_EVENT_CONFIG, baseURI, path, contentType,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -127,7 +127,7 @@ public class SimulatorAPITestcase {
         String contentType = "text/plain";
         String method = "POST";
         logger.info("Simulation REST API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(inValidSingleEventConfig, baseURI, path, contentType,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(IN_VALID_SINGLE_EVENT_CONFIG, baseURI, path, contentType,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -156,7 +156,7 @@ public class SimulatorAPITestcase {
         String simulationContentType = "text/plain";
         String method = "POST";
         logger.info("Uploading Simulation Configuration through API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validFeedEventConfig, baseURI, simlationPath,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(VALID_FEED_EVENT_CONFIG, baseURI, simlationPath,
                 simulationContentType, method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -169,7 +169,7 @@ public class SimulatorAPITestcase {
         String simulationContentType = "text/plain";
         String method = "POST";
         logger.info("Uploading same Simulation Configuration again through API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validFeedEventConfig, baseURI, simlationPath,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(VALID_FEED_EVENT_CONFIG, baseURI, simlationPath,
                 simulationContentType, method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 409);
         logger.info(httpResponseMessage.getErrorContent());
@@ -182,7 +182,7 @@ public class SimulatorAPITestcase {
         String method = "POST";
         String contentType = null;
         logger.info("Simulation starting");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, contentType,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(VALID_SINGLE_EVENT_CONFIG, baseURI, path, contentType,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Thread.sleep(10000);
@@ -193,7 +193,7 @@ public class SimulatorAPITestcase {
         String method = "POST";
         String path = "/simulation/feed/FeedSimulation/?action=pause";
         logger.info("Pause Simulation Configuration API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, null,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(VALID_SINGLE_EVENT_CONFIG, baseURI, path, null,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
@@ -203,7 +203,7 @@ public class SimulatorAPITestcase {
         String method = "POST";
         String path = "/simulation/feed/FeedSimulation/?action=resume";
         logger.info("Resume Simulation Configuration API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, null,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(VALID_SINGLE_EVENT_CONFIG, baseURI, path, null,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
@@ -213,7 +213,7 @@ public class SimulatorAPITestcase {
         String method = "POST";
         String path = "/simulation/feed/FeedSimulation/?action=stop";
         logger.info("Stop Simulation Configuration API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, null,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(VALID_SINGLE_EVENT_CONFIG, baseURI, path, null,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
