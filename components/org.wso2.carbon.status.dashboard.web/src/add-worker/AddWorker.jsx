@@ -336,7 +336,7 @@ export default class AddWorker extends React.Component {
                 } else {
                     this.setState({
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred4444!"
+                        statusMessage: "Unknown error occurred!"
                     })
                 }
             }
