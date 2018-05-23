@@ -80,15 +80,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title: 'Option key-value pair',
+                                title: 'Option',
                                 properties: {
-                                    key: {
-                                        title: 'Key',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    },
-                                    value: {
+                                    optionValue: {
                                         title: 'Value',
                                         type: "string",
                                         required: true,
@@ -128,15 +122,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                                     minItems: 1,
                                     items: {
                                         type: "object",
-                                        title: 'Option key-value pair',
+                                        title: 'Option',
                                         properties: {
-                                            key: {
-                                                title: 'Key',
-                                                type: "string",
-                                                required: true,
-                                                minLength: 1
-                                            },
-                                            value: {
+                                            optionValue: {
                                                 title: 'Value',
                                                 type: "string",
                                                 required: true,
@@ -235,10 +223,10 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 _.set(sourceOptions, 'annotationType', 'SOURCE');
                 _.set(sourceOptions, 'type', editor.getValue().annotationType.name);
 
-                var annotationOptions = {};
+                var annotationOptions = [];
                 if(editor.getValue().annotationOptions !== undefined) {
                     _.forEach(editor.getValue().annotationOptions, function (option) {
-                        annotationOptions[option.key] = option.value;
+                        annotationOptions.push(option.optionValue);
                     });
                     _.set(sourceOptions, 'options', annotationOptions);
                 } else {
@@ -250,12 +238,12 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     var mapperOptions = {};
                     _.set(mapperOptions, 'type', editor.getValue().map.annotationType.name);
 
-                    var mapperAnnotationOptions = {};
+                    var mapperAnnotationOptions = [];
                     if(editor.getValue().map.annotationOptions !== undefined) {
                         _.forEach(editor.getValue().map.annotationOptions, function (option) {
-                            mapperAnnotationOptions[option.key] = option.value;
+                            mapperAnnotationOptions.push(option.optionValue);
                         });
-                        _.set(mapperOptions, 'options', annotationOptions);
+                        _.set(mapperOptions, 'options', mapperAnnotationOptions);
                     } else {
                         _.set(mapperOptions, 'options', undefined);
                     }
@@ -328,14 +316,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
             var sourceOptionsArray = [];
             if (savedSourceOptions !== undefined) {
-                for (var key in savedSourceOptions) {
-                    if (savedSourceOptions.hasOwnProperty(key)) {
-                        sourceOptionsArray.push({
-                            key: key,
-                            value: savedSourceOptions[key]
-                        });
-                    }
-                }
+                _.forEach(savedSourceOptions, function (option) {
+                    sourceOptionsArray.push({optionValue: option})
+                });
             }
 
             var mapperType;
@@ -346,14 +329,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
                 var savedMapperOptions = map.getOptions();
                 if (savedMapperOptions !== undefined) {
-                    for (var key in savedMapperOptions) {
-                        if (savedMapperOptions.hasOwnProperty(key)) {
-                            mapperOptionsArray.push({
-                                key: key,
-                                value: savedMapperOptions[key]
-                            });
-                        }
-                    }
+                    _.forEach(savedMapperOptions, function (option) {
+                        mapperOptionsArray.push({optionValue: option})
+                    });
                 }
 
                 var savedMapperAttributes = map.getAttributes();
@@ -424,15 +402,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title: 'Option key-value pair',
+                                title: 'Option',
                                 properties: {
-                                    key: {
-                                        title: 'Key',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    },
-                                    value: {
+                                    optionValue: {
                                         title: 'Value',
                                         type: "string",
                                         required: true,
@@ -472,15 +444,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                                     minItems: 1,
                                     items: {
                                         type: "object",
-                                        title: 'Option key-value pair',
+                                        title: 'Option',
                                         properties: {
-                                            key: {
-                                                title: 'Key',
-                                                type: "string",
-                                                required: true,
-                                                minLength: 1
-                                            },
-                                            value: {
+                                            optionValue: {
                                                 title: 'Value',
                                                 type: "string",
                                                 required: true,
@@ -579,10 +545,10 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 var config = editor.getValue();
                 clickedElement.setType(config.annotationType.name);
 
-                var annotationOptions = {};
+                var annotationOptions = [];
                 if(config.annotationOptions !== undefined) {
                     _.forEach(config.annotationOptions, function (option) {
-                        annotationOptions[option.key] = option.value;
+                        annotationOptions.push(option.optionValue);
                     });
                     clickedElement.setOptions(annotationOptions);
                 } else {
@@ -593,12 +559,12 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     var mapperOptions = {};
                     _.set(mapperOptions, 'type', config.map.annotationType.name);
 
-                    var mapperAnnotationOptions = {};
+                    var mapperAnnotationOptions = [];
                     if(config.map.annotationOptions !== undefined) {
                         _.forEach(config.map.annotationOptions, function (option) {
-                            mapperAnnotationOptions[option.key] = option.value;
+                            mapperAnnotationOptions.push(option.optionValue);
                         });
-                        _.set(mapperOptions, 'options', annotationOptions);
+                        _.set(mapperOptions, 'options', mapperAnnotationOptions);
                     } else {
                         _.set(mapperOptions, 'options', undefined);
                     }

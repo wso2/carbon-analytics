@@ -29,7 +29,7 @@ define(
             /*
              Data storing structure as follows
                 type*: ‘’,
-                options: {Key-Value Pair JSON},
+                options: ['option1', 'option2=value2',...],
                 attributes: {
                     type*: ‘MAP’
                     value*: {Key-Value Pair JSON}
@@ -40,7 +40,7 @@ define(
                     value*: ['value1',...]
                 } NOTE: LIST value is applicable to source annotation only.
                 << or  >>
-                payload: {
+                attributes: {
                     type*: 'SINGLE',
                     value*: ''
                 } // NOTE : SINGLE value is applicable to sink annotation only.

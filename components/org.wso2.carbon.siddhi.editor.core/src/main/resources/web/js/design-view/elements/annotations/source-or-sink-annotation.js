@@ -31,10 +31,10 @@ define(
                 id*: ‘’,
                 annotationType*: 'SOURCE | SINK',
                 type*: ‘’,
-                options: {Key-Value Pair JSON},
+                options: ['option1', 'option2=value2',...],
                 map: {
                     type*: ‘’,
-                    options: {Key-Value Pair JSON},
+                    options: ['option1', 'option2=value2',...],
                     attributes: {
                         type*: ‘MAP’
                         value*: {Key-Value Pair JSON}
@@ -48,7 +48,7 @@ define(
             */
             if (options !== undefined) {
                 this.id = options.id;
-                this.annotationType = options.annotationType;
+                this.annotationType = (options.annotationType).toUpperCase();
                 this.type = options.type;
                 this.options = options.options;
                 this.map = options.map;
