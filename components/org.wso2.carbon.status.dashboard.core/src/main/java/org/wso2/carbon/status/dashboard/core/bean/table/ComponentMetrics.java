@@ -19,6 +19,7 @@
 
 package org.wso2.carbon.status.dashboard.core.bean.table;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import java.util.List;
  */
 public class ComponentMetrics {
     private String name;
+    private String totalEvents;
     private List<MetricElement> metrics = new ArrayList<>();
     
     public ComponentMetrics() {
@@ -55,5 +57,13 @@ public class ComponentMetrics {
         if (isNew) {
             this.metrics.add(metricsEle);
         }
+    }
+    
+    public String getTotalEvents() {
+        return totalEvents;
+    }
+    
+    public void setTotalEvents(long totalEvents) {
+        this.totalEvents = NumberFormat.getNumberInstance().format(totalEvents);
     }
 }

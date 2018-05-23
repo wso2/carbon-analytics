@@ -36,10 +36,10 @@ const styles = {button: {margin: 12, backgroundColor: '#f17b31', fontSize: 10}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 const latencyMetadata = {
-    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', '75th Percentile', '95th Percentile',
-        '99th Percentile', '99.9th Percentile', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
+    names: ['Time', 'Max', 'Mean', 'Min', 'Standard Deviation', '75th Percentile', '95th Percentile',
+        '99th Percentile', '99.9th Percentile', 'Mean Rate', '1 Minute Rate', '5 Minutes Rate', '15 Minutes Rate'],
     types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
-        'linear', 'linear', 'linear']
+        'linear', 'linear']
 };
 const latencyLineChartConfig = {
     x: 'Time',
@@ -53,9 +53,9 @@ const latencyLineChartConfig = {
         {type: 'area', y: '99th Percentile', fill: '#95dd87', style: {markRadius: 2}},
         {type: 'area', y: '99.9th Percentile', fill: '#890f02', style: {markRadius: 2}},
         {type: 'area', y: 'Mean Rate', fill: '#ff918f', style: {markRadius: 2}},
-        {type: 'area', y: 'M1 Rate', fill: '#b76969', style: {markRadius: 2}},
-        {type: 'area', y: 'M5 Rate', fill: '#aea2e0', style: {markRadius: 2}},
-        {type: 'area', y: 'M15 Rate', fill: '#FFEB3B', style: {markRadius: 2}}
+        {type: 'area', y: '1 Minute Rate', fill: '#b76969', style: {markRadius: 2}},
+        {type: 'area', y: '5 Minutes Rate', fill: '#aea2e0', style: {markRadius: 2}},
+        {type: 'area', y: '15 Minutes Rate', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
     height: 250,
@@ -94,17 +94,17 @@ const memoryLineChartConfig = {
     xAxisTickCount: 10
 };
 const tpMetadata = {
-    names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
-    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear']
+    names: ['Time', 'Mean', '1 Minute', '5 Minutes', '15 Minutes'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear']
 };
 
 const tpLineChartConfig = {
     x: 'Time',
     charts: [
-        {type: 'area', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
-        {type: 'area', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},
-        {type: 'area', y: 'M5 Rate', fill: '#8c51a5', style: {markRadius: 2}},
-        {type: 'area', y: 'M15 Rate', fill: '#FFEB3B', style: {markRadius: 2}}
+        {type: 'area', y: 'Mean', fill: '#50B432', style: {markRadius: 2}},
+        {type: 'area', y: '1 Minute', fill: '#f17b31', style: {markRadius: 2}},
+        {type: 'area', y: '5 Minutes', fill: '#8c51a5', style: {markRadius: 2}},
+        {type: 'area', y: '15 Minutes', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
     height: 250,
@@ -369,13 +369,13 @@ export default class ComponentHistory extends React.Component {
         } else {
             return (
                 <div style={{width: '90%', marginLeft: '10px', paddingTop: 60}}>
-                    <div style={{padding: 30}}>
+                    <div style={{padding: 5}}>
                         {this.renderLatencyChart()}
                     </div>
-                    <div style={{padding: 30}}>
+                    <div style={{padding: 5}}>
                         {this.renderMemoryChart()}
                     </div>
-                    <div style={{padding: 30}}>
+                    <div style={{padding: 5}}>
                         {this.renderThroughputChart()}
                     </div>
                 </div>
