@@ -29,6 +29,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             WINDOW :'windowDrop',
             TRIGGER :'triggerDrop',
             AGGREGATION : 'aggregationDrop',
+            FUNCTION : 'functionDrop',
             PROJECTION : 'projectionQueryDrop',
             FILTER : 'filterQueryDrop',
             JOIN : 'joinQueryDrop',
@@ -169,6 +170,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         // If the dropped Element is a Aggregation then->
                         else if ($(droppedElement).hasClass('aggregation-drag')) {
                             self.handleAggregation(mouseTop, mouseLeft, false);
+                        }
+
+                        // If the dropped Element is a Aggregation then->
+                        else if ($(droppedElement).hasClass('function-drag')) {
+                            self.handleFunction(mouseTop, mouseLeft, false);
                         }
 
                         // If the dropped Element is a Projection Query then->
@@ -972,6 +978,17 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleAggregation(mouseTop, mouseLeft, true, aggregationId, aggregationName);
             });
 
+            _.forEach(self.configurationData.getSiddhiAppConfig().functionList, function(functionObject){
+
+                var functionId = functionObject.getId();
+                var functionName = functionObject.getName();
+                var array = functionId.split("-");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handleFunction(mouseTop, mouseLeft, true, functionId, functionName);
+            });
+
             _.forEach(self.configurationData.getSiddhiAppConfig().patternQueryList, function(patternQuery){
 
                 var patternQueryId = patternQuery.getId();
@@ -1067,6 +1084,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.WINDOW));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.TRIGGER));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.AGGREGATION));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.FUNCTION));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PROJECTION));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.FILTER));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.WINDOW_QUERY));
@@ -1403,6 +1421,35 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             self.canvas.append(newAgent);
             // Drop the Aggregation element. Inside this a it generates the aggregation definition form.
             self.dropElements.dropAggregation(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, aggregationName);
+            self.configurationData.getSiddhiAppConfig()
+                .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
+            self.dropElements.registerElementEventListeners(newAgent);
+        };
+
+        DesignGrid.prototype.handleFunction = function (mouseTop, mouseLeft, isCodeToDesignMode, functionId,
+                                                        functionName) {
+            var self = this;
+            var elementId;
+            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
+                elementId = self.getNewAgentId();
+                // design view container is disabled to prevent the user from dropping any elements before initializing
+                // a stream element
+                self.designViewContainer.addClass('disableContainer');
+                self.toggleViewButton.addClass('disableContainer');
+            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
+                if(functionId !== undefined) {
+                    elementId = functionId;
+                    self.generateNextNewAgentId();
+                } else {
+                    console.log("functionId parameter is undefined");
+                }
+            } else {
+                console.log("isCodeToDesignMode parameter is undefined");
+            }
+            var newAgent = $('<div>').attr('id', elementId).addClass(constants.FUNCTION);
+            self.canvas.append(newAgent);
+            // Drop the Function element. Inside this a it generates the function definition form.
+            self.dropElements.dropFunction(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, functionName);
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);

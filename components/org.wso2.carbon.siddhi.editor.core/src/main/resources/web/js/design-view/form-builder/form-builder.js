@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableForm', 'windowForm', 'aggregationForm',
         'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
-        'sequenceQueryForm', 'sourceForm', 'sinkForm'],
+        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm'],
     function (require, log, $, _, FormUtils, StreamForm, TableForm, WindowForm, AggregationForm, TriggerForm,
               WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
-              SourceForm, SinkForm) {
+              SourceForm, SinkForm, FunctionForm) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -39,6 +39,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             WINDOW :'windowDrop',
             TRIGGER :'triggerDrop',
             AGGREGATION : 'aggregationDrop',
+            FUNCTION : 'functionDrop',
             PROJECTION : 'projectionQueryDrop',
             FILTER : 'filterQueryDrop',
             JOIN : 'joinQueryDrop',
@@ -132,6 +133,10 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
                     }
                 } else if(elementType === constants.AGGREGATION) {
                     if(self.configurationData.getSiddhiAppConfig().getAggregation(elementId) === undefined) {
+                        $("#"+elementId).remove();
+                    }
+                } else if(elementType === constants.FUNCTION) {
+                    if(self.configurationData.getSiddhiAppConfig().getFunction(elementId) === undefined) {
                         $("#"+elementId).remove();
                     }
                 }
@@ -387,6 +392,41 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'formUtils', self.formUtils);
             var aggregationForm = new AggregationForm(formOptions);
             aggregationForm.generatePropertiesForm(element, formConsole, formContainer);
+        };
+
+        /**
+         * @function generate the form to define the function once it is dropped on the canvas
+         * @param i id for the element
+         * @returns user given function name
+         */
+        FormBuilder.prototype.DefineFunction = function (i) {
+            var self = this;
+            var formConsole = this.createTabForForm(i, constants.FUNCTION);
+            var formContainer = formConsole.getContentContainer();
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            var functionForm = new FunctionForm(formOptions);
+            return functionForm.generateDefineForm(i, formConsole, formContainer);
+        };
+
+        /**
+         * @function generate the form for an existing function
+         * @param element selected element(function)
+         */
+        FormBuilder.prototype.GeneratePropertiesFormForFunctions = function (element) {
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            var functionForm = new FunctionForm(formOptions);
+            functionForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
         /**

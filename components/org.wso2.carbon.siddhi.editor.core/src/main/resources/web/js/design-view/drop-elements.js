@@ -622,6 +622,63 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         };
 
         /**
+         * @function drop the function element on the canvas
+         * @param newAgent new element
+         * @param i id of the element
+         * @param top top position of the element
+         * @param left left position of the element
+         * @param isCodeToDesignMode whether code to design mode is enable or not
+         * @param functionName name of the function
+         */
+        DropElements.prototype.dropFunction = function (newAgent, i, top, left, isCodeToDesignMode, functionName) {
+            /*
+             The node hosts a text node where the Function's name input by the user will be held.
+             Rather than simply having a `newAgent.text(functionName)` statement, as the text function tends to
+             reposition the other appended elements with the length of the Function name input by the user.
+            */
+
+            var self= this;
+            var name;
+            if(isCodeToDesignMode) {
+                name = functionName;
+            } else {
+                name = self.formBuilder.DefineFunction(i);
+            }
+            var node = $('<div>' + name + '</div>');
+            newAgent.append(node);
+            node.attr('id', i+"-nodeInitial");
+            node.attr('class', "functionNameNode");
+
+            /*
+             prop --> When clicked on this icon, a definition and related information of the Function Element will
+             be displayed as an alert message
+            */
+            var settingsIconId = ""+ i + "-dropFunctionSettingsId";
+            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
+                'class="element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
+                'class="element-close-icon collapse">').append(prop);
+
+            var settingsIconElement = $('#'+settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePropertiesFormForFunctions(this);
+            });
+
+            var finalElement = newAgent;
+
+            finalElement.css({
+                'top': top,
+                'left': left
+            });
+
+            $(self.container).append(finalElement);
+
+            self.jsPlumbInstance.draggable(finalElement, {
+                containment: true
+            });
+        };
+
+        /**
          * @function drop the query element on the canvas
          * @param newAgent new element
          * @param i id of the element
