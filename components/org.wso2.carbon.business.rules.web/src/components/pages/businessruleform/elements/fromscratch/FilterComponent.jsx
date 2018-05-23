@@ -29,7 +29,6 @@ import AddIcon from 'material-ui-icons/Add';
 import { IconButton } from 'material-ui';
 import Paper from 'material-ui/Paper';
 // App Components
-import Property from '../Property';
 import FilterRule from './filtercomponent/FilterRule';
 // App Utilities
 import BusinessRulesUtilityFunctions from '../../../../../utils/BusinessRulesUtilityFunctions';
@@ -126,7 +125,12 @@ export default class FilterComponent extends Component {
     deleteFilterRule(index) {
         const filterRules = this.props.ruleComponents.filterRules;
         filterRules.splice(index, 1);
-        this.updateRuleComponents(filterRules, this.props.ruleComponents.ruleLogic);
+        if (filterRules.length > 0) {
+            this.updateRuleComponents(filterRules, this.props.ruleComponents.ruleLogic);
+        } else {
+            // No filter rules. Reset ruleComponents
+            this.updateRuleComponents(filterRules, '');
+        }
     }
 
     /**
@@ -192,7 +196,7 @@ export default class FilterComponent extends Component {
                         {this.props.ruleComponents[BusinessRulesConstants.FILTER_RULES_KEY].map((filterRule, index) =>
                             (<FilterRule
                                 key={index}
-                                mode={this.props.formMode} // TODO refactor to 'disable', conditionally
+                                disabled={this.props.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
                                 filterRuleIndex={index}
                                 filterRule={filterRule}
                                 exposedStreamDefinition={
@@ -204,6 +208,10 @@ export default class FilterComponent extends Component {
                                 exposedInputStreamFields={exposedInputStreamFields}
                                 onUpdate={value => this.updateFilterRule(index, value)}
                                 onRemove={() => this.deleteFilterRule(index)}
+                                error={
+                                    !BusinessRulesUtilityFunctions.isEmpty(this.props.errorStates) ?
+                                        this.props.errorStates.filterRules[index] : []
+                                }
                             />))}
                     </div>
                 </div>);
@@ -244,7 +252,9 @@ export default class FilterComponent extends Component {
                     helperText={BusinessRulesMessages.RULE_LOGIC_HELPER_TEXT}
                     value={this.props.ruleComponents.ruleLogic}
                     onChange={e => this.updateRuleLogic(e.target.value)}
-                    error={this.props.errorStates.ruleLogic}
+                    error={
+                        !BusinessRulesUtilityFunctions.isEmpty(this.props.errorStates) ?
+                            this.props.errorStates.ruleLogic : false}
                     disabled={this.props.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
                     fullWidth
                 />);
@@ -266,8 +276,34 @@ export default class FilterComponent extends Component {
         return null;
     }
 
+    displayContent() {
+        if (this.props.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW &&
+            this.props.ruleComponents.filterRules.length === 0 && this.props.ruleComponents.ruleLogic === '') {
+            return (
+                <div>
+                    <br />
+                    <Typography type="subheading">
+                        No filter has been given
+                    </Typography>
+                    <br />
+                </div>
+            );
+        }
+        return (
+            <div>
+                <br />
+                {this.displayFilterRulesTable()}
+                <br />
+                {this.displayAddFilterButton()}
+                <br />
+                <br />
+                {this.displayRuleLogic()}
+                <br />
+            </div>
+        );
+    }
+
     render() {
-        // TODO Some message when no filters & on view mode
         return (
             <div>
                 <AppBar position="static" color="default">
@@ -281,14 +317,7 @@ export default class FilterComponent extends Component {
                 <Paper>
                     <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
                         <div style={this.props.style.paperContainer}>
-                            <br />
-                            {this.displayFilterRulesTable()}
-                            <br />
-                            {this.displayAddFilterButton()}
-                            <br />
-                            <br />
-                            {this.displayRuleLogic()}
-                            <br />
+                            {this.displayContent()}
                         </div>
                     </Collapse>
                 </Paper>

@@ -18,14 +18,10 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Autosuggest from 'react-autosuggest';
-import match from 'autosuggest-highlight/match';
-import parse from 'autosuggest-highlight/parse';
 // Material UI Components
 import Collapse from 'material-ui/transitions/Collapse';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
-import TextField from 'material-ui/TextField';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import { FormControl, FormHelperText } from 'material-ui/Form';
 import Input, { InputLabel } from 'material-ui/Input';
@@ -41,37 +37,7 @@ import BusinessRulesConstants from '../../../../../constants/BusinessRulesConsta
 import BusinessRulesMessages from '../../../../../constants/BusinessRulesMessages';
 // CSS
 import '../../../../../index.css';
-
-/**
- * Styles related to autosuggest fields
- */
-const autoSuggestStyles = {
-    container: {
-        flexGrow: 1,
-        position: 'relative',
-        width: '40%',
-        height: 70,
-        float: 'left',
-    },
-    suggestionsContainerOpen: {
-        position: 'absolute',
-        marginTop: 1,
-        marginBottom: 3,
-        left: 0,
-        right: 0,
-    },
-    suggestion: {
-        display: 'block',
-    },
-    suggestionsList: {
-        margin: 0,
-        padding: 0,
-        listStyleType: 'none',
-    },
-    textField: {
-        width: '100%',
-    },
-};
+import AutoCompleteProperty from './filtercomponent/AutoCompleteProperty';
 
 /**
  * Styles related to this component
@@ -94,100 +60,6 @@ export default class OutputComponent extends Component {
             suggestions: [],
         };
     }
-
-    /* AutoSuggestion related functions [BEGIN] */
-
-    returnSuggestionsAsLabels() {
-        return this.props.getFieldNames(this.props.selectedInputRuleTemplate.templates[0].exposedStreamDefinition)
-            .map(fieldName => ({ label: fieldName }));
-    }
-
-    renderInput(inputProps, mode) {
-        const { autoFocus, value, ref } = inputProps;
-
-        return (
-            <TextField
-                autoFocus={autoFocus}
-                style={autoSuggestStyles.textField}
-                value={value}
-                inputRef={ref}
-                InputProps={{ inputProps }}
-                disabled={mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
-            />
-        );
-    }
-
-    renderSuggestion(suggestion, { query, isHighlighted }) {
-        const matches = match(suggestion.label, query);
-        const parts = parse(suggestion.label, matches);
-
-        return (
-            <MenuItem selected={isHighlighted} component="div">
-                <div>
-                    {parts.map((part, index) => {
-                        return part.highlight ? (
-                            <span key={String(index)} style={{ fontWeight: 300 }}>
-                                {part.text}
-                            </span>) :
-                            (<strong key={String(index)} style={{ fontWeight: 500 }}>
-                                {part.text}
-                            </strong>
-                            );
-                    })}
-                </div>
-            </MenuItem>
-        );
-    }
-
-    renderSuggestionsContainer(options) {
-        const { containerProps, children } = options;
-
-        return (
-            <Paper
-                key={containerProps.key}
-                id={containerProps.id}
-                style={containerProps.style}
-                ref={containerProps.ref}
-                elevation={5}
-                square
-            >
-                {children}
-            </Paper>
-        );
-    }
-
-    getSuggestionValue(suggestion) {
-        return suggestion.label;
-    }
-
-    getSuggestions(value) {
-        const inputValue = value.trim().toLowerCase();
-        const inputLength = inputValue.length;
-        let count = 0;
-
-        const suggestions = this.returnSuggestionsAsLabels();
-
-        return inputLength === 0
-            ? []
-            : suggestions.filter((suggestion) => {
-                const keep =
-                    count < 5 && suggestion.label.toLowerCase().slice(0, inputLength) === inputValue;
-
-                if (keep) {
-                    count += 1;
-                }
-
-                return keep;
-            });
-    }
-
-    handleSuggestionsFetchRequested({ value }) {
-        this.setState({
-            suggestions: this.getSuggestions(value),
-        });
-    }
-
-    /* AutoSuggestion related functions [END] */
 
     /**
      * Displays Rule Template selection
@@ -266,26 +138,17 @@ export default class OutputComponent extends Component {
                         <div style={{ float: 'left', width: '40%', height: 30 }}>
                             <Typography type="caption">Output</Typography>
                         </div>
-                        {exposedOutputStreamFieldNames.map((fieldName) =>
+                        {exposedOutputStreamFieldNames.map(fieldName =>
                             (<div key={fieldName} style={{ width: '100%' }}>
-                                <Autosuggest
-                                    theme={autoSuggestStyles}
-                                    // renderInputComponent={this.renderInput}
-                                    renderInputComponent={e => this.renderInput(e, this.props.mode)}
-                                    suggestions={this.state.suggestions}
-                                    onSuggestionsFetchRequested={e => this.handleSuggestionsFetchRequested(e)}
-                                    renderSuggestionsContainer={this.renderSuggestionsContainer}
-                                    getSuggestionValue={this.getSuggestionValue}
-                                    renderSuggestion={this.renderSuggestion}
-                                    inputProps={{
-                                        autoFocus: true,
-                                        autoSuggestStyles,
-                                        placeholder: '',
-                                        // TODO refactor below type of 'x ? x : ''' to 'x || '''
-                                        value: (this.props.businessRuleProperties.outputMappings[fieldName]) ?
-                                            (this.props.businessRuleProperties.outputMappings[fieldName]) : '',
-                                        onChange: (e, v) => this.props.handleOutputMappingChange(v, fieldName),
-                                    }}
+                                <AutoCompleteProperty
+                                    elements={this.props.inputStreamFields}
+                                    disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                                    error={
+                                        !BusinessRulesUtilityFunctions.isEmpty(this.props.mappingErrorStates) ?
+                                            this.props.mappingErrorStates[fieldName] : false
+                                    }
+                                    value={this.props.businessRuleProperties.outputMappings[fieldName] || ''}
+                                    onChange={v => this.props.handleOutputMappingChange(v, fieldName)}
                                 />
                                 <div style={{ float: 'left', width: '20%', height: 70 }}>
                                     <center>
@@ -353,6 +216,8 @@ OutputComponent.propTypes = {
     handleOutputRuleTemplateSelected: PropTypes.func.isRequired,
     outputRuleTemplates: PropTypes.arrayOf(PropTypes.object).isRequired,
     getPropertyComponents: PropTypes.func.isRequired,
+    inputStreamFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    mappingErrorStates: PropTypes.object.isRequired,
     businessRuleProperties: PropTypes.object.isRequired,
     handleOutputMappingChange: PropTypes.func.isRequired,
     toggleExpansion: PropTypes.func.isRequired,

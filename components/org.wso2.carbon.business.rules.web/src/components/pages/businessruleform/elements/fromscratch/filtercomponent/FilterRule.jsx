@@ -31,6 +31,7 @@ import AutoCompleteProperty from './AutoCompleteProperty';
 import BusinessRulesConstants from '../../../../../../constants/BusinessRulesConstants';
 // CSS
 import '../../../../../../index.css';
+import BusinessRulesUtilityFunctions from '../../../../../../utils/BusinessRulesUtilityFunctions';
 
 /**
  * Styles related to this component
@@ -126,9 +127,8 @@ export default class FilterRule extends Component {
                 elements={this.props.elements}
                 onChange={v => this.updateFilterRuleAttribute(v)}
                 value={this.props.filterRule[0]}
-                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
-                // TODO do the disabled check only in the parent, and pass props
-                error={false} // TODO implement
+                disabled={this.props.disabled}
+                error={!BusinessRulesUtilityFunctions.isEmpty(this.props.error) ? this.props.error[0] : false}
             />
         );
     }
@@ -140,7 +140,8 @@ export default class FilterRule extends Component {
     displayFilterRuleOperator() {
         return (
             <FormControl
-                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                disabled={this.props.disabled}
+                error={!BusinessRulesUtilityFunctions.isEmpty(this.props.error) ? this.props.error[1] : false}
             >
                 <Select
                     value={this.props.filterRule[1]}
@@ -163,9 +164,8 @@ export default class FilterRule extends Component {
                 elements={this.props.elements}
                 onChange={v => this.updateFilterRuleAttributeOrValue(v)}
                 value={this.props.filterRule[2]}
-                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
-                // TODO do the disabled check only in the parent, and pass props
-                error={false} // TODO implement
+                disabled={this.props.disabled}
+                error={!BusinessRulesUtilityFunctions.isEmpty(this.props.error) ? this.props.error[2] : false}
             />
         );
     }
@@ -175,7 +175,7 @@ export default class FilterRule extends Component {
      * @returns {Component}         Delete button
      */
     displayDeleteButton() {
-        if (this.props.mode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW) {
+        if (!this.props.disabled) {
             return (
                 <IconButton
                     color="primary"
@@ -221,15 +221,10 @@ export default class FilterRule extends Component {
 
 FilterRule.propTypes = {
     elements: PropTypes.arrayOf(PropTypes.string).isRequired,
+    disabled: PropTypes.bool.isRequired,
+    error: PropTypes.bool.isRequired,
     filterRule: PropTypes.arrayOf(PropTypes.string).isRequired,
     onUpdate: PropTypes.func.isRequired,
-    getFieldNames: PropTypes.func.isRequired,
-    exposedStreamDefinition: PropTypes.string.isRequired,
-    mode: PropTypes.oneOf([
-        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE,
-        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT,
-        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW,
-    ]).isRequired,
     onRemove: PropTypes.func.isRequired,
     exposedInputStreamFields: PropTypes.object.isRequired,
     filterRuleIndex: PropTypes.number.isRequired,

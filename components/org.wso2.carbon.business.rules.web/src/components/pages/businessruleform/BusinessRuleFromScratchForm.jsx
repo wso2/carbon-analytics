@@ -43,7 +43,7 @@ import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
 import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // CSS
 import '../../../index.css';
-import FormSubmissionError from '../../../utils/FormSubmissionError';
+import FormSubmissionError from '../../../error/FormSubmissionError';
 
 /**
  * Styles related to this component
@@ -880,7 +880,6 @@ export default class BusinessRuleFromScratchForm extends Component {
                     this.state.fieldErrorStates.properties ?
                         this.state.fieldErrorStates.properties.ruleComponents : {}}
                 toggleExpansion={() => this.toggleFilterComponentExpansion()}
-                filterRules={this.state.businessRuleProperties.ruleComponents.filterRules}
                 onUpdate={ruleComponents => this.updateRuleComponents(ruleComponents)}
                 formMode={this.state.formMode}
                 selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}

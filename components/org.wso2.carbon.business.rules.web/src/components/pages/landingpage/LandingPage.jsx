@@ -40,7 +40,7 @@ import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // CSS
 import '../../../index.css';
-import BusinessRulesUtilityFunctions from '../../utils/BusinessRulesUtilityFunctions';
+import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
 
 /**
  * Styles related to this component

@@ -21,7 +21,6 @@ import PropTypes from 'prop-types';
 // Material UI Components
 import Button from 'material-ui/Button';
 import TextField from 'material-ui/TextField';
-import Dialog, { DialogActions, DialogContent, DialogContentText, DialogTitle } from 'material-ui/Dialog';
 import Typography from 'material-ui/Typography';
 import { FormControl, FormHelperText } from 'material-ui/Form';
 import Select from 'material-ui/Select';
@@ -38,7 +37,7 @@ import ProgressDisplay from '../../common/ProgressDisplay';
 import ErrorDisplay from '../../common/error/ErrorDisplay';
 // App Utilities
 import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
-import FormSubmissionError from "../../../utils/FormSubmissionError";
+import FormSubmissionError from '../../../error/FormSubmissionError';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
