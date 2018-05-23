@@ -81,7 +81,6 @@ public class SimulatorAPITestcase {
                         System.getProperty("carbon.analytic.version")), "editor"),
                 copySiddhiFileOption(),
                 copyCSVFileOption(),
-                //CarbonDistributionOption.debug(5005)
         };
     }
 
