@@ -599,7 +599,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param timeInterval   time interval that needed to be taken.
      * @param metricTypeName metrics type name ex: memory,cpu
      * @param currentTime    current time in milliseconds.
-     * @return List<List               <               Object>> of metrics data because charts needed in that format
+     * @return List<List<Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerMetrics(String workerId, long timeInterval, String metricTypeName, long
             currentTime) {
@@ -620,7 +620,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param timeInterval   time interval that needed to be taken.
      * @param metricTypeName metrics type name ex: memory,cpu
      * @param currentTime    current time in milliseconds.
-     * @return List<List               <               Object>> of metrics data because charts needed in that format
+     * @return List<List<Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerAggregatedMetrics(String workerId, long timeInterval, String metricTypeName, long
             currentTime) {
@@ -642,7 +642,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param workerId     source id of the metrics
      * @param timeInterval time interval that metrics needed to be taken.
      * @param currentTime  current time
-     * @return List<List               <               Object>> of metrics data because charts needed in that format
+     * @return List<List<Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerThroughput(String workerId, long timeInterval, long currentTime) {
         String resolvedSelectWorkerThroughputQuery = resolveTableName(selectWorkerThroughputQuery,
@@ -664,7 +664,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param workerId     source id of the metrics
      * @param timeInterval time interval that metrics needed to be taken.
      * @param currentTime  current time
-     * @return List<List               <               Object>> of metrics data because charts needed in that format
+     * @return List<List<Object>> of metrics data because charts needed in that format
      */
     public List selectWorkerAggregatedThroughput(String workerId, long timeInterval, long currentTime) {
         long aggregationTime = DBTableUtils.getAggregation(timeInterval);
