@@ -19,7 +19,7 @@
 /**
  * Constants related to the Business Rules Manager web app
  */
-const BusinessRulesConstants = { // TODO remove unnecessary ones
+const BusinessRulesConstants = {
     // Rule Template types
     RULE_TEMPLATE_TYPE_TEMPLATE: 'template',
     RULE_TEMPLATE_TYPE_INPUT: 'input',
