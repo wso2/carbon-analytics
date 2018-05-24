@@ -35,6 +35,7 @@ import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.stream.input.source.Source;
+import org.wso2.siddhi.core.stream.output.sink.Sink;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.aggregation.TimePeriod.Duration;
 import org.wso2.siddhi.query.api.annotation.Annotation;
@@ -91,6 +92,7 @@ public class DesignGenerator {
         loadStreams();
         // TODO loadSources() loadSinks()
         loadSources();
+        loadSinks();
         loadTables();
         loadWindows();
         loadAggregations();
@@ -180,36 +182,24 @@ public class DesignGenerator {
      * Loads Sources from the SiddhiAppRuntime
      */
     private void loadSources() {
-//        for (List<Source> source : siddhiAppRuntime.getSources()) {
-//            generateSourceOptions(source.get(0).getStreamDefinition().toString());
-//            // source.get(0); // this is a source config
-//            siddhiAppConfig.add(new SourceConfig(
-//                    null,
-//                    null,
-//                    null,
-//                    null));
-//        }
-        // TODO implement
+        SourceSinkConfigGenerator sourceConfigGenerator = new SourceSinkConfigGenerator();
         for (List<Source> sourceList : siddhiAppRuntime.getSources()) {
-//            SourceSinkConfig sourceConfig = new SourceSinkConfigGenerator().generateSourceConfig(source);
             for (Source source : sourceList) {
-                SourceSinkConfig sourceConfig = new SourceSinkConfigGenerator().generateSourceConfig(source);
+                siddhiAppConfig.addSource(sourceConfigGenerator.generateSourceConfig(source));
             }
         }
-
-        throw new IllegalArgumentException("Unable to generate source configs");
     }
 
     /**
      * Loads Sinks from the SiddhiAppRuntime
      */
     private void loadSinks() {
-//        for (List<Sink> sink : siddhiAppRuntime.getSinks()) {
-//            // sink.get(0); // this is a sink config
-//            siddhiAppConfig.add(new SinkConfig(null, null, null, null));
-//        }
-        // TODO implement
-        throw new IllegalArgumentException("Unable to generate sink configs");
+        SourceSinkConfigGenerator sinkConfigGenerator = new SourceSinkConfigGenerator();
+        for (List<Sink> sinkList : siddhiAppRuntime.getSinks()) {
+            for (Sink sink : sinkList) {
+                siddhiAppConfig.addSink(sinkConfigGenerator.generateSinkConfig(sink));
+            }
+        }
     }
 
     /**

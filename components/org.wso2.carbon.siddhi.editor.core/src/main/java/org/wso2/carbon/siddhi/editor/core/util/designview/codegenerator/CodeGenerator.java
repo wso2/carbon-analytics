@@ -28,8 +28,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.SinkConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorHelper;
@@ -393,24 +392,24 @@ public class CodeGenerator {
     }
 
     /**
-     * Converts a SourceConfig object to a Siddhi source annotation string
+     * Converts a SourceSinkConfig object to a Siddhi source annotation string
      *
-     * @param source The SourceConfig object to be converted
-     * @return The source annotation string representation of the given SourceConfig object
+     * @param source The SourceSinkConfig object to be converted
+     * @return The source annotation string representation of the given SourceSinkConfig object
      */
-    private String generateSourceString(SourceConfig source) {
+    private String generateSourceString(SourceSinkConfig source) {
         // TODO: 4/19/18 Write the logic here
         StringBuilder sourceStringBuilder = new StringBuilder();
         return sourceStringBuilder.toString();
     }
 
     /**
-     * Converts a SinkConfig object to a Siddhi source annotation string
+     * Converts a SourceSinkConfig object to a Siddhi source annotation string
      *
-     * @param sink The SinkConfig object to be converted
-     * @return The sink annotation string representation of the given SinkConfig object
+     * @param sink The SourceSinkConfig object to be converted
+     * @return The sink annotation string representation of the given SourceSinkConfig object
      */
-    private String generateSinkString(SinkConfig sink) {
+    private String generateSinkString(SourceSinkConfig sink) {
         // TODO: 4/19/18 Write the logic here
         StringBuilder sinkStringBuilder = new StringBuilder();
         return sinkStringBuilder.toString();
