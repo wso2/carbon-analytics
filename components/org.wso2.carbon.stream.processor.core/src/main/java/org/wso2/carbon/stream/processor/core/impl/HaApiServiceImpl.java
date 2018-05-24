@@ -99,19 +99,20 @@ public class HaApiServiceImpl extends HaApiService {
             for (Map.Entry<String, SiddhiAppData> siddhiAppMapEntry : siddhiAppMap.entrySet()) {
                 SiddhiAppRuntime siddhiAppRuntime = siddhiAppMapEntry.getValue().getSiddhiAppRuntime();
                 if (siddhiAppRuntime != null) {
-                    // TODO: 5/23/18 Make timeout user configurable
-                    siddhiAppRuntime.persist().getFuture().get(60000, TimeUnit.MILLISECONDS);
+                    siddhiAppRuntime.persist().getFuture()
+                            .get(StreamProcessorDataHolder.getDeploymentConfig().getLiveSync().getStateSyncTimeout(),
+                                    TimeUnit.MILLISECONDS);
                 } else {
-                    log.error("Active Node: Snapshot of Siddhi app " + siddhiAppMapEntry.getValue() +
+                    log.error("Active Node: Persisting of Siddhi app " + siddhiAppMapEntry.getValue() +
                             " not successful. Check if app deployed properly");
                 }
             }
         } catch (Exception e) {
-            log.error("Error while snapshoting all siddhi applications to send to passive node. " + e.getMessage(), e);
-            return Response.status(500).build();
+            log.error("Error while persisting siddhi applications. " + e.getMessage(), e);
+            return Response.serverError().build();
         }
 
-        log.info("Active Node: Snapshoting of all Siddhi Applications on request of passive node successful");
+        log.info("Active Node: Persisting of all Siddhi Applications on request of passive node successful");
         return Response.ok().entity(Response.Status.OK).build();
     }
 
@@ -125,16 +126,16 @@ public class HaApiServiceImpl extends HaApiService {
                 siddhiAppData.getSiddhiAppRuntime().persist().getFuture().get(60000, TimeUnit.MILLISECONDS);
             } else {
                 log.warn("Siddhi application " + siddhiAppName + " may not be deployed in active node yet but " +
-                        "requested for snapshot from passive node");
+                        "requested to be persisted from passive node");
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
         } catch (Exception e) {
-            log.error("Error while snapshoting " + siddhiAppName + " to send to passive node. " + e.getMessage(), e);
-            return Response.status(500).build();
+            log.error("Error while persisting " + siddhiAppName + ". " + e.getMessage(), e);
+            return Response.serverError().build();
         }
 
-        log.info("Active Node: Snapshoting of " + siddhiAppName + " on request of passive node successfull");
-        return Response.ok().status(Response.Status.OK).build();
+        log.info("Active Node: Persisting of " + siddhiAppName + " on request of passive node successfull");
+        return Response.ok().entity(Response.Status.OK).build();
     }
 }

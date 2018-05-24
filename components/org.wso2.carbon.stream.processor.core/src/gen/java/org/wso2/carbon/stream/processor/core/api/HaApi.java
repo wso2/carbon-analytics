@@ -72,11 +72,11 @@ public class HaApi implements Microservice {
     @ApiResponses(value = {
             @ApiResponse(
                     code = 200,
-                    message = "The state of all Siddhi applications is successfully retrieved."),
+                    message = "The state of all Siddhi applications successfully persisted."),
 
             @ApiResponse(
-                    code = 404,
-                    message = "The state of all Siddhi applications is not successfully retrieved."),
+                    code = 500,
+                    message = "Internal error occured when persisting states of all Siddhi applications."),
     })
     public Response haStateGet() throws NotFoundException, IOException {
         return delegate.haStateGet();
@@ -88,11 +88,15 @@ public class HaApi implements Microservice {
     @ApiResponses(value = {
             @ApiResponse(
                     code = 200,
-                    message = "The state of the requested Siddhi application is successfully retrieved."),
+                    message = "The state of the requested Siddhi application successfully persisted."),
 
             @ApiResponse(
                     code = 404,
-                    message = "The state of the requested Siddhi application is not successfully retrieved."),
+                    message = "The Siddhi application is not found."),
+
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal error occured when persisting state of the Siddhi application."),
     })
     public Response haStateGet(@PathParam("siddhiAppName") String siddhiAppName) throws NotFoundException,
             IOException {
