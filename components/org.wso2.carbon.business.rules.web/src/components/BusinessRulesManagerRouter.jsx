@@ -18,17 +18,15 @@
 
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-// Custom Theme
+// Material UI Components
 import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
-import { Orange } from '../theme/BusinessRulesManagerColors';
 // Auth Components
 import SecuredRouter from './auth/SecuredRouter';
 import Login from './auth/Login';
 import Logout from './auth/Logout';
+// Custom Theme
+import { Orange } from '../theme/BusinessRulesManagerColors';
 
-/**
- * Custom Theme
- */
 const theme = createMuiTheme({
     palette: {
         primary: Orange,
@@ -36,7 +34,7 @@ const theme = createMuiTheme({
 });
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 

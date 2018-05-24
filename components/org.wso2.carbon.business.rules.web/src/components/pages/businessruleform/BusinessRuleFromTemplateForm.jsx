@@ -35,14 +35,15 @@ import Property from './elements/Property';
 import Header from '../../common/Header';
 import ProgressDisplay from '../../common/ProgressDisplay';
 import ErrorDisplay from '../../common/error/ErrorDisplay';
-// App Utilities
-import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
+// App Errors
 import FormSubmissionError from '../../../error/FormSubmissionError';
+// App Utils
+import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
+// App APIs
+import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
-// App APIs
-import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // CSS
 import '../../../index.css';
 
@@ -67,7 +68,7 @@ const styles = {
 };
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 

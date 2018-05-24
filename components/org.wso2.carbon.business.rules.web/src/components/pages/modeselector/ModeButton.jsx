@@ -47,12 +47,12 @@ const styles = {
 };
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 
 /**
- * Represents a button which allows to select a mode for creating a business rule, that is,
+ * Represents a button which allows to select a mode for creating a business rule,
  * either 'from template' or 'from scratch'
  */
 export default class ModeButton extends Component {

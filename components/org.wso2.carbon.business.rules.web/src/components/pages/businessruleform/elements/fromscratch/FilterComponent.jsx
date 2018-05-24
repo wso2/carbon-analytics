@@ -30,7 +30,7 @@ import { IconButton } from 'material-ui';
 import Paper from 'material-ui/Paper';
 // App Components
 import FilterRule from './filtercomponent/FilterRule';
-// App Utilities
+// App Utils
 import BusinessRulesUtilityFunctions from '../../../../../utils/BusinessRulesUtilityFunctions';
 // App Constants
 import BusinessRulesConstants from '../../../../../constants/BusinessRulesConstants';
@@ -48,8 +48,7 @@ const styles = {
 };
 
 /**
- * Represents the filter component of business rules from scratch form, which contains filter rules, rule logic and
- * a button for adding filter rule
+ * Represents the Filter Component of the business rule from scratch form
  */
 export default class FilterComponent extends Component {
     /**

@@ -19,34 +19,35 @@
 
 import Axios from 'axios';
 import Qs from 'qs';
-import {MediaType} from '../constants/AuthConstants';
-import AuthManager from '../utils/AuthManager';
+// App Constants
+import { MediaType } from '../constants/AuthConstants';
 // App Utils
 import BusinessRulesUtilityFunctions from '../utils/BusinessRulesUtilityFunctions';
+// Auth Utils
+import AuthManager from '../utils/AuthManager';
 
 /**
- * Authentication API base path.
+ * Authentication API base path
  */
 const basePath = window.location.origin;
 
 /**
- * Password grant type.
+ * Password grant type
  */
 const passwordGrantType = 'password';
 
 /**
- * App context sans starting forward slash.
+ * App context starting from forward slash
  */
 const appContext = window.contextPath.substr(1);
 
 /**
- * Authentication API client.
+ * Authentication API client
  */
 export default class AuthenticationAPI {
     /**
-     * Get HTTP client.
-     *
-     * @return {AxiosInstance} Axios client
+     * Returns an Axios HTTP Client
+     * @returns {AxiosInstance}     Axios HTTP Client
      */
     static getHttpClient() {
         const client = Axios.create({
@@ -58,32 +59,30 @@ export default class AuthenticationAPI {
     }
 
     /**
-     * Get new token using refresh token
-     *
-     * @return {AxiosPromise} Axios promise
+     * Gets new token using refresh token
+     * @returns {AxiosPromise}      Response with the refresh token
      */
     static getAccessTokenWithRefreshToken() {
         return AuthenticationAPI
             .getHttpClient()
             .post(`/login/${appContext}`, Qs.stringify({
-                grantType: "refresh_token",
-                rememberMe: true
+                grantType: 'refresh_token',
+                rememberMe: true,
             }), {
                 headers: {
                     'Content-Type': MediaType.APPLICATION_WWW_FORM_URLENCODED,
-                    'Authorization': "Bearer " + AuthManager.getCookie('RTK'),
-                    'Accept': MediaType.APPLICATION_JSON,
+                    Authorization: 'Bearer ' + AuthManager.getCookie('RTK'),
+                    Accept: MediaType.APPLICATION_JSON,
                 },
             });
     }
 
     /**
-     * Login user.
-     *
-     * @param {String} username Username
-     * @param {String} password Password
-     * @param {boolean} rememberMe Remember me flag
-     * @return {AxiosPromise} Axios promise
+     * Logs in a user
+     * @param {String} username         Username
+     * @param {String} password         Password
+     * @param {boolean} rememberMe      Remember me flag
+     * @returns {AxiosPromise}          Response after the login
      */
     static login(username, password, rememberMe = false) {
         return AuthenticationAPI
@@ -93,7 +92,7 @@ export default class AuthenticationAPI {
                 password,
                 grantType: passwordGrantType,
                 rememberMe,
-                appId: "br_" + BusinessRulesUtilityFunctions.generateguid()
+                appId: 'br_' + BusinessRulesUtilityFunctions.generateGUID(),
             }), {
                 headers: {
                     'Content-Type': MediaType.APPLICATION_WWW_FORM_URLENCODED,
@@ -102,10 +101,9 @@ export default class AuthenticationAPI {
     }
 
     /**
-     * Logout user.
-     *
-     * @param {String} token Partial access token
-     * @return {AxiosPromise} Axios promise
+     * Logs out the user
+     * @param {String} token        Partial access token
+     * @returns {AxiosPromise}      Response after logging out
      */
     static logout(token) {
         return AuthenticationAPI

@@ -60,8 +60,7 @@ const styles = {
 };
 
 /**
- * Represents the output component of the business rule from scratch form,
- * which will contain output rule template selection, output configurations and input-as-output mappings
+ * Represents Auto complete input property
  */
 export default class AutoCompleteProperty extends Component {
     constructor() {
@@ -72,12 +71,20 @@ export default class AutoCompleteProperty extends Component {
         };
     }
 
-    /* AutoSuggestion related functions [BEGIN] */
-
+    /**
+     * Returns value of the given suggestion
+     * @param {Object} suggestion       Suggestion object
+     * @returns {String}                Suggestion value
+     */
     getSuggestionValue(suggestion) {
         return suggestion.label;
     }
 
+    /**
+     * Returns suggestions for the given value
+     * @param {String} value        Value for getting suggestions
+     * @returns {Array}             Suggestions acquired for the given value
+     */
     getSuggestions(value) {
         const inputValue = value.trim().toLowerCase();
         const inputLength = inputValue.length;
@@ -94,16 +101,29 @@ export default class AutoCompleteProperty extends Component {
             });
     }
 
+    /**
+     * Returns each suggestion as object with key 'label'
+     * @returns {Array}     Suggestions as labels
+     */
     returnSuggestionsAsLabels() {
         return this.props.elements.map(element => ({ label: element }));
     }
 
+    /**
+     * Fetches suggestions for the given value
+     * @param {Object} value        Requested value
+     */
     handleSuggestionsFetchRequested({ value }) {
         this.setState({
             suggestions: this.getSuggestions(value),
         });
     }
 
+    /**
+     * Returns the suggestions container
+     * @param {Object} options      Options for the suggestions container
+     * @returns {Component}         Suggestions container
+     */
     renderSuggestionsContainer(options) {
         const { containerProps, children } = options;
 
@@ -121,6 +141,13 @@ export default class AutoCompleteProperty extends Component {
         );
     }
 
+    /**
+     * Returns a suggestion, which is a MenuItem
+     * @param {Object} suggestion           Suggestion object
+     * @param {String} query                Queried text
+     * @param {boolean} isHighlighted       Whether the suggestion is highlighted or not
+     * @returns {Element}                   MenuItem
+     */
     renderSuggestion(suggestion, { query, isHighlighted }) {
         const matches = match(suggestion.label, query);
         const parts = parse(suggestion.label, matches);
@@ -142,6 +169,11 @@ export default class AutoCompleteProperty extends Component {
         );
     }
 
+    /**
+     * Returns the input Text Field
+     * @param {Object} inputProps       Input Props for the text field
+     * @returns {Component}             Text Field
+     */
     renderInput(inputProps) {
         const { autoFocus, value, ref } = inputProps;
 
@@ -158,8 +190,6 @@ export default class AutoCompleteProperty extends Component {
         );
     }
 
-    /* AutoSuggestion related functions [END] */
-
     render() {
         return (
             <Autosuggest
@@ -174,7 +204,6 @@ export default class AutoCompleteProperty extends Component {
                     autoFocus: true,
                     autoSuggestStyles: styles,
                     placeholder: '',
-                    // TODO refactor "x ? x : '' " type of things to "x || '' "
                     value: (this.props.value) || '',
                     onChange: (e, v) => this.props.onChange(v),
                 }}

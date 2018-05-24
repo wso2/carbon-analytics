@@ -16,7 +16,7 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 // Material UI Components
 import { CircularProgress } from 'material-ui/Progress';
 import { Typography } from 'material-ui';
@@ -34,14 +34,14 @@ const styles = {
     paper: {
         maxWidth: 400,
         paddingTop: 30,
-        paddingBottom: 30
+        paddingBottom: 30,
     },
 };
 
 /**
  * Represents the progress display, shown while loading a page
  */
-class ProgressDisplay extends React.Component {
+export default class ProgressDisplay extends Component {
     render() {
         return (
             <center>
@@ -55,5 +55,3 @@ class ProgressDisplay extends React.Component {
         );
     }
 }
-
-export default ProgressDisplay;

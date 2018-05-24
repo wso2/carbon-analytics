@@ -26,7 +26,7 @@ import AuthManager from '../utils/AuthManager';
 const appContext = window.contextPath;
 
 /**
- * APIs used in the Business Rules Manager App
+ * Business Rules Manager API client
  */
 export default class BusinessRulesAPI {
     constructor(url) {

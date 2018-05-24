@@ -17,6 +17,7 @@
  */
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
@@ -28,23 +29,23 @@ import AccountCircle from 'material-ui-icons/AccountCircle';
 import HomeIcon from 'material-ui-icons/Home';
 import Menu, { MenuItem } from 'material-ui/Menu';
 import Logo from '../../images/wso2-logo.svg';
-// Auth Utilities
+// Auth Utils
 import AuthManager from '../../utils/AuthManager';
 // CSS
 import '../../index.css';
 
-// Styles related to this component
+/**
+ * Styles related to this component
+ */
 const styles = {
     headerStyle: {
         color: 'white',
         backgroundColor: '#212121',
-        // width: '100%',
-        // margin: 0
-    }
+    },
 };
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 
@@ -66,7 +67,7 @@ export default class Header extends Component {
     renderRightLinks() {
         const homeButton = (
             <Link
-                style={{textDecoration: 'none'}}
+                style={{ textDecoration: 'none' }}
                 to={`${appContext}/businessRulesManager`}
             >
                 <IconButton color="contrast">
@@ -81,12 +82,12 @@ export default class Header extends Component {
         // Show account icon / login button depending on logged in status
         const user = AuthManager.getUser();
         if (!user) {
-            if(window.location.pathname === appContext + '/login') {
+            if (window.location.pathname === appContext + '/login') {
                 return (<div />);
             }
             return (
                 <Link
-                    style={{textDecoration: 'none'}}
+                    style={{ textDecoration: 'none' }}
                     to={`${appContext}/login?referrer=${window.location.pathname}`}
                 >
                     <Button color="contrast">Login</Button>
@@ -104,7 +105,7 @@ export default class Header extends Component {
                     <IconButton
                         aria-owns={open ? 'menu-appbar' : null}
                         aria-haspopup="true"
-                        onClick={event => {
+                        onClick={(event) => {
                             this.setState({ anchorEl: event.currentTarget });
                         }}
                         color="contrast"
@@ -125,7 +126,7 @@ export default class Header extends Component {
                     }}
                     open={this.state.anchorEl !== null}
                     onRequestClose={() => {
-                        this.setState({ anchorEl: null })
+                        this.setState({ anchorEl: null });
                     }}
                 >
                     <MenuItem>
@@ -143,7 +144,7 @@ export default class Header extends Component {
             <AppBar position="static" style={styles.headerStyle}>
                 <Toolbar>
                     <Link to={`${appContext}/businessRulesManager`} style={{ textDecoration: 'none' }}>
-                        <img height="35" src={Logo} style={{ cursor: 'pointer' }}/>
+                        <img height="35" src={Logo} style={{ cursor: 'pointer' }} />
                     </Link>
                     &nbsp;
                     &nbsp;
@@ -157,3 +158,13 @@ export default class Header extends Component {
         );
     }
 }
+
+Header.propTypes = {
+    hideUserSettings: PropTypes.bool,
+    hideHomeButton: PropTypes.bool,
+};
+
+Header.defaultProps = {
+    hideUserSettings: false,
+    hideHomeButton: false,
+};

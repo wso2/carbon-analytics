@@ -32,7 +32,7 @@ import Grid from 'material-ui/Grid';
 import { IconButton } from 'material-ui';
 import Paper from 'material-ui/Paper';
 import List, { ListItem, ListItemText } from 'material-ui/List';
-// App Utilities
+// App Utils
 import BusinessRulesUtilityFunctions from '../../../../../utils/BusinessRulesUtilityFunctions';
 // App Constants
 import BusinessRulesConstants from '../../../../../constants/BusinessRulesConstants';
@@ -50,7 +50,7 @@ const styles = {
 };
 
 /**
- * Represents the input component of the business rule from scratch form
+ * Represents the Input Component of the business rule from scratch form
  */
 export default class InputComponent extends Component {
     /**

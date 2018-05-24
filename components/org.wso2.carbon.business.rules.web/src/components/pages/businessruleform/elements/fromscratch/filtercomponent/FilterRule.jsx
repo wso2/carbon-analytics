@@ -27,11 +27,12 @@ import { FormControl } from 'material-ui/Form';
 import Select from 'material-ui/Select';
 // App Components
 import AutoCompleteProperty from './AutoCompleteProperty';
+// App Utils
+import BusinessRulesUtilityFunctions from '../../../../../../utils/BusinessRulesUtilityFunctions';
 // App Constants
 import BusinessRulesConstants from '../../../../../../constants/BusinessRulesConstants';
 // CSS
 import '../../../../../../index.css';
-import BusinessRulesUtilityFunctions from '../../../../../../utils/BusinessRulesUtilityFunctions';
 
 /**
  * Styles related to this component

@@ -34,7 +34,7 @@ import BusinessRulesConstants from '../../../../constants/BusinessRulesConstants
 import '../../../../index.css';
 
 /**
- * App context sans starting forward slash.
+ * App context
  */
 const appContext = window.contextPath;
 
@@ -61,9 +61,8 @@ export default class BusinessRule extends Component {
      * @returns {Element}       Retry Deploy button
      */
     displayRetryDeployButton() {
-        // TODO test this. Test what happens if 'null' is returned here, by manipulating React tree
         switch (this.props.status) {
-            case 1: // TODO put into constants
+            case 1:
                 return (
                     <Tooltip id="tooltip-right" title="Deploy" placement="right-end">
                         <IconButton

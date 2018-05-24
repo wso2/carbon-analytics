@@ -17,20 +17,22 @@
  *
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Qs from 'qs';
 import { Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
+// Material UI Components
+import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
 // App Components
 import BusinessRulesManager from '../pages/landingpage/LandingPage';
 import TemplateGroupSelector from '../pages/templategroupselector/TemplateGroupSelector';
 import BusinessRuleFromTemplateForm from '../pages/businessruleform/BusinessRuleFromTemplateForm';
 import BusinessRuleFromScratchForm from '../pages/businessruleform/BusinessRuleFromScratchForm';
 import BusinessRuleCreator from '../pages/modeselector/ModeSelector';
-// Auth Utilities
+// Auth Utils
 import AuthManager from '../../utils/AuthManager';
 // Custom Theme
-import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
 import { Orange } from '../../theme/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
@@ -40,13 +42,16 @@ const theme = createMuiTheme({
 });
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 
-export default class SecuredRouter extends React.Component {
+/**
+ * Represents the App's router, which is accessible after a successful login
+ */
+export default class SecuredRouter extends Component {
     componentWillMount() {
-        setInterval(function() {
+        setInterval(() => {
             if (AuthManager.getUser()) {
                 const expiresOn = new Date(AuthManager.getUser().expires);
                 const skew = 100;
@@ -68,7 +73,7 @@ export default class SecuredRouter extends React.Component {
 
             const params = Qs.stringify({ referrer });
             return (
-                <Redirect to={{pathname: `${appContext}/login`, search: params}}/>
+                <Redirect to={{ pathname: `${appContext}/login`, search: params }} />
             );
         }
 
@@ -80,12 +85,14 @@ export default class SecuredRouter extends React.Component {
                         <Route exact path={`${appContext}/businessRuleCreator`} component={BusinessRuleCreator} />
                         <Route
                             exact
-                            path={`${appContext}/businessRuleFromScratchForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
+                            path={`${appContext}/businessRuleFromScratchForm/:formMode/` +
+                                `templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
                             component={BusinessRuleFromScratchForm}
                         />
                         <Route
                             exact
-                            path={`${appContext}/businessRuleFromTemplateForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
+                            path={`${appContext}/businessRuleFromTemplateForm/:formMode/` +
+                                `templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
                             component={BusinessRuleFromTemplateForm}
                         />
                         <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager} />
@@ -100,3 +107,7 @@ export default class SecuredRouter extends React.Component {
         );
     }
 }
+
+SecuredRouter.propTypes = {
+    location: PropTypes.string.isRequired,
+};

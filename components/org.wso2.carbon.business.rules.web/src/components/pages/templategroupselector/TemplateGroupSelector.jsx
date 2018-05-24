@@ -27,12 +27,12 @@ import TemplateGroupThumbnail from './TemplateGroupThumbnail';
 import ProgressDisplay from '../../common/ProgressDisplay';
 import ErrorDisplay from '../../common/error/ErrorDisplay';
 import Header from '../../common/Header';
+// App Utils
+import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
 // App APIs
 import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
-// App Utilities
-import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
 // CSS
 import '../../../index.css';
 
@@ -53,7 +53,7 @@ const styles = {
 };
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 
@@ -96,7 +96,7 @@ export default class TemplateGroupSelector extends Component {
      * Template Groups are removed for filtering, based on the following criteria.
      *      1.  Template Groups that don't have at least one Input Rule Template & one Output Rule Template,
      *          when the mode is 'from scratch'
-     *      2.  Template Groups that don't have at least one Template type of Rule Template,
+     *      2.  Template Groups that don't have at least one 'template' type of Rule Template,
      *          when the mode is 'from template'
      * @param {Array} templateGroups        Unfiltered array of available Template Groups
      * @returns {Array}                     Filtered array of Template Groups

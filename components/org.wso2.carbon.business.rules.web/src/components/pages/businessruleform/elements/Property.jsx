@@ -30,7 +30,7 @@ import '../../../../index.css';
 /**
  * Represents a property of a rule template from which, inputs are gained
  */
-export default class Property extends Component {
+export default class Property extends Component { // TODO fix primary color
     /**
      * Handles the onChange action of the input field
      * @param {object} event        OnChange event
@@ -41,7 +41,7 @@ export default class Property extends Component {
 
     /**
      * Returns a drop down
-     * @returns {Component}     A drop down Component
+     * @returns {Component}     Drop down Component
      */
     displayDropDown() {
         return (
@@ -67,15 +67,15 @@ export default class Property extends Component {
 
     /**
      * Returns a text field
-     * @returns {Component}     A text field Component
+     * @returns {Component}     Text Field Component
      */
     displayTextField() {
         return (
             <TextField
-                fullWidth={(this.props.fullWidth) ? (this.props.fullWidth) : false}
+                fullWidth={this.props.fullWidth || true}
                 required
-                error={(this.props.errorState) ? (this.props.errorState) : false}
-                disabled={(this.props.disabledState) ? (this.props.disabledState) : false}
+                error={this.props.errorState || false}
+                disabled={this.props.disabledState || false}
                 id={this.props.name}
                 name={this.props.name}
                 label={this.props.fieldName}
@@ -109,7 +109,7 @@ Property.propTypes = {
     description: PropTypes.string,
 };
 
-Property.defaultProps = { // TODO find out advantages and remove (someProp ? someProp : '') kinda logics
+Property.defaultProps = {
     description: '',
     options: undefined,
     fullWidth: true,

@@ -17,9 +17,9 @@
  */
 
 /**
- * Has values for all the constants related to Business Rules web app
+ * Constants related to the Business Rules Manager web app
  */
-const BusinessRulesConstants = {
+const BusinessRulesConstants = { // TODO remove unnecessary ones
     // Rule Template types
     RULE_TEMPLATE_TYPE_TEMPLATE: 'template',
     RULE_TEMPLATE_TYPE_INPUT: 'input',
@@ -37,7 +37,7 @@ const BusinessRulesConstants = {
     // Business Rule from scratch property types
     INPUT_DATA_KEY: 'inputData',
     OUTPUT_DATA_KEY: 'outputData',
-    RULE_COMPONENTS_KEY: 'ruleComponents', // TODO refactor to object
+    RULE_COMPONENTS_KEY: 'ruleComponents',
     FILTER_RULES_KEY: 'filterRules',
     RULE_LOGIC_KEY: 'ruleLogic',
     OUTPUT_MAPPINGS_KEY: 'outputMappings',
@@ -62,7 +62,7 @@ const BusinessRulesConstants = {
         MANAGER: 0,
         VIEWER: 1,
         UNSET: -1,
-        NONE: -2
+        NONE: -2,
     },
 
     // Business Rule deployment statuses
@@ -85,7 +85,7 @@ const BusinessRulesConstants = {
     SIDDHI_APP_DEPLOYMENT_STATUS_TEXTS: [
         'Unreachable', // -1
         'Not Deployed', // 0
-        'Deployed' // 1
+        'Deployed', // 1
     ],
 
     BUSINESS_RULE_STATUS_DEPLOYED_STRING: 'Deployed',
@@ -99,17 +99,17 @@ const BusinessRulesConstants = {
         'After BusinessRuleFromScratch Updation', // 2
         'After BusinessRuleFromTemplate Creation', // 3
         'After BusinessRuleFromTemplate Updation', // 4
-        'After deletion' // 5
+        'After deletion', // 5
         // Else, normal mode
     ],
 
     ERROR_CODES: {
         UNKNOWN: 0,
-        NONE: -1
+        NONE: -1,
     },
 
     // URL for APIs
-    BASE_URL: window.location.origin
+    BASE_URL: window.location.origin,
 };
 
 export default BusinessRulesConstants;

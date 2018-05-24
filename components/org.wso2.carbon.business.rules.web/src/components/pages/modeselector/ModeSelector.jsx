@@ -20,11 +20,11 @@ import React, { Component } from 'react';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
-// App Constants
-import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 // App Components
 import Header from '../../common/Header';
 import CreateButton from './ModeButton';
+// App Constants
+import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 // CSS
 import '../../../index.css';
 

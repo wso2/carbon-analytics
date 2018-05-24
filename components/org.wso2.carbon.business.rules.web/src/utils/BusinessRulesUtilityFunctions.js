@@ -16,51 +16,63 @@
  *  under the License.
  */
 
-import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+import BusinessRulesConstants from '../constants/BusinessRulesConstants';
 
-class BusinessRulesUtilityFunctions {
+/**
+ * Utility functions for the Business Rules Manager app
+ */
+export default class BusinessRulesUtilityFunctions {
     /**
-     * Generates UUID for a given Business Rule name
-     *
-     * @param businessRuleName
-     * @returns {String}
+     * Generates UUID for the given name of a business rule
+     * @param {String} businessRuleName     Name of the business rule
+     * @returns {String}                    UUID for the business rule
      */
     static generateBusinessRuleUUID(businessRuleName) {
-        return businessRuleName.toLowerCase().split(' ').join('-')
+        return businessRuleName.toLowerCase().split(' ').join('-');
     }
 
     /**
      * Checks whether a given object is empty or not
-     *
-     * @param object
-     * @returns {boolean}
+     * @param {Object} object       Object, which is to be checked whether empty or not
+     * @returns {boolean}           Whether the object is empty or not
      */
     static isEmpty(object) {
-        for (let key in object) {
-            if (object.hasOwnProperty(key))
+        for (const key in object) {
+            if (object.hasOwnProperty(key)) {
                 return false;
+            }
         }
         return true;
     }
 
     /**
-     * Returns the error code (number) for displaying Error
-     * @param error     Error of an Axios Promise
+     * Returns the error code for displaying Error
+     * @param {Object} error        Erroneous response
+     * @returns {number}            Error number
      */
     static getErrorDisplayCode(error) {
-        let errorCode = BusinessRulesConstants.ERROR_CODES.UNKNOWN;
+        let errorCode;
         if (error.response != null) {
             switch (error.response.status) {
                 case 401:
                 case 403:
                 case 500:
                     errorCode = error.response.status;
+                    break;
+                default:
+                    errorCode = BusinessRulesConstants.ERROR_CODES.UNKNOWN;
             }
+        } else {
+            errorCode = BusinessRulesConstants.ERROR_CODES.UNKNOWN;
         }
         return errorCode;
     }
 
-    static generateguid () {
+    /**
+     * Generates GUID for authentication purposes
+     * @returns {String}        GUID
+     */
+    static generateGUID() {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
@@ -71,5 +83,3 @@ class BusinessRulesUtilityFunctions {
             s4() + '-' + s4() + s4() + s4();
     }
 }
-
-export default BusinessRulesUtilityFunctions;

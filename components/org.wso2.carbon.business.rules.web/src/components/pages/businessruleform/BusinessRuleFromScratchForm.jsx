@@ -34,16 +34,17 @@ import FilterComponent from './elements/fromscratch/FilterComponent';
 import Header from '../../common/Header';
 import ProgressDisplay from '../../common/ProgressDisplay';
 import ErrorDisplay from '../../common/error/ErrorDisplay';
-// App Utilities
+// App Errors
+import FormSubmissionError from '../../../error/FormSubmissionError';
+// App Utils
 import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
+// App APIs
+import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
-// App APIs
-import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // CSS
 import '../../../index.css';
-import FormSubmissionError from '../../../error/FormSubmissionError';
 
 /**
  * Styles related to this component
@@ -102,7 +103,7 @@ const styles = {
 };
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 

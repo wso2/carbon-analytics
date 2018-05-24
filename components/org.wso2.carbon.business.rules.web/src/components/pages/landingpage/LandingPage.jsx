@@ -33,14 +33,15 @@ import DeploymentInfo from './elements/DeploymentInfo';
 import Header from '../../common/Header';
 import ProgressDisplay from '../../common/ProgressDisplay';
 import ErrorDisplay from '../../common/error/ErrorDisplay';
-// App Constants
-import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
-import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
+// App Utils
+import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
 // App APIs
 import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
+// App Constants
+import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
+import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
 // CSS
 import '../../../index.css';
-import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFunctions';
 
 /**
  * Styles related to this component

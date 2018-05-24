@@ -17,24 +17,27 @@
  *
  */
 
-import React from "react";
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-// Material-UI
+// Material UI Components
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 
-export default class FormPanel extends React.Component {
+/**
+ * Represents the panel which consists forms
+ */
+export default class FormPanel extends Component {
     render() {
-        let wrapperStyles = {
+        const wrapperStyles = {
             margin: '0 auto',
             width: this.props.width,
             paddingTop: this.props.paddingTop,
-            paddingBottom: 15
+            paddingBottom: 15,
         };
 
         return (
             <div style={wrapperStyles}>
-                <Paper style={{padding: 50}}>
+                <Paper style={{ padding: 50 }}>
                     <form method="post" onSubmit={this.props.onSubmit}>
                         <Typography type="headline">{this.props.title}</Typography>
                         {this.props.children}
@@ -47,13 +50,13 @@ export default class FormPanel extends React.Component {
 
 FormPanel.propTypes = {
     title: PropTypes.string,
-    onSubmit: PropTypes.func,
+    onSubmit: PropTypes.func.isRequired,
     width: PropTypes.number,
-    paddingTop: PropTypes.number
+    paddingTop: PropTypes.number,
 };
 
 FormPanel.defaultProps = {
     title: '',
     width: 450,
-    paddingTop: 60
+    paddingTop: 60,
 };

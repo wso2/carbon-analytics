@@ -30,14 +30,15 @@ import { MenuItem } from 'material-ui/Menu';
 import { IconButton } from 'material-ui';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
-// App Utilities
+// App Components
+import AutoCompleteProperty from './filtercomponent/AutoCompleteProperty';
+// App Utils
 import BusinessRulesUtilityFunctions from '../../../../../utils/BusinessRulesUtilityFunctions';
 // App Constants
 import BusinessRulesConstants from '../../../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../../../constants/BusinessRulesMessages';
 // CSS
 import '../../../../../index.css';
-import AutoCompleteProperty from './filtercomponent/AutoCompleteProperty';
 
 /**
  * Styles related to this component
@@ -49,8 +50,7 @@ const styles = {
 };
 
 /**
- * Represents the output component of the business rule from scratch form,
- * which will contain output rule template selection, output configurations and input-as-output mappings
+ * Represents the Output Component of the business rule from scratch form
  */
 export default class OutputComponent extends Component {
     constructor() {
