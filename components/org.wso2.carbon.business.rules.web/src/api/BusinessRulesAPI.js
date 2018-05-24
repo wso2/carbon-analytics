@@ -16,7 +16,6 @@
  *  under the License.
  */
 
-import React from 'react';
 import axios from 'axios';
 // Auth Utils
 import AuthManager from '../utils/AuthManager';
@@ -27,116 +26,118 @@ import AuthManager from '../utils/AuthManager';
 const appContext = window.contextPath;
 
 /**
- * Used to call APIs, related to Business Rules
+ * APIs used in the Business Rules Manager App
  */
-class BusinessRulesAPI {
+export default class BusinessRulesAPI {
     constructor(url) {
         this.url = url;
     }
 
     /**
-     * Returns the axios http client
+     * Returns an Axios HTTP Client
+     * @returns {AxiosInstance}     Axios HTTP Client
      */
     getHTTPClient() {
         return axios.create({
             baseURL: this.url + appContext,
             timeout: 30000,
-            headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID}
+            headers: { Authorization: 'Bearer ' + AuthManager.getUser().SDID },
         });
     }
 
     /**
-     * Returns available template groups
+     * Returns available Template Groups
+     * @returns {AxiosPromise}      Available Template Groups
      */
     getTemplateGroups() {
         return this.getHTTPClient().get('/template-groups');
     }
 
     /**
-     * Returns the template group that has the given ID
-     * @param templateGroupID
+     * Returns the Template Group that has the given ID
+     * @param {String} templateGroupID      UUID of the Template Group
+     * @returns {AxiosPromise}              Requested Template Group
      */
     getTemplateGroup(templateGroupID) {
         return this.getHTTPClient().get('/template-groups/' + templateGroupID);
     }
 
     /**
-     * Returns rule templates available under the given template group
-     * @param templateGroupID
+     * Returns Rule Templates available under the Template Group, which has the given ID
+     * @param {String} templateGroupID      UUID of the Template Group
+     * @returns {AxiosPromise}              Available Rule Templates
      */
     getRuleTemplates(templateGroupID) {
         return this.getHTTPClient().get('/template-groups/' + templateGroupID + '/templates');
     }
 
     /**
-     * Returns the rule template that has the given ruleTemplateID and belongs to the template group
-     * with the given templateGroupID
-     *
-     * @param templateGroupID
-     * @param ruleTemplateID
+     * Returns the Rule Template with the given ID, which belongs to the Template Group that has the given ID
+     * @param {String} templateGroupID      UUID of the Template Group
+     * @param {String} ruleTemplateID       UUID of the Rule Template
+     * @returns {AxiosPromise}              Requested Rule Template
      */
     getRuleTemplate(templateGroupID, ruleTemplateID) {
         return this.getHTTPClient().get('/template-groups/' + templateGroupID + '/templates/' + ruleTemplateID);
     }
 
     /**
-     * Creates a business rule with the given business rule JSON.
-     * Deploying enabled or disabled according to the given deployStatus
-     *
-     * @param businessRuleJSON
-     * @param deployStatus Deploy if true, Do not deploy if false
-     * @returns {AxiosPromise}
+     * Creates and saves a business rule with the given business rule JSON,
+     * Deployment is done according to the given deployStatus
+     * @param {Object} businessRuleJSON     Business rule object
+     * @param {boolean} deployStatus        Whether to Deploy the business rule or not
+     * @returns {AxiosPromise}              Response after saving the business rule
      */
     createBusinessRule(businessRuleJSON, deployStatus) {
-        let formData = new FormData();
-        formData.append("businessRule", (businessRuleJSON));
+        const formData = new FormData();
+        formData.append('businessRule', (businessRuleJSON));
         return this.getHTTPClient().post('/instances?deploy=' + deployStatus, formData,
-            {headers: {'Content-Type': 'multipart/form-data'}});
+            { headers: { 'Content-Type': 'multipart/form-data' } });
     }
 
     /**
-     * Returns available business rules
+     * Returns available business rules from the database
+     * @returns {AxiosPromise}      Existing business rules
      */
     getBusinessRules() {
         return this.getHTTPClient().get('/instances');
     }
 
     /**
-     * Returns the business rule with the given ID
-     * @param businessRuleID
+     * Returns the business rule, that has the given ID
+     * @param {String} businessRuleID       ID of the business rule
+     * @returns {AxiosPromise}              Business rule
      */
     getBusinessRule(businessRuleID) {
         return this.getHTTPClient().get('/instances/' + businessRuleID);
     }
 
     /**
-     * Gets deployment info of the business rule with the given ID
-     * @param businessRuleID
+     * Gets deployment info of the business rule, that has the given ID
+     * @param {String} businessRuleID       ID of the business rule
+     * @returns {AxiosPromise}              Deployment info of the business rule
      */
     getDeploymentInfo(businessRuleID) {
         return this.getHTTPClient().get('/instances/' + businessRuleID + '/deployment-info');
     }
 
     /**
-     * Updates the business rule with the given ID, with the given JSON of a business rule; with deployment status
-     * as specified
-     *
-     * @param businessRuleID
-     * @param businessRuleJSON
-     * @param deployStatus
-     * @returns {AxiosPromise}
+     * Updates the business rule that has the given ID, with the given JSON of a business rule
+     * @param {String} businessRuleID       ID of the business rule
+     * @param {Object} businessRuleJSON     Business rule object
+     * @param {boolean} deployStatus        Whether to deploy the business rule or not
+     * @returns {AxiosPromise}              Response after updating the business rule
      */
     updateBusinessRule(businessRuleID, businessRuleJSON, deployStatus) {
         return this.getHTTPClient().put('/instances/' + businessRuleID + '?deploy=' + deployStatus,
-            businessRuleJSON, {headers: {'Content-Type': 'application/json'}});
+            businessRuleJSON, { headers: { 'Content-Type': 'application/json' } });
     }
 
     /**
-     * Deletes the business rule with the given ID.
-     * Un-deploys SiddhiApps of the business rule only if force deletion status is false
-     *
-     * @param businessRuleID
-     * @param forceDeleteStatus
+     * Deletes the business rule, that has the given ID
+     * @param {String} businessRuleID       ID of the business rule
+     * @param {boolean} forceDeleteStatus   Whether to force delete the business rule or not
+     * @returns {AxiosPromise}              Response after deleting the business rule
      */
     deleteBusinessRule(businessRuleID, forceDeleteStatus) {
         return this.getHTTPClient()
@@ -144,13 +145,11 @@ class BusinessRulesAPI {
     }
 
     /**
-     * Re deploys the artifacts of the business rule, identified by the given ID
-     *
-     * @param businessRuleID
+     * Re-deploys the business rule, that has the given ID
+     * @param {String} businessRuleID       ID of the business rule
+     * @returns {AxiosPromise}              Response after re-deploying the business rule
      */
     redeployBusinessRule(businessRuleID) {
         return this.getHTTPClient().post('/instances/' + businessRuleID);
     }
 }
-
-export default BusinessRulesAPI;
