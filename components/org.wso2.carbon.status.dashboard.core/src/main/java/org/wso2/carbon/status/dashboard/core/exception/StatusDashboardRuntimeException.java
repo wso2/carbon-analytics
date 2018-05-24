@@ -27,5 +27,9 @@ public class StatusDashboardRuntimeException extends RuntimeException {
     public StatusDashboardRuntimeException(String message, Throwable throwable) {
         super(message, throwable);
     }
+    
+    public StatusDashboardRuntimeException(String message) {
+        super(message);
+    }
 
 }

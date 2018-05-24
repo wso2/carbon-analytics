@@ -44,8 +44,9 @@ import java.text.SimpleDateFormat;
 @Plugin(name = "EditorConsole", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE, printObject = true)
 public final class EditorConsoleAppender extends AbstractAppender {
 
-    private CircularBuffer<ConsoleLogEvent> circularBuffer;
     private static final int BUFFER_SIZE = 10;
+    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
+    private CircularBuffer<ConsoleLogEvent> circularBuffer;
 
     /**
      * Creates an instance of EditorConsoleAppender.
@@ -60,7 +61,6 @@ public final class EditorConsoleAppender extends AbstractAppender {
     private EditorConsoleAppender(final String name, final Filter filter,
                                   final Layout<? extends Serializable> layout, final boolean ignoreExceptions) {
         super(name, filter, layout, ignoreExceptions);
-
         activateOptions();
     }
 
@@ -119,18 +119,12 @@ public final class EditorConsoleAppender extends AbstractAppender {
         consoleLogEvent.setFqcn(logEvent.getLoggerName());
         consoleLogEvent.setLevel(logEvent.getLevel().name());
         consoleLogEvent.setMessage(getEncodedString(logEvent.getMessage().getFormattedMessage()));
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
-        String dateString = formatter.format(logEvent.getTimeMillis());
+        String dateString = dateFormatter.format(logEvent.getTimeMillis());
         consoleLogEvent.setTimeStamp(dateString);
         if (logEvent.getThrown() != null) {
             consoleLogEvent.setStacktrace(getStacktrace(logEvent.getThrown()));
         }
         return consoleLogEvent;
-    }
-
-    public void close() {
-        // do we need to do anything here. I hope we do not need to reset the queue
-        // as it might still be exposed to others
     }
 
     private String getStacktrace(Throwable e) {
