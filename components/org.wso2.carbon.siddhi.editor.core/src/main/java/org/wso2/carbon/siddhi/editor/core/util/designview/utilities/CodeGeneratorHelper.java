@@ -42,13 +42,42 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import java.util.List;
 import java.util.Map;
 
+// TODO: 4/20/18 Check Everywhere for null values
+// TODO: 5/2/18 Look for constants for all the cases in switch case
+// TODO: 5/24/18 Improve The Information Given In The Error Messages
+
 public class CodeGeneratorHelper {
 
-    private static final String VOID_RETURN = "";
+    public static String getAttributes(List<AttributeConfig> attributes) {
+        if (attributes == null || attributes.isEmpty()) {
+            throw new CodeGenerationException("The attribute list given cannot be null/empty");
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        int attributesLeft = attributes.size();
+        for (AttributeConfig attribute : attributes) {
+            if (attribute == null) {
+                throw new CodeGenerationException("The attribute value given is null");
+            } else if (attribute.getName() == null || attribute.getName().isEmpty()) {
+                throw new CodeGenerationException("The attrubte name given is null");
+            } else if (attribute.getType() == null || attribute.getType().isEmpty()) {
+                throw new CodeGenerationException("The attrubte type given is null");
+            }
+            stringBuilder.append(attribute.getName())
+                    .append(CodeGeneratorConstants.SPACE)
+                    .append(attribute.getType());
+            if (attributesLeft != 1) {
+                stringBuilder.append(CodeGeneratorConstants.COMMA)
+                        .append(CodeGeneratorConstants.SPACE);
+            }
+            attributesLeft--;
+        }
+        return stringBuilder.toString();
+    }
 
     public static String getParameterList(List<String> parameters) {
         if (parameters.isEmpty()) {
-            return VOID_RETURN;
+            return CodeGeneratorConstants.EMPTY_STRING;
         }
 
         StringBuilder parametersStringBuilder = new StringBuilder();
@@ -67,7 +96,7 @@ public class CodeGeneratorHelper {
 
     public static String getStore(StoreConfig store) {
         if (store == null) {
-            return VOID_RETURN;
+            return CodeGeneratorConstants.EMPTY_STRING;
         }
 
         StringBuilder storeStringBuilder = new StringBuilder();
@@ -99,7 +128,7 @@ public class CodeGeneratorHelper {
 
     public static String getAnnotations(List<String> annotations) {
         if (annotations.isEmpty()) {
-            return VOID_RETURN;
+            return CodeGeneratorConstants.EMPTY_STRING;
         }
 
         StringBuilder annotationsStringBuilder = new StringBuilder();
@@ -109,33 +138,6 @@ public class CodeGeneratorHelper {
         }
 
         return annotationsStringBuilder.toString();
-    }
-
-    public static String getAttributes(List<AttributeConfig> attributes) {
-        if (attributes == null || attributes.isEmpty()) {
-            throw new CodeGenerationException("The attribute list given cannot be null/empty");
-        }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        int attributesLeft = attributes.size();
-        for (AttributeConfig attribute : attributes) {
-            if (attribute == null) {
-                throw new CodeGenerationException("The attribute value given is null");
-            } else if (attribute.getName() == null || attribute.getName().isEmpty()) {
-                throw new CodeGenerationException("The attrubte name given is null");
-            } else if (attribute.getType() == null || attribute.getType().isEmpty()) {
-                throw new CodeGenerationException("The attrubte type given is null");
-            }
-            stringBuilder.append(attribute.getName())
-                    .append(CodeGeneratorConstants.SPACE)
-                    .append(attribute.getType());
-            if (attributesLeft != 1) {
-                stringBuilder.append(CodeGeneratorConstants.COMMA)
-                        .append(CodeGeneratorConstants.SPACE);
-            }
-            attributesLeft--;
-        }
-        return stringBuilder.toString();
     }
 
     /**
@@ -391,7 +393,7 @@ public class CodeGeneratorHelper {
      * @return The Siddhi string representation of the given PatternSequenceConfig instance
      */
     private static String getPatternSequenceInput(PatternSequenceConfig patternSequence) {
-        return VOID_RETURN;
+        return CodeGeneratorConstants.EMPTY_STRING;
     }
 
     /**
@@ -469,7 +471,7 @@ public class CodeGeneratorHelper {
 
     public static String getQueryGroupBy(List<String> groupByList) {
         if (groupByList == null || groupByList.isEmpty()) {
-            return VOID_RETURN;
+            return CodeGeneratorConstants.EMPTY_STRING;
         }
 
         StringBuilder groupByListStringBuilder = new StringBuilder();
@@ -481,7 +483,7 @@ public class CodeGeneratorHelper {
 
     public static String getQueryOrderBy(List<QueryOrderByConfig> orderByList) {
         if (orderByList == null || orderByList.isEmpty()) {
-            return VOID_RETURN;
+            return CodeGeneratorConstants.EMPTY_STRING;
         }
 
         StringBuilder orderByListStringBuilder = new StringBuilder();
@@ -520,12 +522,12 @@ public class CodeGeneratorHelper {
                     .append(limit);
             return limitStringBuilder.toString();
         }
-        return VOID_RETURN;
+        return CodeGeneratorConstants.EMPTY_STRING;
     }
 
     public static String getQueryHaving(String having) {
         if (having == null || having.isEmpty()) {
-            return VOID_RETURN;
+            return CodeGeneratorConstants.EMPTY_STRING;
         }
 
         StringBuilder havingStringBuilder = new StringBuilder();
@@ -536,7 +538,7 @@ public class CodeGeneratorHelper {
 
     public static String getQueryOutputRateLimit(String outputRateLimit) {
         if (outputRateLimit == null || outputRateLimit.isEmpty()) {
-            return VOID_RETURN;
+            return CodeGeneratorConstants.EMPTY_STRING;
         }
         StringBuilder outputRateLimitStringBuilder = new StringBuilder();
         outputRateLimitStringBuilder.append(CodeGeneratorConstants.OUTPUT)

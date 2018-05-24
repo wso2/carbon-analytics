@@ -97,6 +97,12 @@ public class CodeGeneratorConstants {
     public static final String AGGREGATE = "aggregate";
     public static final String BY = "by";
 
+    public static final String DEFAULT_APP_NAME = APP_NAME + "SiddhiApp" + SINGLE_QUOTE + CLOSE_BRACKET;
+    public static final String DEFAULT_APP_DESCRIPTION = APP_DESCRIPTION + "Description of the plan"
+            + SINGLE_QUOTE + CLOSE_BRACKET;
+
+    public static final String EMPTY_STRING = "";
+
     private CodeGeneratorConstants() {
     }
 

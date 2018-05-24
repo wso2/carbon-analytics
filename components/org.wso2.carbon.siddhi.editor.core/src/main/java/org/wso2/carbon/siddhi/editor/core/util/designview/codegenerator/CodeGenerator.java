@@ -28,13 +28,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorHelper;
 
-// TODO: 4/20/18 Check Everywhere for null values
-// TODO: 5/22/18 Refactor code to make the class smaller, use seperate helper and constant classes 
+import java.util.List;
 
 /**
  * Used to convert an EventFlow object to a Siddhi app string
@@ -42,6 +40,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
 public class CodeGenerator {
 
     // TODO: 5/2/18 Look for constants for all the cases in switch case
+    // TODO: 5/24/18 Improve The Information Given In The Error Messages
 
     /**
      * Converts a EventFlow object to a Siddhi app string
@@ -53,78 +52,16 @@ public class CodeGenerator {
         // TODO: 4/20/18 complete Main Public Method
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
         StringBuilder siddhiAppStringBuilder = new StringBuilder();
-
-        siddhiAppStringBuilder.append(generateAppNameAndDescription(siddhiApp.getAppName(), siddhiApp.getAppDescription()))
-                .append(CodeGeneratorConstants.NEW_LINE)
-                .append(CodeGeneratorConstants.NEW_LINE);
-
-        // TODO source and sink should be somehow connected to a stream over here
-        if (!siddhiApp.getStreamList().isEmpty()) {
-            siddhiAppStringBuilder.append("-- Streams")
-                    .append(CodeGeneratorConstants.NEW_LINE);
-            for (StreamConfig stream : siddhiApp.getStreamList()) {
-                siddhiAppStringBuilder.append(generateStreamString(stream))
-                        .append(CodeGeneratorConstants.NEW_LINE);
-            }
-            siddhiAppStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
-        }
-
-        if (!siddhiApp.getTableList().isEmpty()) {
-            siddhiAppStringBuilder.append("-- Tables").append(CodeGeneratorConstants.NEW_LINE);
-            for (TableConfig table : siddhiApp.getTableList()) {
-                siddhiAppStringBuilder.append(generateTableString(table))
-                        .append(CodeGeneratorConstants.NEW_LINE);
-            }
-            siddhiAppStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
-        }
-
-        if (!siddhiApp.getWindowList().isEmpty()) {
-            siddhiAppStringBuilder.append("-- Windows").append(CodeGeneratorConstants.NEW_LINE);
-            for (WindowConfig window : siddhiApp.getWindowList()) {
-                siddhiAppStringBuilder.append(generateWindowString(window))
-                        .append(CodeGeneratorConstants.NEW_LINE);
-            }
-            siddhiAppStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
-        }
-
-        if (!siddhiApp.getTriggerList().isEmpty()) {
-            siddhiAppStringBuilder.append("-- Triggers").append(CodeGeneratorConstants.NEW_LINE);
-            for (TriggerConfig trigger : siddhiApp.getTriggerList()) {
-                siddhiAppStringBuilder.append(generateTriggerString(trigger))
-                        .append(CodeGeneratorConstants.NEW_LINE);
-            }
-            siddhiAppStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
-        }
-
-        if (!siddhiApp.getAggregationList().isEmpty()) {
-            siddhiAppStringBuilder.append("-- Aggregations").append(CodeGeneratorConstants.NEW_LINE);
-            for (AggregationConfig aggregation : siddhiApp.getAggregationList()) {
-                siddhiAppStringBuilder.append(generateAggregationString(aggregation))
-                        .append(CodeGeneratorConstants.NEW_LINE);
-            }
-            siddhiAppStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
-        }
-
-        if (!siddhiApp.getFunctionList().isEmpty()) {
-            siddhiAppStringBuilder.append("-- Functions").append(CodeGeneratorConstants.NEW_LINE);
-            for (FunctionConfig function : siddhiApp.getFunctionList()) {
-                siddhiAppStringBuilder.append(generateFunctionString(function)).append(CodeGeneratorConstants.NEW_LINE);
-            }
-            siddhiAppStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
-        }
-
-        // TODO seperate these out into different IF conditions.
-        if (!siddhiApp.getWindowFilterProjectionQueryList().isEmpty() || !siddhiApp.getJoinQueryList().isEmpty() ||
-                !siddhiApp.getPatternQueryList().isEmpty() || !siddhiApp.getSequenceQueryList().isEmpty()) {
-            siddhiAppStringBuilder.append("-- Queries").append(CodeGeneratorConstants.NEW_LINE);
-            for (QueryConfig query : siddhiApp.getWindowFilterProjectionQueryList()) {
-                siddhiAppStringBuilder.append(generateQueryString(query));
-            }
-            for (QueryConfig query : siddhiApp.getJoinQueryList()) {
-                siddhiAppStringBuilder.append(generateQueryString(query));
-            }
-            siddhiAppStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
-        }
+        siddhiAppStringBuilder
+                .append(generateAppNameAndDescription(siddhiApp.getAppName(), siddhiApp.getAppDescription()))
+                .append(generateStreams(siddhiApp.getStreamList()))
+                .append(generateTables(siddhiApp.getTableList()))
+                .append(generateWindows(siddhiApp.getWindowList()))
+                .append(generateTriggers(siddhiApp.getTriggerList()))
+                .append(generateAggregations(siddhiApp.getAggregationList()))
+                .append(generateFunctions(siddhiApp.getFunctionList()))
+                .append(generateQueries(siddhiApp.getWindowFilterProjectionQueryList(), siddhiApp.getJoinQueryList(),
+                        siddhiApp.getPatternQueryList(), siddhiApp.getSequenceQueryList()));
 
         // TODO: 4/23/18 Add the partitions loop
 
@@ -141,21 +78,202 @@ public class CodeGenerator {
      */
     private String generateAppNameAndDescription(String appName, String appDescription) {
         StringBuilder appNameAndDescriptionStringBuilder = new StringBuilder();
+
         if (appName != null && !appName.isEmpty()) {
             appNameAndDescriptionStringBuilder.append(CodeGeneratorConstants.APP_NAME)
                     .append(appName)
                     .append(CodeGeneratorConstants.SINGLE_QUOTE)
-                    .append(CodeGeneratorConstants.CLOSE_BRACKET);
+                    .append(CodeGeneratorConstants.CLOSE_BRACKET)
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        } else {
+            appNameAndDescriptionStringBuilder.append(CodeGeneratorConstants.DEFAULT_APP_NAME)
+                    .append(CodeGeneratorConstants.NEW_LINE);
         }
+
         if (appDescription != null && !appDescription.isEmpty()) {
             appNameAndDescriptionStringBuilder.append(CodeGeneratorConstants.NEW_LINE)
                     .append(CodeGeneratorConstants.APP_DESCRIPTION)
                     .append(appDescription)
                     .append(CodeGeneratorConstants.SINGLE_QUOTE)
-                    .append(CodeGeneratorConstants.CLOSE_BRACKET);
+                    .append(CodeGeneratorConstants.CLOSE_BRACKET)
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        } else {
+            appNameAndDescriptionStringBuilder.append(CodeGeneratorConstants.DEFAULT_APP_DESCRIPTION)
+                    .append(CodeGeneratorConstants.NEW_LINE);
         }
 
+        appNameAndDescriptionStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
+
         return appNameAndDescriptionStringBuilder.toString();
+    }
+
+    private String generateStreams(List<StreamConfig> streamList) {
+        // TODO source and sink should be somehow connected to a stream over here
+        if (streamList == null || streamList.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder streamListStringBuilder = new StringBuilder();
+        streamListStringBuilder.append("-- Streams")
+                .append(CodeGeneratorConstants.NEW_LINE);
+
+        for (StreamConfig stream : streamList) {
+            streamListStringBuilder.append(generateStreamString(stream))
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        }
+
+        streamListStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
+
+        return streamListStringBuilder.toString();
+    }
+
+    private String generateTables(List<TableConfig> tableList) {
+        if (tableList == null || tableList.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder tableListStringBuilder = new StringBuilder();
+        tableListStringBuilder.append("-- Tables")
+                .append(CodeGeneratorConstants.NEW_LINE);
+
+        for (TableConfig table : tableList) {
+            tableListStringBuilder.append(generateTableString(table))
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        }
+
+        tableListStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
+
+        return tableListStringBuilder.toString();
+    }
+
+    private String generateWindows(List<WindowConfig> windowList) {
+        if (windowList == null || windowList.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder windowListStringBuilder = new StringBuilder();
+        windowListStringBuilder.append("-- Windows")
+                .append(CodeGeneratorConstants.NEW_LINE);
+
+        for (WindowConfig window : windowList) {
+            windowListStringBuilder.append(generateWindowString(window))
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        }
+
+        windowListStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
+
+        return windowListStringBuilder.toString();
+    }
+
+    private String generateTriggers(List<TriggerConfig> triggerList) {
+        if (triggerList == null || triggerList.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder triggerListStringBuilder = new StringBuilder();
+        triggerListStringBuilder.append("-- Triggers")
+                .append(CodeGeneratorConstants.NEW_LINE);
+
+        for (TriggerConfig trigger : triggerList) {
+            triggerListStringBuilder.append(generateTriggerString(trigger))
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        }
+
+        triggerListStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
+
+        return triggerListStringBuilder.toString();
+    }
+
+    private String generateAggregations(List<AggregationConfig> aggregationList) {
+        if (aggregationList == null || aggregationList.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder aggregationListStringBuilder = new StringBuilder();
+        aggregationListStringBuilder.append("-- Aggregations")
+                .append(CodeGeneratorConstants.NEW_LINE);
+
+        for (AggregationConfig aggregation : aggregationList) {
+            aggregationListStringBuilder.append(generateAggregationString(aggregation))
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        }
+
+        aggregationListStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
+
+        return aggregationListStringBuilder.toString();
+    }
+
+    private String generateFunctions(List<FunctionConfig> functionList) {
+        if (functionList == null || functionList.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder functionListStringBuilder = new StringBuilder();
+        functionListStringBuilder.append("-- Functions")
+                .append(CodeGeneratorConstants.NEW_LINE);
+
+        for (FunctionConfig function : functionList) {
+            functionListStringBuilder.append(generateFunctionString(function))
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        }
+
+        functionListStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
+
+        return functionListStringBuilder.toString();
+    }
+
+    private String generateQueries(List<QueryConfig> windowFilterProjectionQueryList, List<QueryConfig> joinQueryList,
+                                   List<QueryConfig> patternQueryList, List<QueryConfig> sequenceQueryList) {
+        StringBuilder queryListStringBuilder = new StringBuilder();
+
+        if (windowFilterProjectionQueryList != null && !windowFilterProjectionQueryList.isEmpty()) {
+            for (QueryConfig query : windowFilterProjectionQueryList) {
+                queryListStringBuilder.append(generateQueryString(query))
+                        .append(CodeGeneratorConstants.NEW_LINE);
+            }
+        }
+
+        if (joinQueryList != null && !joinQueryList.isEmpty()) {
+            for (QueryConfig query : joinQueryList) {
+                queryListStringBuilder.append(generateQueryString(query))
+                        .append(CodeGeneratorConstants.NEW_LINE);
+            }
+        }
+
+        if (patternQueryList != null && !patternQueryList.isEmpty()) {
+            for (QueryConfig query : patternQueryList) {
+                queryListStringBuilder.append(generateQueryString(query))
+                        .append(CodeGeneratorConstants.NEW_LINE);
+            }
+        }
+
+        if (sequenceQueryList != null && !sequenceQueryList.isEmpty()) {
+            for (QueryConfig query : sequenceQueryList) {
+                queryListStringBuilder.append(generateQueryString(query))
+                        .append(CodeGeneratorConstants.NEW_LINE);
+            }
+        }
+
+        queryListStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
+
+        return queryListStringBuilder.toString();
+    }
+
+    private String generatePartitions(List<PartitionConfig> partitionList) {
+        if (partitionList == null || partitionList.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder partitionListStringBuilder = new StringBuilder();
+        partitionListStringBuilder.append("-- Partitions");
+        for (PartitionConfig partition : partitionList) {
+            partitionListStringBuilder.append(generatePartitionString(partition))
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        }
+
+        partitionListStringBuilder.append(CodeGeneratorConstants.NEW_LINE);
+
+        return partitionListStringBuilder.toString();
     }
 
     /**
@@ -392,30 +510,6 @@ public class CodeGenerator {
     }
 
     /**
-     * Converts a SourceSinkConfig object to a Siddhi source annotation string
-     *
-     * @param source The SourceSinkConfig object to be converted
-     * @return The source annotation string representation of the given SourceSinkConfig object
-     */
-    private String generateSourceString(SourceSinkConfig source) {
-        // TODO: 4/19/18 Write the logic here
-        StringBuilder sourceStringBuilder = new StringBuilder();
-        return sourceStringBuilder.toString();
-    }
-
-    /**
-     * Converts a SourceSinkConfig object to a Siddhi source annotation string
-     *
-     * @param sink The SourceSinkConfig object to be converted
-     * @return The sink annotation string representation of the given SourceSinkConfig object
-     */
-    private String generateSinkString(SourceSinkConfig sink) {
-        // TODO: 4/19/18 Write the logic here
-        StringBuilder sinkStringBuilder = new StringBuilder();
-        return sinkStringBuilder.toString();
-    }
-
-    /**
      * Converts a QueryConfig object to a Siddhi query definition string
      *
      * @param query The QueryConfig object to be converted
@@ -467,8 +561,7 @@ public class CodeGenerator {
      */
     private String generatePartitionString(PartitionConfig partition) {
         // TODO: 4/19/18 Write the logic here
-        StringBuilder partitionStringBuilder = new StringBuilder();
-        return partitionStringBuilder.toString();
+        return CodeGeneratorConstants.EMPTY_STRING;
     }
 
 }
