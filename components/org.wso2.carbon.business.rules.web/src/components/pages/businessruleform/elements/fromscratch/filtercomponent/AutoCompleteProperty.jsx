@@ -146,7 +146,7 @@ export default class AutoCompleteProperty extends Component {
      * @param {Object} suggestion           Suggestion object
      * @param {String} query                Queried text
      * @param {boolean} isHighlighted       Whether the suggestion is highlighted or not
-     * @returns {Element}                   MenuItem
+     * @returns {Component}                 MenuItem
      */
     renderSuggestion(suggestion, { query, isHighlighted }) {
         const matches = match(suggestion.label, query);

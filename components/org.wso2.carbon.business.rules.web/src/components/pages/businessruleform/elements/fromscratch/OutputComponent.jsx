@@ -95,7 +95,7 @@ export default class OutputComponent extends Component {
 
     /**
      * Returns output property configurations
-     * @returns {Element}       Property Components
+     * @returns {HTMLElement}       Property Components
      */
     displayProperties() {
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) {
@@ -113,7 +113,7 @@ export default class OutputComponent extends Component {
 
     /**
      * Returns output mapping configurations
-     * @returns {Element}       Components for Output mapping
+     * @returns {HTMLElement}       Components for Output mapping
      */
     displayOutputMappings() {
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate) &&

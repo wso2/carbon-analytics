@@ -262,7 +262,7 @@ export default class LandingPage extends Component {
     /**
      * Displays a list of business rules when at least one is available,
      * otherwise, a message for creation
-     * @returns {Element}       Div containing available business rules, or creation message
+     * @returns {HTMLElement}       Div containing available business rules, or creation message
      */
     displayAvailableBusinessRules() {
         const isNoneAvailable = !(this.state.businessRules && this.state.businessRules.length > 0);
@@ -318,7 +318,7 @@ export default class LandingPage extends Component {
 
     /**
      * Displays content of the page
-     * @returns {Element}       Content of the page
+     * @returns {HTMLElement}       Content of the page
      */
     displayContent() {
         if (this.state.hasLoaded) {

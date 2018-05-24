@@ -1020,7 +1020,7 @@ export default class BusinessRuleFromScratchForm extends Component {
 
     /**
      * Returns Submit Buttons
-     * @returns {Element}       Submit Buttons
+     * @returns {HTMLElement}       Submit Buttons
      */
     displaySubmitButtons() {
         if (this.state.showSubmitButtons) {

@@ -154,7 +154,7 @@ export default class FilterComponent extends Component {
 
     /**
      * Returns the table which contains filter rules
-     * @returns {Element}       Div, containing the table that has filter rules TODO rfctr Elements to HTMLElement/XMLEl
+     * @returns {HTMLElement}       Div containing the table that has filter rules
      */
     displayFilterRulesTable() {
         if (this.props.ruleComponents.filterRules.length > 0) {

@@ -58,7 +58,7 @@ export default class BusinessRule extends Component {
 
     /**
      * Returns the Retry Deploy button
-     * @returns {Element}       Retry Deploy button
+     * @returns {HTMLElement}       Retry Deploy button
      */
     displayRetryDeployButton() {
         switch (this.props.status) {

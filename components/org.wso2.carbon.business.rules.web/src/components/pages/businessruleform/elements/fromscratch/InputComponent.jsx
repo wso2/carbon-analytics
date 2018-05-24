@@ -84,7 +84,7 @@ export default class InputComponent extends Component {
 
     /**
      * Returns Properties
-     * @returns {Element}       Property Components
+     * @returns {HTMLElement}       Property Components
      */
     displayProperties() {
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedRuleTemplate)) {

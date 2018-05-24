@@ -62,7 +62,7 @@ export default class Header extends Component {
 
     /**
      * Renders the right side elements of the header
-     * @returns {Element}       Div, containing right side elements of the header
+     * @returns {HTMLElement}       Div with right side elements of the header
      */
     renderRightLinks() {
         const homeButton = (

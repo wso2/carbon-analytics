@@ -369,7 +369,7 @@ export default class BusinessRuleFromTemplateForm extends Component {
 
     /**
      * Returns Submit buttons
-     * @returns {Element}     Div containing Save, Save And Deploy, and Cancel buttons
+     * @returns {HTMLElement}     Div containing Save, Save And Deploy, and Cancel buttons
      */
     displaySubmitButtons() {
         if (this.state.showSubmitButtons) {
