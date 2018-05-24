@@ -143,12 +143,6 @@ export default class WorkerThumbnail extends React.Component {
                     </IconButton>
                 </Tooltip>
             )
-        } else {
-            return (
-                <IconButton iconStyle={{width: 20, height: 20, display: 'none'}} tooltip="Delete Worker"
-                            tooltipPosition="bottom-center" onClick={() => {
-                }}><Delete color="grey"/></IconButton>
-            )
         }
     }
 
