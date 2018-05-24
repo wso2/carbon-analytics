@@ -934,7 +934,7 @@ public class EditorMicroservice implements Microservice {
             Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
             EventFlow eventFlow = gson.fromJson(siddhiAppEventFlowJSON, EventFlow.class);
             CodeGenerator codeGenerator = CodeGeneratorSingleton.getInstance();
-            String siddhiAppCode = codeGenerator.getSiddhiAppCode(eventFlow);
+            String siddhiAppCode = codeGenerator.generateSiddhiAppCode(eventFlow);
 
             String encodedSiddhiAppString =
                     new String(Base64.getEncoder().encode(siddhiAppCode.getBytes(StandardCharsets.UTF_8)),
