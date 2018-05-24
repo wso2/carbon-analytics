@@ -37,7 +37,6 @@ import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
-import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestampCollection;
 
 import java.net.URI;
@@ -174,9 +173,20 @@ public class HAActiveNodeTestcase {
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
 
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        HAStateSyncObject haStateSyncObject = new Gson().fromJson((String) httpResponseMessage.getSuccessContent(),
-                HAStateSyncObject.class);
-        Assert.assertTrue(haStateSyncObject != null);
+    }
+
+    @Test(dependsOnMethods = "testActiveNodeOutputSyncCollection")
+    public void testActiveNodeGetStateOfInvalidSiddhiApp() {
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/ha/state/TestApp1";
+        String contentType = "text/plain";
+        String method = "GET";
+
+        log.info("Calling active node to get state of SiddhiApp");
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
     }
 
     @Test(dependsOnMethods = "testActiveNodeGetStateOfSingleSiddhiApp")
@@ -191,9 +201,6 @@ public class HAActiveNodeTestcase {
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
 
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        HAStateSyncObject haStateSyncObject = new Gson().fromJson((String) httpResponseMessage.getSuccessContent(),
-                HAStateSyncObject.class);
-        Assert.assertTrue(haStateSyncObject != null);
     }
 
     private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
