@@ -731,8 +731,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                 for (const propertyKey in state.selectedInputRuleTemplate.properties) {
                     if (Object.prototype.hasOwnProperty.call(state.selectedInputRuleTemplate.properties,
                         propertyKey)) {
-                        state.businessRuleProperties[BusinessRulesConstants
-                            .INPUT_DATA_KEY][propertyKey] =
+                        state.businessRuleProperties.inputData[propertyKey] =
                             state.selectedInputRuleTemplate.properties[propertyKey].defaultValue;
                     }
                 }
@@ -764,8 +763,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                 for (const propertyKey in state.selectedOutputRuleTemplate.properties) {
                     if (Object.prototype.hasOwnProperty.call(state.selectedOutputRuleTemplate.properties,
                         propertyKey)) {
-                        state.businessRuleProperties[BusinessRulesConstants
-                            .OUTPUT_DATA_KEY][propertyKey] =
+                        state.businessRuleProperties.outputData[propertyKey] =
                             state.selectedOutputRuleTemplate.properties[propertyKey.toString()].defaultValue;
                     }
                 }

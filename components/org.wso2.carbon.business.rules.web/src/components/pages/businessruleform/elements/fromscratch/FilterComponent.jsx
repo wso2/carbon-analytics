@@ -192,7 +192,7 @@ export default class FilterComponent extends Component {
                         <div style={{ float: 'left', width: '10%', height: 30 }}>
                             <Typography />
                         </div>
-                        {this.props.ruleComponents[BusinessRulesConstants.FILTER_RULES_KEY].map((filterRule, index) =>
+                        {this.props.ruleComponents.filterRules.map((filterRule, index) =>
                             (<FilterRule
                                 key={index}
                                 disabled={this.props.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}

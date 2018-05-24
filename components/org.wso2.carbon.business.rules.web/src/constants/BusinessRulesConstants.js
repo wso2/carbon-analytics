@@ -51,10 +51,6 @@ const BusinessRulesConstants = { // TODO remove unnecessary ones
     // Business Rule Filter Rule operators
     BUSINESS_RULE_FILTER_RULE_OPERATORS: ['<', '<=', '>', '>=', '==', '!='],
 
-    // Business Rule deployment statuses
-    BUSINESS_RULE_STATUS_DEPLOYED: 3,
-    BUSINESS_RULE_STATUS_DEPLOYMENT_FAILED: 1, // Tried to save & deploy, but only save was successful
-    BUSINESS_RULE_STATUS_NOT_DEPLOYED: 0, // Tried only to save, and was successful
     SCRIPT_EXECUTION_ERROR: 7, // Script execution has been failed in the backend, due to the provided value(s)
 
     // User Permissions
@@ -86,21 +82,6 @@ const BusinessRulesConstants = { // TODO remove unnecessary ones
         'Unreachable', // -1
         'Not Deployed', // 0
         'Deployed', // 1
-    ],
-
-    BUSINESS_RULE_STATUS_DEPLOYED_STRING: 'Deployed',
-    BUSINESS_RULE_STATUS_NOT_DEPLOYED_STRING: 'Not Deployed',
-    BUSINESS_RULE_STATUS_DEPLOYMENT_FAILED_STRING: 'Deployment Failed',
-
-    // Each possible mode of loading Business Rules Manager landing page after an action
-    LOAD_BUSINESS_RULES_MANAGER_STATUSES: [
-        'After re-deployment', // 0
-        'After BusinessRuleFromScratch Creation', // 1
-        'After BusinessRuleFromScratch Updation', // 2
-        'After BusinessRuleFromTemplate Creation', // 3
-        'After BusinessRuleFromTemplate Updation', // 4
-        'After deletion', // 5
-        // Else, normal mode
     ],
 
     ERROR_CODES: {
