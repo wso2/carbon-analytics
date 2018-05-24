@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.MapperConfig;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Represents Siddhi Source/Sink
@@ -29,10 +29,10 @@ import java.util.Map;
 public class SourceSinkConfig extends SiddhiElementConfig {
     private String annotationType;
     private String type;
-    private Map<String, String> options;
+    private List<String> options;
     private MapperConfig map;
 
-    public SourceSinkConfig(String annotationType, String type, Map<String, String> options, MapperConfig map) {
+    public SourceSinkConfig(String annotationType, String type, List<String> options, MapperConfig map) {
         this.annotationType = annotationType;
         this.type = type;
         this.options = options;
@@ -47,7 +47,7 @@ public class SourceSinkConfig extends SiddhiElementConfig {
         return type;
     }
 
-    public Map<String, String> getOptions() {
+    public List<String> getOptions() {
         return options;
     }
 

@@ -26,8 +26,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.SequenceQueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sink.SinkConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.source.SourceConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +45,8 @@ public class SiddhiAppConfig {
     private List<QueryConfig> patternQueryList = new ArrayList<>();
     private List<QueryConfig> sequenceQueryList = new ArrayList<>();
 
-    private List<SinkConfig> sinkList = new ArrayList<>();
-    private List<SourceConfig> sourceList = new ArrayList<>();
+    private List<SourceSinkConfig> sourceList = new ArrayList<>();
+    private List<SourceSinkConfig> sinkList = new ArrayList<>();
     private List<StreamConfig> streamList = new ArrayList<>();
     private List<TableConfig> tableList = new ArrayList<>();
     private List<TriggerConfig> triggerList = new ArrayList<>();
@@ -66,7 +65,7 @@ public class SiddhiAppConfig {
 
     /**
      * Adds a given generic type Siddhi ElementConfig, to the given list of the same generic type
-     * @param elementList       List reference to which, the given element config should be added
+     * @param elementList       List to which, the given element config should be added
      * @param elementConfig     Siddhi ElementConfig object
      * @param <T>               Type of the Siddhi ElementConfig object and the list
      */
@@ -83,12 +82,12 @@ public class SiddhiAppConfig {
         this.appDescription = appDescription;
     }
 
-    public void add(SinkConfig sinkConfig) {
-        addElement(sinkList, sinkConfig);
+    public void addSource(SourceSinkConfig sourceConfig) {
+        addElement(sourceList, sourceConfig);
     }
 
-    public void add(SourceConfig sourceConfig) {
-        addElement(sourceList, sourceConfig);
+    public void addSink(SourceSinkConfig sinkConfig) {
+        addElement(sinkList, sinkConfig);
     }
 
     public void add(StreamConfig streamConfig) {
@@ -139,12 +138,12 @@ public class SiddhiAppConfig {
         return appDescription;
     }
 
-    public List<SinkConfig> getSinkList() {
-        return sinkList;
+    public List<SourceSinkConfig> getSourceList() {
+        return sourceList;
     }
 
-    public List<SourceConfig> getSourceList() {
-        return sourceList;
+    public List<SourceSinkConfig> getSinkList() {
+        return sinkList;
     }
 
     public List<StreamConfig> getStreamList() {

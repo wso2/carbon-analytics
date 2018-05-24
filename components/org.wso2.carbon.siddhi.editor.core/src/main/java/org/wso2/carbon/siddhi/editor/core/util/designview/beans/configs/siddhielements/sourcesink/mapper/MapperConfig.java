@@ -18,17 +18,17 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Represents Siddhi Source/Sink Mapper
  */
 public class MapperConfig {
     private String type;
-    private Map<String, String> options;
-    private MapperAttributesConfig attributes;
+    private List<String> options;
+    private List<String> attributes;
 
-    public MapperConfig(String type, Map<String, String> options, MapperAttributesConfig attributes) {
+    public MapperConfig(String type, List<String> options, List<String> attributes) {
         this.type = type;
         this.options = options;
         this.attributes = attributes;
@@ -38,11 +38,11 @@ public class MapperConfig {
         return type;
     }
 
-    public Map<String, String> getOptions() {
+    public List<String> getOptions() {
         return options;
     }
 
-    public MapperAttributesConfig getAttributes() {
+    public List<String> getAttributes() {
         return attributes;
     }
 }

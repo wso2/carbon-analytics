@@ -18,10 +18,11 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AllSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.factories.AttributesSelectionConfigFactory;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.execution.query.selection.Selector;
 
@@ -45,14 +46,12 @@ public class AttributesSelectionConfigGenerator {
      */
     public AttributesSelectionConfig generateAttributesSelectionConfig(Selector selector) {
         String selectString = extractSelectedAttributesString(selector);
-        AttributesSelectionConfigFactory attributesSelectionConfigFactory = new AttributesSelectionConfigFactory();
         if (selectString.equals(AttributeSelection.VALUE_ALL)) {
-            // All attributes selection (*)
-            return attributesSelectionConfigFactory.getAttributesSelectionConfig(AttributeSelection.VALUE_ALL);
+            // All attributes selection
+            return new AllSelectionConfig();
         }
         // User defined selection
-        return attributesSelectionConfigFactory
-                .getAttributesSelectionConfig(generateSelectedAttributeList(selectString));
+        return new UserDefinedSelectionConfig(generateSelectedAttributeList(selectString));
     }
 
     /**
