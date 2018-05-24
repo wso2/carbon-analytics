@@ -1505,12 +1505,12 @@
 
     <properties>
         <carbon.analytics.version>2.0.336-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.1.25</siddhi.version>
-        <siddhi.bundle.version>4.1.25</siddhi.bundle.version>
+        <siddhi.version>4.1.26</siddhi.version>
+        <siddhi.bundle.version>4.1.26</siddhi.bundle.version>
 
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.0.59</carbon.analytics-common.version>
-        <carbon.analytics-common.version.range>[6.0.52, 6.1.0)</carbon.analytics-common.version.range>
+        <carbon.analytics-common.version>6.0.61</carbon.analytics-common.version>
+        <carbon.analytics-common.version.range>[6.0.61, 6.1.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
