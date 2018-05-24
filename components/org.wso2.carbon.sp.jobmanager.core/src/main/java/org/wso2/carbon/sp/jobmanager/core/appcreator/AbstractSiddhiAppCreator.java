@@ -30,8 +30,10 @@ import java.util.List;
  * Siddhi App Creator based on the distribute implementation.
  */
 public abstract class AbstractSiddhiAppCreator implements SiddhiAppCreator {
+    protected boolean transportChannelCreationEnabled;
 
     public List<DeployableSiddhiQueryGroup> createApps(SiddhiTopology topology) {
+        transportChannelCreationEnabled = topology.isTransportChannelCreationEnabled();
         List<DeployableSiddhiQueryGroup> deployableSiddhiQueryGroupList = new ArrayList<>(topology.getQueryGroupList
                 ().size());
         for (SiddhiQueryGroup queryGroup : topology.getQueryGroupList()) {
