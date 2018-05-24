@@ -123,6 +123,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         } else {
             zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
             zooKeeperConfig = new ZooKeeperConfig();
+            log.warn("Deprecated configuration used to specify zooKeeperURLs." +
+                    " Please refer official documentation for latest configurations.");
         }
 
         String[] zooKeeperServerURLs = zooKeeperServerURL.replaceAll("\\s+", "").split(",");
