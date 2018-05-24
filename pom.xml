@@ -1505,7 +1505,7 @@
 
     <properties>
         <carbon.analytics.version>2.0.336-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.1.25</siddhi.version>
+        <siddhi.version>4.1.26</siddhi.version>
         <siddhi.bundle.version>4.1.25</siddhi.bundle.version>
 
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
@@ -1712,7 +1712,7 @@
 
         <siddhi.io.tcp.version>2.0.15</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.0.12</siddhi.io.email.version>
-        <siddhi.io.kafka.version>4.1.9</siddhi.io.kafka.version>
+        <siddhi.io.kafka.version>4.1.11</siddhi.io.kafka.version>
         <siddhi.io.http.version>1.0.19</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.0.20</siddhi.map.json.version>
