@@ -17,25 +17,24 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
-import {Redirect} from "react-router";
+import React from 'react';
+import {Link} from 'react-router-dom';
+import {Redirect} from 'react-router';
 //App Components
-import AppTable from "./AppTable";
-import WorkerSpecificCharts from "./WorkerSpecificCharts";
-import WorkerGeneralCard from "./WorkerGeneralCard";
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import Header from "../common/Header";
+import AppTable from './AppTable';
+import WorkerSpecificCharts from './WorkerSpecificCharts';
+import WorkerGeneralCard from './WorkerGeneralCard';
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import Header from '../common/Header';
 //Material UI
-import HomeButton from "material-ui/svg-icons/action/home";
-import {Card, Dialog, FlatButton, Popover, RaisedButton, Snackbar} from "material-ui";
-import {List, ListItem} from "material-ui/List";
-import Delete from "material-ui/svg-icons/action/delete";
-import Settings from "material-ui/svg-icons/action/settings";
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import Error401 from "../error-pages/Error401";
-import Error403 from "../error-pages/Error403";
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Card, Dialog, FlatButton, Popover, RaisedButton, Snackbar} from 'material-ui';
+import {List, ListItem} from 'material-ui/List';
+import Delete from 'material-ui/svg-icons/action/delete';
+import Settings from 'material-ui/svg-icons/action/settings';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import Error403 from '../error-pages/Error403';
 
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -76,13 +75,13 @@ export default class WorkerSpecific extends React.Component {
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null){
-                if(error.response.status === 401){
+            if (error.response != null) {
+                if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
                         sessionInvalid: true
                     })
-                } else if(error.response.status === 403){
+                } else if (error.response.status === 403) {
                     message = "User Have No Permission to view this page.";
                     this.setState({
                         hasViewerPermission: false
@@ -102,7 +101,7 @@ export default class WorkerSpecific extends React.Component {
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
@@ -168,7 +167,7 @@ export default class WorkerSpecific extends React.Component {
                     <ListItem
                         style={{color: 'white'}}
                         primaryText="Settings"
-                        leftIcon={<Settings />}
+                        leftIcon={<Settings/>}
                         onClick={(event) => {
                             this.setState({popOver: true, anchorEl: event.currentTarget})
                         }}
@@ -184,7 +183,7 @@ export default class WorkerSpecific extends React.Component {
                                 style={{color: 'white'}}
                                 key={1}
                                 primaryText="Delete Worker"
-                                leftIcon={<Delete />}
+                                leftIcon={<Delete/>}
                                 onClick={() => {
                                     this.setState({open: true})
                                 }}
@@ -199,7 +198,7 @@ export default class WorkerSpecific extends React.Component {
                     <ListItem
                         style={{color: 'white', display: 'none'}}
                         primaryText="Settings"
-                        leftIcon={<Settings />}
+                        leftIcon={<Settings/>}
                         onClick={(event) => {
                             this.setState({popOver: true, anchorEl: event.currentTarget})
                         }}

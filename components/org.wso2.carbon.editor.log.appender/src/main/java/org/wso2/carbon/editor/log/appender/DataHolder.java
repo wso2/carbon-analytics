@@ -36,5 +36,4 @@ public class DataHolder {
         }
         return circularBuffer;
     }
-
 }

@@ -35,6 +35,9 @@ import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 import org.wso2.msf4j.Request;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
@@ -66,8 +69,21 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         }
     }
 
+    public Response getClusteredWorkerNodeDetails() {
+        Map<String, ResourceNode> clusteredWorkerList = ServiceDataHolder.getResourcePool().getResourceNodeMap();
+        List<Map<String,String>> resourceNodeDetailMap = new ArrayList<>();
+        for (Map.Entry<String, ResourceNode> resourceNodeEntry : clusteredWorkerList.entrySet()) {
+            Map<String,String> clusteredResourceNode = new HashMap<>();
+            clusteredResourceNode.put(Constants.HTTP_HOST,resourceNodeEntry.getValue().getHttpInterface().getHost());
+            clusteredResourceNode.put(Constants.HTTP_PORT,String.valueOf(resourceNodeEntry.getValue().getHttpInterface().getPort()));
+            clusteredResourceNode.put(Constants.NODE_ID, resourceNodeEntry.getValue().getId());
+            resourceNodeDetailMap.add(clusteredResourceNode);
+        }
+        return Response.ok().entity(resourceNodeDetailMap).build();
+    }
+
     /**
-     * This method is to retrieve the resource node details in the cluster
+     * This method is to retrieve number of the resource node in the cluster
      *
      * @param request
      * @return the count of the worker nodes in the resource cluster.
@@ -84,6 +100,27 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     + "execution plan").build();
         } else {
             return getResourceCluster();
+        }
+    }
+
+    /**
+     * This method retrieves the details of the clustered worker node details.
+     *
+     * @param request
+     * @return
+     * @throws NotFoundException
+     */
+
+    @Override
+    public Response getClusteredWorkerNodeDetails(Request request) throws NotFoundException {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the "
+                    + "execution plan").build();
+        } else {
+            return getClusteredWorkerNodeDetails();
         }
     }
 

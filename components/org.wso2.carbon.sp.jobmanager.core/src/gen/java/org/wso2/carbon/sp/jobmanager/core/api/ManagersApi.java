@@ -170,8 +170,8 @@ public class ManagersApi implements Microservice {
     @GET
     @Path("/kafkaDetails/{appName}")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Get the details of child siddhi apps",
-            notes = "Retrieves the details of child siddhi apps with the specified "
+    @io.swagger.annotations.ApiOperation(value = "Get the kafka details of each child siddhi apps",
+            notes = "Retrieves kafka details of child siddhi apps with the specified "
                     + "parent siddhi app name.",
             response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {

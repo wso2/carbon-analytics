@@ -23,6 +23,10 @@ package org.wso2.carbon.status.dashboard.core.dbhandler.utils;
  * Class to define SQL queries and constants.
  */
 public class SQLConstants {
+    private SQLConstants() {
+        //preventing initialization
+    }
+    
     public static final String SELECT_QUERY = "recordSelectQuery";
     public static final String SELECT_APP_METRICS_QUERY = "recordSelectAppMetricsQuery";
     public static final String SELECT_WORKER_METRICS_QUERY = "recordSelectWorkerMetricsQuery";
@@ -38,7 +42,7 @@ public class SQLConstants {
     public static final String ISTABLE_EXISTS_QUERY = "tableCheckQuery";
     public static final String DELETE_QUERY = "recordDeleteQuery";
     public static final String INSERT_QUERY = "recordInsertQuery";
-
+    
     //Placeholder strings needed for processing the query configuration file
     public static final String DASHBOARD_CONFIG_FILE = "dashboard-configs.yaml";
     public static final String QUERY_CONFIG_FILE = "queries.yaml";
@@ -59,13 +63,36 @@ public class SQLConstants {
     public static final String INTEGER_TEMPLATE = "%d";
     public static final String SQL_WHERE = "WHERE";
     public static final String WHITESPACE = " ";
-    public static final String SEPARATOR = ", ";
-    public static final String TUPLES_SEPARATOR = ",%n";
+    public static final String SEPARATOR = ",";
+    public static final String SEPARATOR_REGEX = ",";
+    public static final String TUPLE_SEPARATOR = ",%n";
     public static final String QUESTION_MARK = "?";
     public static final String PERCENTAGE_MARK = "%";
-
-    private SQLConstants() {
-        //preventing initialization
-    }
-
+    public static final String PACKAGE_NAME_SEPARATOR = ".";
+    public static final String COLUMN_COUNT = "TIMESTAMP,COUNT";
+    public static final String AGG_COLUMN_COUNT = "AGG_TIMESTAMP,COUNT";
+    public static final String AGG_AVG_COLUMN_COUNT ="AVG(COUNT) as COUNT";
+    //metrics types
+    public static final String METRICS_TYPE_LATENCY = "latency";
+    public static final String METRICS_TYPE_LATENCY_COUNT = "latency_count";
+    public static final String METRICS_TYPE_MEMORY = "memory";
+    public static final String METRICS_TYPE_THROUGHPUT = "throughput";
+    public static final String METRICS_TYPE_THROUGHPUT_COUNT = "throughput_count";
+    //metrics table names
+    public static final String METRICS_TABLE_METRIC_COUNTER = "METRIC_COUNTER";
+    public static final String METRICS_TABLE_METRIC_GAUGE = "METRIC_GAUGE";
+    public static final String METRICS_TABLE_METRIC_HISTOGRAM = "METRIC_HISTOGRAM";
+    public static final String METRICS_TABLE_METRIC_METER = "METRIC_METER";
+    public static final String METRICS_TABLE_METRIC_TIMER = "METRIC_TIMER";
+    
+    //metrics column names
+    public static final String COLUMN_TIMESTAMP = "TIMESTAMP";
+    public static final String COLUMN_AGG_TIMESTAMP = "AGG_TIMESTAMP";
+    public static final String COLUMN_VALUE = "VALUE";
+    public static final String COLUMN_NAME = "NAME";
+    public static final String COLUMN_M1_RATE = "M1_RATE";
+    
+    //sql expressions
+    public static final String EXPR_SUM_FROM_STRING = "SUM(CAST(result.VALUE as DECIMAL(22,2)))";
+    public static final String EXPR_SUM_FROM_M1_RATE = "SUM(result.M1_RATE)";
 }

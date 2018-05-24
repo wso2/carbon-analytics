@@ -1,12 +1,12 @@
 /*
- * Copyright 2015 WSO2 Inc. (http://wso2.org)
- * 
+ * Copyright 2017 WSO2 Inc. (http://wso2.org)
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,6 +33,9 @@ import org.wso2.carbon.stream.processor.statistics.internal.service.ConfigServic
 import org.wso2.carbon.stream.processor.statistics.internal.service.NodeConfigServiceComponent;
 import org.wso2.carbon.stream.processor.statistics.internal.service.SiddhiAppRuntimeServiceComponent;
 
+import java.lang.management.ManagementFactory;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -40,9 +43,6 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import java.lang.management.ManagementFactory;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * A set of metrics for Operating System usage, including stats on load average, cpu load,
@@ -69,29 +69,29 @@ public class OperatingSystemMetricSet {
     private boolean isJMXEnabled;
     private MBeanServer mBeanServer;
     private MetricManagementService metricManagementService;
-
+    
     @Activate
     protected void start(BundleContext bundleContext) {
         bundleContext.registerService(OperatingSystemMetricSet.class.getName(),
                 new OperatingSystemMetricSet(), null);
     }
-
+    
     /**
      * Get the MBean name from the deployment yaml and get access to the MBean.
      */
     public OperatingSystemMetricSet() {
     }
-
+    
     public void initConnection() {
         try {
             metricManagementService = StreamProcessorStatisticDataHolder.getInstance().getMetricsManagementService();
             isJMXEnabled = metricManagementService.isReporterRunning("JMX");
             mBeanServer = ManagementFactory.getPlatformMBeanServer();
         } catch (IllegalArgumentException e) {
-            LOGGER.warn("Worker level jmx reporting has disabled.");
+            LOGGER.warn("Worker level jmx reporting has disabled." + e.getMessage(), e);
         }
     }
-
+    
     /**
      * Read the load , cpu memory from the MBean of the mBeanServer.
      *
@@ -119,7 +119,7 @@ public class OperatingSystemMetricSet {
                             LOAD_AVG_MBEAN_NAME + " cause may not enable jmx reporter. Hence use default " +
                             "metrics. ", e);
                 }
-
+                
                 try {
                     systemCPU = (Double) mBeanServer.getAttribute(new ObjectName(SYSTEM_CPU_MBEAN_NAME),
                             VALUE_ATTRIBUTE);
@@ -129,7 +129,7 @@ public class OperatingSystemMetricSet {
                             SYSTEM_CPU_MBEAN_NAME + " cause may not enable jmx reporter. Hence use default" +
                             " metrics. ", e);
                 }
-
+                
                 try {
                     memoryUsage = (double) mBeanServer.getAttribute(new ObjectName(MEMORY_USAGE_MBEAN_NAME),
                             VALUE_ATTRIBUTE);
@@ -139,7 +139,7 @@ public class OperatingSystemMetricSet {
                             MEMORY_USAGE_MBEAN_NAME + " cause may not enable jmx reporter. Hence use default" +
                             " metrics. ", e);
                 }
-
+                
                 try {
                     processCPU = (Double) mBeanServer.getAttribute(new ObjectName(PROCESS_CPU_MBEAN_NAME),
                             VALUE_ATTRIBUTE);
@@ -155,7 +155,7 @@ public class OperatingSystemMetricSet {
         } else {
             throw new MetricsConfigException("WSO2 Carbon metrics is not enabled.");
         }
-
+        
         WorkerMetrics workerMetrics = new WorkerMetrics();
         workerMetrics.setLoadAverage(loadAverage);
         workerMetrics.setSystemCPU(systemCPU);
@@ -167,12 +167,12 @@ public class OperatingSystemMetricSet {
         workerStatistics.setRunningStatus("Reachable");
         return workerStatistics;
     }
-
+    
     private void addNodeInforToWorkerStatistics(WorkerStatistics workerStatistics) {
         NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
         if (nodeInfo.getMode().compareTo(DeploymentMode.SINGLE_NODE) == 0) {
-            workerStatistics.setClusterID("Non Clusters");
+            workerStatistics.setClusterID("Single Node Deployments");
             workerStatistics.setLastSyncTime("n/a");
             workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
         } else {
@@ -184,10 +184,9 @@ public class OperatingSystemMetricSet {
                 workerStatistics.setInSync(nodeInfo.isInSync());
                 workerStatistics.setLastSyncTime(dateFormatter.format(new Date(nodeInfo.getLastSyncedTimestamp())));
             }
-
         }
     }
-
+    
     /**
      * this method is used when metric is disabled of jmx reporter is not enabled.
      *
@@ -207,7 +206,7 @@ public class OperatingSystemMetricSet {
         workerStatistics.setStatsEnabled(false);
         return workerStatistics;
     }
-
+    
     /**
      * Util class to get HA Status mapping.
      *
@@ -226,7 +225,7 @@ public class OperatingSystemMetricSet {
             }
         }
     }
-
+    
     /**
      * Method to disable the metrics of a worker.
      */
@@ -239,7 +238,7 @@ public class OperatingSystemMetricSet {
             LOGGER.warn("Wso2 Carbon metrics is already disabled.");
         }
     }
-
+    
     /**
      * Method to check whether the metrics are enabled or not.
      *
@@ -248,7 +247,7 @@ public class OperatingSystemMetricSet {
     public boolean isEnableWorkerMetrics() {
         return metricManagementService.isEnabled();
     }
-
+    
     /**
      * Method to disable the metrics of a worker.
      */
@@ -261,7 +260,7 @@ public class OperatingSystemMetricSet {
             LOGGER.warn("Wso2 Carbon metrics is already enabled.");
         }
     }
-
+    
     @Reference(
             name = "org.wso2.carbon.stream.processor.statistics.internal.service.ConfigServiceComponent",
             service = ConfigServiceComponent.class,
@@ -272,11 +271,11 @@ public class OperatingSystemMetricSet {
     protected void registerConfigServiceComponent(ConfigServiceComponent configServiceComponent) {
         //to make to read the metrics MBean name
     }
-
+    
     protected void unregisterConfigServiceComponent(ConfigServiceComponent configServiceComponent) {
-
+    
     }
-
+    
     @Reference(
             name = "org.wso2.carbon.stream.processor.statistics.internal.service.NodeConfigServiceComponent",
             service = NodeConfigServiceComponent.class,
@@ -287,11 +286,11 @@ public class OperatingSystemMetricSet {
     protected void registerNodeConfigServiceComponent(NodeConfigServiceComponent nodeConfigServiceComponent) {
         //to make to read the metrics MBean name
     }
-
+    
     protected void unregisterNodeConfigServiceComponent(NodeConfigServiceComponent nodeConfigServiceComponent) {
-
+    
     }
-
+    
     @Reference(
             name = "org.wso2.carbon.stream.processor.statistics.internal.service.SiddhiAppRuntimeServiceComponent",
             service = SiddhiAppRuntimeServiceComponent.class,
@@ -302,8 +301,8 @@ public class OperatingSystemMetricSet {
     protected void registerSiddhiAppRuntimeServiceComponent(SiddhiAppRuntimeServiceComponent serviceComponent) {
         //to make to read the metrics MBean name
     }
-
+    
     protected void unregisterSiddhiAppRuntimeServiceComponent(SiddhiAppRuntimeServiceComponent serviceComponent) {
-
+    
     }
 }

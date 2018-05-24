@@ -23,6 +23,8 @@ import kafka.utils.ZkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.sp.jobmanager.core.bean.ZooKeeperConfig;
+import org.wso2.carbon.sp.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.OutputStreamDataHolder;
@@ -117,8 +119,16 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         String[] bootstrapServerURLs = null;
         SafeZkClient safeZkClient;
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
-        String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
-
+        ZooKeeperConfig zooKeeperConfig = ServiceDataHolder.getDeploymentConfig().getZooKeeperConfig();
+        String zooKeeperServerURL;
+        if (zooKeeperConfig != null) {
+            zooKeeperServerURL = zooKeeperConfig.getZooKeeperURLs();
+        } else {
+            zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
+            zooKeeperConfig = new ZooKeeperConfig();
+            log.warn("Deprecated configuration used to specify zooKeeperURLs." +
+                    " Please refer official documentation for latest configurations.");
+        }
         if (zooKeeperServerURL == null) {
             throw new SiddhiAppCreationException("ZooKeeper URLs are not provided " +
                     "in deployment.yaml under deployment.config. Hence cannot check existence of topics.");
@@ -126,7 +136,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
             String[] zooKeeperServerURLs = zooKeeperServerURL.replaceAll("\\s+", "").split(",");
             boolean isSecureKafkaCluster = false;
             safeZkClient = new SafeZkClient();
-            zkUtils = safeZkClient.createZkClient(zooKeeperServerURLs, isSecureKafkaCluster);
+            zkUtils = safeZkClient.createZkClient(zooKeeperServerURLs, isSecureKafkaCluster,
+                    zooKeeperConfig.getSessionTimeout(), zooKeeperConfig.getConnectionTimeout());
         }
 
         if (bootstrapServerURL != null) {

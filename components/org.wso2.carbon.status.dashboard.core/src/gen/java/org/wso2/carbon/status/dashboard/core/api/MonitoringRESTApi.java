@@ -163,6 +163,47 @@ public class MonitoringRESTApi implements Microservice {
         return workersApi.getAllWorkers(getUserName(request));
     }
 
+    /**
+     * Get all the single deployment siddhi apps
+     *
+     * @param request
+     * @return
+     * @throws NotFoundException
+     * @throws SQLException
+     */
+    @GET
+    @Path("/siddhi-apps/single-deployment-apps")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "List all the single Deployment siddhi applications that are " +
+            "deployed in worker nodes.", notes
+            = "Lists all siddhi applications.",
+            response = void.class, tags = {"Nodes",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class)})
+    public Response getSingleDeploymentSiddhiApps(@Context Request request)
+            throws NotFoundException, SQLException {
+        return workersApi.getSingleDeploymentSiddhiApps(getUserName(request));
+    }
+
+    @GET
+    @Path("/siddhi-apps/ha-apps")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "List all the ha deployment siddhi applications that deployed in " +
+            "worker nodes.", notes = "Lists all siddhi applications.",
+            response = void.class, tags = {"Nodes",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class)})
+    public Response getAllHASiddhiApps(@Context Request request)
+            throws NotFoundException, SQLException {
+        return workersApi.getHASiddhiApps(getUserName(request));
+    }
+
 
     @GET
     @Path("/{id}/runTime")
@@ -182,6 +223,28 @@ public class MonitoringRESTApi implements Microservice {
         return workersApi.getRuntimeEnv(id, getUserName(request));
     }
 
+    /**
+     * List all the siddhi apps that are depoloyed in the active manager nodes
+     * @param request
+     * @return
+     * @throws NotFoundException
+     * @throws SQLException
+     */
+    @GET
+    @Path("/manager/siddhi-apps")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "List all siddhi applications that deployed in manager nodes.",
+            notes = "Lists all siddhi applications.",
+            response = void.class, tags = {"Nodes",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class)})
+    public Response getAllManagersSiddhiApps(@Context Request request)
+            throws NotFoundException, SQLException {
+        return workersApi.getAllManagersSiddhiApps(getUserName(request));
+    }
 
     /**
      * Delete worker from the status dashboard. PS. Do not delete metrics details.
@@ -643,7 +706,7 @@ public class MonitoringRESTApi implements Microservice {
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.",
             notes = "Retrieves the general text view and flow of a siddhi-app",
-            response = void.class, tags = {"Workers",})
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
                     response = void.class),
@@ -663,9 +726,9 @@ public class MonitoringRESTApi implements Microservice {
     @GET
     @Path("/manager/{id}/siddhi-apps/{appName}/child-apps")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.",
-            notes = "Retrieves the general text view and flow of a siddhi-app",
-            response = void.class, tags = {"Workers",})
+    @io.swagger.annotations.ApiOperation(value = "Get the child apps details.",
+            notes = "Retrieves child app details of a parent siddhi-app",
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
                     response = void.class),
@@ -684,9 +747,9 @@ public class MonitoringRESTApi implements Microservice {
     @GET
     @Path("/manager/{id}/siddhi-apps/{appName}/child-apps/transport")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.",
-            notes = "Retrieves the general text view and flow of a siddhi-app",
-            response = void.class, tags = {"Workers",})
+    @io.swagger.annotations.ApiOperation(value = "Get the transport details of each child apps",
+            notes = "Retrieves the transport details of each child siddhi-apps",
+            response = void.class, tags = {"Managers",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
                     response = void.class),
@@ -701,6 +764,29 @@ public class MonitoringRESTApi implements Microservice {
             throws NotFoundException, IOException {
         return workersApi.getChildAppsTransportDetails(id, appName, getUserName(request));
     }
+
+    @GET
+    @Path("/manager/{id}/clusteredResourceNodeDetails")
+
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get the resource cluster information of a given manager.",
+            notes = "Retrieves the resoource cluster summary details of manager with the "
+                    + "specified id.",
+            response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Summary successfully retrieved.",
+                    response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Summary not found.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class)})
+    public Response getClusterResourceNodeDetails(@Context Request request,
+                                                  @ApiParam(value = "ID of the Node.", required = true) @PathParam("id")
+                                                          String id) throws NotFoundException, IOException {
+        return workersApi.getClusterResourceNodeDetails(id, getUserName(request));
+    }
+
 
     private static String getUserName(Request request) {
         return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();

@@ -170,7 +170,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
 
     @Override
     public Map<String, Object> currentState() {
-        HashMap<String, Object> currentState = new HashMap<>();
+        Map<String, Object> currentState = new HashMap<>();
         currentState.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP, lastProcessedEventTimestamp);
         if (log.isDebugEnabled()) {
             log.debug("Active Node: Saving state of Source Handler with Id " + getElementId() + " with timestamp "
