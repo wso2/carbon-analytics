@@ -40,14 +40,8 @@ import '../../../index.css';
  * Styles related to this component
  */
 const styles = {
-    containerDiv: {
-        maxWidth: 750,
-    },
     root: {
         flexGrow: 1,
-    },
-    control: {
-        padding: 5,
     },
     spacing: '0',
 };

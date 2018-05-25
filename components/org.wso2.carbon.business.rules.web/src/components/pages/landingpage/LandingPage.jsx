@@ -55,15 +55,6 @@ const styles = {
         paddingTop: 30,
         paddingBottom: 30,
     },
-    card: {
-        width: 345,
-        height: 200,
-        margin: 15,
-    },
-    chip: {
-        margin: 5,
-    },
-    spacing: '0',
     snackbar: {
         direction: 'up',
     },

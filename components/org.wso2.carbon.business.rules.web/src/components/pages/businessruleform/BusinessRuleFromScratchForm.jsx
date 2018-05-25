@@ -50,28 +50,6 @@ import '../../../index.css';
  * Styles related to this component
  */
 const styles = {
-    addFilterRuleButton: {
-        backgroundColor: '#EF6C00',
-        color: 'white',
-    },
-    button: {
-        backgroundColor: '#EF6C00',
-        color: 'white',
-        marginRight: 10,
-    },
-    secondaryButton: {
-        marginRight: 10,
-    },
-    paper: {
-        padding: 40,
-        paddingTop: 15,
-        paddingBottom: 15,
-    },
-    paperContainer: {
-        margin: 40,
-        marginTop: 15,
-        marginBottom: 15,
-    },
     root: {
         width: '100%',
         maxWidth: 360,
@@ -79,16 +57,13 @@ const styles = {
         overflow: 'auto',
         maxHeight: 300,
     },
-    rootGrid: {
-        flexGrow: 1,
-        paddingTop: 20,
-    },
-    propertyComponentPadding: {
-        paddingLeft: 40,
-        paddingRight: 40,
-    },
     listSection: {
         background: 'inherit',
+    },
+    paperContainer: {
+        margin: 40,
+        marginTop: 15,
+        marginBottom: 15,
     },
     formRoot: {
         flexGrow: 1,

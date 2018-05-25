@@ -28,9 +28,6 @@ import '../../index.css';
  * Styles related to this component
  */
 const styles = {
-    progress: {
-        color: '#EF6C00',
-    },
     paper: {
         maxWidth: 400,
         paddingTop: 30,

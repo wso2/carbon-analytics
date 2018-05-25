@@ -45,6 +45,10 @@ const styles = {
     errorText: {
         color: '#ff1744', // TODO move these kind of common styles to an object
     },
+    addFilterRuleButton: {
+        backgroundColor: '#EF6C00',
+        color: 'white',
+    },
 };
 
 /**
@@ -227,7 +231,7 @@ export default class FilterComponent extends Component {
             return (
                 <IconButton
                     color="primary"
-                    style={this.props.style.addFilterRuleButton}
+                    style={styles.addFilterRuleButton}
                     aria-label="Remove"
                     onClick={() => this.addFilterRule()}
                 >

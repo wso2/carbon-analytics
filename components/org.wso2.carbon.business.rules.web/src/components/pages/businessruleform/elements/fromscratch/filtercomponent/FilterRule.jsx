@@ -35,38 +35,6 @@ import BusinessRulesConstants from '../../../../../../constants/BusinessRulesCon
 import '../../../../../../index.css';
 
 /**
- * Styles related to this component
- */
-const styles = {
-    deployButton: {
-        color: '#EF6C00',
-    },
-    container: {
-        flexGrow: 1,
-        position: 'relative',
-        height: 200,
-    },
-    suggestionsContainerOpen: {
-        position: 'absolute',
-        marginTop: 2,
-        marginBottom: 2,
-        left: 0,
-        right: 0,
-    },
-    suggestion: {
-        display: 'block',
-    },
-    suggestionsList: {
-        margin: 0,
-        padding: 0,
-        listStyleType: 'none',
-    },
-    textField: {
-        width: '100%',
-    },
-};
-
-/**
  * Represents a Filter Rule, which is specified in a Business Rule from scratch, that has exactly 4 elements :
  * FilterRuleNumber, Attribute, Operator and AttributeOrvalue
  */
@@ -98,7 +66,6 @@ export default class FilterRule extends Component {
         filterRule[1] = value;
         this.updateFilterRule(filterRule);
     }
-
 
     /**
      * Updates the AttributeOrValue of the filter rule
@@ -180,7 +147,6 @@ export default class FilterRule extends Component {
             return (
                 <IconButton
                     color="primary"
-                    style={styles.deployButton}
                     aria-label="Remove"
                     onClick={() => this.props.onRemove()}
                 >

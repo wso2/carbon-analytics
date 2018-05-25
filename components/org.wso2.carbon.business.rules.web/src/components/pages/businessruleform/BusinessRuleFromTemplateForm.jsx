@@ -51,10 +51,6 @@ import '../../../index.css';
  * Styles related to this component
  */
 const styles = {
-    container: {
-        align: 'center',
-        maxWidth: 800,
-    },
     formRoot: {
         flexGrow: 1,
         marginTop: 30,

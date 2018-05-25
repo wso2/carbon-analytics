@@ -34,11 +34,6 @@ const styles = {
         height: 200,
         margin: 15,
     },
-    avatarButton: {
-        color: 'white',
-        width: 55,
-        height: 55,
-    },
 };
 
 /**
