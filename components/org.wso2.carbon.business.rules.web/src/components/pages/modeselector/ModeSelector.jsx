@@ -69,7 +69,7 @@ export default class ModeSelector extends Component {
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
                                         title="From Scratch"
                                         description={
-                                            'Create a business rules with templates for input & output,' +
+                                            'Create a business rules with templates for input & output, ' +
                                             'and customized filters'}
                                     />
                                 </Grid>
