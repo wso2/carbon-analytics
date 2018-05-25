@@ -73,6 +73,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
 
+                var savedAnnotations = clickedElement.getAnnotationList();
+                var annotations = [];
+                _.forEach(savedAnnotations, function (savedAnnotation) {
+                    annotations.push({annotation: savedAnnotation});
+                });
+
                 var inputStreamNames = clickedElement.getQueryInput().getConnectedElementNameList();
                 var conditionList = clickedElement.getQueryInput().getConditionList();
                 var logic = clickedElement.getQueryInput().getLogic();
@@ -222,6 +228,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 }
 
+                var fillQueryAnnotation = {
+                    annotations: annotations
+                };
+                fillQueryAnnotation = self.formUtils.cleanJSONObject(fillQueryAnnotation);
                 var fillQueryInputWith = {
                     conditions: conditionList,
                     logic: {
@@ -304,9 +314,47 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                formContainer.append('<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
+                formContainer.append('<div class="row"><div id="form-query-annotation" class="col-md-12"></div></div>' +
+                    '<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
                     '<div id="form-query-output" class="col-md-4"></div></div>');
+
+                var editorAnnotation = new JSONEditor($(formContainer).find('#form-query-annotation')[0], {
+                    schema: {
+                        type: "object",
+                        title: "Query Annotations",
+                        properties: {
+                            annotations: {
+                                propertyOrder: 1,
+                                type: "array",
+                                format: "table",
+                                title: "Add Annotations",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    type: "object",
+                                    title: "Annotation",
+                                    options: {
+                                        disable_properties: true
+                                    },
+                                    properties: {
+                                        annotation: {
+                                            title: "Annotation",
+                                            type: "string",
+                                            minLength: 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    startval: fillQueryAnnotation,
+                    show_errors: "always",
+                    display_required_only: true,
+                    no_additional_properties: true,
+                    disable_array_delete_all_rows: true,
+                    disable_array_delete_last_row: true
+                });
 
                 var editorInput = new JSONEditor($(formContainer).find('#form-query-input')[0], {
                     schema: {
@@ -758,17 +806,24 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var submitButtonElement = $(formContainer).find('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
 
+                    var annotationErrors = editorAnnotation.validate();
                     var inputErrors = editorInput.validate();
                     var selectErrors = editorSelect.validate();
                     var outputErrors = editorOutput.validate();
-                    if(inputErrors.length || selectErrors.length || outputErrors.length) {
+                    if(annotationErrors.length || inputErrors.length || selectErrors.length || outputErrors.length) {
                         return;
                     }
 
+                    var annotationConfig = editorAnnotation.getValue();
                     var inputConfig = editorInput.getValue();
                     var selectConfig = editorSelect.getValue();
                     var outputConfig = editorOutput.getValue();
-                    
+
+                    clickedElement.clearAnnotationList();
+                    _.forEach(annotationConfig.annotations, function (annotation) {
+                        clickedElement.addAnnotation(annotation.annotation);
+                    });
+
                     var queryInput = clickedElement.getQueryInput();
 
                     queryInput.clearConditionList();

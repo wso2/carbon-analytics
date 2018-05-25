@@ -54,16 +54,38 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                     type: "object",
                     title: "Stream",
                     properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title : "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 1
+                            propertyOrder: 2
                         },
                         attributes: {
                             required: true,
-                            propertyOrder: 2,
+                            propertyOrder: 3,
                             type: "array",
                             format: "table",
                             title: "Attributes",
@@ -72,6 +94,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                             items: {
                                 type: "object",
                                 title : 'Attribute',
+                                options: {
+                                    disable_properties: true
+                                },
                                 properties: {
                                     name: {
                                         title : 'Name',
@@ -93,41 +118,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                                     }
                                 }
                             }
-                        }//, TODO: Since annotations structure is not confirmed, commenting it.
-                        // annotations: {
-                        //     required: true,
-                        //     propertyOrder: 3,
-                        //     type: 'object',
-                        //     title: 'Annotations',          //@Async(buffer.size='64')
-                        //     properties: {                 //@info(name='HelloWorldQuery')
-                        //         Async: {
-                        //             type: 'object',
-                        //             title: 'Async',
-                        //             annotationType: 'map',
-                        //             properties: {
-                        //                 prop1: {
-                        //                     title: 'buffer.size',
-                        //                     type: "integer",
-                        //                     required: true
-                        //                 }
-                        //             },
-                        //             propertyOrder: 1
-                        //         },
-                        //         Info: {
-                        //             type: 'object',
-                        //             title: 'Info',
-                        //             annotationType: 'map',
-                        //             properties: {
-                        //                 prop1: {
-                        //                     title: 'name',
-                        //                     type: "string",
-                        //                     required: true
-                        //                 }
-                        //             },
-                        //             propertyOrder: 2
-                        //         }
-                        //     }
-                        // }
+                        }
                     }
                 },
                 show_errors: "always",
@@ -162,6 +153,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                 _.forEach(editor.getValue().attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);
                     stream.addAttribute(attributeObject);
+                });
+                _.forEach(editor.getValue().annotations, function (annotation) {
+                    stream.addAnnotation(annotation.annotation);
                 });
                 self.configurationData.getSiddhiAppConfig().addStream(stream);
 
@@ -206,26 +200,55 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                 };
                 attributes.push(attributeObject);
             });
+            var savedAnnotations = clickedElement.getAnnotationList();
+            var annotations = [];
+            _.forEach(savedAnnotations, function (savedAnnotation) {
+                annotations.push({annotation: savedAnnotation});
+            });
 
             var fillWith = {
+                annotations : annotations,
                 name : name,
                 attributes : attributes
             };
+            fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor(formContainer[0], {
                 schema: {
                     type: "object",
                     title: "Stream",
                     properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title : "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 1
+                            propertyOrder: 2
                         },
                         attributes: {
                             required: true,
-                            propertyOrder: 2,
+                            propertyOrder: 3,
                             type: "array",
                             format: "table",
                             title: "Attributes",
@@ -297,6 +320,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                 _.forEach(config.attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);
                     clickedElement.addAttribute(attributeObject);
+                });
+
+                clickedElement.clearAnnotationList();
+                _.forEach(config.annotations, function (annotation) {
+                    clickedElement.addAnnotation(annotation.annotation);
                 });
 
                 var textNode = $(element).parent().find('.streamNameNode');

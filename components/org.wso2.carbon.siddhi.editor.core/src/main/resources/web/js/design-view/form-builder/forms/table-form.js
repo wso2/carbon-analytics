@@ -54,16 +54,38 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                     type: "object",
                     title: "Table",
                     properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title : "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 1
+                            propertyOrder: 2
                         },
                         attributes: {
                             required: true,
-                            propertyOrder: 2,
+                            propertyOrder: 3,
                             type: "array",
                             format: "table",
                             title: "Attributes",
@@ -129,6 +151,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                     var attributeObject = new Attribute(attribute);
                     table.addAttribute(attributeObject);
                 });
+                _.forEach(editor.getValue().annotations, function (annotation) {
+                    table.addAnnotation(annotation.annotation);
+                });
                 self.configurationData.getSiddhiAppConfig().addTable(table);
 
                 var textNode = $('#'+i).find('.tableNameNode');
@@ -172,25 +197,54 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                 };
                 attributes.push(attributeObject);
             });
+            var savedAnnotations = clickedElement.getAnnotationList();
+            var annotations = [];
+            _.forEach(savedAnnotations, function (savedAnnotation) {
+                annotations.push({annotation: savedAnnotation});
+            });
             var fillWith = {
+                annotations : annotations,
                 name : name,
                 attributes : attributes
             };
+            fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor(formContainer[0], {
                 schema: {
                     type: "object",
                     title: "Table",
                     properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title : "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 1
+                            propertyOrder: 2
                         },
                         attributes: {
                             required: true,
-                            propertyOrder: 2,
+                            propertyOrder: 3,
                             type: "array",
                             format: "table",
                             title: "Attributes",
@@ -262,6 +316,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                 _.forEach(config.attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);
                     clickedElement.addAttribute(attributeObject);
+                });
+
+                clickedElement.clearAnnotationList();
+                _.forEach(config.annotations, function (annotation) {
+                    clickedElement.addAnnotation(annotation.annotation);
                 });
 
                 var textNode = $(element).parent().find('.tableNameNode');

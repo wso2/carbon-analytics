@@ -37,19 +37,7 @@ define(['require', 'elementUtils'],
                         type: ‘’
                     }
                 ],
-                annotationList: [
-                    {
-                        name: ‘’,
-                        type: ‘VALUE’,
-                        value: [‘value1’,’value2’]
-                    },
-                    and|or
-                    {
-                        name: ‘’
-                        type: ‘KEY_VALUE’,
-                        value: {‘option’:’value’}
-                    }
-                ]
+                annotationList: [annotation1, annotation2, ...]
             */
             if (options !== undefined) {
                 this.id = options.id;

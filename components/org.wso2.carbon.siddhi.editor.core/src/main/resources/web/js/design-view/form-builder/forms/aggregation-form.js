@@ -48,7 +48,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             var propertyDiv = $('<div id="property-header"><h3>Define Aggregation </h3></div>' +
                 '<div id="define-aggregation" class="define-aggregation"></div>');
             formContainer.append(propertyDiv);
-            formContainer.append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
+            formContainer.append('<div class="row"><div id="form-aggregation-annotation" class="col-md-12"></div></div>' +
+                '<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
                 '<div id="form-aggregation-select" class="col-md-4"></div>' +
                 '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
 
@@ -84,6 +85,41 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             }
 
             // generate the form to define a aggregation
+            var editorAnnotation = new JSONEditor($(formContainer).find('#form-aggregation-annotation')[0], {
+                schema: {
+                    type: "object",
+                    title: "Aggregation Annotations",
+                    properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Add Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title: "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title: "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                show_errors: "always",
+                display_required_only: true,
+                no_additional_properties: true,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true
+            });
             var editorInput = new JSONEditor($(formContainer).find('#form-aggregation-input')[0], {
                 schema: {
                     type: "object",
@@ -311,10 +347,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
+                var annotationErrors = editorAnnotation.validate();
                 var inputErrors = editorInput.validate();
                 var selectErrors = editorSelect.validate();
                 var aggregateErrors = editorAggregate.validate();
-                if(inputErrors.length || selectErrors.length || aggregateErrors.length) {
+                if(annotationErrors.length || inputErrors.length || selectErrors.length || aggregateErrors.length) {
                     return;
                 }
                 var isAggregationNameUsed = self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name);
@@ -366,12 +403,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     _.set(aggregateByTimePeriodOptions, 'maxValue',
                         (editorAggregate.getValue().aggregateByTimePeriod.maxValue).toUpperCase());
                 } else {
-                    _.set(aggregateByTimePeriodOptions, 'minValue', undefined);
+                    _.set(aggregateByTimePeriodOptions, 'maxValue', undefined);
                 }
                 var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                 _.set(aggregationOptions, 'aggregateByTimePeriod', aggregateByTimePeriod);
 
                 var aggregation = new Aggregation(aggregationOptions);
+
+                _.forEach(editorAnnotation.getValue().annotations, function (annotation) {
+                    aggregation.addAnnotation(annotation.annotation);
+                });
                 self.configurationData.getSiddhiAppConfig().addAggregation(aggregation);
 
                 var textNode = $('#'+i).find('.aggregationNameNode');
@@ -407,6 +448,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
             }
+
+            var savedAnnotations = clickedElement.getAnnotationList();
+            var annotations = [];
+            _.forEach(savedAnnotations, function (savedAnnotation) {
+                annotations.push({annotation: savedAnnotation});
+            });
+
             var name = clickedElement.getName();
             var from = clickedElement.getFrom();
             var select = clickedElement.getSelect().getValue();
@@ -421,6 +469,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 };
                 groupBy.push(groupByAttributeObject);
             });
+
+            var fillAnnotation = {
+                annotations: annotations
+            };
+            fillAnnotation = self.formUtils.cleanJSONObject(fillAnnotation);
 
             var fillInput = {
                 name : name,
@@ -461,7 +514,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 };
             }
 
-            formContainer.append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
+            formContainer.append('<div class="row"><div id="form-aggregation-annotation" class="col-md-12"></div></div>' +
+                '<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
                 '<div id="form-aggregation-select" class="col-md-4"></div>' +
                 '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
 
@@ -495,6 +549,42 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             }
 
             // generate the form to define a aggregation
+            var editorAnnotation = new JSONEditor($(formContainer).find('#form-aggregation-annotation')[0], {
+                schema: {
+                    type: "object",
+                    title: "Aggregation Annotations",
+                    properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Add Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title: "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title: "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                startval: fillAnnotation,
+                show_errors: "always",
+                display_required_only: true,
+                no_additional_properties: true,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true
+            });
             var editorInput = new JSONEditor($(formContainer).find('#form-aggregation-input')[0], {
                 schema: {
                     type: "object",
@@ -713,10 +803,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+                var annotationErrors = editorAnnotation.validate();
                 var inputErrors = editorInput.validate();
                 var selectErrors = editorSelect.validate();
                 var aggregateErrors = editorAggregate.validate();
-                if(inputErrors.length || selectErrors.length || aggregateErrors.length) {
+                if(annotationErrors.length || inputErrors.length || selectErrors.length || aggregateErrors.length) {
                     return;
                 }
                 var isAggregationNameUsed =
@@ -726,9 +817,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     return;
                 }
 
+                var configAnnotation = editorAnnotation.getValue();
                 var configInput = editorInput.getValue();
                 var configSelect = editorSelect.getValue();
                 var configAggregate = editorAggregate.getValue();
+
+                clickedElement.clearAnnotationList();
+                _.forEach(configAnnotation.annotations, function (annotation) {
+                    clickedElement.addAnnotation(annotation.annotation);
+                });
 
                 // update selected aggregation model
                 clickedElement.setName(configInput.name);
@@ -771,7 +868,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     _.set(aggregateByTimePeriodOptions, 'maxValue',
                         (configAggregate.aggregateByTimePeriod.maxValue).toUpperCase());
                 } else {
-                    _.set(aggregateByTimePeriodOptions, 'minValue', undefined);
+                    _.set(aggregateByTimePeriodOptions, 'maxValue', undefined);
                 }
                 var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                 clickedElement.setAggregateByTimePeriod(aggregateByTimePeriod);
