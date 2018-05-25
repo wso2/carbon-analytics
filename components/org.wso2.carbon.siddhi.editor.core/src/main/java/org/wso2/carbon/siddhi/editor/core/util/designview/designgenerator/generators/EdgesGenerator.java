@@ -44,57 +44,107 @@ public class EdgesGenerator {
 
     /**
      * Generates Edges for the elements in the SiddhiAppConfig
-     * @return      List of Edges
+     * @return      List of all the Edges
      */
     public List<Edge> generateEdges() {
         List<Edge> edges = new ArrayList<>();
-        for (QueryConfig query : siddhiAppConfig.getWindowFilterProjectionQueryList()) {
-            // Edge towards Query element
-            edges.add(
-                    generateEdge(
-                            getElementWithStreamName(
-                                    ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom()).getId(),
-                            query.getId())); // TODO implement
-            // Edge from Query element
-            edges.add(
-                    generateEdge(
-                            query.getId(),
-                            getElementWithStreamName(query.getQueryOutput().getTarget()).getId()));
-        }
-        for (QueryConfig query : siddhiAppConfig.getJoinQueryList()) {
-            // Edge towards Query element (From Left element)
-            edges.add(
-                    generateEdge(
-                            getElementWithStreamName(
-                                    ((JoinConfig) (query.getQueryInput())).getLeft().getFrom()).getId(),
-                            query.getId()));
-            // Edge towards Query element (From Right element)
-            edges.add(
-                    generateEdge(
-                            getElementWithStreamName(
-                                    ((JoinConfig) (query.getQueryInput())).getRight().getFrom()).getId(),
-                            query.getId()));
-            // Edge from Query element
-            edges.add(
-                    generateEdge(
-                            query.getId(),
-                            getElementWithStreamName(query.getQueryOutput().getTarget()).getId()));
-        }
-        // TODO: 3/29/18 implement other edges
+        edges.addAll(generateWindowFilterProjectionQueryEdges(siddhiAppConfig.getWindowFilterProjectionQueryList()));
+        edges.addAll(generateJoinQueryEdges(siddhiAppConfig.getJoinQueryList()));
+        // TODO implement other edges
         return edges;
     }
 
     /**
-     * Returns an Edge, that represents the connection between given parent and child, denoted by their Ids
-     * @param parentId      Id of the edge's starting Node
-     * @param childId       Id of the edge's ending Node
-     * @return              Edge which represents the connection between parent and child elements
+     * Generates a list of edges, whose members denote an Edge related to a JoinQuery element
+     * @param windowFilterProjectionQueryList       List of WindowFilterProjection QueryConfigs
+     * @return                                      List of Edges
      */
-    private Edge generateEdge(String parentId, String childId) {
-        NodeType parentType = getSiddhiElementType(getElementWithId(parentId));
-        NodeType childType = getSiddhiElementType(getElementWithId(childId));
-        String edgeId = DesignGeneratorHelper.generateEdgeID(parentId, childId);
-        return new Edge(edgeId, parentId, parentType, childId, childType);
+    private List<Edge> generateWindowFilterProjectionQueryEdges(List<QueryConfig> windowFilterProjectionQueryList) {
+        List<Edge> edges = new ArrayList<>();
+        for (QueryConfig query : windowFilterProjectionQueryList) {
+            // Edge towards Query element
+            edges.add(
+                    generateEdge(
+                            getElementWithStreamName(
+                                    ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom()),
+                            query));
+            // Edge from Query element
+            edges.add(
+                    generateEdge(
+                            query,
+                            getElementWithStreamName(query.getQueryOutput().getTarget()).getId()));
+        }
+        return edges;
+    }
+
+    /**
+     * Generates a list of edges, whose members denote an Edge related to a JoinQuery element
+     * @param joinQueryList     List of Join QueryConfigs
+     * @return                  List of Edges
+     */
+    private List<Edge> generateJoinQueryEdges(List<QueryConfig> joinQueryList) {
+        List<Edge> edges = new ArrayList<>();
+        for (QueryConfig query : joinQueryList) {
+            // Edge towards Query element (From Left element)
+            edges.add(
+                    generateEdge(
+                            getElementWithStreamName(((JoinConfig) (query.getQueryInput())).getLeft().getFrom()),
+                            query));
+            // Edge towards Query element (From Right element)
+            edges.add(
+                    generateEdge(
+                            getElementWithStreamName(((JoinConfig) (query.getQueryInput())).getRight().getFrom()),
+                            query));
+            // Edge from Query element
+            edges.add(
+                    generateEdge(
+                            query,
+                            getElementWithStreamName(query.getQueryOutput().getTarget())));
+        }
+        return edges;
+    }
+
+    /**
+     * Generates an Edge between corresponding parent and child SiddhiElements.
+     * When one of the given parent/child is a SiddhiElement object, the Element is used directly.
+     * When one of those is an Id, the respective element for the id is got and used
+     * @param parentElementOrId     Parent Element object or Id
+     * @param childElementOrId      Child Element object or Id
+     * @return                      Edge object
+     */
+    private Edge generateEdge(Object parentElementOrId, Object childElementOrId) {
+        SiddhiElementConfig parentElement = getOrAcceptSiddhiElement(parentElementOrId);
+        SiddhiElementConfig childElement = getOrAcceptSiddhiElement(childElementOrId);
+        return generateEdgesForElements(parentElement, childElement);
+    }
+
+    /**
+     * Accepts and returns the given object when it is a SiddhiElementConfig.
+     * Gets the respective SiddhiElement and returns, when the Id is given
+     * @param elementOrId       SiddhiElementConfig object or Id
+     * @return                  SiddhiElementConfig object
+     */
+    private SiddhiElementConfig getOrAcceptSiddhiElement(Object elementOrId) {
+        if (elementOrId instanceof SiddhiElementConfig) {
+            return (SiddhiElementConfig) elementOrId;
+        } else if (elementOrId instanceof String) {
+            return getElementWithId((String) elementOrId);
+        }
+        throw new IllegalArgumentException(
+                "SiddhiElement ID or SiddhiElement object is expected, to find the element or accept the given one");
+    }
+
+    /**
+     * Generates an edge between the given parent and child SiddhiElements
+     * @param parentElement     SiddhiElement object, where the Edge starts from
+     * @param childElement      SiddhiElement object, where the Edge ends at
+     * @return                  Edge object
+     */
+    private Edge generateEdgesForElements(SiddhiElementConfig parentElement, SiddhiElementConfig childElement) {
+        NodeType parentType = getSiddhiElementType(parentElement);
+        NodeType childType = getSiddhiElementType(childElement);
+        String edgeId = DesignGeneratorHelper.generateEdgeID(parentElement.getId(), childElement.getId());
+        return new Edge(edgeId, parentElement.getId(), parentType, childElement.getId(), childType);
     }
 
     /**

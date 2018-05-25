@@ -32,6 +32,7 @@ import java.util.List;
  * Generator to create Source/Sink config
  */
 public class SourceSinkConfigGenerator {
+    private static final String TYPE = "TYPE";
     /**
      * Generates config for a given Siddhi Source
      * @param source        Siddhi Source
@@ -40,10 +41,12 @@ public class SourceSinkConfigGenerator {
     public SourceSinkConfig generateSourceConfig(Source source) {
         return new SourceSinkConfig(
                 AnnotationType.SOURCE.toString(),
+                source.getStreamDefinition().getId(),
                 source.getType(),
                 generateSourceOrSinkOptions(source.getStreamDefinition().getAnnotations().get(0).getElements()),
                 generateMapperConfig(
-                        source.getStreamDefinition().getAnnotations().get(0).getAnnotations("map").get(0)));
+                        source.getStreamDefinition().getAnnotations().get(0)
+                                .getAnnotations(AnnotationType.MAP.toString()).get(0)));
     }
 
     /**
@@ -54,10 +57,12 @@ public class SourceSinkConfigGenerator {
     public SourceSinkConfig generateSinkConfig(Sink sink) {
         return new SourceSinkConfig(
                 AnnotationType.SINK.toString(),
+                sink.getStreamDefinition().getId(),
                 sink.getType(),
                 generateSourceOrSinkOptions(sink.getStreamDefinition().getAnnotations().get(0).getElements()),
                 generateMapperConfig(
-                        sink.getStreamDefinition().getAnnotations().get(0).getAnnotations("map").get(0)));
+                        sink.getStreamDefinition().getAnnotations().get(0)
+                                .getAnnotations(AnnotationType.MAP.toString()).get(0)));
     }
 
     /**
@@ -70,7 +75,7 @@ public class SourceSinkConfigGenerator {
         for (Element element : sourceOrSinkElements) {
             if (element.getKey() != null) {
                 // Put elements except 'type'
-                if (!element.getKey().equalsIgnoreCase(ElementKey.TYPE.toString())) {
+                if (!element.getKey().equalsIgnoreCase(TYPE)) {
                     options.add(element.toString());
                 }
             } else {
@@ -87,7 +92,7 @@ public class SourceSinkConfigGenerator {
      */
     private MapperConfig generateMapperConfig(Annotation mapAnnotation) {
         return new MapperConfig(
-                mapAnnotation.getElement(ElementKey.TYPE.toString()),
+                mapAnnotation.getElement(TYPE),
                 generateMapperOptions(mapAnnotation),
                 generateCustomMappingAttributes(mapAnnotation));
     }
@@ -101,7 +106,7 @@ public class SourceSinkConfigGenerator {
         List<String> options = new ArrayList<>();
         for (Element element : mapAnnotation.getElements()) {
             // Put elements except 'type'
-            if (!(ElementKey.TYPE.toString()).equalsIgnoreCase(element.getKey())) {
+            if (!(TYPE).equalsIgnoreCase(element.getKey())) {
                 options.add(element.toString());
             }
         }
@@ -125,14 +130,13 @@ public class SourceSinkConfigGenerator {
         return customMappingAttributes;
     }
 
+    /**
+     * Annotation Type
+     */
     private enum AnnotationType {
         SOURCE,
         SINK,
         MAP,
         ATTRIBUTES;
-    }
-
-    private enum ElementKey {
-        TYPE;
     }
 }
