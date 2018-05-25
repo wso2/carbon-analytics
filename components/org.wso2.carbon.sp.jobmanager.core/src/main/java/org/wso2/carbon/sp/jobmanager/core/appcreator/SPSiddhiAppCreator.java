@@ -186,7 +186,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         throw new SiddhiAppCreationException("Number of partitions in the existing topic has higher " +
                                 "number of partitions than the expected count. Hence need to delete and recreate " +
                                 "topic with " + partitions + "partitions.  User has disabled topic creation by " +
-                                "setting"  + SiddhiTopologyCreatorConstants.TRANSPORT_CHANNEL_CREATION_IDENTIFIER +
+                                "setting "  + SiddhiTopologyCreatorConstants.TRANSPORT_CHANNEL_CREATION_IDENTIFIER +
                                 " property to false. Hence new topics can't be created and Siddhi App deployemnt " +
                                 "will be aborted.");
                     }
