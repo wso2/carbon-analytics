@@ -33,6 +33,7 @@ import java.util.List;
  */
 public class SourceSinkConfigGenerator {
     private static final String TYPE = "TYPE";
+
     /**
      * Generates config for a given Siddhi Source
      * @param source        Siddhi Source
