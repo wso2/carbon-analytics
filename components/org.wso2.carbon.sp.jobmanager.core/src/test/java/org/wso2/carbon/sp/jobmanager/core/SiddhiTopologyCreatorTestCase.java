@@ -1189,7 +1189,7 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test(dependsOnMethods = "testUsergivenSourceNoGroup",
             expectedExceptions = SiddhiAppCreationException.class)
-    public void testPartitionTopicCreationDisabledWithNoTopics() {
+    public void testPartitionTopicCreationDisabledWithNoTopics() throws InterruptedException {
         String siddhiApp = "@App:name('TestPlan13')  @App:transportChannelCreationEnabled('false')\n"
                 + "@source(type='kafka', topic.list='TestPlan12.stockStream', group.id='1', threading.option='single"
                 + ".thread', bootstrap.servers='localhost:9092', @map(type='xml'))  "
@@ -1225,6 +1225,7 @@ public class SiddhiTopologyCreatorTestCase {
 
         String topics[] = new String[]{"TestPlan12.stockStream", "TestPlan12.companyTriggerStream"};
         KafkaTestUtil.createTopic(topics, 1);
+        Thread.sleep(1000);
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
