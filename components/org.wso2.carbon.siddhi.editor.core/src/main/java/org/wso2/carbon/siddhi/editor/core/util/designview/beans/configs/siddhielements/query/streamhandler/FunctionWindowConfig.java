@@ -16,22 +16,20 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.filterfunctionwindow;
-
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.FilterFunctionWindowType;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler;
 
 /**
- * Represents a Filter
+ * Represents a Function|Window
  */
-public class FilterConfig extends FilterFunctionWindowConfig {
-    String value;
+public class FunctionWindowConfig extends StreamHandlerConfig {
+    private FunctionWindowValue value;
 
-    public FilterConfig(String value) {
-        super(FilterFunctionWindowType.FILTER.toString());
+    public FunctionWindowConfig(String type, FunctionWindowValue value) {
+        super(type);
         this.value = value;
     }
 
-    public String getValue() {
+    public FunctionWindowValue getValue() {
         return value;
     }
 }

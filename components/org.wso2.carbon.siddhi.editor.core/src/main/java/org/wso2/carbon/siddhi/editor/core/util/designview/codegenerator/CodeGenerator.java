@@ -490,41 +490,42 @@ public class CodeGenerator {
      * @return The window,filter or projection string representation of the given WindowFilterProjection object
      */
     private String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection) {
-        if (windowFilterProjection == null) {
-            throw new CodeGenerationException("The WindowFilterProjection Instance Is Null");
-        } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
-            throw new CodeGenerationException("From Value Is Null");
-        }
-
-        StringBuilder windowFilterProjectionStringBuilder = new StringBuilder();
-        windowFilterProjectionStringBuilder.append(Constants.FROM)
-                .append(Constants.SPACE)
-                .append(windowFilterProjection.getFrom());
-
-        if (windowFilterProjection.getFilter() != null && !windowFilterProjection.getFilter().isEmpty()) {
-            windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
-                    .append(windowFilterProjection.getFilter())
-                    .append(Constants.CLOSE_SQUARE_BRACKET);
-        }
-
-        if (windowFilterProjection.getWindow() != null) {
-            QueryWindowConfig queryWindow = windowFilterProjection.getWindow();
-            windowFilterProjectionStringBuilder.append(Constants.HASH)
-                    .append(Constants.WINDOW)
-                    .append(Constants.FULL_STOP)
-                    .append(queryWindow.getFunction())
-                    .append(Constants.OPEN_BRACKET)
-                    .append(getParameterList(queryWindow.getParameters()))
-                    .append(Constants.CLOSE_BRACKET);
-        }
-
-        if (windowFilterProjection.getPostWindowFilter() != null && !windowFilterProjection.getPostWindowFilter().isEmpty()) {
-            windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
-                    .append(windowFilterProjection.getPostWindowFilter())
-                    .append(Constants.CLOSE_SQUARE_BRACKET);
-        }
-
-        return windowFilterProjectionStringBuilder.toString();
+//        if (windowFilterProjection == null) {
+//            throw new CodeGenerationException("The WindowFilterProjection Instance Is Null");
+//        } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
+//            throw new CodeGenerationException("From Value Is Null");
+//        }
+//
+//        StringBuilder windowFilterProjectionStringBuilder = new StringBuilder();
+//        windowFilterProjectionStringBuilder.append(Constants.FROM)
+//                .append(Constants.SPACE)
+//                .append(windowFilterProjection.getFrom());
+//
+//        if (windowFilterProjection.getFilter() != null && !windowFilterProjection.getFilter().isEmpty()) {
+//            windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
+//                    .append(windowFilterProjection.getFilter())
+//                    .append(Constants.CLOSE_SQUARE_BRACKET);
+//        }
+//
+//        if (windowFilterProjection.getWindow() != null) {
+//            QueryWindowConfig queryWindow = windowFilterProjection.getWindow();
+//            windowFilterProjectionStringBuilder.append(Constants.HASH)
+//                    .append(Constants.WINDOW)
+//                    .append(Constants.FULL_STOP)
+//                    .append(queryWindow.getFunction())
+//                    .append(Constants.OPEN_BRACKET)
+//                    .append(getParameterList(queryWindow.getParameters()))
+//                    .append(Constants.CLOSE_BRACKET);
+//        }
+//
+//        if (windowFilterProjection.getPostWindowFilter() != null && !windowFilterProjection.getPostWindowFilter().isEmpty()) {
+//            windowFilterProjectionStringBuilder.append(Constants.OPEN_SQUARE_BRACKET)
+//                    .append(windowFilterProjection.getPostWindowFilter())
+//                    .append(Constants.CLOSE_SQUARE_BRACKET);
+//        }
+//
+//        return windowFilterProjectionStringBuilder.toString();
+        return null;
     }
 
     /**

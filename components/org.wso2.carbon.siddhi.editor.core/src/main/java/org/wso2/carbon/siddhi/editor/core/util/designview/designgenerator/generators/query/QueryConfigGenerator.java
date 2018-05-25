@@ -51,8 +51,7 @@ public class QueryConfigGenerator {
     public QueryConfig generateQueryConfig(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
         // Generate Input
         QueryInputConfigGenerator queryInputConfigGenerator = new QueryInputConfigGenerator(siddhiAppString, siddhiApp);
-        QueryInputConfig queryInputConfig =
-                queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream());
+        QueryInputConfig queryInputConfig = queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream());
 
         // Generate Select
         AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =

@@ -16,27 +16,22 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.filterfunctionwindow;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler;
 
-import java.util.List;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.StreamHandlerType;
 
 /**
- * Represents value of a Function|Window
+ * Represents a Filter
  */
-public class FunctionWindowValue {
-    private String function;
-    private List<String> parameters;
+public class FilterConfig extends StreamHandlerConfig {
+    String value;
 
-    public FunctionWindowValue(String function, List<String> parameters) {
-        this.function = function;
-        this.parameters = parameters;
+    public FilterConfig(String value) {
+        super(StreamHandlerType.FILTER.toString());
+        this.value = value;
     }
 
-    public String getFunction() {
-        return function;
-    }
-
-    public List<String> getParameters() {
-        return parameters;
+    public String getValue() {
+        return value;
     }
 }

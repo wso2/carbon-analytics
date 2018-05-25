@@ -16,10 +16,19 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.constants.query;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler;
 
-public enum FilterFunctionWindowType {
-    FILTER,
-    FUNCTION,
-    WINDOW;
+/**
+ * Represents a Siddhi Stream Handler
+ */
+public abstract class StreamHandlerConfig {
+    private String type;
+
+    public StreamHandlerConfig(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
 }
