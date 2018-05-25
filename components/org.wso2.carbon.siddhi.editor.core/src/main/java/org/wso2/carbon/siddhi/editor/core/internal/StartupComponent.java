@@ -27,7 +27,10 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.siddhi.editor.core.util.HostAddressFinder;
 import org.wso2.msf4j.MicroservicesServer;
+
+import java.net.SocketException;
 
 /**
  * Startup component of Siddhi Editor.
@@ -57,7 +60,15 @@ public class StartupComponent {
     protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
         microservicesServer.getListenerConfigurations().entrySet().stream().forEach(entry -> {
             if (("http").equals(entry.getValue().getScheme())) {
-                String startingURL = entry.getValue().getScheme() + "://localhost:" + entry.getValue()
+                String hostname;
+                try {
+                    hostname = HostAddressFinder.findAddress(entry.getValue().getHost());
+                } catch (SocketException e) {
+                    hostname = entry.getValue().getHost();
+                    logger.error("Error in finding address for provided hostname " + hostname + "." +
+                            e.getMessage(), e);
+                }
+                String startingURL = entry.getValue().getScheme() + "://" + hostname + ":" + entry.getValue()
                         .getPort() + "/editor";
                 logger.info("Editor Started on : " + startingURL);
             }

@@ -19,7 +19,7 @@
 
 import Axios from 'axios';
 import Qs from 'qs';
-import { MediaType } from '../Constants';
+import {MediaType} from '../Constants';
 import AuthManager from "../../auth/utils/AuthManager";
 import DashboardUtils from '../DashboardUtils';
 

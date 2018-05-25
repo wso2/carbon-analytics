@@ -22,7 +22,7 @@ import {Link} from "react-router-dom";
 export default class LandingPage extends React.Component {
 
     componentWillMount() {
-        window.location.href = "/"+window.contextPath.substr(1) + "/overview";
+        window.location.href = "/" + window.contextPath.substr(1) + "/overview";
     }
 
 }

@@ -17,12 +17,12 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 //App Components
-import DashboardUtils from "../utils/DashboardUtils";
-import ChartCard from "../common/ChartCard";
+import DashboardUtils from '../utils/DashboardUtils';
+import ChartCard from '../common/ChartCard';
 // Material UI
-import {Card, CardHeader, CardMedia, Divider} from "material-ui";
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
 
 const metadata = {
     names: ['Time', 'Total Classes Loaded', 'Current Classes Loaded', 'Total Classes Unloaded'],
@@ -48,7 +48,7 @@ export default class JVMLoading extends React.Component {
             jvmClassLoadingLoadedTotal: nextprops.data[0],
             jvmClassLoadingLoadedCurrent: nextprops.data[1],
             jvmClassLoadingUnloadedTotal: nextprops.data[2],
-            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length > 10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -61,22 +61,22 @@ export default class JVMLoading extends React.Component {
             width: 700,
             height: 200,
             style: {
-                tickLabelColor:'#f2f2f2',
+                tickLabelColor: '#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 10,
+                legendTitleSize: 12
             },
-            legend:true,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            legend: true,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             interactiveLegend: true,
             gridColor: '#f2f2f2',
-            xAxisTickCount:this.state.tickCount
+            xAxisTickCount: this.state.tickCount
         };
-        if(this.state.jvmClassLoadingLoadedTotal.length === 0 && this.state.jvmClassLoadingLoadedCurrent.length === 0
-            && this.state.jvmClassLoadingUnloadedTotal.length === 0){
-            return(
+        if (this.state.jvmClassLoadingLoadedTotal.length === 0 && this.state.jvmClassLoadingLoadedCurrent.length === 0
+            && this.state.jvmClassLoadingUnloadedTotal.length === 0) {
+            return (
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
@@ -95,9 +95,9 @@ export default class JVMLoading extends React.Component {
         let data = DashboardUtils.getCombinedChartList(
             DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
                 this.state.jvmClassLoadingLoadedCurrent), this.state.jvmClassLoadingUnloadedTotal);
-        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmClassLoadingLoadedTotal,
+        let intY = DashboardUtils.initCombinedYDomain(this.state.jvmClassLoadingLoadedTotal,
             this.state.jvmClassLoadingLoadedCurrent);
-        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmClassLoadingUnloadedTotal,intY);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmClassLoadingUnloadedTotal, intY);
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={data} metadata={metadata} config={chartConfig} yDomain={y2}

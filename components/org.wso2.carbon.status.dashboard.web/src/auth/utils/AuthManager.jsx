@@ -27,7 +27,7 @@ const sessionUser = 'DASHBOARD_USER';
  * Name of the refresh token cookie.
  */
 const REFRESH_TOKEN_COOKIE_NAME = 'REFRESH_TOKEN';
-const TIMESTAMP_SKEW =  100;
+const TIMESTAMP_SKEW = 100;
 const REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
 
 /**
@@ -71,12 +71,12 @@ export default class AuthManager {
         return !!AuthManager.getUser();
     }
 
-    static authenticateWithRefreshToken(){
+    static authenticateWithRefreshToken() {
         return new Promise((resolve, reject) => {
             AuthenticationAPI
                 .getAccessTokenWithRefreshToken()
                 .then((response) => {
-                    const { pID, lID, validityPeriod } = response.data;
+                    const {pID, lID, validityPeriod} = response.data;
                     const username = AuthManager.isRememberMeSet() ?
                         window.localStorage.getItem('username') : AuthManager.getUser().username;
                     AuthManager.setUser({
@@ -86,8 +86,10 @@ export default class AuthManager {
                         expires: AuthManager.calculateExpiryTime(validityPeriod),
                     });
                     // If rememberMe, set refresh token into a persistent cookie else session cookie.
-                    const refreshTokenValidityPeriod = AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
-                    AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
+                    const refreshTokenValidityPeriod =
+                        AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
+                    AuthManager
+                        .setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -117,7 +119,7 @@ export default class AuthManager {
             AuthenticationAPI
                 .login(username, password, rememberMe)
                 .then((response) => {
-                    const { authUser, pID, lID, validityPeriod } = response.data;
+                    const {authUser, pID, lID, validityPeriod} = response.data;
                     window.localStorage.setItem('rememberMe', rememberMe);
                     if (rememberMe) {
                         window.localStorage.setItem('username', authUser);
@@ -131,7 +133,8 @@ export default class AuthManager {
                     });
                     // If rememberMe, set refresh token into a persistent cookie else session cookie.
                     const refreshTokenValidityPeriod = rememberMe ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
-                    AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
+                    AuthManager
+                        .setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -199,7 +202,7 @@ export default class AuthManager {
      * @param {String} name : Name of the cookie which need to be deleted
      */
     static deleteCookie(name) {
-        document.cookie = name + '=; path=' + window.contextPath + '; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = name + ' = ;path = ' + window.contextPath + '; expires = Thu, 01 Jan 1970 00:00:01 GMT;';
     }
 
     /**

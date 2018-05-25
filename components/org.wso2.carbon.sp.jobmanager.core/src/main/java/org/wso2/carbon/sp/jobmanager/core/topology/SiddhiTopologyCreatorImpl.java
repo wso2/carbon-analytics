@@ -79,10 +79,11 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         String siddhiAppName = getSiddhiAppName();
         this.siddhiTopologyDataHolder = new SiddhiTopologyDataHolder(siddhiAppName, userDefinedSiddhiApp);
         String defaultExecGroupName = siddhiAppName + "-" + UUID.randomUUID();
-
+        boolean transportChannelCreationEnabled = isTransportChannelCreationEnabled(siddhiApp.getAnnotations());
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
 
             parallel = getExecGroupParallel(executionElement);
+
             execGroupName = getExecGroupName(executionElement, siddhiAppName, defaultExecGroupName);
             siddhiQueryGroup = createSiddhiQueryGroup(execGroupName, parallel);
 
@@ -135,13 +136,13 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         checkUserGivenSourceDistribution();
         assignPublishingStrategyOutputStream();
         return new SiddhiTopology(siddhiTopologyDataHolder.getSiddhiAppName(), new ArrayList<>
-                (siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values()));
+                (siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values()), transportChannelCreationEnabled);
     }
-
 
 
     /**
      * Get SiddhiAppName if given by the user unless a unique SiddhiAppName is returned
+     *
      * @return String SiddhiAppName
      */
     private String getSiddhiAppName() {
@@ -180,6 +181,20 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             return SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL;
         } else {
             return Integer.parseInt(element.getValue());
+        }
+    }
+
+    /**
+     * Get user preference on creating kafka topics from {@link org.wso2.carbon.sp.jobmanager.core.SiddhiAppCreator}.
+     * If no value is defined 'true' is returned
+     */
+    private boolean isTransportChannelCreationEnabled(List<Annotation> annotationList) {
+        Element element = AnnotationHelper.getAnnotationElement(
+                SiddhiTopologyCreatorConstants.TRANSPORT_CHANNEL_CREATION_IDENTIFIER, null, annotationList);
+        if (element == null) {
+            return true;
+        } else {
+            return Boolean.valueOf(element.getValue());
         }
     }
 
@@ -226,7 +241,8 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     }
 
     /**
-     *Get Map of {@link InputStreamDataHolder} corresponding to a {@link Query}
+     * Get Map of {@link InputStreamDataHolder} corresponding to a {@link Query}
+     *
      * @return Map of  StreamID and {@link InputStreamDataHolder}
      */
     private Map<String, InputStreamDataHolder> getInputStreamHolderInfo(Query executionElement,
@@ -280,6 +296,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
     /**
      * Get {@link OutputStreamDataHolder} for an OutputStream of a {@link Query}
+     *
      * @return {@link OutputStreamDataHolder}
      */
     private OutputStreamDataHolder getOutputStreamHolderInfo(String outputStreamId, int parallel,
@@ -303,6 +320,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     /**
      * Extract primary information corresponding to {@link InputStreamDataHolder} and {@link OutputStreamDataHolder}.
      * Information is retrieved and assigned to {@link StreamDataHolder} .
+     *
      * @return StreamDataHolder
      */
     private StreamDataHolder extractStreamHolderInfo(String streamId, int parallel, String groupName) {
@@ -407,6 +425,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
     /**
      * Transport strategy corresponding to an InputStream is calculated.
+     *
      * @return {@link TransportStrategy}
      */
     private TransportStrategy findStreamSubscriptionStrategy(boolean isQuery, String streamId, int parallel,
@@ -430,7 +449,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     }
 
     /**
-     *Checks whether a given Stream definition contains Sink or Source configurations.
+     * Checks whether a given Stream definition contains Sink or Source configurations.
      */
     private boolean isUserGivenTransport(String streamDefinition) {
         return streamDefinition.toLowerCase().contains(
@@ -481,7 +500,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * Checks if the Distributed SiddhiApp contains InputStreams with @Source Configurations which are used by multiple
      * execGroups.Such inputStreams will be added to a separate execGroup as a separate SiddhiApp including a completed
      * {@link SiddhiTopologyCreatorConstants#DEFAULT_PASSTROUGH_QUERY_TEMPLATE} passthrough Queries.
-     *
+     * <p>
      * Note: The passthrough query will create an internal Stream which will enrich awaiting excGroups.
      */
 
@@ -538,6 +557,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * If the Stream definition string contains {@link SiddhiTopologyCreatorConstants#SINK_IDENTIFIER} or
      * {@link SiddhiTopologyCreatorConstants#SOURCE_IDENTIFIER} ,meta info related to Sink/Source configuration is
      * removed.
+     *
      * @return Stream definition String after removing Sink/Source configuration
      */
     private String removeMetaInfoStream(String streamId, String streamDefinition, String identifier) {
@@ -558,6 +578,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
     /**
      * Creates a Separate execGroup for the passthrough queries.
+     *
      * @return {@link SiddhiQueryGroup} as the PassthroughQueryGroup
      */
     private SiddhiQueryGroup createPassthroughQueryGroup() {
@@ -567,7 +588,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     }
 
     /**
-     *passthroughSiddhiQueryGroup, SiddhiQueryGroup object is moved as the first element of the linkedHashMap of
+     * passthroughSiddhiQueryGroup, SiddhiQueryGroup object is moved as the first element of the linkedHashMap of
      * already created SiddhiQueryGroups.
      */
     private void addFirst(SiddhiQueryGroup passthroughSiddhiQueryGroup) {

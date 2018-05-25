@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.sp.jobmanager.core.internal;
 
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
@@ -48,6 +49,7 @@ public class ServiceDataHolder {
     private static ResourcePool resourcePool;
     private static DeploymentManagerImpl deploymentManager;
     private static boolean leader;
+    private static PermissionProvider permissionProvider;
     //newly added
     private static Map<String, String> userDefinedSiddhiApp;
 
@@ -149,5 +151,13 @@ public class ServiceDataHolder {
 
     public static void setUserDefinedSiddhiApp(Map<String, String> userDefinedSiddhiApp) {
         ServiceDataHolder.userDefinedSiddhiApp = userDefinedSiddhiApp;
+    }
+
+    public static PermissionProvider getPermissionProvider() {
+        return permissionProvider;
+    }
+
+    public static void setPermissionProvider(PermissionProvider permissionProvider) {
+        ServiceDataHolder.permissionProvider = permissionProvider;
     }
 }

@@ -17,12 +17,12 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 //App Components
-import DashboardUtils from "../utils/DashboardUtils";
-import ChartCard from "../common/ChartCard";
+import DashboardUtils from '../utils/DashboardUtils';
+import ChartCard from '../common/ChartCard';
 // Material UI
-import {Card, CardHeader, CardMedia, Divider} from "material-ui";
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
 
 const metadata = {names: ['Time', 'Open Count', 'Max Count'], types: ['time', 'linear', 'linear']};
 
@@ -44,7 +44,7 @@ export default class FileDescriptor extends React.Component {
         this.setState({
             jvmOsFileDescriptorOpenCount: nextprops.data[0],
             jvmOsFileDescriptorMaxCount: nextprops.data[1],
-            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length > 10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -56,21 +56,22 @@ export default class FileDescriptor extends React.Component {
             width: 700,
             height: 200,
             style: {
-                tickLabelColor:'#f2f2f2',
+                tickLabelColor: '#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 10,
+                legendTitleSize: 12
             },
-            legend:true,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            legend: true,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             interactiveLegend: true,
             gridColor: '#f2f2f2',
-            xAxisTickCount:this.state.tickCount
+            xAxisTickCount: this.state.tickCount
         };
-        if(this.state.jvmOsFileDescriptorOpenCount.length === 0 && this.state.jvmOsFileDescriptorMaxCount.length === 0){
-            return(
+        if (this.state.jvmOsFileDescriptorOpenCount.length === 0 &&
+            this.state.jvmOsFileDescriptorMaxCount.length === 0) {
+            return (
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
@@ -86,7 +87,8 @@ export default class FileDescriptor extends React.Component {
                 </div>
             );
         }
-        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmOsFileDescriptorOpenCount, this.state.jvmOsFileDescriptorMaxCount);
+        let intY = DashboardUtils
+            .initCombinedYDomain(this.state.jvmOsFileDescriptorOpenCount, this.state.jvmOsFileDescriptorMaxCount);
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={DashboardUtils.getCombinedChartList(this.state.jvmOsFileDescriptorOpenCount,

@@ -57,8 +57,7 @@ public class RDBMSServiceImpl {
         String datasourceName = ServiceDataHolder.getDeploymentConfig().getDatasource();
         if (datasourceName == null) {
             throw new ResourceManagerException("No datasource specified to be used with RDBMS based resource pool " +
-                                                       "management. Please check configurations under "
-                                                       + ResourceManagerConstants.DEPLOYMENT_CONFIG_NS);
+                    "management. Please check configurations under " + ResourceManagerConstants.DEPLOYMENT_CONFIG_NS);
         }
         DataSourceService dataSourceService = ServiceDataHolder.getDataSourceService();
         try {
@@ -106,21 +105,21 @@ public class RDBMSServiceImpl {
                 byte[] resourceMappingAsBytes = byteArrayOutputStream.toByteArray();
                 // TODO: 10/31/17 Instead of REPLACE, use DELETE and INSERT
                 preparedStatement = connection.prepareStatement(ResourceManagerConstants
-                                                                        .PS_REPLACE_RESOURCE_MAPPING_ROW);
+                        .PS_REPLACE_RESOURCE_MAPPING_ROW);
                 preparedStatement.setString(1, resourcePool.getGroupId());
                 preparedStatement.setBinaryStream(2, new ByteArrayInputStream(resourceMappingAsBytes));
                 preparedStatement.executeUpdate();
                 connection.commit();
                 if (log.isDebugEnabled()) {
                     log.debug(ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING + " " +
-                                      resourcePool.getGroupId() + " executed successfully");
+                            resourcePool.getGroupId() + " executed successfully");
                 }
             } catch (SQLException e) {
                 rollback(connection, ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING);
                 throw new ResourceManagerException("Error occurred while " +
-                                                           ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING
-                                                           + ". Group ID" +
-                                                           resourcePool.getGroupId(), e);
+                        ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING
+                        + ". Group ID" +
+                        resourcePool.getGroupId(), e);
             } catch (IOException e) {
                 throw new ResourceManagerException(e);
             } finally {
@@ -156,7 +155,7 @@ public class RDBMSServiceImpl {
             connection.commit();
         } catch (SQLException | ClassNotFoundException | IOException e) {
             throw new ResourceManagerException("Error occurred while " +
-                                                       ResourceManagerConstants.TASK_GET_RESOURCE_MAPPING, e);
+                    ResourceManagerConstants.TASK_GET_RESOURCE_MAPPING, e);
         } finally {
             close(resultSet, ResourceManagerConstants.TASK_GET_RESOURCE_MAPPING);
             close(preparedStatement, ResourceManagerConstants.TASK_GET_RESOURCE_MAPPING);

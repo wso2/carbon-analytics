@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Details about Resource Pool
+ * Details about Resource Pool.
  */
 public class ResourcePool implements Serializable {
     private static final Logger LOG = Logger.getLogger(ResourcePool.class);
@@ -160,7 +160,7 @@ public class ResourcePool implements Serializable {
      */
     public Map<ResourceNode, List<SiddhiAppHolder>> getNodeAppMapping() {
         return siddhiAppHoldersMap.values().stream().flatMap(List::stream).filter(siddhiAppHolder
-                                                                                          -> siddhiAppHolder
+                -> siddhiAppHolder
                 .getDeployedNode() != null)
                 .collect(Collectors.groupingBy(SiddhiAppHolder::getDeployedNode));
     }

@@ -48,4 +48,4 @@ const ComponentType = {
     SOURCE_MAPPERS: 'SourceMappers',
 };
 
-export { HttpStatus, MediaType, ComponentType };
+export {HttpStatus, MediaType, ComponentType};
