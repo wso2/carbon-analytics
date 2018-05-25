@@ -50,11 +50,11 @@ public class EdgesGenerator {
         List<Edge> edges = new ArrayList<>();
         for (QueryConfig query : siddhiAppConfig.getWindowFilterProjectionQueryList()) {
             // Edge towards Query element
-//            edges.add(
-//                    generateEdge(
-//                            getElementWithStreamName(
-//                                    ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom()).getId(),
-//                            query.getId())); // TODO implement
+            edges.add(
+                    generateEdge(
+                            getElementWithStreamName(
+                                    ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom()).getId(),
+                            query.getId())); // TODO implement
             // Edge from Query element
             edges.add(
                     generateEdge(
