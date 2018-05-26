@@ -40,7 +40,8 @@ import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
-// CSS
+// Styles
+import Styles from '../../../style/Styles';
 import '../../../index.css';
 
 /**
@@ -50,13 +51,11 @@ const styles = {
     container: {
         maxWidth: 1020,
     },
-    paper: {
-        maxWidth: 400,
-        paddingTop: 30,
-        paddingBottom: 30,
-    },
-    snackbar: {
-        direction: 'up',
+    floatingButton: {
+        position: 'fixed',
+        right: '20%',
+        zIndex: 9,
+        top: '10%',
     },
 };
 
@@ -221,7 +220,7 @@ export default class LandingPage extends Component {
     displayGetStarted() {
         if (this.state.permissions === BusinessRulesConstants.USER_PERMISSIONS.MANAGER) {
             return (
-                <Paper style={styles.paper}>
+                <Paper style={Styles.messageContainer}>
                     <Typography type="title">
                         No business rules found
                     </Typography>
@@ -238,7 +237,7 @@ export default class LandingPage extends Component {
             );
         } else {
             return (
-                <Paper style={styles.paper}>
+                <Paper style={Styles.messageContainer}>
                     <Typography type="title">
                         No business rules found
                     </Typography>
@@ -299,11 +298,13 @@ export default class LandingPage extends Component {
      */
     displayCreateFloatButton() {
         return (
-            <Link to={`${appContext}/businessRuleCreator`} style={{ textDecoration: 'none' }}>
-                <Button fab color="primary" style={{ float: 'right' }} aria-label="Add">
-                    <AddIcon />
-                </Button>
-            </Link>
+            <div style={styles.floatingButton}>
+                <Link to={`${appContext}/businessRuleCreator`} style={{ textDecoration: 'none' }}>
+                    <Button fab color="primary" style={{ float: 'right' }} aria-label="Add">
+                        <AddIcon />
+                    </Button>
+                </Link>
+            </div>
         );
     }
 
@@ -320,7 +321,7 @@ export default class LandingPage extends Component {
                         autoHideDuration={3500}
                         open={this.state.displaySnackbar}
                         onRequestClose={() => this.toggleSnackbar()}
-                        transition={<Slide direction={styles.snackbar.direction} />}
+                        transition={<Slide direction={Styles.snackbar.direction} />}
                         SnackbarContentProps={{
                             'aria-describedby': 'snackbarMessage',
                         }}

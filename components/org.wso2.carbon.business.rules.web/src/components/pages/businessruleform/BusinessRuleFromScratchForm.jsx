@@ -43,39 +43,9 @@ import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
-// CSS
+// Styles
+import Styles from '../../../style/Styles';
 import '../../../index.css';
-
-/**
- * Styles related to this component
- */
-const styles = {
-    root: {
-        width: '100%',
-        maxWidth: 360,
-        position: 'relative',
-        overflow: 'auto',
-        maxHeight: 300,
-    },
-    listSection: {
-        background: 'inherit',
-    },
-    paperContainer: {
-        margin: 40,
-        marginTop: 15,
-        marginBottom: 15,
-    },
-    formRoot: {
-        flexGrow: 1,
-        marginTop: 30,
-    },
-    formPaper: {
-        padding: 50,
-    },
-    snackbar: {
-        direction: 'up',
-    },
-};
 
 /**
  * App context
@@ -834,7 +804,6 @@ export default class BusinessRuleFromScratchForm extends Component {
                 getPropertyComponents={(propertiesType, formMode) =>
                     this.getPropertyComponents(propertiesType, formMode)}
                 toggleExpansion={() => this.toggleInputComponentExpansion()}
-                style={styles}
             />
         );
     }
@@ -861,7 +830,6 @@ export default class BusinessRuleFromScratchForm extends Component {
                     this.getFieldNamesAndTypes(streamDefinition)}
                 getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
                 ruleComponents={this.state.businessRuleProperties.ruleComponents}
-                style={styles}
             />
         );
     }
@@ -901,7 +869,6 @@ export default class BusinessRuleFromScratchForm extends Component {
                 businessRuleProperties={this.state.businessRuleProperties}
                 isExpanded={this.state.isOutputComponentExpanded}
                 toggleExpansion={() => this.toggleOutputComponentExpansion()}
-                style={styles}
             />
         );
     }
@@ -915,9 +882,9 @@ export default class BusinessRuleFromScratchForm extends Component {
                 return (
                     <div>
                         {this.displaySnackbar()}
-                        <Grid container spacing={24} style={styles.formRoot} justify="center">
+                        <Grid container spacing={24} style={Styles.businessRuleForm.root} justify="center">
                             <Grid item xs={12} sm={7}>
-                                <Paper style={styles.formPaper}>
+                                <Paper style={Styles.businessRuleForm.paper}>
                                     <center>
                                         <Typography type="headline">
                                             {this.state.selectedTemplateGroup.name}
@@ -978,7 +945,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                 autoHideDuration={3500}
                 open={this.state.displaySnackbar}
                 onRequestClose={() => this.toggleSnackbar()}
-                transition={<Slide direction={styles.snackbar.direction} />}
+                transition={<Slide direction={Styles.snackbar.direction} />}
                 SnackbarContentProps={{
                     'aria-describedby': 'snackbarMessage',
                 }}

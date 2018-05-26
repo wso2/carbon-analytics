@@ -44,24 +44,9 @@ import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
-// CSS
+// Styles
+import Styles from '../../../style/Styles';
 import '../../../index.css';
-
-/**
- * Styles related to this component
- */
-const styles = {
-    formRoot: {
-        flexGrow: 1,
-        marginTop: 30,
-    },
-    formPaper: {
-        padding: 50,
-    },
-    snackbar: {
-        direction: 'up',
-    },
-};
 
 /**
  * App context
@@ -280,7 +265,7 @@ export default class BusinessRuleFromTemplateForm extends Component {
                 autoHideDuration={3500}
                 open={this.state.displaySnackbar}
                 onRequestClose={() => this.toggleSnackbar()}
-                transition={<Slide direction={styles.snackbar.direction} />}
+                transition={<Slide direction={Styles.snackbar.direction} />}
                 SnackbarContentProps={{
                     'aria-describedby': 'snackbarMessage',
                 }}
@@ -579,9 +564,9 @@ export default class BusinessRuleFromTemplateForm extends Component {
                 return (
                     <div>
                         {this.displaySnackbar()}
-                        <Grid container spacing={24} style={styles.formRoot} justify="center">
+                        <Grid container spacing={24} style={Styles.businessRuleForm.root} justify="center">
                             <Grid item xs={12} sm={6}>
-                                <Paper style={styles.formPaper}>
+                                <Paper style={Styles.businessRuleForm.paper}>
                                     <center>
                                         <Typography type="headline">
                                             {this.state.selectedTemplateGroup.name}

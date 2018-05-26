@@ -21,19 +21,9 @@ import React, { Component } from 'react';
 import { CircularProgress } from 'material-ui/Progress';
 import { Typography } from 'material-ui';
 import Paper from 'material-ui/Paper';
-// CSS
+// Styles
+import Styles from '../../style/Styles';
 import '../../index.css';
-
-/**
- * Styles related to this component
- */
-const styles = {
-    paper: {
-        maxWidth: 400,
-        paddingTop: 30,
-        paddingBottom: 30,
-    },
-};
 
 /**
  * Represents the progress display, shown while loading a page
@@ -42,7 +32,7 @@ export default class ProgressDisplay extends Component {
     render() {
         return (
             <center>
-                <Paper style={styles.paper}>
+                <Paper style={Styles.messageContainer}>
                     <CircularProgress size={50} />
                     <Typography type="subheading">
                         Please wait

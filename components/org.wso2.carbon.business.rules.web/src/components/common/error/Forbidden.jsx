@@ -20,19 +20,9 @@ import React from 'react';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
-// CSS
+// Styles
+import Styles from '../../../style/Styles';
 import '../../../index.css';
-
-/**
- * Styles related to this component
- */
-const styles = {
-    paper: {
-        maxWidth: 400,
-        paddingTop: 30,
-        paddingBottom: 30,
-    },
-};
 
 /**
  * Represents a Forbidden Error message display
@@ -40,7 +30,7 @@ const styles = {
 class Forbidden extends React.Component {
     render() {
         return (
-            <Paper style={styles.paper}>
+            <Paper style={Styles.messageContainer}>
                 <Typography type="title">
                     Forbidden
                 </Typography>

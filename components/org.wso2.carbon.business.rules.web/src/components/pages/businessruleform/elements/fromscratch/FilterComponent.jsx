@@ -35,7 +35,8 @@ import BusinessRulesUtilityFunctions from '../../../../../utils/BusinessRulesUti
 // App Constants
 import BusinessRulesConstants from '../../../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../../../constants/BusinessRulesMessages';
-// CSS
+// Styles
+import Styles from '../../../../../style/Styles';
 import '../../../../../index.css';
 
 /**
@@ -285,9 +286,11 @@ export default class FilterComponent extends Component {
             return (
                 <div>
                     <br />
-                    <Typography type="subheading">
-                        No filter has been given
-                    </Typography>
+                    <center>
+                        <Typography type="subheading">
+                            No filter has been given
+                        </Typography>
+                    </center>
                     <br />
                 </div>
             );
@@ -311,7 +314,11 @@ export default class FilterComponent extends Component {
             <div>
                 <AppBar position="static" color="default">
                     <Toolbar>
-                        <Typography type="subheading" style={this.props.isErroneous ? styles.errorText : {}}>
+                        <Typography
+                            type="subheading"
+                            style={this.props.isErroneous ?
+                                Styles.businessRuleForm.fromScratch.component.erroneousTitle : {}}
+                        >
                             Filters
                         </Typography>
                         {this.displayExpandButton()}
@@ -319,7 +326,7 @@ export default class FilterComponent extends Component {
                 </AppBar>
                 <Paper>
                     <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
-                        <div style={this.props.style.paperContainer}>
+                        <div style={Styles.businessRuleForm.fromScratch.component.contentContainer}>
                             {this.displayContent()}
                         </div>
                     </Collapse>

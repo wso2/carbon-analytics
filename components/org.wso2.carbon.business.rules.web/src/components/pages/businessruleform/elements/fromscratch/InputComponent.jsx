@@ -37,15 +37,23 @@ import BusinessRulesUtilityFunctions from '../../../../../utils/BusinessRulesUti
 // App Constants
 import BusinessRulesConstants from '../../../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../../../constants/BusinessRulesMessages';
-// CSS
+// Styles
+import Styles from '../../../../../style/Styles';
 import '../../../../../index.css';
 
 /**
  * Styles related to this component
  */
 const styles = {
-    errorText: {
-        color: '#ff1744',
+    root: {
+        width: '100%',
+        maxWidth: 360,
+        position: 'relative',
+        overflow: 'auto',
+        maxHeight: 300,
+    },
+    listSection: {
+        background: 'inherit',
     },
 };
 
@@ -116,9 +124,9 @@ export default class InputComponent extends Component {
                             Exposed stream fields
                         </Typography>
                         <br />
-                        {<List subheader style={this.props.style.root}>
+                        {<List subheader style={styles.root}>
                             {Object.keys(inputStreamFields).map(field => (
-                                <div key={field} style={this.props.style.listSection}>
+                                <div key={field} style={styles.listSection}>
                                     <ListItem button key={field}>
                                         <ListItemText primary={field} secondary={inputStreamFields[field]} />
                                     </ListItem>
@@ -137,7 +145,11 @@ export default class InputComponent extends Component {
             <div>
                 <AppBar position="static" color="default">
                     <Toolbar>
-                        <Typography type="subheading" style={this.props.isErroneous ? styles.errorText : {}}>
+                        <Typography
+                            type="subheading"
+                            style={this.props.isErroneous ?
+                                Styles.businessRuleForm.fromScratch.component.erroneousTitle : {}}
+                        >
                             Input
                         </Typography>
                         <IconButton
@@ -149,7 +161,7 @@ export default class InputComponent extends Component {
                 </AppBar>
                 <Paper>
                     <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
-                        <div style={this.props.style.paperContainer}>
+                        <div style={Styles.businessRuleForm.fromScratch.component.contentContainer}>
                             <br />
                             <center>
                                 {this.displayRuleTemplateSelection()}

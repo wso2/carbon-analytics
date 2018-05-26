@@ -25,7 +25,8 @@ import Header from '../../common/Header';
 import CreateButton from './ModeButton';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
-// CSS
+// Styles
+import Styles from '../../../style/Styles';
 import '../../../index.css';
 
 /**
@@ -54,9 +55,9 @@ export default class ModeSelector extends Component {
                     </Typography>
                     <br />
                     <br />
-                    <Grid container style={styles.root}>
+                    <Grid container style={Styles.grid.root}>
                         <Grid item xs={12}>
-                            <Grid container justify="center" spacing={styles.spacing}>
+                            <Grid container justify="center" spacing={40}>
                                 <Grid item>
                                     <CreateButton
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}

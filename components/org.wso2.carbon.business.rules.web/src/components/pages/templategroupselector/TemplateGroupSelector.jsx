@@ -33,18 +33,9 @@ import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFu
 import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
-// CSS
+// Styles
+import Styles from '../../../style/Styles';
 import '../../../index.css';
-
-/**
- * Styles related to this component
- */
-const styles = {
-    root: {
-        flexGrow: 1,
-    },
-    spacing: '0',
-};
 
 /**
  * App context
@@ -185,9 +176,9 @@ export default class TemplateGroupSelector extends Component {
                             Select a Template Group
                         </Typography>
                         <br />
-                        <Grid container style={styles.root}>
+                        <Grid container style={Styles.grid.root}>
                             <Grid item xs={12}>
-                                <Grid container justify="center" spacing={Number(styles.spacing)}>
+                                <Grid container justify="center" spacing={0}>
                                     {(this.state.templateGroups.length > 0) ?
                                         (templateGroups) : (this.displayNoTemplateGroupsFound())}
                                 </Grid>
