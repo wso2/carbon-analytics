@@ -19,7 +19,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 // Material UI Components
-import Button from 'material-ui/Button';
 import TextField from 'material-ui/TextField';
 import { Typography } from 'material-ui';
 import Grid from 'material-ui/Grid';
@@ -31,6 +30,7 @@ import Property from './elements/Property';
 import InputComponent from './elements/fromscratch/InputComponent';
 import OutputComponent from './elements/fromscratch/OutputComponent';
 import FilterComponent from './elements/fromscratch/FilterComponent';
+import SubmitButtonGroup from './elements/SubmitButtonGroup';
 import Header from '../../common/Header';
 import ProgressDisplay from '../../common/ProgressDisplay';
 import ErrorDisplay from '../../common/error/ErrorDisplay';
@@ -968,35 +968,17 @@ export default class BusinessRuleFromScratchForm extends Component {
                 !BusinessRulesUtilityFunctions.isEmpty(this.state.selectedInputRuleTemplate) &&
                 !BusinessRulesUtilityFunctions.isEmpty(this.state.selectedOutputRuleTemplate)) {
                 return (
-                    <div>
-                        <Button
-                            raised
-                            color="default"
-                            style={{ marginRight: 10 }}
-                            onClick={() => this.submitBusinessRule(
-                                false, this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT)}
-                        >
-                            Save
-                        </Button>
-                        <Button
-                            raised
-                            color="primary"
-                            style={{ marginRight: 10 }}
-                            onClick={() => this.submitBusinessRule(
-                                true, this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT)}
-                        >
-                            Save & Deploy
-                        </Button>
-                        <Button
-                            color="default"
-                            style={{ marginRight: 10 }}
-                            onClick={() => {
-                                window.location.href = appContext + '/businessRulesManager';
-                            }}
-                        >
-                            Cancel
-                        </Button>
-                    </div>);
+                    <SubmitButtonGroup
+                        onSubmit={
+                            shouldDeploy =>
+                                this.submitBusinessRule(
+                                    shouldDeploy,
+                                    this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT)}
+                        onCancel={() => {
+                            window.location.href = appContext + '/businessRulesManager';
+                        }}
+                    />
+                );
             }
         }
         return null;
