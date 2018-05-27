@@ -90,11 +90,11 @@ export default class BusinessRuleFromScratchForm extends Component {
                 outputComponent: false,
             },
 
-            // Snackbar
+            // To display the Snackbar
             displaySnackbar: false,
             snackbarMessage: '',
 
-            // To show Progress or Unauthorized message
+            // To show Progress or error message
             hasLoaded: false,
             errorCode: BusinessRulesConstants.ERROR_CODES.UNKNOWN,
         };

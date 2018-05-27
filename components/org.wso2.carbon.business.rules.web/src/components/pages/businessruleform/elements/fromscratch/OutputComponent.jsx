@@ -219,5 +219,4 @@ OutputComponent.propTypes = {
     toggleExpansion: PropTypes.func.isRequired,
     isExpanded: PropTypes.bool.isRequired,
     isErroneous: PropTypes.bool.isRequired,
-    style: PropTypes.object.isRequired,
 };

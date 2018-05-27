@@ -68,15 +68,15 @@ export default class BusinessRuleFromTemplateForm extends Component {
             selectedTemplateGroup: {},
             selectedRuleTemplate: {},
             businessRuleProperties: {},
+
+            // For form validation purpose
             showSubmitButtons: true,
+            isFieldErrorStatesDirty: false,
+            fieldErrorStates: {},
 
             // To display the Snackbar
             displaySnackbar: false,
             snackbarMessage: '',
-
-            // To capture and display errors in form fields
-            isFieldErrorStatesDirty: false,
-            fieldErrorStates: {},
 
             // To show Progress or error message
             hasLoaded: false,

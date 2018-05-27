@@ -333,7 +333,10 @@ export default class FilterComponent extends Component {
 }
 
 FilterComponent.propTypes = {
-    ruleComponents: PropTypes.object.isRequired,
+    ruleComponents: PropTypes.shape({
+        filterRules: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)),
+        ruleLogic: PropTypes.string,
+    }).isRequired,
     onUpdate: PropTypes.func.isRequired,
     getFieldNamesAndTypes: PropTypes.func.isRequired,
     selectedInputRuleTemplate: PropTypes.object.isRequired,
@@ -343,7 +346,6 @@ FilterComponent.propTypes = {
         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW,
     ]).isRequired,
     getFieldNames: PropTypes.func.isRequired,
-    style: PropTypes.object.isRequired,
     errorStates: PropTypes.object.isRequired,
     toggleExpansion: PropTypes.func.isRequired,
     isErroneous: PropTypes.bool.isRequired,

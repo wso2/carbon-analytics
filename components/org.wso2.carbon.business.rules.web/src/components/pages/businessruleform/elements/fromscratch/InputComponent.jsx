@@ -201,7 +201,6 @@ InputComponent.propTypes = {
     inputRuleTemplates: PropTypes.array.isRequired,
     getPropertyComponents: PropTypes.func.isRequired,
     getFieldNamesAndTypes: PropTypes.func.isRequired,
-    style: PropTypes.object.isRequired,
     isErroneous: PropTypes.bool.isRequired,
     toggleExpansion: PropTypes.func.isRequired,
     isExpanded: PropTypes.bool.isRequired,
