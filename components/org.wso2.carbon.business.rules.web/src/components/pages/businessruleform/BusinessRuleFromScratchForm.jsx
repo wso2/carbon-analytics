@@ -78,19 +78,21 @@ export default class BusinessRuleFromScratchForm extends Component {
                 outputMappings: {},
             },
 
-            // Expanded states of components
-            isInputComponentExpanded: false,
-            isFilterComponentExpanded: false,
-            isOutputComponentExpanded: false,
-
-            // Snackbar
-            displaySnackbar: false,
-            snackbarMessage: '',
-
             // For form validation purpose
             showSubmitButtons: true,
             isFieldErrorStatesDirty: false,
             fieldErrorStates: {},
+
+            // Expanded states of components
+            expandedStates: {
+                inputComponent: false,
+                filterComponent: false,
+                outputComponent: false,
+            },
+
+            // Snackbar
+            displaySnackbar: false,
+            snackbarMessage: '',
 
             // To show Progress or Unauthorized message
             hasLoaded: false,
@@ -100,13 +102,9 @@ export default class BusinessRuleFromScratchForm extends Component {
 
     componentDidMount() {
         if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE) {
-            // 'Create' mode
-            const templateGroupUUID = this.props.match.params.templateGroupUUID;
-            this.loadNewForm(templateGroupUUID);
+            this.loadNewForm(this.props.match.params.templateGroupUUID);
         } else {
-            // 'Edit' or 'View' mode
-            const businessRuleUUID = this.props.match.params.businessRuleUUID;
-            this.loadExistingForm(businessRuleUUID);
+            this.loadExistingForm(this.props.match.params.businessRuleUUID);
         }
     }
 
@@ -546,6 +544,35 @@ export default class BusinessRuleFromScratchForm extends Component {
     }
 
     /**
+     * Handles error, occurred when submitting the business rule
+     * @param {Object} error        Error response
+     */
+    handleSubmissionError(error) {
+        this.setState({
+            isFieldErrorStatesDirty: true,
+        });
+        // Check for script execution error
+        if (error.response) {
+            if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                this.setState({
+                    showSubmitButtons: true,
+                });
+                this.toggleSnackbar(error.response.data[1]);
+            } else {
+                this.toggleSnackbar('Failed to create the Business Rule');
+                setTimeout(() => {
+                    window.location.href = appContext + '/businessRulesManager';
+                }, 3000);
+            }
+        } else {
+            this.toggleSnackbar('Failed to create the Business Rule');
+            setTimeout(() => {
+                window.location.href = appContext + '/businessRulesManager';
+            }, 3000);
+        }
+    }
+
+    /**
      * Submits the entered properties of the business rule for saving
      * @param {boolean} shouldDeploy        Whether to deploy the business rule or not
      * @param {boolean} isUpdate            Whether to update or create the business rule
@@ -578,28 +605,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                         }, 3000);
                     })
                     .catch((error) => {
-                        this.setState({
-                            isFieldErrorStatesDirty: true,
-                        });
-                        // Check for script execution error
-                        if (error.response) {
-                            if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
-                                this.setState({
-                                    showSubmitButtons: true,
-                                });
-                                this.toggleSnackbar(error.response.data[1]);
-                            } else {
-                                this.toggleSnackbar('Failed to create the Business Rule');
-                                setTimeout(() => {
-                                    window.location.href = appContext + '/businessRulesManager';
-                                }, 3000);
-                            }
-                        } else {
-                            this.toggleSnackbar('Failed to create the Business Rule');
-                            setTimeout(() => {
-                                window.location.href = appContext + '/businessRulesManager';
-                            }, 3000);
-                        }
+                        this.handleSubmissionError(error);
                     });
             }
         } catch (error) {
@@ -791,7 +797,7 @@ export default class BusinessRuleFromScratchForm extends Component {
         return (
             <InputComponent
                 mode={this.state.formMode}
-                isExpanded={this.state.isInputComponentExpanded}
+                isExpanded={this.state.expandedStates.inputComponent}
                 isErroneous={
                     this.state.fieldErrorStates.properties ?
                         this.state.fieldErrorStates.properties.inputComponent : false}
@@ -803,7 +809,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                 handleInputRuleTemplateSelected={e => this.handleInputRuleTemplateSelected(e)}
                 getPropertyComponents={(propertiesType, formMode) =>
                     this.getPropertyComponents(propertiesType, formMode)}
-                toggleExpansion={() => this.toggleInputComponentExpansion()}
+                toggleExpansion={() => this.toggleExpansion('inputComponent')}
             />
         );
     }
@@ -815,21 +821,21 @@ export default class BusinessRuleFromScratchForm extends Component {
     displayFilterComponent() {
         return (
             <FilterComponent
-                isExpanded={this.state.isFilterComponentExpanded}
+                mode={this.state.formMode}
+                isExpanded={this.state.expandedStates.outputComponent}
                 isErroneous={
                     this.state.fieldErrorStates.properties ?
                         this.state.fieldErrorStates.properties.filterComponent : false}
+                selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
                 errorStates={
                     this.state.fieldErrorStates.properties ?
                         this.state.fieldErrorStates.properties.ruleComponents : {}}
-                toggleExpansion={() => this.toggleFilterComponentExpansion()}
+                ruleComponents={this.state.businessRuleProperties.ruleComponents}
+                toggleExpansion={() => this.toggleExpansion('filterComponent')}
                 onUpdate={ruleComponents => this.updateRuleComponents(ruleComponents)}
-                formMode={this.state.formMode}
-                selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
                 getFieldNamesAndTypes={streamDefinition =>
                     this.getFieldNamesAndTypes(streamDefinition)}
                 getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
-                ruleComponents={this.state.businessRuleProperties.ruleComponents}
             />
         );
     }
@@ -850,7 +856,6 @@ export default class BusinessRuleFromScratchForm extends Component {
                         this.state.fieldErrorStates.properties.outputMappings : {}
                 }
                 outputRuleTemplates={this.state.outputRuleTemplates}
-                getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
                 selectedOutputRuleTemplate={this.state.selectedOutputRuleTemplate}
                 selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
                 inputStreamFields={
@@ -860,6 +865,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                             this.state.selectedInputRuleTemplate.templates[0]
                                 .exposedStreamDefinition) : []
                 }
+                getFieldNames={streamDefinition => this.getFieldNames(streamDefinition)}
                 handleOutputRuleTemplateSelected={e =>
                     this.handleOutputRuleTemplateSelected(e)}
                 handleOutputMappingChange={(value, fieldName) =>
@@ -867,8 +873,48 @@ export default class BusinessRuleFromScratchForm extends Component {
                 getPropertyComponents={(propertiesType, formMode) =>
                     this.getPropertyComponents(propertiesType, formMode)}
                 businessRuleProperties={this.state.businessRuleProperties}
-                isExpanded={this.state.isOutputComponentExpanded}
-                toggleExpansion={() => this.toggleOutputComponentExpansion()}
+                isExpanded={this.state.expandedStates.outputComponent}
+                toggleExpansion={() => this.toggleExpansion('outputComponent')}
+            />
+        );
+    }
+
+    /**
+     * Displays the title of the form
+     * @returns {HTMLElement}       Title of the form
+     */
+    displayTitle() {
+        return (
+            <div>
+                <Typography type="headline">
+                    {this.state.selectedTemplateGroup.name}
+                </Typography>
+                <Typography type="subheading">
+                    {this.state.selectedTemplateGroup.description || ''}
+                </Typography>
+            </div>
+        );
+    }
+
+    /**
+     * Returns Input field to enter the business rule's name
+     * @returns {Component}     TextField Component
+     */
+    displayBusinessRuleName() {
+        return (
+            <TextField
+                id="businessRuleName"
+                name="businessRuleName"
+                label={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_NAME}
+                placeholder={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_DESCRIPTION}
+                value={this.state.businessRuleName}
+                onChange={e => this.handleBusinessRuleNameChange(e)}
+                disabled={(this.state.formMode !==
+                    BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE)}
+                error={this.state.fieldErrorStates.businessRuleName}
+                required
+                fullWidth
+                margin="normal"
             />
         );
     }
@@ -886,29 +932,9 @@ export default class BusinessRuleFromScratchForm extends Component {
                             <Grid item xs={12} sm={7}>
                                 <Paper style={Styles.businessRuleForm.paper}>
                                     <center>
-                                        <Typography type="headline">
-                                            {this.state.selectedTemplateGroup.name}
-                                        </Typography>
-                                        <Typography type="subheading">
-                                            {this.state.selectedTemplateGroup.description ?
-                                                this.state.selectedTemplateGroup.description : ''}
-                                        </Typography>
+                                        {this.displayTitle()}
                                         <br />
-                                        {/* Business Rule Name */}
-                                        <TextField
-                                            id="businessRuleName"
-                                            name="businessRuleName"
-                                            label={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_NAME}
-                                            placeholder={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_DESCRIPTION}
-                                            value={this.state.businessRuleName}
-                                            onChange={e => this.handleBusinessRuleNameChange(e)}
-                                            disabled={(this.state.formMode !==
-                                                BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE)}
-                                            error={this.state.fieldErrorStates.businessRuleName}
-                                            required
-                                            fullWidth
-                                            margin="normal"
-                                        />
+                                        {this.displayBusinessRuleName()}
                                     </center>
                                     <br />
                                     <br />
@@ -1002,24 +1028,13 @@ export default class BusinessRuleFromScratchForm extends Component {
     }
 
     /**
-     * Toggles expansion of the Input Component
+     * Toggles expansion of the given component
+     * @param {String} componentKey     Component key from which, the expansion state is denoted
      */
-    toggleInputComponentExpansion() {
-        this.setState({ isInputComponentExpanded: !this.state.isInputComponentExpanded });
-    }
-
-    /**
-     * Toggles expansion of the Filter Component
-     */
-    toggleFilterComponentExpansion() {
-        this.setState({ isFilterComponentExpanded: !this.state.isFilterComponentExpanded });
-    }
-
-    /**
-     * Toggles expansion of the Output Component
-     */
-    toggleOutputComponentExpansion() {
-        this.setState({ isOutputComponentExpanded: !this.state.isOutputComponentExpanded });
+    toggleExpansion(componentKey) {
+        const state = this.state;
+        state.expandedStates[componentKey] = !state.expandedStates[componentKey];
+        this.setState(state);
     }
 
     render() {

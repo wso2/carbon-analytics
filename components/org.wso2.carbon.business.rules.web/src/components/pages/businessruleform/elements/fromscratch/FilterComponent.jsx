@@ -43,9 +43,6 @@ import '../../../../../index.css';
  * Styles related to this component
  */
 const styles = {
-    errorText: {
-        color: '#ff1744', // TODO move these kind of common styles to an object
-    },
     addFilterRuleButton: {
         backgroundColor: '#EF6C00',
         color: 'white',
@@ -200,7 +197,7 @@ export default class FilterComponent extends Component {
                         {this.props.ruleComponents.filterRules.map((filterRule, index) =>
                             (<FilterRule
                                 key={index}
-                                disabled={this.props.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
                                 filterRuleIndex={index}
                                 filterRule={filterRule}
                                 exposedStreamDefinition={
@@ -228,7 +225,7 @@ export default class FilterComponent extends Component {
      * @returns {Component}     Add Filter button
      */
     displayAddFilterButton() {
-        if (this.props.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW) {
+        if (this.props.mode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW) {
             return (
                 <IconButton
                     color="primary"
@@ -259,7 +256,7 @@ export default class FilterComponent extends Component {
                     error={
                         !BusinessRulesUtilityFunctions.isEmpty(this.props.errorStates) ?
                             this.props.errorStates.ruleLogic : false}
-                    disabled={this.props.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                    disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
                     fullWidth
                 />);
         }
@@ -281,7 +278,7 @@ export default class FilterComponent extends Component {
     }
 
     displayContent() {
-        if (this.props.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW &&
+        if (this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW &&
             this.props.ruleComponents.filterRules.length === 0 && this.props.ruleComponents.ruleLogic === '') {
             return (
                 <div>
@@ -340,7 +337,7 @@ FilterComponent.propTypes = {
     onUpdate: PropTypes.func.isRequired,
     getFieldNamesAndTypes: PropTypes.func.isRequired,
     selectedInputRuleTemplate: PropTypes.object.isRequired,
-    formMode: PropTypes.oneOf([
+    mode: PropTypes.oneOf([
         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE,
         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT,
         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW,

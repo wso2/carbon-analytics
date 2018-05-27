@@ -86,112 +86,9 @@ export default class BusinessRuleFromTemplateForm extends Component {
 
     componentDidMount() {
         if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE) {
-            // 'Create' mode
-            const templateGroupUUID = this.props.match.params.templateGroupUUID;
-            new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-                .getTemplateGroup(templateGroupUUID)
-                .then((templateGroupResponse) => {
-                    const templateGroup = templateGroupResponse.data[2];
-                    new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-                        .getRuleTemplates(templateGroupUUID)
-                        .then((ruleTemplatesResponse) => {
-                            // Filter 'template' type rule templates
-                            const templateRuleTemplates = [];
-                            for (const ruleTemplate of ruleTemplatesResponse.data[2]) {
-                                if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) {
-                                    templateRuleTemplates.push(ruleTemplate);
-                                }
-                            }
-                            this.setState({
-                                selectedTemplateGroup: templateGroup,
-                                templateRuleTemplates,
-                                hasLoaded: true,
-                                errorCode: BusinessRulesConstants.ERROR_CODES.NONE,
-                            });
-                        })
-                        .catch((error) => {
-                            // Error in Loading Rule Templates
-                            this.setState({
-                                hasLoaded: true,
-                                errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
-                            });
-                        });
-                })
-                .catch((error) => {
-                    // Error in Loading Template Group
-                    this.setState({
-                        hasLoaded: true,
-                        errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
-                    });
-                });
+            this.loadNewForm(this.props.match.params.templateGroupUUID);
         } else {
-            // 'Edit' or 'View' mode
-            const businessRuleUUID = this.props.match.params.businessRuleUUID;
-            new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-                .getBusinessRule(businessRuleUUID)
-                .then((businessRuleResponse) => {
-                    const businessRule = businessRuleResponse.data[2];
-                    new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-                        .getTemplateGroup(businessRule.templateGroupUUID)
-                        .then((response) => {
-                            const templateGroup = response.data[2];
-                            // Filter rule template types
-                            new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-                                .getRuleTemplates(templateGroup.uuid)
-                                .then((ruleTemplatesResponse) => {
-                                    const templateRuleTemplates = [];
-                                    for (const ruleTemplate of ruleTemplatesResponse.data[2]) {
-                                        if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) {
-                                            templateRuleTemplates.push(ruleTemplate);
-                                        }
-                                    }
-                                    new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-                                        .getRuleTemplate(businessRule.templateGroupUUID, businessRule.ruleTemplateUUID)
-                                        .then((ruleTemplateResponse) => {
-                                            this.setState({
-                                                businessRuleType: BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
-                                                businessRuleName: businessRule.name,
-                                                businessRuleUUID: businessRule.uuid,
-                                                selectedTemplateGroup: templateGroup,
-                                                selectedRuleTemplate: ruleTemplateResponse.data[2],
-                                                templateRuleTemplates,
-                                                businessRuleProperties: businessRule.properties,
-                                                fieldErrorStates: this.getDefaultErrorStates(businessRule.properties),
-                                                hasLoaded: true,
-                                                errorCode: BusinessRulesConstants.ERROR_CODES.NONE,
-                                            });
-                                        })
-                                        .catch((error) => {
-                                            // Error in Loading the respective Rule Template
-                                            this.setState({
-                                                hasLoaded: true,
-                                                errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
-                                            });
-                                        });
-                                })
-                                .catch((error) => {
-                                    // Error in Loading Rule Templates
-                                    this.setState({
-                                        hasLoaded: true,
-                                        errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
-                                    });
-                                });
-                        })
-                        .catch((error) => {
-                            // Error in Loading Template Group
-                            this.setState({
-                                hasLoaded: true,
-                                errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
-                            });
-                        });
-                })
-                .catch((error) => {
-                    // Error in Loading Business Rule
-                    this.setState({
-                        hasLoaded: true,
-                        errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
-                    });
-                });
+            this.loadExistingForm(this.props.match.params.businessRuleUUID);
         }
     }
 
@@ -212,24 +109,6 @@ export default class BusinessRuleFromTemplateForm extends Component {
             businessRuleName: false,
             properties: errorStates,
         };
-    }
-
-    /**
-     * Shows the snackbar with the given message, or hides when no message is given
-     * @param {String} message       Snackbar message text
-     */
-    toggleSnackbar(message) {
-        if (message) {
-            this.setState({
-                displaySnackbar: true,
-                snackbarMessage: message,
-            });
-        } else {
-            this.setState({
-                displaySnackbar: false,
-                snackbarMessage: '',
-            });
-        }
     }
 
     /**
@@ -256,91 +135,57 @@ export default class BusinessRuleFromTemplateForm extends Component {
     }
 
     /**
-     * Returns a Snackbar
-     * @returns {Component}     Snackbar Component
+     * Gets the AxiosPromise for Create/Update, based on the given parameter
+     * @param {Object} businessRuleObject       Business Rule Object to submit
+     * @param {boolean} deployStatus            Deployment status, when saving the business rule
+     * @param {boolean} isUpdate                Whether the submission is an update of a business rule
+     * @returns {AxiosPromise}                  AxiosPromise for Create/Update business rule
      */
-    displaySnackbar() {
-        return (
-            <Snackbar
-                autoHideDuration={3500}
-                open={this.state.displaySnackbar}
-                onRequestClose={() => this.toggleSnackbar()}
-                transition={<Slide direction={Styles.snackbar.direction} />}
-                SnackbarContentProps={{
-                    'aria-describedby': 'snackbarMessage',
-                }}
-                message={
-                    <span id="snackbarMessage">
-                        {this.state.snackbarMessage}
-                    </span>
-                }
-            />
-        );
-    }
-
-    /**
-     * Resets error states of all the properties of the Business Rule,
-     * if any of the field is currently having an error
-     */
-    resetErrorStates() {
-        if (this.state.isFieldErrorStatesDirty) {
-            this.setState({
-                isFieldErrorStatesDirty: false,
-                fieldErrorStates: this.getDefaultErrorStates(this.state.businessRuleProperties),
-            });
+    getSubmitPromise(businessRuleObject, deployStatus, isUpdate) {
+        if (isUpdate) {
+            return new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+                .updateBusinessRule(businessRuleObject.uuid, JSON.stringify(businessRuleObject), deployStatus);
         }
+        return new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+            .createBusinessRule(JSON.stringify(businessRuleObject), deployStatus.toString());
     }
 
     /**
-     * Updates the name of the Business Rule
-     * @param {Object} event     Event of the Business Rule Name Text Field
+     * Loads a new form, with configurations of the template group with the given UUID
+     * @param {String} templateGroupUUID        UUID of the template group
      */
-    handleBusinessRuleNameChange(event) {
-        const state = this.state;
-        state.businessRuleName = event.target.value;
-        state.businessRuleUUID = BusinessRulesUtilityFunctions.generateBusinessRuleUUID(event.target.value);
-        this.setState(state);
-        this.resetErrorStates();
-    }
-
-    /**
-     * Updates the value of the given property of the Business Rule
-     * @param {String} property      Property key
-     * @param {String} value         Property value
-     */
-    updatePropertyValue(property, value) {
-        const state = this.state;
-        state.businessRuleProperties[property] = value;
-        state.fieldErrorStates = this.getDefaultErrorStates(this.state.businessRuleProperties);
-        this.setState(state);
-        this.resetErrorStates();
-    }
-
-    /**
-     * Loads properties for the selected Rule Template
-     * @param {String} templateGroupUUID        UUID of the Template Group to which, the Rule Template belongs to
-     * @param {Object} event                    Event of the Rule Template selection
-     */
-    handleRuleTemplateSelected(templateGroupUUID, event) {
-        const state = this.state;
+    loadNewForm(templateGroupUUID) {
         new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-            .getRuleTemplate(templateGroupUUID, event.target.value)
-            .then((selectedRuleTemplateResponse) => {
-                // Set default value for properties in state
-                state.selectedRuleTemplate = selectedRuleTemplateResponse.data[2];
-                for (const propertyKey in state.selectedRuleTemplate.properties) {
-                    if (Object.prototype.hasOwnProperty.call(state.selectedRuleTemplate.properties, propertyKey)) {
-                        state.businessRuleProperties[propertyKey] =
-                            state.selectedRuleTemplate.properties[propertyKey].defaultValue;
-                    }
-                }
-                state.fieldErrorStates = this.getDefaultErrorStates(state.businessRuleProperties);
-                state.hasLoaded = true;
-                state.errorCode = BusinessRulesConstants.ERROR_CODES.NONE;
-                this.setState(state);
+            .getTemplateGroup(templateGroupUUID)
+            .then((templateGroupResponse) => {
+                const templateGroup = templateGroupResponse.data[2];
+                new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+                    .getRuleTemplates(templateGroupUUID)
+                    .then((ruleTemplatesResponse) => {
+                        // Filter 'template' type rule templates
+                        const templateRuleTemplates = [];
+                        for (const ruleTemplate of ruleTemplatesResponse.data[2]) {
+                            if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) {
+                                templateRuleTemplates.push(ruleTemplate);
+                            }
+                        }
+                        this.setState({
+                            selectedTemplateGroup: templateGroup,
+                            templateRuleTemplates,
+                            hasLoaded: true,
+                            errorCode: BusinessRulesConstants.ERROR_CODES.NONE,
+                        });
+                    })
+                    .catch((error) => {
+                        // Error in Loading Rule Templates
+                        this.setState({
+                            hasLoaded: true,
+                            errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
+                        });
+                    });
             })
             .catch((error) => {
-                // Error in Loading Properties for the selected Rule Template
+                // Error in Loading Template Group
                 this.setState({
                     hasLoaded: true,
                     errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
@@ -349,28 +194,75 @@ export default class BusinessRuleFromTemplateForm extends Component {
     }
 
     /**
-     * Returns Submit buttons
-     * @returns {HTMLElement}     Div containing Save, Save And Deploy, and Cancel buttons
+     * Loads form for an existing business rule, which has the given UUID
+     * @param {String} businessRuleUUID         UUID of the business rule
      */
-    displaySubmitButtons() {
-        if (this.state.showSubmitButtons) {
-            if (this.state.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW &&
-                !BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
-                return (
-                    <SubmitButtonGroup
-                        onSubmit={
-                            shouldDeploy =>
-                                this.submitBusinessRule(
-                                    shouldDeploy,
-                                    this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT)}
-                        onCancel={() => {
-                            window.location.href = appContext + '/businessRulesManager';
-                        }}
-                    />
-                );
-            }
-        }
-        return null;
+    loadExistingForm(businessRuleUUID) {
+        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+            .getBusinessRule(businessRuleUUID)
+            .then((businessRuleResponse) => {
+                const businessRule = businessRuleResponse.data[2];
+                new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+                    .getTemplateGroup(businessRule.templateGroupUUID)
+                    .then((response) => {
+                        const templateGroup = response.data[2];
+                        // Filter rule template types
+                        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+                            .getRuleTemplates(templateGroup.uuid)
+                            .then((ruleTemplatesResponse) => {
+                                const templateRuleTemplates = [];
+                                for (const ruleTemplate of ruleTemplatesResponse.data[2]) {
+                                    if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) {
+                                        templateRuleTemplates.push(ruleTemplate);
+                                    }
+                                }
+                                new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+                                    .getRuleTemplate(businessRule.templateGroupUUID, businessRule.ruleTemplateUUID)
+                                    .then((ruleTemplateResponse) => {
+                                        this.setState({
+                                            businessRuleType: BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+                                            businessRuleName: businessRule.name,
+                                            businessRuleUUID: businessRule.uuid,
+                                            selectedTemplateGroup: templateGroup,
+                                            selectedRuleTemplate: ruleTemplateResponse.data[2],
+                                            templateRuleTemplates,
+                                            businessRuleProperties: businessRule.properties,
+                                            fieldErrorStates: this.getDefaultErrorStates(businessRule.properties),
+                                            hasLoaded: true,
+                                            errorCode: BusinessRulesConstants.ERROR_CODES.NONE,
+                                        });
+                                    })
+                                    .catch((error) => {
+                                        // Error in Loading the respective Rule Template
+                                        this.setState({
+                                            hasLoaded: true,
+                                            errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
+                                        });
+                                    });
+                            })
+                            .catch((error) => {
+                                // Error in Loading Rule Templates
+                                this.setState({
+                                    hasLoaded: true,
+                                    errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
+                                });
+                            });
+                    })
+                    .catch((error) => {
+                        // Error in Loading Template Group
+                        this.setState({
+                            hasLoaded: true,
+                            errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
+                        });
+                    });
+            })
+            .catch((error) => {
+                // Error in Loading Business Rule
+                this.setState({
+                    hasLoaded: true,
+                    errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
+                });
+            });
     }
 
     /**
@@ -416,19 +308,32 @@ export default class BusinessRuleFromTemplateForm extends Component {
     }
 
     /**
-     * Gets the AxiosPromise for Create/Update, based on the given parameter
-     * @param {Object} businessRuleObject       Business Rule Object to submit
-     * @param {boolean} deployStatus            Deployment status, when saving the business rule
-     * @param {boolean} isUpdate                Whether the submission is an update of a business rule
-     * @returns {AxiosPromise}                  AxiosPromise for Create/Update business rule
+     * Handles error, occurred when submitting the business rule
+     * @param {Object} error        Error response
      */
-    getSubmitPromise(businessRuleObject, deployStatus, isUpdate) {
-        if (isUpdate) {
-            return new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-                .updateBusinessRule(businessRuleObject.uuid, JSON.stringify(businessRuleObject), deployStatus);
+    handleSubmissionError(error) {
+        this.setState({
+            isFieldErrorStatesDirty: true,
+        });
+        // Check for script execution error
+        if (error.response) {
+            if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                this.setState({
+                    showSubmitButtons: true,
+                });
+                this.toggleSnackbar(error.response.data[1]);
+            } else {
+                this.toggleSnackbar('Failed to create the Business Rule');
+                setTimeout(() => {
+                    window.location.href = appContext + '/businessRulesManager';
+                }, 3000);
+            }
+        } else {
+            this.toggleSnackbar('Failed to create the Business Rule');
+            setTimeout(() => {
+                window.location.href = appContext + '/businessRulesManager';
+            }, 3000);
         }
-        return new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-            .createBusinessRule(JSON.stringify(businessRuleObject), deployStatus.toString());
     }
 
     /**
@@ -463,28 +368,7 @@ export default class BusinessRuleFromTemplateForm extends Component {
                         }, 3000);
                     })
                     .catch((error) => {
-                        this.setState({
-                            isFieldErrorStatesDirty: true,
-                        });
-                        // Check for script execution error
-                        if (error.response) {
-                            if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
-                                this.setState({
-                                    showSubmitButtons: true,
-                                });
-                                this.toggleSnackbar(error.response.data[1]);
-                            } else {
-                                this.toggleSnackbar('Failed to create the Business Rule');
-                                setTimeout(() => {
-                                    window.location.href = appContext + '/businessRulesManager';
-                                }, 3000);
-                            }
-                        } else {
-                            this.toggleSnackbar('Failed to create the Business Rule');
-                            setTimeout(() => {
-                                window.location.href = appContext + '/businessRulesManager';
-                            }, 3000);
-                        }
+                        this.handleSubmissionError(error);
                     });
             }
         } catch (error) {
@@ -498,51 +382,230 @@ export default class BusinessRuleFromTemplateForm extends Component {
     }
 
     /**
+     * Loads properties for the selected Rule Template
+     * @param {String} templateGroupUUID        UUID of the Template Group to which, the Rule Template belongs to
+     * @param {Object} event                    Event of the Rule Template selection
+     */
+    handleRuleTemplateSelected(templateGroupUUID, event) {
+        const state = this.state;
+        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+            .getRuleTemplate(templateGroupUUID, event.target.value)
+            .then((selectedRuleTemplateResponse) => {
+                // Set default value for properties in state
+                state.selectedRuleTemplate = selectedRuleTemplateResponse.data[2];
+                for (const propertyKey in state.selectedRuleTemplate.properties) {
+                    if (Object.prototype.hasOwnProperty.call(state.selectedRuleTemplate.properties, propertyKey)) {
+                        state.businessRuleProperties[propertyKey] =
+                            state.selectedRuleTemplate.properties[propertyKey].defaultValue;
+                    }
+                }
+                state.fieldErrorStates = this.getDefaultErrorStates(state.businessRuleProperties);
+                state.hasLoaded = true;
+                state.errorCode = BusinessRulesConstants.ERROR_CODES.NONE;
+                this.setState(state);
+            })
+            .catch((error) => {
+                // Error in Loading Properties for the selected Rule Template
+                this.setState({
+                    hasLoaded: true,
+                    errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
+                });
+            });
+    }
+
+    /**
+     * Updates the name of the Business Rule
+     * @param {Object} event     Event of the Business Rule Name Text Field
+     */
+    handleBusinessRuleNameChange(event) {
+        const state = this.state;
+        state.businessRuleName = event.target.value;
+        state.businessRuleUUID = BusinessRulesUtilityFunctions.generateBusinessRuleUUID(event.target.value);
+        this.setState(state);
+        this.resetErrorStates();
+    }
+
+    /**
+     * Updates the value of the given property of the Business Rule
+     * @param {String} property      Property key
+     * @param {String} value         Property value
+     */
+    updatePropertyValue(property, value) {
+        const state = this.state;
+        state.businessRuleProperties[property] = value;
+        state.fieldErrorStates = this.getDefaultErrorStates(this.state.businessRuleProperties);
+        this.setState(state);
+        this.resetErrorStates();
+    }
+
+    /**
+     * Resets error states of all the properties of the Business Rule,
+     * if any of the field is currently having an error
+     */
+    resetErrorStates() {
+        if (this.state.isFieldErrorStatesDirty) {
+            this.setState({
+                isFieldErrorStatesDirty: false,
+                fieldErrorStates: this.getDefaultErrorStates(this.state.businessRuleProperties),
+            });
+        }
+    }
+
+    /**
+     * Shows the snackbar with the given message, or hides when no message is given
+     * @param {String} message       Snackbar message text
+     */
+    toggleSnackbar(message) {
+        if (message) {
+            this.setState({
+                displaySnackbar: true,
+                snackbarMessage: message,
+            });
+        } else {
+            this.setState({
+                displaySnackbar: false,
+                snackbarMessage: '',
+            });
+        }
+    }
+
+    /**
+     * Returns Submit buttons
+     * @returns {HTMLElement}     Div containing Save, Save And Deploy, and Cancel buttons
+     */
+    displaySubmitButtons() {
+        if (this.state.showSubmitButtons) {
+            if (this.state.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW &&
+                !BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
+                return (
+                    <SubmitButtonGroup
+                        onSubmit={
+                            shouldDeploy =>
+                                this.submitBusinessRule(
+                                    shouldDeploy,
+                                    this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT)}
+                        onCancel={() => {
+                            window.location.href = appContext + '/businessRulesManager';
+                        }}
+                    />
+                );
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns a Snackbar
+     * @returns {Component}     Snackbar Component
+     */
+    displaySnackbar() {
+        return (
+            <Snackbar
+                autoHideDuration={3500}
+                open={this.state.displaySnackbar}
+                onRequestClose={() => this.toggleSnackbar()}
+                transition={<Slide direction={Styles.snackbar.direction} />}
+                SnackbarContentProps={{
+                    'aria-describedby': 'snackbarMessage',
+                }}
+                message={
+                    <span id="snackbarMessage">
+                        {this.state.snackbarMessage}
+                    </span>
+                }
+            />
+        );
+    }
+
+    /**
+     * Displays the title of the form
+     * @returns {HTMLElement}       Title of the form
+     */
+    displayTitle() {
+        return (
+            <div>
+                <Typography type="headline">
+                    {this.state.selectedTemplateGroup.name}
+                </Typography>
+                <Typography type="subheading">
+                    {this.state.selectedTemplateGroup.description || ''}
+                </Typography>
+            </div>
+        );
+    }
+
+    /**
+     * Returns Dropdown for selecting a Rule Template
+     * @returns {Component}     FormControl Component
+     */
+    displayRuleTemplateSelection() {
+        let ruleTemplateDescription;
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
+            if (this.state.selectedRuleTemplate.description) {
+                ruleTemplateDescription = this.state.selectedRuleTemplate.description;
+            } else {
+                ruleTemplateDescription = '';
+            }
+        } else {
+            ruleTemplateDescription = BusinessRulesMessages.SELECT_RULE_TEMPLATE;
+        }
+
+        return (
+            <FormControl
+                disabled={this.state.formMode !==
+                BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}
+            >
+                <InputLabel htmlFor="ruleTemplate">RuleTemplate</InputLabel>
+                <Select
+                    value={(!BusinessRulesUtilityFunctions
+                        .isEmpty(this.state.selectedRuleTemplate)) ? (this.state.selectedRuleTemplate.uuid) : ('')}
+                    onChange={e => this.handleRuleTemplateSelected(this.state.selectedTemplateGroup.uuid, e)}
+                    input={<Input id="ruleTemplate" />}
+                >
+                    {this.state.templateRuleTemplates.map(ruleTemplate =>
+                        (<MenuItem key={ruleTemplate.uuid} value={ruleTemplate.uuid}>
+                            {ruleTemplate.name}
+                        </MenuItem>))}
+                </Select>
+                <FormHelperText>
+                    {ruleTemplateDescription}
+                </FormHelperText>
+            </FormControl>
+        );
+    }
+
+    /**
+     * Returns Input field to enter the business rule's name
+     * @returns {Component}     TextField Component
+     */
+    displayBusinessRuleName() {
+        // If a rule template has been selected
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
+            return (
+                <TextField
+                    id="businessRuleName"
+                    name="businessRuleName"
+                    label={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_NAME}
+                    placeholder={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_DESCRIPTION}
+                    value={this.state.businessRuleName}
+                    onChange={e => this.handleBusinessRuleNameChange(e)}
+                    disabled={this.state.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}
+                    error={this.state.fieldErrorStates.businessRuleName}
+                    required
+                    fullWidth
+                    margin="normal"
+                />);
+        }
+        return null;
+    }
+
+    /**
      * Displays content of the page
      * @returns {Component}     Content of the page
      */
     displayContent() {
         if (this.state.hasLoaded) {
             if (this.state.errorCode === BusinessRulesConstants.ERROR_CODES.NONE) {
-                // Business Rule Name text field
-                let businessRuleNameTextField;
-                // To display properties as input fields
-                let properties;
-
-                // If a rule template has been selected
-                if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
-                    // To display business rule name field
-                    businessRuleNameTextField =
-                        (<TextField
-                            id="businessRuleName"
-                            name="businessRuleName"
-                            label={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_NAME}
-                            placeholder={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_DESCRIPTION}
-                            value={this.state.businessRuleName}
-                            onChange={e => this.handleBusinessRuleNameChange(e)}
-                            disabled={this.state.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}
-                            error={this.state.fieldErrorStates.businessRuleName}
-                            required
-                            fullWidth
-                            margin="normal"
-                        />);
-
-                    // To display each property as an input field
-                    properties = this.getPropertyComponents(this.state.formMode);
-                }
-
-                // Rule Template Description text
-                let ruleTemplateDescription;
-                if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
-                    if (this.state.selectedRuleTemplate.description) {
-                        ruleTemplateDescription = this.state.selectedRuleTemplate.description;
-                    } else {
-                        ruleTemplateDescription = '';
-                    }
-                } else {
-                    ruleTemplateDescription = BusinessRulesMessages.SELECT_RULE_TEMPLATE;
-                }
-
                 return (
                     <div>
                         {this.displaySnackbar()}
@@ -550,45 +613,14 @@ export default class BusinessRuleFromTemplateForm extends Component {
                             <Grid item xs={12} sm={6}>
                                 <Paper style={Styles.businessRuleForm.paper}>
                                     <center>
-                                        <Typography type="headline">
-                                            {this.state.selectedTemplateGroup.name}
-                                        </Typography>
-                                        <Typography type="subheading">
-                                            {this.state.selectedTemplateGroup.description ?
-                                                this.state.selectedTemplateGroup.description : ''}
-                                        </Typography>
+                                        {this.displayTitle()}
                                         <br />
-                                        {/* Rule Template Selection */}
-                                        <FormControl
-                                            disabled={this.state.formMode !==
-                                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}
-                                        >
-                                            <InputLabel htmlFor="ruleTemplate">RuleTemplate</InputLabel>
-                                            <Select
-                                                value={(!BusinessRulesUtilityFunctions
-                                                    .isEmpty(this.state.selectedRuleTemplate)) ?
-                                                    (this.state.selectedRuleTemplate.uuid) :
-                                                    ('')
-                                                }
-                                                onChange={e =>
-                                                    this.handleRuleTemplateSelected(
-                                                        this.state.selectedTemplateGroup.uuid, e)}
-                                                input={<Input id="ruleTemplate" />}
-                                            >
-                                                {this.state.templateRuleTemplates.map(ruleTemplate =>
-                                                    (<MenuItem key={ruleTemplate.uuid} value={ruleTemplate.uuid}>
-                                                        {ruleTemplate.name}
-                                                    </MenuItem>))}
-                                            </Select>
-                                            <FormHelperText>
-                                                {ruleTemplateDescription}
-                                            </FormHelperText>
-                                        </FormControl>
+                                        {this.displayRuleTemplateSelection()}
                                         <br />
                                         <br />
-                                        {businessRuleNameTextField}
+                                        {this.displayBusinessRuleName()}
                                     </center>
-                                    {properties}
+                                    {this.getPropertyComponents(this.state.formMode)}
                                     <br />
                                     <br />
                                     <center>
