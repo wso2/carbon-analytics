@@ -117,21 +117,24 @@ export default class BusinessRuleFromTemplateForm extends Component {
      * @returns {Component[]}       Property Components
      */
     getPropertyComponents(formMode) {
-        const properties = this.state.selectedRuleTemplate.properties;
-        return Object.keys(properties).map(property =>
-            (<Property
-                key={property}
-                name={property}
-                fieldName={properties[property].fieldName}
-                description={properties[property].description ? properties[property].description : ''}
-                value={(this.state.businessRuleProperties[property]) ?
-                    (this.state.businessRuleProperties[property]) : ('')}
-                errorState={this.state.fieldErrorStates.properties[property]}
-                disabledState={formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
-                options={properties[property].options}
-                onValueChange={e => this.updatePropertyValue(property, e)}
-                fullWidth
-            />));
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
+            const properties = this.state.selectedRuleTemplate.properties;
+            return Object.keys(this.state.selectedRuleTemplate.properties).map(property =>
+                (<Property
+                    key={property}
+                    name={property}
+                    fieldName={properties[property].fieldName}
+                    description={properties[property].description ? properties[property].description : ''}
+                    value={(this.state.businessRuleProperties[property]) ?
+                        (this.state.businessRuleProperties[property]) : ('')}
+                    errorState={this.state.fieldErrorStates.properties[property]}
+                    disabledState={formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                    options={properties[property].options}
+                    onValueChange={e => this.updatePropertyValue(property, e)}
+                    fullWidth
+                />));
+        }
+        return null;
     }
 
     /**
