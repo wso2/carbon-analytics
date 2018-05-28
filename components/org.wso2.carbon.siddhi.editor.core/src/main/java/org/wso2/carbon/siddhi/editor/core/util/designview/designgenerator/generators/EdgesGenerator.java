@@ -26,10 +26,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -59,8 +62,12 @@ public class EdgesGenerator {
      */
     public List<Edge> generateEdges() throws DesignGenerationException {
         List<Edge> edges = new ArrayList<>();
-        edges.addAll(generateWindowFilterProjectionQueryEdges(siddhiAppConfig.getWindowFilterProjectionQueryList()));
-        edges.addAll(generateJoinQueryEdges(siddhiAppConfig.getJoinQueryList()));
+        edges.addAll(
+                generateWindowFilterProjectionQueryEdges(
+                        siddhiAppConfig.getQueryLists().get(QueryInputType.WINDOW_FILTER_PROJECTION.toString())));
+        edges.addAll(
+                generateJoinQueryEdges(
+                        siddhiAppConfig.getQueryLists().get(QueryInputType.JOIN.toString())));
         return edges;
     }
 
@@ -206,61 +213,67 @@ public class EdgesGenerator {
      * @throws DesignGenerationException        Error while generating config
      */
     private SiddhiElementConfig getElementWithId(String id) throws DesignGenerationException {
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getWindowFilterProjectionQueryList()) {
+        for (String queryType : siddhiAppConfig.getQueryLists().keySet()) {
+            for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getQueryLists().get(queryType)) {
+                if (siddhiElementConfig.getId().equals(id)) {
+                    return siddhiElementConfig;
+                }
+            }
+        }
+
+        List<SiddhiElementConfig> siddhiElementLists = new ArrayList<>();
+
+        siddhiElementLists.addAll(siddhiAppConfig.getSinkList());
+        siddhiElementLists.addAll(siddhiAppConfig.getSourceList());
+        siddhiElementLists.addAll(siddhiAppConfig.getStreamList());
+        siddhiElementLists.addAll(siddhiAppConfig.getTableList());
+        siddhiElementLists.addAll(siddhiAppConfig.getTriggerList());
+        siddhiElementLists.addAll(siddhiAppConfig.getWindowList());
+        siddhiElementLists.addAll(siddhiAppConfig.getAggregationList());
+
+        for (SiddhiElementConfig siddhiElementConfig : siddhiElementLists) {
             if (siddhiElementConfig.getId().equals(id)) {
                 return siddhiElementConfig;
             }
         }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getJoinQueryList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getPatternQueryList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getSequenceQueryList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getSinkList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getSourceList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getStreamList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getTableList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getTriggerList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getWindowList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
-        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getAggregationList()) {
-            if (siddhiElementConfig.getId().equals(id)) {
-                return siddhiElementConfig;
-            }
-        }
+
+        // TODO Get reviewed
+
+//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getSinkList()) {
+//            if (siddhiElementConfig.getId().equals(id)) {
+//                return siddhiElementConfig;
+//            }
+//        }
+//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getSourceList()) {
+//            if (siddhiElementConfig.getId().equals(id)) {
+//                return siddhiElementConfig;
+//            }
+//        }
+//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getStreamList()) {
+//            if (siddhiElementConfig.getId().equals(id)) {
+//                return siddhiElementConfig;
+//            }
+//        }
+//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getTableList()) {
+//            if (siddhiElementConfig.getId().equals(id)) {
+//                return siddhiElementConfig;
+//            }
+//        }
+//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getTriggerList()) {
+//            if (siddhiElementConfig.getId().equals(id)) {
+//                return siddhiElementConfig;
+//            }
+//        }
+//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getWindowList()) {
+//            if (siddhiElementConfig.getId().equals(id)) {
+//                return siddhiElementConfig;
+//            }
+//        }
+//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getAggregationList()) {
+//            if (siddhiElementConfig.getId().equals(id)) {
+//                return siddhiElementConfig;
+//            }
+//        }
         throw new DesignGenerationException("Unable to find element with id '" + id + "'");
     }
 
