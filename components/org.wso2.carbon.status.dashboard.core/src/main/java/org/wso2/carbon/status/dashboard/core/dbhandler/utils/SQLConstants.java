@@ -69,7 +69,15 @@ public class SQLConstants {
     public static final String QUESTION_MARK = "?";
     public static final String PERCENTAGE_MARK = "%";
     public static final String PACKAGE_NAME_SEPARATOR = ".";
-    
+    public static final String COLUMN_COUNT = "TIMESTAMP,COUNT";
+    public static final String AGG_COLUMN_COUNT = "AGG_TIMESTAMP,COUNT";
+    public static final String AGG_AVG_COLUMN_COUNT ="AVG(COUNT) as COUNT";
+    //metrics types
+    public static final String METRICS_TYPE_LATENCY = "latency";
+    public static final String METRICS_TYPE_LATENCY_COUNT = "latency_count";
+    public static final String METRICS_TYPE_MEMORY = "memory";
+    public static final String METRICS_TYPE_THROUGHPUT = "throughput";
+    public static final String METRICS_TYPE_THROUGHPUT_COUNT = "throughput_count";
     //metrics table names
     public static final String METRICS_TABLE_METRIC_COUNTER = "METRIC_COUNTER";
     public static final String METRICS_TABLE_METRIC_GAUGE = "METRIC_GAUGE";

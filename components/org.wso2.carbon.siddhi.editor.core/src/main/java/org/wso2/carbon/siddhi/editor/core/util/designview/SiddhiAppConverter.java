@@ -48,7 +48,7 @@ public class SiddhiAppConverter {
      */
     public String generateCode(EventFlow eventFlow) {
         CodeGenerator codeGenerator = CodeGeneratorSingleton.getInstance();
-        return codeGenerator.getSiddhiAppCode(eventFlow);
+        return codeGenerator.generateSiddhiAppCode(eventFlow);
     }
 
 }

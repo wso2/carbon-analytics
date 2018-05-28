@@ -50,4 +50,5 @@ public class SiddhiTopologyCreatorConstants {
 
     public static final String DEFAULT_PASSTROUGH_QUERY_TEMPLATE = "from ${" + INPUTSTREAMID + "} select * " + "insert"
             + " into " + "${" + OUTPUTSTREAMID + "}";
+    public static final String TRANSPORT_CHANNEL_CREATION_IDENTIFIER = "transportChannelCreationEnabled";
 }

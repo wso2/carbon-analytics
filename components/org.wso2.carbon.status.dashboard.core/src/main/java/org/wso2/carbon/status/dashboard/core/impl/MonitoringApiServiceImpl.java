@@ -56,6 +56,7 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardRuntimeException;
 import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
 import org.wso2.carbon.status.dashboard.core.internal.ApiResponseMessageWithCode;
 import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
@@ -81,6 +82,9 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TYPE_LATENCY;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TYPE_MEMORY;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TYPE_THROUGHPUT;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.HOUR;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.PROTOCOL;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_COMMITTED;
@@ -94,7 +98,7 @@ import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_
         date = "2017-09-11T07:55:11.886Z")
 @Component(service = MonitoringApiService.class, immediate = true)
 public class MonitoringApiServiceImpl extends MonitoringApiService {
-
+    
     private static StatusDashboardDBHandler dashboardStore;
     private static StatusDashboardMetricsDBHandler metricStore;
     private static final int MAX_SIDDHI_APPS_PER_PAGE = 100;
@@ -109,16 +113,16 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             Constants.PERMISSION_SUFFIX_MANAGER;
     private static final String VIWER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
             Constants.PERMISSION_SUFFIX_VIEWER;
-
+    
     public MonitoringApiServiceImpl() {
         permissionProvider = MonitoringDataHolder.getInstance().getPermissionProvider();
         dashboardConfigurations = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs();
     }
-
+    
     public static StatusDashboardDBHandler getDashboardStore() { //todo: remove static
         return dashboardStore;
     }
-
+    
     /**
      * This is the deactivation method of ConfigServiceComponent. This will be called when this component
      * is being stopped or references are satisfied during runtime.
@@ -131,7 +135,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             logger.debug("@Reference(unbind) Status Dashboard MonitoringApiServiceImpl API");
         }
     }
-
+    
     /**
      * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
      *
@@ -145,8 +149,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         dashboardStore = new StatusDashboardDBHandler();
         metricStore = new StatusDashboardMetricsDBHandler();
     }
-
-
+    
+    
     /**
      * Return all realtime statistics of the workers.If worker is not currently reachable then send the last
      * persistant state of that worker.
@@ -184,13 +188,13 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             logger.debug(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.", e);
                         }
                         logger.warn(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.");
-
+                        
                     } catch (IOException e) {
                         logger.warn("Error occured while getting the response " + e.getMessage());
                     }
                 });
             }
-
+            
             if (!workerList.isEmpty()) {
                 workerList.parallelStream().forEach(worker -> {
                     if (!ResourceClusteredWorkerNode.contains(getCarbonID(worker.getWorkerId()))) {
@@ -230,7 +234,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 workerOverview.setLastUpdate(timeInMillis);
                                 workerOverview.setWorkerId(worker.getWorkerId());
                                 workerOverview.setServerDetails(serverDetails);
-
+                                
                                 //grouping the clusters of the workers
                                 List nonClusterList = groupedWorkers.get(Constants.NON_CLUSTERS_ID);
                                 String clusterID = serverDetails.getClusterId();
@@ -310,9 +314,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     .entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     private String getErrorMessage(int errorCode) {
-
+        
         if (errorCode == 401) {
             return "Unauthorize to reach worker";
         } else if (errorCode == 404) {
@@ -321,7 +325,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return "Internal server error.";
         }
     }
-
+    
     /**
      * Get worker general details.
      *
@@ -366,7 +370,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + userName).build();
         }
     }
-
+    
     /**
      * Get worker metrics history such as latency,memory,load average
      *
@@ -375,11 +379,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @param type     type of metrics.
      * @return returnmetrics for a given time.
      */
-
+    
     @Override
     public Response getWorkerHistory(String workerId, String period, String type, Boolean more, String username) throws
             NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -658,7 +662,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     timeInterval, Constants.SYSTEM_CPU_USAGE, System.currentTimeMillis());
                             List<List<Object>> workerProcessCUP = metricStore.selectWorkerMetrics(carbonId,
                                     timeInterval, Constants.PROCESS_CPU_USAGE, System.currentTimeMillis());
-
+                            
                             workerMetricsHistory.setProcessCPUData(workerProcessCUP);
                             workerMetricsHistory.setSystemCPU(workerSystemCUP);
                             break;
@@ -688,7 +692,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Get all siddhi apps and siddhi app summary.
      *
@@ -702,7 +706,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     public Response getAllSiddhiApps(String workerId, String period, String type, Integer pangeNum,
                                      String username) throws
             NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -813,8 +817,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
-
+    
+    
     /**
      * Get siddhi app metrics histrory such as memory,throughput and latency.
      *
@@ -883,7 +887,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * This method return the both siddi apptext view and flow chart.PS: Currently implemetented till text view.
      *
@@ -929,7 +933,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Try to reach the worker node;
      *
@@ -957,7 +961,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return workerId + " Unnable to reach worker. Caused by: " + e.getMessage();
         }
     }
-
+    
     /**
      * Get the carbon id of thw worker if carbon id not presented in inmemry state.
      *
@@ -965,7 +969,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return
      */
     private String getCarbonID(String workerId) {
-
+        
         if (workerId != null) {
             String workerGeneralCArbonId = null;
             workerGeneralCArbonId = dashboardStore.selectWorkerCarbonID(workerId);
@@ -990,7 +994,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return null;
         }
     }
-
+    
     /**
      * Get all siddhi app components.
      *
@@ -1001,11 +1005,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getSiddhiAppComponents(String workerId, String appName, String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
-
+            
             String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
             if (hostPort.length == 2) {
                 String carbonId = workerIDCarbonIDMap.get(workerId);
@@ -1013,14 +1017,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     carbonId = getCarbonID(workerId);
                 }
                 Map<String, List<String>> components = metricStore.selectAppComponentsList(carbonId, appName,
-                        Constants
-                                .DEFAULT_TIME_INTERVAL_MILLIS,
-                        System.currentTimeMillis());
+                        Constants.DEFAULT_TIME_INTERVAL_MILLIS, System.currentTimeMillis());
                 List componentsRecentMetrics = metricStore.selectComponentsLastMetric
                         (carbonId, appName, components, Constants.DEFAULT_TIME_INTERVAL_MILLIS,
                                 System.currentTimeMillis());
-                String json = gson.toJson(componentsRecentMetrics);
-                return Response.ok().entity(json).build();
+                String jsonMetricsPayload = gson.toJson(componentsRecentMetrics);
+                return Response.ok().entity(jsonMetricsPayload).build();
             } else {
                 logger.error("Inproper format of worker ID:" + workerId);
                 return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + workerId)
@@ -1031,10 +1033,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     @Override
     public Response getRolesByUsername(String username, String permissionSuffix) {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 Constants.PERMISSION_APP_NAME + "." + permissionSuffix));
         if (isAuthorized) {
@@ -1043,7 +1045,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.ok().entity(isAuthorized).build();
         }
     }
-
+    
     /**
      * Generate the worker ker wich is uniquelyidenfy in the status dashboard as wellas routing.
      *
@@ -1052,10 +1054,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return returnconcadinating the host_port
      */
     private String generateWorkerKey(String host, String port) {
-
+        
         return host + Constants.WORKER_KEY_GENERATOR + port;
     }
-
+    
     /**
      * Generate the worker ker wich is use for rest call.
      *
@@ -1064,10 +1066,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return returnconcadinating the host:port
      */
     private String generateURLHostPort(String host, String port) {
-
+        
         return host + Constants.URL_HOST_PORT_SEPERATOR + port;
     }
-
+    
     /**
      * Delete an existing worker.
      *
@@ -1077,7 +1079,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response deleteWorker(String id, String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1101,8 +1103,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
-
+    
+    
     /**
      * Enable or dissable the siddhi app metrics
      *
@@ -1114,7 +1116,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     @Override
     public Response enableSiddhiAppStats(String workerId, String appName, StatsEnable statEnable, String username)
             throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 STATS_MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1152,10 +1154,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     @Override
     public Response getHADetails(String workerId, String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1199,11 +1201,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     @Override
     public Response getComponentHistory(String workerId, String appName, String componentType, String componentId
             , String period, String type, String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1214,134 +1216,146 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             if ((timeInterval <= HOUR)) {
                 switch (componentType.toLowerCase()) {
                     case "streams": {
-                        String metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                componentType, componentId, false));
                         break;
                     }
                     case "trigger": {
-                        String metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                componentType, componentId, false));
                         break;
                     }
                     case "storequeries": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
+                                componentId, false));
                         break;
                     }
                     case "queries": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                        metricsType = "memory";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY,
+                                componentType, componentId, false));
+                        componentHistory.put(METRICS_TYPE_MEMORY, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_MEMORY, componentType,
+                                componentId, false));
                         break;
                     }
                     case "tables": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                        metricsType = "memory";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                        metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
+                                componentId, false));
+                        componentHistory.put(METRICS_TYPE_MEMORY, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_MEMORY, componentType,
+                                componentId, false));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                componentType, componentId, false));
                         break;
                     }
                     case "sources": {
-                        String metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                componentType, componentId, false));
                         break;
                     }
                     case "sinks": {
-                        String metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                componentType, componentId, false));
                         break;
                     }
                     case "sourcemappers": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
+                                componentId, false));
                         break;
                     }
                     case "sinkmappers": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
+                                componentId, false));
                         break;
+                    }
+                    default: {
+                        throw new StatusDashboardRuntimeException("Metrics type '" + componentType.toLowerCase() +
+                                "' not valid.");
                     }
                 }
             } else {
                 switch (componentType.toLowerCase()) {
                     case "streams": {
-                        String metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore
+                                .selectAppComponentsAggHistory(carbonId, appName,
+                                        timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                        componentType, componentId, false));
                         break;
                     }
                     case "trigger": {
-                        String metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore
+                                .selectAppComponentsAggHistory(carbonId, appName, timeInterval,
+                                        System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT, componentType, componentId,
+                                        false));
                         break;
                     }
                     case "storequeries": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsAggHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
+                                componentId, false));
                         break;
                     }
                     case "queries": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                        metricsType = "memory";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsAggHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
+                                componentId, false));
+                        componentHistory.put(METRICS_TYPE_MEMORY, metricStore.selectAppComponentsAggHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_MEMORY, componentType,
+                                componentId, false));
                         break;
                     }
                     case "tables": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval,
-                                System.currentTimeMillis(), metricsType, componentType, componentId));
-                        metricsType = "memory";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                        metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsAggHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
+                                componentId, false));
+                        componentHistory.put(METRICS_TYPE_MEMORY, metricStore.selectAppComponentsAggHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_MEMORY, componentType,
+                                componentId, false));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore
+                                .selectAppComponentsAggHistory(carbonId, appName, timeInterval,
+                                        System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                        componentType, componentId, false));
                         break;
                     }
                     case "sources": {
-                        String metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore
+                                .selectAppComponentsAggHistory(carbonId, appName, timeInterval,
+                                        System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT, componentType, componentId,
+                                        false));
                         break;
                     }
                     case "sinks": {
-                        String metricsType = "throughput";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_THROUGHPUT, metricStore
+                                .selectAppComponentsAggHistory(carbonId, appName, timeInterval,
+                                        System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT, componentType, componentId,
+                                        false));
                         break;
                     }
                     case "sourcemappers": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsAggHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
+                                componentId, false));
                         break;
                     }
                     case "sinkmappers": {
-                        String metricsType = "latency";
-                        componentHistory.put(metricsType, metricStore.selectAppComponentsAggHistory(carbonId, appName,
-                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsAggHistory(carbonId,
+                                appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
+                                componentId, false));
                         break;
+                    }
+                    default: {
+                        throw new StatusDashboardRuntimeException("Metrics type '" + componentType.toLowerCase() +
+                                "' not valid.");
                     }
                 }
             }
@@ -1352,7 +1366,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Return the worker configuration fromthe worker services table for using when editing the worker.
      *
@@ -1362,7 +1376,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getWorkerConfig(String id, String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1379,7 +1393,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Test teh worker credentilas are ok or not.
      *
@@ -1390,7 +1404,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response testConnection(String workerId, String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1436,7 +1450,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Read the SP Status Dashboard YML file and returen polling enterval.
      *
@@ -1445,7 +1459,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getDashboardConfig(String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1458,11 +1472,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Rest API's Related to Distributed View.
      */
-
+    
     /**
      * Add a new worker.
      *
@@ -1472,7 +1486,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response addWorker(Node worker, String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1485,8 +1499,14 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     workerDBHandler.insertWorkerConfiguration(workerConfigData);
                 } catch (RDBMSTableException e) {
                     logger.error("Error occured while inserting the Worker due to " + e.getMessage(), e);
-                    return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                            "Error occured while inserting the Worker due to " + e.getMessage())).build();
+                    if (e.getMessage().contains("Unique index or primary key violation")) {
+                        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                                "Duplicate Worker. " + worker.getHost() + ":" +
+                                        String.valueOf(worker.getPort()) + " already exists")).build();
+                    } else {
+                        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                                "Error occured while inserting the Worker due to " + e.getMessage())).build();
+                    }
                 }
                 //This part to be sucess is optional at this level
                 String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
@@ -1524,7 +1544,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Add a new manager.
      *
@@ -1544,7 +1564,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         new NodeConfigurationDetails(managerId, manager.getHost(), Integer.valueOf(manager.getPort()));
                 try {
                     dashboardStore.insertManagerConfiguration(managerConfigurationDetails);
-
+                    
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
                             "managerId " + "\n" + managerId + "\n" + "successfully " + " added")).build();
                 } catch (RDBMSTableException e) {
@@ -1562,7 +1582,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Delete an existing manager Node.
      *
@@ -1572,7 +1592,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response deleteManager(String id, String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1590,7 +1610,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Return all realtime statistics of the managers.If manager is not currently reachable then send the last
      * persistant state of that manager.
@@ -1598,7 +1618,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return Realtime data and status of workers.
      * @throws NotFoundException
      */
-
+    
     @Override
     public Response getManagers(String username) throws NotFoundException, SQLException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
@@ -1630,7 +1650,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
                             List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody,
                                     new TypeToken<List<String>>() {
-
+                                    
                                     }.getType());
                             feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory.getWorkerHttpsClient(
                                     PROTOCOL + generateURLHostPort(manager.getHost(), String.valueOf(manager
@@ -1638,14 +1658,14 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
                             List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody,
                                     new TypeToken<List<String>>() {
-
+                                    
                                     }.getType());
                             serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
                             ManagerMetricsSnapshot snapshot = new ManagerMetricsSnapshot(serverDetails, timeInMillis);
                             WorkerStateHolder.addManagerMetrics(manager.getWorkerId(), snapshot);
                             managerOverView.setLastUpdate(timeInMillis);
                             managerOverView.setWorkerId(manager.getWorkerId());
-
+                            
                             feign.Response haDetails = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
                                             generateURLHostPort(manager.getHost(), String.valueOf(manager.getPort())),
                                     getUsername(), getPassword()).getManagerDetails();
@@ -1653,7 +1673,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             ManagerClusterInfo clusterInfo = gson.fromJson(haResponseBody, ManagerClusterInfo.class);
                             managerOverView.setServerDetails(serverDetails);
                             managerOverView.setClusterInfo(clusterInfo);
-
+                            
                             //grouping the clusters of the managers
                             List nonClusterList = groupedManagers.get(Constants.NON_CLUSTERS_ID);
                             String clusterID = clusterInfo.getGroupId();
@@ -1737,7 +1757,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     .entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Returns HA Details of manager nodes. whether active or pasive
      *
@@ -1783,7 +1803,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Reurns the text view of the parent siddhi application
      *
@@ -1832,17 +1852,17 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /***
      * Return the run time environment of the node
      * @param username
      * @return the runtime environmet
      * @throws NotFoundException
      */
-
+    
     @Override
     public Response getRuntimeEnv(String managerId, String username) throws NotFoundException {
-
+        
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -1875,7 +1895,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Returns the summary details of deployed parent siddhi application.
      *
@@ -1903,20 +1923,20 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 }.getType());
                         if (!totalApps.isEmpty()) {
                             Map<String, ParentSummaryDetails> appSummary = new HashMap<>();
-
+                            
                             for (ParentSiddhiApp siddhiapp : totalApps) {
                                 String parentAppName = siddhiapp.getParentAppName();
                                 if (!(appSummary.containsKey(parentAppName))) {
                                     appSummary.put(siddhiapp.getParentAppName(), new ParentSummaryDetails());
                                 }
-
+                                
                                 ParentSummaryDetails existingParentAppName = appSummary.get(parentAppName);
                                 if (existingParentAppName.getGroups() != null) {
                                     if (!(existingParentAppName.getGroups().contains(siddhiapp.getGroupName()))) {
                                         existingParentAppName.getGroups().add(siddhiapp.getGroupName());
                                     }
                                 }
-
+                                
                                 int numberOfChildApp = existingParentAppName.getChildApps() + 1;
                                 existingParentAppName.setChildApps(numberOfChildApp);
                                 if (siddhiapp.getId() != null) {
@@ -1981,8 +2001,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
-
-
+    
+    
     /**
      * Returns kafka topic details of each child apps
      *
@@ -1991,7 +2011,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @param username
      * @throws IOException
      */
-
+    
     @Override
     public Response getChildAppsTransportDetails(String managerId, String appName, String username) throws IOException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants
@@ -2028,7 +2048,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized user : " + username).build();
         }
     }
-
+    
     /**
      * Returns all the single deployment siddhi apps
      *
@@ -2045,7 +2065,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             List<NodeConfigurationDetails> registeredWorkers = dashboardStore.selectAllWorkers();
             List<NodeConfigurationDetails> registeredManagers = dashboardStore.getAllManagerConfigDetails();
             List<SiddhiAppSummaryInfo> siddhiAppSummaryInfos = new ArrayList<>();
-
+            
             List<String> ResourceClusteredWorkerNode = new ArrayList<>();
             if (!registeredManagers.isEmpty()) {
                 registeredManagers.parallelStream().forEach(manager -> {
@@ -2068,7 +2088,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             logger.debug(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.", e);
                         }
                         logger.warn(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.");
-
+                        
                     } catch (IOException e) {
                         logger.warn("Error occured while getting the response " + e.getMessage());
                     }
@@ -2087,7 +2107,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             if (serverHADetails.getClusterId().equals(Constants.NON_CLUSTERS_ID)) {
                                 feign.Response registeredWorkerSiddhiAppsResponse = WorkerServiceFactory
                                         .getWorkerHttpsClient
-
+                                                
                                                 (PROTOCOL + generateURLHostPort(worker.getHost(), String.valueOf(
                                                         worker.getPort())), this.getUsername(), this.getPassword())
                                         .getAllAppDetails();
@@ -2096,7 +2116,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     List<SiddhiAppStatus> totalApps = gson.fromJson(inputReader, new
                                             TypeToken<List<SiddhiAppStatus>>() {
                                             }.getType());
-
+                                    
                                     for (SiddhiAppStatus siddhiapp : totalApps) {
                                         SiddhiAppSummaryInfo siddhiAppSummaryInfo = new SiddhiAppSummaryInfo();
                                         siddhiAppSummaryInfo.setAppName(siddhiapp.getAppName());
@@ -2125,7 +2145,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     .entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Returns all the HA Siddhi app details
      *
@@ -2164,13 +2184,13 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             logger.debug(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.", e);
                         }
                         logger.warn(removeCRLFCharacters(manager.getWorkerId()) + " Unnable to reach manager.");
-
+                        
                     } catch (IOException e) {
                         logger.warn("Error occured while getting the response " + e.getMessage());
                     }
                 });
             }
-
+            
             if (!registeredWorkers.isEmpty()) {
                 registeredWorkers.parallelStream().forEach(worker -> {
                     ServerHADetails serverHADetails = new ServerHADetails();
@@ -2185,7 +2205,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     .getHAStatus().equalsIgnoreCase(Constants.ACTIVE_APP_STATUS)) {
                                 feign.Response registeredWorkerSiddhiAppsResponse = WorkerServiceFactory
                                         .getWorkerHttpsClient
-
+                                                
                                                 (PROTOCOL + generateURLHostPort(worker.getHost(), String.valueOf(
                                                         worker.getPort())), this.getUsername(), this.getPassword())
                                         .getAllAppDetails();
@@ -2194,7 +2214,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     List<SiddhiAppStatus> totalApps = gson.fromJson(inputReader, new
                                             TypeToken<List<SiddhiAppStatus>>() {
                                             }.getType());
-
+                                    
                                     for (SiddhiAppStatus siddhiapp : totalApps) {
                                         SiddhiAppSummaryInfo siddhiAppSummaryInfo = new SiddhiAppSummaryInfo();
                                         siddhiAppSummaryInfo.setAppName(siddhiapp.getAppName());
@@ -2209,7 +2229,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 }
                             }
                         } catch (feign.RetryableException ex) {
-                            logger.error("Error ocurred while connecting the node " + worker.getWorkerId(),ex);
+                            logger.error("Error ocurred while connecting the node " + worker.getWorkerId(), ex);
                         } catch (IOException e) {
                             logger.error("error occurred while retrieving response ", e);
                         }
@@ -2223,7 +2243,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     .entity("Unauthorized for user : " + username).build();
         }
     }
-
+    
     /**
      * Return all the siddhi apps that are deployed in the active manager nodes
      *
@@ -2232,7 +2252,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @throws NotFoundException
      * @throws SQLException
      */
-
+    
     @Override
     public Response getAllManagersSiddhiApps(String username) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(
@@ -2248,7 +2268,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             List<ManagerSiddhiApps> totalApps = gson.fromJson(String.valueOf
                                     (registeredManagerSiddhiAppResponse
                                             .getEntity()), new TypeToken<List<ManagerSiddhiApps>>() {
-
+                                
                             }.getType());
                             if (!totalApps.isEmpty()) {
                                 for (ManagerSiddhiApps managerSiddhiApps : totalApps) {
@@ -2281,29 +2301,29 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     .entity("Unauthorized for user : " + username).build();
         }
     }
-
-
+    
+    
     /**
      * Get worker asscess username.
      *
      * @return
      */
-
+    
     private String getUsername() {
-
+        
         return dashboardConfigurations.getUsername();
     }
-
+    
     /**
      * GetGet worker asscess password.
      *
      * @return
      */
     private String getPassword() {
-
+        
         return dashboardConfigurations.getPassword();
     }
-
+    
     /**
      * Parser for time
      *
@@ -2311,7 +2331,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      * @return
      */
     private long parsePeriod(String interval) {
-
+        
         long millisVal = Constants.DEFAULT_TIME_INTERVAL_MILLIS;
         String numberOnly = interval.replaceAll("[^0-9]", "");
         if (interval.contains("sec")) {
@@ -2336,7 +2356,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         }
         return millisVal;
     }
-
+    
     /**
      * Returns the child siddhi application details of the specific parent siddhi application
      *
@@ -2374,7 +2394,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     String errString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
                             .SERVER_CONNECTION_ERROR, e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
-
+                    
                 }
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
@@ -2384,7 +2404,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized user : " + username).build();
         }
     }
-
+    
     @Override
     public Response getClusterResourceNodeDetails(String managerId, String username)
             throws NotFoundException, IOException {
@@ -2405,7 +2425,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         Map<String, List<WorkerOverview>> totalResourceClusterDetails = new HashMap<>();
                         List<WorkerOverview> resourceClusterList = new ArrayList<>();
                         List<NodeConfigurationDetails> storedWorkerList = dashboardStore.selectAllWorkers();
-
+                        
                         for (ResourceClusterInfo clusterInfo : clusterInfos) {
                             if (!storedWorkerList.isEmpty()) {
                                 for (NodeConfigurationDetails worker : storedWorkerList) {
@@ -2475,13 +2495,13 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 resourceClusterList.add(workerOverview);
                             }
                         }
-
+                        
                         if (resourceClusterList.size() != 0) {
                             totalResourceClusterDetails.put("ResourceCluster", resourceClusterList);
                         }
                         String jsonString = new Gson().toJson(totalResourceClusterDetails);
                         return Response.ok().entity(jsonString).build();
-
+                        
                     } else if (resourceResponse.status() == 401) {
                         String jsonString = new Gson().toJson(resourceResponse.body().toString());
                         return Response.status(Response.Status.UNAUTHORIZED).entity(jsonString).build();
@@ -2502,20 +2522,20 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("unauthorized user : " + username).build();
         }
     }
-
+    
     public static StatusDashboardMetricsDBHandler getMetricStore() {
-
+        
         return metricStore;
     }
-
+    
     private String removeCRLFCharacters(String str) {
-
+        
         if (str != null) {
             str = str.replace('\n', '_').replace('\r', '_');
         }
         return str;
     }
-
+    
     @Reference(
             name = "org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent",
             service = DatasourceServiceComponent.class,
@@ -2524,20 +2544,20 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             unbind = "unregisterServiceDatasource"
     )
     public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-
+        
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DatasourceServiceComponent");
         }
-
+        
     }
-
+    
     public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-
+        
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");
         }
     }
-
+    
     @Reference(
             name = "org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent",
             service = PermissionGrantServiceComponent.class,
@@ -2546,15 +2566,15 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             unbind = "unregisterServicePermissionGrantService"
     )
     public void registerServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
-
+        
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) ServicePermissionGrantService");
         }
     }
-
+    
     public void unregisterServicePermissionGrantService(
             PermissionGrantServiceComponent permissionGrantServiceComponent) {
-
+        
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) ServicePermissionGrantService");
         }
