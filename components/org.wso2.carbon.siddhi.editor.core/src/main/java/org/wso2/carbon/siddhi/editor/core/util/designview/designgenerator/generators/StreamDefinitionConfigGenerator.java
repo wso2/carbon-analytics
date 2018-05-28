@@ -25,6 +25,7 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,8 +44,12 @@ public class StreamDefinitionConfigGenerator {
             attributeConfigs.add(new AttributeConfig(attribute.getName(), attribute.getType().name().toLowerCase()));
         }
         List<String> annotationConfigs = new ArrayList<>();
+        List<String> streamElementAnnotationNames = new ArrayList<>(Arrays.asList("SOURCE", "SINK", "STORE"));
         for (Annotation annotation : streamDefinition.getAnnotations()) {
-            annotationConfigs.add(new AnnotationConfigGenerator().generateAnnotationConfig(annotation));
+            if (!streamElementAnnotationNames.contains(annotation.getName().toUpperCase())) {
+                // Since these annotations represent the stream itself
+                annotationConfigs.add(new AnnotationConfigGenerator().generateAnnotationConfig(annotation));
+            }
         }
         return new StreamConfig(streamDefinition.getId(),
                 streamDefinition.getId(),
