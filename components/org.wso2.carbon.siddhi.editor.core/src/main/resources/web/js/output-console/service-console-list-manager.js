@@ -73,8 +73,6 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             if(activeTab._title != "welcome-page"){
                                 if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                                     activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                                } else {
-                                    //TODO:activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                                 }
                             }
                         } else {
