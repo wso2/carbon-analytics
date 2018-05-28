@@ -37,4 +37,12 @@ public class WindowFilterProjectionConfig extends QueryInputConfig {
         this.from = from;
         this.streamHandlerList = streamHandlerList;
     }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public List<StreamHandlerConfig> getStreamHandlerList() {
+        return streamHandlerList;
+    }
 }

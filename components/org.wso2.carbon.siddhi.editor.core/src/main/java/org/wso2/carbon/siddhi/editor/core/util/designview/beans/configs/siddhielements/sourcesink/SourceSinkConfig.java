@@ -28,12 +28,18 @@ import java.util.List;
  */
 public class SourceSinkConfig extends SiddhiElementConfig {
     private String annotationType;
+    private String connectedElementName;
     private String type;
     private List<String> options;
     private MapperConfig map;
 
-    public SourceSinkConfig(String annotationType, String type, List<String> options, MapperConfig map) {
+    public SourceSinkConfig(String annotationType,
+                            String connectedElementName,
+                            String type,
+                            List<String> options,
+                            MapperConfig map) {
         this.annotationType = annotationType;
+        this.connectedElementName = connectedElementName;
         this.type = type;
         this.options = options;
         this.map = map;
@@ -41,6 +47,10 @@ public class SourceSinkConfig extends SiddhiElementConfig {
 
     public String getAnnotationType() {
         return annotationType;
+    }
+
+    public String getConnectedElementName() {
+        return connectedElementName;
     }
 
     public String getType() {
