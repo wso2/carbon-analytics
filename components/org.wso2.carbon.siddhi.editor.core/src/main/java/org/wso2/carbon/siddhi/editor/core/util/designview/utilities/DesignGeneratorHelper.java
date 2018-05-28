@@ -53,7 +53,6 @@ public class DesignGeneratorHelper {
      * @return          true - when the value should be treated a string. Otherwise, false
      */
     public static boolean isStringValue(Element element) {
-        // TODO: 4/3/18 Implement if a case occurs. Keep for now
         return true;
     }
 

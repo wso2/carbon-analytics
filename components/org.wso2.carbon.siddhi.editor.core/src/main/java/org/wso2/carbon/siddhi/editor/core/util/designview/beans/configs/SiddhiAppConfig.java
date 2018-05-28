@@ -22,8 +22,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.pattern.PatternQueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.OLD_REMOVE.sequence.SequenceQueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
@@ -53,7 +51,6 @@ public class SiddhiAppConfig {
     private List<WindowConfig> windowList = new ArrayList<>();
     private List<AggregationConfig> aggregationList = new ArrayList<>();
     private List<FunctionConfig> functionList = new ArrayList<>();
-    // TODO: 3/27/18 Other {Element}Lists
 
     /**
      * Returns Id for the next element id, after incrementing the final element count
@@ -117,11 +114,8 @@ public class SiddhiAppConfig {
             addElement(windowFilterProjectionQueryList, queryConfig);
         } else if (queryInputConfig instanceof JoinConfig) {
             addElement(joinQueryList, queryConfig);
-        } else if (queryInputConfig instanceof PatternQueryConfig) {
-            addElement(patternQueryList, queryConfig);
-        } else if (queryInputConfig instanceof SequenceQueryConfig) {
-            addElement(sequenceQueryList, queryConfig);
         } else {
+            // TODO add pattern & sequences
             throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
         }
     }

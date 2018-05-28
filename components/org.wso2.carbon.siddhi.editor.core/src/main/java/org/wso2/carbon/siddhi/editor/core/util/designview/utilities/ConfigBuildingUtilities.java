@@ -23,7 +23,7 @@ import org.wso2.siddhi.query.api.SiddhiElement;
 /**
  * Has methods involved in converting Siddhi elements to Design view Config objects
  */
-public class ConfigBuildingUtilities { // TODO move entirely to DesignGeneratorHelper
+public class ConfigBuildingUtilities {
     /**
      * Avoids Instantiation
      */
