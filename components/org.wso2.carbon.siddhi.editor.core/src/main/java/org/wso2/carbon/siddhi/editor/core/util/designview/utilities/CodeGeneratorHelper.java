@@ -35,6 +35,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.InsertOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateInsertIntoOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute.SetAttributeConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.MapperConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
@@ -138,6 +139,41 @@ public class CodeGeneratorHelper {
         }
 
         return annotationsStringBuilder.toString();
+    }
+
+    public static String getMapper(MapperConfig mapper, String annotationType) {
+        if (mapper.getType() == null || mapper.getType().isEmpty()) {
+            // TODO not sure whether to throw an error here or not
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder mapperStringBuilder = new StringBuilder();
+        mapperStringBuilder.append(CodeGeneratorConstants.MAP)
+                .append(mapper.getType())
+                .append(CodeGeneratorConstants.SINGLE_QUOTE);
+
+        if (mapper.getOptions() != null && !mapper.getOptions().isEmpty()) {
+            mapperStringBuilder.append(CodeGeneratorConstants.COMMA)
+                    .append(CodeGeneratorConstants.SPACE)
+                    .append(getParameterList(mapper.getOptions()));
+        }
+
+        if (mapper.getAttributes() != null && !mapper.getAttributes().isEmpty()) {
+            mapperStringBuilder.append(CodeGeneratorConstants.COMMA)
+                    .append(CodeGeneratorConstants.SPACE);
+            if (annotationType.equalsIgnoreCase("SINK")) {
+                mapperStringBuilder.append(CodeGeneratorConstants.ATTRIBUTES);
+            } else if (annotationType.equalsIgnoreCase("SOURCE")) {
+                mapperStringBuilder.append(CodeGeneratorConstants.PAYLOAD);
+            }
+
+            mapperStringBuilder.append(getParameterList(mapper.getAttributes()))
+                    .append(CodeGeneratorConstants.CLOSE_BRACKET);
+        }
+
+        mapperStringBuilder.append(CodeGeneratorConstants.CLOSE_BRACKET);
+
+        return mapperStringBuilder.toString();
     }
 
     /**

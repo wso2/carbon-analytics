@@ -28,6 +28,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorHelper;
@@ -54,7 +55,7 @@ public class CodeGenerator {
         StringBuilder siddhiAppStringBuilder = new StringBuilder();
         siddhiAppStringBuilder
                 .append(generateAppNameAndDescription(siddhiApp.getAppName(), siddhiApp.getAppDescription()))
-                .append(generateStreams(siddhiApp.getStreamList()))
+                .append(generateStreams(siddhiApp.getStreamList(), siddhiApp.getSourceList(), siddhiApp.getSinkList()))
                 .append(generateTables(siddhiApp.getTableList()))
                 .append(generateWindows(siddhiApp.getWindowList()))
                 .append(generateTriggers(siddhiApp.getTriggerList()))
@@ -107,7 +108,7 @@ public class CodeGenerator {
         return appNameAndDescriptionStringBuilder.toString();
     }
 
-    private String generateStreams(List<StreamConfig> streamList) {
+    private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList, List<SourceSinkConfig> sinkList) {
         // TODO source and sink should be somehow connected to a stream over here
         if (streamList == null || streamList.isEmpty()) {
             return CodeGeneratorConstants.EMPTY_STRING;
@@ -562,6 +563,44 @@ public class CodeGenerator {
     private String generatePartitionString(PartitionConfig partition) {
         // TODO: 4/19/18 Write the logic here
         return CodeGeneratorConstants.EMPTY_STRING;
+    }
+
+    private String generateSourceSinkString(SourceSinkConfig sourceSink) {
+        if (sourceSink == null) {
+            throw new CodeGenerationException("The given SourceSinkConfig instance is null");
+        } else if (sourceSink.getAnnotationType() == null || sourceSink.getAnnotationType().isEmpty()) {
+            throw new CodeGenerationException("The annotation type for the given SourceSinkConfig is empty");
+        } else if (sourceSink.getType() == null || sourceSink.getType().isEmpty()) {
+            throw new CodeGenerationException("The type of source/sink for the given SourceSinkConfig is empty");
+        }
+
+        StringBuilder sourceSinkStringBuilder = new StringBuilder();
+        if (sourceSink.getAnnotationType().equalsIgnoreCase("SOURCE")) {
+            sourceSinkStringBuilder.append(CodeGeneratorConstants.SOURCE);
+        } else if (sourceSink.getAnnotationType().equalsIgnoreCase("SINK")) {
+            sourceSinkStringBuilder.append(CodeGeneratorConstants.SINK);
+        } else {
+            throw new CodeGenerationException("Unknown type: " + sourceSink.getType() +
+                    ". The SinkSourceConfig can only have type 'SINK' or type 'SOURCE'");
+        }
+
+        sourceSinkStringBuilder.append(sourceSink.getType())
+                .append(CodeGeneratorConstants.SINGLE_QUOTE);
+        if (sourceSink.getOptions() != null && !sourceSink.getOptions().isEmpty()) {
+            sourceSinkStringBuilder.append(CodeGeneratorConstants.COMMA)
+                    .append(CodeGeneratorConstants.SPACE)
+                    .append(CodeGeneratorHelper.getParameterList(sourceSink.getOptions()));
+        }
+
+        if (sourceSink.getMap() != null) {
+            sourceSinkStringBuilder.append(CodeGeneratorConstants.COMMA)
+                    .append(CodeGeneratorConstants.SPACE)
+                    .append(CodeGeneratorHelper.getMapper(sourceSink.getMap(), sourceSink.getAnnotationType()));
+        }
+
+        sourceSinkStringBuilder.append(CodeGeneratorConstants.CLOSE_BRACKET);
+
+        return sourceSinkStringBuilder.toString();
     }
 
 }

@@ -23,6 +23,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
  * the CodeGenerator class to build the entire Siddhi app string
  */
 public class CodeGeneratorConstants {
+    // TODO: 5/25/18 Have better names for the constants
     // TODO: 5/3/18 Change the name of the constants class to something else
     public static final char ALL = '*';
     public static final char CLOSE_BRACKET = ')';
@@ -74,7 +75,12 @@ public class CodeGeneratorConstants {
     public static final String RETURN = "return";
     public static final String LIMIT = "limit";
     public static final String WINDOW = "window";
+    public static final String SOURCE = "@source(type='";
+    public static final String SINK = "@sink(type='";
     public static final String STORE = "@store(type='";
+    public static final String MAP = "@map(type='";
+    public static final String ATTRIBUTES = "@attributes(";
+    public static final String PAYLOAD = "@payload(";
     public static final String HAVING = "having";
     public static final String OUTPUT = "output";
     public static final String ON = "on";
@@ -105,6 +111,8 @@ public class CodeGeneratorConstants {
 
     private CodeGeneratorConstants() {
     }
+
+    // TODO: 5/25/18 Change the name of this class to SiddhiSyntax and create a new class for CodeGeneratorConstants 
 
     // TODO: 5/4/18 Add another constants class for values that are not used to create the siddhi app
     // use these values for things like switch cases
