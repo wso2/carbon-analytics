@@ -390,6 +390,23 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var model;
                     var connectedElementName;
 
+                    if ((sourceElement.hasClass(constants.SOURCE) || sourceElement.hasClass(constants.SINK))
+                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
+                        if(targetElement.hasClass(constants.STREAM)) {
+                            connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(targetId)
+                                .getName();
+                        } else if (targetElement.hasClass(constants.TRIGGER)) {
+                            connectedElementName = self.configurationData.getSiddhiAppConfig().getTrigger(targetId)
+                                .getName();
+                        }
+                        if (sourceElement.hasClass(constants.SOURCE)) {
+                            self.configurationData.getSiddhiAppConfig().getSource(sourceId)
+                                .setConnectedElementName(connectedElementName);
+                        } else if (sourceElement.hasClass(constants.SINK)) {
+                            self.configurationData.getSiddhiAppConfig().getSink(sourceId)
+                                .setConnectedElementName(connectedElementName);
+                        }
+                    }
                     if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)) {
@@ -681,6 +698,17 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                     var model;
                     var streams;
+
+                    if ((sourceElement.hasClass(constants.SOURCE) || sourceElement.hasClass(constants.SINK))
+                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
+                        if (sourceElement.hasClass(constants.SOURCE)) {
+                            self.configurationData.getSiddhiAppConfig().getSource(sourceId)
+                                .setConnectedElementName(undefined);
+                        } else if (sourceElement.hasClass(constants.SINK)) {
+                            self.configurationData.getSiddhiAppConfig().getSink(sourceId)
+                                .setConnectedElementName(undefined);
+                        }
+                    }
 
                     if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
