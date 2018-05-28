@@ -29,6 +29,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.genera
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -61,10 +62,11 @@ public class DesignGenerator {
 
     /**
      * Gets EventFlow configuration for a given Siddhi app code string
-     * @param siddhiAppString   Code representation of the Siddhi app
-     * @return                  Event flow representation of the Siddhi app
+     * @param siddhiAppString                   Code representation of the Siddhi app
+     * @return                                  Event flow representation of the Siddhi app
+     * @throws DesignGenerationException        Error while generating config
      */
-    public EventFlow getEventFlow(String siddhiAppString) {
+    public EventFlow getEventFlow(String siddhiAppString) throws DesignGenerationException {
         try {
             this.siddhiAppString = siddhiAppString;
             siddhiApp = SiddhiCompiler.parse(siddhiAppString);
@@ -84,8 +86,9 @@ public class DesignGenerator {
 
     /**
      * Loads generated SiddhiElementConfigs into SiddhiAppConfig object
+     * @throws DesignGenerationException        Error while loading elements
      */
-    private void loadElements() {
+    private void loadElements() throws DesignGenerationException {
         loadAppNameAndDescription();
         loadTriggers();
         loadStreams();
@@ -113,8 +116,9 @@ public class DesignGenerator {
 
     /**
      * Loads Triggers from the SiddhiApp
+     * @throws DesignGenerationException        Error while loading elements
      */
-    private void loadTriggers() {
+    private void loadTriggers() throws DesignGenerationException {
         final String EVERY_SPLIT_KEYWORD = "every ";
         for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
             // Get 'at'
@@ -151,8 +155,9 @@ public class DesignGenerator {
 
     /**
      * Loads Streams from the SiddhiAppRuntime
+     * @throws DesignGenerationException        Error while loading elements
      */
-    private void loadStreams() {
+    private void loadStreams() throws DesignGenerationException {
         for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
             if (!isTriggerDefined(streamDefinition.getId(), siddhiApp)) {
                 siddhiAppConfig.add(
@@ -169,8 +174,9 @@ public class DesignGenerator {
                             new StreamDefinitionConfigGenerator()
                                     .generateStreamConfig((StreamDefinition) abstractDefinition, false));
                 } else {
-                    throw new IllegalArgumentException("The partitioned inner stream definition map does not have an " +
-                            "instance of class 'StreamDefinition'");
+                    throw new DesignGenerationException(
+                            "The partitioned inner stream definition map does not have an instance of class " +
+                                    "'StreamDefinition'");
                 }
             }
         }
@@ -220,8 +226,9 @@ public class DesignGenerator {
 
     /**
      * Loads Windows from the SiddhiAppRuntime
+     * @throws DesignGenerationException        Error while loading elements
      */
-    private void loadWindows() {
+    private void loadWindows() throws DesignGenerationException {
         // Defined Windows
         for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
             List<String> parameters = new ArrayList<>();
@@ -241,8 +248,9 @@ public class DesignGenerator {
 
     /**
      * Loads Aggregations from the SiddhiApp
+     * @throws DesignGenerationException        Error while loading elements
      */
-    private void loadAggregations() {
+    private void loadAggregations() throws DesignGenerationException {
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
             AttributesSelectionConfig selectedAttributesConfig;
             List<String> groupBy = new ArrayList<>();
@@ -258,7 +266,7 @@ public class DesignGenerator {
                     groupBy.add(ConfigBuildingUtilities.getDefinition(variable, siddhiAppString));
                 }
             } else {
-                throw new IllegalArgumentException("Selector of AggregationDefinition is not of class BasicSelector");
+                throw new DesignGenerationException("Selector of AggregationDefinition is not of class BasicSelector");
             }
 
             List<String> annotationList = new ArrayList<>();
@@ -308,8 +316,9 @@ public class DesignGenerator {
 
     /**
      * Loads Execution Elements from the Siddhi App
+     * @throws DesignGenerationException        Error while loading elements
      */
-    private void loadExecutionElements() {
+    private void loadExecutionElements() throws DesignGenerationException {
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
                 siddhiAppConfig.add(
@@ -317,9 +326,9 @@ public class DesignGenerator {
                                 .generateQueryConfig((Query) executionElement, siddhiAppString, siddhiApp));
             } else if (executionElement instanceof Partition) {
                 // TODO: 3/28/18 implement
-                throw new IllegalArgumentException("Unable to generate partition configs");
+                throw new DesignGenerationException("Unable to generate partition configs");
             } else {
-                throw new IllegalArgumentException("Unable create config for execution element of type unknown");
+                throw new DesignGenerationException("Unable create config for execution element of type unknown");
             }
         }
     }
@@ -330,8 +339,9 @@ public class DesignGenerator {
 
     /**
      * Loads generated Edges that represent connections between SiddhiElementConfigs, into SiddhiAppConfig object
+     * @throws DesignGenerationException        Error while loading edges
      */
-    private void loadEdges() {
+    private void loadEdges() throws DesignGenerationException {
         EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
         edges = edgesGenerator.generateEdges();
     }

@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.*;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.JoinInputStream;
@@ -41,10 +42,11 @@ public class QueryInputConfigGenerator {
 
     /**
      * Generates Config for Query Input, from given Siddhi Query object and the complete Siddhi app string
-     * @param queryInputStream      Siddhi Query InputStream object
-     * @return                      QueryInputConfig object
+     * @param queryInputStream                  Siddhi Query InputStream object
+     * @return                                  QueryInputConfig object
+     * @throws DesignGenerationException        Error while generating config
      */
-    public QueryInputConfig generateQueryInputConfig(InputStream queryInputStream) {
+    public QueryInputConfig generateQueryInputConfig(InputStream queryInputStream) throws DesignGenerationException {
         String queryInputType = getQueryInputType(queryInputStream);
 
         if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW_FILTER_PROJECTION.toString())) {
@@ -55,10 +57,10 @@ public class QueryInputConfigGenerator {
         } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString()) ||
                 queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
             // TODO implement
-            throw new IllegalArgumentException(queryInputType + " queries are not supported yet");
+            throw new DesignGenerationException(queryInputType + " queries are not supported yet");
         }
 
-        throw new IllegalArgumentException("Unknown type: " + queryInputType);
+        throw new DesignGenerationException("Unknown type: " + queryInputType);
     }
 
     /**

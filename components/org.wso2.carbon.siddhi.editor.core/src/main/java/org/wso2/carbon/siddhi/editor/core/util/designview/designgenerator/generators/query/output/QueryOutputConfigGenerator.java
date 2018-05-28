@@ -24,6 +24,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.DeleteOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.InsertOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryOutputType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.execution.query.output.stream.*;
 
@@ -40,8 +41,14 @@ public class QueryOutputConfigGenerator {
         this.siddhiAppString = siddhiAppString;
     }
 
-    // TODO: 4/17/18 comment
-    public QueryOutputConfig generateQueryOutputConfig(OutputStream queryOutputStream) {
+    /**
+     * Generates Config for a Siddhi Query's output part
+     * @param queryOutputStream                 Siddhi QueryOutputStream
+     * @return                                  QueryOutputConfig
+     * @throws DesignGenerationException        Error while generating Query Output
+     */
+    public QueryOutputConfig generateQueryOutputConfig(OutputStream queryOutputStream)
+            throws DesignGenerationException {
         if (queryOutputStream instanceof InsertIntoStream) {
             return generateInsertOutputConfig((InsertIntoStream) queryOutputStream);
         } else if (queryOutputStream instanceof DeleteStream) {
@@ -51,9 +58,14 @@ public class QueryOutputConfigGenerator {
         } else if (queryOutputStream instanceof UpdateOrInsertStream) {
             return generateUpdateOrInsertIntoOutputConfig((UpdateOrInsertStream) queryOutputStream);
         }
-        throw new IllegalArgumentException("Unknown type of Query Output Stream for generating Query Output Config");
+        throw new DesignGenerationException("Unknown type of Query Output Stream for generating Query Output Config");
     }
 
+    /**
+     * Generates a QueryOutputConfig of type 'insert into'
+     * @param insertIntoStream      Siddhi InsertIntoStream
+     * @return                      QueryOutputConfig
+     */
     private QueryOutputConfig generateInsertOutputConfig(InsertIntoStream insertIntoStream) {
         return new QueryOutputConfig(
                 QueryOutputType.INSERT.toString(),
@@ -61,7 +73,13 @@ public class QueryOutputConfigGenerator {
                 insertIntoStream.getId());
     }
 
-    private QueryOutputConfig generateDeleteOutputConfig(DeleteStream deleteStream) {
+    /**
+     * Generates a QueryOutputConfig of type 'delete'
+     * @param deleteStream                      Siddhi DeleteStream
+     * @return                                  QueryOutputConfig
+     * @throws DesignGenerationException        Error while generating QueryOutputConfig
+     */
+    private QueryOutputConfig generateDeleteOutputConfig(DeleteStream deleteStream) throws DesignGenerationException {
         return new QueryOutputConfig(
                 QueryOutputType.DELETE.toString(),
                 new DeleteOutputConfig(
@@ -70,7 +88,13 @@ public class QueryOutputConfigGenerator {
                 deleteStream.getId());
     }
 
-    private QueryOutputConfig generateUpdateOutputConfig(UpdateStream updateStream) {
+    /**
+     * Generates a QueryOutputConfig of type 'update'
+     * @param updateStream                      Siddhi UpdateStream
+     * @return                                  QueryOutputConfig
+     * @throws DesignGenerationException        Error while generating QueryOutputConfig
+     */
+    private QueryOutputConfig generateUpdateOutputConfig(UpdateStream updateStream) throws DesignGenerationException {
         return new QueryOutputConfig(
                 QueryOutputType.UPDATE.toString(),
                 new UpdateInsertIntoOutputConfig(
@@ -80,7 +104,14 @@ public class QueryOutputConfigGenerator {
                 updateStream.getId());
     }
 
-    private QueryOutputConfig generateUpdateOrInsertIntoOutputConfig(UpdateOrInsertStream updateOrInsertStream) {
+    /**
+     * Generates a QueryOutputConfig of type 'update or insert into'
+     * @param updateOrInsertStream              Siddhi UpdateOrInsertStream
+     * @return                                  QueryOutputConfig
+     * @throws DesignGenerationException        Error while generating QueryOutputConfig
+     */
+    private QueryOutputConfig generateUpdateOrInsertIntoOutputConfig(UpdateOrInsertStream updateOrInsertStream)
+            throws DesignGenerationException {
         return new QueryOutputConfig(
                 QueryOutputType.UPDATE_OR_INSERT_INTO.toString(),
                 new UpdateInsertIntoOutputConfig(
@@ -91,7 +122,14 @@ public class QueryOutputConfigGenerator {
                 updateOrInsertStream.getId());
     }
 
-    private List<SetAttributeConfig> generateSetAttributeConfigsList(List<UpdateSet.SetAttribute> setAttributes) {
+    /**
+     * Generates config of attributes, set in 'update' or 'update or insert into' queries
+     * @param setAttributes                     List of Siddhi SetAttributes
+     * @return                                  List of SetAttributeConfigs
+     * @throws DesignGenerationException        Error while generating config
+     */
+    private List<SetAttributeConfig> generateSetAttributeConfigsList(List<UpdateSet.SetAttribute> setAttributes)
+            throws DesignGenerationException {
         List<SetAttributeConfig> setAttributeConfigs = new ArrayList<>();
         for (UpdateSet.SetAttribute setAttribute : setAttributes) {
             // Attribute name and value

@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.CodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.singletons.CodeGeneratorSingleton;
 import org.wso2.carbon.siddhi.editor.core.util.designview.singletons.DesignGeneratorSingleton;
 
@@ -31,11 +32,11 @@ public class SiddhiAppConverter {
 
     /**
      * Generates Siddhi app's Visual representation to be shown in the design view, from the given code string
-     *
-     * @param siddhiAppCode Code representation of the Siddhi app
-     * @return Event flow representation of the Siddhi app
+     * @param siddhiAppCode                     Code representation of the Siddhi app
+     * @return                                  Event flow representation of the Siddhi app
+     * @throws DesignGenerationException        Error while converting to design view
      */
-    public EventFlow generateDesign(String siddhiAppCode) {
+    public EventFlow generateDesign(String siddhiAppCode) throws DesignGenerationException {
         DesignGenerator designGenerator = DesignGeneratorSingleton.getInstance();
         return designGenerator.getEventFlow(siddhiAppCode);
     }

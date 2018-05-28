@@ -27,6 +27,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +54,13 @@ public class EdgesGenerator {
 
     /**
      * Generates Edges for the elements in the SiddhiAppConfig
-     * @return      List of all the Edges
+     * @return                                  List of all the Edges
+     * @throws DesignGenerationException        Error while generating config
      */
-    public List<Edge> generateEdges() {
+    public List<Edge> generateEdges() throws DesignGenerationException {
         List<Edge> edges = new ArrayList<>();
         edges.addAll(generateWindowFilterProjectionQueryEdges(siddhiAppConfig.getWindowFilterProjectionQueryList()));
         edges.addAll(generateJoinQueryEdges(siddhiAppConfig.getJoinQueryList()));
-        // TODO implement other edges
         return edges;
     }
 
@@ -67,8 +68,10 @@ public class EdgesGenerator {
      * Generates a list of edges, whose members denote an Edge related to a JoinQuery element
      * @param windowFilterProjectionQueryList       List of WindowFilterProjection QueryConfigs
      * @return                                      List of Edges
+     * @throws DesignGenerationException            Error while generating config
      */
-    private List<Edge> generateWindowFilterProjectionQueryEdges(List<QueryConfig> windowFilterProjectionQueryList) {
+    private List<Edge> generateWindowFilterProjectionQueryEdges(List<QueryConfig> windowFilterProjectionQueryList)
+            throws DesignGenerationException {
         List<Edge> edges = new ArrayList<>();
         for (QueryConfig query : windowFilterProjectionQueryList) {
             // Edge towards Query element
@@ -88,10 +91,11 @@ public class EdgesGenerator {
 
     /**
      * Generates a list of edges, whose members denote an Edge related to a JoinQuery element
-     * @param joinQueryList     List of Join QueryConfigs
-     * @return                  List of Edges
+     * @param joinQueryList                     List of Join QueryConfigs
+     * @return                                  List of Edges
+     * @throws DesignGenerationException        Error while generating config
      */
-    private List<Edge> generateJoinQueryEdges(List<QueryConfig> joinQueryList) {
+    private List<Edge> generateJoinQueryEdges(List<QueryConfig> joinQueryList) throws DesignGenerationException {
         List<Edge> edges = new ArrayList<>();
         for (QueryConfig query : joinQueryList) {
             // Edge towards Query element (From Left element)
@@ -117,11 +121,12 @@ public class EdgesGenerator {
      * Generates an Edge between corresponding parent and child SiddhiElements.
      * When one of the given parent/child is a SiddhiElement object, the Element is used directly.
      * When one of those is an Id, the respective element for the id is got and used
-     * @param parentElementOrId     Parent Element object or Id
-     * @param childElementOrId      Child Element object or Id
-     * @return                      Edge object
+     * @param parentElementOrId                 Parent Element object or Id
+     * @param childElementOrId                  Child Element object or Id
+     * @return                                  Edge object
+     * @throws DesignGenerationException        Error while generating config
      */
-    private Edge generateEdge(Object parentElementOrId, Object childElementOrId) {
+    private Edge generateEdge(Object parentElementOrId, Object childElementOrId) throws DesignGenerationException {
         SiddhiElementConfig parentElement = getOrAcceptSiddhiElement(parentElementOrId);
         SiddhiElementConfig childElement = getOrAcceptSiddhiElement(childElementOrId);
         return generateEdgesForElements(parentElement, childElement);
@@ -130,26 +135,29 @@ public class EdgesGenerator {
     /**
      * Accepts and returns the given object when it is a SiddhiElementConfig.
      * Gets the respective SiddhiElement and returns, when the Id is given
-     * @param elementOrId       SiddhiElementConfig object or Id
-     * @return                  SiddhiElementConfig object
+     * @param elementOrId                       SiddhiElementConfig object or Id
+     * @return                                  SiddhiElementConfig object
+     * @throws DesignGenerationException        Error while generating config
      */
-    private SiddhiElementConfig getOrAcceptSiddhiElement(Object elementOrId) {
+    private SiddhiElementConfig getOrAcceptSiddhiElement(Object elementOrId) throws DesignGenerationException {
         if (elementOrId instanceof SiddhiElementConfig) {
             return (SiddhiElementConfig) elementOrId;
         } else if (elementOrId instanceof String) {
             return getElementWithId((String) elementOrId);
         }
-        throw new IllegalArgumentException(
+        throw new DesignGenerationException(
                 "SiddhiElement ID or SiddhiElement object is expected, to find the element or accept the given one");
     }
 
     /**
      * Generates an edge between the given parent and child SiddhiElements
-     * @param parentElement     SiddhiElement object, where the Edge starts from
-     * @param childElement      SiddhiElement object, where the Edge ends at
-     * @return                  Edge object
+     * @param parentElement                     SiddhiElement object, where the Edge starts from
+     * @param childElement                      SiddhiElement object, where the Edge ends at
+     * @return                                  Edge object
+     * @throws DesignGenerationException        Error while generating config
      */
-    private Edge generateEdgesForElements(SiddhiElementConfig parentElement, SiddhiElementConfig childElement) {
+    private Edge generateEdgesForElements(SiddhiElementConfig parentElement, SiddhiElementConfig childElement)
+            throws DesignGenerationException {
         NodeType parentType = getSiddhiElementType(parentElement);
         NodeType childType = getSiddhiElementType(childElement);
         String edgeId = generateEdgeId(parentElement.getId(), childElement.getId());
@@ -158,10 +166,11 @@ public class EdgesGenerator {
 
     /**
      * Gets SiddhiElementConfig object from the SiddhiAppConfig, which has a related stream with the given name
-     * @param streamName        Name of the SiddhiElementConfig's related stream
-     * @return                  SiddhiElementConfig object
+     * @param streamName                        Name of the SiddhiElementConfig's related stream
+     * @return                                  SiddhiElementConfig object
+     * @throws DesignGenerationException        Error while generating config
      */
-    private SiddhiElementConfig getElementWithStreamName(String streamName) {
+    private SiddhiElementConfig getElementWithStreamName(String streamName) throws DesignGenerationException {
         for (StreamConfig streamConfig : siddhiAppConfig.getStreamList()) {
             if (streamConfig.getName().equals(streamName)) {
                 return streamConfig;
@@ -187,15 +196,16 @@ public class EdgesGenerator {
                 return aggregationConfig;
             }
         }
-        throw new IllegalArgumentException("Unable to find an element with related stream name '" + streamName + "'");
+        throw new DesignGenerationException("Unable to find an element with related stream name '" + streamName + "'");
     }
 
     /**
      * Gets SiddhiElementConfig object from the SiddhiAppConfig, which has the given Id
-     * @param id        Id of the SiddhiElementConfig
-     * @return          SiddhiElementConfig object
+     * @param id                                Id of the SiddhiElementConfig
+     * @return                                  SiddhiElementConfig object
+     * @throws DesignGenerationException        Error while generating config
      */
-    private SiddhiElementConfig getElementWithId(String id) {
+    private SiddhiElementConfig getElementWithId(String id) throws DesignGenerationException {
         for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getWindowFilterProjectionQueryList()) {
             if (siddhiElementConfig.getId().equals(id)) {
                 return siddhiElementConfig;
@@ -251,15 +261,16 @@ public class EdgesGenerator {
                 return siddhiElementConfig;
             }
         }
-        throw new IllegalArgumentException("Unable to find element with id '" + id + "'");
+        throw new DesignGenerationException("Unable to find element with id '" + id + "'");
     }
 
     /**
      * Gets Node Type of the given SiddhiElementConfig object
-     * @param siddhiElementConfig       SiddhiElementConfig object, which is represented as a Node
-     * @return                          Node type
+     * @param siddhiElementConfig               SiddhiElementConfig object, which is represented as a Node
+     * @return                                  Node type
+     * @throws DesignGenerationException        Error while generating config
      */
-    private NodeType getSiddhiElementType(SiddhiElementConfig siddhiElementConfig) {
+    private NodeType getSiddhiElementType(SiddhiElementConfig siddhiElementConfig) throws DesignGenerationException {
         if (siddhiElementConfig instanceof StreamConfig) {
             return NodeType.STREAM;
         }
@@ -283,10 +294,9 @@ public class EdgesGenerator {
             if (queryInputConfig instanceof JoinConfig) {
                 return NodeType.JOIN_QUERY;
             }
-            throw new IllegalArgumentException("Type is unknown for Query Input");
+            throw new DesignGenerationException("Type is unknown for Query Input");
         }
-        // TODO implement
-        throw new IllegalArgumentException(
+        throw new DesignGenerationException(
                 "Type is unknown for Siddhi Element with id '" + siddhiElementConfig.getId() + "'");
     }
 }

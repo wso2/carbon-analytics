@@ -23,6 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.JoinWithType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
@@ -50,16 +51,18 @@ public class JoinConfigGenerator {
      * @param siddhiAppString       Complete Siddhi app string
      * @return                      JoinQueryConfig object
      */
-    public JoinConfig getJoinQueryConfig(InputStream queryInputStream, SiddhiApp siddhiApp, String siddhiAppString) {
+    public JoinConfig getJoinQueryConfig(InputStream queryInputStream, SiddhiApp siddhiApp, String siddhiAppString)
+            throws DesignGenerationException {
         distinguishElements(queryInputStream.getUniqueStreamIds(), siddhiApp);
         return generateJoinConfig(queryInputStream, siddhiAppString);
     }
 
     /**
      * Gets the JoinWithType for the JoinQueryConfig
-     * @return      JoinWithType object
+     * @return                                  JoinWithType object
+     * @throws DesignGenerationException        Error while generating config
      */
-    private JoinWithType getJoinWithType() {
+    private JoinWithType getJoinWithType() throws DesignGenerationException {
         if (tableIDs.size() == 1) {
             return JoinWithType.TABLE;
         } else if (aggregationIDs.size() == 1) {
@@ -69,7 +72,7 @@ public class JoinConfigGenerator {
         } else if (!streamIDs.isEmpty()) {
             return JoinWithType.STREAM;
         } else {
-            throw new IllegalArgumentException("Unknown element present in Join Query");
+            throw new DesignGenerationException("Unknown element present in Join Query");
         }
     }
 
@@ -121,7 +124,8 @@ public class JoinConfigGenerator {
      * @param siddhiAppString       Complete Siddhi app string
      * @return                      JoinElementConfig object, representing a Left|Right element of a join
      */
-    private JoinElementConfig generateJoinElementConfig(SingleInputStream singleInputStream, String siddhiAppString) {
+    private JoinElementConfig generateJoinElementConfig(SingleInputStream singleInputStream, String siddhiAppString)
+            throws DesignGenerationException {
         JoinElementType joinElementType = getJoinElementType(singleInputStream.getStreamId());
 
         StreamHandlerConfigGenerator streamHandlerConfigGenerator = new StreamHandlerConfigGenerator(siddhiAppString);
@@ -140,19 +144,21 @@ public class JoinConfigGenerator {
 
     /**
      * Generates a JoinConfig, which represents a Join Input of a Siddhi Query
-     * @param queryInputStream      Siddhi Query InputStream object
-     * @param siddhiAppString       Complete Siddhi app string
-     * @return                      JoinConfig object
+     * @param queryInputStream                  Siddhi Query InputStream object
+     * @param siddhiAppString                   Complete Siddhi app string
+     * @return                                  JoinConfig object
+     * @throws DesignGenerationException        Error while generating config
      */
-    private JoinConfig generateJoinConfig(InputStream queryInputStream, String siddhiAppString) {
+    private JoinConfig generateJoinConfig(InputStream queryInputStream, String siddhiAppString)
+            throws DesignGenerationException {
         JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
         // Left element of the join
         JoinElementConfig leftElement =
-                generateJoinElementConfig((SingleInputStream)(joinInputStream.getLeftInputStream()), siddhiAppString);
+                generateJoinElementConfig((SingleInputStream) (joinInputStream.getLeftInputStream()), siddhiAppString);
 
         // Right element of the join
         JoinElementConfig rightElement =
-                generateJoinElementConfig((SingleInputStream)(joinInputStream.getRightInputStream()), siddhiAppString);
+                generateJoinElementConfig((SingleInputStream) (joinInputStream.getRightInputStream()), siddhiAppString);
 
         // Set 'isUnidirectional'
         if (joinInputStream.getTrigger().name().equalsIgnoreCase(JoinDirection.LEFT.toString())) {

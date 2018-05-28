@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -15,8 +15,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.carbon.siddhi.editor.core.util.designview.exceptions;
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
+/**
+ * Exceptions related to operations of generating Configs from code
+ */
+public class DesignGenerationException extends Exception {
+    public DesignGenerationException(String message) {
+        super(message);
+    }
 
-public interface StateElementConfig {
+    public DesignGenerationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
