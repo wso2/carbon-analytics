@@ -36,6 +36,7 @@ import org.wso2.carbon.sp.jobmanager.core.util.TransportStrategy;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
@@ -152,11 +153,12 @@ public class SiddhiTopologyCreatorTestCase {
 
     /**
      * Filter query can reside in an execGroup with parallel > 1 and the corresponding stream will have
-     * {@link TransportStrategy#ROUND_ROBIN}
+     * {@link TransportStrategy#ROUND_ROBIN}. Also transportChannelCreationEnabled is set to false and topics are
+     * created manually. Apps should be able to connect to existing topics.
      */
     @Test(dependsOnMethods = "testSiddhiTopologyCreator")
     public void testFilterQuery() {
-        String siddhiApp = "@App:name('TestPlan2') "
+        String siddhiApp = "@App:name('TestPlan2')  @App:transportChannelCreationEnabled('false')"
                 + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
                 + "bootstrap.servers='localhost:9092', @map(type='xml')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -173,12 +175,13 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
         Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams().get("TempInternalStream")
                 .getSubscriptionStrategy().getStrategy(), TransportStrategy.ROUND_ROBIN);
-        String topics[] = new String[]{"TestPlan2.TempInternalStream"};
+        String topics[] = new String[]{"custom_topic", "TestPlan2.TempInternalStream"};
+        KafkaTestUtil.createTopic(topics, 1);
 
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
 
-        KafkaTestUtil.createTopic(topics, 1);
+
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
             Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = createSiddhiAppRuntimes(siddhiManager,
@@ -209,11 +212,13 @@ public class SiddhiTopologyCreatorTestCase {
 
     /**
      *Window can can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream.
-     * This test will also validate ability to create topics and partitions on demand.
+     * This test will also validate ability to create topics and partitions on demand. Also
+     * transportChannelCreationEnabled is set to false and topics are created manually. Apps should be able to
+     * connect to existing topics.
      */
     @Test(dependsOnMethods = "testFilterQuery")
     public void testPartitionWithWindow() {
-        String siddhiApp = "@App:name('TestPlan3') "
+        String siddhiApp = "@App:name('TestPlan3')  @App:transportChannelCreationEnabled('false')"
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
                 + "@info(name = 'query1') @dist(parallel ='1', execGroup='group1')\n "
                 + "from TempStream\n"
@@ -231,6 +236,8 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
         Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams().get("TempInternalStream")
                 .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
+        String topics[] = new String[]{"TestPlan3.TempInternalStream.deviceID"};
+        KafkaTestUtil.createTopic(topics, 2);
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -1176,6 +1183,91 @@ public class SiddhiTopologyCreatorTestCase {
         }
 
     }
+
+    /**
+     * When user has disabled the topic creation and topics are not available app creation should fail.
+     */
+    @Test(dependsOnMethods = "testUsergivenSourceNoGroup",
+            expectedExceptions = SiddhiAppCreationException.class)
+    public void testPartitionTopicCreationDisabledWithNoTopics() throws InterruptedException {
+        String siddhiApp = "@App:name('TestPlan13')  @App:transportChannelCreationEnabled('false')\n"
+                + "@source(type='kafka', topic.list='TestPlan12.stockStream', group.id='1', threading.option='single"
+                + ".thread', bootstrap.servers='localhost:9092', @map(type='xml'))  "
+                + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
+                + "@source(type='kafka', topic.list='TestPlan12.companyTriggerStream', group.id='1', threading"
+                + ".option='single"
+                + ".thread', bootstrap.servers='localhost:9092', @map(type='xml'))"
+                + "Define stream companyTriggerStream(symbol string);\n"
+                + "@info(name = 'query1')@dist(parallel='2', execGroup='001')\n"
+                + "From stockStream[price > 100]\n"
+                + "Select *\n"
+                + "Insert into filteredStockStream;\n"
+                + "@info(name = 'query2')@dist(parallel='2', execGroup='001')\n"
+                + "From companyTriggerStream \n"
+                + "Select *\n"
+                + "Insert into SymbolStream;\n"
+                + "@info(name = 'query3')@dist(parallel='3', execGroup='002')\n"
+                + "From stockStream[price < 100]\n"
+                + "Select *\n"
+                + "Insert into LowStockStream;\n"
+                + "@info(name='query4')@dist(parallel='3', execGroup='002')\n"
+                + "Partition with (symbol of filteredStockStream)\n"
+                + "begin\n"
+                + "From filteredStockStream#window.time(5 min)\n"
+                + "Select symbol, avg(price) as avgPrice, quantity\n"
+                + "Insert into #avgPriceStream;\n"
+                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerStream#window.length"
+                + "(1)\n"
+                + "On (companyTriggerStream.symbol == a.symbol)\n"
+                + "Select a.symbol, a.avgPrice, a.quantity\n"
+                + "Insert into triggeredAvgStream;\n"
+                + "End;\n";
+
+        String topics[] = new String[]{"TestPlan12.stockStream", "TestPlan12.companyTriggerStream"};
+        KafkaTestUtil.createTopic(topics, 1);
+        Thread.sleep(1000);
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        try {
+            appCreator.createApps(topology);
+            Assert.fail();
+        } catch (SiddhiAppCreationException e) {
+            Assert.assertTrue(e.getMessage().contains("User has disabled topic creation by setting " +
+                    "transportChannelCreationEnabled property to false. Hence Siddhi App deployment will be aborted"));
+            throw e;
+        }
+
+    }
+
+    @Test(dependsOnMethods = "testPartitionTopicCreationDisabledWithNoTopics",
+            expectedExceptions = SiddhiAppCreationException.class)
+    public void testTopicCreationDisabledWithNoTopics() {
+        String siddhiApp = "@App:name('TestPlan14')  @App:transportChannelCreationEnabled('false')"
+                + "@source(type='kafka', topic.list='custom_topic14', group.id='1', threading.option='single.thread', "
+                + "bootstrap.servers='localhost:9092', @map(type='xml')) "
+                + "define stream TempStream(deviceID long, roomNo int, temp double); "
+                + "@info(name = 'query1') @dist(parallel ='1', execGroup='001')\n "
+                + "from TempStream\n"
+                + "select *\n"
+                + "insert into TempInternalStream;"
+                + "@info(name='query2')@dist(parallel='3',execGroup='002')\n"
+                + "from TempInternalStream[(roomNo >= 100 and roomNo < 210) and temp > 40]\n"
+                + "select roomNo, temp\n"
+                + "insert into HighTempStream;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        try {
+            siddhiTopologyCreator.createTopology(siddhiApp);
+            Assert.fail();
+        } catch (SiddhiAppCreationException e) {
+            Assert.assertTrue(e.getMessage().contains("Topic(s) custom_topic14 creation failed. User has disabled topic" +
+                    " creation by setting transportChannelCreationEnabled property to false"));
+            throw e;
+        }
+    }
+
+
 
     private Map<String, List<SiddhiAppRuntime>> createSiddhiAppRuntimes(
             SiddhiManager siddhiManager, List<DeployableSiddhiQueryGroup> queryGroupList) {
