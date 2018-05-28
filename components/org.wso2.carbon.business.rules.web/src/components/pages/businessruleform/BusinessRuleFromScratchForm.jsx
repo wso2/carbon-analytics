@@ -440,6 +440,10 @@ export default class BusinessRuleFromScratchForm extends Component {
             this.state.selectedOutputRuleTemplate.uuid === '') {
             throw new FormSubmissionError(fieldErrorStates, 'Please select a valid Output Rule Template');
         }
+        if (this.state.businessRuleName === '') {
+            fieldErrorStates.businessRuleName = true;
+            throw new FormSubmissionError(fieldErrorStates, 'Name of the Business Rule can not be empty');
+        }
         if ((this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX) === null) ||
             (this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX)[0] !==
                 this.state.businessRuleName)) {
@@ -624,10 +628,16 @@ export default class BusinessRuleFromScratchForm extends Component {
      * @returns {Object}                            Modified business rule properties, for submission
      */
     wrapBusinessRuleProperties(businessRuleProperties) {
+        // Avoids mutating the param object, as it is not referenced from the state
         const properties = JSON.parse(JSON.stringify(businessRuleProperties));
         const filterRules = [];
         for (const filterRule of properties.ruleComponents.filterRules) {
-            filterRules.push(filterRule.join(' '));
+            // Remove spaces in Attributes, Property and AttributeOrValue of each filter rule
+            const filterRuleWithTrimmedElements = [];
+            for (const element of filterRule) {
+                filterRuleWithTrimmedElements.push(element.split(' ').join(''));
+            }
+            filterRules.push(filterRuleWithTrimmedElements.join(' '));
         }
         properties.ruleComponents = {
             filterRules,
@@ -642,9 +652,8 @@ export default class BusinessRuleFromScratchForm extends Component {
      * @returns {Object}                            Modified business rule properties, for handling in the form
      */
     unwrapBusinessRuleProperties(businessRuleProperties) {
-        // To avoid mutating the param object, as it is not referenced from the state
+        // Avoids mutating the param object, as it is not referenced from the state
         const properties = JSON.parse(JSON.stringify(businessRuleProperties));
-        // TODO handle saved with old implementation data
         const filterRules = [];
         for (const filterRule of properties.ruleComponents.filterRules) {
             filterRules.push(filterRule.split(' '));
@@ -822,7 +831,7 @@ export default class BusinessRuleFromScratchForm extends Component {
         return (
             <FilterComponent
                 mode={this.state.formMode}
-                isExpanded={this.state.expandedStates.outputComponent}
+                isExpanded={this.state.expandedStates.filterComponent}
                 isErroneous={
                     this.state.fieldErrorStates.properties ?
                         this.state.fieldErrorStates.properties.filterComponent : false}
@@ -848,6 +857,7 @@ export default class BusinessRuleFromScratchForm extends Component {
         return (
             <OutputComponent
                 mode={this.state.formMode}
+                isExpanded={this.state.expandedStates.outputComponent}
                 isErroneous={
                     this.state.fieldErrorStates.properties ?
                         this.state.fieldErrorStates.properties.outputComponent : false}
@@ -858,6 +868,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                 outputRuleTemplates={this.state.outputRuleTemplates}
                 selectedOutputRuleTemplate={this.state.selectedOutputRuleTemplate}
                 selectedInputRuleTemplate={this.state.selectedInputRuleTemplate}
+                businessRuleProperties={this.state.businessRuleProperties}
                 inputStreamFields={
                     !BusinessRulesUtilityFunctions.isEmpty(
                         this.state.selectedInputRuleTemplate) ?
@@ -872,8 +883,6 @@ export default class BusinessRuleFromScratchForm extends Component {
                     this.updateOutputMapping(value.newValue, fieldName)}
                 getPropertyComponents={(propertiesType, formMode) =>
                     this.getPropertyComponents(propertiesType, formMode)}
-                businessRuleProperties={this.state.businessRuleProperties}
-                isExpanded={this.state.expandedStates.outputComponent}
                 toggleExpansion={() => this.toggleExpansion('outputComponent')}
             />
         );
