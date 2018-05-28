@@ -47,7 +47,7 @@ public class SourceSinkConfigGenerator {
                 generateSourceOrSinkOptions(source.getStreamDefinition().getAnnotations().get(0).getElements()),
                 generateMapperConfig(
                         source.getStreamDefinition().getAnnotations().get(0)
-                                .getAnnotations(AnnotationType.MAP.toString()).get(0)));
+                                .getAnnotations(AnnotationType.MAP.toString())));
     }
 
     /**
@@ -63,7 +63,7 @@ public class SourceSinkConfigGenerator {
                 generateSourceOrSinkOptions(sink.getStreamDefinition().getAnnotations().get(0).getElements()),
                 generateMapperConfig(
                         sink.getStreamDefinition().getAnnotations().get(0)
-                                .getAnnotations(AnnotationType.MAP.toString()).get(0)));
+                                .getAnnotations(AnnotationType.MAP.toString())));
     }
 
     /**
@@ -87,15 +87,21 @@ public class SourceSinkConfigGenerator {
     }
 
     /**
-     * Generates config for a Mapper of a Siddhi Source/Sink
-     * @param mapAnnotation     Siddhi Annotation object, which represents @map
-     * @return                  Mapper Config object
+     * Generates config for Map annotation of a Siddhi Source/Sink
+     * @param mapAnnotationList     Has a single element which represents the Map Annotation - if @map is present,
+     *                              otherwise empty
+     * @return                      MapperConfig object
      */
-    private MapperConfig generateMapperConfig(Annotation mapAnnotation) {
-        return new MapperConfig(
-                mapAnnotation.getElement(TYPE),
-                generateMapperOptions(mapAnnotation),
-                generateCustomMappingAttributes(mapAnnotation));
+    private MapperConfig generateMapperConfig(List<Annotation> mapAnnotationList) {
+        if (!mapAnnotationList.isEmpty()) {
+            Annotation mapAnnotation = mapAnnotationList.get(0);
+            return new MapperConfig(
+                    mapAnnotation.getElement(TYPE),
+                    generateMapperOptions(mapAnnotation),
+                    generateCustomMappingAttributes(mapAnnotation));
+
+        }
+        return null;
     }
 
     /**
