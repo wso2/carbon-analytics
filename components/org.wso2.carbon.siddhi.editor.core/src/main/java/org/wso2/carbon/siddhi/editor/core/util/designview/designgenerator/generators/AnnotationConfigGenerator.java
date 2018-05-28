@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.annotation;
+package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.annotation.Element;
@@ -36,27 +36,16 @@ public class AnnotationConfigGenerator {
         annotationConfig.append(annotation.getName());
         annotationConfig.append("(");
 
-        List<String> elements = new ArrayList<>();
+        List<String> annotationMembers = new ArrayList<>();
         for (Element element : annotation.getElements()) {
-            if (element.getKey() == null) {
-                elements.add(String.format("'%s'", element.getValue()));
-            } else {
-                elements.add(String.format("%s='%s'", element.getKey(), element.getValue()));
-            }
+            annotationMembers.add(element.toString());
         }
-
-        List<String> innerAnnotations = new ArrayList<>();
         for (Annotation innerAnnotation : annotation.getAnnotations()) {
-            innerAnnotations.add(generateAnnotationConfig(innerAnnotation));
+            annotationMembers.add(generateAnnotationConfig(innerAnnotation));
         }
 
-        annotationConfig.append(
-                String.join(
-                        ", ",
-                        String.join(", ", elements),
-                        String.join(", ", innerAnnotations)));
+        annotationConfig.append(String.join(", ", annotationMembers));
         annotationConfig.append(")");
-
         return annotationConfig.toString();
     }
 }

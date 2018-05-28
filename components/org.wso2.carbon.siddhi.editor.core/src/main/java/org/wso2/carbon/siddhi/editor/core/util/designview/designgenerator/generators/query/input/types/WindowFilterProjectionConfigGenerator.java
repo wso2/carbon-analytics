@@ -20,6 +20,8 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryWindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
@@ -43,22 +45,21 @@ public class WindowFilterProjectionConfigGenerator {
     }
 
     /**
-     * Gets a WindowFilterProjectionConfig object, from the given Siddhi Query object
+     * Generates a WindowFilterProjectionConfig object, from the given Siddhi Query InputStream object
      * @param queryInputStream      Siddhi Query InputStream object
      * @return                      WindowFilterProjectionConfig object
      */
-    public WindowFilterProjectionConfig getWindowFilterProjectionQueryConfig(InputStream queryInputStream) {
-        switch (getType(queryInputStream)) {
-            case PROJECTION:
-                return generateProjectionQueryInput(queryInputStream);
-            case FILTER:
-                return generateFilterQueryInput(queryInputStream);
-            case WINDOW:
-                return generateWindowQueryInput(queryInputStream);
-            default:
-                throw new IllegalArgumentException("Unknown type: " + getType(queryInputStream) +
-                        " for generating Window-Filter-Projection Query Config");
+    public WindowFilterProjectionConfig generateWindowFilterProjectionConfig(InputStream queryInputStream) {
+        StreamHandlerConfigGenerator streamHandlerConfigGenerator = new StreamHandlerConfigGenerator(siddhiAppString);
+        List<StreamHandlerConfig> streamHandlerConfigs = new ArrayList<>();
+        for (StreamHandler streamHandler : ((SingleInputStream) queryInputStream).getStreamHandlers()) {
+            streamHandlerConfigs.add(streamHandlerConfigGenerator.generateStreamHandlerConfig(streamHandler));
         }
+
+        return new WindowFilterProjectionConfig(
+                getType(queryInputStream).toString(),
+                queryInputStream.getUniqueStreamIds().get(0),
+                streamHandlerConfigs);
     }
 
     /**
@@ -78,78 +79,6 @@ public class WindowFilterProjectionConfigGenerator {
             }
             return WindowFilterProjectionQueryType.FILTER;
         }
-    }
-
-    /**
-     * Generates a QueryInputConfig of type Projection, with the given Siddhi Query
-     * @param queryInputStream      Siddhi Query InputStream object
-     * @return                      WindowFilterProjectionConfig object,
-     *                              with the configuration of a Projection query
-     */
-    private WindowFilterProjectionConfig generateProjectionQueryInput(InputStream queryInputStream) {
-        return new WindowFilterProjectionConfig(
-                WindowFilterProjectionQueryType.PROJECTION.toString(),
-                queryInputStream.getUniqueStreamIds().get(0),
-                null,
-                null,
-                "");
-    }
-
-    /**
-     * Generates a QueryInputConfig of type Filter, with the given Siddhi Query
-     * @param queryInputStream      Siddhi Query InputStream object
-     * @return                      WindowFilterProjectionConfig object, with the configuration of a Filter query
-     */
-    private WindowFilterProjectionConfig generateFilterQueryInput(InputStream queryInputStream) {
-        String from = queryInputStream.getUniqueStreamIds().get(0);
-        // Filter query will have just one StreamHandler, that's the Filter
-        Filter filter = (Filter) ((BasicSingleInputStream) queryInputStream).getStreamHandlers().get(0);
-        String filterDefinition = ConfigBuildingUtilities.getDefinition(filter, siddhiAppString);
-
-        return new WindowFilterProjectionConfig(
-                WindowFilterProjectionQueryType.FILTER.toString(),
-                from,
-                filterDefinition.substring(1, filterDefinition.length() - 1).trim(),
-                null,
-                "");
-    }
-
-    /**
-     * Generates a QueryInputConfig of type Window, with the given Siddhi Query
-     * @param queryInputStream      Siddhi Query InputStream object
-     * @return                      WindowFilterProjectionConfig object, with the configuration of a Window query
-     */
-    private WindowFilterProjectionConfig generateWindowQueryInput(InputStream queryInputStream) {
-        String mainFilter = null;
-        String postWindowFilter = "";
-        String function = null;
-        List<String> parameters = new ArrayList<>();
-
-        for (StreamHandler streamHandler : ((SingleInputStream) queryInputStream).getStreamHandlers()) {
-            if (streamHandler instanceof Filter) {
-                String definition;
-                // First Filter will be Query's, and the next one will be window's
-                if (mainFilter == null) {
-                    definition = ConfigBuildingUtilities.getDefinition(streamHandler, siddhiAppString);
-                    mainFilter = definition.substring(1, definition.length() - 1).trim();
-                } else {
-                    definition = ConfigBuildingUtilities.getDefinition(streamHandler, siddhiAppString);
-                    postWindowFilter = definition.substring(1, definition.length() - 1).trim();
-                }
-            } else if (streamHandler instanceof Window) {
-                for (Expression expression : streamHandler.getParameters()) {
-                    parameters.add(ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));
-                }
-                function = ((Window)streamHandler).getName();
-            }
-        }
-
-        return new WindowFilterProjectionConfig(
-                WindowFilterProjectionQueryType.WINDOW.toString(),
-                queryInputStream.getUniqueStreamIds().get(0),
-                mainFilter,
-                new QueryWindowConfig(function, parameters),
-                postWindowFilter);
     }
 
     /**

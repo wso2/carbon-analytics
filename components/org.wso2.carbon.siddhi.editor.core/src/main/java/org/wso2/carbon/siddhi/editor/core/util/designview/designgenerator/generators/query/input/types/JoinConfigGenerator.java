@@ -20,17 +20,15 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinElementConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinElementWindowConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input.JoinWithType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
-import org.wso2.siddhi.query.api.execution.query.input.handler.Window;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.JoinInputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
-import org.wso2.siddhi.query.api.expression.Expression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,38 +124,18 @@ public class JoinConfigGenerator {
     private JoinElementConfig generateJoinElementConfig(SingleInputStream singleInputStream, String siddhiAppString) {
         JoinElementType joinElementType = getJoinElementType(singleInputStream.getStreamId());
 
-        // Instantiate JoinElementConfig with default values
-        JoinElementConfig joinElementConfig =
-                new JoinElementConfig(
-                        joinElementType.toString(),
-                        singleInputStream.getStreamId(),
-                        "", // TODO Confirm whether "" or null
-                        new JoinElementWindowConfig(), // TODO Confirm whether {} or null
-                        singleInputStream.getStreamReferenceId(),
-                        false);
-
+        StreamHandlerConfigGenerator streamHandlerConfigGenerator = new StreamHandlerConfigGenerator(siddhiAppString);
+        List<StreamHandlerConfig> streamHandlerList = new ArrayList<>();
         for (StreamHandler streamHandler : singleInputStream.getStreamHandlers()) {
-            if (streamHandler instanceof Filter) {
-                String definition = ConfigBuildingUtilities.getDefinition(streamHandler, siddhiAppString);
-                joinElementConfig.setFilter(definition.substring(1, definition.length() - 1).trim());
-            } else if (streamHandler instanceof Window) {
-                List<String> windowParameters = new ArrayList<>();
-                for (Expression expression : streamHandler.getParameters()) {
-                    windowParameters.add(ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));
-                }
-                joinElementConfig.setWindow(
-                        new JoinElementWindowConfig(((Window)streamHandler).getName(), windowParameters));
-            }
+            streamHandlerList.add(streamHandlerConfigGenerator.generateStreamHandlerConfig(streamHandler));
         }
 
-        if (joinElementType.equals(JoinElementType.WINDOW)) {
-            // If the Join element is of type 'window', Set stream handler window to null
-            joinElementConfig.setWindow(null); // TODO confirm whether {} or null
-        } else if (!joinElementConfig.getFilter().isEmpty() && joinElementConfig.getWindow().isEmpty()) {
-            throw new IllegalArgumentException("A Window Join with a filter, cannot exist without a window");
-        }
-
-        return joinElementConfig;
+        return new JoinElementConfig(
+                joinElementType.toString(),
+                singleInputStream.getStreamId(),
+                streamHandlerList,
+                singleInputStream.getStreamReferenceId(),
+                false);
     }
 
     /**

@@ -18,43 +18,23 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryWindowConfig;
+
+import java.util.List;
 
 /**
  * Represents a Window | Filter | Projection QueryInputConfig, for Siddhi Query
  */
 public class WindowFilterProjectionConfig extends QueryInputConfig {
     private String from;
-    private String filter;
-    private QueryWindowConfig window;
-    private String postWindowFilter;
+    private List<StreamHandlerConfig> streamHandlerList;
 
     public WindowFilterProjectionConfig(String type,
                                         String from,
-                                        String filter,
-                                        QueryWindowConfig window,
-                                        String postWindowFilter) {
+                                        List<StreamHandlerConfig> streamHandlerList) {
         super(type);
         this.from = from;
-        this.filter = filter;
-        this.window = window;
-        this.postWindowFilter = postWindowFilter;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public String getFilter() {
-        return filter;
-    }
-
-    public QueryWindowConfig getWindow() {
-        return window;
-    }
-
-    public String getPostWindowFilter() {
-        return postWindowFilter;
+        this.streamHandlerList = streamHandlerList;
     }
 }

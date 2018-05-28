@@ -50,7 +50,7 @@ public class QueryInputConfigGenerator {
 
         if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW_FILTER_PROJECTION.toString())) {
             return new WindowFilterProjectionConfigGenerator(siddhiAppString)
-                    .getWindowFilterProjectionQueryConfig(queryInputStream);
+                    .generateWindowFilterProjectionConfig(queryInputStream);
         } else if (queryInputType.equalsIgnoreCase(QueryInputType.JOIN.toString())) {
             return new JoinConfigGenerator().getJoinQueryConfig(queryInputStream, siddhiApp, siddhiAppString);
         } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString()) ||

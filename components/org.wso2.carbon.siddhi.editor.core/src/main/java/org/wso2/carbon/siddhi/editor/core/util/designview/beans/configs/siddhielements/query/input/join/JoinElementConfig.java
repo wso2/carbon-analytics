@@ -18,14 +18,17 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
+
+import java.util.List;
+
 /**
  * Represents a Join element of Join QueryInputConfig
  */
 public class JoinElementConfig {
     private String type;
     private String from;
-    private String filter;
-    private JoinElementWindowConfig window;
+    private List<StreamHandlerConfig> streamHandlerList;
     private String as;
     private boolean isUnidirectional;
 
@@ -34,14 +37,12 @@ public class JoinElementConfig {
 
     public JoinElementConfig(String type,
                              String from,
-                             String filter,
-                             JoinElementWindowConfig window,
+                             List<StreamHandlerConfig> streamHandlerList,
                              String as,
                              boolean isUnidirectional) {
         this.type = type;
         this.from = from;
-        this.filter = filter;
-        this.window = window;
+        this.streamHandlerList = streamHandlerList;
         this.as = as;
         this.isUnidirectional = isUnidirectional;
     }
@@ -54,12 +55,8 @@ public class JoinElementConfig {
         return from;
     }
 
-    public String getFilter() {
-        return filter;
-    }
-
-    public JoinElementWindowConfig getWindow() {
-        return window;
+    public List<StreamHandlerConfig> getStreamHandlerList() {
+        return streamHandlerList;
     }
 
     public String getAs() {
@@ -78,12 +75,8 @@ public class JoinElementConfig {
         this.from = from;
     }
 
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
-
-    public void setWindow(JoinElementWindowConfig window) {
-        this.window = window;
+    public void setStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
+        this.streamHandlerList = streamHandlerList;
     }
 
     public void setAs(String as) {

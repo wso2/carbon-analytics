@@ -24,6 +24,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributesSelectionConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.QueryInputConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.output.QueryOutputConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
@@ -51,8 +52,7 @@ public class QueryConfigGenerator {
     public QueryConfig generateQueryConfig(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
         // Generate Input
         QueryInputConfigGenerator queryInputConfigGenerator = new QueryInputConfigGenerator(siddhiAppString, siddhiApp);
-        QueryInputConfig queryInputConfig =
-                queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream());
+        QueryInputConfig queryInputConfig = queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream());
 
         // Generate Select
         AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
@@ -113,7 +113,11 @@ public class QueryConfigGenerator {
         }
 
         // Get annotation list
-        List<String> annotationList = new ArrayList<>(); // TODO: 4/20/18 implement list population
+        List<String> annotationList = new ArrayList<>();
+        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
+        for (Annotation annotation : query.getAnnotations()) {
+            annotationList.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
+        }
 
         return new QueryConfig(
                 queryId,

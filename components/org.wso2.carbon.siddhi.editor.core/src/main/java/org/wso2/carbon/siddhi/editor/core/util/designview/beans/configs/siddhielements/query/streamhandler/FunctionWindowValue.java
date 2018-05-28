@@ -16,21 +16,18 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join;
+package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler;
 
 import java.util.List;
 
 /**
- * Represents Window of a Join element of Join QueryInputConfig
+ * Represents value of a Function|Window
  */
-public class JoinElementWindowConfig {
+public class FunctionWindowValue {
     private String function;
     private List<String> parameters;
 
-    public JoinElementWindowConfig() {
-    }
-
-    public JoinElementWindowConfig(String function, List<String> parameters) {
+    public FunctionWindowValue(String function, List<String> parameters) {
         this.function = function;
         this.parameters = parameters;
     }
@@ -41,21 +38,5 @@ public class JoinElementWindowConfig {
 
     public List<String> getParameters() {
         return parameters;
-    }
-
-    public void setFunction(String function) {
-        this.function = function;
-    }
-
-    public void setParameters(List<String> parameters) {
-        this.parameters = parameters;
-    }
-
-    /**
-     * Returns whether the object is empty or not
-     * @return      Empty status of the object
-     */
-    public boolean isEmpty() {
-        return function == null && parameters == null;
     }
 }
