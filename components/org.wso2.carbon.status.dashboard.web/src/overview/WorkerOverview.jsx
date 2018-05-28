@@ -89,6 +89,7 @@ export default class WorkerOverview extends React.Component {
             enableAutoSync: window.localStorage.getItem("enableAutoSync") != null ?
                 ((window.localStorage.getItem("enableAutoSync")) === 'true') : false,
             isApiCalled: false,
+            isManagerApiCalled: false,
             counter: 0,
             hasManagerPermission: false,
             hasViewPermission: true,
@@ -170,7 +171,7 @@ export default class WorkerOverview extends React.Component {
                 if (response.status === HttpStatus.OK) {
                     this.setState({
                         managerClusterList: response.data,
-                        isApiCalled: true,
+                        isManagerApiCalled: true,
                         statusMessage: !WorkerOverview.hasNodes(this.state.managerClusterList) ?
                             "Currently there are no nodes to display" : ''
                     });
@@ -182,19 +183,19 @@ export default class WorkerOverview extends React.Component {
             if (error.response != null) {
                 if (error.response.status === 401) {
                     this.setState({
-                        isApiCalled: true,
+                        isManagerApiCalled: true,
                         sessionInvalid: true,
                         statusMessage: "Authentication failed. Please login again."
                     })
                 } else if (error.response.status === 403) {
                     this.setState({
-                        isApiCalled: true,
+                        isManagerApiCalled: true,
                         statusMessage: "User Have No Permission to view this page."
                     })
                 } else {
                     this.state({
                         isError: true,
-                        isApiCalled: true,
+                        isManagerApiCalled: true,
                         statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
                     });
                 }
@@ -354,7 +355,7 @@ export default class WorkerOverview extends React.Component {
      */
     renderWorkers(workersList, managerList) {
 
-        if (this.state.isApiCalled && !WorkerOverview.hasNodes(this.state.clustersList) &&
+        if (this.state.isApiCalled && this.state.isManagerApiCalled && !WorkerOverview.hasNodes(this.state.clustersList) &&
             !WorkerOverview.hasNodes(this.state.managerClusterList)) {
             if (this.state.hasViewPermission) {
                 return (
@@ -400,7 +401,7 @@ export default class WorkerOverview extends React.Component {
                     </div>
                 );
             }
-        } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList)) &&
+        } else if (this.state.isApiCalled && this.state.isManagerApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList)) &&
                 (WorkerOverview.hasNodes(this.state.managerClusterList)))) {
             return (
 
@@ -517,7 +518,7 @@ export default class WorkerOverview extends React.Component {
                     })}
                 </div>
             );
-        } else if (this.state.isApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList))) &&
+        } else if (this.state.isApiCalled && this.state.isManagerApiCalled && ((WorkerOverview.hasNodes(this.state.clustersList))) &&
             (!WorkerOverview.hasNodes(this.state.managerClusterList))) {
             return (
                 <div style={styles.background}>
@@ -578,7 +579,7 @@ export default class WorkerOverview extends React.Component {
                     })}
                 </div>
             );
-        } else if (this.state.isApiCalled && (WorkerOverview.hasNodes(this.state.managerClusterList)) &&
+        } else if (this.state.isApiCalled && this.state.isManagerApiCalled && (WorkerOverview.hasNodes(this.state.managerClusterList)) &&
             (!WorkerOverview.hasNodes(this.state.clustersList))) {
             return (
                 <div style={styles.background}>

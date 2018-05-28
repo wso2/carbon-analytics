@@ -856,45 +856,6 @@ public class EditorMicroservice implements Microservice {
                 ).build();
     }
 
-    /**
-     * Converts a given Siddhi App string to a specific JSON format for a graph that diagrammatically
-     * display's the Siddhi App to be generated in the Editor design view.
-     *
-     * @param siddhiAppBase64 The Siddhi App (encoded to Base64) to be converted to JSON
-     * @return The JSON result in a predefined format
-     */
-//    @POST
-//    @Path("/event-flow")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response constructEventFlowJsonString(String siddhiAppBase64) {
-//        try {
-//            String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
-//
-//            SiddhiAppMap siddhiAppMap = new SiddhiAppMap(siddhiAppString);
-//            EventFlow eventFlow = new EventFlow(siddhiAppMap);
-//
-//            // The 'Access-Control-Allow-Origin' header must be set to '*' as this might be accessed
-//            // by other domains in the future.
-//            return Response.status(Response.Status.OK)
-//                    .header("Access-Control-Allow-Origin", "*")
-//                    .entity(eventFlow.getEventFlowJSON().toString())
-//                    .build();
-//        } catch (SiddhiAppCreationException e) {
-//            log.error("Unable to generate graph view.", e);
-//            return Response.status(Response.Status.BAD_REQUEST)
-//                    .header("Access-Control-Allow-Origin", "*")
-//                    .entity(e.getMessage())
-//                    .build();
-//        } catch (IllegalArgumentException e) {
-//            log.error("Unable to construct event flow JSON string.", e);
-//            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-//                    .header("Access-Control-Allow-Origin", "*")
-//                    .entity(e.getMessage())
-//                    .build();
-//        }
-//    }
-
     @POST
     @Path("/design-view")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -934,7 +895,7 @@ public class EditorMicroservice implements Microservice {
             Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
             EventFlow eventFlow = gson.fromJson(siddhiAppEventFlowJSON, EventFlow.class);
             CodeGenerator codeGenerator = CodeGeneratorSingleton.getInstance();
-            String siddhiAppCode = codeGenerator.getSiddhiAppCode(eventFlow);
+            String siddhiAppCode = codeGenerator.generateSiddhiAppCode(eventFlow);
 
             String encodedSiddhiAppString =
                     new String(Base64.getEncoder().encode(siddhiAppCode.getBytes(StandardCharsets.UTF_8)),

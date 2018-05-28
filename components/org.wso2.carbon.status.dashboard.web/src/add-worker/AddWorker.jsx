@@ -122,14 +122,11 @@ export default class AddWorker extends React.Component {
 
         let that = this;
         let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
-        console.log(this.refs.host.input.value, this.refs.port.input.value);
-
 
         if (this.refs.port.input.value > 0 && this.refs.port.input.value <= 65535) {
             StatusDashboardAPIS.getRuntimeEnv(nodeID)
                 .then((response) => {
                     if (response.status = HttpStatus.OK) {
-                        console.log(response.data);
                         if (response.data === "manager") {
                             that._addManager(nodeID);
                         } else if (response.data === "worker") {
@@ -164,7 +161,7 @@ export default class AddWorker extends React.Component {
                     } else {
                         this.setState({
                             isApiCalled: true,
-                            statusMessage: "Unknown error occurred!"
+                            statusMessage: error.response.data.message
                         })
                     }
                 }
@@ -236,7 +233,7 @@ export default class AddWorker extends React.Component {
                 } else {
                     this.setState({
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred!"
+                        statusMessage: error.response.data.message
                     })
                 }
             }
@@ -296,7 +293,7 @@ export default class AddWorker extends React.Component {
                 } else {
                     this.setState({
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred!"
+                        statusMessage: error.response.data.message
                     })
                 }
             }

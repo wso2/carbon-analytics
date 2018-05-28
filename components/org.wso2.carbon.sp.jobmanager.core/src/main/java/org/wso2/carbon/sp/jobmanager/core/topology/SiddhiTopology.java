@@ -27,11 +27,13 @@ import java.util.List;
 public class SiddhiTopology {
     private String name;
     private List<SiddhiQueryGroup> queryGroupList;
+    private boolean transportChannelCreationEnabled;
 
     public SiddhiTopology(String name,
-                          List<SiddhiQueryGroup> queryGroupList) {
+                          List<SiddhiQueryGroup> queryGroupList, boolean transportChannelCreationEnabled) {
         this.name = name;
         this.queryGroupList = queryGroupList;
+        this.transportChannelCreationEnabled = transportChannelCreationEnabled;
     }
 
 
@@ -41,5 +43,9 @@ public class SiddhiTopology {
 
     public List<SiddhiQueryGroup> getQueryGroupList() {
         return queryGroupList;
+    }
+
+    public boolean isTransportChannelCreationEnabled() {
+        return transportChannelCreationEnabled;
     }
 }

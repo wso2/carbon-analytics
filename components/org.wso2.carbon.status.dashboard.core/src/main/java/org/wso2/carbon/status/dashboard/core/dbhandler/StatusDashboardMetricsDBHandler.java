@@ -46,7 +46,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.AGG_AVG_COLUMN_COUNT;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.AGG_COLUMN_COUNT;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_AGG_TIMESTAMP;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_COUNT;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_M1_RATE;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_NAME;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.COLUMN_TIMESTAMP;
@@ -58,6 +61,8 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_HISTOGRAM;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_METER;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TABLE_METRIC_TIMER;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TYPE_LATENCY;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.METRICS_TYPE_THROUGHPUT;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PACKAGE_NAME_SEPARATOR;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PERCENTAGE_MARK;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_AGGREGATION_COMPONENT_COLOUM;
@@ -188,20 +193,28 @@ public class StatusDashboardMetricsDBHandler {
      * @return
      */
     public List<List<Object>> selectAppComponentsHistory(String workerId, String appName, long timeInterval, long
-            currentTimeMilli, String metricsType, String componentType, String componentId) {
+            currentTimeMilli, String metricsType, String componentType, String componentId, boolean isCount) {
         Map<String, String> typeTableColumn = DBTableUtils.getInstance().loadMetricsTypeSelection();
         String tableName = typeTableColumn.get(metricsType);
-        Map<String, String> tableColumn = DBTableUtils.getInstance().loadMetricsAllValueSelection();
         String componentName = APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR + "Siddhi" + PACKAGE_NAME_SEPARATOR
                 + componentType + PACKAGE_NAME_SEPARATOR + componentId + PACKAGE_NAME_SEPARATOR + metricsType;
         String resolvedSelectWorkerMetricsHistoryQuery = resolveTableName(selectAppComponentHistory, tableName);
         String resolvedQuery = resolvedSelectWorkerMetricsHistoryQuery.replace(SQLConstants.PLACEHOLDER_BEGIN_TIME,
                 QUESTION_MARK).replace(PLACEHOLDER_NAME, QUESTION_MARK).replace
                 (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
-                QUESTION_MARK).replace(PLACEHOLDER_COLUMNS, tableColumn.get(tableName));
-        Object[] parameters = new Object[] {workerId, componentName + PERCENTAGE_MARK,
-                currentTimeMilli - timeInterval, currentTimeMilli};
-        return select(resolvedQuery, tableColumn.get(tableName), tableName, parameters);
+                QUESTION_MARK);
+        if (!isCount) {
+            Map<String, String> tableColumn = DBTableUtils.getInstance().loadMetricsAllValueSelection();
+            resolvedQuery = resolvedQuery.replace(PLACEHOLDER_COLUMNS, tableColumn.get(tableName));
+            Object[] parameters = new Object[] {workerId, componentName + PERCENTAGE_MARK,
+                    currentTimeMilli - timeInterval, currentTimeMilli};
+            return select(resolvedQuery, tableColumn.get(tableName), tableName, parameters);
+        } else {
+            resolvedQuery = resolvedQuery.replace(PLACEHOLDER_COLUMNS, COLUMN_COUNT);
+            Object[] parameters = new Object[] {workerId, componentName + PERCENTAGE_MARK,
+                    currentTimeMilli - timeInterval, currentTimeMilli};
+            return select(resolvedQuery, COLUMN_COUNT, tableName, parameters);
+        }
     }
     
     /**
@@ -215,12 +228,10 @@ public class StatusDashboardMetricsDBHandler {
      * @return
      */
     public List<List<Object>> selectAppComponentsAggHistory(String workerId, String appName, long timeInterval, long
-            currentTimeMilli, String metricsType, String componentType, String componentId) {
+            currentTimeMilli, String metricsType, String componentType, String componentId, boolean isCount) {
         long aggregationTime = DBTableUtils.getAggregation(timeInterval);
         Map<String, String> typeTableColumn = DBTableUtils.getInstance().loadMetricsTypeSelection();
         String tableName = typeTableColumn.get(metricsType);
-        Map<String, String> tableAggColumn = DBTableUtils.getInstance().loadAggMetricsAllValueSelection();
-        Map<String, String> tableColumn = DBTableUtils.getInstance().loadAggRowMetricsAllValueSelection();
         String componentName = APP_NAME_PREFIX + appName + PACKAGE_NAME_SEPARATOR + "Siddhi" +
                 PACKAGE_NAME_SEPARATOR + componentType + PACKAGE_NAME_SEPARATOR + componentId +
                 PACKAGE_NAME_SEPARATOR + metricsType;
@@ -231,11 +242,21 @@ public class StatusDashboardMetricsDBHandler {
                 .replace(PLACEHOLDER_NAME, QUESTION_MARK)
                 .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
                 .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
-                .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime))
-                .replace(PLACEHOLDER_AGGREGATION_COMPONENT_COLOUM, tableAggColumn.get(tableName));
-        Object[] parameters = new Object[] {workerId, componentName + PERCENTAGE_MARK,
-                currentTimeMilli - timeInterval, currentTimeMilli};
-        return select(resolvedQuery, tableColumn.get(tableName), tableName, parameters);
+                .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
+        if (!isCount) {
+            Map<String, String> tableAggColumn = DBTableUtils.getInstance().loadAggMetricsAllValueSelection();
+            Map<String, String> tableColumn = DBTableUtils.getInstance().loadAggRowMetricsAllValueSelection();
+            resolvedQuery = resolvedQuery.replace(PLACEHOLDER_AGGREGATION_COMPONENT_COLOUM, tableAggColumn
+                    .get(tableName));
+            Object[] parameters = new Object[] {workerId, componentName + PERCENTAGE_MARK,
+                    currentTimeMilli - timeInterval, currentTimeMilli};
+            return select(resolvedQuery, tableColumn.get(tableName), tableName, parameters);
+        } else {
+            resolvedQuery = resolvedQuery.replace(PLACEHOLDER_AGGREGATION_COMPONENT_COLOUM, AGG_AVG_COLUMN_COUNT);
+            Object[] parameters = new Object[] {workerId, componentName + PERCENTAGE_MARK,
+                    currentTimeMilli - timeInterval, currentTimeMilli};
+            return select(resolvedQuery, AGG_COLUMN_COUNT, tableName, parameters);
+        }
     }
     
     /**
@@ -346,6 +367,13 @@ public class StatusDashboardMetricsDBHandler {
                         metricElement.setType(metricType + " " + tableMetricsUnitsMap.get(metricType));
                     }
                     componentMetrics.addMetrics(metricElement);
+                    if (selectAppComponentsHistory
+                            (carbonId, appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                    componentElements[0], componentElements[1], true).size() > 0) {
+                        
+                    }
+                    componentMetrics.setTotalEvents(getEventsCount(componentElements[0], componentElements[1],
+                            carbonId, appName, timeInterval));
                     metricElement = new MetricElement();
                     componentMetrics.setName(componentElements[1]);
                     typeMetrics.setType(componentElements[0]);
@@ -354,7 +382,7 @@ public class StatusDashboardMetricsDBHandler {
             }
             boolean isNew = true;
             for (TypeMetrics typeMetric : componentsRecentMetrics) {
-                if (typeMetrics.getType().equalsIgnoreCase(typeMetric.getType())) {
+                if (typeMetric.getType().equalsIgnoreCase(typeMetrics.getType())) {
                     isNew = false;
                     typeMetric.getData().add(typeMetrics.getData().get(0));
                 }
@@ -366,6 +394,61 @@ public class StatusDashboardMetricsDBHandler {
             typeMetrics = new TypeMetrics();
         }
         return componentsRecentMetrics;
+    }
+    
+    private long getEventsCount(String componentType, String componentId, String carbonId, String appName,
+                                long timeInterval) {
+        
+        switch (componentType.toLowerCase()) {
+            case "sinks":
+            case "sources":
+            case "trigger":
+            case "streams": {
+                List<List<Object>> metrics = selectAppComponentsHistory
+                        (carbonId, appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                componentType, componentId, true);
+                if (metrics.size() > 0) {
+                    return (long) metrics.get(0).get(1);
+                } else {
+                    return 0;
+                }
+            }
+            case "sinkmappers":
+            case "sourcemappers":
+            case "queries":
+            case "storequeries": {
+                List<List<Object>> metrics = selectAppComponentsHistory
+                        (carbonId, appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY,
+                                componentType, componentId, true);
+                if (metrics.size() > 0) {
+                    return (long) metrics.get(0).get(1);
+                } else {
+                    return 0;
+                }
+            }
+            case "tables": {
+                List<List<Object>> metricsLatency = selectAppComponentsHistory
+                        (carbonId, appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY,
+                                componentType, componentId, true);
+                List<List<Object>> metricsThroughput = selectAppComponentsHistory
+                        (carbonId, appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_THROUGHPUT,
+                                componentType, componentId, true);
+                if ((metricsLatency.size() == 0) && (metricsThroughput.size() == 0)) {
+                    return 0;
+                } else if (metricsLatency.size() == 0) {
+                    return (long) metricsThroughput.get(0).get(1);
+                } else if (metricsThroughput.size() == 0) {
+                    return (long) metricsLatency.get(0).get(1);
+                } else {
+                    return Math.max((long) metricsLatency.get(0).get(1), (long) metricsThroughput.get(0).get(1));
+                }
+            }
+            default: {
+                throw new StatusDashboardRuntimeException("Metrics type '" + componentType.toLowerCase() +
+                        "' not valid.");
+            }
+            
+        }
     }
     
     /**

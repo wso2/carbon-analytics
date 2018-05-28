@@ -79,10 +79,11 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         String siddhiAppName = getSiddhiAppName();
         this.siddhiTopologyDataHolder = new SiddhiTopologyDataHolder(siddhiAppName, userDefinedSiddhiApp);
         String defaultExecGroupName = siddhiAppName + "-" + UUID.randomUUID();
-
+        boolean transportChannelCreationEnabled = isTransportChannelCreationEnabled(siddhiApp.getAnnotations());
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
 
             parallel = getExecGroupParallel(executionElement);
+
             execGroupName = getExecGroupName(executionElement, siddhiAppName, defaultExecGroupName);
             siddhiQueryGroup = createSiddhiQueryGroup(execGroupName, parallel);
 
@@ -135,7 +136,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         checkUserGivenSourceDistribution();
         assignPublishingStrategyOutputStream();
         return new SiddhiTopology(siddhiTopologyDataHolder.getSiddhiAppName(), new ArrayList<>
-                (siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values()));
+                (siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values()), transportChannelCreationEnabled);
     }
 
 
@@ -180,6 +181,20 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             return SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL;
         } else {
             return Integer.parseInt(element.getValue());
+        }
+    }
+
+    /**
+     * Get user preference on creating kafka topics from {@link org.wso2.carbon.sp.jobmanager.core.SiddhiAppCreator}.
+     * If no value is defined 'true' is returned
+     */
+    private boolean isTransportChannelCreationEnabled(List<Annotation> annotationList) {
+        Element element = AnnotationHelper.getAnnotationElement(
+                SiddhiTopologyCreatorConstants.TRANSPORT_CHANNEL_CREATION_IDENTIFIER, null, annotationList);
+        if (element == null) {
+            return true;
+        } else {
+            return Boolean.valueOf(element.getValue());
         }
     }
 
