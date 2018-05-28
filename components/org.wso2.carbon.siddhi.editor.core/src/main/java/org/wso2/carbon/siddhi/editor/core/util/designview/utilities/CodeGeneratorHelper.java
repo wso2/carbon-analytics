@@ -25,7 +25,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryWindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
@@ -35,6 +34,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.InsertOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateInsertIntoOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute.SetAttributeConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.FilterConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.FunctionWindowConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.MapperConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
@@ -128,12 +130,29 @@ public class CodeGeneratorHelper {
     }
 
     public static String getAnnotations(List<String> annotations) {
-        if (annotations.isEmpty()) {
+        if (annotations == null || annotations.isEmpty()) {
             return CodeGeneratorConstants.EMPTY_STRING;
         }
 
         StringBuilder annotationsStringBuilder = new StringBuilder();
         for (String annotation : annotations) {
+            annotationsStringBuilder.append(annotation)
+                    .append(CodeGeneratorConstants.NEW_LINE);
+        }
+
+        return annotationsStringBuilder.toString();
+    }
+
+    public static String getAggregationAnnotations(List<String> annotations) {
+        if (annotations == null || annotations.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder annotationsStringBuilder = new StringBuilder();
+        for (String annotation : annotations) {
+            if (annotation.toLowerCase().contains("@primarykey")) {
+                break;
+            }
             annotationsStringBuilder.append(annotation)
                     .append(CodeGeneratorConstants.NEW_LINE);
         }
@@ -221,6 +240,7 @@ public class CodeGeneratorHelper {
      * @return The window,filter or projection string representation of the given WindowFilterProjection object
      */
     private static String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection) {
+        // TODO: 5/28/18 Complete this 
         if (windowFilterProjection == null) {
             throw new CodeGenerationException("The WindowFilterProjection Instance Is Null");
         } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
@@ -230,30 +250,8 @@ public class CodeGeneratorHelper {
         StringBuilder windowFilterProjectionStringBuilder = new StringBuilder();
         windowFilterProjectionStringBuilder.append(CodeGeneratorConstants.FROM)
                 .append(CodeGeneratorConstants.SPACE)
-                .append(windowFilterProjection.getFrom());
-
-        if (windowFilterProjection.getFilter() != null && !windowFilterProjection.getFilter().isEmpty()) {
-            windowFilterProjectionStringBuilder.append(CodeGeneratorConstants.OPEN_SQUARE_BRACKET)
-                    .append(windowFilterProjection.getFilter())
-                    .append(CodeGeneratorConstants.CLOSE_SQUARE_BRACKET);
-        }
-
-        if (windowFilterProjection.getWindow() != null) {
-            QueryWindowConfig queryWindow = windowFilterProjection.getWindow();
-            windowFilterProjectionStringBuilder.append(CodeGeneratorConstants.HASH)
-                    .append(CodeGeneratorConstants.WINDOW)
-                    .append(CodeGeneratorConstants.FULL_STOP)
-                    .append(queryWindow.getFunction())
-                    .append(CodeGeneratorConstants.OPEN_BRACKET)
-                    .append(getParameterList(queryWindow.getParameters()))
-                    .append(CodeGeneratorConstants.CLOSE_BRACKET);
-        }
-
-        if (windowFilterProjection.getPostWindowFilter() != null && !windowFilterProjection.getPostWindowFilter().isEmpty()) {
-            windowFilterProjectionStringBuilder.append(CodeGeneratorConstants.OPEN_SQUARE_BRACKET)
-                    .append(windowFilterProjection.getPostWindowFilter())
-                    .append(CodeGeneratorConstants.CLOSE_SQUARE_BRACKET);
-        }
+                .append(windowFilterProjection.getFrom())
+                .append(getStreamHandlerList(windowFilterProjection.getStreamHandlerList()));
 
         return windowFilterProjectionStringBuilder.toString();
     }
@@ -279,11 +277,6 @@ public class CodeGeneratorHelper {
             throw new CodeGenerationException("The left join element does not have a type");
         } else if (join.getRight().getType() == null || join.getRight().getType().isEmpty()) {
             throw new CodeGenerationException("The right join element does not have a type");
-        } else if (!(join.getLeft().getType().equalsIgnoreCase("STREAM") ||
-                join.getRight().getType().equalsIgnoreCase("STREAM") ||
-                join.getLeft().getType().equalsIgnoreCase("TRIGGER") ||
-                join.getRight().getType().equalsIgnoreCase("TRIGGER"))) {
-            throw new CodeGenerationException("Atleast one of the join elements must be of type 'stream' or 'trigger'");
         }
 
         StringBuilder joinStringBuilder = new StringBuilder();
@@ -329,6 +322,7 @@ public class CodeGeneratorHelper {
      * @return The Siddhi string representation of the given JoinElementConfig object
      */
     private static String getJoinElement(JoinElementConfig joinElement) {
+        // TODO: 5/28/18 complete and test this
         if (joinElement == null) {
             throw new CodeGenerationException("The given JoinElementConfig instance given is null");
         } else if (joinElement.getFrom() == null || joinElement.getFrom().isEmpty()) {
@@ -337,49 +331,8 @@ public class CodeGeneratorHelper {
 
         StringBuilder joinElementStringBuilder = new StringBuilder();
 
-        joinElementStringBuilder.append(joinElement.getFrom());
-
-        if (joinElement.getFilter() != null && !joinElement.getFilter().isEmpty()) {
-            if (joinElement.getType().equalsIgnoreCase("WINDOW")) {
-                joinElementStringBuilder.append(CodeGeneratorConstants.OPEN_SQUARE_BRACKET)
-                        .append(joinElement.getFilter())
-                        .append(CodeGeneratorConstants.CLOSE_SQUARE_BRACKET);
-            } else if (!joinElement.getWindow().isEmpty()) {
-                if (joinElement.getWindow().getFunction() == null || joinElement.getWindow().getFunction().isEmpty()) {
-                    throw new CodeGenerationException("The 'function' value of the given window in the join query is null");
-                } else if (joinElement.getWindow().getParameters() == null) {
-                    throw new CodeGenerationException("The parameter list for the given window is null");
-                }
-
-                joinElementStringBuilder.append(CodeGeneratorConstants.OPEN_SQUARE_BRACKET)
-                        .append(joinElement.getFilter())
-                        .append(CodeGeneratorConstants.CLOSE_SQUARE_BRACKET)
-                        .append(CodeGeneratorConstants.HASH)
-                        .append(CodeGeneratorConstants.WINDOW)
-                        .append(CodeGeneratorConstants.FULL_STOP)
-                        .append(joinElement.getWindow().getFunction())
-                        .append(CodeGeneratorConstants.OPEN_BRACKET)
-                        .append(getParameterList(joinElement.getWindow().getParameters()))
-                        .append(CodeGeneratorConstants.CLOSE_BRACKET);
-            } else {
-                throw new CodeGenerationException("The given " + joinElement.getType() + " cannot have a filter without a window");
-            }
-        } else if (!joinElement.getType().equalsIgnoreCase("WINDOW") &&
-                joinElement.getWindow() != null && !joinElement.getWindow().isEmpty()) {
-            if (joinElement.getWindow().getFunction() == null || joinElement.getWindow().getFunction().isEmpty()) {
-                throw new CodeGenerationException("The 'function' of the given window in the join query is null");
-            } else if (joinElement.getWindow().getParameters() == null) {
-                throw new CodeGenerationException("The parameter list for the given window is null");
-            }
-
-            joinElementStringBuilder.append(CodeGeneratorConstants.HASH)
-                    .append(CodeGeneratorConstants.WINDOW)
-                    .append(CodeGeneratorConstants.FULL_STOP)
-                    .append(joinElement.getWindow().getFunction())
-                    .append(CodeGeneratorConstants.OPEN_BRACKET)
-                    .append(getParameterList(joinElement.getWindow().getParameters()))
-                    .append(CodeGeneratorConstants.CLOSE_BRACKET);
-        }
+        joinElementStringBuilder.append(joinElement.getFrom())
+                .append(getStreamHandlerList(joinElement.getStreamHandlerList()));
 
         if (joinElement.getAs() != null && !joinElement.getAs().isEmpty()) {
             joinElementStringBuilder.append(CodeGeneratorConstants.SPACE)
@@ -394,6 +347,62 @@ public class CodeGeneratorHelper {
         }
 
         return joinElementStringBuilder.toString();
+    }
+
+    private static String getStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
+        if (streamHandlerList == null || streamHandlerList.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
+        StringBuilder streamhandlerListStringBuilder = new StringBuilder();
+
+        for (StreamHandlerConfig streamHandler : streamHandlerList) {
+            streamhandlerListStringBuilder.append(getStreamHandler(streamHandler));
+        }
+
+        return streamhandlerListStringBuilder.toString();
+    }
+
+    private static String getStreamHandler(StreamHandlerConfig streamHandler) {
+        if (streamHandler == null) {
+            throw new CodeGenerationException("Empty StreamHandler Config");
+        } else if (streamHandler.getType() == null || streamHandler.getType().isEmpty()) {
+            throw new CodeGenerationException("The type variable of the StreamHandlerConfig instance given is null");
+        }
+
+        StringBuilder streamHandlerStringBuilder = new StringBuilder();
+
+        switch (streamHandler.getType().toUpperCase()) {
+            case "FILTER":
+                FilterConfig filter = (FilterConfig) streamHandler;
+                streamHandlerStringBuilder.append(CodeGeneratorConstants.OPEN_SQUARE_BRACKET)
+                        .append(filter.getValue())
+                        .append(CodeGeneratorConstants.CLOSE_SQUARE_BRACKET);
+                break;
+            case "FUNCTION":
+                FunctionWindowConfig function = (FunctionWindowConfig) streamHandler;
+                streamHandlerStringBuilder.append(CodeGeneratorConstants.HASH)
+                        .append(function.getValue().getFunction())
+                        .append(CodeGeneratorConstants.OPEN_BRACKET)
+                        .append(getParameterList(function.getValue().getParameters()))
+                        .append(CodeGeneratorConstants.CLOSE_BRACKET);
+                break;
+            case "WINDOW":
+                FunctionWindowConfig window = (FunctionWindowConfig) streamHandler;
+                streamHandlerStringBuilder.append(CodeGeneratorConstants.HASH)
+                        .append(CodeGeneratorConstants.WINDOW)
+                        .append(CodeGeneratorConstants.FULL_STOP)
+                        .append(window.getValue().getFunction())
+                        .append(CodeGeneratorConstants.OPEN_BRACKET)
+                        .append(getParameterList(window.getValue().getParameters()))
+                        .append(CodeGeneratorConstants.CLOSE_BRACKET);
+                break;
+            default:
+                throw new CodeGenerationException("Unidentified StreamHandlerConfig type: "
+                        + streamHandler.getType());
+        }
+
+        return streamHandlerStringBuilder.toString();
     }
 
     /**
@@ -429,6 +438,7 @@ public class CodeGeneratorHelper {
      * @return The Siddhi string representation of the given PatternSequenceConfig instance
      */
     private static String getPatternSequenceInput(PatternSequenceConfig patternSequence) {
+        // TODO: 5/28/18 Complete 
         return CodeGeneratorConstants.EMPTY_STRING;
     }
 
@@ -528,6 +538,7 @@ public class CodeGeneratorHelper {
 
         int orderByAttributesLeft = orderByList.size();
         for (QueryOrderByConfig orderByAttribute : orderByList) {
+            // TODO: 5/28/18 Can add this to another method to decrease complexity
             if (orderByAttribute == null) {
                 throw new CodeGenerationException("Query Order By Attribute Cannot Be Null");
             } else if (orderByAttribute.getValue() == null || orderByAttribute.getValue().isEmpty()) {

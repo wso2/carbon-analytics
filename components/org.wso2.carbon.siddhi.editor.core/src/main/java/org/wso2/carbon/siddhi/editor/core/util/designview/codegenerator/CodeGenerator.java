@@ -119,6 +119,21 @@ public class CodeGenerator {
                 .append(CodeGeneratorConstants.NEW_LINE);
 
         for (StreamConfig stream : streamList) {
+
+            for (SourceSinkConfig source : sourceList) {
+                if (stream.getName().equals(source.getConnectedElementName())) {
+                    streamListStringBuilder.append(generateSourceSinkString(source))
+                            .append(CodeGeneratorConstants.NEW_LINE);
+                }
+            }
+
+            for (SourceSinkConfig sink : sinkList) {
+                if (stream.getName().equals(sink.getConnectedElementName())) {
+                    streamListStringBuilder.append(generateSourceSinkString(sink))
+                            .append(CodeGeneratorConstants.NEW_LINE);
+                }
+            }
+
             streamListStringBuilder.append(generateStreamString(stream))
                     .append(CodeGeneratorConstants.NEW_LINE);
         }
@@ -434,7 +449,7 @@ public class CodeGenerator {
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
         aggregationStringBuilder.append(CodeGeneratorHelper.getStore(aggregation.getStore()))
-                .append(CodeGeneratorHelper.getAnnotations(aggregation.getAnnotationList()))
+                .append(CodeGeneratorHelper.getAggregationAnnotations(aggregation.getAnnotationList()))
                 .append(CodeGeneratorConstants.DEFINE_AGGREGATION)
                 .append(CodeGeneratorConstants.SPACE)
                 .append(aggregation.getName())
@@ -452,6 +467,7 @@ public class CodeGenerator {
                 .append(CodeGeneratorConstants.NEW_LINE)
                 .append(CodeGeneratorConstants.AGGREGATE);
 
+        // TODO: 5/28/18 Can break this down into smaller methods in the Helper class
         if (aggregation.getAggregateByAttribute() != null && !aggregation.getAggregateByAttribute().isEmpty()) {
             aggregationStringBuilder.append(CodeGeneratorConstants.SPACE)
                     .append(CodeGeneratorConstants.BY)
@@ -527,6 +543,7 @@ public class CodeGenerator {
                 .append(CodeGeneratorConstants.NEW_LINE)
                 .append(CodeGeneratorHelper.getQuerySelect(query.getSelect()));
 
+        // TODO: 5/28/18 Can add this to submethods in the Helper as well 
         if (query.getGroupBy() != null && !query.getGroupBy().isEmpty()) {
             queryStringBuilder.append(CodeGeneratorConstants.NEW_LINE)
                     .append(CodeGeneratorHelper.getQueryGroupBy(query.getGroupBy()));
