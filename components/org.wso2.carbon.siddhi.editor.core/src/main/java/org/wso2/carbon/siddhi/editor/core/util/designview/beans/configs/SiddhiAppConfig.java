@@ -25,9 +25,12 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Contains elements of a Siddhi app
@@ -38,7 +41,9 @@ public class SiddhiAppConfig {
     private String appName = "";
     private String appDescription = "";
 
-    private List<QueryConfig> windowFilterProjectionQueryList = new ArrayList<>();
+    private Map<String, List<QueryConfig>> queryLists = new HashMap<>();
+
+    private List<QueryConfig> windowFilterProjectionQueryList = new ArrayList<>(); // TODO REMOVE BELOW
     private List<QueryConfig> joinQueryList = new ArrayList<>();
     private List<QueryConfig> patternQueryList = new ArrayList<>();
     private List<QueryConfig> sequenceQueryList = new ArrayList<>();
@@ -51,6 +56,13 @@ public class SiddhiAppConfig {
     private List<WindowConfig> windowList = new ArrayList<>();
     private List<AggregationConfig> aggregationList = new ArrayList<>();
     private List<FunctionConfig> functionList = new ArrayList<>();
+
+    public SiddhiAppConfig() {
+        queryLists.put(QueryInputType.WINDOW_FILTER_PROJECTION.toString(), new ArrayList<>());
+        queryLists.put(QueryInputType.JOIN.toString(), new ArrayList<>());
+        queryLists.put(QueryInputType.PATTERN.toString(), new ArrayList<>());
+        queryLists.put(QueryInputType.SEQUENCE.toString(), new ArrayList<>());
+    }
 
     /**
      * Returns Id for the next element id, after incrementing the final element count
@@ -69,6 +81,13 @@ public class SiddhiAppConfig {
     private <T> void addElement(List<T> elementList, T elementConfig) {
         ((SiddhiElementConfig) elementConfig).setId(generateNextElementId());
         elementList.add(elementConfig);
+    }
+
+    private void addQuery(QueryInputType queryType,
+                          Map<String, List<QueryConfig>> queryLists,
+                          QueryConfig queryConfig) {
+        queryConfig.setId(generateNextElementId());
+        queryLists.get(queryType.toString()).add(queryConfig); // TODO method comment
     }
 
     public void setAppName(String appName) {
@@ -111,9 +130,11 @@ public class SiddhiAppConfig {
         // Categorize QueryConfig from its Input, and add QueryConfig to the relevant list
         QueryInputConfig queryInputConfig = queryConfig.getQueryInput();
         if (queryInputConfig instanceof WindowFilterProjectionConfig) {
-            addElement(windowFilterProjectionQueryList, queryConfig);
+//            addElement(windowFilterProjectionQueryList, queryConfig); TODO remove
+            addQuery(QueryInputType.WINDOW_FILTER_PROJECTION, queryLists, queryConfig);
         } else if (queryInputConfig instanceof JoinConfig) {
-            addElement(joinQueryList, queryConfig);
+//            addElement(joinQueryList, queryConfig); TODO remove
+            addQuery(QueryInputType.JOIN, queryLists, queryConfig);
         } else {
             // TODO add pattern & sequences
             throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
@@ -174,6 +195,10 @@ public class SiddhiAppConfig {
 
     public List<QueryConfig> getSequenceQueryList() {
         return sequenceQueryList;
+    }
+
+    public Map<String, List<QueryConfig>> getQueryLists() {
+        return queryLists;
     }
 
     public List<FunctionConfig> getFunctionList() {
