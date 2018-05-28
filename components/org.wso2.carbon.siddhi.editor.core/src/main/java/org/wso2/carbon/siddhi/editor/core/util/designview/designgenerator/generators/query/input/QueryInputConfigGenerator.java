@@ -45,7 +45,6 @@ public class QueryInputConfigGenerator {
      * @return                      QueryInputConfig object
      */
     public QueryInputConfig generateQueryInputConfig(InputStream queryInputStream) {
-        // TODO: 4/25/18 THIS METHOD SHOULD BE REDONE
         String queryInputType = getQueryInputType(queryInputStream);
 
         if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW_FILTER_PROJECTION.toString())) {
@@ -56,14 +55,8 @@ public class QueryInputConfigGenerator {
         } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString()) ||
                 queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
             // TODO implement
-//            return new PatternSequenceConfigGenerator(siddhiAppString).getPatternQueryConfig(queryInputStream);
+            throw new IllegalArgumentException(queryInputType + " queries are not supported yet");
         }
-//        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString())) { // TODO refactor this
-//            return new PatternConfigGenerator(siddhiAppString).getPatternQueryConfig(queryInputStream);
-//        } else if (queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
-//            return new SequenceConfigGenerator(siddhiAppString).getPatternQueryConfig(queryInputStream);
-////            return new SequenceConfigGenerator(siddhiAppString).getSequenceQueryConfig(queryInputStream);
-//        }
 
         throw new IllegalArgumentException("Unknown type: " + queryInputType);
     }

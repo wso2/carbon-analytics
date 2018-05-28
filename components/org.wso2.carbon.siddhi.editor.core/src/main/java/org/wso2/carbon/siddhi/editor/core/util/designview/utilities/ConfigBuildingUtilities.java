@@ -23,7 +23,7 @@ import org.wso2.siddhi.query.api.SiddhiElement;
 /**
  * Has methods involved in converting Siddhi elements to Design view Config objects
  */
-public class ConfigBuildingUtilities { // TODO move entirely to DesignGeneratorHelper
+public class ConfigBuildingUtilities {
     /**
      * Avoids Instantiation
      */
@@ -47,8 +47,7 @@ public class ConfigBuildingUtilities { // TODO move entirely to DesignGeneratorH
         int startLinePosition = ordinalIndexOf(startIndex[0], siddhiAppString);
         int endLinePosition = ordinalIndexOf(endIndex[0], siddhiAppString);
 
-        return siddhiAppString.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1])
-                .replaceAll("'", "\"");
+        return siddhiAppString.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1]);
     }
 
     /**

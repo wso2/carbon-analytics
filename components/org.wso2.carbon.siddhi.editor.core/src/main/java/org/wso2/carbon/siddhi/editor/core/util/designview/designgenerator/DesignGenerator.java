@@ -89,7 +89,6 @@ public class DesignGenerator {
         loadAppNameAndDescription();
         loadTriggers();
         loadStreams();
-        // TODO loadSources() loadSinks()
         loadSources();
         loadSinks();
         loadTables();
@@ -232,7 +231,6 @@ public class DesignGenerator {
             siddhiAppConfig.add(new WindowConfig(
                     windowDefinition.getId(),
                     windowDefinition.getId(),
-//                    generateAttributeConfigs(windowDefinition.getAttributeList()),
                     new AttributeConfigListGenerator().generateAttributeConfigList(windowDefinition.getAttributeList()),
                     windowDefinition.getWindow().getName(),
                     parameters,
