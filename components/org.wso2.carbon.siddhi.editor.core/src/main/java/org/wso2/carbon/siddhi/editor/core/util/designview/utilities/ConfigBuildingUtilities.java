@@ -47,8 +47,7 @@ public class ConfigBuildingUtilities {
         int startLinePosition = ordinalIndexOf(startIndex[0], siddhiAppString);
         int endLinePosition = ordinalIndexOf(endIndex[0], siddhiAppString);
 
-        return siddhiAppString.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1])
-                .replaceAll("'", "\"");
+        return siddhiAppString.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1]);
     }
 
     /**

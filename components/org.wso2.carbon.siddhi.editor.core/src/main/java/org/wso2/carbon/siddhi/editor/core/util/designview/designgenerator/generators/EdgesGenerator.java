@@ -27,7 +27,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
-import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.DesignGeneratorHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +39,16 @@ public class EdgesGenerator {
 
     public EdgesGenerator(SiddhiAppConfig siddhiAppConfig) {
         this.siddhiAppConfig = siddhiAppConfig;
+    }
+
+    /**
+     * Generates Edge ID using the parent ID and the child ID, that are connected to this edge
+     * @param parentID  ID of the parent node
+     * @param childID   ID of the child node
+     * @return          ID of the edge
+     */
+    private static String generateEdgeId(String parentID, String childID) {
+        return String.format("%s_%s", parentID, childID);
     }
 
     /**
@@ -143,7 +152,7 @@ public class EdgesGenerator {
     private Edge generateEdgesForElements(SiddhiElementConfig parentElement, SiddhiElementConfig childElement) {
         NodeType parentType = getSiddhiElementType(parentElement);
         NodeType childType = getSiddhiElementType(childElement);
-        String edgeId = DesignGeneratorHelper.generateEdgeID(parentElement.getId(), childElement.getId());
+        String edgeId = generateEdgeId(parentElement.getId(), childElement.getId());
         return new Edge(edgeId, parentElement.getId(), parentType, childElement.getId(), childType);
     }
 
