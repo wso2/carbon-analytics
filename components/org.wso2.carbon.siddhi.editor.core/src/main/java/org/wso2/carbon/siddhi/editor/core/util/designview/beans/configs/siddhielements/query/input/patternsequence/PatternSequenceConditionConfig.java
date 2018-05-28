@@ -18,18 +18,23 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
+
+import java.util.List;
+
 /**
  * Represents a Condition element of Pattern | Sequence QueryInputConfig
  */
 public class PatternSequenceConditionConfig {
     private String conditionId;
     private String streamName;
-    private String filter;
+    private List<StreamHandlerConfig> streamHandlerList;
 
-    public PatternSequenceConditionConfig(String conditionId, String streamName, String filter) {
+    public PatternSequenceConditionConfig(String conditionId, String streamName,
+                                          List<StreamHandlerConfig> streamHandlerList) {
         this.conditionId = conditionId;
         this.streamName = streamName;
-        this.filter = filter;
+        this.streamHandlerList = streamHandlerList;
     }
 
     public String getConditionId() {
@@ -40,8 +45,8 @@ public class PatternSequenceConditionConfig {
         return streamName;
     }
 
-    public String getFilter() {
-        return filter;
+    public List<StreamHandlerConfig> getStreamHandlerList() {
+        return streamHandlerList;
     }
 
     public void setConditionId(String conditionId) {
@@ -52,7 +57,7 @@ public class PatternSequenceConditionConfig {
         this.streamName = streamName;
     }
 
-    public void setFilter(String filter) {
-        this.filter = filter;
+    public void setStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
+        this.streamHandlerList = streamHandlerList;
     }
 }
