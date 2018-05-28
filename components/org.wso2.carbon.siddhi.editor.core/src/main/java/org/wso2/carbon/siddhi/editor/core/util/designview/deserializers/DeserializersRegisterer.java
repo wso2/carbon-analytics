@@ -23,9 +23,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.AttributesSelectionConfigDeSerializer;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.QueryInputConfigDeSerializer;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.QueryOutputConfigDeSerializer;
+import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.StreamHandlerConfigDeserializer;
 
 /**
  * Handles De-serializer registrations with GsonBuilder, for required classes
@@ -46,6 +48,7 @@ public class DeserializersRegisterer {
         GsonBuilder gsonBuilder = new GsonBuilder();
         // Register de-serializers for required classes
         gsonBuilder.registerTypeAdapter(AttributesSelectionConfig.class, new AttributesSelectionConfigDeSerializer());
+        gsonBuilder.registerTypeAdapter(StreamHandlerConfig.class, new StreamHandlerConfigDeserializer());
         gsonBuilder.registerTypeAdapter(QueryInputConfig.class, new QueryInputConfigDeSerializer());
         gsonBuilder.registerTypeAdapter(QueryOutputConfig.class, new QueryOutputConfigDeSerializer());
         return gsonBuilder;
