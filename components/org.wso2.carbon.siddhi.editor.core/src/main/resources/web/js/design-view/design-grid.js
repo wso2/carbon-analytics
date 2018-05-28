@@ -347,31 +347,42 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
             // Update the model when a connection is established and bind events for the connection
             function updateModelOnConnectionAttach() {
-                //TODO: whenever a annotation is changed, delete the entire annotation and save on it
                 self.jsPlumbInstance.bind('connection', function (connection) {
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     var targetElement = $('#' + targetId);
+                    var targetType;
+                    if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true)
+                        !== undefined) {
+                        targetType
+                            = self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true).type;
+                    } else {
+                        console.log("Target element not found!");
+                    }
 
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
                     var sourceElement = $('#' + sourceId);
+                    var sourceType;
+                    if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true)
+                        !== undefined) {
+                        sourceType
+                            = self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true).type;
+                    } else {
+                        console.log("Source element not found!");
+                    }
 
                     // create and add an edge to the edgeList
 
                     var edgeId = ''+ targetId + '_' + sourceId + '';
                     var edgeInTheEdgeList = self.configurationData.getEdge(edgeId);
-                    if(edgeInTheEdgeList !== undefined) {
-                        //TODO update the model. why?: query type can be changed even the connection  is same
-                        //edgeInTheEdgeList.setParentType(undefined);
-                        //edgeInTheEdgeList.setChildType(undefined);
-                    } else {
+                    if(edgeInTheEdgeList === undefined) {
                         var edgeOptions = {};
                         _.set(edgeOptions, 'id', edgeId);
                         _.set(edgeOptions, 'parentId', targetId);
-                        _.set(edgeOptions, 'parentType', 'query');//TODO: correct this
+                        _.set(edgeOptions, 'parentType', targetType);
                         _.set(edgeOptions, 'childId', sourceId);
-                        _.set(edgeOptions, 'childType', 'stream');
+                        _.set(edgeOptions, 'childType', sourceType);
                         var edge = new Edge(edgeOptions);
                         self.configurationData.addEdge(edge);
                     }
@@ -1586,7 +1597,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
         };
 
         DesignGrid.prototype.generateNextNewAgentId = function () {
-            // TODO: Not finalized
             var newId = parseInt(this.newAgentId) +1;
             this.newAgentId = "" + newId + "";
             return this.currentTabId + "_element_" + this.newAgentId;

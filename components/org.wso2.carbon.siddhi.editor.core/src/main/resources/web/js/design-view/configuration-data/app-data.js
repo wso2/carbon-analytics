@@ -211,9 +211,10 @@ define(['require', 'elementUtils', 'lodash'],
         /**
          * @function Get the element by providing the element id
          * @param elementId id of the definition element
+         * @param includeQueryTypes if true search in the queries as well
          * @return requestedElement returns undefined if the requested element is not found
          */
-        AppData.prototype.getDefinitionElementById = function (elementId) {
+        AppData.prototype.getDefinitionElementById = function (elementId, includeQueryTypes) {
             var self = this;
             var requestedElement = undefined;
             var streamList = self.streamList;
@@ -222,7 +223,18 @@ define(['require', 'elementUtils', 'lodash'],
             var aggregationList = self.aggregationList;
             var functionList = self.functionList;
             var triggerList = self.triggerList;
-            var lists = [streamList, tableList, windowList, aggregationList, functionList, triggerList];
+            var windowFilterProjectionQueryList = self.windowFilterProjectionQueryList;
+            var patternQueryList = self.patternQueryList;
+            var sequenceQueryList = self.sequenceQueryList;
+            var joinQueryList = self.joinQueryList;
+
+            var lists;
+            if (includeQueryTypes !== undefined && includeQueryTypes) {
+                lists = [streamList, tableList, windowList, aggregationList, functionList, triggerList,
+                    windowFilterProjectionQueryList, patternQueryList, sequenceQueryList, joinQueryList];
+            } else {
+                lists = [streamList, tableList, windowList, aggregationList, functionList, triggerList];
+            }
 
             _.forEach(lists, function (list) {
                 _.forEach(list, function (element) {
@@ -240,6 +252,14 @@ define(['require', 'elementUtils', 'lodash'],
                             type = 'FUNCTION';
                         } else if (list === triggerList) {
                             type = 'TRIGGER';
+                        } else if (list === windowFilterProjectionQueryList) {
+                            type = 'WINDOW_FILTER_PROJECTION_QUERY';
+                        } else if (list === patternQueryList) {
+                            type = 'PATTERN_QUERY';
+                        } else if (list === sequenceQueryList) {
+                            type = 'SEQUENCE_QUERY';
+                        } else if (list === joinQueryList) {
+                            type = 'JOIN_QUERY';
                         }
                         requestedElement = {
                             type: type,
@@ -255,9 +275,10 @@ define(['require', 'elementUtils', 'lodash'],
         /**
          * @function Get the element by providing the element name
          * @param elementName name of the definition element
+         * @param includeQueryTypes if true search in the queries as well
          * @return requestedElement returns undefined if the requested element is not found
          */
-        AppData.prototype.getDefinitionElementByName = function (elementName) {
+        AppData.prototype.getDefinitionElementByName = function (elementName, includeQueryTypes) {
             var self = this;
             var requestedElement = undefined;
             var streamList = self.streamList;
@@ -266,7 +287,18 @@ define(['require', 'elementUtils', 'lodash'],
             var aggregationList = self.aggregationList;
             var functionList = self.functionList;
             var triggerList = self.triggerList;
-            var listNames = [streamList, tableList, windowList, aggregationList, functionList, triggerList];
+            var windowFilterProjectionQueryList = self.windowFilterProjectionQueryList;
+            var patternQueryList = self.patternQueryList;
+            var sequenceQueryList = self.sequenceQueryList;
+            var joinQueryList = self.joinQueryList;
+
+            var listNames;
+            if (includeQueryTypes !== undefined && includeQueryTypes) {
+                listNames = [streamList, tableList, windowList, aggregationList, functionList, triggerList,
+                    windowFilterProjectionQueryList, patternQueryList, sequenceQueryList, joinQueryList];
+            } else {
+                listNames = [streamList, tableList, windowList, aggregationList, functionList, triggerList];
+            }
 
             _.forEach(listNames, function (list) {
                 _.forEach(list, function (element) {
@@ -284,6 +316,14 @@ define(['require', 'elementUtils', 'lodash'],
                             type = 'FUNCTION';
                         } else if (list === triggerList) {
                             type = 'TRIGGER';
+                        } else if (list === windowFilterProjectionQueryList) {
+                            type = 'WINDOW_FILTER_PROJECTION_QUERY';
+                        } else if (list === patternQueryList) {
+                            type = 'PATTERN_QUERY';
+                        } else if (list === sequenceQueryList) {
+                            type = 'SEQUENCE_QUERY';
+                        } else if (list === joinQueryList) {
+                            type = 'JOIN_QUERY';
                         }
                         requestedElement = {
                             type: type,
