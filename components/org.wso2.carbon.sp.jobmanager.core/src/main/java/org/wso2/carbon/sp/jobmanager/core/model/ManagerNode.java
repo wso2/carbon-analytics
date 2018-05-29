@@ -15,12 +15,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.sp.jobmanager.core.model;
 
 import org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig;
 
 import java.io.Serializable;
-
 
 /**
  * This class represents a Manager node.

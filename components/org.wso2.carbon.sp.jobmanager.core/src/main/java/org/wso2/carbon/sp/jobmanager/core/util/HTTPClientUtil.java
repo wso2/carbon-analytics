@@ -26,7 +26,6 @@ import okhttp3.Response;
 
 import java.io.IOException;
 
-
 /**
  * Utility class to handle HTTP requests.
  */

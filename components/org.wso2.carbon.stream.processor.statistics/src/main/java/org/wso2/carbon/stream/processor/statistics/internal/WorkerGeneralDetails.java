@@ -48,15 +48,15 @@ public class WorkerGeneralDetails {
     private String userCountry;
     private String repoLocation;
     private String serverStartTime;
-
+    
     private WorkerGeneralDetails() {
         init();
     }
-
-    public static WorkerGeneralDetails getInstance(){
+    
+    public static WorkerGeneralDetails getInstance() {
         return instance;
     }
-
+    
     private void init() {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
         repoLocation = System.getProperty("carbon.home") + "/deployment";
@@ -74,19 +74,19 @@ public class WorkerGeneralDetails {
         javaHome = System.getProperty("java.home");
         carbonId = getCarbonID();
     }
-
+    
     private String getCarbonID() {
         try {
             ConfigProvider configProvider = StreamProcessorStatisticDataHolder.getInstance().getConfigProvider();
             CarbonConfiguration carbonConfiguration = configProvider.getConfigurationObject(CarbonConfiguration.class);
             return carbonConfiguration.getId();
         } catch (ConfigurationException e) {
-            logger.error("Error in fetching data from carbon config provider.",e);
+            logger.error("Error in fetching data from carbon config provider.", e);
         }
-
+        
         return getDefaultSource();
     }
-
+    
     /**
      * A utility method to provide a default source value
      *
@@ -94,80 +94,80 @@ public class WorkerGeneralDetails {
      * available, it will return "Carbon".
      */
     private static String getDefaultSource() {
-            // Use host name if available
-            String hostname = null;
-            try {
-                hostname = InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException e) {
-                // Ignore exception
-            }
-            if (hostname == null || hostname.trim().length() == 0) {
-               return  "Carbon";
-            } else {
-                return hostname;
-            }
+        // Use host name if available
+        String hostname = null;
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            // Ignore exception
+        }
+        if (hostname == null || hostname.trim().length() == 0) {
+            return "Carbon";
+        } else {
+            return hostname;
+        }
     }
-
+    
     public String getJavaRuntimeName() {
         return javaRuntimeName;
     }
-
+    
     public String getJavaVMVersion() {
         return javaVMVersion;
     }
-
+    
     public String getJavaVMVendor() {
         return javaVMVendor;
     }
-
+    
     public String getJavaHome() {
         return javaHome;
     }
-
+    
     public String getJavaVersion() {
         return javaVersion;
     }
-
+    
     public String getOsName() {
         return osName;
     }
-
+    
     public String getOsVersion() {
         return osVersion;
     }
-
+    
     public String getUserHome() {
         return userHome;
     }
-
+    
     public String getUserTimezone() {
         return userTimezone;
     }
-
+    
     public String getUserName() {
         return userName;
     }
-
+    
     public String getUserCountry() {
         return userCountry;
     }
-
+    
     public String getRepoLocation() {
         return repoLocation;
     }
-
+    
     public String getServerStartTime() {
         return serverStartTime;
     }
-
+    
     public String getCarbonId() {
         return carbonId;
     }
-
+    
     public void setCarbonId(String carbonId) {
         this.carbonId = carbonId;
     }
-
+    
     public String toString() {
         return "JVM Name='" + javaRuntimeName + '\'' +
                 ", JVM Version='" + javaVMVersion + '\'' +
@@ -181,5 +181,5 @@ public class WorkerGeneralDetails {
                 ", User Country='" + userCountry + '\'' +
                 ", Repository Location='" + repoLocation + '\'';
     }
-
+    
 }

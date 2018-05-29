@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -61,7 +61,7 @@ public class QueryManager {
                 PersistenceStoreConfigs componentConfigurations = readYamlContent(url.openStream());
                 componentQueries = componentConfigurations.getQueries();
             } else {
-                throw new RuntimeException("Unable to load queries.yaml file.");
+                throw new ConfigurationException("Unable to load queries.yaml file.");
             }
             queries = QueryProvider.mergeMapping(databaseType, databaseVersion, (ArrayList<Queries>) componentQueries,
                     (ArrayList<Queries>) deploymentQueries);
@@ -75,9 +75,9 @@ public class QueryManager {
         return queries;
     }
 
-    public String getQuery(String key) {
+    public String getQuery(String key) throws ConfigurationException {
         if (!queries.containsKey(key)) {
-            throw new RuntimeException("Unable to find the configuration entry for the key: " + key);
+            throw new ConfigurationException("Unable to find the configuration entry for the key: " + key);
         }
         return queries.get(key);
     }

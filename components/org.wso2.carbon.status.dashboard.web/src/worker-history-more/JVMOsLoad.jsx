@@ -17,14 +17,17 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 //App Components
-import DashboardUtils from "../utils/DashboardUtils";
-import ChartCard from "../common/ChartCard";
+import DashboardUtils from '../utils/DashboardUtils';
+import ChartCard from '../common/ChartCard';
 // Material UI
-import {Card, CardHeader, CardMedia, Divider} from "material-ui";
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
 
-const cpuMetadata = {names: ['Time', 'System CPU Load', 'Process CPU Load', 'System Load Avg'], types: ['time', 'linear', 'linear']};
+const cpuMetadata = {
+    names: ['Time', 'System CPU Load', 'Process CPU Load', 'System Load Avg'],
+    types: ['time', 'linear', 'linear']
+};
 
 /**
  * JVM CPU Load chart component.
@@ -43,7 +46,7 @@ export default class JVMOsLoad extends React.Component {
         this.setState({
             loadProcess: nextprops.data[0],
             loadSystem: nextprops.data[1],
-            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length > 10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -52,25 +55,25 @@ export default class JVMOsLoad extends React.Component {
             x: 'Time',
             charts: [{type: 'area', y: 'System CPU Load', fill: '#f17b31', style: {markRadius: 2}},
                 {type: 'area', y: 'Process CPU Load', fill: '#1af12c', style: {markRadius: 2}}
-                ],
+            ],
             width: 700,
             height: 200,
             style: {
-                tickLabelColor:'#f2f2f2',
+                tickLabelColor: '#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 10,
+                legendTitleSize: 12
             },
-            legend:true,
+            legend: true,
             interactiveLegend: true,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             gridColor: '#f2f2f2',
-            xAxisTickCount:this.state.tickCount
+            xAxisTickCount: this.state.tickCount
         };
-        if(this.state.loadProcess.length === 0 && this.state.loadSystem.length === 0){
-            return(
+        if (this.state.loadProcess.length === 0 && this.state.loadSystem.length === 0) {
+            return (
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
@@ -86,8 +89,8 @@ export default class JVMOsLoad extends React.Component {
                 </div>
             );
         }
-        let data=DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem);
-        let y= DashboardUtils.initCombinedYDomain(this.state.loadProcess, this.state.loadSystem);
+        let data = DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem);
+        let y = DashboardUtils.initCombinedYDomain(this.state.loadProcess, this.state.loadSystem);
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={data} yDomain={y}

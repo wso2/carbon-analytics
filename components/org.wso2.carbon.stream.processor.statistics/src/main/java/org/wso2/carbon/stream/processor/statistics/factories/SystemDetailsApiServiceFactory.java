@@ -25,8 +25,8 @@ import org.wso2.carbon.stream.processor.statistics.impl.SystemDetailsApiServiceI
  * Siddhi Metrics API Service factory Class for expose the worker general details.
  */
 public class SystemDetailsApiServiceFactory {
-    private  static final SystemDetailsApiService service = new SystemDetailsApiServiceImpl();
-
+    private static final SystemDetailsApiService service = new SystemDetailsApiServiceImpl();
+    
     public static SystemDetailsApiService getSystemDetailsApi() {
         return service;
     }

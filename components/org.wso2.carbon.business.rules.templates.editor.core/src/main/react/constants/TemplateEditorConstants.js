@@ -20,7 +20,7 @@
  * Has values for all the constants related to the Template Editor
  */
 const TemplateEditorConstants = {
-    TEMPLATED_ELEMENT_REGEX: /\${(\S+)}/g,
+    TEMPLATED_ELEMENT_REGEX: /\${([^\$\s]+)}/g,
     STREAM_DEFINITION_REGEX: /define stream.*?\((.*?)\);/g,
     VALID_UUID_REGEX: /[a-zA-Z][a-zA-Z0-9_-]*/g,
 

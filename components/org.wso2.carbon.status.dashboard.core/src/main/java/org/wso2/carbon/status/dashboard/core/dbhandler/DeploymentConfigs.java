@@ -1,4 +1,3 @@
-package org.wso2.carbon.status.dashboard.core.dbhandler;
 /*
  *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -17,6 +16,7 @@ package org.wso2.carbon.status.dashboard.core.dbhandler;
  *  under the License.
  *
  */
+package org.wso2.carbon.status.dashboard.core.dbhandler;
 
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
@@ -126,8 +126,8 @@ public class DeploymentConfigs {
         return workerConnectionConfigurations;
     }
 
-    public void setWorkerConnectionConfigurations(int connectionTimeOut,int readTimeOut) {
-        this.workerConnectionConfigurations = new WorkerConnectionConfigurations(connectionTimeOut,readTimeOut);
+    public void setWorkerConnectionConfigurations(int connectionTimeOut, int readTimeOut) {
+        this.workerConnectionConfigurations = new WorkerConnectionConfigurations(connectionTimeOut, readTimeOut);
     }
 
     public String getUsername() {

@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 public class KafkaTestUtil {
@@ -245,5 +246,41 @@ public class KafkaTestUtil {
             }
         }
         producer.close();
+    }
+
+    public static void publish(String topic, List<String> messages, int numOfPartitions,
+                               String bootstrapServers) {
+        Properties props = new Properties();
+        if (null == bootstrapServers) {
+            props.put("bootstrap.servers", "localhost:9092");
+        } else {
+            props.put("bootstrap.servers", bootstrapServers);
+        }
+        props.put("acks", "all");
+        props.put("retries", 0);
+        props.put("batch.size", 16384);
+        props.put("linger.ms", 1);
+        props.put("buffer.memory", 33559000);
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        Producer<String, String> producer = new KafkaProducer<String, String>(props);
+        int i = 0;
+        for (String message : messages) {
+            if (numOfPartitions > 1) {
+                log.info("producing: " + message + " into partition: " + (i % numOfPartitions));
+                producer.send(new ProducerRecord<>(topic, (i % numOfPartitions), null, message));
+            } else {
+                log.info("producing: " + message);
+                producer.send(new ProducerRecord<>(topic, null, null, message));
+            }
+            i++;
+        }
+        producer.flush();
+        producer.close();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

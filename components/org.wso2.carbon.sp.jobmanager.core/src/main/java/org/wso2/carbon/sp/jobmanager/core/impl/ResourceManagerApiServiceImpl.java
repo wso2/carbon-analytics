@@ -65,7 +65,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                 String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
                 ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourcePool(groupId);
                 ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
-                                                          : new ResourcePool(groupId));
+                        : new ResourcePool(groupId));
                 ServiceDataHolder.getResourcePool().init();
                 LOG.info(ServiceDataHolder.getCurrentNode() + " is the leader of the resource pool.");
             }
@@ -73,9 +73,9 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             return Response
                     .status(Response.Status.NO_CONTENT)
                     .entity(new HeartbeatResponse()
-                                    .connectedManagers(null)
-                                    .joinedState(null)
-                                    .leader(null))
+                            .connectedManagers(null)
+                            .joinedState(null)
+                            .leader(null))
                     .build();
         }
         if (ServiceDataHolder.isLeader()) {
@@ -146,17 +146,17 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             return Response
                     .ok()
                     .entity(new HeartbeatResponse()
-                                    .connectedManagers(connectedManagers)
-                                    .joinedState(joinedState)
-                                    .leader(leader))
+                            .connectedManagers(connectedManagers)
+                            .joinedState(joinedState)
+                            .leader(leader))
                     .build();
         } else {
             return Response
                     .status(Response.Status.MOVED_PERMANENTLY)
                     .entity(new HeartbeatResponse()
-                                    .connectedManagers(null)
-                                    .joinedState(null)
-                                    .leader(TypeConverter.convert(ServiceDataHolder.getLeaderNode())))
+                            .connectedManagers(null)
+                            .joinedState(null)
+                            .leader(TypeConverter.convert(ServiceDataHolder.getLeaderNode())))
                     .build();
         }
     }

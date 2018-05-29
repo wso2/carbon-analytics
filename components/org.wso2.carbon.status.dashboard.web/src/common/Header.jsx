@@ -17,10 +17,10 @@
  *
  */
 
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 // Material UI
-import { AppBar, FlatButton, IconButton, IconMenu, MenuItem } from 'material-ui';
+import {AppBar, FlatButton, IconButton, IconMenu, MenuItem} from 'material-ui';
 import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 // App Components
 import AuthManager from '../auth/utils/AuthManager';
@@ -40,7 +40,7 @@ export default class Header extends Component {
      */
     renderRightLinks() {
         if (this.props.hideUserSettings) {
-            return <div />;
+            return <div/>;
         }
 
         // If the user is not set show the login button. Else show account information.
@@ -49,7 +49,7 @@ export default class Header extends Component {
             return (
                 <FlatButton
                     label="Login"
-                    containerElement={<Link to={`${window.contextPath}/login?referrer=${window.location.pathname}`} />}
+                    containerElement={<Link to={`${window.contextPath}/login?referrer=${window.location.pathname}`}/>}
                 />
             );
         }
@@ -58,13 +58,13 @@ export default class Header extends Component {
             <div>
                 <span style={accName}>{user.username}</span>
                 <IconMenu
-                    iconButtonElement={<IconButton><AccountCircle /></IconButton>}
-                    targetOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                    anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    iconButtonElement={<IconButton><AccountCircle/></IconButton>}
+                    targetOrigin={{horizontal: 'right', vertical: 'bottom'}}
+                    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                 >
                     <MenuItem
                         primaryText="Logout"
-                        containerElement={<Link to={`${window.contextPath}/logout`} />}
+                        containerElement={<Link to={`${window.contextPath}/logout`}/>}
                     />
                 </IconMenu>
             </div>
@@ -83,7 +83,7 @@ export default class Header extends Component {
                 title="Stream Processor Status Dashboard"
                 iconElementLeft={<img height='24' src={Logo}/>}
                 titleStyle={title}
-                iconStyleLeft={{margin:'15px 15px 0 0'}}
+                iconStyleLeft={{margin: '15px 15px 0 0'}}
                 iconElementRight={this.renderRightLinks()}
             />
         );

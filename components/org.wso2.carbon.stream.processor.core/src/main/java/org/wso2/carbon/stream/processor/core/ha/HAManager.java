@@ -166,7 +166,6 @@ public class HAManager {
         nodeInfo.setNodeId(nodeId);
         nodeInfo.setGroupId(clusterId);
         nodeInfo.setActiveNode(isActiveNode);
-
     }
 
     /**

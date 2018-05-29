@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,13 +19,14 @@
 package org.wso2.carbon.stream.processor.core.persistence.beans;
 
 import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore;
 
 @Configuration(namespace = "state.persistence", description = "Query configurations for state persistence")
 public class PersistenceConfigurations {
     private boolean enabled = false;
     private int intervalInMin = 1;
     private int revisionsToKeep = 3;
-    private String persistenceStore = "org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore";
+    private String persistenceStore = FileSystemPersistenceStore.class.getName();
     private PersistenceStoreConfigs config;
 
     public boolean isEnabled() {

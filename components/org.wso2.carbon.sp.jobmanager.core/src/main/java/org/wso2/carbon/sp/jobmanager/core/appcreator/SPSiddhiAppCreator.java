@@ -23,6 +23,8 @@ import kafka.utils.ZkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.sp.jobmanager.core.bean.ZooKeeperConfig;
+import org.wso2.carbon.sp.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.OutputStreamDataHolder;
@@ -30,6 +32,7 @@ import org.wso2.carbon.sp.jobmanager.core.topology.PublishingStrategyDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiQueryGroup;
 import org.wso2.carbon.sp.jobmanager.core.topology.SubscriptionStrategyDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.util.ResourceManagerConstants;
+import org.wso2.carbon.sp.jobmanager.core.util.SiddhiTopologyCreatorConstants;
 import org.wso2.carbon.sp.jobmanager.core.util.TransportStrategy;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 
@@ -46,6 +49,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     private static final Logger log = Logger.getLogger(SPSiddhiAppCreator.class);
+    private static final int TIMEOUT = 120;
 
     @Override
     protected List<SiddhiQuery> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup) {
@@ -88,17 +92,17 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     }
                     sinkValuesMap.put(ResourceManagerConstants.DESTINATIONS, StringUtils.join(destinations, ","));
                     String sinkString = getUpdatedQuery(ResourceManagerConstants.PARTITIONED_KAFKA_SINK_TEMPLATE,
-                                                        sinkValuesMap);
+                            sinkValuesMap);
                     sinkList.put(sinkValuesMap.get(ResourceManagerConstants.TOPIC_LIST), sinkString);
                     topicParallelismMap.put(sinkValuesMap.get(ResourceManagerConstants.TOPIC_LIST),
-                                            holder.getParallelism());
+                            holder.getParallelism());
                 } else {
                     //ATM we are handling both strategies in same manner. Later will improve to have multiple
                     // partitions for RR
                     if (partitionKeys.isEmpty()) {
                         //Define a sink only if there are no partitioned sinks present
                         String sinkString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_KAFKA_SINK_TEMPLATE,
-                                                            sinkValuesMap);
+                                sinkValuesMap);
                         sinkList.put(sinkValuesMap.get(ResourceManagerConstants.TOPIC_LIST), sinkString);
                     }
                 }
@@ -111,15 +115,37 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     }
 
     private void createTopicPartitions(Map<String, Integer> topicParallelismMap) {
-        int timeout = 120;
+        ZkUtils zkUtils;
+        String[] bootstrapServerURLs = null;
+        SafeZkClient safeZkClient;
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
-        String[] bootstrapServerURLs = bootstrapServerURL.replaceAll("\\s+", "").split(",");
-        String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
-        String[] zooKeeperServerURLs = zooKeeperServerURL.replaceAll("\\s+", "").split(",");
+        ZooKeeperConfig zooKeeperConfig = ServiceDataHolder.getDeploymentConfig().getZooKeeperConfig();
+        String zooKeeperServerURL;
+        if (zooKeeperConfig != null) {
+            zooKeeperServerURL = zooKeeperConfig.getZooKeeperURLs();
+        } else {
+            zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
+            zooKeeperConfig = new ZooKeeperConfig();
+            log.warn("Deprecated configuration used to specify zooKeeperURLs." +
+                    " Please refer official documentation for latest configurations.");
+        }
+        if (zooKeeperServerURL == null) {
+            throw new SiddhiAppCreationException("ZooKeeper URLs are not provided " +
+                    "in deployment.yaml under deployment.config. Hence cannot check existence of topics.");
+        } else {
+            String[] zooKeeperServerURLs = zooKeeperServerURL.replaceAll("\\s+", "").split(",");
+            boolean isSecureKafkaCluster = false;
+            safeZkClient = new SafeZkClient();
+            zkUtils = safeZkClient.createZkClient(zooKeeperServerURLs, isSecureKafkaCluster,
+                    zooKeeperConfig.getSessionTimeout(), zooKeeperConfig.getConnectionTimeout());
+        }
 
-        boolean isSecureKafkaCluster = false;
-        SafeZkClient safeZkClient = new SafeZkClient();
-        ZkUtils zkUtils = safeZkClient.createZkClient(zooKeeperServerURLs, isSecureKafkaCluster);
+        if (bootstrapServerURL != null) {
+            bootstrapServerURLs = bootstrapServerURL.replaceAll("\\s+", "").split(",");
+        } else if (transportChannelCreationEnabled) {
+            throw new SiddhiAppCreationException("Bootstrap server URLs  are not provided " +
+                    "in deployment.yaml under deployment.config. Hence cannot create required topics.");
+        }
 
         Properties topicConfig = new Properties();
         for (Map.Entry<String, Integer> entry : topicParallelismMap.entrySet()) {
@@ -132,33 +158,50 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     (new SafeKafkaInvoker()).addKafkaPartition(zkUtils, topic, partitions);
                     log.info("Added " + partitions + " partitions to topic " + topic);
                 } else if (existingPartitions > partitions) {
-                    log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
-                                     + " have to delete the topic and recreate with " + partitions + "partitions.");
-                    AdminUtils.deleteTopic(zkUtils, topic);
-                    long startTime = System.currentTimeMillis();
-                    while (AdminUtils.topicExists(zkUtils, topic)) {
-                        try {
-                            TimeUnit.SECONDS.sleep(1);
-                            if (System.currentTimeMillis() - startTime > timeout * 1000L) {
-                                break;
+                    if (transportChannelCreationEnabled) {
+                        log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
+                                + " have to delete the topic and recreate with " + partitions + "partitions.");
+                        AdminUtils.deleteTopic(zkUtils, topic);
+                        long startTime = System.currentTimeMillis();
+                        while (AdminUtils.topicExists(zkUtils, topic)) {
+                            try {
+                                TimeUnit.SECONDS.sleep(1);
+                                if (System.currentTimeMillis() - startTime > TIMEOUT * 1000L) {
+                                    break;
+                                }
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
                             }
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
                         }
-                    }
-                    if (!AdminUtils.topicExists(zkUtils, topic)) {
-                        (new SafeKafkaInvoker()).createKafkaTopic(bootstrapServerURLs, zkUtils, topicConfig, topic,
-                                                                  partitions);
-                        log.info("Created topic " + topic + "with " + partitions + " partitions.");
+                        if (!AdminUtils.topicExists(zkUtils, topic)) {
+                            (new SafeKafkaInvoker()).createKafkaTopic(bootstrapServerURLs, zkUtils, topicConfig, topic,
+                                    partitions);
+                            log.info("Created topic " + topic + " with " + partitions + " partitions.");
+                        } else {
+                            throw new SiddhiAppCreationException("Topic " + topic + " deletion failed. Hence Could not "
+                                    + "create new topic to facilitate new partitions."
+                            );
+                        }
                     } else {
-                        throw new SiddhiAppCreationException("Topic " + topic + " deletion failed. Hence Could not "
-                                                                     + "create new topic to facilitate new partitions."
-                        );
+                        throw new SiddhiAppCreationException("Number of partitions in the existing topic has higher " +
+                                "number of partitions than the expected count. Hence need to delete and recreate " +
+                                "topic with " + partitions + "partitions.  User has disabled topic creation by " +
+                                "setting "  + SiddhiTopologyCreatorConstants.TRANSPORT_CHANNEL_CREATION_IDENTIFIER +
+                                " property to false. Hence new topics can't be created and Siddhi App deployemnt " +
+                                "will be aborted.");
                     }
                 }
             } else {
-                (new SafeKafkaInvoker()).createKafkaTopic(bootstrapServerURLs, zkUtils, topicConfig, topic, partitions);
-                log.info("Created topic " + topic + "with " + partitions + " partitions.");
+                if (transportChannelCreationEnabled) {
+                    new SafeKafkaInvoker().createKafkaTopic(bootstrapServerURLs, zkUtils, topicConfig, topic,
+                            partitions);
+                    log.info("Created topic " + topic + " with " + partitions + " partitions.");
+                } else {
+                    throw new SiddhiAppCreationException("Topic " + topic + " creation failed. User has disabled " +
+                            "topic creation by setting " +
+                            SiddhiTopologyCreatorConstants.TRANSPORT_CHANNEL_CREATION_IDENTIFIER +
+                            " property to false. Hence Siddhi App deployment will be aborted.");
+                }
             }
         }
         safeZkClient.closeClient();
@@ -181,10 +224,10 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         List<Integer> partitionNumbers = getPartitionNumbers(queryList.size(), subscriptionStrategy
                                 .getOfferedParallelism(), i);
                         sourceValuesMap.put(ResourceManagerConstants.PARTITION_LIST, StringUtils.join(partitionNumbers,
-                                                                                                      ","));
+                                ","));
                         String sourceString =
                                 getUpdatedQuery(ResourceManagerConstants.PARTITIONED_KAFKA_SOURCE_TEMPLATE,
-                                                sourceValuesMap);
+                                        sourceValuesMap);
                         Map<String, String> queryValuesMap = new HashMap<>(1);
                         queryValuesMap.put(inputStream.getStreamName(), sourceString);
                         String updatedQuery = getUpdatedQuery(queryList.get(i).getApp(), queryValuesMap);
@@ -193,7 +236,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                 } else if (subscriptionStrategy.getStrategy() == TransportStrategy.ROUND_ROBIN) {
                     sourceValuesMap.put(ResourceManagerConstants.CONSUMER_GROUP_ID, groupName);
                     String sourceString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_KAFKA_SOURCE_TEMPLATE,
-                                                          sourceValuesMap);
+                            sourceValuesMap);
                     Map<String, String> queryValuesMap = new HashMap<>(1);
                     queryValuesMap.put(inputStream.getStreamName(), sourceString);
                     updateQueryList(queryList, queryValuesMap);
@@ -202,7 +245,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         sourceValuesMap.put(ResourceManagerConstants.CONSUMER_GROUP_ID, groupName + "-" +
                                 i);
                         String sourceString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_KAFKA_SOURCE_TEMPLATE,
-                                                              sourceValuesMap);
+                                sourceValuesMap);
                         Map<String, String> queryValuesMap = new HashMap<>(1);
                         queryValuesMap.put(inputStream.getStreamName(), sourceString);
                         String updatedQuery = getUpdatedQuery(queryList.get(i).getApp(), queryValuesMap);

@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.api;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
@@ -24,6 +25,9 @@ import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import java.text.FieldPosition;
 import java.util.Date;
 
+/**
+ * Helper class that helps to covert date format.
+ */
 public class RFC3339DateFormat extends ISO8601DateFormat {
 
     // Same as ISO8601DateFormat but serializing milliseconds.
@@ -33,5 +37,4 @@ public class RFC3339DateFormat extends ISO8601DateFormat {
         toAppendTo.append(value);
         return toAppendTo;
     }
-
 }

@@ -20,6 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -50,6 +51,12 @@ import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
+import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.DeserializersRegisterer;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.CodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
@@ -57,6 +64,7 @@ import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
+import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 
 import java.io.File;
@@ -66,6 +74,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -80,6 +89,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -842,6 +852,69 @@ public class EditorMicroservice implements Microservice {
                                 .getSiddhiAppRuntimeHolder(siddhiAppName)
                                 .getStreamAttributes(streamName)
                 ).build();
+    }
+
+    @POST
+    @Path("/design-view")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDesignView(String siddhiAppBase64) {
+        try {
+            String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
+            DesignGenerator designGenerator = new DesignGenerator();
+            EventFlow eventFlow = designGenerator.getEventFlow(siddhiAppString);
+
+            Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+            return Response.status(Response.Status.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(gson.toJson(eventFlow).replace("\\\"", "\\\\\\\""))
+                    .build();
+        } catch (SiddhiAppCreationException e) {
+            log.error("Unable to generate design view", e);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        } catch (DesignGenerationException e) {
+            log.error("Failed to convert Siddhi app code to design view", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/code-view")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response getCodeView(String siddhiAppEventFlowJSON) {
+        try {
+            Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
+            EventFlow eventFlow = gson.fromJson(siddhiAppEventFlowJSON, EventFlow.class);
+            CodeGenerator codeGenerator = new CodeGenerator();
+            String siddhiAppCode = codeGenerator.generateSiddhiAppCode(eventFlow);
+
+            String encodedSiddhiAppString =
+                    new String(Base64.getEncoder().encode(siddhiAppCode.getBytes(StandardCharsets.UTF_8)),
+                            StandardCharsets.UTF_8);
+            return Response.status(Response.Status.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(encodedSiddhiAppString)
+                    .build();
+        } catch (CodeGenerationException e) {
+            log.error("Unable to generate code view", e);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            log.error("Failed to convert the Siddhi app design view to code");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        }
     }
 
     /**

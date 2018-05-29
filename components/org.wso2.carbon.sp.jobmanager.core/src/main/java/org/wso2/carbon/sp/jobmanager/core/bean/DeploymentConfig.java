@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.sp.jobmanager.core.bean;
 
+package org.wso2.carbon.sp.jobmanager.core.bean;
 
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
@@ -40,8 +40,14 @@ public class DeploymentConfig implements Serializable {
     private String datasource;
     @Element(description = "bootstrap urls for Kafka", required = true)
     private String bootstrapURLs;
+    /**
+     * @deprecated zooKeeperURLs is moved to {@link ZooKeeperConfig} bean
+     */
+    @Deprecated
     @Element(description = "ZooKeeper urls of Kafka cluster", required = true)
     private String zooKeeperURLs;
+    @Element(description = "ZooKeeper configurations", required = true)
+    private ZooKeeperConfig zooKeeperConfig;
 
     public String getType() {
         return type;
@@ -106,4 +112,13 @@ public class DeploymentConfig implements Serializable {
     public void setZooKeeperURLs(String zooKeeperURLs) {
         this.zooKeeperURLs = zooKeeperURLs;
     }
+
+    public ZooKeeperConfig getZooKeeperConfig() {
+        return zooKeeperConfig;
+    }
+
+    public void setZooKeeperConfig(ZooKeeperConfig zooKeeperConfig) {
+        this.zooKeeperConfig = zooKeeperConfig;
+    }
+
 }
