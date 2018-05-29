@@ -26,13 +26,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -210,7 +208,7 @@ public class EdgesGenerator {
      * Gets SiddhiElementConfig object from the SiddhiAppConfig, which has the given Id
      * @param id                                Id of the SiddhiElementConfig
      * @return                                  SiddhiElementConfig object
-     * @throws DesignGenerationException        Error while generating config
+     * @throws DesignGenerationException        No element found with the given Id
      */
     private SiddhiElementConfig getElementWithId(String id) throws DesignGenerationException {
         for (String queryType : siddhiAppConfig.getQueryLists().keySet()) {

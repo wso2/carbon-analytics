@@ -18,7 +18,12 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.*;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
@@ -41,13 +46,6 @@ public class SiddhiAppConfig {
     private String appName = "";
     private String appDescription = "";
 
-    private Map<String, List<QueryConfig>> queryLists = new HashMap<>();
-
-    private List<QueryConfig> windowFilterProjectionQueryList = new ArrayList<>(); // TODO REMOVE BELOW
-    private List<QueryConfig> joinQueryList = new ArrayList<>();
-    private List<QueryConfig> patternQueryList = new ArrayList<>();
-    private List<QueryConfig> sequenceQueryList = new ArrayList<>();
-
     private List<SourceSinkConfig> sourceList = new ArrayList<>();
     private List<SourceSinkConfig> sinkList = new ArrayList<>();
     private List<StreamConfig> streamList = new ArrayList<>();
@@ -56,6 +54,7 @@ public class SiddhiAppConfig {
     private List<WindowConfig> windowList = new ArrayList<>();
     private List<AggregationConfig> aggregationList = new ArrayList<>();
     private List<FunctionConfig> functionList = new ArrayList<>();
+    private Map<String, List<QueryConfig>> queryLists = new HashMap<>();
 
     public SiddhiAppConfig() {
         queryLists.put(QueryInputType.WINDOW_FILTER_PROJECTION.toString(), new ArrayList<>());
@@ -76,18 +75,24 @@ public class SiddhiAppConfig {
      * Adds a given generic type Siddhi ElementConfig, to the given list of the same generic type
      * @param elementList       List to which, the given element config should be added
      * @param elementConfig     Siddhi ElementConfig object
-     * @param <T>               Type of the Siddhi ElementConfig object and the list
+     * @param <T>               Generic type of the Siddhi ElementConfig object, and each membe of the list
      */
     private <T> void addElement(List<T> elementList, T elementConfig) {
         ((SiddhiElementConfig) elementConfig).setId(generateNextElementId());
         elementList.add(elementConfig);
     }
 
+    /**
+     * Adds a given QueryConfig object to its specific query list, denoted by the given QueryInputType
+     * @param queryType         Key with which, the specific query list is denoted
+     * @param queryLists        Map of query lists, where key is the type of query, and value is the specific query list
+     * @param queryConfig       QueryConfig object
+     */
     private void addQuery(QueryInputType queryType,
                           Map<String, List<QueryConfig>> queryLists,
                           QueryConfig queryConfig) {
         queryConfig.setId(generateNextElementId());
-        queryLists.get(queryType.toString()).add(queryConfig); // TODO method comment
+        queryLists.get(queryType.toString()).add(queryConfig);
     }
 
     public void setAppName(String appName) {
@@ -130,10 +135,10 @@ public class SiddhiAppConfig {
         // Categorize QueryConfig from its Input, and add QueryConfig to the relevant list
         QueryInputConfig queryInputConfig = queryConfig.getQueryInput();
         if (queryInputConfig instanceof WindowFilterProjectionConfig) {
-//            addElement(windowFilterProjectionQueryList, queryConfig); TODO remove
+//            addElement(windowFilterProjectionQueryList, queryConfig); TODO review & remove
             addQuery(QueryInputType.WINDOW_FILTER_PROJECTION, queryLists, queryConfig);
         } else if (queryInputConfig instanceof JoinConfig) {
-//            addElement(joinQueryList, queryConfig); TODO remove
+//            addElement(joinQueryList, queryConfig); TODO review & remove
             addQuery(QueryInputType.JOIN, queryLists, queryConfig);
         } else {
             // TODO add pattern & sequences
@@ -179,22 +184,6 @@ public class SiddhiAppConfig {
 
     public List<AggregationConfig> getAggregationList() {
         return aggregationList;
-    }
-
-    public List<QueryConfig> getWindowFilterProjectionQueryList() {
-        return windowFilterProjectionQueryList;
-    }
-
-    public List<QueryConfig> getJoinQueryList() {
-        return joinQueryList;
-    }
-
-    public List<QueryConfig> getPatternQueryList() {
-        return patternQueryList;
-    }
-
-    public List<QueryConfig> getSequenceQueryList() {
-        return sequenceQueryList;
     }
 
     public Map<String, List<QueryConfig>> getQueryLists() {
