@@ -198,6 +198,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 var patternQueryInput = new PatternOrSequenceQueryInput(patternQuery.queryInput);
                 _.forEach(patternQuery.queryInput.conditionList, function(condition){
                     var patternQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                    setStreamHandlerListForQuery(patternQueryConditionObject, condition.streamHandlerList);
                     patternQueryInput.addCondition(patternQueryConditionObject);
                 });
                 patternQueryObject.setQueryInput(patternQueryInput);
