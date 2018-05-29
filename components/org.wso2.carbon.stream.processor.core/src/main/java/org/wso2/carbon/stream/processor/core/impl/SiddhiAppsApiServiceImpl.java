@@ -154,7 +154,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         if (isActive != null && !isActive.trim().isEmpty()) {
             isActiveValue = Boolean.parseBoolean(isActive);
             for (Map.Entry<String, SiddhiAppData> siddhiAppFileEntry : siddhiAppFileMap.entrySet()) {
-                if(isActiveValue == siddhiAppFileEntry.getValue().isActive()) {
+                if (isActiveValue == siddhiAppFileEntry.getValue().isActive()) {
                     artifactList.add(siddhiAppFileEntry.getKey());
                 }
             }
@@ -332,7 +332,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 for (Map.Entry<String, SiddhiAppData> siddhiAppFileEntry : siddhiAppFileMap.entrySet()) {
                     SiddhiAppData siddiAppData = siddhiAppFileEntry.getValue();
                     SiddhiAppMetrics appMetrics = new SiddhiAppMetrics();
-                    if(siddiAppData.isActive()) {
+                    if (siddiAppData.isActive()) {
                         long age = (System.currentTimeMillis() - siddiAppData.getDeploymentTime());
                         appMetrics.setAge(age);
                     } else {
@@ -429,7 +429,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                         loadOutputData(siddhiApp, siddhiAppRuntime, outPutStreamId, siddhiAppString, siddhiAppElements);
                         loadFunctionData(siddhiApp, ((Query) siddhiApp.getExecutionElementList().get(i)).getSelector
                                 ().getSelectionList(), siddhiAppElements, siddhiAppString);
-                        loadQueryName(siddhiApp.getExecutionElementList().get(i).getAnnotations(),siddhiAppElements);
+                        loadQueryName(siddhiApp.getExecutionElementList().get(i).getAnnotations(), siddhiAppElements);
                         Query query = (Query) siddhiApp.getExecutionElementList().get(i);
                         siddhiAppElements.setQuery(getDefinition(query, siddhiAppString));
                         listOfSiddhiAppElements.add(siddhiAppElements);
@@ -444,12 +444,15 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                             siddhiAppElements.setInputStreamId(inputStreamId);
                             siddhiAppElements.setOutputStreamId(query.getOutputStream().getId());
                             siddhiAppElements.setPartitionQuery(getDefinition(query, siddhiAppString));
-                            loadQueryName(siddhiApp.getExecutionElementList().get(i).getAnnotations(),siddhiAppElements);
+                            loadQueryName(siddhiApp.getExecutionElementList().get(i).getAnnotations(),
+                                    siddhiAppElements);
 
-                            loadInputData(siddhiApp, siddhiAppRuntime, inputStreamId, siddhiAppString, siddhiAppElements);
+                            loadInputData(siddhiApp, siddhiAppRuntime, inputStreamId, siddhiAppString,
+                                    siddhiAppElements);
                             String outputStreamId = query.getOutputStream().getId();
 
-                            loadOutputData(siddhiApp, siddhiAppRuntime, outputStreamId, siddhiAppString, siddhiAppElements);
+                            loadOutputData(siddhiApp, siddhiAppRuntime, outputStreamId, siddhiAppString,
+                                    siddhiAppElements);
                             loadFunctionData(siddhiApp, query.getSelector().getSelectionList(), siddhiAppElements,
                                     siddhiAppString);
 
@@ -477,7 +480,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 }
             }
 
-            loadSAggregarionData(siddhiApp,siddhiAppRuntime,listOfSiddhiAppElements,siddhiAppString);
+            loadSAggregarionData(siddhiApp, siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString);
             return Response.ok().entity(listOfSiddhiAppElements).build();
         }
 
@@ -574,7 +577,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     }
 
     /**
-     *obtains information of all the user defined Functions.
+     * obtains information of all the user defined Functions.
      */
 
     private void loadFunctionData(SiddhiApp siddhiApp, List<OutputAttribute> functionList, SiddhiAppElements
@@ -595,10 +598,11 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     }
 
     /**
-     *Obtains information of all the Aggregations.
+     * Obtains information of all the Aggregations.
      */
 
-    private void loadSAggregarionData(SiddhiApp siddhiApp,SiddhiAppRuntime siddhiAppRuntime,List<SiddhiAppElements> streams,String appData) {
+    private void loadSAggregarionData(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+            streams, String appData) {
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
             SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
             siddhiAppElements.setInputStreamId(aggregationDefinition.getBasicSingleInputStream().getStreamId());
@@ -615,7 +619,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Obtain query name of each siddhi app elements
      */
-    private void loadQueryName(List<Annotation> queryAnnotations,SiddhiAppElements siddhiAppElements) {
+    private void loadQueryName(List<Annotation> queryAnnotations, SiddhiAppElements siddhiAppElements) {
         for (Annotation annotation : queryAnnotations) {
             for (Element element : annotation.getElements()) {
                 siddhiAppElements.setQueryName(element.getValue());
@@ -756,7 +760,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to restore the " +
                     "Siddhi App" + appName).build();
         }
-        return siddhiAppsAppNameRestorePost(appName,revision);
+        return siddhiAppsAppNameRestorePost(appName, revision);
     }
 
     @Override
@@ -782,7 +786,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                     "stats for Siddhi App" + appFileName).build();
         }
 
-        return siddhiAppStatsEnable(appFileName,statsEnabled);
+        return siddhiAppStatsEnable(appFileName, statsEnabled);
     }
 
     @Override
