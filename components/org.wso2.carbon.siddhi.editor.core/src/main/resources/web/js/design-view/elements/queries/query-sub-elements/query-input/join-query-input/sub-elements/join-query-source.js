@@ -74,7 +74,7 @@ define(
         };
 
         JoinSource.prototype.setType = function (type) {
-            this.type = type;
+            this.type = type.toUpperCase();
         };
 
         JoinSource.prototype.setFrom = function (from) {
