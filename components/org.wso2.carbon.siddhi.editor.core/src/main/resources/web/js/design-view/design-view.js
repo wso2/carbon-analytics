@@ -244,15 +244,9 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 addAnnotationsForElement(joinQuery, queryObject);
                 var joinQueryInput = new JoinQueryInput(joinQuery.queryInput);
                 var leftSource = new JoinQuerySource(joinQuery.queryInput.left);
-                if (joinQuery.queryInput.left.window !== undefined) {
-                    var leftWindowObject = new QueryWindow(joinQuery.queryInput.left.window);
-                    leftSource.setWindow(leftWindowObject);
-                }
+                setStreamHandlerListForQuery(leftSource, joinQuery.queryInput.left.streamHandlerList);
                 var rightSource = new JoinQuerySource(joinQuery.queryInput.right);
-                if (joinQuery.queryInput.right.window !== undefined) {
-                    var rightWindowObject = new QueryWindow(joinQuery.queryInput.right.window);
-                    rightSource.setWindow(rightWindowObject);
-                }
+                setStreamHandlerListForQuery(rightSource, joinQuery.queryInput.right.streamHandlerList);
                 joinQueryInput.setLeft(leftSource);
                 joinQueryInput.setRight(rightSource);
                 queryObject.setQueryInput(joinQueryInput);

@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(
-    function () {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class Join Source
@@ -30,11 +30,21 @@ define(
              Data storing structure as follows.
                 type*: 'STREAM|TABLE|WINDOW|AGGREGATION|TRIGGER',
                 from*: '',
-                filter: '', // If there is a filter, there must be a window for joins (the only exception is when type = window).
-                window: {
-                    function*: '',
-                    parameters*: ['value1',...]
-                },
+                streamHandlerList: [
+                    {
+                        type*: 'FILTER',
+                        value*: ''
+                    },
+                    << and|or >>
+                    {
+                        type*: 'FUNCTION|WINDOW',
+                        value*: {
+                            function*: '',
+                            parameters*: ['value1',...],
+                        }
+                    },
+                    ...
+                ] // If there is a filter, there must be a window for joins (the only exception is when type = window).
                 as: '',
                 isUnidirectional: true|false // Only one 'isUnidirectional' value can be true at a time (either left definition|right definition|none)
             */
@@ -42,11 +52,18 @@ define(
                 this.type
                     = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.from = options.from;
-                this.filter = options.filter;
-                this.window = options.window;
                 this.as = options.as;
                 this.isUnidirectional = options.isUnidirectional;
             }
+            this.streamHandlerList = [];
+        };
+
+        JoinSource.prototype.addStreamHandler = function (streamHandler) {
+            this.streamHandlerList.push(streamHandler);
+        };
+
+        JoinSource.prototype.clearStreamHandlerList = function () {
+            ElementUtils.prototype.removeAllElements(this.streamHandlerList);
         };
 
         JoinSource.prototype.getType = function () {
@@ -57,12 +74,8 @@ define(
             return this.from;
         };
 
-        JoinSource.prototype.getFilter = function () {
-            return this.filter;
-        };
-
-        JoinSource.prototype.getWindow = function () {
-            return this.window;
+        JoinSource.prototype.getStreamHandlerList = function () {
+            return this.streamHandlerList;
         };
 
         JoinSource.prototype.getAs = function () {
@@ -81,12 +94,8 @@ define(
             this.from = from;
         };
 
-        JoinSource.prototype.setFilter = function (filter) {
-            this.filter = filter;
-        };
-
-        JoinSource.prototype.setWindow = function (window) {
-            this.window = window;
+        JoinSource.prototype.setStreamHandlerList = function (streamHandlerList) {
+            this.streamHandlerList = streamHandlerList;
         };
 
         JoinSource.prototype.setAs = function (as) {
