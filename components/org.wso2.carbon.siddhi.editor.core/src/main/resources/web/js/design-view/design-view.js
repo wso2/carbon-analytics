@@ -214,6 +214,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 var sequenceQueryInput = new PatternOrSequenceQueryInput(sequenceQuery.queryInput);
                 _.forEach(sequenceQuery.queryInput.conditionList, function(condition){
                     var sequenceQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                    setStreamHandlerListForQuery(sequenceQueryConditionObject, condition.streamHandlerList);
                     sequenceQueryInput.addCondition(sequenceQueryConditionObject);
                 });
                 sequenceQueryObject.setQueryInput(sequenceQueryInput);
