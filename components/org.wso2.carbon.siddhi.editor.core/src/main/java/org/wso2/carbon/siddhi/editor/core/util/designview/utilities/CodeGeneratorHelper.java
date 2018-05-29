@@ -452,7 +452,7 @@ public class CodeGeneratorHelper {
         String logic = patternSequence.getLogic();
 
         for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
-            logic.replace(condition.getConditionId(), getPatternSequenceConditionLogic(condition));
+            logic = logic.replace(condition.getConditionId(), getPatternSequenceConditionLogic(condition));
         }
 
         return logic;

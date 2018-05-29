@@ -34,6 +34,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorHelper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Used to convert an EventFlow object to a Siddhi app string
@@ -58,11 +59,10 @@ public class CodeGenerator {
                 .append(generateStreams(siddhiApp.getStreamList(), siddhiApp.getSourceList(), siddhiApp.getSinkList()))
                 .append(generateTables(siddhiApp.getTableList()))
                 .append(generateWindows(siddhiApp.getWindowList()))
-                .append(generateTriggers(siddhiApp.getTriggerList()))
+                .append(generateTriggers(siddhiApp.getTriggerList(), siddhiApp.getSourceList(), siddhiApp.getSinkList()))
                 .append(generateAggregations(siddhiApp.getAggregationList()))
                 .append(generateFunctions(siddhiApp.getFunctionList()))
-                .append(generateQueries(siddhiApp.getWindowFilterProjectionQueryList(), siddhiApp.getJoinQueryList(),
-                        siddhiApp.getPatternQueryList(), siddhiApp.getSequenceQueryList()));
+                .append(generateQueries(siddhiApp.getQueryLists()));
 
         // TODO: 4/23/18 Add the partitions loop
 
@@ -108,7 +108,8 @@ public class CodeGenerator {
         return appNameAndDescriptionStringBuilder.toString();
     }
 
-    private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList, List<SourceSinkConfig> sinkList) {
+    private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList,
+                                   List<SourceSinkConfig> sinkList) {
         // TODO source and sink should be somehow connected to a stream over here
         if (streamList == null || streamList.isEmpty()) {
             return CodeGeneratorConstants.EMPTY_STRING;
@@ -119,8 +120,13 @@ public class CodeGenerator {
                 .append(CodeGeneratorConstants.NEW_LINE);
 
         for (StreamConfig stream : streamList) {
-            // TODO: 5/29/18 Check fir inner streams 
+            // TODO: 5/29/18 Check for inner streams
+            if (stream.isInnerStream()) {
+                break;
+            }
+
             for (SourceSinkConfig source : sourceList) {
+                // TODO: 5/29/18 This might have to be .equalsIgnoreCase() Check whether it is possible
                 if (stream.getName().equals(source.getConnectedElementName())) {
                     streamListStringBuilder.append(generateSourceSinkString(source))
                             .append(CodeGeneratorConstants.NEW_LINE);
@@ -181,7 +187,8 @@ public class CodeGenerator {
         return windowListStringBuilder.toString();
     }
 
-    private String generateTriggers(List<TriggerConfig> triggerList) {
+    private String generateTriggers(List<TriggerConfig> triggerList, List<SourceSinkConfig> sourceList,
+                                    List<SourceSinkConfig> sinkList) {
         // TODO: 5/28/18 NOTE - Triggers can have sources and sinks as well
         if (triggerList == null || triggerList.isEmpty()) {
             return CodeGeneratorConstants.EMPTY_STRING;
@@ -192,6 +199,21 @@ public class CodeGenerator {
                 .append(CodeGeneratorConstants.NEW_LINE);
 
         for (TriggerConfig trigger : triggerList) {
+
+            for (SourceSinkConfig source : sourceList) {
+                if (trigger.getName().equals(source.getConnectedElementName())) {
+                    triggerListStringBuilder.append(generateSourceSinkString(source))
+                            .append(CodeGeneratorConstants.NEW_LINE);
+                }
+            }
+
+            for (SourceSinkConfig sink: sinkList) {
+                if (trigger.getName().equals(sink.getConnectedElementName())) {
+                    triggerListStringBuilder.append(generateSourceSinkString(sink))
+                            .append(CodeGeneratorConstants.NEW_LINE);
+                }
+            }
+
             triggerListStringBuilder.append(generateTriggerString(trigger))
                     .append(CodeGeneratorConstants.NEW_LINE);
         }
@@ -239,33 +261,17 @@ public class CodeGenerator {
         return functionListStringBuilder.toString();
     }
 
-    private String generateQueries(List<QueryConfig> windowFilterProjectionQueryList, List<QueryConfig> joinQueryList,
-                                   List<QueryConfig> patternQueryList, List<QueryConfig> sequenceQueryList) {
+    private String generateQueries(Map<String, List<QueryConfig>> queryLists) {
+        if (queryLists == null || queryLists.isEmpty()) {
+            return CodeGeneratorConstants.EMPTY_STRING;
+        }
+
         StringBuilder queryListStringBuilder = new StringBuilder();
+        queryListStringBuilder.append("-- Queries")
+                .append(CodeGeneratorConstants.NEW_LINE);
 
-        if (windowFilterProjectionQueryList != null && !windowFilterProjectionQueryList.isEmpty()) {
-            for (QueryConfig query : windowFilterProjectionQueryList) {
-                queryListStringBuilder.append(generateQueryString(query))
-                        .append(CodeGeneratorConstants.NEW_LINE);
-            }
-        }
-
-        if (joinQueryList != null && !joinQueryList.isEmpty()) {
-            for (QueryConfig query : joinQueryList) {
-                queryListStringBuilder.append(generateQueryString(query))
-                        .append(CodeGeneratorConstants.NEW_LINE);
-            }
-        }
-
-        if (patternQueryList != null && !patternQueryList.isEmpty()) {
-            for (QueryConfig query : patternQueryList) {
-                queryListStringBuilder.append(generateQueryString(query))
-                        .append(CodeGeneratorConstants.NEW_LINE);
-            }
-        }
-
-        if (sequenceQueryList != null && !sequenceQueryList.isEmpty()) {
-            for (QueryConfig query : sequenceQueryList) {
+        for (List<QueryConfig> queryList : queryLists.values()) {
+            for (QueryConfig query : queryList) {
                 queryListStringBuilder.append(generateQueryString(query))
                         .append(CodeGeneratorConstants.NEW_LINE);
             }
