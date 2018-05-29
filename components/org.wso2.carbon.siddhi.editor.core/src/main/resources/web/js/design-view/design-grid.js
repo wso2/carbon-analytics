@@ -347,31 +347,44 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
             // Update the model when a connection is established and bind events for the connection
             function updateModelOnConnectionAttach() {
-                //TODO: whenever a annotation is changed, delete the entire annotation and save on it
                 self.jsPlumbInstance.bind('connection', function (connection) {
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     var targetElement = $('#' + targetId);
+                    var targetType;
+                    if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true, true)
+                        !== undefined) {
+                        targetType
+                            = self.configurationData.getSiddhiAppConfig()
+                            .getDefinitionElementById(targetId, true, true).type;
+                    } else {
+                        console.log("Target element not found!");
+                    }
 
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
                     var sourceElement = $('#' + sourceId);
+                    var sourceType;
+                    if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
+                        !== undefined) {
+                        sourceType
+                            = self.configurationData.getSiddhiAppConfig()
+                            .getDefinitionElementById(sourceId, true, true).type;
+                    } else {
+                        console.log("Source element not found!");
+                    }
 
                     // create and add an edge to the edgeList
 
                     var edgeId = ''+ targetId + '_' + sourceId + '';
                     var edgeInTheEdgeList = self.configurationData.getEdge(edgeId);
-                    if(edgeInTheEdgeList !== undefined) {
-                        //TODO update the model. why?: query type can be changed even the connection  is same
-                        //edgeInTheEdgeList.setParentType(undefined);
-                        //edgeInTheEdgeList.setChildType(undefined);
-                    } else {
+                    if(edgeInTheEdgeList === undefined) {
                         var edgeOptions = {};
                         _.set(edgeOptions, 'id', edgeId);
                         _.set(edgeOptions, 'parentId', targetId);
-                        _.set(edgeOptions, 'parentType', 'query');//TODO: correct this
+                        _.set(edgeOptions, 'parentType', targetType);
                         _.set(edgeOptions, 'childId', sourceId);
-                        _.set(edgeOptions, 'childType', 'stream');
+                        _.set(edgeOptions, 'childType', sourceType);
                         var edge = new Edge(edgeOptions);
                         self.configurationData.addEdge(edge);
                     }
@@ -379,6 +392,23 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var model;
                     var connectedElementName;
 
+                    if ((sourceElement.hasClass(constants.SOURCE) || sourceElement.hasClass(constants.SINK))
+                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
+                        if(targetElement.hasClass(constants.STREAM)) {
+                            connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(targetId)
+                                .getName();
+                        } else if (targetElement.hasClass(constants.TRIGGER)) {
+                            connectedElementName = self.configurationData.getSiddhiAppConfig().getTrigger(targetId)
+                                .getName();
+                        }
+                        if (sourceElement.hasClass(constants.SOURCE)) {
+                            self.configurationData.getSiddhiAppConfig().getSource(sourceId)
+                                .setConnectedElementName(connectedElementName);
+                        } else if (sourceElement.hasClass(constants.SINK)) {
+                            self.configurationData.getSiddhiAppConfig().getSink(sourceId)
+                                .setConnectedElementName(connectedElementName);
+                        }
+                    }
                     if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)) {
@@ -671,6 +701,17 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var model;
                     var streams;
 
+                    if ((sourceElement.hasClass(constants.SOURCE) || sourceElement.hasClass(constants.SINK))
+                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
+                        if (sourceElement.hasClass(constants.SOURCE)) {
+                            self.configurationData.getSiddhiAppConfig().getSource(sourceId)
+                                .setConnectedElementName(undefined);
+                        } else if (sourceElement.hasClass(constants.SINK)) {
+                            self.configurationData.getSiddhiAppConfig().getSink(sourceId)
+                                .setConnectedElementName(undefined);
+                        }
+                    }
+
                     if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)) {
@@ -904,7 +945,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
         DesignGrid.prototype.drawGraphFromAppData = function () {
             var self = this;
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().sourceList, function(source){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getSourceList(), function(source){
                 var sourceId = source.getId();
                 var sourceName = "Source";
                 var array = sourceId.split("-");
@@ -914,7 +955,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleSourceAnnotation(mouseTop, mouseLeft, true, sourceName, sourceId);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().sinkList, function(sink){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getSinkList(), function(sink){
                 var sinkId = sink.getId();
                 var sinkName = "Sink";
                 var array = sinkId.split("-");
@@ -924,7 +965,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleSinkAnnotation(mouseTop, mouseLeft, true, sinkName, sinkId);
             });
             
-            _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function(stream){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getStreamList(), function(stream){
                 var streamId = stream.getId();
                 var streamName = stream.getName();
                 var array = streamId.split("-");
@@ -934,7 +975,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().tableList, function(table){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getTableList(), function(table){
 
                 var tableId = table.getId();
                 var tableName = table.getName();
@@ -945,7 +986,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleTable(mouseTop, mouseLeft, true, tableId, tableName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().windowList, function(window){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getWindowList(), function(window){
 
                 var windowId = window.getId();
                 var windowName = window.getName();
@@ -956,7 +997,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleWindow(mouseTop, mouseLeft, true, windowId, windowName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().triggerList, function(trigger){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getTriggerList(), function(trigger){
 
                 var triggerId = trigger.getId();
                 var triggerName = trigger.getName();
@@ -967,7 +1008,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleTrigger(mouseTop, mouseLeft, true, triggerId, triggerName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().aggregationList, function(aggregation){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getAggregationList(), function(aggregation){
 
                 var aggregationId = aggregation.getId();
                 var aggregationName = aggregation.getName();
@@ -978,7 +1019,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleAggregation(mouseTop, mouseLeft, true, aggregationId, aggregationName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().functionList, function(functionObject){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getFunctionList(), function(functionObject){
 
                 var functionId = functionObject.getId();
                 var functionName = functionObject.getName();
@@ -989,7 +1030,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleFunction(mouseTop, mouseLeft, true, functionId, functionName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().patternQueryList, function(patternQuery){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getPatternQueryList(), function(patternQuery){
 
                 var patternQueryId = patternQuery.getId();
                 var patternQueryName = "Pattern";
@@ -1000,7 +1041,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().sequenceQueryList, function(sequenceQuery){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getSequenceQueryList(), function(sequenceQuery){
 
                 var sequenceQueryId = sequenceQuery.getId();
                 var sequenceQueryName = "Sequence";
@@ -1011,7 +1052,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().windowFilterProjectionQueryList,
+            _.forEach(self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQueryList(),
                 function (windowFilterProjectionQuery) {
                     var queryId = windowFilterProjectionQuery.getId();
                     var queryName = "Query";
@@ -1033,7 +1074,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().joinQueryList, function(joinQuery){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getJoinQueryList(), function(joinQuery){
 
                 var joinQueryId = joinQuery.getId();
                 var joinQueryName = "Join";
@@ -1586,7 +1627,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
         };
 
         DesignGrid.prototype.generateNextNewAgentId = function () {
-            // TODO: Not finalized
             var newId = parseInt(this.newAgentId) +1;
             this.newAgentId = "" + newId + "";
             return this.currentTabId + "_element_" + this.newAgentId;

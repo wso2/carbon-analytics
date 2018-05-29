@@ -172,7 +172,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 functionObject.setId(newIdBeginningPhrase + functionObject.getId());
                 appData.addFunction(functionObject);
             });
-            _.forEach(configurationData.siddhiAppConfig.patternQueryList, function(patternQuery){
+            _.forEach(configurationData.siddhiAppConfig.queryLists.PATTERN, function(patternQuery){
                 var patternQueryObject = new Query(patternQuery);
                 addAnnotationsForElement(patternQuery, patternQueryObject);
                 var patternQueryInput = new PatternOrSequenceQueryInput(patternQuery.queryInput);
@@ -187,7 +187,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 patternQueryObject.setId(newIdBeginningPhrase + patternQueryObject.getId());
                 appData.addPatternQuery(patternQueryObject);
             });
-            _.forEach(configurationData.siddhiAppConfig.sequenceQueryList, function(sequenceQuery){
+            _.forEach(configurationData.siddhiAppConfig.queryLists.SEQUENCE, function(sequenceQuery){
                 var sequenceQueryObject = new Query(sequenceQuery);
                 addAnnotationsForElement(sequenceQuery, sequenceQueryObject);
                 var sequenceQueryInput = new PatternOrSequenceQueryInput(sequenceQuery.queryInput);
@@ -202,7 +202,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 sequenceQueryObject.setId(newIdBeginningPhrase + sequenceQueryObject.getId());
                 appData.addSequenceQuery(sequenceQueryObject);
             });
-            _.forEach(configurationData.siddhiAppConfig.windowFilterProjectionQueryList,
+            _.forEach(configurationData.siddhiAppConfig.queryLists.WINDOW_FILTER_PROJECTION,
                 function(windowFilterProjectionQuery){
                 var queryObject = new Query(windowFilterProjectionQuery);
                 addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
@@ -219,7 +219,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 queryObject.setId(newIdBeginningPhrase + queryObject.getId());
                 appData.addWindowFilterProjectionQuery(queryObject);
             });
-            _.forEach(configurationData.siddhiAppConfig.joinQueryList, function(joinQuery){
+            _.forEach(configurationData.siddhiAppConfig.queryLists.JOIN, function(joinQuery){
                 var queryObject = new Query(joinQuery);
                 addAnnotationsForElement(joinQuery, queryObject);
                 var joinQueryInput = new JoinQueryInput(joinQuery.queryInput);

@@ -214,8 +214,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
              showIcon --> An icon that elucidates whether the dropped stream element is an Import/Export/Defined
              stream (In this case: an Import arrow icon)
-             conIcon --> Clicking this icon is supposed to toggle between showing and hiding the
-             "Connection Anchor Points" (Not implemented)//TODO: implement this feature
             */
             var settingsIconId = ""+ i + "-dropStreamSettingsId";
             var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
@@ -1073,37 +1071,34 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
                 if (newElement.hasClass('streamDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeStream(elementId);
-
                 } else if (newElement.hasClass('tableDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeTable(elementId);
-
                 } else if (newElement.hasClass('windowDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeWindow(elementId);
-
                 } else if (newElement.hasClass('triggerDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeTrigger(elementId);
-
                 } else if (newElement.hasClass('aggregationDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeAggregation(elementId);
-
+                } else if (newElement.hasClass('functionDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeFunction(elementId);
                 } else if (newElement.hasClass('projectionQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
-
                 } else if (newElement.hasClass('filterQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
-
                 } else if (newElement.hasClass('windowQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
-
                 } else if (newElement.hasClass('patternQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removePatternQuery(elementId);
-
+                } else if (newElement.hasClass('sequenceQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeSequenceQuery(elementId);
                 } else if (newElement.hasClass('joinQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeJoinQuery(elementId);
-
                 } else if (newElement.hasClass('partitionDrop')) {
                     self.configurationData.getSiddhiAppConfig().removePartition(elementId);
-
+                } else if (newElement.hasClass('sourceDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeSource(elementId);
+                } else if (newElement.hasClass('sinkDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeSink(elementId);
                 }
                 if(self.jsPlumbInstance.getGroupFor(newElement)){
                     var queries = self.configurationData.getSiddhiAppConfig()

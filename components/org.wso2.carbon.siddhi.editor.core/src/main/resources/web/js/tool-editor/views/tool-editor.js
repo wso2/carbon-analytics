@@ -152,29 +152,195 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     }
                     this._sourceView.editorResize();
 
-                    var JSONString = "{\"siddhiAppConfig\":{\"streamList\":[{\"id\":\"view10_element_1\",\"name\":\"das\"," +
-                        "\"attributeList\":[{\"name\":\"DA\",\"type\":\"string\"}],\"annotationList\":[]},{\"id\":\"view10_element_3\"," +
-                        "\"name\":\"asc\",\"attributeList\":[{\"name\":\"DA\",\"type\":\"string\"}],\"annotationList\":[]}],\"tableList\":[]," +
-                        "\"windowList\":[],\"triggerList\":[],\"aggregationList\":[],\"windowFilterProjectionQueryList\":" +
-                        "[{\"id\":\"view10_element_4\",\"queryInput\":{\"type\":\"projection\",\"from\":\"das\",\"filter\":\"\",\"window\":{}}," +
-                        "\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"\",\"as\":\"\"}]},\"groupBy\":[]," +
-                        "\"limit\":12,\"having\":\"\",\"outputRateLimit\":\"\",\"queryOutput\":{\"type\":\"insert\",\"output\":" +
-                        "{\"eventType\":\"all\"},\"target\":\"asc\"},\"orderBy\":[{\"value\":\"DA\",\"order\":\"desc\"}],\"annotationList\":[]}]," +
-                        "\"patternQueryList\":[],\"sequenceQueryList\":[{\"id\":\"view10_element_5\",\"queryInput\":" +
-                        "{\"type\":\"sequence\",\"logic\":\"gerwg\",\"connectedElementNameList\":[\"das\",\"asc\"]," +
-                        "\"conditionList\":[{\"conditionId\":\"ferwgfre\",\"streamName\":\"das\"},{\"conditionId\":\"rewgrew\"," +
-                        "\"streamName\":\"asc\",\"filter\":\"kgk\"}]},\"select\":{\"type\":\"user_defined\"," +
-                        "\"value\":[{\"expression\":\"jkjgj\",\"as\":\"DA\"}]},\"queryOutput\":{\"type\":\"insert\"," +
-                        "\"output\":{\"eventType\":\"all_events\"},\"target\":\"asc\"},\"orderBy\":[],\"annotationList\":" +
-                        "[]}],\"joinQueryList\":[],\"partitionList\":[],\"finalElementCount\":4},\"edgeList\":[{\"id\":" +
-                        "\"view10_element_4_view10_element_1\",\"parentId\":\"view10_element_4\",\"parentType\":\"query\"," +
-                        "\"childId\":\"view10_element_1\",\"childType\":\"stream\"},{\"id\":\"view10_element_3_view10_element_4\"," +
-                        "\"parentId\":\"view10_element_3\",\"parentType\":\"query\",\"childId\":\"view10_element_4\",\"childType\":\"stream\"}," +
-                        "{\"id\":\"view10_element_5_view10_element_1\",\"parentId\":\"view10_element_5\",\"parentType\":" +
-                        "\"query\",\"childId\":\"view10_element_1\",\"childType\":\"stream\"},{\"id\":\"view10_element_3_view10_element_5\"" +
-                        ",\"parentId\":\"view10_element_3\",\"parentType\":\"query\",\"childId\":\"view10_element_5\"," +
-                        "\"childType\":\"stream\"},{\"id\":\"view10_element_5_view10_element_3\",\"parentId\":\"view10_element_5\"" +
-                        ",\"parentType\":\"query\",\"childId\":\"view10_element_3\",\"childType\":\"stream\"}]}";
+                    var JSONString = "{" +
+                        " \"siddhiAppConfig\": {" +
+                        "  \"streamList\": [" +
+                        "   {" +
+                        "    \"id\": \"view118_element_2\"," +
+                        "    \"name\": \"InStream\"," +
+                        "    \"isInnerStream\": false," +
+                        "    \"attributeList\": [" +
+                        "     {" +
+                        "      \"name\": \"name\"," +
+                        "      \"type\": \"STRING\"" +
+                        "     }," +
+                        "     {" +
+                        "      \"name\": \"age\"," +
+                        "      \"type\": \"INT\"" +
+                        "     }" +
+                        "    ]," +
+                        "    \"annotationList\": []" +
+                        "   }," +
+                        "   {" +
+                        "    \"id\": \"view118_element_3\"," +
+                        "    \"name\": \"OutStream\"," +
+                        "    \"isInnerStream\": false," +
+                        "    \"attributeList\": [" +
+                        "     {" +
+                        "      \"name\": \"name\"," +
+                        "      \"type\": \"STRING\"" +
+                        "     }," +
+                        "     {" +
+                        "      \"name\": \"age\"," +
+                        "      \"type\": \"INT\"" +
+                        "     }" +
+                        "    ]," +
+                        "    \"annotationList\": []" +
+                        "   }" +
+                        "  ]," +
+                        "  \"tableList\": [" +
+                        "   {" +
+                        "    \"id\": \"view118_element_4\"," +
+                        "    \"name\": \"InTable\"," +
+                        "    \"attributeList\": [" +
+                        "     {" +
+                        "      \"name\": \"name\"," +
+                        "      \"type\": \"STRING\"" +
+                        "     }," +
+                        "     {" +
+                        "      \"name\": \"age\"," +
+                        "      \"type\": \"INT\"" +
+                        "     }" +
+                        "    ]," +
+                        "    \"annotationList\": []" +
+                        "   }" +
+                        "  ]," +
+                        "  \"windowList\": [" +
+                        "   {" +
+                        "    \"id\": \"view118_element_5\"," +
+                        "    \"name\": \"InWindow\"," +
+                        "    \"function\": \"time\"," +
+                        "    \"parameters\": [" +
+                        "     \"1 min\"" +
+                        "    ]," +
+                        "    \"outputEventType\": \"ALL_EVENTS\"," +
+                        "    \"attributeList\": [" +
+                        "     {" +
+                        "      \"name\": \"name\"," +
+                        "      \"type\": \"STRING\"" +
+                        "     }," +
+                        "     {" +
+                        "      \"name\": \"age\"," +
+                        "      \"type\": \"INT\"" +
+                        "     }" +
+                        "    ]," +
+                        "    \"annotationList\": []" +
+                        "   }" +
+                        "  ]," +
+                        "  \"triggerList\": [" +
+                        "   {" +
+                        "    \"id\": \"view118_element_1\"," +
+                        "    \"name\": \"InTrigger\"," +
+                        "    \"at\": \"every 5 min\"," +
+                        "    \"annotationList\": []" +
+                        "   }" +
+                        "  ]," +
+                        "  \"aggregationList\": [" +
+                        "   {" +
+                        "    \"id\": \"view118_element_6\"," +
+                        "    \"name\": \"InAggregation\"," +
+                        "    \"from\": \"InStream\"," +
+                        "    \"select\": {" +
+                        "     \"type\": \"USER_DEFINED\"," +
+                        "     \"value\": [" +
+                        "      {" +
+                        "       \"expression\": \"name\"," +
+                        "       \"as\": \"\"" +
+                        "      }," +
+                        "      {" +
+                        "       \"expression\": \"avg(age)\"," +
+                        "       \"as\": \"avgAge\"" +
+                        "      }" +
+                        "     ]" +
+                        "    }," +
+                        "    \"groupBy\": [" +
+                        "     \"name\"" +
+                        "    ]," +
+                        "    \"aggregateByAttribute\": \"\"," +
+                        "    \"aggregateByTimePeriod\": {" +
+                        "     \"minValue\": \"MINUTES\"," +
+                        "     \"maxValue\": \"MINUTES\"" +
+                        "    }," +
+                        "    \"annotationList\": [" +
+                        "     {" +
+                        "      \"value\": [" +
+                        "       {" +
+                        "        \"value\": \"AGG_TIMESTAMP\"," +
+                        "        \"isString\": true" +
+                        "       }," +
+                        "       {" +
+                        "        \"value\": \"name\"," +
+                        "        \"isString\": true" +
+                        "       }" +
+                        "      ]," +
+                        "      \"name\": \"PrimaryKey\"," +
+                        "      \"type\": \"LIST\"" +
+                        "     }" +
+                        "    ]" +
+                        "   }" +
+                        "  ]," +
+                        "  \"functionList\": []," +
+                        "  \"partitionList\": []," +
+                        "  \"sourceList\": []," +
+                        "  \"sinkList\": []," +
+                        "  \"queryLists\": {" +
+                        "   \"WINDOW_FILTER_PROJECTION\": [" +
+                        "    {" +
+                        "     \"id\": \"view118_element_7\"," +
+                        "     \"queryInput\": {" +
+                        "      \"type\": \"WINDOW\"," +
+                        "      \"from\": \"OutStream\"," +
+                        "      \"filter\": \"age >= 18\"," +
+                        "      \"window\": {" +
+                        "       \"function\": \"time\"," +
+                        "       \"parameters\": [" +
+                        "        \"10 min\"" +
+                        "       ]" +
+                        "      }," +
+                        "      \"postWindowFilter\": \"age < 30\"" +
+                        "     }," +
+                        "     \"select\": {" +
+                        "      \"type\": \"ALL\"," +
+                        "      \"value\": \"*\"" +
+                        "     }," +
+                        "     \"groupBy\": []," +
+                        "     \"limit\": 0," +
+                        "     \"having\": \"\"," +
+                        "     \"outputRateLimit\": \"\"," +
+                        "     \"queryOutput\": {" +
+                        "      \"type\": \"INSERT\"," +
+                        "      \"output\": {" +
+                        "       \"eventType\": \"CURRENT_EVENTS\"" +
+                        "      }," +
+                        "      \"target\": \"InStream\"" +
+                        "     }," +
+                        "     \"orderBy\": []," +
+                        "     \"annotationList\": []" +
+                        "    }" +
+                        "   ]," +
+                        "   \"PATTERN\": []," +
+                        "   \"SEQUENCE\": []," +
+                        "   \"JOIN\": []" +
+                        "  }," +
+                        "  \"finalElementCount\": 7" +
+                        " }," +
+                        " \"edgeList\": [" +
+                        "  {" +
+                        "   \"id\": \"view118_element_2_view118_element_7\"," +
+                        "   \"parentId\": \"view118_element_2\"," +
+                        "   \"parentType\": \"STREAM\"," +
+                        "   \"childId\": \"view118_element_7\"," +
+                        "   \"childType\": \"WINDOW_FILTER_PROJECTION_QUERY\"" +
+                        "  }," +
+                        "  {" +
+                        "   \"id\": \"view118_element_7_view118_element_3\"," +
+                        "   \"parentId\": \"view118_element_7\"," +
+                        "   \"parentType\": \"WINDOW_FILTER_PROJECTION_QUERY\"," +
+                        "   \"childId\": \"view118_element_3\"," +
+                        "   \"childType\": \"STREAM\"" +
+                        "  }" +
+                        " ]" +
+                        "}";
 
                     this.JSONObject = JSON.parse(JSONString);
                     console.log(this.JSONObject);
@@ -188,6 +354,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var toggleViewButtonDynamicId = "toggle-view-button-" + this._$parent_el.attr('id');
                     toggleViewButton.attr('id', toggleViewButtonDynamicId);
 
+                    //TODO: add general validation: check whether all required fields in the forms are filled, elements are connected properly(ex: source should be connected to a stream)
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
                             if (application.tabController.getActiveTab().getFile().isDirty()) {
