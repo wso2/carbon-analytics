@@ -1568,9 +1568,15 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
                             "managerId " + "\n" + managerId + "\n" + "successfully " + " added")).build();
                 } catch (RDBMSTableException e) {
-                    logger.error("Error occurred while inserting the Manager due to " + e.getMessage(), e);
-                    return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error "
-                            + "occured while inserting the Manager due to " + e.getMessage())).build();
+                    logger.error("Error occured while inserting the Manager due to " + e.getMessage(), e);
+                    if (e.getMessage().contains("Unique index or primary key violation")) {
+                        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                                "Duplicate Manager. " + manager.getHost() + ":" +
+                                        String.valueOf(manager.getPort()) + " already exists")).build();
+                    } else {
+                        return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                                "Error occured while inserting the Manager due to " + e.getMessage())).build();
+                    }
                 }
             } else {
                 logger.error("There is no manager node specified:" + manager.toString());
