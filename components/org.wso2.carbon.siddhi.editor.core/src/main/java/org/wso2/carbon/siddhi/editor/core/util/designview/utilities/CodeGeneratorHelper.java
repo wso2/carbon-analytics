@@ -27,6 +27,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinElementConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConditionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
@@ -438,8 +439,39 @@ public class CodeGeneratorHelper {
      * @return The Siddhi string representation of the given PatternSequenceConfig instance
      */
     private static String getPatternSequenceInput(PatternSequenceConfig patternSequence) {
-        // TODO: 5/28/18 Complete 
-        return CodeGeneratorConstants.EMPTY_STRING;
+        // TODO: 5/28/18 Complete and test
+        if (patternSequence == null) {
+            throw new CodeGenerationException("The given PatternSequenceConfig instance is null");
+        } else if (patternSequence.getLogic() == null || patternSequence.getLogic().isEmpty()) {
+            throw new CodeGenerationException("The 'logic' attribute in the given " +
+                    "PatternSequenceConfig instance in null");
+        } else if (patternSequence.getConditionList() == null || patternSequence.getConditionList().isEmpty()) {
+            throw new CodeGenerationException("The condition list of the given PatternSequenceConfig is null/empty");
+        }
+
+        String logic = patternSequence.getLogic();
+
+        for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
+            logic.replace(condition.getConditionId(), getPatternSequenceConditionLogic(condition));
+        }
+
+        return logic;
+    }
+
+    private static String getPatternSequenceConditionLogic(PatternSequenceConditionConfig condition) {
+        if (condition == null) {
+            throw new CodeGenerationException("The given PatternSequenceConditionConfig instance is null");
+        } else if (condition.getStreamName() == null || condition.getStreamName().isEmpty()) {
+            throw new CodeGenerationException("The stream name of the given PatternSequenceConditionConfig" +
+                    " instance is null");
+        }
+
+        StringBuilder patternSequenceConditionStringBuilder = new StringBuilder();
+
+        patternSequenceConditionStringBuilder.append(condition.getStreamName())
+                .append(getStreamHandlerList(condition.getStreamHandlerList()));
+
+        return patternSequenceConditionStringBuilder.toString();
     }
 
     /**

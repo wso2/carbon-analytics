@@ -119,7 +119,7 @@ public class CodeGenerator {
                 .append(CodeGeneratorConstants.NEW_LINE);
 
         for (StreamConfig stream : streamList) {
-
+            // TODO: 5/29/18 Check fir inner streams 
             for (SourceSinkConfig source : sourceList) {
                 if (stream.getName().equals(source.getConnectedElementName())) {
                     streamListStringBuilder.append(generateSourceSinkString(source))
@@ -182,6 +182,7 @@ public class CodeGenerator {
     }
 
     private String generateTriggers(List<TriggerConfig> triggerList) {
+        // TODO: 5/28/18 NOTE - Triggers can have sources and sinks as well
         if (triggerList == null || triggerList.isEmpty()) {
             return CodeGeneratorConstants.EMPTY_STRING;
         }
