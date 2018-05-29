@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.query.api.SiddhiElement;
 
 /**
@@ -32,16 +33,18 @@ public class ConfigBuildingUtilities {
 
     /**
      * Gets the piece of the code for the given SiddhiElement, from the siddhiAppString
-     * @param siddhiElement     SiddhiElement object, whose code definition is to be extracted
-     * @param siddhiAppString   Complete Siddhi app string
-     * @return                  Code definition of the given SiddhiElement object
+     * @param siddhiElement                     SiddhiElement object, whose code definition is to be extracted
+     * @param siddhiAppString                   Complete Siddhi app string
+     * @return                                  Code definition of the given SiddhiElement object
+     * @throws DesignGenerationException        Error on getting query start/end index of the element
      */
-    public static String getDefinition(SiddhiElement siddhiElement, String siddhiAppString) {
+    public static String getDefinition(SiddhiElement siddhiElement, String siddhiAppString)
+            throws DesignGenerationException {
         int[] startIndex = siddhiElement.getQueryContextStartIndex();
         int[] endIndex = siddhiElement.getQueryContextEndIndex();
 
         if (startIndex == null || endIndex == null) {
-            throw new IllegalArgumentException("Unable to get the definition of the SiddhiElement");
+            throw new DesignGenerationException("Unable to get the definition of the SiddhiElement");
         }
 
         int startLinePosition = ordinalIndexOf(startIndex[0], siddhiAppString);

@@ -56,8 +56,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.Deserial
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.CodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
-import org.wso2.carbon.siddhi.editor.core.util.designview.singletons.CodeGeneratorSingleton;
-import org.wso2.carbon.siddhi.editor.core.util.designview.singletons.DesignGeneratorSingleton;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
@@ -862,7 +861,7 @@ public class EditorMicroservice implements Microservice {
     public Response getDesignView(String siddhiAppBase64) {
         try {
             String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
-            DesignGenerator designGenerator = DesignGeneratorSingleton.getInstance();
+            DesignGenerator designGenerator = new DesignGenerator();
             EventFlow eventFlow = designGenerator.getEventFlow(siddhiAppString);
 
             Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -876,7 +875,7 @@ public class EditorMicroservice implements Microservice {
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();
-        } catch (IllegalArgumentException e) {
+        } catch (DesignGenerationException e) {
             log.error("Failed to convert Siddhi app code to design view", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
@@ -893,7 +892,7 @@ public class EditorMicroservice implements Microservice {
         try {
             Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
             EventFlow eventFlow = gson.fromJson(siddhiAppEventFlowJSON, EventFlow.class);
-            CodeGenerator codeGenerator = CodeGeneratorSingleton.getInstance();
+            CodeGenerator codeGenerator = new CodeGenerator();
             String siddhiAppCode = codeGenerator.generateSiddhiAppCode(eventFlow);
 
             String encodedSiddhiAppString =

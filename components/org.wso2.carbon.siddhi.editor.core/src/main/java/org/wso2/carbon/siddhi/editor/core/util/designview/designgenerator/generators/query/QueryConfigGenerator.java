@@ -27,6 +27,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.genera
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.QueryInputConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.output.QueryOutputConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Annotation;
@@ -49,7 +50,8 @@ public class QueryConfigGenerator {
      * @param siddhiApp             Compiled Siddhi app
      * @return                      QueryConfig object
      */
-    public QueryConfig generateQueryConfig(Query query, String siddhiAppString, SiddhiApp siddhiApp) {
+    public QueryConfig generateQueryConfig(Query query, String siddhiAppString, SiddhiApp siddhiApp)
+            throws DesignGenerationException {
         // Generate Input
         QueryInputConfigGenerator queryInputConfigGenerator = new QueryInputConfigGenerator(siddhiAppString, siddhiApp);
         QueryInputConfig queryInputConfig = queryInputConfigGenerator.generateQueryInputConfig(query.getInputStream());
@@ -67,16 +69,18 @@ public class QueryConfigGenerator {
                 queryOutputConfigGenerator.generateQueryOutputConfig(query.getOutputStream());
 
         // Get Query ID
-        String queryId = null;
+        String queryName = null;
         for (Annotation annotation : query.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase(SiddhiQueryAnnotation.INFO.toString())) {
-                queryId = annotation.getElement(SiddhiQueryAnnotation.NAME.toString());
+                queryName = annotation.getElement(SiddhiQueryAnnotation.NAME.toString());
                 break;
             }
         }
-        if (queryId == null) {
+        if (queryName == null) {
             // Set UUID when no Id is present
-            queryId = UUID.randomUUID().toString();
+            // TODO generate like 'query1'...
+            // TODO Get query name annotations in a list, check ifExists, and name in incremental order as aboveMentiond
+            queryName = UUID.randomUUID().toString();
         }
 
         // Get 'groupBy' list
@@ -120,7 +124,7 @@ public class QueryConfigGenerator {
         }
 
         return new QueryConfig(
-                queryId,
+                queryName,
                 queryInputConfig,
                 querySelectConfig,
                 groupBy,

@@ -22,8 +22,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
+import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 import org.wso2.siddhi.query.api.execution.query.selection.Selector;
 
 import java.util.ArrayList;
@@ -45,45 +46,30 @@ public class AttributesSelectionConfigGenerator {
      * @return              AttributesSelectionConfig object
      */
     public AttributesSelectionConfig generateAttributesSelectionConfig(Selector selector) {
-        String selectString = extractSelectedAttributesString(selector);
-        if (selectString.equals(AttributeSelection.VALUE_ALL)) {
-            // All attributes selection
-            return new AllSelectionConfig();
-        }
-        // User defined selection
-        return new UserDefinedSelectionConfig(generateSelectedAttributeList(selectString));
-    }
-
-    /**
-     * Extracts only the string of attributes selection, without the 'select' keyword
-     * @param selector      Siddhi Selector object
-     * @return              Attributes selection string
-     */
-    private String extractSelectedAttributesString(Selector selector) {
-        final String SELECT = "select";
-        final String GROUP_BY = "group by";
-        final String HAVING = "having";
-        String completeSelectString = ConfigBuildingUtilities.getDefinition(selector, siddhiAppString);
-        String selectString = completeSelectString.split(GROUP_BY)[0].split(HAVING)[0];
-        String selectedCollection = selectString.split(SELECT)[1].replace("\n", "");
-        return selectedCollection.trim();
-    }
-
-    /**
-     * Generates a list of SelectedAttributes from the given string, of selected attributes separated by commas
-     * @param selectedAttributesString      Selected attributes separated by commas
-     * @return                              List of SelectedAttributes
-     */
-    private List<SelectedAttribute> generateSelectedAttributeList(String selectedAttributesString) {
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
-        for (String selectedElement : selectedAttributesString.split(",")) {
-            String[] nameAndAlias = selectedElement.split("([a|A][s|S])");
-            if (nameAndAlias.length == 1) {
-                selectedAttributes.add(new SelectedAttribute(nameAndAlias[0].trim(), nameAndAlias[0].trim()));
-            } else {
-                selectedAttributes.add(new SelectedAttribute(nameAndAlias[0].trim(), nameAndAlias[1].trim()));
+        for (OutputAttribute outputAttribute : selector.getSelectionList()) {
+            try {
+                selectedAttributes.add(generateSelectedAttribute(outputAttribute));
+            } catch (DesignGenerationException e) {
+                // Selector object has been successfully compiled by the Siddhi Compiler, but no query indexes
+                // The OutputAttribute object was a result of 'select *'
+                return new AllSelectionConfig();
             }
         }
-        return selectedAttributes;
+        return new UserDefinedSelectionConfig(selectedAttributes);
+    }
+
+    /**
+     * Generates a SelectedAttribute object from the given Siddhi OutputAttribute
+     * @param outputAttribute                   Siddhi OutputAttribute object
+     * @return                                  SelectedAttribute object
+     * @throws DesignGenerationException        Error while getting the definition of the OutputAttribute
+     */
+    private SelectedAttribute generateSelectedAttribute(OutputAttribute outputAttribute)
+            throws DesignGenerationException {
+        return new SelectedAttribute(
+                ConfigBuildingUtilities.getDefinition(outputAttribute.getExpression(), siddhiAppString),
+                outputAttribute.getRename());
+
     }
 }

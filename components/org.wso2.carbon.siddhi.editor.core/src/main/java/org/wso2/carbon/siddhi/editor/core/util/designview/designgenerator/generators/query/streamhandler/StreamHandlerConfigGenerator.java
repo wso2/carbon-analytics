@@ -23,6 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.FunctionWindowValue;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.StreamHandlerType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
 import org.wso2.siddhi.query.api.execution.query.input.handler.StreamFunction;
@@ -45,10 +46,12 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates StreamHandlerConfig from the given Siddhi StreamHandler
-     * @param streamHandler     Siddhi StreamHandler object
-     * @return                  StreamHandlerConfig object
+     * @param streamHandler                     Siddhi StreamHandler object
+     * @return                                  StreamHandlerConfig object
+     * @throws DesignGenerationException        Error while generating config
      */
-    public StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler) {
+    public StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler)
+            throws DesignGenerationException {
         if (streamHandler instanceof Filter) {
             return generateFilterConfig((Filter) streamHandler);
         } else if (streamHandler instanceof StreamFunction) {
@@ -56,15 +59,15 @@ public class StreamHandlerConfigGenerator {
         } else if (streamHandler instanceof Window) {
             return generateWindow((Window) streamHandler);
         }
-        throw new IllegalArgumentException("Unknown type of StreamHandler for generating config");
+        throw new DesignGenerationException("Unknown type of StreamHandler for generating config");
     }
 
     /**
      * Generates FilterConfig from the given Siddhi Filter
      * @param filter        Siddhi Filter object
-     * @return              FilterConfig object
+     * @return              FilterConfig object todo exception comment
      */
-    private FilterConfig generateFilterConfig(Filter filter) {
+    private FilterConfig generateFilterConfig(Filter filter) throws DesignGenerationException {
         String filterDefinition = ConfigBuildingUtilities.getDefinition(filter, siddhiAppString);
         return new FilterConfig(filterDefinition.substring(1, filterDefinition.length() - 1).trim());
     }
@@ -72,9 +75,9 @@ public class StreamHandlerConfigGenerator {
     /**
      * Generates Function config from the given Siddhi StreamFunction
      * @param streamFunction        Siddhi StreamFunction object
-     * @return                      FunctionWindowConfig object
+     * @return                      FunctionWindowConfig object todo exception comment
      */
-    private FunctionWindowConfig generateFunction(StreamFunction streamFunction) {
+    private FunctionWindowConfig generateFunction(StreamFunction streamFunction) throws DesignGenerationException {
         StringBuilder function = new StringBuilder();
         if (streamFunction.getNamespace() != null && !streamFunction.getNamespace().isEmpty()) {
             function.append(streamFunction.getNamespace());
@@ -92,9 +95,9 @@ public class StreamHandlerConfigGenerator {
     /**
      * Generates Window config from the given Siddhi Window
      * @param window        Siddhi Window object
-     * @return              FunctionWindowConfig object
+     * @return              FunctionWindowConfig object todo exception comment
      */
-    private FunctionWindowConfig generateWindow(Window window) {
+    private FunctionWindowConfig generateWindow(Window window) throws DesignGenerationException {
         StringBuilder function = new StringBuilder();
         if (window.getNamespace() != null && !window.getNamespace().isEmpty()) {
             function.append(window.getNamespace());
@@ -112,9 +115,9 @@ public class StreamHandlerConfigGenerator {
     /**
      * Generates a string list of parameters, from the given list of Siddhi Expressions
      * @param parameters        Siddhi Expressions
-     * @return                  String list of parameters
+     * @return                  String list of parameters todo exception comment
      */
-    private List<String> generateParameters(Expression[] parameters) {
+    private List<String> generateParameters(Expression[] parameters) throws DesignGenerationException {
         List<String> parameterStrings = new ArrayList<>();
         for (Expression parameter : parameters) {
             parameterStrings.add(ConfigBuildingUtilities.getDefinition(parameter, siddhiAppString));
