@@ -39,7 +39,6 @@ export default class AppEventFlow extends React.Component {
                     this.setState({
                         appData: response.data
                     });
-                    console.log("data" + this.state.appData)
                 }
                 let g = new dagreD3.graphlib.Graph({compound: true}).setGraph({});
 
@@ -55,8 +54,6 @@ export default class AppEventFlow extends React.Component {
                     let inputStreamSiddhiApp = entry.inputStreamSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
                     let outputStreamSiddhiApp = entry.outputStreamSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
 
-                    console.log("entry" + entry.inputStreamId)
-                    console.log("am here")
                     switch (entry.inputStreamType) {
                         case "Stream":
                             inputContainer =
@@ -274,8 +271,6 @@ export default class AppEventFlow extends React.Component {
                         }, {labelStyle: "width:300"});
                     }
 
-                    console.log("function" + entry.function)
-
                     if (entry.function !== undefined) {
                         functionContainer =
                             "<div id='container' class='node-content' title='" + entry.functionQuery + "'>"
@@ -331,7 +326,6 @@ export default class AppEventFlow extends React.Component {
 
                     }
                     if (entry.partitionType === 'Value Partition' || entry.partitionType === 'Range Partition') {
-                        console.log("input" + entry.inputStreamId);
                         g.setEdge(entry.inputStreamId, entry.partitionType, {
                             arrowheadStyle: "fill: #bbb",
                             lineInterpolate: "basis"
