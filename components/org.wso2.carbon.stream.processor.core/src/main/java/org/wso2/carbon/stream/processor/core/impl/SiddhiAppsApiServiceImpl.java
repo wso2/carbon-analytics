@@ -489,11 +489,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
     }
 
-
     /**
      * Obtain the siddhi app and the type of input stream.
      */
-
     private void loadInputData(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, String inputStream, String
             appData, SiddhiAppElements siddhiAppElements) {
         Map<String, StreamDefinition> streamDefinitionMap = (siddhiAppRuntime.getStreamDefinitionMap());
@@ -536,7 +534,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Obtain the siddhi app and the type of output stream.
      */
-
     private void loadOutputData(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, String outputStream, String
             appData, SiddhiAppElements siddhiAppElements) {
         Map<String, StreamDefinition> streamDefinitionMap = (siddhiAppRuntime.getStreamDefinitionMap());
@@ -579,7 +576,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * obtains information of all the user defined Functions.
      */
-
     private void loadFunctionData(SiddhiApp siddhiApp, List<OutputAttribute> functionList, SiddhiAppElements
             siddhiAppElements, String appData) {
         for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
@@ -600,7 +596,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Obtains information of all the Aggregations.
      */
-
     private void loadSAggregarionData(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
             streams, String appData) {
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
@@ -630,7 +625,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         }
     }
 
-
     /**
      * Obtains the piece of the code from the siddhiAppString variable where the given SiddhiElement object is defined.
      *
@@ -647,7 +641,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return siddhiAppString.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1])
                 .replaceAll("'", "\"");
     }
-
 
     /**
      * Gets the relative position in the siddhiAppString of the start of the given line number.
