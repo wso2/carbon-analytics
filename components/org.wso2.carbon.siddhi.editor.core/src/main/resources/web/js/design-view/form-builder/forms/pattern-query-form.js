@@ -433,6 +433,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                             propertyOrder: 2
                                         },
                                         streamHandlerList: {
+                                            propertyOrder: 3,
                                             required: true,
                                             type: "array",
                                             format: "table",

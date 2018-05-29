@@ -367,6 +367,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 }
                             },
                             streamHandlerList: {
+                                propertyOrder: 2,
                                 type: "array",
                                 format: "table",
                                 title: "Stream Handlers",
@@ -466,6 +467,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 }
                             },
                             streamHandlerList: {
+                                propertyOrder: 2,
                                 type: "array",
                                 format: "table",
                                 title: "Stream Handlers",
