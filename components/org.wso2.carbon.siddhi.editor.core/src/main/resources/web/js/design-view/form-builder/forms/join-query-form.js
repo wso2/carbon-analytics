@@ -17,9 +17,10 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindow', 'queryOrderByValue', 'joinQuerySource'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
+        'joinQuerySource', 'streamHandler', 'queryWindowOrFunction'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindow, QueryOrderByValue, joinQuerySource) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler) {
 
         var constants = {
             LEFT_SOURCE : 'Left Source',
@@ -360,6 +361,85 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 }
                             }
                         }
+                    },
+                    definitions: {
+                        filter: {
+                            type: "object",
+                            title: "Filter",
+                            required: true,
+                            properties: {
+                                filter: {
+                                    required: true,
+                                    title: "Filter Condition",
+                                    type: "string",
+                                    minLength: 1
+                                }
+                            }
+                        },
+                        window: {
+                            title: "Window",
+                            type: "object",
+                            required: true,
+                            properties: {
+                                windowName: {
+                                    required: true,
+                                    title: "Window Name",
+                                    type: "string",
+                                    minLength: 1
+                                },
+                                parameters: {
+                                    required: true,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Parameters",
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: 'Attribute',
+                                        properties: {
+                                            parameter: {
+                                                required: true,
+                                                type: 'string',
+                                                title: 'Parameter Name',
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        functionDef: {
+                            title: "Function",
+                            type: "object",
+                            required: true,
+                            properties: {
+                                functionName: {
+                                    required: true,
+                                    title: "Function Name",
+                                    type: "string",
+                                    minLength: 1
+                                },
+                                parameters: {
+                                    required: true,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Parameters",
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: 'Attribute',
+                                        properties: {
+                                            parameter: {
+                                                required: true,
+                                                type: 'string',
+                                                title: 'Parameter Name',
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 };
 
@@ -513,8 +593,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     display_required_only: true,
                     no_additional_properties: true,
                     disable_array_delete_all_rows: true,
-                    disable_array_delete_last_row: true,
-                    disable_array_reorder: true
+                    disable_array_delete_last_row: true
                 });
 
                 /*
@@ -1001,6 +1080,47 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var selectConfig = editorSelect.getValue();
                     var outputConfig = editorOutput.getValue();
 
+                    // checks stream handlers related validations
+                    function validateSourceStreamHandlers(joinConfiguration, joinSourceSide) {
+                        var validity = true;
+                        var noOfFiltersInSource = 0;
+                        var noOfWindowsInSource = 0;
+                        _.forEach(joinConfiguration.streamHandlerList, function (streamHandler) {
+                            streamHandler = streamHandler.streamHandler;
+                            if (streamHandler.windowName !== undefined) {
+                                noOfWindowsInSource++;
+                            } else if (streamHandler.filter !== undefined) {
+                                noOfFiltersInSource++;
+                            }
+                        });
+                        var elementType;
+                        if (joinSourceSide === constants.LEFT_SOURCE) {
+                            elementType = firstInputElementType;
+                        } else {
+                            elementType = secondInputElementType;
+                        }
+                        if (noOfWindowsInSource > 1) {
+                            alert("Only one window can be defined in a join source!");
+                            validity = false;
+                        } else if (noOfFiltersInSource > 0
+                            && noOfWindowsInSource === 0 && elementType !== 'WINDOW') {
+                            alert("Since a filter is defined, a window is also needed to be defined in join source!");
+                            validity = false;
+                        } else if (noOfWindowsInSource === 1){
+                            var streamHandlerListLength = joinConfiguration.streamHandlerList.length;
+                            var lastStreamHandlerInList = joinConfiguration.streamHandlerList[streamHandlerListLength-1];
+                            if (lastStreamHandlerInList.streamHandler.windowName === undefined) {
+                                alert("Window should be defined as the last stream handler in a join source!");
+                                validity = false;
+                            }
+                        }
+                        return validity;
+                    }
+
+                    if (!validateSourceStreamHandlers(inputConfig.left, constants.LEFT_SOURCE)
+                        || !validateSourceStreamHandlers(inputConfig.right, constants.RIGHT_SOURCE)) {
+                        return;
+                    }
                     clickedElement.clearAnnotationList();
                     _.forEach(annotationConfig.annotations, function (annotation) {
                         clickedElement.addAnnotation(annotation.annotation);
@@ -1008,116 +1128,72 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     var queryInput = clickedElement.getQueryInput();
 
-                    // saving data related to left source
-                    var leftSourceOptions = {};
-                    _.set(leftSourceOptions, 'type', firstInputElementType);
-                    if (inputConfig.left.input.from !== undefined) {
-                        _.set(leftSourceOptions, 'from', inputConfig.left.input.from);
-                    } else {
-                        _.set(leftSourceOptions, 'from', undefined);
-                    }
-                    if (inputConfig.left.as !== undefined && inputConfig.left.as.name !== undefined) {
-                        _.set(leftSourceOptions, 'as', inputConfig.left.as.name);
-                    } else {
-                        _.set(leftSourceOptions, 'as', undefined);
-                    }
-                    if (inputConfig.left.isUnidirectional !== undefined) {
-                        _.set(leftSourceOptions, 'isUnidirectional', inputConfig.left.isUnidirectional);
-                    } else {
-                        _.set(leftSourceOptions, 'isUnidirectional', undefined);
-                    }
-                    // setting the filter
-                    if (inputConfig.left.filter !== undefined && inputConfig.left.filter.filter !== undefined) {
-                        _.set(leftSourceOptions, 'filter', inputConfig.left.filter.filter);
-                    } else if (inputConfig.left.filterWithWindow !== undefined
-                        && inputConfig.left.filterWithWindow.filter !== undefined) {
-                        _.set(leftSourceOptions, 'filter', inputConfig.left.filterWithWindow.filter);
-                    } else {
-                        _.set(leftSourceOptions, 'filter', undefined);
-                    }
-                    // setting the window
-                    if (inputConfig.left.window !== undefined) {
-                        var windowOptions = {};
-                        _.set(windowOptions, 'function', inputConfig.left.window.functionName);
-                        var parameters = [];
-                        _.forEach(inputConfig.left.window.parameters, function (parameter) {
-                            parameters.push(parameter.parameter);
+                    function saveDataForJoinSources(joinConfiguration, joinSourceSide) {
+                        var sourceOptions = {};
+                        if (joinSourceSide === constants.LEFT_SOURCE) {
+                            _.set(sourceOptions, 'type', firstInputElementType);
+                        } else {
+                            _.set(sourceOptions, 'type', secondInputElementType);
+                        }
+                        if (joinConfiguration.input.from !== undefined) {
+                            _.set(sourceOptions, 'from', joinConfiguration.input.from);
+                        } else {
+                            _.set(sourceOptions, 'from', undefined);
+                        }
+                        if (joinConfiguration.as !== undefined && joinConfiguration.as.name !== undefined) {
+                            _.set(sourceOptions, 'as', joinConfiguration.as.name);
+                        } else {
+                            _.set(sourceOptions, 'as', undefined);
+                        }
+                        if (joinConfiguration.isUnidirectional !== undefined) {
+                            _.set(sourceOptions, 'isUnidirectional', joinConfiguration.isUnidirectional);
+                        } else {
+                            _.set(sourceOptions, 'isUnidirectional', undefined);
+                        }
+                        var joinSource = new joinQuerySource(sourceOptions);
+
+                        _.forEach(joinConfiguration.streamHandlerList, function (streamHandler) {
+                            streamHandler = streamHandler.streamHandler;
+                            var streamHandlerOptions = {};
+                            var parameters = [];
+                            if (streamHandler.windowName !== undefined) {
+                                var windowOptions = {};
+                                _.set(windowOptions, 'function', streamHandler.windowName);
+                                _.forEach(streamHandler.parameters, function (parameter) {
+                                    parameters.push(parameter.parameter);
+                                });
+                                _.set(windowOptions, 'parameters', parameters);
+                                var queryWindow = new QueryWindowOrFunction(windowOptions);
+                                _.set(streamHandlerOptions, 'type', 'WINDOW');
+                                _.set(streamHandlerOptions, 'value', queryWindow);
+                            } else if (streamHandler.functionName !== undefined) {
+                                var functionOptions = {};
+                                _.set(functionOptions, 'function', streamHandler.functionName);
+                                _.forEach(streamHandler.parameters, function (parameter) {
+                                    parameters.push(parameter.parameter);
+                                });
+                                _.set(functionOptions, 'parameters', parameters);
+                                var queryFunction = new QueryWindowOrFunction(functionOptions);
+                                _.set(streamHandlerOptions, 'type', 'FUNCTION');
+                                _.set(streamHandlerOptions, 'value', queryFunction);
+                            } else if (streamHandler.filter !== undefined) {
+                                _.set(streamHandlerOptions, 'type', 'FILTER');
+                                _.set(streamHandlerOptions, 'value', streamHandler.filter);
+                            } else {
+                                console.log("Unknown stream handler received!");
+                            }
+                            var streamHandlerObject = new StreamHandler(streamHandlerOptions);
+                            joinSource.addStreamHandler(streamHandlerObject);
                         });
-                        _.set(windowOptions, 'parameters', parameters);
-                        var queryWindow = new QueryWindow(windowOptions);
-                        _.set(leftSourceOptions, 'window', queryWindow);
-                    } else if (inputConfig.left.filterWithWindow !== undefined
-                        && inputConfig.left.filterWithWindow.functionName !== undefined
-                        && inputConfig.left.filterWithWindow.parameters !== undefined) {
-                        var windowOptions = {};
-                        _.set(windowOptions, 'function', inputConfig.left.filterWithWindow.functionName);
-                        var parameters = [];
-                        _.forEach(inputConfig.left.filterWithWindow.parameters, function (parameter) {
-                            parameters.push(parameter.parameter);
-                        });
-                        _.set(windowOptions, 'parameters', parameters);
-                        var queryWindow = new QueryWindow(windowOptions);
-                        _.set(leftSourceOptions, 'window', queryWindow);
-                    } else {
-                        _.set(leftSourceOptions, 'window', undefined);
+
+                        return joinSource;
                     }
-                    var leftSource = new joinQuerySource(leftSourceOptions);
+                    
+                    // saving data related to left and right source
+                    var leftSource = saveDataForJoinSources(inputConfig.left, constants.LEFT_SOURCE);
                     queryInput.setLeft(leftSource);
 
-                    // saving data related to right source
-                    var rightSourceOptions = {};
-                    _.set(rightSourceOptions, 'type', firstInputElementType);
-                    if (inputConfig.right.input.from !== undefined) {
-                        _.set(rightSourceOptions, 'from', inputConfig.right.input.from);
-                    } else {
-                        _.set(rightSourceOptions, 'from', undefined);
-                    }
-                    if (inputConfig.right.as !== undefined && inputConfig.right.as.name !== undefined) {
-                        _.set(rightSourceOptions, 'as', inputConfig.right.as.name);
-                    } else {
-                        _.set(rightSourceOptions, 'as', undefined);
-                    }
-                    if (inputConfig.right.isUnidirectional !== undefined) {
-                        _.set(rightSourceOptions, 'isUnidirectional', inputConfig.right.isUnidirectional);
-                    } else {
-                        _.set(rightSourceOptions, 'isUnidirectional', undefined);
-                    }
-                    // setting the filter
-                    if (inputConfig.right.filter !== undefined && inputConfig.right.filter.filter !== undefined) {
-                        _.set(rightSourceOptions, 'filter', inputConfig.right.filter.filter);
-                    } else if (inputConfig.right.filterWithWindow !== undefined
-                        && inputConfig.right.filterWithWindow.filter !== undefined) {
-                        _.set(rightSourceOptions, 'filter', inputConfig.right.filterWithWindow.filter);
-                    } else {
-                        _.set(rightSourceOptions, 'filter', undefined);
-                    }
-                    // setting the window
-                    if (inputConfig.right.window !== undefined) {
-                        var windowOptions = {};
-                        _.set(windowOptions, 'function', inputConfig.right.window.functionName);
-                        var parameters = [];
-                        _.forEach(inputConfig.right.window.parameters, function (parameter) {
-                            parameters.push(parameter.parameter);
-                        });
-                        _.set(windowOptions, 'parameters', parameters);
-                        var queryWindow = new QueryWindow(windowOptions);
-                        _.set(rightSourceOptions, 'window', queryWindow);
-                    } else if (inputConfig.right.filterWithWindow !== undefined
-                        && inputConfig.right.filterWithWindow.functionName !== undefined
-                        && inputConfig.right.filterWithWindow.parameters !== undefined) {
-                        var windowOptions = {};
-                        _.set(windowOptions, 'function', inputConfig.right.filterWithWindow.functionName);
-                        var parameters = [];
-                        _.forEach(inputConfig.right.filterWithWindow.parameters, function (parameter) {
-                            parameters.push(parameter.parameter);
-                        });
-                        _.set(windowOptions, 'parameters', parameters);
-                        var queryWindow = new QueryWindow(windowOptions);
-                        _.set(rightSourceOptions, 'window', queryWindow);
-                    } else {
-                        _.set(rightSourceOptions, 'window', undefined);
-                    }
-                    var rightSource = new joinQuerySource(rightSourceOptions);
+                    var rightSource = saveDataForJoinSources(inputConfig.right, constants.RIGHT_SOURCE);
                     queryInput.setRight(rightSource);
                     
                     var joinWithType = undefined;
@@ -1284,7 +1360,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         JoinQueryForm.prototype.getJoinSourceSchema = function (sourceType, sourceName, secondarySourceName, sourceSide,
                                                                 savedJoinSourceData) {
             var self = this;
-            var fullJoinSchema = {};
             // starting values for the join source
             var fillSourceWith = {};
             if (savedJoinSourceData !== undefined) {
@@ -1352,133 +1427,117 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
             };
 
+            var streamHandlerListSchema;
             if (sourceType === "WINDOW") {
-                fullJoinSchema = commonJoinSourceSchema;
-            } else if (sourceType === "STREAM" || sourceType === "TRIGGER") {
-                var filterWithWindowSchema = {
+                streamHandlerListSchema = {
                     propertyOrder: 2,
-                    type: "object",
-                    title: "Filter with Window",
-                    properties: {
-                        filter: {
-                            required: true,
-                            title: "Filter Condition",
-                            type: "string",
-                            minLength: 1
-                        },
-                        functionName: {
-                            required: true,
-                            title: "Window Name",
-                            type: "string",
-                            minLength: 1
-                        },
-                        parameters: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Window Parameters",
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    parameter: {
-                                        type: 'string',
-                                        title: 'Parameter Name',
-                                        minLength: 1
+                    type: "array",
+                    format: "table",
+                    title: "Stream Handlers",
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Stream Handler',
+                        properties: {
+                            streamHandler: {
+                                title: 'Stream Handler',
+                                required: true,
+                                oneOf: [
+                                    {
+                                        $ref: "#/definitions/filter",
+                                        title: "Filter"
+                                    },
+                                    {
+                                        $ref: "#/definitions/functionDef",
+                                        title: "Function"
                                     }
-                                }
+                                ]
                             }
                         }
                     }
                 };
-                fullJoinSchema = commonJoinSourceSchema;
-                _.set(fullJoinSchema.properties, 'filterWithWindow', filterWithWindowSchema);
-
-                if (savedJoinSourceData !== undefined) {
-                    _.set(fillSourceWith, 'filterWithWindow.filter', savedJoinSourceData.getFilter());
-                    if (savedJoinSourceData.getWindow() !== undefined) {
-                        _.set(fillSourceWith, 'filterWithWindow.functionName',
-                            savedJoinSourceData.getWindow().getFunction());
-                        var savedParameterValues = savedJoinSourceData.getWindow().getParameters();
-                        var parameters = [];
-                        _.forEach(savedParameterValues, function (savedParameterValue) {
-                            var parameterObject = {
-                                parameter: savedParameterValue
-                            };
-                            parameters.push(parameterObject);
-                        });
-                        _.set(fillSourceWith, 'filterWithWindow.parameters', parameters);
-                    }
-                }
-
-            } else if (sourceType === "TABLE" || sourceType === "AGGREGATION") {
-                var filterSchema = {
+            } else if (sourceType === "STREAM" || sourceType === "TRIGGER" ||sourceType === "TABLE"
+                || sourceType === "AGGREGATION") {
+                streamHandlerListSchema = {
                     propertyOrder: 2,
-                    type: "object",
-                    title: "Filter",
-                    properties: {
-                        filter: {
-                            required: true,
-                            title: "Condition",
-                            type: "string",
-                            minLength: 1
-                        }
-                    }
-                };
-
-                var windowSchema = {
-                    propertyOrder: 3,
-                    title: "Window",
-                    type: "object",
-                    properties: {
-                        functionName: {
-                            required: true,
-                            title: "Name",
-                            type: "string",
-                            minLength: 1
-                        },
-                        parameters: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Parameters",
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    parameter: {
-                                        type: 'string',
-                                        title: 'Parameter Name',
-                                        minLength: 1
+                    type: "array",
+                    format: "table",
+                    title: "Stream Handlers",
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Stream Handler',
+                        properties: {
+                            streamHandler: {
+                                title: 'Stream Handler',
+                                required: true,
+                                oneOf: [
+                                    {
+                                        $ref: "#/definitions/filter",
+                                        title: "Filter"
+                                    },
+                                    {
+                                        $ref: "#/definitions/functionDef",
+                                        title: "Function"
+                                    },
+                                    {
+                                        $ref: "#/definitions/window",
+                                        title: "Window"
                                     }
-                                }
+                                ]
                             }
                         }
                     }
                 };
-                fullJoinSchema = commonJoinSourceSchema;
-                _.set(fullJoinSchema.properties, 'filter', filterSchema);
-                _.set(fullJoinSchema.properties, 'window', windowSchema);
-
-                if (savedJoinSourceData !== undefined) {
-                    _.set(fillSourceWith, 'filter.filter', savedJoinSourceData.getFilter());
-                    if (savedJoinSourceData.getWindow() !== undefined) {
-                        _.set(fillSourceWith, 'window.functionName', savedJoinSourceData.getWindow().getFunction());
-                        var savedParameterValues = savedJoinSourceData.getWindow().getParameters();
-                        var parameters = [];
-                        _.forEach(savedParameterValues, function (savedParameterValue) {
-                            var parameterObject = {
-                                parameter: savedParameterValue
-                            };
-                            parameters.push(parameterObject);
-                        });
-                        _.set(fillSourceWith, 'window.parameters', parameters);
-                    }
-                }
             } else {
                 console.log("Unknown source type received!");
+            }
+            var fullJoinSchema = commonJoinSourceSchema;
+            _.set(fullJoinSchema.properties, 'streamHandlerList', streamHandlerListSchema);
+
+            if (savedJoinSourceData !== undefined) {
+                var savedStreamHandlerList = savedJoinSourceData.getStreamHandlerList();
+                var streamHandlerList = [];
+                _.forEach(savedStreamHandlerList, function (streamHandler) {
+                    var streamHandlerObject;
+                    var parameters = [];
+                    if (streamHandler.getType() === "FILTER") {
+                        streamHandlerObject = {
+                            streamHandler: {
+                                filter: streamHandler.getValue()
+                            }
+                        };
+                    } else if (streamHandler.getType() === "FUNCTION") {
+                        _.forEach(streamHandler.getValue().getParameters(), function (savedParameterValue) {
+                            var parameterObject = {
+                                parameter: savedParameterValue
+                            };
+                            parameters.push(parameterObject);
+                        });
+                        streamHandlerObject = {
+                            streamHandler: {
+                                functionName: streamHandler.getValue().getFunction(),
+                                parameters: parameters
+                            }
+                        };
+                    } else if (streamHandler.getType() === "WINDOW" && sourceType !== "WINDOW") {
+                        _.forEach(streamHandler.getValue().getParameters(), function (savedParameterValue) {
+                            var parameterObject = {
+                                parameter: savedParameterValue
+                            };
+                            parameters.push(parameterObject);
+                        });
+                        streamHandlerObject = {
+                            streamHandler: {
+                                windowName: streamHandler.getValue().getFunction(),
+                                parameters: parameters
+                            }
+                        };
+                    }
+                    streamHandlerList.push(streamHandlerObject);
+                });
+
+                _.set(fillSourceWith, 'streamHandlerList', streamHandlerList);
             }
 
             if (sourceSide === constants.LEFT_SOURCE) {

@@ -72,11 +72,11 @@ define(
         };
 
         Function.prototype.setScriptType = function (scriptType) {
-            this.scriptType = scriptType;
+            this.scriptType = scriptType.toUpperCase();
         };
 
         Function.prototype.setReturnType = function (returnType) {
-            this.returnType = returnType;
+            this.returnType = returnType.toUpperCase();
         };
 
         Function.prototype.setBody = function (body) {

@@ -18,17 +18,17 @@
 
 define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid',
         'configurationData', 'appData', 'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation',
-        'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'edge', 'querySelect',
+        'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindowOrFunction', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
         'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation',
-        'functionDefinition'],
+        'functionDefinition', 'streamHandler'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
-              QueryWindow, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete,
-              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource,
-              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation,
-              FunctionDefinition) {
+              QueryWindowOrFunction, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert,
+              QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput,
+              JoinQuerySource, PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation,
+              MapAnnotation, FunctionDefinition, StreamHandler) {
 
         /**
          * @class DesignView
@@ -79,6 +79,26 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 _.forEach(element.attributeList, function(attribute){
                     var attributeObject = new Attribute(attribute);
                     newElementObject.addAttribute(attributeObject);
+                });
+            }
+
+            // sets the stream handler list in query input
+            function setStreamHandlerListForQuery(queryInput, streamHandlerList) {
+                _.forEach(streamHandlerList, function(streamHandler){
+                    var streamHandlerOptions = {};
+                    if (streamHandler.type === "FUNCTION" || streamHandler.type === "WINDOW") {
+                        var windowOrFunctionObject = new QueryWindowOrFunction(streamHandler.value);
+                        streamHandlerOptions = {};
+                        _.set(streamHandlerOptions, 'type', streamHandler.type);
+                        _.set(streamHandlerOptions, 'value', windowOrFunctionObject);
+                    } else if (streamHandler.type === "FILTER") {
+                        _.set(streamHandlerOptions, 'type', streamHandler.type);
+                        _.set(streamHandlerOptions, 'value', streamHandler.value);
+                    } else {
+                        console.log("Unknown Stream Handler type detected!")
+                    }
+                    var streamHandlerObject = new StreamHandler(streamHandlerOptions);
+                    queryInput.addStreamHandler(streamHandlerObject);
                 });
             }
 
@@ -178,6 +198,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 var patternQueryInput = new PatternOrSequenceQueryInput(patternQuery.queryInput);
                 _.forEach(patternQuery.queryInput.conditionList, function(condition){
                     var patternQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                    setStreamHandlerListForQuery(patternQueryConditionObject, condition.streamHandlerList);
                     patternQueryInput.addCondition(patternQueryConditionObject);
                 });
                 patternQueryObject.setQueryInput(patternQueryInput);
@@ -193,6 +214,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 var sequenceQueryInput = new PatternOrSequenceQueryInput(sequenceQuery.queryInput);
                 _.forEach(sequenceQuery.queryInput.conditionList, function(condition){
                     var sequenceQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                    setStreamHandlerListForQuery(sequenceQueryConditionObject, condition.streamHandlerList);
                     sequenceQueryInput.addCondition(sequenceQueryConditionObject);
                 });
                 sequenceQueryObject.setQueryInput(sequenceQueryInput);
@@ -208,10 +230,8 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
                 var windowFilterProjectionQueryInput =
                     new WindowFilterProjectionQueryInput(windowFilterProjectionQuery.queryInput);
-                if (windowFilterProjectionQuery.queryInput.window !== undefined) {
-                    var queryWindowObject = new QueryWindow(windowFilterProjectionQuery.queryInput.window);
-                    windowFilterProjectionQueryInput.setWindow(queryWindowObject);
-                }
+                setStreamHandlerListForQuery(windowFilterProjectionQueryInput,
+                    windowFilterProjectionQuery.queryInput.streamHandlerList);
                 queryObject.setQueryInput(windowFilterProjectionQueryInput);
                 setSelectForQuery(queryObject, windowFilterProjectionQuery.select);
                 setOrderByForQuery(queryObject, windowFilterProjectionQuery.orderBy);
@@ -224,15 +244,9 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 addAnnotationsForElement(joinQuery, queryObject);
                 var joinQueryInput = new JoinQueryInput(joinQuery.queryInput);
                 var leftSource = new JoinQuerySource(joinQuery.queryInput.left);
-                if (joinQuery.queryInput.left.window !== undefined) {
-                    var leftWindowObject = new QueryWindow(joinQuery.queryInput.left.window);
-                    leftSource.setWindow(leftWindowObject);
-                }
+                setStreamHandlerListForQuery(leftSource, joinQuery.queryInput.left.streamHandlerList);
                 var rightSource = new JoinQuerySource(joinQuery.queryInput.right);
-                if (joinQuery.queryInput.right.window !== undefined) {
-                    var rightWindowObject = new QueryWindow(joinQuery.queryInput.right.window);
-                    rightSource.setWindow(rightWindowObject);
-                }
+                setStreamHandlerListForQuery(rightSource, joinQuery.queryInput.right.streamHandlerList);
                 joinQueryInput.setLeft(leftSource);
                 joinQueryInput.setRight(rightSource);
                 queryObject.setQueryInput(joinQueryInput);

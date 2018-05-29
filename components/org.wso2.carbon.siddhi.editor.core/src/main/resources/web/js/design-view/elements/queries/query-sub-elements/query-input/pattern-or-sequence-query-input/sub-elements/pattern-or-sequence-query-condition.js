@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(
-    function () {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class PatternOrSequenceQueryCondition
@@ -30,13 +30,35 @@ define(
              Data storing structure as follows.
                conditionId*: '',
                streamName*: '',
-               filter: ''
+               streamHandlerList: [
+                    {
+                        type*: 'FILTER',
+                        value*: ''
+                    },
+                    << and|or >>
+                    {
+                        type*: 'FUNCTION',
+                        value*: {
+                            function*: '',
+                            parameters*: ['value1',...],
+                        }
+                    },
+                    ...
+                ]
             */
             if (options !== undefined) {
                 this.conditionId = options.conditionId;
                 this.streamName = options.streamName;
-                this.filter = options.filter;
             }
+            this.streamHandlerList = [];
+        };
+
+        PatternOrSequenceQueryCondition.prototype.addStreamHandler = function (streamHandler) {
+            this.streamHandlerList.push(streamHandler);
+        };
+
+        PatternOrSequenceQueryCondition.prototype.clearStreamHandlerList = function () {
+            ElementUtils.prototype.removeAllElements(this.streamHandlerList);
         };
 
         PatternOrSequenceQueryCondition.prototype.getConditionId = function () {
@@ -47,8 +69,8 @@ define(
             return this.streamName;
         };
 
-        PatternOrSequenceQueryCondition.prototype.getFilter = function () {
-            return this.filter;
+        PatternOrSequenceQueryCondition.prototype.getStreamHandlerList = function () {
+            return this.streamHandlerList;
         };
 
         PatternOrSequenceQueryCondition.prototype.setConditionId = function (conditionId) {
@@ -59,8 +81,8 @@ define(
             this.streamName = streamName;
         };
 
-        PatternOrSequenceQueryCondition.prototype.setFilter = function (filter) {
-            this.filter = filter;
+        PatternOrSequenceQueryCondition.prototype.setStreamHandlerList = function (streamHandlerList) {
+            this.streamHandlerList = streamHandlerList;
         };
 
         return PatternOrSequenceQueryCondition;

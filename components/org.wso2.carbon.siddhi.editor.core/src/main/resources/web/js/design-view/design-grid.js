@@ -304,28 +304,32 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 } else if (firstConnectedElement !== undefined
                                     && secondConnectedElement === undefined) {
                                     var firstElementType = firstConnectedElement.type;
-                                    if (firstElementType === 'STREAM' || firstElementType === 'TRIGGER') {
+                                    if (firstElementType === 'STREAM' || firstElementType === 'TRIGGER'
+                                        || firstElementType === 'WINDOW') {
                                         connectionValidity = true;
                                     } else if (connectedElementSourceType === 'STREAM'
-                                        || connectedElementSourceType === 'TRIGGER') {
+                                        || connectedElementSourceType === 'TRIGGER'
+                                        || connectedElementSourceType === 'WINDOW') {
                                         connectionValidity = true;
                                     } else {
                                         connectionValidity = false;
                                         alert("At least one connected input element in join query should be a stream " +
-                                            "or a trigger!");
+                                            "or a trigger or a window!");
                                     }
                                 } else if (firstConnectedElement === undefined
                                     && secondConnectedElement !== undefined) {
                                     var secondElementType = secondConnectedElement.type;
-                                    if (secondElementType === 'STREAM' || secondElementType === 'TRIGGER') {
+                                    if (secondElementType === 'STREAM' || secondElementType === 'TRIGGER'
+                                        || secondElementType === 'WINDOW') {
                                         connectionValidity = true;
                                     } else if (connectedElementSourceType === 'STREAM'
-                                        || connectedElementSourceType === 'TRIGGER') {
+                                        || connectedElementSourceType === 'TRIGGER'
+                                        || connectedElementSourceType === 'WINDOW') {
                                         connectionValidity = true;
                                     } else {
                                         connectionValidity = false;
                                         alert("At least one connected input element in join query should be a stream " +
-                                            "or a trigger!");
+                                            "or a trigger or a window!");
                                     }
                                 }
                             }

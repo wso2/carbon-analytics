@@ -17,9 +17,10 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindow', 'queryOrderByValue'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
+        'streamHandler'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindow, QueryOrderByValue) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler) {
 
         var constants = {
             PROJECTION: 'projectionQueryDrop',
@@ -78,44 +79,51 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var savedQueryInput = {};
-                if (clickedElement.getQueryInput().getWindow() === undefined) {
-                    savedQueryInput = {
-                        input: {
-                            from : clickedElement.getQueryInput().getFrom()
-                        },
-                        filter: {
-                            filter : clickedElement.getQueryInput().getFilter()
-                        },
-                        postWindowFilter: {
-                            filter : clickedElement.getQueryInput().getPostWindowFilter()
-                        }
-                    };
-                } else {
-                    var savedParameterValues = clickedElement.getQueryInput().getWindow().getParameters();
+
+                var savedStreamHandlerList = clickedElement.getQueryInput().getStreamHandlerList();
+                var streamHandlerList = [];
+                var noOfSavedFilters = 0;
+                var noOfSavedWindows = 0;
+                _.forEach(savedStreamHandlerList, function (streamHandler) {
+                    var streamHandlerObject;
                     var parameters = [];
-                    _.forEach(savedParameterValues, function (savedParameterValue) {
-                        var parameterObject = {
-                            parameter: savedParameterValue
+                    if (streamHandler.getType() === "FILTER") {
+                        noOfSavedFilters++;
+                        streamHandlerObject = {
+                            streamHandler: {
+                                filter: streamHandler.getValue()
+                            }
                         };
-                        parameters.push(parameterObject);
-                    });
-                    savedQueryInput = {
-                        input: {
-                            from : clickedElement.getQueryInput().getFrom()
-                        },
-                        filter: {
-                            filter : clickedElement.getQueryInput().getFilter()
-                        },
-                        window : {
-                            functionName: clickedElement.getQueryInput().getWindow().getFunction(),
-                            parameters: parameters
-                        },
-                        postWindowFilter: {
-                            filter : clickedElement.getQueryInput().getPostWindowFilter()
-                        }
-                    };
-                }
+                    } else if (streamHandler.getType() === "FUNCTION") {
+                        _.forEach(streamHandler.getValue().getParameters(), function (savedParameterValue) {
+                            var parameterObject = {
+                                parameter: savedParameterValue
+                            };
+                            parameters.push(parameterObject);
+                        });
+                        streamHandlerObject = {
+                            streamHandler: {
+                                functionName: streamHandler.getValue().getFunction(),
+                                parameters: parameters
+                            }
+                        };
+                    } else if (streamHandler.getType() === "WINDOW") {
+                        noOfSavedWindows++;
+                        _.forEach(streamHandler.getValue().getParameters(), function (savedParameterValue) {
+                            var parameterObject = {
+                                parameter: savedParameterValue
+                            };
+                            parameters.push(parameterObject);
+                        });
+                        streamHandlerObject = {
+                            streamHandler: {
+                                windowName: streamHandler.getValue().getFunction(),
+                                parameters: parameters
+                            }
+                        };
+                    }
+                    streamHandlerList.push(streamHandlerObject);
+                });
 
                 var savedAnnotations = clickedElement.getAnnotationList();
                 var annotations = [];
@@ -274,24 +282,40 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 }
 
-                var fillQueryInputWith = self.formUtils.cleanJSONObject(savedQueryInput);
+
                 /*
-                * test whether filter and window queries has their unique elements. For an example if a filter is added
+                * Test whether filter and window queries has their unique elements. For an example if a filter is added
                 * the filter field should be activated. If a window is added window fields should be activated.
                 * NOTE: this check is only essential when a form is opened for a query for the first time. After that
                 * query type is changed according to the user input. So the required fields are already activated and
                 * filled.
                 * */
-                if ($(element).parent().hasClass(constants.FILTER)) {
-                    if (fillQueryInputWith.filter === undefined && fillQueryInputWith.postWindowFilter === undefined) {
-                        _.set(fillQueryInputWith, 'filter.filter', '');
-                    }
-                } else if ($(element).parent().hasClass(constants.WINDOW_QUERY)) {
-                    if (fillQueryInputWith.window === undefined) {
-                        _.set(fillQueryInputWith, 'window.functionName', '');
-                        _.set(fillQueryInputWith, 'window.parameters', '');
-                    }
+                if ($(element).parent().hasClass(constants.FILTER) && noOfSavedFilters === 0) {
+                    var streamHandlerFilterObject = {
+                        streamHandler: {
+                            functionName: ' ',
+                            parameters: [{parameter: ' '}]
+                        }
+                    };
+                    streamHandlerList.push(streamHandlerFilterObject);
+
+                } else if ($(element).parent().hasClass(constants.WINDOW_QUERY) && noOfSavedWindows === 0) {
+                    var streamHandlerWindowObject = {
+                        streamHandler: {
+                            windowName: ' ',
+                            parameters: [{parameter: ' '}]
+                        }
+                    };
+                    streamHandlerList.push(streamHandlerWindowObject);
                 }
+
+                var savedQueryInput = {
+                    input: {
+                        from : clickedElement.getQueryInput().getFrom()
+                    },
+                    streamHandlerList: streamHandlerList
+                };
+                var fillQueryInputWith = self.formUtils.cleanJSONObject(savedQueryInput);
 
                 var fillQueryAnnotation = {
                     annotations: annotations
@@ -342,16 +366,77 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                     }
                                 }
                             },
-                            filter: {
+                            streamHandlerList: {
                                 propertyOrder: 2,
+                                type: "array",
+                                format: "table",
+                                title: "Stream Handlers",
+                                minItems: 1,
+                                items: {
+                                    type: "object",
+                                    title: 'Stream Handler',
+                                    properties: {
+                                        streamHandler: {
+                                            required: true,
+                                            title: 'Stream Handler1',
+                                            oneOf: [
+                                                {
+                                                    $ref: "#/definitions/filter",
+                                                    title: "Filter"
+                                                },
+                                                {
+                                                    $ref: "#/definitions/functionDef",
+                                                    title: "Function"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        definitions: {
+                            filter: {
                                 type: "object",
                                 title: "Filter",
+                                required: true,
                                 properties: {
                                     filter: {
                                         required: true,
-                                        title: "Condition",
+                                        title: "Filter Condition",
                                         type: "string",
                                         minLength: 1
+                                    }
+                                }
+                            },
+                            functionDef: {
+                                title: "Function",
+                                type: "object",
+                                required: true,
+                                properties: {
+                                    functionName: {
+                                        required: true,
+                                        title: "Function Name",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    parameters: {
+                                        required: true,
+                                        type: "array",
+                                        format: "table",
+                                        title: "Parameters",
+                                        minItems: 1,
+                                        items: {
+                                            type: "object",
+                                            title: 'Attribute',
+                                            properties: {
+                                                parameter: {
+                                                    required: true,
+                                                    type: 'string',
+                                                    title: 'Parameter Name',
+                                                    minLength: 1
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -381,27 +466,60 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                     }
                                 }
                             },
-                            filter: {
+                            streamHandlerList: {
                                 propertyOrder: 2,
+                                type: "array",
+                                format: "table",
+                                title: "Stream Handlers",
+                                minItems: 1,
+                                items: {
+                                    type: "object",
+                                    title: 'Stream Handler',
+                                    properties: {
+                                        streamHandler: {
+                                            title: 'Stream Handler',
+                                            required: true,
+                                            oneOf: [
+                                                {
+                                                    $ref: "#/definitions/filter",
+                                                    title: "Filter"
+                                                },
+                                                {
+                                                    $ref: "#/definitions/functionDef",
+                                                    title: "Function"
+                                                },
+                                                {
+                                                    $ref: "#/definitions/window",
+                                                    title: "Window"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        definitions: {
+                            filter: {
                                 type: "object",
                                 title: "Filter",
+                                required: true,
                                 properties: {
                                     filter: {
                                         required: true,
-                                        title: "Condition",
+                                        title: "Filter Condition",
                                         type: "string",
                                         minLength: 1
                                     }
                                 }
                             },
                             window: {
-                                propertyOrder: 3,
                                 title: "Window",
                                 type: "object",
+                                required: true,
                                 properties: {
-                                    functionName: {
+                                    windowName: {
                                         required: true,
-                                        title: "Name",
+                                        title: "Window Name",
                                         type: "string",
                                         minLength: 1
                                     },
@@ -416,6 +534,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                             title: 'Attribute',
                                             properties: {
                                                 parameter: {
+                                                    required: true,
                                                     type: 'string',
                                                     title: 'Parameter Name',
                                                     minLength: 1
@@ -425,16 +544,35 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                     }
                                 }
                             },
-                            postWindowFilter: {
-                                propertyOrder: 4,
+                            functionDef: {
+                                title: "Function",
                                 type: "object",
-                                title: "Post Window Filter",
+                                required: true,
                                 properties: {
-                                    filter: {
+                                    functionName: {
                                         required: true,
-                                        title: "Condition",
+                                        title: "Function Name",
                                         type: "string",
                                         minLength: 1
+                                    },
+                                    parameters: {
+                                        required: true,
+                                        type: "array",
+                                        format: "table",
+                                        title: "Parameters",
+                                        minItems: 1,
+                                        items: {
+                                            type: "object",
+                                            title: 'Attribute',
+                                            properties: {
+                                                parameter: {
+                                                    required: true,
+                                                    type: 'string',
+                                                    title: 'Parameter Name',
+                                                    minLength: 1
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -547,7 +685,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     no_additional_properties: true,
                     disable_array_delete_all_rows: true,
                     disable_array_delete_last_row: true,
-                    disable_array_reorder: true
+                    disable_array_reorder: false
                 });
                 var selectScheme = {
                     schema: {
@@ -942,6 +1080,51 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var selectConfig = editorSelect.getValue();
                     var outputConfig = editorOutput.getValue();
 
+                    var numberOfWindows = 0;
+                    var numberOfFilters = 0;
+                    clickedElement.getQueryInput().clearStreamHandlerList();
+
+                    _.forEach(inputConfig.streamHandlerList, function (streamHandler) {
+                        streamHandler = streamHandler.streamHandler;
+                        var streamHandlerOptions = {};
+                        if (streamHandler.windowName !== undefined) {
+                            numberOfWindows++;
+                            var windowOptions = {};
+                            _.set(windowOptions, 'function', streamHandler.windowName);
+                            var parameters = [];
+                            _.forEach(streamHandler.parameters, function (parameter) {
+                                parameters.push(parameter.parameter);
+                            });
+                            _.set(windowOptions, 'parameters', parameters);
+                            var queryWindow = new QueryWindowOrFunction(windowOptions);
+                            _.set(streamHandlerOptions, 'type', 'WINDOW');
+                            _.set(streamHandlerOptions, 'value', queryWindow);
+                        } else if (streamHandler.functionName !== undefined) {
+                            var functionOptions = {};
+                            _.set(functionOptions, 'function', streamHandler.functionName);
+                            var parameters = [];
+                            _.forEach(streamHandler.parameters, function (parameter) {
+                                parameters.push(parameter.parameter);
+                            });
+                            _.set(functionOptions, 'parameters', parameters);
+                            var queryFunction = new QueryWindowOrFunction(functionOptions);
+                            _.set(streamHandlerOptions, 'type', 'FUNCTION');
+                            _.set(streamHandlerOptions, 'value', queryFunction);
+                        } else if (streamHandler.filter !== undefined) {
+                            numberOfFilters++;
+                            _.set(streamHandlerOptions, 'type', 'FILTER');
+                            _.set(streamHandlerOptions, 'value', streamHandler.filter);
+                        } else {
+                            console.log("Unknown stream handler received!");
+                        }
+                        var streamHandlerObject = new StreamHandler(streamHandlerOptions);
+                        clickedElement.getQueryInput().addStreamHandler(streamHandlerObject);
+                    });
+
+                    if (numberOfWindows > 1) {
+                        alert('Only one window can be defined!');
+                        return;
+                    }
                     clickedElement.clearAnnotationList();
                     _.forEach(annotationConfig.annotations, function (annotation) {
                         clickedElement.addAnnotation(annotation.annotation);
@@ -949,17 +1132,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     var type;
                     // change the query icon depending on the fields filled
-                    if (inputConfig.window) {
+                    if (numberOfWindows === 1) {
                         type = "WINDOW";
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
-                    } else if ((inputConfig.filter && inputConfig.filter.filter)
-                        || (inputConfig.postWindowFilter && inputConfig.postWindowFilter.filter)) {
+                    } else if (numberOfFilters > 0) {
                         type = "FILTER";
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.FILTER + ' jtk-draggable');
-                    } else if (!((inputConfig.filter && inputConfig.filter.filter) || inputConfig.window
-                        || (inputConfig.postWindowFilter && inputConfig.postWindowFilter.filter))) {
+                    } else {
                         type = "PROJECTION";
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.PROJECTION + ' jtk-draggable');
@@ -967,32 +1148,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     var queryInput = clickedElement.getQueryInput();
                     queryInput.setType(type);
-                    if (inputConfig.filter !== undefined && inputConfig.filter.filter !== undefined) {
-                        queryInput.setFilter(inputConfig.filter.filter);
-                    } else {
-                        queryInput.setFilter(undefined);
-                    }
-
-                    if (inputConfig.window !== undefined) {
-                        var windowOptions = {};
-                        _.set(windowOptions, 'function', inputConfig.window.functionName);
-                        var parameters = [];
-                        _.forEach(inputConfig.window.parameters, function (parameter) {
-                            parameters.push(parameter.parameter);
-                        });
-                        _.set(windowOptions, 'parameters', parameters);
-                        var queryWindow = new QueryWindow(windowOptions);
-                        queryInput.setWindow(queryWindow);
-                    } else {
-                        queryInput.setWindow(undefined);
-                    }
-
-                    if (inputConfig.postWindowFilter !== undefined &&
-                        inputConfig.postWindowFilter.filter !== undefined) {
-                        queryInput.setPostWindowFilter(inputConfig.postWindowFilter.filter);
-                    } else {
-                        queryInput.setPostWindowFilter(undefined);
-                    }
 
                     var selectAttributeOptions = {};
                     if (selectConfig.select instanceof Array) {
