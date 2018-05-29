@@ -221,6 +221,11 @@ body {
     width: 500px;
 }
 
+.clusters .cluster rect {
+    fill: #696969;
+    height: 200px;
+}
+
 .edgePath path {
     stroke: #bbb;
     stroke-width: 2px;
@@ -291,4 +296,77 @@ p.node-last-update {
     display: flex;
     justify-content: center;
     margin: 20px 0;
+}
+
+.stream-indicator {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: #2196F3;
+}
+
+.table-indicator {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: #8BC34A;
+}
+
+
+.trigger-indicator {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: #F44336;
+}
+
+.window-indicator {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: #009688;
+}
+
+
+.query-indicator {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: #9C27B0;
+}
+
+.function-indicator {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: #FF5722;
+}
+
+.aggregation-indicator {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: #FF9800;
+}
+
+
+.partition-type-colour {
+    height: 60px;
+    width: 15px;
+    float: left;
+    margin: 1px 40px 1px 1px;
+    background-color: #FFEB3B;
+}
+
+.partition {
+    font-size: 30px;
+    color: #d3d3d3;
+    margin-top: 150%;
 }
