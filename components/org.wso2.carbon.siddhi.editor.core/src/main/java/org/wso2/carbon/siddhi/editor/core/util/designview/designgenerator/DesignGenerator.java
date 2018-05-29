@@ -102,6 +102,15 @@ public class DesignGenerator {
     }
 
     /**
+     * Loads generated Edges that represent connections between SiddhiElementConfigs, into SiddhiAppConfig object
+     * @throws DesignGenerationException        Error while loading edges
+     */
+    private void loadEdges() throws DesignGenerationException {
+        EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
+        edges = edgesGenerator.generateEdges();
+    }
+
+    /**
      * Loads name & description from the SiddhiApp
      */
     private void loadAppNameAndDescription() {
@@ -119,38 +128,23 @@ public class DesignGenerator {
      * @throws DesignGenerationException        Error while loading elements
      */
     private void loadTriggers() throws DesignGenerationException {
-        final String EVERY_SPLIT_KEYWORD = "every ";
+        TriggerConfigGenerator triggerConfigGenerator =
+                new TriggerConfigGenerator(siddhiAppString, siddhiAppRuntime.getStreamDefinitionMap());
         for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
-            // Get 'at'
-            String at = "";
-            if (triggerDefinition.getAtEvery() != null) {
-                at = EVERY_SPLIT_KEYWORD +
-                        ConfigBuildingUtilities.getDefinition(triggerDefinition, siddhiAppString)
-                                .split(EVERY_SPLIT_KEYWORD)[1];
-            } else if (triggerDefinition.getAt() != null) {
-                at = triggerDefinition.getAt();
-            }
-
-            List<String> annotationConfigs = new ArrayList<>();
-
-            siddhiAppConfig.add(new TriggerConfig(
-                    triggerDefinition.getId(),
-                    triggerDefinition.getId(),
-                    at,
-                    null)); // TODO: 3/29/18 annotationList
+            siddhiAppConfig.add(triggerConfigGenerator.generateTriggerConfig(triggerDefinition));
         }
     }
 
     /**
      * Returns the availability of a Trigger with the given name, in the given Siddhi app
      *
-     * @param triggerName   Name of the Trigger
+     * @param streamName    Name of the Stream
      * @param siddhiApp     Siddhi app in which, availability of Trigger is searched
      * @return              Availability of Trigger with the given name, in given Siddhi app
      */
-    private boolean isTriggerDefined(String triggerName, SiddhiApp siddhiApp) {
+    private boolean isTriggerDefined(String streamName, SiddhiApp siddhiApp) {
         return (siddhiApp.getTriggerDefinitionMap().size() != 0 &&
-                siddhiApp.getTriggerDefinitionMap().containsKey(triggerName));
+                siddhiApp.getTriggerDefinitionMap().containsKey(streamName));
     }
 
     /**
@@ -158,21 +152,24 @@ public class DesignGenerator {
      * @throws DesignGenerationException        Error while loading elements
      */
     private void loadStreams() throws DesignGenerationException {
-        for (StreamDefinition streamDefinition : siddhiAppRuntime.getStreamDefinitionMap().values()) {
-            if (!isTriggerDefined(streamDefinition.getId(), siddhiApp)) {
+        StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
+        Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
+        for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitionMap.entrySet()) {
+            if (!isTriggerDefined(streamDefinitionEntry.getKey(), siddhiApp)) {
                 siddhiAppConfig.add(
-                        new StreamDefinitionConfigGenerator()
-                                .generateStreamConfig(streamDefinition, false));
+                        streamDefinitionConfigGenerator
+                                .generateStreamConfig(streamDefinitionEntry.getValue(), false));
             }
         }
+
         // Inner Streams
         for (Map<String, AbstractDefinition> abstractDefinitionMap :
                 siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
             for (AbstractDefinition abstractDefinition : abstractDefinitionMap.values()) {
                 if (abstractDefinition instanceof StreamDefinition) {
                     siddhiAppConfig.add(
-                            new StreamDefinitionConfigGenerator()
-                                    .generateStreamConfig((StreamDefinition) abstractDefinition, false));
+                            streamDefinitionConfigGenerator
+                                    .generateStreamConfig((StreamDefinition) abstractDefinition, true));
                 } else {
                     throw new DesignGenerationException(
                             "The partitioned inner stream definition map does not have an instance of class " +
@@ -210,39 +207,20 @@ public class DesignGenerator {
      * Loads Tables from the Siddhi App
      */
     private void loadTables() {
+        TableConfigGenerator tableConfigGenerator = new TableConfigGenerator();
         for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
-            List<String> annotationConfigs = new ArrayList<>();
-            for (Annotation annotation : tableDefinition.getAnnotations()) {
-                annotationConfigs.add(new AnnotationConfigGenerator().generateAnnotationConfig(annotation));
-            }
-            siddhiAppConfig.add(new TableConfig(
-                    tableDefinition.getId(),
-                    tableDefinition.getId(),
-                    new AttributeConfigListGenerator().generateAttributeConfigList(tableDefinition.getAttributeList()),
-                    null, // TODO: 3/29/18 store
-                    annotationConfigs));
+            siddhiAppConfig.add(tableConfigGenerator.generateTableConfig(tableDefinition));
         }
     }
 
     /**
-     * Loads Windows from the SiddhiAppRuntime
+     * Loads Defined Windows from the SiddhiAppRuntime
      * @throws DesignGenerationException        Error while loading elements
      */
     private void loadWindows() throws DesignGenerationException {
-        // Defined Windows
+        WindowConfigGenerator windowConfigGenerator = new WindowConfigGenerator(siddhiAppString);
         for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
-            List<String> parameters = new ArrayList<>();
-            for (Expression expression : windowDefinition.getWindow().getParameters()) {
-                parameters.add(ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));
-            }
-            siddhiAppConfig.add(new WindowConfig(
-                    windowDefinition.getId(),
-                    windowDefinition.getId(),
-                    new AttributeConfigListGenerator().generateAttributeConfigList(windowDefinition.getAttributeList()),
-                    windowDefinition.getWindow().getName(),
-                    parameters,
-                    windowDefinition.getOutputEventType().name(),
-                    null)); // TODO: 3/29/18 annotations might not be possible
+            siddhiAppConfig.add(windowConfigGenerator.generateWindowConfig(windowDefinition));
         }
     }
 
@@ -251,51 +229,9 @@ public class DesignGenerator {
      * @throws DesignGenerationException        Error while loading elements
      */
     private void loadAggregations() throws DesignGenerationException {
+        AggregationConfigGenerator aggregationConfigGenerator = new AggregationConfigGenerator(siddhiAppString);
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
-            AttributesSelectionConfig selectedAttributesConfig;
-            List<String> groupBy = new ArrayList<>();
-
-            if (aggregationDefinition.getSelector() instanceof BasicSelector) {
-                BasicSelector selector = (BasicSelector) aggregationDefinition.getSelector();
-                AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
-                        new AttributesSelectionConfigGenerator(siddhiAppString);
-                selectedAttributesConfig =
-                        attributesSelectionConfigGenerator.generateAttributesSelectionConfig(selector);
-                // Populate 'groupBy' list
-                for (Variable variable : selector.getGroupByList()) {
-                    groupBy.add(ConfigBuildingUtilities.getDefinition(variable, siddhiAppString));
-                }
-            } else {
-                throw new DesignGenerationException("Selector of AggregationDefinition is not of class BasicSelector");
-            }
-
-            List<String> annotationList = new ArrayList<>();
-            for (Annotation annotation : aggregationDefinition.getAnnotations()) {
-                annotationList.add(new AnnotationConfigGenerator().generateAnnotationConfig(annotation));
-            }
-
-            // For creating 'aggregate by time' object
-            List<Duration> aggregationTimePeriodDurations = aggregationDefinition.getTimePeriod().getDurations();
-
-            // 'aggregateByAttribute'
-            String aggregateByAttribute = "";
-            if (aggregationDefinition.getAggregateAttribute() != null) {
-                aggregateByAttribute = aggregationDefinition.getAggregateAttribute().getAttributeName();
-            }
-
-            siddhiAppConfig.add(new AggregationConfig(
-                    aggregationDefinition.getId(),
-                    aggregationDefinition.getId(),
-                    aggregationDefinition.getBasicSingleInputStream().getStreamId(),
-                    selectedAttributesConfig,
-                    groupBy,
-                    aggregateByAttribute,
-                    new AggregateByTimePeriod(
-                            (aggregationTimePeriodDurations.get(0)).name().toLowerCase(),
-                            (aggregationTimePeriodDurations.get(aggregationTimePeriodDurations.size() - 1))
-                                    .name().toLowerCase()),
-                    null, // TODO: 4/6/18 store
-                    annotationList));
+            siddhiAppConfig.add(aggregationConfigGenerator.generateAggregationConfig(aggregationDefinition));
         }
     }
 
@@ -303,14 +239,9 @@ public class DesignGenerator {
      * Loads Functions from the siddhi app
      */
     private void loadFunctions() {
-        for (Map.Entry<String, FunctionDefinition> functionDefinition :
-                siddhiApp.getFunctionDefinitionMap().entrySet()) {
-            siddhiAppConfig.add(
-                    new FunctionConfig(
-                            functionDefinition.getKey(),
-                            functionDefinition.getValue().getLanguage(),
-                            functionDefinition.getValue().getReturnType().toString(),
-                            functionDefinition.getValue().getBody()));
+        FunctionConfigGenerator functionConfigGenerator = new FunctionConfigGenerator();
+        for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
+            siddhiAppConfig.add(functionConfigGenerator.generateFunctionConfig(functionDefinition));
         }
     }
 
@@ -331,18 +262,5 @@ public class DesignGenerator {
                 throw new DesignGenerationException("Unable create config for execution element of type unknown");
             }
         }
-    }
-
-
-
-    /* HELPER METHODS [END] */
-
-    /**
-     * Loads generated Edges that represent connections between SiddhiElementConfigs, into SiddhiAppConfig object
-     * @throws DesignGenerationException        Error while loading edges
-     */
-    private void loadEdges() throws DesignGenerationException {
-        EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
-        edges = edgesGenerator.generateEdges();
     }
 }

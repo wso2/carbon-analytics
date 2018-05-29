@@ -24,6 +24,9 @@ import org.wso2.siddhi.query.api.annotation.Element;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Generator to create AnnotationConfig
+ */
 public class AnnotationConfigGenerator {
     /**
      * Generates AnnotationConfig String for the given Siddhi Annotation
@@ -47,5 +50,18 @@ public class AnnotationConfigGenerator {
         annotationConfig.append(String.join(", ", annotationMembers));
         annotationConfig.append(")");
         return annotationConfig.toString();
+    }
+
+    /**
+     * Generates a string list of annotations, from the given list of Siddhi Annotation
+     * @param annotations       List of Siddhi Annotation objects
+     * @return                  List of strings, each representing an Annotation
+     */
+    public List<String> generateAnnotationConfigList(List<Annotation> annotations) {
+        List<String> annotationList = new ArrayList<>();
+        for (Annotation annotation : annotations) {
+            annotationList.add(generateAnnotationConfig(annotation));
+        }
+        return annotationList;
     }
 }

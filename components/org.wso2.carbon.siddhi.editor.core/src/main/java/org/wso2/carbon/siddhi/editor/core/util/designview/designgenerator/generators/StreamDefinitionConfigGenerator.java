@@ -45,10 +45,11 @@ public class StreamDefinitionConfigGenerator {
         }
         List<String> annotationConfigs = new ArrayList<>();
         List<String> streamElementAnnotationNames = new ArrayList<>(Arrays.asList("SOURCE", "SINK", "STORE"));
+        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         for (Annotation annotation : streamDefinition.getAnnotations()) {
             if (!streamElementAnnotationNames.contains(annotation.getName().toUpperCase())) {
                 // Since these annotations represent the stream itself
-                annotationConfigs.add(new AnnotationConfigGenerator().generateAnnotationConfig(annotation));
+                annotationConfigs.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
             }
         }
         return new StreamConfig(streamDefinition.getId(),
