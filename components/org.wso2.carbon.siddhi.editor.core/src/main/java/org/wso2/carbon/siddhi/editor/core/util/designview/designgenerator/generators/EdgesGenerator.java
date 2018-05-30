@@ -28,7 +28,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 import java.util.ArrayList;
@@ -55,10 +55,10 @@ public class EdgesGenerator {
         edges.addAll(generateSinkEdges(siddhiAppConfig.getSinkList()));
         edges.addAll(
                 generateWindowFilterProjectionQueryEdges(
-                        siddhiAppConfig.getQueryLists().get(QueryInputType.WINDOW_FILTER_PROJECTION.toString())));
+                        siddhiAppConfig.getQueryLists().get(QueryListType.WINDOW_FILTER_PROJECTION)));
         edges.addAll(
                 generateJoinQueryEdges(
-                        siddhiAppConfig.getQueryLists().get(QueryInputType.JOIN.toString())));
+                        siddhiAppConfig.getQueryLists().get(QueryListType.JOIN)));
         return edges;
     }
 
@@ -230,8 +230,8 @@ public class EdgesGenerator {
      * @throws DesignGenerationException        No element found with the given Id
      */
     private SiddhiElementConfig getElementWithId(String id) throws DesignGenerationException {
-        for (String queryType : siddhiAppConfig.getQueryLists().keySet()) {
-            for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getQueryLists().get(queryType)) {
+        for (QueryListType queryListType : siddhiAppConfig.getQueryLists().keySet()) {
+            for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getQueryLists().get(queryListType)) {
                 if (siddhiElementConfig.getId().equals(id)) {
                     return siddhiElementConfig;
                 }

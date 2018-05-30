@@ -30,7 +30,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,13 +54,13 @@ public class SiddhiAppConfig {
     private List<WindowConfig> windowList = new ArrayList<>();
     private List<AggregationConfig> aggregationList = new ArrayList<>();
     private List<FunctionConfig> functionList = new ArrayList<>();
-    private Map<String, List<QueryConfig>> queryLists = new HashMap<>();
+    private Map<QueryListType, List<QueryConfig>> queryLists = new HashMap<>();
 
     public SiddhiAppConfig() {
-        queryLists.put(QueryInputType.WINDOW_FILTER_PROJECTION.toString(), new ArrayList<>());
-        queryLists.put(QueryInputType.JOIN.toString(), new ArrayList<>());
-        queryLists.put(QueryInputType.PATTERN.toString(), new ArrayList<>());
-        queryLists.put(QueryInputType.SEQUENCE.toString(), new ArrayList<>());
+        queryLists.put(QueryListType.WINDOW_FILTER_PROJECTION, new ArrayList<>());
+        queryLists.put(QueryListType.JOIN, new ArrayList<>());
+        queryLists.put(QueryListType.PATTERN, new ArrayList<>());
+        queryLists.put(QueryListType.SEQUENCE, new ArrayList<>());
     }
 
     /**
@@ -84,15 +84,16 @@ public class SiddhiAppConfig {
 
     /**
      * Adds a given QueryConfig object to its specific query list, denoted by the given QueryInputType
-     * @param queryType         Key with which, the specific query list is denoted
-     * @param queryLists        Map of query lists, where key is the type of query, and value is the specific query list
+     * @param queryListType     Key with which, the specific query list is denoted
+     * @param queryLists        Map of query lists,
+     *                          where key is the type of query list, and value is the specific query list
      * @param queryConfig       QueryConfig object
      */
-    private void addQuery(QueryInputType queryType,
-                          Map<String, List<QueryConfig>> queryLists,
+    private void addQuery(QueryListType queryListType,
+                          Map<QueryListType, List<QueryConfig>> queryLists,
                           QueryConfig queryConfig) {
         queryConfig.setId(generateNextElementId());
-        queryLists.get(queryType.toString()).add(queryConfig);
+        queryLists.get(queryListType).add(queryConfig);
     }
 
     public void setAppName(String appName) {
@@ -135,11 +136,9 @@ public class SiddhiAppConfig {
         // Categorize QueryConfig from its Input, and add QueryConfig to the relevant list
         QueryInputConfig queryInputConfig = queryConfig.getQueryInput();
         if (queryInputConfig instanceof WindowFilterProjectionConfig) {
-//            addElement(windowFilterProjectionQueryList, queryConfig); TODO review & remove
-            addQuery(QueryInputType.WINDOW_FILTER_PROJECTION, queryLists, queryConfig);
+            addQuery(QueryListType.WINDOW_FILTER_PROJECTION, queryLists, queryConfig);
         } else if (queryInputConfig instanceof JoinConfig) {
-//            addElement(joinQueryList, queryConfig); TODO review & remove
-            addQuery(QueryInputType.JOIN, queryLists, queryConfig);
+            addQuery(QueryListType.JOIN, queryLists, queryConfig);
         } else {
             // TODO add pattern & sequences
             throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
@@ -186,7 +185,7 @@ public class SiddhiAppConfig {
         return aggregationList;
     }
 
-    public Map<String, List<QueryConfig>> getQueryLists() {
+    public Map<QueryListType, List<QueryConfig>> getQueryLists() {
         return queryLists;
     }
 
