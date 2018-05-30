@@ -118,7 +118,7 @@ define(['require', 'elementUtils'],
         };
 
         Window.prototype.setOutputEventType = function (outputEventType) {
-            this.outputEventType = outputEventType;
+            this.outputEventType = outputEventType.toUpperCase();;
         };
 
         Window.prototype.setAnnotationList = function (annotationList) {

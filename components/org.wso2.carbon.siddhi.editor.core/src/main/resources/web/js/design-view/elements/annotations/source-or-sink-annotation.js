@@ -91,7 +91,7 @@ define(
         };
 
         SourceOrSinkAnnotation.prototype.setAnnotationType = function (annotationType) {
-            this.annotationType = annotationType;
+            this.annotationType = annotationType.toUpperCase();
         };
 
         SourceOrSinkAnnotation.prototype.setType = function (type) {

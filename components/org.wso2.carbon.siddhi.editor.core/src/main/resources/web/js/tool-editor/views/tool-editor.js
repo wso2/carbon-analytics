@@ -154,192 +154,24 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     var JSONString = "{" +
                         " \"siddhiAppConfig\": {" +
-                        "  \"streamList\": [" +
-                        "   {" +
-                        "    \"id\": \"view118_element_2\"," +
-                        "    \"name\": \"InStream\"," +
-                        "    \"isInnerStream\": false," +
-                        "    \"attributeList\": [" +
-                        "     {" +
-                        "      \"name\": \"name\"," +
-                        "      \"type\": \"STRING\"" +
-                        "     }," +
-                        "     {" +
-                        "      \"name\": \"age\"," +
-                        "      \"type\": \"INT\"" +
-                        "     }" +
-                        "    ]," +
-                        "    \"annotationList\": []" +
-                        "   }," +
-                        "   {" +
-                        "    \"id\": \"view118_element_3\"," +
-                        "    \"name\": \"OutStream\"," +
-                        "    \"isInnerStream\": false," +
-                        "    \"attributeList\": [" +
-                        "     {" +
-                        "      \"name\": \"name\"," +
-                        "      \"type\": \"STRING\"" +
-                        "     }," +
-                        "     {" +
-                        "      \"name\": \"age\"," +
-                        "      \"type\": \"INT\"" +
-                        "     }" +
-                        "    ]," +
-                        "    \"annotationList\": []" +
-                        "   }" +
-                        "  ]," +
-                        "  \"tableList\": [" +
-                        "   {" +
-                        "    \"id\": \"view118_element_4\"," +
-                        "    \"name\": \"InTable\"," +
-                        "    \"attributeList\": [" +
-                        "     {" +
-                        "      \"name\": \"name\"," +
-                        "      \"type\": \"STRING\"" +
-                        "     }," +
-                        "     {" +
-                        "      \"name\": \"age\"," +
-                        "      \"type\": \"INT\"" +
-                        "     }" +
-                        "    ]," +
-                        "    \"annotationList\": []" +
-                        "   }" +
-                        "  ]," +
-                        "  \"windowList\": [" +
-                        "   {" +
-                        "    \"id\": \"view118_element_5\"," +
-                        "    \"name\": \"InWindow\"," +
-                        "    \"function\": \"time\"," +
-                        "    \"parameters\": [" +
-                        "     \"1 min\"" +
-                        "    ]," +
-                        "    \"outputEventType\": \"ALL_EVENTS\"," +
-                        "    \"attributeList\": [" +
-                        "     {" +
-                        "      \"name\": \"name\"," +
-                        "      \"type\": \"STRING\"" +
-                        "     }," +
-                        "     {" +
-                        "      \"name\": \"age\"," +
-                        "      \"type\": \"INT\"" +
-                        "     }" +
-                        "    ]," +
-                        "    \"annotationList\": []" +
-                        "   }" +
-                        "  ]," +
-                        "  \"triggerList\": [" +
-                        "   {" +
-                        "    \"id\": \"view118_element_1\"," +
-                        "    \"name\": \"InTrigger\"," +
-                        "    \"at\": \"every 5 min\"," +
-                        "    \"annotationList\": []" +
-                        "   }" +
-                        "  ]," +
-                        "  \"aggregationList\": [" +
-                        "   {" +
-                        "    \"id\": \"view118_element_6\"," +
-                        "    \"name\": \"InAggregation\"," +
-                        "    \"from\": \"InStream\"," +
-                        "    \"select\": {" +
-                        "     \"type\": \"USER_DEFINED\"," +
-                        "     \"value\": [" +
-                        "      {" +
-                        "       \"expression\": \"name\"," +
-                        "       \"as\": \"\"" +
-                        "      }," +
-                        "      {" +
-                        "       \"expression\": \"avg(age)\"," +
-                        "       \"as\": \"avgAge\"" +
-                        "      }" +
-                        "     ]" +
-                        "    }," +
-                        "    \"groupBy\": [" +
-                        "     \"name\"" +
-                        "    ]," +
-                        "    \"aggregateByAttribute\": \"\"," +
-                        "    \"aggregateByTimePeriod\": {" +
-                        "     \"minValue\": \"MINUTES\"," +
-                        "     \"maxValue\": \"MINUTES\"" +
-                        "    }," +
-                        "    \"annotationList\": [" +
-                        "     {" +
-                        "      \"value\": [" +
-                        "       {" +
-                        "        \"value\": \"AGG_TIMESTAMP\"," +
-                        "        \"isString\": true" +
-                        "       }," +
-                        "       {" +
-                        "        \"value\": \"name\"," +
-                        "        \"isString\": true" +
-                        "       }" +
-                        "      ]," +
-                        "      \"name\": \"PrimaryKey\"," +
-                        "      \"type\": \"LIST\"" +
-                        "     }" +
-                        "    ]" +
-                        "   }" +
-                        "  ]," +
+                        "  \"streamList\": []," +
+                        "  \"tableList\": []," +
+                        "  \"windowList\": []," +
+                        "  \"triggerList\": []," +
+                        "  \"aggregationList\": []," +
                         "  \"functionList\": []," +
                         "  \"partitionList\": []," +
                         "  \"sourceList\": []," +
                         "  \"sinkList\": []," +
                         "  \"queryLists\": {" +
-                        "   \"WINDOW_FILTER_PROJECTION\": [" +
-                        "    {" +
-                        "     \"id\": \"view118_element_7\"," +
-                        "     \"queryInput\": {" +
-                        "      \"type\": \"WINDOW\"," +
-                        "      \"from\": \"OutStream\"," +
-                        "      \"filter\": \"age >= 18\"," +
-                        "      \"window\": {" +
-                        "       \"function\": \"time\"," +
-                        "       \"parameters\": [" +
-                        "        \"10 min\"" +
-                        "       ]" +
-                        "      }," +
-                        "      \"postWindowFilter\": \"age < 30\"" +
-                        "     }," +
-                        "     \"select\": {" +
-                        "      \"type\": \"ALL\"," +
-                        "      \"value\": \"*\"" +
-                        "     }," +
-                        "     \"groupBy\": []," +
-                        "     \"limit\": 0," +
-                        "     \"having\": \"\"," +
-                        "     \"outputRateLimit\": \"\"," +
-                        "     \"queryOutput\": {" +
-                        "      \"type\": \"INSERT\"," +
-                        "      \"output\": {" +
-                        "       \"eventType\": \"CURRENT_EVENTS\"" +
-                        "      }," +
-                        "      \"target\": \"InStream\"" +
-                        "     }," +
-                        "     \"orderBy\": []," +
-                        "     \"annotationList\": []" +
-                        "    }" +
-                        "   ]," +
+                        "   \"WINDOW_FILTER_PROJECTION\": []," +
                         "   \"PATTERN\": []," +
                         "   \"SEQUENCE\": []," +
                         "   \"JOIN\": []" +
                         "  }," +
-                        "  \"finalElementCount\": 7" +
+                        "  \"finalElementCount\": 0" +
                         " }," +
-                        " \"edgeList\": [" +
-                        "  {" +
-                        "   \"id\": \"view118_element_2_view118_element_7\"," +
-                        "   \"parentId\": \"view118_element_2\"," +
-                        "   \"parentType\": \"STREAM\"," +
-                        "   \"childId\": \"view118_element_7\"," +
-                        "   \"childType\": \"WINDOW_FILTER_PROJECTION_QUERY\"" +
-                        "  }," +
-                        "  {" +
-                        "   \"id\": \"view118_element_7_view118_element_3\"," +
-                        "   \"parentId\": \"view118_element_7\"," +
-                        "   \"parentType\": \"WINDOW_FILTER_PROJECTION_QUERY\"," +
-                        "   \"childId\": \"view118_element_3\"," +
-                        "   \"childType\": \"STREAM\"" +
-                        "  }" +
-                        " ]" +
+                        " \"edgeList\": []" +
                         "}";
 
                     this.JSONObject = JSON.parse(JSONString);
@@ -376,17 +208,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                              * Removed attributes are used only for front end use only.
                              * */
                             function removeUnnecessaryFieldsFromJSON(object) {
-                                _.forEach(object.siddhiAppConfig.patternQueryList, function(patternQuery){
+                                _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function(patternQuery){
                                     if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
                                         delete patternQuery.queryInput['connectedElementNameList'];
                                     }
                                 });
-                                _.forEach(object.siddhiAppConfig.sequenceQueryList, function(sequenceQuery){
+                                _.forEach(object.siddhiAppConfig.queryLists.SEQUENCE, function(sequenceQuery){
                                     if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
                                         delete sequenceQuery.queryInput['connectedElementNameList'];
                                     }
                                 });
-                                _.forEach(object.siddhiAppConfig.joinQueryList, function(joinQuery){
+                                _.forEach(object.siddhiAppConfig.queryLists.JOIN, function(joinQuery){
                                     if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
                                         delete joinQuery.queryInput['firstConnectedElement'];
                                     }
