@@ -73,59 +73,59 @@
 }
 
 .sourceDrop{
-    background-image: url("../images/source.png");
+    background-image: url("../images/source.svg");
 }
 
 .sinkDrop{
-    background-image: url("../images/sink.png");
+    background-image: url("../images/sink.svg");
 }
 
 .streamDrop {
-    background-image: url("../images/stream.png");
+    background-image: url("../images/streams.svg");
 }
 
 .tableDrop {
-    background-image: url("../images/table.png");
+    background-image: url("../images/table.svg");
 }
 
 .windowDrop {
-    background-image: url("../images/window.png");
+    background-image: url("../images/window-query.svg");
 }
 
 .triggerDrop {
-    background-image: url("../images/trigger.png");
+    background-image: url("../images/trigger.svg");
 }
 
 .aggregationDrop {
-    background-image: url("../images/aggregation.png");
+    background-image: url("../images/aggregate.svg");
 }
 
 .functionDrop {
-    background-image: url("../images/function.png");
+    background-image: url("../images/function.svg");
 }
 
 .projectionQueryDrop {
-    background-image: url("../images/projectionQuery.png");
+    background-image: url("../images/projection-query.svg");
 }
 
 .filterQueryDrop {
-    background-image: url("../images/filterQuery.png");
+    background-image: url("../images/filter-query.svg");
 }
 
 .windowQueryDrop {
-    background-image: url("../images/windowQuery.png");
+    background-image: url("../images/window-query.svg");
 }
 
 .joinQueryDrop {
-    background-image: url("../images/join.png");
+    background-image: url("../images/join-query.svg");
 }
 
 .patternQueryDrop {
-    background-image: url("../images/patternQuery.png");
+    background-image: url("../images/pattern-query.svg");
 }
 
 .sequenceQueryDrop {
-    background-image: url("../images/sequenceQuery.png");
+    background-image: url("../images/sequence-query.svg");
 }
 
 /*
