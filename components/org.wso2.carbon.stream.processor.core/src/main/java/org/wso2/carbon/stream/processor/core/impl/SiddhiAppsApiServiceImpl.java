@@ -429,7 +429,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 }
             }
 
-            loadSAggregarionData(siddhiApp, siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString);
+            loadAggregarionData(siddhiApp, siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString);
             return Response.ok().entity(listOfSiddhiAppElements).build();
         }
 
@@ -513,6 +513,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         Map<String, TableDefinition> tableDefinitionMap = siddhiAppRuntime.getTableDefinitionMap();
         Map<String, TriggerDefinition> triggerDefinitionMap = siddhiApp.getTriggerDefinitionMap();
         Map<String, WindowDefinition> windowDefinitionMap = siddhiAppRuntime.getWindowDefinitionMap();
+        Map<String, AggregationDefinition> aggregationDefinitionMap = siddhiApp.getAggregationDefinitionMap();
         for (Map.Entry<String, StreamDefinition> entry : streamDefinitionMap.entrySet()) {
             if (entry.getKey().equals(inputStream)) {
                 siddhiAppElements.setInputStreamSiddhiApp(String.valueOf(entry.getValue()));
@@ -544,6 +545,14 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
+
+        for (Map.Entry<String,AggregationDefinition> entry: aggregationDefinitionMap.entrySet()) {
+            if(entry.getKey().equals(inputStream)) {
+                siddhiAppElements.setInputStreamSiddhiApp(getDefinition(entry.getValue(), appData));
+                siddhiAppElements.setInputStreamType(Constants.AGGREGATION);
+                break;
+            }
+        }
     }
 
     /**
@@ -555,6 +564,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         Map<String, TableDefinition> tableDefinitionMap = siddhiAppRuntime.getTableDefinitionMap();
         Map<String, TriggerDefinition> triggerDefinitionMap = siddhiApp.getTriggerDefinitionMap();
         Map<String, WindowDefinition> windowDefinitionMap = siddhiAppRuntime.getWindowDefinitionMap();
+        Map<String, AggregationDefinition> aggregationDefinitionMap = siddhiApp.getAggregationDefinitionMap();
+
         for (Map.Entry<String, StreamDefinition> entry : streamDefinitionMap.entrySet()) {
             if (entry.getKey().equals(outputStream)) {
                 siddhiAppElements.setOutputStreamSiddhiApp(String.valueOf(entry.getValue()));
@@ -586,6 +597,14 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
+
+        for (Map.Entry<String, AggregationDefinition> entry : aggregationDefinitionMap.entrySet()) {
+            if (entry.getKey().equals(outputStream)) {
+                siddhiAppElements.setOutputStreamSiddhiApp(getDefinition(entry.getValue(), appData));
+                siddhiAppElements.setOutputStreamType(Constants.AGGREGATION);
+                break;
+            }
+        }
     }
 
     /**
@@ -611,7 +630,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Obtains information of all the Aggregations.
      */
-    private void loadSAggregarionData(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+    private void loadAggregarionData(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
             streams, String appData) {
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
             SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
