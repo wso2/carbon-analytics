@@ -314,7 +314,6 @@ p.node-last-update {
     background-color: #8BC34A;
 }
 
-
 .trigger-indicator {
     height: 60px;
     width: 15px;
@@ -330,7 +329,6 @@ p.node-last-update {
     margin: 1px 40px 1px 1px;
     background-color: #009688;
 }
-
 
 .query-indicator {
     height: 60px;
@@ -356,7 +354,6 @@ p.node-last-update {
     background-color: #FF9800;
 }
 
-
 .partition-type-colour {
     height: 60px;
     width: 15px;
@@ -369,4 +366,32 @@ p.node-last-update {
     font-size: 30px;
     color: #d3d3d3;
     margin-top: 150%;
+}
+
+.legend {
+    color: #fff;
+    font-size: 14px;
+    text-align: left;
+    float: right;
+    width: 100%;
+    max-width: 440px;
+    padding: 10px;
+    background: #333;
+}
+
+.legend-key {
+    padding: 0 5px;
+    display: inline-block;
+}
+
+.legend-text {
+    line-height: 24px;
+    font-size: 12px;
+}
+
+.legend-colour {
+    width: 15px;
+    height: 15px;
+    float: left;
+    margin: 5px;
 }

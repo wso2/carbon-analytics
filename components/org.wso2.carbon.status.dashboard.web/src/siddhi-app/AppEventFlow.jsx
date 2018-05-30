@@ -54,195 +54,47 @@ export default class AppEventFlow extends React.Component {
                     let inputStreamSiddhiApp = entry.inputStreamSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
                     let outputStreamSiddhiApp = entry.outputStreamSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
 
-                    switch (entry.inputStreamType) {
-                        case "Stream":
-                            inputContainer =
-                                "<div id='container' class='node-content' title='" + inputStreamSiddhiApp + "'>"
-                                + "<span class='stream-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.inputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.inputStreamId, {
-                                labelType: "html",
-                                label: inputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-                            break;
+                    const inputCssClassType = entry.inputStreamType.toLowerCase();
+                    inputContainer =
+                        `<div id="container" class="node-content" title="${inputStreamSiddhiApp}">
+                            <span class="${inputCssClassType}-indicator"></span>
+                            <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.inputStreamId}</span>
+                         </div>`;
+                    g.setNode(entry.inputStreamId, {
+                        labelType: "html",
+                        label: inputContainer,
+                        paddingBottom: 0,
+                        paddingTop: 0,
+                        paddingLeft: 0,
+                        paddingRight: 150,
+                        rx: 0,
+                        ry: 0
+                    }, {labelStyle: "width:300"});
 
-                        case "Table":
-                            inputContainer =
-                                "<div id='container' class='node-content' title='" + inputStreamSiddhiApp + "'>"
-                                + "<span class='table-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.inputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.inputStreamId, {
-                                labelType: "html",
-                                label: inputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-                            break;
-                        case "Trigger":
-                            inputContainer =
-                                "<div id='container' class='node-content' title='" + inputStreamSiddhiApp + "'>"
-                                + "<span class='trigger-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.inputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.inputStreamId, {
-                                labelType: "html",
-                                label: inputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-                            break;
-                        case "Window":
-                            inputContainer =
-                                "<div id='container' class='node-content' title='" + inputStreamSiddhiApp + "'>"
-                                + "<span class='window-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.inputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.inputStreamId, {
-                                labelType: "html",
-                                label: inputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-                            break;
-                        case "Aggregation":
-                            inputContainer =
-                                "<div id='container' class='node-content' title='" + inputStreamSiddhiApp + "'>"
-                                + "<span class='aggregation-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.inputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.inputStreamId, {
-                                labelType: "html",
-                                label: inputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-                            break;
-
-
-                    }
-
-                    switch (entry.outputStreamType) {
-                        case "Stream":
-                            outputContainer =
-                                "<div id='container' class='node-content' title='" + outputStreamSiddhiApp + "'>"
-                                + "<span class='stream-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.outputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.outputStreamId, {
-                                labelType: "html",
-                                label: outputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-                            break;
-                        case "Table":
-                            outputContainer =
-                                "<div id='container' class='node-content' title='" + outputStreamSiddhiApp + "'>"
-                                + "<span class='table-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.outputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.outputStreamId, {
-                                labelType: "html",
-                                label: outputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-
-                            break;
-                        case "Trigger":
-                            outputContainer =
-                                "<div id='container' class='node-content' title='" + outputStreamSiddhiApp + "'>"
-                                + "<span class='trigger-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.outputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.outputStreamId, {
-                                labelType: "html",
-                                label: outputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-
-                            break;
-                        case "Window":
-                            outputContainer =
-                                "<div id='container' class='node-content' title='" + outputStreamSiddhiApp + "'>"
-                                + "<span class='window-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.outputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.outputStreamId, {
-                                labelType: "html",
-                                label: outputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-
-                            break;
-                        case "Aggregation":
-                            outputContainer =
-                                "<div id='container' class='node-content' title='" + outputStreamSiddhiApp + "'>"
-                                + "<span class='aggregation-indicator'></span>"
-                                + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.outputStreamId + "</span>"
-                                + "</div>";
-                            g.setNode(entry.outputStreamId, {
-                                labelType: "html",
-                                label: outputContainer,
-                                paddingBottom: 0,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                paddingRight: 150,
-                                rx: 0,
-                                ry: 0
-                            }, {labelStyle: "width:300"});
-                            break;
-                    }
+                    const outputCssClassNamePrefix = entry.outputStreamType.toLowerCase();
+                    outputContainer =
+                        `<div id="container" class="node-content" title="${outputStreamSiddhiApp}">
+                            <span class="${outputCssClassNamePrefix}-indicator"></span>
+                            <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.outputStreamId}</span>
+                         </div>`;
+                    g.setNode(entry.outputStreamId, {
+                        labelType: "html",
+                        label: outputContainer,
+                        paddingBottom: 0,
+                        paddingTop: 0,
+                        paddingLeft: 0,
+                        paddingRight: 150,
+                        rx: 0,
+                        ry: 0
+                    }, {labelStyle: "width:300"});
 
 
                     if (entry.query !== undefined && entry.partitionType === 'Value Partition' || entry.partitionType === 'Range Partition') {
                         siddhiAppContainer =
-                            "<div id='container' class='node-content' title='" + entry.partitionQuery + "'>"
-                            + "<span class='query-indicator'></span>"
-                            + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + "query" + "</span>"
-                            + "</div>";
+                            `<div id="container" class="node-content" title='${entry.partitionQuery}'>
+                                <span class="query-indicator"></span>
+                                <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">query</span>
+                             </div>`;
                         g.setNode(entry.query, {
                             labelType: "html",
                             label: siddhiAppContainer,
@@ -255,10 +107,10 @@ export default class AppEventFlow extends React.Component {
                         }, {labelStyle: "width:300"});
                     } else if (entry.query !== undefined) {
                         siddhiAppContainer =
-                            "<div id='container' class='node-content' title='" + entry.query + "'>"
-                            + "<span class='query-indicator'></span>"
-                            + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.queryName + "</span>"
-                            + "</div>";
+                            `<div id="container" class="node-content" title='${entry.query}'>
+                                <span class="query-indicator"></span>
+                                <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.queryName}</span>
+                             </div>`;
                         g.setNode(entry.query, {
                             labelType: "html",
                             label: siddhiAppContainer,
@@ -273,10 +125,10 @@ export default class AppEventFlow extends React.Component {
 
                     if (entry.function !== undefined) {
                         functionContainer =
-                            "<div id='container' class='node-content' title='" + entry.functionQuery + "'>"
-                            + "<span class='function-indicator'></span>"
-                            + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.function + "</span>"
-                            + "</div>";
+                            `<div id="container" class="node-content" title="${entry.functionQuery}">
+                                <span class="function-indicator"></span>
+                                <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.function}</span>
+                             </div>`;
                         g.setNode(entry.function, {
                             labelType: "html",
                             label: functionContainer,
@@ -291,10 +143,10 @@ export default class AppEventFlow extends React.Component {
 
                     if (entry.partitionType === 'Value Partition' || entry.partitionType === 'Range Partition') {
                         partitionType =
-                            "<div id='container' class='node-content' title='" + entry.partitionTypeQuery + "'>"
-                            + "<span class='partition-type-colour'></span>"
-                            + "<span id='myTextInput' class='nodeLabel'style='margin-top: 10px'>" + entry.partitionType + "</span>"
-                            + "</div>";
+                            `<div id="container" class="node-content" title="${entry.partitionTypeQuery}">
+                                <span class="partition-type-colour"></span>
+                                <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.partitionType}</span>
+                             </div>`;
                         g.setNode(entry.partitionType, {
                             labelType: "html",
                             label: partitionType,
@@ -307,10 +159,7 @@ export default class AppEventFlow extends React.Component {
                         }, {labelStyle: "width:300"});
 
                         partitionContainer =
-                            "<div id='container' class='partition' title='" + entry.query + "'>"
-
-                            + entry.queryName
-                            + "</div>";
+                            `<div id="container" class="partition" title='${entry.query}'>${entry.queryName}</div>`;
                         g.setNode("partition", {
                             labelType: "html",
                             label: partitionContainer,
@@ -392,29 +241,29 @@ export default class AppEventFlow extends React.Component {
                     render(inner, g);
                 });
 
-            }).catch((error) => {
-            if (error.response != null) {
-                if (error.response.status === 401) {
-                    this.setState({
-                        isApiCalled: true,
-                        sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again."
-                    })
-                } else if (error.response.status === 403) {
-                    this.setState({
-                        isApiCalled: true,
-                        statusMessage: "User Have No Permission to view this page."
-                    });
-                } else {
-                    this.setState({
-                        isError: true,
-                        isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
-                    });
+            })
+            .catch((error) => {
+                if (error.response != null) {
+                    if (error.response.status === 401) {
+                        this.setState({
+                            isApiCalled: true,
+                            sessionInvalid: true,
+                            statusMessage: "Authentication fail. Please login again."
+                        })
+                    } else if (error.response.status === 403) {
+                        this.setState({
+                            isApiCalled: true,
+                            statusMessage: "User Have No Permission to view this page."
+                        });
+                    } else {
+                        this.setState({
+                            isError: true,
+                            isApiCalled: true,
+                            statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                        });
+                    }
                 }
-            }
-        });
-
+            });
     }
 
     render() {

@@ -518,7 +518,43 @@ export default class WorkerSpecific extends React.Component {
                         />
                         <Divider/>
 
-                        <CardText style={{padding:'80px'}}>
+                        <CardText style={{padding: '80px'}}>
+                            <ul class="legend">
+                                <li class="legend-key ">
+                                    <span class="legend-colour" style={{backgroundColor: '#2196F3'}}></span>
+                                    <span class="legend-text">Stream</span>
+                                </li>
+
+                                <li class="legend-key ">
+                                    <span class="legend-colour" style={{backgroundColor: '#8BC34A'}}></span>
+                                    <span class="legend-text">Table</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour" style={{backgroundColor: '#009688'}}></span>
+                                    <span class="legend-text">Window</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour" style={{backgroundColor: '#F44336'}}></span>
+                                    <span class="legend-text">Trigger</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour" style={{backgroundColor: '#FF9800'}}></span>
+                                    <span class="legend-text">Aggregation</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour" style={{backgroundColor: '#FF5722'}}></span>
+                                    <span class="legend-text">Function</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour" style={{backgroundColor: '#9C27B0'}}></span>
+                                    <span class="legend-text">Query</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour" style={{backgroundColor: '#FFEB3B'}}></span>
+                                    <span class="legend-text">Partition</span>
+                                </li>
+                            </ul>
+
                             <AppEventFlow id={this.props.match.params.id} appName={this.props.match.params.appName}/>
                         </CardText>
                     </Card>
