@@ -232,11 +232,13 @@ export default class AppEventFlow extends React.Component {
                         inner.attr("transform", d3.event.transform);
                     });
                     svg.call(zoom);
+                    const height = g.graph().height || 10;
+                    const width = g.graph().width || 300;
+                    svg.attr("height", height + 40).attr('width', width + 40);
 
-                    svg.attr("height", g.graph().height + 40).attr('width', g.graph().width + 40);
                     // Center the graph
                     let initialScale = 2.25;
-                    svg.call(zoom.transform, d3.zoomIdentity.translate((svg.attr("width") - g.graph().width * initialScale) / 2, 10).scale(initialScale));
+                    svg.call(zoom.transform, d3.zoomIdentity.translate((svg.attr("width") - width * initialScale) / 2, 10).scale(initialScale));
                     svg.classed("nodeTree", true);
                     render(inner, g);
                 });
@@ -273,7 +275,6 @@ export default class AppEventFlow extends React.Component {
                 ref={(ref) => {
                     this.nodeTree = ref;
                 }}
-
                 style={{
                     display: 'flex',
                     position: 'relative',
@@ -282,8 +283,8 @@ export default class AppEventFlow extends React.Component {
                     verticalAlign: 'middle',
                     overflow: 'scroll'
                 }}
-
-                preserveAspectRatio="xMidYMin meet" viewBox="-900 -70 5000 500"
+                preserveAspectRatio="xMidYMin meet"
+                viewBox="-900 -70 5000 500"
                 height="500"
                 width="300"
             >
@@ -295,7 +296,7 @@ export default class AppEventFlow extends React.Component {
                        top: '10',
                        left: '0'
                    }}
-                   viewBox="0 0 100 100"
+                   viewBox="0 0 1000 100"
                 />
             </svg>
         );
