@@ -42,7 +42,7 @@ import java.util.Map;
 /**
  * Builder to create EventFlow
  */
-public class EventFlowBuilder { // TODO review
+public class EventFlowBuilder {
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
     private SiddhiAppRuntime siddhiAppRuntime;

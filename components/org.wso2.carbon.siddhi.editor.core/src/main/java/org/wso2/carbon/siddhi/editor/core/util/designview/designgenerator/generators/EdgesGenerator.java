@@ -255,44 +255,6 @@ public class EdgesGenerator {
         }
 
         throw new DesignGenerationException("Unable to find element with id '" + id + "'");
-
-        // TODO Get reviewed and remove below Old working code
-
-//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getSinkList()) {
-//            if (siddhiElementConfig.getId().equals(id)) {
-//                return siddhiElementConfig;
-//            }
-//        }
-//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getSourceList()) {
-//            if (siddhiElementConfig.getId().equals(id)) {
-//                return siddhiElementConfig;
-//            }
-//        }
-//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getStreamList()) {
-//            if (siddhiElementConfig.getId().equals(id)) {
-//                return siddhiElementConfig;
-//            }
-//        }
-//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getTableList()) {
-//            if (siddhiElementConfig.getId().equals(id)) {
-//                return siddhiElementConfig;
-//            }
-//        }
-//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getTriggerList()) {
-//            if (siddhiElementConfig.getId().equals(id)) {
-//                return siddhiElementConfig;
-//            }
-//        }
-//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getWindowList()) {
-//            if (siddhiElementConfig.getId().equals(id)) {
-//                return siddhiElementConfig;
-//            }
-//        }
-//        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getAggregationList()) {
-//            if (siddhiElementConfig.getId().equals(id)) {
-//                return siddhiElementConfig;
-//            }
-//        }
     }
 
     /**
