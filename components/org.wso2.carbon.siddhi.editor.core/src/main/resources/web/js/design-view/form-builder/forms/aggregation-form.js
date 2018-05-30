@@ -17,8 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
-        'elementUtils'],
-    function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils) {
+        'elementUtils', 'storeAnnotation'],
+    function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils, 
+              StoreAnnotation) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -48,7 +49,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             var propertyDiv = $('<div id="property-header"><h3>Define Aggregation </h3></div>' +
                 '<div id="define-aggregation" class="define-aggregation"></div>');
             formContainer.append(propertyDiv);
-            formContainer.append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
+            formContainer.append('<div class="row"><div id="form-aggregation-annotation" class="col-md-12"></div></div>' +
+                '<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
                 '<div id="form-aggregation-select" class="col-md-4"></div>' +
                 '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
 
@@ -84,6 +86,88 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             }
 
             // generate the form to define a aggregation
+            var editorAnnotation = new JSONEditor($(formContainer).find('#form-aggregation-annotation')[0], {
+                schema: {
+                    type: "object",
+                    title: "Aggregation Annotations",
+                    properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Add Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title: "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title: "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
+                        storeAnnotation: {
+                            propertyOrder: 2,
+                            title: "Store Annotation",
+                            type: "object",
+                            options: {
+                                disable_properties: true
+                            },
+                            properties: {
+                                annotationType: {
+                                    propertyOrder: 1,
+                                    required: true,
+                                    title: "Type",
+                                    type: "string",
+                                    minLength: 1
+                                 },
+                                storeOptions: {
+                                    propertyOrder: 2,
+                                    required: true,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Options",
+                                    uniqueItems: true,
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: "Option",
+                                        options: {
+                                            disable_properties: true
+                                        },
+                                        properties: {
+                                            key: {
+                                                required: true,
+                                                title: "Key",
+                                                type: "string",
+                                                minLength: 1
+                                            },
+                                            value: {
+                                                required: true,
+                                                title: "value",
+                                                type: "string",
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                show_errors: "always",
+                display_required_only: true,
+                no_additional_properties: true,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true
+            });
             var editorInput = new JSONEditor($(formContainer).find('#form-aggregation-input')[0], {
                 schema: {
                     type: "object",
@@ -311,10 +395,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
+                var annotationErrors = editorAnnotation.validate();
                 var inputErrors = editorInput.validate();
                 var selectErrors = editorSelect.validate();
                 var aggregateErrors = editorAggregate.validate();
-                if(inputErrors.length || selectErrors.length || aggregateErrors.length) {
+                if(annotationErrors.length || inputErrors.length || selectErrors.length || aggregateErrors.length) {
                     return;
                 }
                 var isAggregationNameUsed = self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name);
@@ -327,6 +412,23 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 _.set(aggregationOptions, 'id', i);
                 _.set(aggregationOptions, 'name', editorInput.getValue().name);
                 _.set(aggregationOptions, 'from', editorInput.getValue().from);
+
+                // add the store annotation for aggregation
+                if (editorAnnotation.getValue().storeAnnotation !== undefined) {
+                    var optionsMap = {};
+                    _.forEach(editorAnnotation.getValue().storeAnnotation.storeOptions, function (option) {
+                        optionsMap[option.key] = option.value;
+                    });
+                    
+                    var storeAnnotationOptions = {};
+                    _.set(storeAnnotationOptions, 'type', editorAnnotation.getValue().storeAnnotation.annotationType);
+                    _.set(storeAnnotationOptions, 'options', optionsMap);
+
+                    var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+                    _.set(aggregationOptions, 'store', storeAnnotation);
+                } else {
+                    _.set(aggregationOptions, 'store', undefined);
+                }
 
                 var selectAttributeOptions = {};
                 if (editorSelect.getValue().select instanceof Array) {
@@ -366,12 +468,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     _.set(aggregateByTimePeriodOptions, 'maxValue',
                         (editorAggregate.getValue().aggregateByTimePeriod.maxValue).toUpperCase());
                 } else {
-                    _.set(aggregateByTimePeriodOptions, 'minValue', undefined);
+                    _.set(aggregateByTimePeriodOptions, 'maxValue', undefined);
                 }
                 var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                 _.set(aggregationOptions, 'aggregateByTimePeriod', aggregateByTimePeriod);
 
                 var aggregation = new Aggregation(aggregationOptions);
+
+                _.forEach(editorAnnotation.getValue().annotations, function (annotation) {
+                    aggregation.addAnnotation(annotation.annotation);
+                });
                 self.configurationData.getSiddhiAppConfig().addAggregation(aggregation);
 
                 var textNode = $('#'+i).find('.aggregationNameNode');
@@ -407,6 +513,29 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
             }
+
+            var savedAnnotations = clickedElement.getAnnotationList();
+            var annotations = [];
+            _.forEach(savedAnnotations, function (savedAnnotation) {
+                annotations.push({annotation: savedAnnotation});
+            });
+
+            var savedStoreAnnotation = clickedElement.getStore();
+            var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
+            var storeOptions = [];
+            for (var key in savedStoreAnnotationOptions) {
+                if (savedStoreAnnotationOptions.hasOwnProperty(key)) {
+                    storeOptions.push({
+                        key: key,
+                        value: savedStoreAnnotationOptions[key]
+                    });
+                }
+            }
+            var storeAnnotation = {
+                annotationType: savedStoreAnnotation.getType(),
+                storeOptions: storeOptions
+            };
+
             var name = clickedElement.getName();
             var from = clickedElement.getFrom();
             var select = clickedElement.getSelect().getValue();
@@ -421,6 +550,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 };
                 groupBy.push(groupByAttributeObject);
             });
+
+            var fillAnnotation = {
+                annotations: annotations,
+                storeAnnotation: storeAnnotation
+            };
+            fillAnnotation = self.formUtils.cleanJSONObject(fillAnnotation);
 
             var fillInput = {
                 name : name,
@@ -461,7 +596,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 };
             }
 
-            formContainer.append('<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
+            formContainer.append('<div class="row"><div id="form-aggregation-annotation" class="col-md-12"></div></div>' +
+                '<div class="row"><div id="form-aggregation-input" class="col-md-4"></div>' +
                 '<div id="form-aggregation-select" class="col-md-4"></div>' +
                 '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
 
@@ -495,6 +631,89 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             }
 
             // generate the form to define a aggregation
+            var editorAnnotation = new JSONEditor($(formContainer).find('#form-aggregation-annotation')[0], {
+                schema: {
+                    type: "object",
+                    title: "Aggregation Annotations",
+                    properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Add Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title: "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title: "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
+                        storeAnnotation: {
+                            propertyOrder: 2,
+                            title: "Store Annotation",
+                            type: "object",
+                            options: {
+                                disable_properties: true
+                            },
+                            properties: {
+                                annotationType: {
+                                    propertyOrder: 1,
+                                    required: true,
+                                    title: "Type",
+                                    type: "string",
+                                    minLength: 1
+                                },
+                                storeOptions: {
+                                    propertyOrder: 2,
+                                    required: true,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Options",
+                                    uniqueItems: true,
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: "Option",
+                                        options: {
+                                            disable_properties: true
+                                        },
+                                        properties: {
+                                            key: {
+                                                required: true,
+                                                title: "Key",
+                                                type: "string",
+                                                minLength: 1
+                                            },
+                                            value: {
+                                                required: true,
+                                                title: "value",
+                                                type: "string",
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                startval: fillAnnotation,
+                show_errors: "always",
+                display_required_only: true,
+                no_additional_properties: true,
+                disable_array_delete_all_rows: true,
+                disable_array_delete_last_row: true
+            });
             var editorInput = new JSONEditor($(formContainer).find('#form-aggregation-input')[0], {
                 schema: {
                     type: "object",
@@ -713,10 +932,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#form-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+                var annotationErrors = editorAnnotation.validate();
                 var inputErrors = editorInput.validate();
                 var selectErrors = editorSelect.validate();
                 var aggregateErrors = editorAggregate.validate();
-                if(inputErrors.length || selectErrors.length || aggregateErrors.length) {
+                if(annotationErrors.length || inputErrors.length || selectErrors.length || aggregateErrors.length) {
                     return;
                 }
                 var isAggregationNameUsed =
@@ -726,14 +946,37 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     return;
                 }
 
+                var configAnnotation = editorAnnotation.getValue();
                 var configInput = editorInput.getValue();
                 var configSelect = editorSelect.getValue();
                 var configAggregate = editorAggregate.getValue();
+
+                clickedElement.clearAnnotationList();
+                _.forEach(configAnnotation.annotations, function (annotation) {
+                    clickedElement.addAnnotation(annotation.annotation);
+                });
 
                 // update selected aggregation model
                 clickedElement.setName(configInput.name);
                 clickedElement.setFrom(configInput.from);
 
+                // add the store annotation for aggregation
+                if (configAnnotation.storeAnnotation !== undefined) {
+                    var optionsMap = {};
+                    _.forEach(configAnnotation.storeAnnotation.storeOptions, function (option) {
+                        optionsMap[option.key] = option.value;
+                    });
+
+                    var storeAnnotationOptions = {};
+                    _.set(storeAnnotationOptions, 'type', configAnnotation.storeAnnotation.annotationType);
+                    _.set(storeAnnotationOptions, 'options', optionsMap);
+
+                    var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+                    clickedElement.setStore(storeAnnotation);
+                } else {
+                    clickedElement.setStore(undefined);
+                }
+                
                 var selectAttributeOptions = {};
                 if (configSelect.select instanceof Array) {
                     _.set(selectAttributeOptions, 'type', 'USER_DEFINED');
@@ -771,7 +1014,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     _.set(aggregateByTimePeriodOptions, 'maxValue',
                         (configAggregate.aggregateByTimePeriod.maxValue).toUpperCase());
                 } else {
-                    _.set(aggregateByTimePeriodOptions, 'minValue', undefined);
+                    _.set(aggregateByTimePeriodOptions, 'maxValue', undefined);
                 }
                 var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                 clickedElement.setAggregateByTimePeriod(aggregateByTimePeriod);

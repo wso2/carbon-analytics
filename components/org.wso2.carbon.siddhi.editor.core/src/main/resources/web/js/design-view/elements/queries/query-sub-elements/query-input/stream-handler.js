@@ -20,39 +20,41 @@ define(
     function () {
 
         /**
-         * @class QueryWindow
+         * @class StreamHandler
          * @constructor
-         * @class QueryWindow Creates a window for a query
+         * @class StreamHandler Creates a Stream Handler object for a query which is stored in streamHandler list
+         *          in query input
          * @param {Object} options Rendering options for the view
          */
-        var QueryWindow = function (options) {
+        var StreamHandler = function (options) {
             /*
              Data storing structure as follows.
-                function*: '',
-                parameters*: ['value1',...]'
+                type*: 'FILTER | FUNCTION | WINDOW',
+                value*: ''
             */
             if (options !== undefined) {
-                this.function = options.function;
-                this.parameters = options.parameters;
+                this.type
+                    = (options.type !== undefined)? (options.type).toUpperCase() : undefined;
+                this.value = options.value;
             }
         };
 
-        QueryWindow.prototype.getFunction = function () {
-            return this.function;
+        StreamHandler.prototype.getType = function () {
+            return this.type;
         };
 
-        QueryWindow.prototype.getParameters = function () {
-            return this.parameters;
+        StreamHandler.prototype.getValue = function () {
+            return this.value;
         };
 
-        QueryWindow.prototype.setFunction = function (functionName) {
-            this.function = functionName;
+        StreamHandler.prototype.setType = function (type) {
+            this.type = type.toUpperCase();
         };
 
-        QueryWindow.prototype.setParameters = function (parameters) {
-            this.parameters = parameters;
+        StreamHandler.prototype.setValue = function (value) {
+            this.value = value;
         };
 
-        return QueryWindow;
+        return StreamHandler;
 
     });

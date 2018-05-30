@@ -17,10 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindow', 'queryOrderByValue',
-        'patternOrSequenceQueryCondition'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
+        'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindow, QueryOrderByValue, PatternOrSequenceQueryCondition) {
+              QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
+              QueryWindowOrFunction) {
 
         /**
          * @class PatternQueryForm Creates a forms to collect data from a pattern query
@@ -76,8 +77,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
 
+                var savedAnnotations = clickedElement.getAnnotationList();
+                var annotations = [];
+                _.forEach(savedAnnotations, function (savedAnnotation) {
+                    annotations.push({annotation: savedAnnotation});
+                });
+
                 var inputStreamNames = clickedElement.getQueryInput().getConnectedElementNameList();
-                var conditionList = clickedElement.getQueryInput().getConditionList();
+                var savedConditionList = clickedElement.getQueryInput().getConditionList();
                 var logic = clickedElement.getQueryInput().getLogic();
                 var savedGroupByAttributes = clickedElement.getGroupBy();
                 var having = clickedElement.getHaving();
@@ -85,6 +92,43 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var limit = clickedElement.getLimit();
                 var outputRateLimit = clickedElement.getOutputRateLimit();
                 var outputElementName = clickedElement.getQueryOutput().getTarget();
+
+                var conditionList = [];
+                _.forEach(savedConditionList, function (savedCondition) {
+                    var streamHandlerList = [];
+                    _.forEach(savedCondition.getStreamHandlerList(), function (streamHandler) {
+                        var streamHandlerObject;
+                        var parameters = [];
+                        if (streamHandler.getType() === "FILTER") {
+                            streamHandlerObject = {
+                                streamHandler: {
+                                    filter: streamHandler.getValue()
+                                }
+                            };
+                        } else if (streamHandler.getType() === "FUNCTION") {
+                            _.forEach(streamHandler.getValue().getParameters(), function (savedParameterValue) {
+                                var parameterObject = {
+                                    parameter: savedParameterValue
+                                };
+                                parameters.push(parameterObject);
+                            });
+                            streamHandlerObject = {
+                                streamHandler: {
+                                    functionName: streamHandler.getValue().getFunction(),
+                                    parameters: parameters
+                                }
+                            };
+                        }
+                        streamHandlerList.push(streamHandlerObject);
+                    });
+
+                    var conditionObject = {
+                        conditionId: savedCondition.getConditionId(),
+                        streamName: savedCondition.getStreamName(),
+                        streamHandlerList: streamHandlerList
+                    };
+                    conditionList.push(conditionObject);
+                });
 
                 var groupBy = [];
                 _.forEach(savedGroupByAttributes, function (savedGroupByAttribute) {
@@ -225,6 +269,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 }
 
+                var fillQueryAnnotation = {
+                    annotations: annotations
+                };
+                fillQueryAnnotation = self.formUtils.cleanJSONObject(fillQueryAnnotation);
                 var fillQueryInputWith = {
                     conditions: conditionList,
                     logic: {
@@ -307,9 +355,47 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                formContainer.append('<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
+                formContainer.append('<div class="row"><div id="form-query-annotation" class="col-md-12"></div></div>' +
+                    '<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
                     '<div id="form-query-output" class="col-md-4"></div></div>');
+
+                var editorAnnotation = new JSONEditor($(formContainer).find('#form-query-annotation')[0], {
+                    schema: {
+                        type: "object",
+                        title: "Query Annotations",
+                        properties: {
+                            annotations: {
+                                propertyOrder: 1,
+                                type: "array",
+                                format: "table",
+                                title: "Add Annotations",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    type: "object",
+                                    title: "Annotation",
+                                    options: {
+                                        disable_properties: true
+                                    },
+                                    properties: {
+                                        annotation: {
+                                            title: "Annotation",
+                                            type: "string",
+                                            minLength: 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    startval: fillQueryAnnotation,
+                    show_errors: "always",
+                    display_required_only: true,
+                    no_additional_properties: true,
+                    disable_array_delete_all_rows: true,
+                    disable_array_delete_last_row: true
+                });
 
                 var editorInput = new JSONEditor($(formContainer).find('#form-query-input')[0], {
                     schema: {
@@ -346,11 +432,33 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                             required: true,
                                             propertyOrder: 2
                                         },
-                                        filter: {
-                                            type: 'string',
-                                            title: 'Filter',
-                                            minLength: 1,
-                                            propertyOrder: 3
+                                        streamHandlerList: {
+                                            propertyOrder: 3,
+                                            required: true,
+                                            type: "array",
+                                            format: "table",
+                                            title: "Stream Handlers",
+                                            minItems: 1,
+                                            items: {
+                                                type: "object",
+                                                title: 'Stream Handler',
+                                                properties: {
+                                                    streamHandler: {
+                                                        required: true,
+                                                        title: 'Stream Handler1',
+                                                        oneOf: [
+                                                            {
+                                                                $ref: "#/definitions/filter",
+                                                                title: "Filter"
+                                                            },
+                                                            {
+                                                                $ref: "#/definitions/functionDef",
+                                                                title: "Function"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -366,6 +474,53 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         title: 'Statement',
                                         minLength:1,
                                         required: true
+                                    }
+                                }
+                            }
+                        },
+                        definitions: {
+                            filter: {
+                                type: "object",
+                                title: "Filter",
+                                required: true,
+                                properties: {
+                                    filter: {
+                                        required: true,
+                                        title: "Filter Condition",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            },
+                            functionDef: {
+                                title: "Function",
+                                type: "object",
+                                required: true,
+                                properties: {
+                                    functionName: {
+                                        required: true,
+                                        title: "Function Name",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    parameters: {
+                                        required: true,
+                                        type: "array",
+                                        format: "table",
+                                        title: "Parameters",
+                                        minItems: 1,
+                                        items: {
+                                            type: "object",
+                                            title: 'Attribute',
+                                            properties: {
+                                                parameter: {
+                                                    required: true,
+                                                    type: 'string',
+                                                    title: 'Parameter Name',
+                                                    minLength: 1
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -761,17 +916,24 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var submitButtonElement = $(formContainer).find('#form-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
 
+                    var annotationErrors = editorAnnotation.validate();
                     var inputErrors = editorInput.validate();
                     var selectErrors = editorSelect.validate();
                     var outputErrors = editorOutput.validate();
-                    if(inputErrors.length || selectErrors.length || outputErrors.length) {
+                    if(annotationErrors.length || inputErrors.length || selectErrors.length || outputErrors.length) {
                         return;
                     }
 
+                    var annotationConfig = editorAnnotation.getValue();
                     var inputConfig = editorInput.getValue();
                     var selectConfig = editorSelect.getValue();
                     var outputConfig = editorOutput.getValue();
-                    
+
+                    clickedElement.clearAnnotationList();
+                    _.forEach(annotationConfig.annotations, function (annotation) {
+                        clickedElement.addAnnotation(annotation.annotation);
+                    });
+
                     var queryInput = clickedElement.getQueryInput();
 
                     queryInput.clearConditionList();
@@ -779,12 +941,34 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         var conditionObjectOptions = {};
                         _.set(conditionObjectOptions, 'conditionId', condition.conditionId);
                         _.set(conditionObjectOptions, 'streamName', condition.streamName);
-                        if (condition.filter !== undefined) {
-                            _.set(conditionObjectOptions, 'filter', condition.filter);
-                        } else {
-                            _.set(conditionObjectOptions, 'filter', undefined);
-                        }
+
+                        var streamHandlers = [];
+
+                        _.forEach(condition.streamHandlerList, function (streamHandler) {
+                            streamHandler = streamHandler.streamHandler;
+                            var streamHandlerOptions = {};
+                            if (streamHandler.functionName !== undefined) {
+                                var functionOptions = {};
+                                _.set(functionOptions, 'function', streamHandler.functionName);
+                                var parameters = [];
+                                _.forEach(streamHandler.parameters, function (parameter) {
+                                    parameters.push(parameter.parameter);
+                                });
+                                _.set(functionOptions, 'parameters', parameters);
+                                var queryFunction = new QueryWindowOrFunction(functionOptions);
+                                _.set(streamHandlerOptions, 'type', 'FUNCTION');
+                                _.set(streamHandlerOptions, 'value', queryFunction);
+                            } else if (streamHandler.filter !== undefined) {
+                                _.set(streamHandlerOptions, 'type', 'FILTER');
+                                _.set(streamHandlerOptions, 'value', streamHandler.filter);
+                            } else {
+                                console.log("Unknown stream handler received!");
+                            }
+                            var streamHandlerObject = new StreamHandler(streamHandlerOptions);
+                            streamHandlers.push(streamHandlerObject);
+                        });
                         var conditionObject = new PatternOrSequenceQueryCondition(conditionObjectOptions);
+                        conditionObject.setStreamHandlerList(streamHandlers);
                         queryInput.addCondition(conditionObject);
                     });
 

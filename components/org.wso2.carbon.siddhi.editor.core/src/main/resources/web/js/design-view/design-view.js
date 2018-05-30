@@ -18,17 +18,17 @@
 
 define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid',
         'configurationData', 'appData', 'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation',
-        'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindow', 'edge', 'querySelect',
+        'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindowOrFunction', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
         'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation',
-        'functionDefinition'],
+        'functionDefinition', 'streamHandler', 'storeAnnotation'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
-              QueryWindow, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete,
-              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource,
-              PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation,
-              FunctionDefinition) {
+              QueryWindowOrFunction, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert,
+              QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput,
+              JoinQuerySource, PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation,
+              MapAnnotation, FunctionDefinition, StreamHandler, StoreAnnotation) {
 
         /**
          * @class DesignView
@@ -82,6 +82,26 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 });
             }
 
+            // sets the stream handler list in query input
+            function setStreamHandlerListForQuery(queryInput, streamHandlerList) {
+                _.forEach(streamHandlerList, function(streamHandler){
+                    var streamHandlerOptions = {};
+                    if (streamHandler.type === "FUNCTION" || streamHandler.type === "WINDOW") {
+                        var windowOrFunctionObject = new QueryWindowOrFunction(streamHandler.value);
+                        streamHandlerOptions = {};
+                        _.set(streamHandlerOptions, 'type', streamHandler.type);
+                        _.set(streamHandlerOptions, 'value', windowOrFunctionObject);
+                    } else if (streamHandler.type === "FILTER") {
+                        _.set(streamHandlerOptions, 'type', streamHandler.type);
+                        _.set(streamHandlerOptions, 'value', streamHandler.value);
+                    } else {
+                        console.log("Unknown Stream Handler type detected!")
+                    }
+                    var streamHandlerObject = new StreamHandler(streamHandlerOptions);
+                    queryInput.addStreamHandler(streamHandlerObject);
+                });
+            }
+
             // sets the query select(and aggregation definition select) part in a query
             function setSelectForQuery(query, querySelect) {
                 var querySelectObject = new QuerySelect(querySelect);
@@ -132,35 +152,39 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             });
             _.forEach(configurationData.siddhiAppConfig.streamList, function(stream){
                 var streamObject = new Stream(stream);
-                //addAnnotationsForElement(stream, streamObject);
+                addAnnotationsForElement(stream, streamObject);
                 addAttributesForElement(stream, streamObject);
                 streamObject.setId(newIdBeginningPhrase + streamObject.getId());
                 appData.addStream(streamObject);
             });
             _.forEach(configurationData.siddhiAppConfig.tableList, function(table){
                 var tableObject = new Table(table);
-                //addAnnotationsForElement(table, tableObject);
+                var storeAnnotation = new StoreAnnotation(table.store);
+                tableObject.setStore(storeAnnotation);
+                addAnnotationsForElement(table, tableObject);
                 addAttributesForElement(table, tableObject);
                 tableObject.setId(newIdBeginningPhrase + tableObject.getId());
                 appData.addTable(tableObject);
             });
             _.forEach(configurationData.siddhiAppConfig.windowList, function(window){
                 var windowObject = new Window(window);
-                //addAnnotationsForElement(window, windowObject);
+                addAnnotationsForElement(window, windowObject);
                 addAttributesForElement(window, windowObject);
                 windowObject.setId(newIdBeginningPhrase + windowObject.getId());
                 appData.addWindow(windowObject);
             });
             _.forEach(configurationData.siddhiAppConfig.triggerList, function(trigger){
                 var triggerObject = new Trigger(trigger);
-                //addAnnotationsForElement(trigger, triggerObject);
+                addAnnotationsForElement(trigger, triggerObject);
                 addAttributesForElement(trigger, triggerObject);
                 triggerObject.setId(newIdBeginningPhrase + triggerObject.getId());
                 appData.addTrigger(triggerObject);
             });
             _.forEach(configurationData.siddhiAppConfig.aggregationList, function(aggregation){
                 var aggregationObject = new Aggregation(aggregation);
-                //addAnnotationsForElement(aggregation, aggregationObject);
+                var storeAnnotation = new StoreAnnotation(aggregation.store);
+                aggregationObject.setStore(storeAnnotation);
+                addAnnotationsForElement(aggregation, aggregationObject);
                 setSelectForQuery(aggregationObject, aggregation.select);
                 var aggregateByTimePeriodSubElement = new AggregateByTimePeriod(aggregation.aggregateByTimePeriod);
                 aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriodSubElement);
@@ -172,11 +196,13 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 functionObject.setId(newIdBeginningPhrase + functionObject.getId());
                 appData.addFunction(functionObject);
             });
-            _.forEach(configurationData.siddhiAppConfig.patternQueryList, function(patternQuery){
+            _.forEach(configurationData.siddhiAppConfig.queryLists.PATTERN, function(patternQuery){
                 var patternQueryObject = new Query(patternQuery);
+                addAnnotationsForElement(patternQuery, patternQueryObject);
                 var patternQueryInput = new PatternOrSequenceQueryInput(patternQuery.queryInput);
                 _.forEach(patternQuery.queryInput.conditionList, function(condition){
                     var patternQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                    setStreamHandlerListForQuery(patternQueryConditionObject, condition.streamHandlerList);
                     patternQueryInput.addCondition(patternQueryConditionObject);
                 });
                 patternQueryObject.setQueryInput(patternQueryInput);
@@ -186,11 +212,13 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 patternQueryObject.setId(newIdBeginningPhrase + patternQueryObject.getId());
                 appData.addPatternQuery(patternQueryObject);
             });
-            _.forEach(configurationData.siddhiAppConfig.sequenceQueryList, function(sequenceQuery){
+            _.forEach(configurationData.siddhiAppConfig.queryLists.SEQUENCE, function(sequenceQuery){
                 var sequenceQueryObject = new Query(sequenceQuery);
+                addAnnotationsForElement(sequenceQuery, sequenceQueryObject);
                 var sequenceQueryInput = new PatternOrSequenceQueryInput(sequenceQuery.queryInput);
                 _.forEach(sequenceQuery.queryInput.conditionList, function(condition){
                     var sequenceQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                    setStreamHandlerListForQuery(sequenceQueryConditionObject, condition.streamHandlerList);
                     sequenceQueryInput.addCondition(sequenceQueryConditionObject);
                 });
                 sequenceQueryObject.setQueryInput(sequenceQueryInput);
@@ -200,15 +228,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 sequenceQueryObject.setId(newIdBeginningPhrase + sequenceQueryObject.getId());
                 appData.addSequenceQuery(sequenceQueryObject);
             });
-            _.forEach(configurationData.siddhiAppConfig.windowFilterProjectionQueryList,
+            _.forEach(configurationData.siddhiAppConfig.queryLists.WINDOW_FILTER_PROJECTION,
                 function(windowFilterProjectionQuery){
                 var queryObject = new Query(windowFilterProjectionQuery);
+                addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
                 var windowFilterProjectionQueryInput =
                     new WindowFilterProjectionQueryInput(windowFilterProjectionQuery.queryInput);
-                if (windowFilterProjectionQuery.queryInput.window !== undefined) {
-                    var queryWindowObject = new QueryWindow(windowFilterProjectionQuery.queryInput.window);
-                    windowFilterProjectionQueryInput.setWindow(queryWindowObject);
-                }
+                setStreamHandlerListForQuery(windowFilterProjectionQueryInput,
+                    windowFilterProjectionQuery.queryInput.streamHandlerList);
                 queryObject.setQueryInput(windowFilterProjectionQueryInput);
                 setSelectForQuery(queryObject, windowFilterProjectionQuery.select);
                 setOrderByForQuery(queryObject, windowFilterProjectionQuery.orderBy);
@@ -216,19 +243,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 queryObject.setId(newIdBeginningPhrase + queryObject.getId());
                 appData.addWindowFilterProjectionQuery(queryObject);
             });
-            _.forEach(configurationData.siddhiAppConfig.joinQueryList, function(joinQuery){
+            _.forEach(configurationData.siddhiAppConfig.queryLists.JOIN, function(joinQuery){
                 var queryObject = new Query(joinQuery);
+                addAnnotationsForElement(joinQuery, queryObject);
                 var joinQueryInput = new JoinQueryInput(joinQuery.queryInput);
                 var leftSource = new JoinQuerySource(joinQuery.queryInput.left);
-                if (joinQuery.queryInput.left.window !== undefined) {
-                    var leftWindowObject = new QueryWindow(joinQuery.queryInput.left.window);
-                    leftSource.setWindow(leftWindowObject);
-                }
+                setStreamHandlerListForQuery(leftSource, joinQuery.queryInput.left.streamHandlerList);
                 var rightSource = new JoinQuerySource(joinQuery.queryInput.right);
-                if (joinQuery.queryInput.right.window !== undefined) {
-                    var rightWindowObject = new QueryWindow(joinQuery.queryInput.right.window);
-                    rightSource.setWindow(rightWindowObject);
-                }
+                setStreamHandlerListForQuery(rightSource, joinQuery.queryInput.right.streamHandlerList);
                 joinQueryInput.setLeft(leftSource);
                 joinQueryInput.setRight(rightSource);
                 queryObject.setQueryInput(joinQueryInput);
@@ -240,7 +262,9 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             });
             _.forEach(configurationData.siddhiAppConfig.partitionList, function(partition){
                 //partitionObject.setId(newIdBeginningPhrase + partitionObject.getId());
-                appData.addPartition(new Partition(partition));
+                var partitionObject = new Partition(partition);
+                addAnnotationsForElement(partition, partitionObject);
+                appData.addPartition(partitionObject);
             });
             _.forEach(configurationData.edgeList, function(edge){
                 var newParentId = newIdBeginningPhrase + edge.parentId;

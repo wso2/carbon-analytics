@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(
-    function () {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class WindowFilterProjectionQueryInput
@@ -30,21 +30,35 @@ define(
              Data storing structure as follows.
                 type*: 'WINDOW|FILTER|PROJECTION',
                 from*: '',
-                filter: '',
-                window: {
-                    function*: '',
-                    parameters*: ['value1',...],
-                    filter: ''
-                },
-                postWindowFilter: ''
+                streamHandlerList: [
+                    {
+                        type*: 'FILTER',
+                        value*: ''
+                    },
+                    << and|or >>
+                    {
+                        type*: 'FUNCTION|WINDOW',
+                        value*: {
+                            function*: '',
+                            parameters*: ['value1',...],
+                        }
+                    },
+                    ...
+                ]
             */
             if (options !== undefined) {
                 this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.from = options.from;
-                this.filter = options.filter;
-                this.window = options.window;
-                this.postWindowFilter = options.postWindowFilter;
             }
+            this.streamHandlerList = [];
+        };
+
+        WindowFilterProjectionQueryInput.prototype.addStreamHandler = function (streamHandler) {
+            this.streamHandlerList.push(streamHandler);
+        };
+
+        WindowFilterProjectionQueryInput.prototype.clearStreamHandlerList = function () {
+            ElementUtils.prototype.removeAllElements(this.streamHandlerList);
         };
 
         WindowFilterProjectionQueryInput.prototype.getType = function () {
@@ -55,16 +69,8 @@ define(
             return this.from;
         };
 
-        WindowFilterProjectionQueryInput.prototype.getFilter = function () {
-            return this.filter;
-        };
-
-        WindowFilterProjectionQueryInput.prototype.getWindow = function () {
-            return this.window;
-        };
-
-        WindowFilterProjectionQueryInput.prototype.getPostWindowFilter = function () {
-            return this.postWindowFilter;
+        WindowFilterProjectionQueryInput.prototype.getStreamHandlerList = function () {
+            return this.streamHandlerList;
         };
 
         WindowFilterProjectionQueryInput.prototype.setType = function (type) {
@@ -75,16 +81,8 @@ define(
             this.from = from;
         };
 
-        WindowFilterProjectionQueryInput.prototype.setFilter = function (filter) {
-            this.filter = filter;
-        };
-
-        WindowFilterProjectionQueryInput.prototype.setWindow = function (window) {
-            this.window = window;
-        };
-
-        WindowFilterProjectionQueryInput.prototype.setPostWindowFilter = function (postWindowFilter) {
-            this.postWindowFilter = postWindowFilter;
+        WindowFilterProjectionQueryInput.prototype.setStreamHandlerList = function (streamHandlerList) {
+            this.streamHandlerList = streamHandlerList;
         };
 
         return WindowFilterProjectionQueryInput;

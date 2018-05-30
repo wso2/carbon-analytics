@@ -54,16 +54,38 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                     type: "object",
                     title: "Window",
                     properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title : "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 1
+                            propertyOrder: 2
                         },
                         attributes: {
                             required: true,
-                            propertyOrder: 2,
+                            propertyOrder: 3,
                             type: "array",
                             format: "table",
                             title: "Attributes",
@@ -99,11 +121,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                             title: "Function Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 3
+                            propertyOrder: 4
                         },
                         parameters: {
                             required: true,
-                            propertyOrder: 4,
+                            propertyOrder: 5,
                             type: "array",
                             format: "table",
                             title: "Parameters",
@@ -123,7 +145,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                         outputEventType: {
                             type: "string",
                             title: "Output Event Type",
-                            propertyOrder: 5,
+                            propertyOrder: 6,
                             enum: [
                                 "current events",
                                 "expired events",
@@ -182,6 +204,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                     var attributeObject = new Attribute(attribute);
                     window.addAttribute(attributeObject);
                 });
+                _.forEach(editor.getValue().annotations, function (annotation) {
+                    window.addAnnotation(annotation.annotation);
+                });
                 self.configurationData.getSiddhiAppConfig().addWindow(window);
 
                 var textNode = $('#'+i).find('.windowNameNode');
@@ -224,6 +249,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 };
                 attributes.push(attributeObject);
             });
+            var savedAnnotations = clickedElement.getAnnotationList();
+            var annotations = [];
+            _.forEach(savedAnnotations, function (savedAnnotation) {
+                annotations.push({annotation: savedAnnotation});
+            });
             var functionName = clickedElement.getFunction();
             var savedParameterValues = clickedElement.getParameters();
 
@@ -247,27 +277,51 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 outputEventType = 'expired events';
             }
             var fillWith = {
+                annotations: annotations,
                 name : name,
                 attributes : attributes,
                 functionName : functionName,
                 parameters : parameters,
                 outputEventType : outputEventType
             };
+            fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor(formContainer[0], {
                 schema: {
                     type: "object",
                     title: "Window",
                     properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title : "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 1
+                            propertyOrder: 2
                         },
                         attributes: {
                             required: true,
-                            propertyOrder: 2,
+                            propertyOrder: 3,
                             type: "array",
                             format: "table",
                             title: "Attributes",
@@ -303,11 +357,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                             title: "Function Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 3
+                            propertyOrder: 4
                         },
                         parameters: {
                             required: true,
-                            propertyOrder: 4,
+                            propertyOrder: 5,
                             type: "array",
                             format: "table",
                             title: "Parameters",
@@ -327,7 +381,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                         outputEventType: {
                             type: "string",
                             title: "Output Event Type",
-                            propertyOrder: 5,
+                            propertyOrder: 6,
                             enum: [
                                 "current events",
                                 "expired events",
@@ -394,6 +448,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 _.forEach(config.attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);
                     clickedElement.addAttribute(attributeObject);
+                });
+
+                clickedElement.clearAnnotationList();
+                _.forEach(config.annotations, function (annotation) {
+                    clickedElement.addAnnotation(annotation.annotation);
                 });
 
                 var textNode = $(element).parent().find('.windowNameNode');

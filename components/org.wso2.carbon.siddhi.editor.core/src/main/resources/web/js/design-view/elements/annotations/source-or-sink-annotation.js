@@ -29,6 +29,7 @@ define(
             /*
              Data storing structure as follows
                 id*: ‘’,
+                connectedElementName*: '',
                 annotationType*: 'SOURCE | SINK',
                 type*: ‘’,
                 options: ['option1', 'option2=value2',...],
@@ -48,6 +49,7 @@ define(
             */
             if (options !== undefined) {
                 this.id = options.id;
+                this.connectedElementName = options.connectedElementName;
                 this.annotationType
                     = (options.annotationType !== undefined)? (options.annotationType).toUpperCase() : undefined;
                 this.type = options.type;
@@ -58,6 +60,10 @@ define(
 
         SourceOrSinkAnnotation.prototype.getId = function () {
             return this.id;
+        };
+
+        SourceOrSinkAnnotation.prototype.getConnectedElementName = function () {
+            return this.connectedElementName;
         };
 
         SourceOrSinkAnnotation.prototype.getAnnotationType = function () {
@@ -80,8 +86,12 @@ define(
             this.id = id;
         };
 
+        SourceOrSinkAnnotation.prototype.setConnectedElementName = function (connectedElementName) {
+            this.connectedElementName = connectedElementName;
+        };
+
         SourceOrSinkAnnotation.prototype.setAnnotationType = function (annotationType) {
-            this.annotationType = annotationType;
+            this.annotationType = annotationType.toUpperCase();
         };
 
         SourceOrSinkAnnotation.prototype.setType = function (type) {

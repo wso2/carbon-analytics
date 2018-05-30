@@ -110,7 +110,7 @@ define(
         };
 
         JoinQueryInput.prototype.setJoinWith = function (joinWith) {
-            this.joinWith = joinWith;
+            this.joinWith = joinWith.toUpperCase();
         };
 
         JoinQueryInput.prototype.setLeft = function (left) {
@@ -118,7 +118,7 @@ define(
         };
 
         JoinQueryInput.prototype.setJoinType = function (joinType) {
-            this.joinType = joinType;
+            this.joinType = joinType.toUpperCase();
         };
 
         JoinQueryInput.prototype.setRight = function (right) {

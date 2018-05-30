@@ -80,7 +80,7 @@ define(['require', 'log', 'jquery', 'lodash'],
                 self.toggleViewButton.addClass('disableContainer');
 
                 var editor = new JSONEditor(formContainer[0], {
-                    ajax: true,
+                    ajax: true,//TODO: add annotations for partition
                     schema: {
                         type: 'object',
                         title: 'Partition Key',

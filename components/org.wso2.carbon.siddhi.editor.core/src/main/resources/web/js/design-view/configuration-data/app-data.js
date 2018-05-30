@@ -32,13 +32,15 @@ define(['require', 'elementUtils', 'lodash'],
             this.triggerList = [];
             this.aggregationList = [];
             this.functionList = [];
-            this.windowFilterProjectionQueryList = [];
-            this.patternQueryList = [];
-            this.sequenceQueryList = [];
-            this.joinQueryList = [];
             this.partitionList = [];
             this.sourceList = [];
             this.sinkList = [];
+            this.queryLists = {
+                WINDOW_FILTER_PROJECTION: [],
+                PATTERN: [],
+                SEQUENCE: [],
+                JOIN: []
+            };
             // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
             this.finalElementCount = 0;
 
@@ -69,19 +71,19 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.addWindowFilterProjectionQuery = function (windowFilterProjectionQuery) {
-            this.windowFilterProjectionQueryList.push(windowFilterProjectionQuery);
+            this.queryLists.WINDOW_FILTER_PROJECTION.push(windowFilterProjectionQuery);
         };
 
         AppData.prototype.addPatternQuery = function (patternQuery) {
-            this.patternQueryList.push(patternQuery);
+            this.queryLists.PATTERN.push(patternQuery);
         };
 
         AppData.prototype.addSequenceQuery = function (sequenceQuery) {
-            this.sequenceQueryList.push(sequenceQuery);
+            this.queryLists.SEQUENCE.push(sequenceQuery);
         };
 
         AppData.prototype.addJoinQuery = function (joinQuery) {
-            this.joinQueryList.push(joinQuery);
+            this.queryLists.JOIN.push(joinQuery);
         };
 
         AppData.prototype.addPartition = function (partition) {
@@ -121,19 +123,20 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.removeWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
-            ElementUtils.prototype.removeElement(this.windowFilterProjectionQueryList, windowFilterProjectionQueryId);
+            ElementUtils.prototype
+                .removeElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
         };
 
         AppData.prototype.removePatternQuery = function (patternQueryId) {
-            ElementUtils.prototype.removeElement(this.patternQueryList, patternQueryId);
+            ElementUtils.prototype.removeElement(this.queryLists.PATTERN, patternQueryId);
         };
 
         AppData.prototype.removeSequenceQuery = function (sequenceQueryId) {
-            ElementUtils.prototype.removeElement(this.sequenceQueryList, sequenceQueryId);
+            ElementUtils.prototype.removeElement(this.queryLists.SEQUENCE, sequenceQueryId);
         };
 
         AppData.prototype.removeJoinQuery = function (joinQueryId) {
-            ElementUtils.prototype.removeElement(this.joinQueryList, joinQueryId);
+            ElementUtils.prototype.removeElement(this.queryLists.JOIN, joinQueryId);
         };
 
         AppData.prototype.removePartition = function (partitionId) {
@@ -177,19 +180,20 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
-            return ElementUtils.prototype.getElement(this.windowFilterProjectionQueryList, windowFilterProjectionQueryId);
+            return ElementUtils.prototype
+                .getElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
         };
 
         AppData.prototype.getPatternQuery = function (patternQueryId) {
-            return ElementUtils.prototype.getElement(this.patternQueryList, patternQueryId);
+            return ElementUtils.prototype.getElement(this.queryLists.PATTERN, patternQueryId);
         };
 
         AppData.prototype.getSequenceQuery = function (sequenceQueryId) {
-            return ElementUtils.prototype.getElement(this.sequenceQueryList, sequenceQueryId);
+            return ElementUtils.prototype.getElement(this.queryLists.SEQUENCE, sequenceQueryId);
         };
 
         AppData.prototype.getJoinQuery = function (joinQueryId) {
-            return ElementUtils.prototype.getElement(this.joinQueryList, joinQueryId);
+            return ElementUtils.prototype.getElement(this.queryLists.JOIN, joinQueryId);
         };
 
         AppData.prototype.getPartition = function (partitionId) {
@@ -204,6 +208,58 @@ define(['require', 'elementUtils', 'lodash'],
             return ElementUtils.prototype.getElement(this.sinkList, sinkId);
         };
 
+        AppData.prototype.getStreamList = function () {
+            return this.streamList;
+        };
+
+        AppData.prototype.getTableList = function () {
+            return this.tableList;
+        };
+
+        AppData.prototype.getWindowList = function () {
+            return this.windowList;
+        };
+
+        AppData.prototype.getTriggerList = function () {
+            return this.triggerList;
+        };
+
+        AppData.prototype.getAggregationList = function () {
+            return this.aggregationList;
+        };
+
+        AppData.prototype.getFunctionList = function () {
+            return this.functionList;
+        };
+
+        AppData.prototype.getWindowFilterProjectionQueryList = function () {
+            return this.queryLists.WINDOW_FILTER_PROJECTION;
+        };
+
+        AppData.prototype.getPatternQueryList = function () {
+            return this.queryLists.PATTERN;
+        };
+
+        AppData.prototype.getSequenceQueryList = function () {
+            return this.queryLists.SEQUENCE;
+        };
+
+        AppData.prototype.getJoinQueryList = function () {
+            return this.queryLists.JOIN;
+        };
+
+        AppData.prototype.getPartitionList = function () {
+            return this.partitionList;
+        };
+
+        AppData.prototype.getSourceList = function () {
+            return this.sourceList;
+        };
+
+        AppData.prototype.getSinkList = function () {
+            return this.sinkList;
+        };
+
         AppData.prototype.getFinalElementCount = function () {
             return this.finalElementCount;
         };
@@ -211,9 +267,11 @@ define(['require', 'elementUtils', 'lodash'],
         /**
          * @function Get the element by providing the element id
          * @param elementId id of the definition element
+         * @param includeQueryTypes if true search in the queries as well
+         * @param includeSourceAndSink if true search in the sinks and sources as well
          * @return requestedElement returns undefined if the requested element is not found
          */
-        AppData.prototype.getDefinitionElementById = function (elementId) {
+        AppData.prototype.getDefinitionElementById = function (elementId, includeQueryTypes, includeSourceAndSink) {
             var self = this;
             var requestedElement = undefined;
             var streamList = self.streamList;
@@ -222,7 +280,25 @@ define(['require', 'elementUtils', 'lodash'],
             var aggregationList = self.aggregationList;
             var functionList = self.functionList;
             var triggerList = self.triggerList;
+            var windowFilterProjectionQueryList = self.queryLists.WINDOW_FILTER_PROJECTION;
+            var patternQueryList = self.queryLists.PATTERN;
+            var sequenceQueryList = self.queryLists.SEQUENCE;
+            var joinQueryList = self.queryLists.JOIN;
+            var sourceList = self.sourceList;
+            var sinkList = self.sinkList;
+
             var lists = [streamList, tableList, windowList, aggregationList, functionList, triggerList];
+
+            if (includeQueryTypes !== undefined && includeQueryTypes) {
+                lists.push(windowFilterProjectionQueryList);
+                lists.push(patternQueryList);
+                lists.push(sequenceQueryList);
+                lists.push(joinQueryList);
+            }
+            if (includeSourceAndSink !== undefined && includeSourceAndSink) {
+                lists.push(sourceList);
+                lists.push(sinkList);
+            }
 
             _.forEach(lists, function (list) {
                 _.forEach(list, function (element) {
@@ -240,6 +316,18 @@ define(['require', 'elementUtils', 'lodash'],
                             type = 'FUNCTION';
                         } else if (list === triggerList) {
                             type = 'TRIGGER';
+                        } else if (list === windowFilterProjectionQueryList) {
+                            type = 'WINDOW_FILTER_PROJECTION_QUERY';
+                        } else if (list === patternQueryList) {
+                            type = 'PATTERN_QUERY';
+                        } else if (list === sequenceQueryList) {
+                            type = 'SEQUENCE_QUERY';
+                        } else if (list === joinQueryList) {
+                            type = 'JOIN_QUERY';
+                        } else if (list === sourceList) {
+                            type = 'SOURCE';
+                        } else if (list === sinkList) {
+                            type = 'SINK';
                         }
                         requestedElement = {
                             type: type,
@@ -255,9 +343,10 @@ define(['require', 'elementUtils', 'lodash'],
         /**
          * @function Get the element by providing the element name
          * @param elementName name of the definition element
+         * @param includeQueryTypes if true search in the queries as well
          * @return requestedElement returns undefined if the requested element is not found
          */
-        AppData.prototype.getDefinitionElementByName = function (elementName) {
+        AppData.prototype.getDefinitionElementByName = function (elementName, includeQueryTypes) {
             var self = this;
             var requestedElement = undefined;
             var streamList = self.streamList;
@@ -266,7 +355,19 @@ define(['require', 'elementUtils', 'lodash'],
             var aggregationList = self.aggregationList;
             var functionList = self.functionList;
             var triggerList = self.triggerList;
+            var windowFilterProjectionQueryList = self.queryLists.WINDOW_FILTER_PROJECTION;
+            var patternQueryList = self.queryLists.PATTERN;
+            var sequenceQueryList = self.queryLists.SEQUENCE;
+            var joinQueryList = self.queryLists.JOIN;
+
             var listNames = [streamList, tableList, windowList, aggregationList, functionList, triggerList];
+
+            if (includeQueryTypes !== undefined && includeQueryTypes) {
+                listNames.push(windowFilterProjectionQueryList);
+                listNames.push(patternQueryList);
+                listNames.push(sequenceQueryList);
+                listNames.push(joinQueryList);
+            }
 
             _.forEach(listNames, function (list) {
                 _.forEach(list, function (element) {
@@ -284,6 +385,14 @@ define(['require', 'elementUtils', 'lodash'],
                             type = 'FUNCTION';
                         } else if (list === triggerList) {
                             type = 'TRIGGER';
+                        } else if (list === windowFilterProjectionQueryList) {
+                            type = 'WINDOW_FILTER_PROJECTION_QUERY';
+                        } else if (list === patternQueryList) {
+                            type = 'PATTERN_QUERY';
+                        } else if (list === sequenceQueryList) {
+                            type = 'SEQUENCE_QUERY';
+                        } else if (list === joinQueryList) {
+                            type = 'JOIN_QUERY';
                         }
                         requestedElement = {
                             type: type,

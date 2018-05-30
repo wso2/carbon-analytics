@@ -90,8 +90,6 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 if (activeTab !== undefined && activeTab.getTitle() != "welcome-page") {
                     if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                    } else {
-                        //TODO: activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                     }
                 }
             },
@@ -113,8 +111,6 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     if (activeTab.getSiddhiFileEditor().isInSourceView() !== undefined
                         && activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                    } else {
-                        //TODO: activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                     }
                 }
             },

@@ -152,29 +152,27 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     }
                     this._sourceView.editorResize();
 
-                    var JSONString = "{\"siddhiAppConfig\":{\"streamList\":[{\"id\":\"view10_element_1\",\"name\":\"das\"," +
-                        "\"attributeList\":[{\"name\":\"DA\",\"type\":\"string\"}],\"annotationList\":[]},{\"id\":\"view10_element_3\"," +
-                        "\"name\":\"asc\",\"attributeList\":[{\"name\":\"DA\",\"type\":\"string\"}],\"annotationList\":[]}],\"tableList\":[]," +
-                        "\"windowList\":[],\"triggerList\":[],\"aggregationList\":[],\"windowFilterProjectionQueryList\":" +
-                        "[{\"id\":\"view10_element_4\",\"queryInput\":{\"type\":\"projection\",\"from\":\"das\",\"filter\":\"\",\"window\":{}}," +
-                        "\"select\":{\"type\":\"user_defined\",\"value\":[{\"expression\":\"\",\"as\":\"\"}]},\"groupBy\":[]," +
-                        "\"limit\":12,\"having\":\"\",\"outputRateLimit\":\"\",\"queryOutput\":{\"type\":\"insert\",\"output\":" +
-                        "{\"eventType\":\"all\"},\"target\":\"asc\"},\"orderBy\":[{\"value\":\"DA\",\"order\":\"desc\"}],\"annotationList\":[]}]," +
-                        "\"patternQueryList\":[],\"sequenceQueryList\":[{\"id\":\"view10_element_5\",\"queryInput\":" +
-                        "{\"type\":\"sequence\",\"logic\":\"gerwg\",\"connectedElementNameList\":[\"das\",\"asc\"]," +
-                        "\"conditionList\":[{\"conditionId\":\"ferwgfre\",\"streamName\":\"das\"},{\"conditionId\":\"rewgrew\"," +
-                        "\"streamName\":\"asc\",\"filter\":\"kgk\"}]},\"select\":{\"type\":\"user_defined\"," +
-                        "\"value\":[{\"expression\":\"jkjgj\",\"as\":\"DA\"}]},\"queryOutput\":{\"type\":\"insert\"," +
-                        "\"output\":{\"eventType\":\"all_events\"},\"target\":\"asc\"},\"orderBy\":[],\"annotationList\":" +
-                        "[]}],\"joinQueryList\":[],\"partitionList\":[],\"finalElementCount\":4},\"edgeList\":[{\"id\":" +
-                        "\"view10_element_4_view10_element_1\",\"parentId\":\"view10_element_4\",\"parentType\":\"query\"," +
-                        "\"childId\":\"view10_element_1\",\"childType\":\"stream\"},{\"id\":\"view10_element_3_view10_element_4\"," +
-                        "\"parentId\":\"view10_element_3\",\"parentType\":\"query\",\"childId\":\"view10_element_4\",\"childType\":\"stream\"}," +
-                        "{\"id\":\"view10_element_5_view10_element_1\",\"parentId\":\"view10_element_5\",\"parentType\":" +
-                        "\"query\",\"childId\":\"view10_element_1\",\"childType\":\"stream\"},{\"id\":\"view10_element_3_view10_element_5\"" +
-                        ",\"parentId\":\"view10_element_3\",\"parentType\":\"query\",\"childId\":\"view10_element_5\"," +
-                        "\"childType\":\"stream\"},{\"id\":\"view10_element_5_view10_element_3\",\"parentId\":\"view10_element_5\"" +
-                        ",\"parentType\":\"query\",\"childId\":\"view10_element_3\",\"childType\":\"stream\"}]}";
+                    var JSONString = "{" +
+                        " \"siddhiAppConfig\": {" +
+                        "  \"streamList\": []," +
+                        "  \"tableList\": []," +
+                        "  \"windowList\": []," +
+                        "  \"triggerList\": []," +
+                        "  \"aggregationList\": []," +
+                        "  \"functionList\": []," +
+                        "  \"partitionList\": []," +
+                        "  \"sourceList\": []," +
+                        "  \"sinkList\": []," +
+                        "  \"queryLists\": {" +
+                        "   \"WINDOW_FILTER_PROJECTION\": []," +
+                        "   \"PATTERN\": []," +
+                        "   \"SEQUENCE\": []," +
+                        "   \"JOIN\": []" +
+                        "  }," +
+                        "  \"finalElementCount\": 0" +
+                        " }," +
+                        " \"edgeList\": []" +
+                        "}";
 
                     this.JSONObject = JSON.parse(JSONString);
                     console.log(this.JSONObject);
@@ -188,6 +186,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var toggleViewButtonDynamicId = "toggle-view-button-" + this._$parent_el.attr('id');
                     toggleViewButton.attr('id', toggleViewButtonDynamicId);
 
+                    //TODO: add general validation: check whether all required fields in the forms are filled, elements are connected properly(ex: source should be connected to a stream)
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
                             if (application.tabController.getActiveTab().getFile().isDirty()) {
@@ -209,17 +208,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                              * Removed attributes are used only for front end use only.
                              * */
                             function removeUnnecessaryFieldsFromJSON(object) {
-                                _.forEach(object.siddhiAppConfig.patternQueryList, function(patternQuery){
+                                _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function(patternQuery){
                                     if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
                                         delete patternQuery.queryInput['connectedElementNameList'];
                                     }
                                 });
-                                _.forEach(object.siddhiAppConfig.sequenceQueryList, function(sequenceQuery){
+                                _.forEach(object.siddhiAppConfig.queryLists.SEQUENCE, function(sequenceQuery){
                                     if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
                                         delete sequenceQuery.queryInput['connectedElementNameList'];
                                     }
                                 });
-                                _.forEach(object.siddhiAppConfig.joinQueryList, function(joinQuery){
+                                _.forEach(object.siddhiAppConfig.queryLists.JOIN, function(joinQuery){
                                     if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
                                         delete joinQuery.queryInput['firstConnectedElement'];
                                     }

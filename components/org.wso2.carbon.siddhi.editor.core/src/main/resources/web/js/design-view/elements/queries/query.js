@@ -44,7 +44,7 @@ define(['require', 'elementUtils'],
                 having: '',
                 outputRateLimit: ''
                 queryOutput*: {Query Output JSON},
-                annotationList: {Annotation JSON Array}
+                annotationList: [annotation1, annotation2, ...]
             */
             if (options !== undefined) {
                 this.id = options.id;

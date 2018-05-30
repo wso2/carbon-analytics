@@ -54,19 +54,41 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                     type: "object",
                     title: "Trigger",
                     properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title : "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 1
+                            propertyOrder: 2
                         },
                         at: {
                             type: "string",
                             title: "At",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 2
+                            propertyOrder: 3
                         }
                     }
                 },
@@ -99,6 +121,9 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 _.set(triggerOptions, 'name', editor.getValue().name);
                 _.set(triggerOptions, 'at', editor.getValue().at);
                 var trigger = new Trigger(triggerOptions);
+                _.forEach(editor.getValue().annotations, function (annotation) {
+                    trigger.addAnnotation(annotation.annotation);
+                });
                 self.configurationData.getSiddhiAppConfig().addTrigger(trigger);
 
                 var textNode = $('#'+i).find('.triggerNameNode');
@@ -133,28 +158,57 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
             }
             var name = clickedElement.getName();
             var at = clickedElement.getAt();
+            var savedAnnotations = clickedElement.getAnnotationList();
+            var annotations = [];
+            _.forEach(savedAnnotations, function (savedAnnotation) {
+                annotations.push({annotation: savedAnnotation});
+            });
             var fillWith = {
+                annotations : annotations,
                 name : name,
                 at : at
             };
+            fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor(formContainer[0], {
                 schema: {
                     type: "object",
                     title: "Trigger",
                     properties: {
+                        annotations: {
+                            propertyOrder: 1,
+                            type: "array",
+                            format: "table",
+                            title: "Annotations",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title : "Annotation",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    annotation: {
+                                        title : "Annotation",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 1
+                            propertyOrder: 2
                         },
                         at: {
                             type: "string",
                             title: "At",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 2
+                            propertyOrder: 3
                         }
                     }
                 },
@@ -192,6 +246,11 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 // update selected trigger model
                 clickedElement.setName(config.name);
                 clickedElement.setAt(config.at);
+
+                clickedElement.clearAnnotationList();
+                _.forEach(config.annotations, function (annotation) {
+                    clickedElement.addAnnotation(annotation.annotation);
+                });
 
                 var textNode = $(element).parent().find('.triggerNameNode');
                 textNode.html(config.name);
