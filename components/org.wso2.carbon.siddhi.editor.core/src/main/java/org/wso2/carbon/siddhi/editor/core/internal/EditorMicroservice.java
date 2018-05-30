@@ -57,7 +57,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.CodeGene
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
-//import org.wso2.carbon.siddhi.editor.core.util.eventflow.EventFlow;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
@@ -90,6 +89,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -97,7 +97,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -906,12 +905,6 @@ public class EditorMicroservice implements Microservice {
         } catch (CodeGenerationException e) {
             log.error("Unable to generate code view", e);
             return Response.status(Response.Status.BAD_REQUEST)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(e.getMessage())
-                    .build();
-        } catch (IllegalArgumentException e) {
-            log.error("Failed to convert the Siddhi app design view to code");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();
