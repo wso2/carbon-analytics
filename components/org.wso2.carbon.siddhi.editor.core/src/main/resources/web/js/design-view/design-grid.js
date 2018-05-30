@@ -380,15 +380,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                     // create and add an edge to the edgeList
 
-                    var edgeId = ''+ targetId + '_' + sourceId + '';
+                    var edgeId = ''+ sourceId + '_' + targetId + '';
                     var edgeInTheEdgeList = self.configurationData.getEdge(edgeId);
                     if(edgeInTheEdgeList === undefined) {
                         var edgeOptions = {};
                         _.set(edgeOptions, 'id', edgeId);
-                        _.set(edgeOptions, 'parentId', targetId);
-                        _.set(edgeOptions, 'parentType', targetType);
-                        _.set(edgeOptions, 'childId', sourceId);
-                        _.set(edgeOptions, 'childType', sourceType);
+                        _.set(edgeOptions, 'childId', targetId);
+                        _.set(edgeOptions, 'childType', targetType);
+                        _.set(edgeOptions, 'parentId', sourceId);
+                        _.set(edgeOptions, 'parentType', sourceType);
                         var edge = new Edge(edgeOptions);
                         self.configurationData.addEdge(edge);
                     }
@@ -699,7 +699,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var sourceElement = $('#' + sourceId);
 
                     // removing edge from the edgeList
-                    var edgeId = ''+ targetId + '_' + sourceId + '';
+                    var edgeId = ''+ sourceId + '_' + targetId + '';
                     self.configurationData.removeEdge(edgeId);
 
                     var model;
@@ -1091,8 +1091,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
             _.forEach(self.configurationData.edgeList, function(edge){
 
-                var targetId = edge.getParentId();
-                var sourceId = edge.getChildId();
+                var targetId = edge.getChildId();
+                var sourceId = edge.getParentId();
 
                 self.jsPlumbInstance.connect({
                     source: sourceId+'-out',
