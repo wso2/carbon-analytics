@@ -17,8 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
-        'elementUtils'],
-    function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils) {
+        'elementUtils', 'storeAnnotation'],
+    function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils, 
+              StoreAnnotation) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -108,6 +109,53 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                         title: "Annotation",
                                         type: "string",
                                         minLength: 1
+                                    }
+                                }
+                            }
+                        },
+                        storeAnnotation: {
+                            propertyOrder: 2,
+                            title: "Store Annotation",
+                            type: "object",
+                            options: {
+                                disable_properties: true
+                            },
+                            properties: {
+                                annotationType: {
+                                    propertyOrder: 1,
+                                    required: true,
+                                    title: "Type",
+                                    type: "string",
+                                    minLength: 1
+                                 },
+                                storeOptions: {
+                                    propertyOrder: 2,
+                                    required: true,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Options",
+                                    uniqueItems: true,
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: "Option",
+                                        options: {
+                                            disable_properties: true
+                                        },
+                                        properties: {
+                                            key: {
+                                                required: true,
+                                                title: "Key",
+                                                type: "string",
+                                                minLength: 1
+                                            },
+                                            value: {
+                                                required: true,
+                                                title: "value",
+                                                type: "string",
+                                                minLength: 1
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -365,6 +413,23 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 _.set(aggregationOptions, 'name', editorInput.getValue().name);
                 _.set(aggregationOptions, 'from', editorInput.getValue().from);
 
+                // add the store annotation for aggregation
+                if (editorAnnotation.getValue().storeAnnotation !== undefined) {
+                    var optionsMap = {};
+                    _.forEach(editorAnnotation.getValue().storeAnnotation.storeOptions, function (option) {
+                        optionsMap[option.key] = option.value;
+                    });
+                    
+                    var storeAnnotationOptions = {};
+                    _.set(storeAnnotationOptions, 'type', editorAnnotation.getValue().storeAnnotation.annotationType);
+                    _.set(storeAnnotationOptions, 'options', optionsMap);
+
+                    var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+                    _.set(aggregationOptions, 'store', storeAnnotation);
+                } else {
+                    _.set(aggregationOptions, 'store', undefined);
+                }
+
                 var selectAttributeOptions = {};
                 if (editorSelect.getValue().select instanceof Array) {
                     _.set(selectAttributeOptions, 'type', 'USER_DEFINED');
@@ -455,6 +520,22 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 annotations.push({annotation: savedAnnotation});
             });
 
+            var savedStoreAnnotation = clickedElement.getStore();
+            var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
+            var storeOptions = [];
+            for (var key in savedStoreAnnotationOptions) {
+                if (savedStoreAnnotationOptions.hasOwnProperty(key)) {
+                    storeOptions.push({
+                        key: key,
+                        value: savedStoreAnnotationOptions[key]
+                    });
+                }
+            }
+            var storeAnnotation = {
+                annotationType: savedStoreAnnotation.getType(),
+                storeOptions: storeOptions
+            };
+
             var name = clickedElement.getName();
             var from = clickedElement.getFrom();
             var select = clickedElement.getSelect().getValue();
@@ -471,7 +552,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             });
 
             var fillAnnotation = {
-                annotations: annotations
+                annotations: annotations,
+                storeAnnotation: storeAnnotation
             };
             fillAnnotation = self.formUtils.cleanJSONObject(fillAnnotation);
 
@@ -572,6 +654,53 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                         title: "Annotation",
                                         type: "string",
                                         minLength: 1
+                                    }
+                                }
+                            }
+                        },
+                        storeAnnotation: {
+                            propertyOrder: 2,
+                            title: "Store Annotation",
+                            type: "object",
+                            options: {
+                                disable_properties: true
+                            },
+                            properties: {
+                                annotationType: {
+                                    propertyOrder: 1,
+                                    required: true,
+                                    title: "Type",
+                                    type: "string",
+                                    minLength: 1
+                                },
+                                storeOptions: {
+                                    propertyOrder: 2,
+                                    required: true,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Options",
+                                    uniqueItems: true,
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: "Option",
+                                        options: {
+                                            disable_properties: true
+                                        },
+                                        properties: {
+                                            key: {
+                                                required: true,
+                                                title: "Key",
+                                                type: "string",
+                                                minLength: 1
+                                            },
+                                            value: {
+                                                required: true,
+                                                title: "value",
+                                                type: "string",
+                                                minLength: 1
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -831,6 +960,23 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 clickedElement.setName(configInput.name);
                 clickedElement.setFrom(configInput.from);
 
+                // add the store annotation for aggregation
+                if (configAnnotation.storeAnnotation !== undefined) {
+                    var optionsMap = {};
+                    _.forEach(configAnnotation.storeAnnotation.storeOptions, function (option) {
+                        optionsMap[option.key] = option.value;
+                    });
+
+                    var storeAnnotationOptions = {};
+                    _.set(storeAnnotationOptions, 'type', configAnnotation.storeAnnotation.annotationType);
+                    _.set(storeAnnotationOptions, 'options', optionsMap);
+
+                    var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+                    clickedElement.setStore(storeAnnotation);
+                } else {
+                    clickedElement.setStore(undefined);
+                }
+                
                 var selectAttributeOptions = {};
                 if (configSelect.select instanceof Array) {
                     _.set(selectAttributeOptions, 'type', 'USER_DEFINED');

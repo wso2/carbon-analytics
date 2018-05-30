@@ -22,13 +22,13 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
         'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation',
-        'functionDefinition', 'streamHandler'],
+        'functionDefinition', 'streamHandler', 'storeAnnotation'],
     function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindowOrFunction, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert,
               QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput,
               JoinQuerySource, PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation,
-              MapAnnotation, FunctionDefinition, StreamHandler) {
+              MapAnnotation, FunctionDefinition, StreamHandler, StoreAnnotation) {
 
         /**
          * @class DesignView
@@ -180,6 +180,8 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             });
             _.forEach(configurationData.siddhiAppConfig.aggregationList, function(aggregation){
                 var aggregationObject = new Aggregation(aggregation);
+                var storeAnnotation = new StoreAnnotation(aggregation.store);
+                aggregationObject.setStore(storeAnnotation);
                 addAnnotationsForElement(aggregation, aggregationObject);
                 setSelectForQuery(aggregationObject, aggregation.select);
                 var aggregateByTimePeriodSubElement = new AggregateByTimePeriod(aggregation.aggregateByTimePeriod);
