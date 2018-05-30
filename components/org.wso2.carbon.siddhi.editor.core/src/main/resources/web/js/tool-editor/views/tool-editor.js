@@ -164,7 +164,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
                             if (application.tabController.getActiveTab().getFile().isDirty()) {
-                                alert("Please save the file before switching to the Design View");
+                                self._designView.warnAlert("Please save the file before switching to the Design View");
                                 return;
                             }
                             var response = self._designView.getDesign(self.getContent());
@@ -179,7 +179,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 designView.renderDesignGrid(self.JSONObject);
 
                             } else if (response.status === "fail") {
-                                alert(response.errorMessage);
+                                self._designView.errorAlert(response.errorMessage);
                             }
                         } else if (designContainer.is(':visible')) {
 
@@ -222,7 +222,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 console.log(JSON.stringify(designView.getConfigurationData()));
 
                             } else if (response.status === "fail") {
-                                alert(response.errorMessage);
+                                self._designView.errorAlert(response.errorMessage);
                             }
                         }
                         // NOTE - This trigger should be always handled after the 'if' condition

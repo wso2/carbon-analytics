@@ -16,14 +16,14 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid',
+define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palette', 'designViewGrid',
         'configurationData', 'appData', 'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation',
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindowOrFunction', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
         'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation',
         'functionDefinition', 'streamHandler', 'storeAnnotation'],
-    function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
+    function (require, log, _, $, alerts, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindowOrFunction, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert,
               QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput,
@@ -405,6 +405,25 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             });
             return result;
         };
+
+        /**
+         * Display's a warning using the AlertsManager.
+         *
+         * @param message The content to be displayed in the alert
+         */
+        DesignView.prototype.warnAlert = function (message) {
+            alerts.warn(message);
+        };
+
+        /**
+         * Display's a error using the AlertsManager.
+         *
+         * @param message The content to be displayed in the alert
+         */
+        DesignView.prototype.errorAlert = function (message) {
+            alerts.error(message);
+        };
+        //TODO: replace all the alert with the alert library objects
 
         return DesignView;
     });
