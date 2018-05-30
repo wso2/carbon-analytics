@@ -66,7 +66,7 @@ public class EdgesGenerator {
      * Generates Edges related to Sources
      * @param sourceList                        List of Source configs
      * @return                                  List of Edges
-     * @throws DesignGenerationException        Error when generating edges
+     * @throws DesignGenerationException        Error while generating edges
      */
     private List<Edge> generateSourceEdges(List<SourceSinkConfig> sourceList) throws DesignGenerationException {
         List<Edge> edges = new ArrayList<>();
@@ -80,7 +80,7 @@ public class EdgesGenerator {
      * Generates Edges related to Sinks
      * @param sinkList                          List of Sink configs
      * @return                                  List of Edges
-     * @throws DesignGenerationException        Error when generating edges
+     * @throws DesignGenerationException        Error while generating edges
      */
     private List<Edge> generateSinkEdges(List<SourceSinkConfig> sinkList) throws DesignGenerationException {
         List<Edge> edges = new ArrayList<>();
@@ -94,7 +94,7 @@ public class EdgesGenerator {
      * Generates Edges related to a WindowFilterProjection Queries
      * @param windowFilterProjectionQueryList       List of WindowFilterProjection QueryConfigs
      * @return                                      List of Edges
-     * @throws DesignGenerationException            Error when generating edges
+     * @throws DesignGenerationException            Error while generating edges
      */
     private List<Edge> generateWindowFilterProjectionQueryEdges(List<QueryConfig> windowFilterProjectionQueryList)
             throws DesignGenerationException {
@@ -117,7 +117,7 @@ public class EdgesGenerator {
      * Generates Edges related to a Join Queries
      * @param joinQueryList                         List of Join QueryConfigs
      * @return                                      List of Edges
-     * @throws DesignGenerationException            Error when generating edges
+     * @throws DesignGenerationException            Error while generating edges
      */
     private List<Edge> generateJoinQueryEdges(List<QueryConfig> joinQueryList) throws DesignGenerationException {
         List<Edge> edges = new ArrayList<>();
@@ -256,7 +256,7 @@ public class EdgesGenerator {
 
         throw new DesignGenerationException("Unable to find element with id '" + id + "'");
 
-        // TODO Get reviewed and remove below
+        // TODO Get reviewed and remove below Old working code
 
 //        for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getSinkList()) {
 //            if (siddhiElementConfig.getId().equals(id)) {
