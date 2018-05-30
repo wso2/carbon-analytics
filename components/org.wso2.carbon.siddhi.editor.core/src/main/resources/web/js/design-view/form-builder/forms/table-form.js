@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
-    function (require, log, $, _, Attribute,  Table) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation'],
+    function (require, log, $, _, Attribute,  Table, StoreAnnotation) {
 
         /**
          * @class TableForm Creates a forms to collect data from a table
@@ -76,16 +76,63 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                                 }
                             }
                         },
+                        storeAnnotation: {
+                            propertyOrder: 2,
+                            title: "Store Annotation",
+                            type: "object",
+                            options: {
+                                disable_properties: true
+                            },
+                            properties: {
+                                annotationType: {
+                                    propertyOrder: 1,
+                                    required: true,
+                                    title: "Type",
+                                    type: "string",
+                                    minLength: 1
+                                },
+                                storeOptions: {
+                                    propertyOrder: 2,
+                                    required: true,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Options",
+                                    uniqueItems: true,
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: "Option",
+                                        options: {
+                                            disable_properties: true
+                                        },
+                                        properties: {
+                                            key: {
+                                                required: true,
+                                                title: "Key",
+                                                type: "string",
+                                                minLength: 1
+                                            },
+                                            value: {
+                                                required: true,
+                                                title: "value",
+                                                type: "string",
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 2
+                            propertyOrder: 3
                         },
                         attributes: {
                             required: true,
-                            propertyOrder: 3,
+                            propertyOrder: 4,
                             type: "array",
                             format: "table",
                             title: "Attributes",
@@ -146,6 +193,24 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                 _.set(tableOptions, 'id', i);
                 _.set(tableOptions, 'name', editor.getValue().name);
                 _.set(tableOptions, 'store', undefined);
+
+                // add the store annotation for table
+                if (editor.getValue().storeAnnotation !== undefined) {
+                    var optionsMap = {};
+                    _.forEach(editor.getValue().storeAnnotation.storeOptions, function (option) {
+                        optionsMap[option.key] = option.value;
+                    });
+
+                    var storeAnnotationOptions = {};
+                    _.set(storeAnnotationOptions, 'type', editor.getValue().storeAnnotation.annotationType);
+                    _.set(storeAnnotationOptions, 'options', optionsMap);
+
+                    var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+                    _.set(tableOptions, 'store', storeAnnotation);
+                } else {
+                    _.set(tableOptions, 'store', undefined);
+                }
+                
                 var table = new Table(tableOptions);
                 _.forEach(editor.getValue().attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);
@@ -202,8 +267,26 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
             _.forEach(savedAnnotations, function (savedAnnotation) {
                 annotations.push({annotation: savedAnnotation});
             });
+
+            var savedStoreAnnotation = clickedElement.getStore();
+            var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
+            var storeOptions = [];
+            for (var key in savedStoreAnnotationOptions) {
+                if (savedStoreAnnotationOptions.hasOwnProperty(key)) {
+                    storeOptions.push({
+                        key: key,
+                        value: savedStoreAnnotationOptions[key]
+                    });
+                }
+            }
+            var storeAnnotation = {
+                annotationType: savedStoreAnnotation.getType(),
+                storeOptions: storeOptions
+            };
+            
             var fillWith = {
                 annotations : annotations,
+                storeAnnotation: storeAnnotation,
                 name : name,
                 attributes : attributes
             };
@@ -235,16 +318,63 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                                 }
                             }
                         },
+                        storeAnnotation: {
+                            propertyOrder: 2,
+                            title: "Store Annotation",
+                            type: "object",
+                            options: {
+                                disable_properties: true
+                            },
+                            properties: {
+                                annotationType: {
+                                    propertyOrder: 1,
+                                    required: true,
+                                    title: "Type",
+                                    type: "string",
+                                    minLength: 1
+                                },
+                                storeOptions: {
+                                    propertyOrder: 2,
+                                    required: true,
+                                    type: "array",
+                                    format: "table",
+                                    title: "Options",
+                                    uniqueItems: true,
+                                    minItems: 1,
+                                    items: {
+                                        type: "object",
+                                        title: "Option",
+                                        options: {
+                                            disable_properties: true
+                                        },
+                                        properties: {
+                                            key: {
+                                                required: true,
+                                                title: "Key",
+                                                type: "string",
+                                                minLength: 1
+                                            },
+                                            value: {
+                                                required: true,
+                                                title: "value",
+                                                type: "string",
+                                                minLength: 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
                         name: {
                             type: "string",
                             title: "Name",
                             minLength: 1,
                             required: true,
-                            propertyOrder: 2
+                            propertyOrder: 3
                         },
                         attributes: {
                             required: true,
-                            propertyOrder: 3,
+                            propertyOrder: 4,
                             type: "array",
                             format: "table",
                             title: "Attributes",
@@ -322,6 +452,23 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table'],
                 _.forEach(config.annotations, function (annotation) {
                     clickedElement.addAnnotation(annotation.annotation);
                 });
+
+                // add the store annotation for table
+                if (config.storeAnnotation !== undefined) {
+                    var optionsMap = {};
+                    _.forEach(config.storeAnnotation.storeOptions, function (option) {
+                        optionsMap[option.key] = option.value;
+                    });
+
+                    var storeAnnotationOptions = {};
+                    _.set(storeAnnotationOptions, 'type', config.storeAnnotation.annotationType);
+                    _.set(storeAnnotationOptions, 'options', optionsMap);
+
+                    var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+                    clickedElement.setStore(storeAnnotation);
+                } else {
+                    clickedElement.setStore(undefined);
+                }
 
                 var textNode = $(element).parent().find('.tableNameNode');
                 textNode.html(config.name);
