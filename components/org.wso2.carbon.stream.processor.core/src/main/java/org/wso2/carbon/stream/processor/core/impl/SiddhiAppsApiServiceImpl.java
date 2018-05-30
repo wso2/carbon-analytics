@@ -45,6 +45,7 @@ import org.wso2.siddhi.query.api.SiddhiElement;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.definition.*;
+import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
 import org.wso2.siddhi.query.api.execution.partition.PartitionType;
 import org.wso2.siddhi.query.api.execution.partition.RangePartitionType;
@@ -416,67 +417,15 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             SiddhiApp siddhiApp = SiddhiCompiler.parse(String.valueOf(siddhiAppString));
             SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
             List<SiddhiAppElements> listOfSiddhiAppElements = new ArrayList<>();
+
             for (int i = 0; i < siddhiApp.getExecutionElementList().size(); i++) {
-                if (siddhiApp.getExecutionElementList().get(i) instanceof Query) {
-                    for (String inputStreamId : (((Query) siddhiApp.getExecutionElementList().get(i)).getInputStream()
-                            .getUniqueStreamIds())) {
-                        SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
-                        siddhiAppElements.setInputStreamId(inputStreamId);
-                        loadInputData(siddhiApp, siddhiAppRuntime, inputStreamId, siddhiAppString, siddhiAppElements);
-                        String outPutStreamId = ((Query) siddhiApp.getExecutionElementList().get(i))
-                                .getOutputStream().getId();
-                        siddhiAppElements.setOutputStreamId(outPutStreamId);
-                        loadOutputData(siddhiApp, siddhiAppRuntime, outPutStreamId, siddhiAppString, siddhiAppElements);
-                        loadFunctionData(siddhiApp, ((Query) siddhiApp.getExecutionElementList().get(i)).getSelector
-                                ().getSelectionList(), siddhiAppElements, siddhiAppString);
-                        loadQueryName(siddhiApp.getExecutionElementList().get(i).getAnnotations(), siddhiAppElements);
-                        Query query = (Query) siddhiApp.getExecutionElementList().get(i);
-                        siddhiAppElements.setQuery(getDefinition(query, siddhiAppString));
-                        listOfSiddhiAppElements.add(siddhiAppElements);
-                    }
-                } else if (siddhiApp.getExecutionElementList().get(i) instanceof Partition) {
-                    List<Query> partitionStream = ((Partition) siddhiApp.getExecutionElementList().get(i))
-                            .getQueryList();
-                    for (Query query : partitionStream) {
-                        for (String inputStreamId : query.getInputStream().getUniqueStreamIds()) {
-                            SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
-
-                            siddhiAppElements.setInputStreamId(inputStreamId);
-                            siddhiAppElements.setOutputStreamId(query.getOutputStream().getId());
-                            siddhiAppElements.setPartitionQuery(getDefinition(query, siddhiAppString));
-                            loadQueryName(siddhiApp.getExecutionElementList().get(i).getAnnotations(),
-                                    siddhiAppElements);
-
-                            loadInputData(siddhiApp, siddhiAppRuntime, inputStreamId, siddhiAppString,
-                                    siddhiAppElements);
-                            String outputStreamId = query.getOutputStream().getId();
-
-                            loadOutputData(siddhiApp, siddhiAppRuntime, outputStreamId, siddhiAppString,
-                                    siddhiAppElements);
-                            loadFunctionData(siddhiApp, query.getSelector().getSelectionList(), siddhiAppElements,
-                                    siddhiAppString);
-
-                            for (PartitionType partitionType : ((Partition) siddhiApp.getExecutionElementList().get(i))
-                                    .getPartitionTypeMap().values()) {
-                                if (partitionType instanceof ValuePartitionType) {
-                                    siddhiAppElements.setPartitionType(Constants.VALUE_PARTITION_TYPE);
-                                    String partitionTypeDefinition = getDefinition(partitionType, siddhiAppString);
-                                    siddhiAppElements.setPartitionTypeQuery(partitionTypeDefinition);
-                                } else if (partitionType instanceof RangePartitionType) {
-                                    siddhiAppElements.setPartitionType(Constants.RANGE_PARTITION_TYPE);
-                                    String partitionTypeDefinition = getDefinition(partitionType, siddhiAppString);
-                                    siddhiAppElements.setPartitionTypeQuery(partitionTypeDefinition);
-                                } else {
-                                    throw new IllegalArgumentException("An unidentified instance of the PartitionType" +
-                                            " " + "Class was found");
-                                }
-                            }
-
-                            Partition partitionQuery = (Partition) siddhiApp.getExecutionElementList().get(i);
-                            siddhiAppElements.setQuery(getDefinition(partitionQuery, siddhiAppString));
-                            listOfSiddhiAppElements.add(siddhiAppElements);
-                        }
-                    }
+                ExecutionElement executionElement = siddhiApp.getExecutionElementList().get(i);
+                if (executionElement instanceof Query) {
+                    loadQueryExecutionElements(siddhiApp, siddhiAppRuntime, executionElement, siddhiAppString,
+                            listOfSiddhiAppElements);
+                } else if (executionElement instanceof Partition) {
+                    loadPartitionExecutionElements(siddhiApp, siddhiAppRuntime, executionElement, siddhiAppString,
+                            listOfSiddhiAppElements);
                 }
             }
 
@@ -485,8 +434,74 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         }
 
         jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
-                "There is no Siddhi App exist " + "with provided name : " + appName));
+                "There is no Siddhi App exist with provided name : " + appName));
         return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
+    }
+
+    /**
+     * Load all the elements of query
+     */
+    private void loadQueryExecutionElements(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, ExecutionElement
+            executionElement, String siddhiAppString, List<SiddhiAppElements> listOfSiddhiAppElements) {
+        for (String inputStreamId : (((Query) executionElement).getInputStream()
+                .getUniqueStreamIds())) {
+            SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
+            siddhiAppElements.setInputStreamId(inputStreamId);
+            loadInputData(siddhiApp, siddhiAppRuntime, inputStreamId, siddhiAppString, siddhiAppElements);
+            String outPutStreamId = ((Query) executionElement)
+                    .getOutputStream().getId();
+            siddhiAppElements.setOutputStreamId(outPutStreamId);
+            loadOutputData(siddhiApp, siddhiAppRuntime, outPutStreamId, siddhiAppString, siddhiAppElements);
+            loadFunctionData(siddhiApp, ((Query) executionElement).getSelector
+                    ().getSelectionList(), siddhiAppElements, siddhiAppString);
+            loadQueryName(executionElement.getAnnotations(), siddhiAppElements);
+            Query query = (Query) executionElement;
+            siddhiAppElements.setQuery(getDefinition(query, siddhiAppString));
+            listOfSiddhiAppElements.add(siddhiAppElements);
+        }
+    }
+
+    /**
+     * Load all the elements of partition
+     */
+    private void loadPartitionExecutionElements(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime,
+                                                ExecutionElement executionElement, String siddhiAppString,
+                                                List<SiddhiAppElements> listOfSiddhiAppElements) {
+        List<Query> partitionStream = ((Partition) executionElement).getQueryList();
+        for (Query query : partitionStream) {
+            for (String inputStreamId : query.getInputStream().getUniqueStreamIds()) {
+                SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
+
+                siddhiAppElements.setInputStreamId(inputStreamId);
+                siddhiAppElements.setOutputStreamId(query.getOutputStream().getId());
+                siddhiAppElements.setPartitionQuery(getDefinition(query, siddhiAppString));
+                loadQueryName(executionElement.getAnnotations(), siddhiAppElements);
+                loadInputData(siddhiApp, siddhiAppRuntime, inputStreamId, siddhiAppString, siddhiAppElements);
+                String outputStreamId = query.getOutputStream().getId();
+                loadOutputData(siddhiApp, siddhiAppRuntime, outputStreamId, siddhiAppString, siddhiAppElements);
+                loadFunctionData(siddhiApp, query.getSelector().getSelectionList(), siddhiAppElements, siddhiAppString);
+
+                for (PartitionType partitionType : ((Partition) executionElement)
+                        .getPartitionTypeMap().values()) {
+                    if (partitionType instanceof ValuePartitionType) {
+                        siddhiAppElements.setPartitionType(Constants.VALUE_PARTITION_TYPE);
+                        String partitionTypeDefinition = getDefinition(partitionType, siddhiAppString);
+                        siddhiAppElements.setPartitionTypeQuery(partitionTypeDefinition);
+                    } else if (partitionType instanceof RangePartitionType) {
+                        siddhiAppElements.setPartitionType(Constants.RANGE_PARTITION_TYPE);
+                        String partitionTypeDefinition = getDefinition(partitionType, siddhiAppString);
+                        siddhiAppElements.setPartitionTypeQuery(partitionTypeDefinition);
+                    } else {
+                        throw new IllegalArgumentException("An unidentified instance of the PartitionType" +
+                                " " + "Class was found");
+                    }
+                }
+
+                Partition partitionQuery = (Partition) executionElement;
+                siddhiAppElements.setQuery(getDefinition(partitionQuery, siddhiAppString));
+                listOfSiddhiAppElements.add(siddhiAppElements);
+            }
+        }
     }
 
     /**
