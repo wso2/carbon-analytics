@@ -33,7 +33,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +54,7 @@ public class SiddhiAppConfig {
     private List<WindowConfig> windowList = new ArrayList<>();
     private List<AggregationConfig> aggregationList = new ArrayList<>();
     private List<FunctionConfig> functionList = new ArrayList<>();
-    private Map<QueryListType, List<QueryConfig>> queryLists = new HashMap<>();
+    private Map<QueryListType, List<QueryConfig>> queryLists = new EnumMap<>(QueryListType.class);
 
     public SiddhiAppConfig() {
         queryLists.put(QueryListType.WINDOW_FILTER_PROJECTION, new ArrayList<>());
