@@ -39,10 +39,6 @@ public class StreamDefinitionConfigGenerator {
      * @return                  StreamConfig object
      */
     public StreamConfig generateStreamConfig(StreamDefinition streamDefinition, boolean isInnerStream) {
-        List<AttributeConfig> attributeConfigs = new ArrayList<>();
-        for (Attribute attribute : streamDefinition.getAttributeList()) {
-            attributeConfigs.add(new AttributeConfig(attribute.getName(), attribute.getType().name().toLowerCase()));
-        }
         List<String> annotationConfigs = new ArrayList<>();
         List<String> streamElementAnnotationNames = new ArrayList<>(Arrays.asList("SOURCE", "SINK", "STORE"));
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
@@ -55,7 +51,7 @@ public class StreamDefinitionConfigGenerator {
         return new StreamConfig(streamDefinition.getId(),
                 streamDefinition.getId(),
                 isInnerStream,
-                attributeConfigs,
+                new AttributeConfigListGenerator().generateAttributeConfigList(streamDefinition.getAttributeList()),
                 annotationConfigs);
     }
 }
