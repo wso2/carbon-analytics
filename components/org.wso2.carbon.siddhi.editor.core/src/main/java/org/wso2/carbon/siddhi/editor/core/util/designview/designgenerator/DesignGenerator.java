@@ -18,37 +18,14 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.*;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregateByTimePeriod;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.*;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.builders.EventFlowBuilder;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
-import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
-import org.wso2.siddhi.core.stream.input.source.Source;
-import org.wso2.siddhi.core.stream.output.sink.Sink;
 import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.aggregation.TimePeriod.Duration;
-import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.*;
-import org.wso2.siddhi.query.api.execution.ExecutionElement;
-import org.wso2.siddhi.query.api.execution.partition.Partition;
-import org.wso2.siddhi.query.api.execution.query.Query;
-import org.wso2.siddhi.query.api.execution.query.selection.BasicSelector;
-import org.wso2.siddhi.query.api.expression.Expression;
-import org.wso2.siddhi.query.api.expression.Variable;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
-
-import java.util.*;
 
 /**
  * Generator to create Config objects from Siddhi Code
