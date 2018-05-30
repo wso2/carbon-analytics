@@ -39,9 +39,6 @@ public class QueryConfig extends SiddhiElementConfig {
     private QueryOutputConfig queryOutput;
     private List<String> annotationList;
 
-    public QueryConfig() {
-    }
-
     public QueryInputConfig getQueryInput() {
         return queryInput;
     }

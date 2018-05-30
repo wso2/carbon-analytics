@@ -37,9 +37,6 @@ public class AggregationConfig extends SiddhiElementConfig {
     private StoreConfig store;
     private List<String> annotationList;
 
-    public AggregationConfig() {
-    }
-
     public String getName() {
         return name;
     }
