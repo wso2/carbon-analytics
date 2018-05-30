@@ -51,30 +51,29 @@ public class AggregationConfigGenerator {
      */
     public AggregationConfig generateAggregationConfig(AggregationDefinition aggregationDefinition)
             throws DesignGenerationException {
-        AttributesSelectionConfig selectedAttributesConfig;
-        List<String> groupBy = new ArrayList<>();
+        AggregationConfig aggregationConfig = new AggregationConfig();
 
+        aggregationConfig.setName(aggregationDefinition.getId());
+        aggregationConfig.setFrom(aggregationDefinition.getBasicSingleInputStream().getStreamId());
+
+        // 'select' and 'groupBy'
         if (aggregationDefinition.getSelector() instanceof BasicSelector) {
             BasicSelector selector = (BasicSelector) aggregationDefinition.getSelector();
-            selectedAttributesConfig =
-                    new AttributesSelectionConfigGenerator(siddhiAppString).generateAttributesSelectionConfig(selector);
-
-            // Populate 'groupBy' list
-            for (Variable variable : selector.getGroupByList()) {
-                groupBy.add(ConfigBuildingUtilities.getDefinition(variable, siddhiAppString));
-            }
+            aggregationConfig.setSelect(
+                    new AttributesSelectionConfigGenerator(siddhiAppString)
+                            .generateAttributesSelectionConfig(selector));
+            aggregationConfig.setGroupBy(generateGroupBy(selector.getGroupByList()));
         } else {
             throw new DesignGenerationException("Selector of AggregationDefinition is not of class BasicSelector");
         }
 
-        // For creating 'aggregate by time' object
-        List<TimePeriod.Duration> aggregationTimePeriodDurations = aggregationDefinition.getTimePeriod().getDurations();
-
         // 'aggregateByAttribute'
-        String aggregateByAttribute = "";
-        if (aggregationDefinition.getAggregateAttribute() != null) {
-            aggregateByAttribute = aggregationDefinition.getAggregateAttribute().getAttributeName();
-        }
+        aggregationConfig.setAggregateByAttribute(
+                generateAggregateByAttribute(aggregationDefinition.getAggregateAttribute()));
+
+        // 'aggregateByTime'
+        aggregationConfig.setAggregateByTime(
+                generateAggregateByTime(aggregationDefinition.getTimePeriod().getDurations()));
 
         // 'store' and annotations
         StoreConfigGenerator storeConfigGenerator = new StoreConfigGenerator();
@@ -88,19 +87,46 @@ public class AggregationConfigGenerator {
                 annotationList.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
             }
         }
+        aggregationConfig.setStore(storeConfig);
+        aggregationConfig.setAnnotationList(annotationList);
 
-        return new AggregationConfig(
-                aggregationDefinition.getId(),
-                aggregationDefinition.getId(),
-                aggregationDefinition.getBasicSingleInputStream().getStreamId(),
-                selectedAttributesConfig,
-                groupBy,
-                aggregateByAttribute,
-                new AggregateByTimePeriod(
-                        (aggregationTimePeriodDurations.get(0)).name().toLowerCase(),
-                        (aggregationTimePeriodDurations.get(aggregationTimePeriodDurations.size() - 1))
-                                .name().toLowerCase()),
-                storeConfig,
-                annotationList);
+        return aggregationConfig;
+    }
+
+    /**
+     * Generates list of groupBy variables, from the given list of Siddhi Variables
+     * @param groupByVariables                  Siddhi Variables list
+     * @return                                  String list of variables
+     * @throws DesignGenerationException        Error while generating groupBy variables
+     */
+    private List<String> generateGroupBy(List<Variable> groupByVariables) throws DesignGenerationException {
+        List<String> groupByList = new ArrayList<>();
+        for (Variable variable : groupByVariables) {
+            groupByList.add(ConfigBuildingUtilities.getDefinition(variable, siddhiAppString));
+        }
+        return groupByList;
+    }
+
+    /**
+     * Generates AggregateByTimePeriod with the given Siddhi TimePeriod.Duration
+     * @param aggregationTimePeriodDurations        Siddhi TimePeriod.Duration
+     * @return                                      AggregateByTimePeriod object
+     */
+    private AggregateByTimePeriod generateAggregateByTime(List<TimePeriod.Duration> aggregationTimePeriodDurations) {
+        return new AggregateByTimePeriod(
+                (aggregationTimePeriodDurations.get(0)).name(),
+                (aggregationTimePeriodDurations.get(aggregationTimePeriodDurations.size() - 1)).name());
+    }
+
+    /**
+     * Generates string for aggregateBy attribute, with the given Siddhi Variable
+     * @param aggregateAttribute        Siddhi Variable
+     * @return                          String representing the aggregateAttribute
+     */
+    private String generateAggregateByAttribute(Variable aggregateAttribute) {
+        if (aggregateAttribute != null) {
+            return aggregateAttribute.getAttributeName();
+        }
+        return "";
     }
 }
