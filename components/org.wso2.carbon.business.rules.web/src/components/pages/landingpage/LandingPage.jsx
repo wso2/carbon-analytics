@@ -78,14 +78,18 @@ export default class LandingPage extends Component {
             displaySnackbar: false,
             snackbarMessage: '',
 
-            // To show dialog when deleting a business rule
-            displayDeleteDialog: false,
-            businessRuleUUIDToBeDeleted: '',
+            // Dialog for deleting a business rule
+            deleteDialog: {
+                businessRuleUUID: '',
+                isVisible: false,
+            },
 
-            // Business rule Deployment Info
-            displayDeploymentInfo: false,
-            deploymentInfo: {},
-            deploymentInfoRequestedBusinessRule: {}, // TODO move inside deploymentInfo{} if possible
+            // Deployment Info of a business rule
+            deploymentInfoDialog: {
+                isVisible: false,
+                info: {},
+                businessRule: {},
+            },
 
             // Loaded state of page and related Error code
             hasLoaded: false,
@@ -160,10 +164,10 @@ export default class LandingPage extends Component {
     showDeploymentInfo(businessRule) {
         new BusinessRulesAPI(BusinessRulesConstants.BASE_URL).getDeploymentInfo(businessRule[0].uuid)
             .then((response) => {
-                this.setState({
-                    deploymentInfo: response.data[2],
-                    deploymentInfoRequestedBusinessRule: businessRule, // TODO bring that inside
-                });
+                const state = this.state;
+                state.deploymentInfoDialog.info = response.data[2];
+                state.deploymentInfoDialog.businessRule = businessRule;
+                this.setState(state);
                 this.toggleDeploymentInfoView();
             })
             .catch(() => {
@@ -175,7 +179,9 @@ export default class LandingPage extends Component {
      * Toggles the visibility of deployment info
      */
     toggleDeploymentInfoView() {
-        this.setState({ displayDeploymentInfo: !this.state.displayDeploymentInfo });
+        const state = this.state;
+        state.deploymentInfoDialog.isVisible = !state.deploymentInfoDialog.isVisible;
+        this.setState(state);
     }
 
     /**
@@ -201,16 +207,15 @@ export default class LandingPage extends Component {
      * @param {String} businessRuleUUID     UUID of the business rule
      */
     toggleDeleteDialog(businessRuleUUID) {
+        const state = this.state;
         if (businessRuleUUID) {
-            this.setState({
-                businessRuleUUIDToBeDeleted: businessRuleUUID,
-                displayDeleteDialog: true,
-            });
+            state.deleteDialog.businessRuleUUID = businessRuleUUID;
+            state.deleteDialog.isVisible = true;
         } else {
-            this.setState({
-                displayDeleteDialog: false,
-            });
+            state.deleteDialog.businessRuleUUID = '';
+            state.deleteDialog.isVisible = false;
         }
+        this.setState(state);
     }
 
     /**
@@ -333,7 +338,7 @@ export default class LandingPage extends Component {
                     />);
 
                 const deleteConfirmationDialog =
-                    (<Dialog open={this.state.displayDeleteDialog} onRequestClose={() => this.toggleDeleteDialog()}>
+                    (<Dialog open={this.state.deleteDialog.isVisible} onRequestClose={() => this.toggleDeleteDialog()}>
                         <DialogTitle>
                             {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_TITLE}
                         </DialogTitle>
@@ -343,7 +348,7 @@ export default class LandingPage extends Component {
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => this.deleteBusinessRule(this.state.businessRuleUUIDToBeDeleted)}>
+                            <Button onClick={() => this.deleteBusinessRule(this.state.deleteDialog.businessRuleUUID)}>
                                 Delete
                             </Button>
                         </DialogActions>
@@ -354,9 +359,9 @@ export default class LandingPage extends Component {
                         {snackbar}
                         {deleteConfirmationDialog}
                         <DeploymentInfo
-                            businessRule={this.state.deploymentInfoRequestedBusinessRule}
-                            info={this.state.deploymentInfo}
-                            open={this.state.displayDeploymentInfo}
+                            businessRule={this.state.deploymentInfoDialog.businessRule}
+                            info={this.state.deploymentInfoDialog.info}
+                            open={this.state.deploymentInfoDialog.isVisible}
                             onRequestClose={() => this.toggleDeploymentInfoView()}
                         />
                         <center>
