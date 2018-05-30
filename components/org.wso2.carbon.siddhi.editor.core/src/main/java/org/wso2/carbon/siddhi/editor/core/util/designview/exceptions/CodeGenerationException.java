@@ -17,7 +17,6 @@
  */
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.exceptions;
-// TODO: 4/20/18 Leave this as a runtime exception for now, but check on this later
 
 /**
  * Represents the exception which occurs during code generation from the 'CodeGenerator' class
@@ -26,10 +25,6 @@ public class CodeGenerationException extends RuntimeException {
 
     public CodeGenerationException(String message) {
         super(message);
-    }
-
-    public CodeGenerationException(String message, Throwable cause) {
-        super(message, cause);
     }
 
 }

@@ -40,7 +40,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.MapperConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 
 import java.util.List;
@@ -49,6 +49,7 @@ import java.util.Map;
 // TODO: 4/20/18 Check Everywhere for null values
 // TODO: 5/2/18 Look for constants for all the cases in switch case
 // TODO: 5/24/18 Improve The Information Given In The Error Messages
+// todo add class comments for all the classes
 
 public class CodeGeneratorHelper {
 
@@ -68,11 +69,11 @@ public class CodeGeneratorHelper {
                 throw new CodeGenerationException("The attrubte type given is null");
             }
             stringBuilder.append(attribute.getName())
-                    .append(CodeGeneratorConstants.SPACE)
+                    .append(SiddhiCodeConstants.SPACE)
                     .append(attribute.getType());
             if (attributesLeft != 1) {
-                stringBuilder.append(CodeGeneratorConstants.COMMA)
-                        .append(CodeGeneratorConstants.SPACE);
+                stringBuilder.append(SiddhiCodeConstants.COMMA)
+                        .append(SiddhiCodeConstants.SPACE);
             }
             attributesLeft--;
         }
@@ -80,8 +81,8 @@ public class CodeGeneratorHelper {
     }
 
     public static String getParameterList(List<String> parameters) {
-        if (parameters.isEmpty()) {
-            return CodeGeneratorConstants.EMPTY_STRING;
+        if (parameters == null || parameters.isEmpty()) {
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
 
         StringBuilder parametersStringBuilder = new StringBuilder();
@@ -89,8 +90,8 @@ public class CodeGeneratorHelper {
         for (String parameter : parameters) {
             parametersStringBuilder.append(parameter);
             if (parametersLeft != 1) {
-                parametersStringBuilder.append(CodeGeneratorConstants.COMMA)
-                        .append(CodeGeneratorConstants.SPACE);
+                parametersStringBuilder.append(SiddhiCodeConstants.COMMA)
+                        .append(SiddhiCodeConstants.SPACE);
             }
             parametersLeft--;
         }
@@ -100,45 +101,45 @@ public class CodeGeneratorHelper {
 
     public static String getStore(StoreConfig store) {
         if (store == null) {
-            return CodeGeneratorConstants.EMPTY_STRING;
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
 
         StringBuilder storeStringBuilder = new StringBuilder();
 
-        storeStringBuilder.append(CodeGeneratorConstants.STORE)
+        storeStringBuilder.append(SiddhiCodeConstants.STORE)
                 .append(store.getType())
-                .append(CodeGeneratorConstants.SINGLE_QUOTE)
-                .append(CodeGeneratorConstants.COMMA)
-                .append(CodeGeneratorConstants.SPACE);
+                .append(SiddhiCodeConstants.SINGLE_QUOTE)
+                .append(SiddhiCodeConstants.COMMA)
+                .append(SiddhiCodeConstants.SPACE);
         Map<String, String> options = store.getOptions();
         int optionsLeft = options.size();
         for (Map.Entry<String, String> entry : options.entrySet()) {
             storeStringBuilder.append(entry.getKey())
-                    .append(CodeGeneratorConstants.EQUALS)
-                    .append(CodeGeneratorConstants.SINGLE_QUOTE)
+                    .append(SiddhiCodeConstants.EQUALS)
+                    .append(SiddhiCodeConstants.SINGLE_QUOTE)
                     .append(entry.getValue())
-                    .append(CodeGeneratorConstants.SINGLE_QUOTE);
+                    .append(SiddhiCodeConstants.SINGLE_QUOTE);
             if (optionsLeft != 1) {
-                storeStringBuilder.append(CodeGeneratorConstants.COMMA)
-                        .append(CodeGeneratorConstants.SPACE);
+                storeStringBuilder.append(SiddhiCodeConstants.COMMA)
+                        .append(SiddhiCodeConstants.SPACE);
             }
             optionsLeft--;
         }
-        storeStringBuilder.append(CodeGeneratorConstants.CLOSE_BRACKET)
-                .append(CodeGeneratorConstants.NEW_LINE);
+        storeStringBuilder.append(SiddhiCodeConstants.CLOSE_BRACKET)
+                .append(SiddhiCodeConstants.NEW_LINE);
 
         return storeStringBuilder.toString();
     }
 
     public static String getAnnotations(List<String> annotations) {
         if (annotations == null || annotations.isEmpty()) {
-            return CodeGeneratorConstants.EMPTY_STRING;
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
 
         StringBuilder annotationsStringBuilder = new StringBuilder();
         for (String annotation : annotations) {
             annotationsStringBuilder.append(annotation)
-                    .append(CodeGeneratorConstants.NEW_LINE);
+                    .append(SiddhiCodeConstants.NEW_LINE);
         }
 
         return annotationsStringBuilder.toString();
@@ -146,16 +147,17 @@ public class CodeGeneratorHelper {
 
     public static String getAggregationAnnotations(List<String> annotations) {
         if (annotations == null || annotations.isEmpty()) {
-            return CodeGeneratorConstants.EMPTY_STRING;
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
 
         StringBuilder annotationsStringBuilder = new StringBuilder();
         for (String annotation : annotations) {
+            // TODO: 5/30/18 explain why we have this if condition
             if (annotation.toLowerCase().contains("@primarykey")) {
                 break;
             }
             annotationsStringBuilder.append(annotation)
-                    .append(CodeGeneratorConstants.NEW_LINE);
+                    .append(SiddhiCodeConstants.NEW_LINE);
         }
 
         return annotationsStringBuilder.toString();
@@ -164,34 +166,35 @@ public class CodeGeneratorHelper {
     public static String getMapper(MapperConfig mapper, String annotationType) {
         if (mapper.getType() == null || mapper.getType().isEmpty()) {
             // TODO not sure whether to throw an error here or not
-            return CodeGeneratorConstants.EMPTY_STRING;
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
 
         StringBuilder mapperStringBuilder = new StringBuilder();
-        mapperStringBuilder.append(CodeGeneratorConstants.MAP)
+        mapperStringBuilder.append(SiddhiCodeConstants.MAP)
                 .append(mapper.getType())
-                .append(CodeGeneratorConstants.SINGLE_QUOTE);
+                .append(SiddhiCodeConstants.SINGLE_QUOTE);
 
         if (mapper.getOptions() != null && !mapper.getOptions().isEmpty()) {
-            mapperStringBuilder.append(CodeGeneratorConstants.COMMA)
-                    .append(CodeGeneratorConstants.SPACE)
+            mapperStringBuilder.append(SiddhiCodeConstants.COMMA)
+                    .append(SiddhiCodeConstants.SPACE)
                     .append(getParameterList(mapper.getOptions()));
         }
 
         if (mapper.getAttributes() != null && !mapper.getAttributes().isEmpty()) {
-            mapperStringBuilder.append(CodeGeneratorConstants.COMMA)
-                    .append(CodeGeneratorConstants.SPACE);
+            mapperStringBuilder.append(SiddhiCodeConstants.COMMA)
+                    .append(SiddhiCodeConstants.SPACE);
+            //todo shoudnlt SOURCES have attributes and SINK have payload?
             if (annotationType.equalsIgnoreCase("SINK")) {
-                mapperStringBuilder.append(CodeGeneratorConstants.ATTRIBUTES);
+                mapperStringBuilder.append(SiddhiCodeConstants.ATTRIBUTES);
             } else if (annotationType.equalsIgnoreCase("SOURCE")) {
-                mapperStringBuilder.append(CodeGeneratorConstants.PAYLOAD);
+                mapperStringBuilder.append(SiddhiCodeConstants.PAYLOAD);
             }
 
             mapperStringBuilder.append(getParameterList(mapper.getAttributes()))
-                    .append(CodeGeneratorConstants.CLOSE_BRACKET);
+                    .append(SiddhiCodeConstants.CLOSE_BRACKET);
         }
 
-        mapperStringBuilder.append(CodeGeneratorConstants.CLOSE_BRACKET);
+        mapperStringBuilder.append(SiddhiCodeConstants.CLOSE_BRACKET);
 
         return mapperStringBuilder.toString();
     }
@@ -249,8 +252,8 @@ public class CodeGeneratorHelper {
         }
 
         StringBuilder windowFilterProjectionStringBuilder = new StringBuilder();
-        windowFilterProjectionStringBuilder.append(CodeGeneratorConstants.FROM)
-                .append(CodeGeneratorConstants.SPACE)
+        windowFilterProjectionStringBuilder.append(SiddhiCodeConstants.FROM)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(windowFilterProjection.getFrom())
                 .append(getStreamHandlerList(windowFilterProjection.getStreamHandlerList()));
 
@@ -281,17 +284,17 @@ public class CodeGeneratorHelper {
         }
 
         StringBuilder joinStringBuilder = new StringBuilder();
-        joinStringBuilder.append(CodeGeneratorConstants.FROM)
-                .append(CodeGeneratorConstants.SPACE)
+        joinStringBuilder.append(SiddhiCodeConstants.FROM)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(getJoinElement(join.getLeft()))
-                .append(CodeGeneratorConstants.SPACE)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(getJoinType(join.getJoinType()))
-                .append(CodeGeneratorConstants.SPACE)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(getJoinElement(join.getRight()))
-                .append(CodeGeneratorConstants.NEW_LINE)
-                .append(CodeGeneratorConstants.TAB_SPACE)
-                .append(CodeGeneratorConstants.ON)
-                .append(CodeGeneratorConstants.SPACE)
+                .append(SiddhiCodeConstants.NEW_LINE)
+                .append(SiddhiCodeConstants.TAB_SPACE)
+                .append(SiddhiCodeConstants.ON)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(join.getOn());
 
         if (join.getJoinWith().equalsIgnoreCase("AGGREGATION")) {
@@ -301,15 +304,15 @@ public class CodeGeneratorHelper {
                 throw new CodeGenerationException("The 'per' attribute for the given join aggregation query is null");
             }
 
-            joinStringBuilder.append(CodeGeneratorConstants.NEW_LINE)
-                    .append(CodeGeneratorConstants.TAB_SPACE)
-                    .append(CodeGeneratorConstants.WITHIN)
-                    .append(CodeGeneratorConstants.SPACE)
+            joinStringBuilder.append(SiddhiCodeConstants.NEW_LINE)
+                    .append(SiddhiCodeConstants.TAB_SPACE)
+                    .append(SiddhiCodeConstants.WITHIN)
+                    .append(SiddhiCodeConstants.SPACE)
                     .append(join.getWithin())
-                    .append(CodeGeneratorConstants.NEW_LINE)
-                    .append(CodeGeneratorConstants.TAB_SPACE)
-                    .append(CodeGeneratorConstants.PER)
-                    .append(CodeGeneratorConstants.SPACE)
+                    .append(SiddhiCodeConstants.NEW_LINE)
+                    .append(SiddhiCodeConstants.TAB_SPACE)
+                    .append(SiddhiCodeConstants.PER)
+                    .append(SiddhiCodeConstants.SPACE)
                     .append(join.getPer());
         }
 
@@ -336,15 +339,15 @@ public class CodeGeneratorHelper {
                 .append(getStreamHandlerList(joinElement.getStreamHandlerList()));
 
         if (joinElement.getAs() != null && !joinElement.getAs().isEmpty()) {
-            joinElementStringBuilder.append(CodeGeneratorConstants.SPACE)
-                    .append(CodeGeneratorConstants.AS)
-                    .append(CodeGeneratorConstants.SPACE)
+            joinElementStringBuilder.append(SiddhiCodeConstants.SPACE)
+                    .append(SiddhiCodeConstants.AS)
+                    .append(SiddhiCodeConstants.SPACE)
                     .append(joinElement.getAs());
         }
 
         if (joinElement.isUnidirectional()) {
-            joinElementStringBuilder.append(CodeGeneratorConstants.SPACE)
-                    .append(CodeGeneratorConstants.UNIDIRECTIONAL);
+            joinElementStringBuilder.append(SiddhiCodeConstants.SPACE)
+                    .append(SiddhiCodeConstants.UNIDIRECTIONAL);
         }
 
         return joinElementStringBuilder.toString();
@@ -352,7 +355,7 @@ public class CodeGeneratorHelper {
 
     private static String getStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
         if (streamHandlerList == null || streamHandlerList.isEmpty()) {
-            return CodeGeneratorConstants.EMPTY_STRING;
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
 
         StringBuilder streamhandlerListStringBuilder = new StringBuilder();
@@ -376,27 +379,27 @@ public class CodeGeneratorHelper {
         switch (streamHandler.getType().toUpperCase()) {
             case "FILTER":
                 FilterConfig filter = (FilterConfig) streamHandler;
-                streamHandlerStringBuilder.append(CodeGeneratorConstants.OPEN_SQUARE_BRACKET)
+                streamHandlerStringBuilder.append(SiddhiCodeConstants.OPEN_SQUARE_BRACKET)
                         .append(filter.getValue())
-                        .append(CodeGeneratorConstants.CLOSE_SQUARE_BRACKET);
+                        .append(SiddhiCodeConstants.CLOSE_SQUARE_BRACKET);
                 break;
             case "FUNCTION":
                 FunctionWindowConfig function = (FunctionWindowConfig) streamHandler;
-                streamHandlerStringBuilder.append(CodeGeneratorConstants.HASH)
+                streamHandlerStringBuilder.append(SiddhiCodeConstants.HASH)
                         .append(function.getValue().getFunction())
-                        .append(CodeGeneratorConstants.OPEN_BRACKET)
+                        .append(SiddhiCodeConstants.OPEN_BRACKET)
                         .append(getParameterList(function.getValue().getParameters()))
-                        .append(CodeGeneratorConstants.CLOSE_BRACKET);
+                        .append(SiddhiCodeConstants.CLOSE_BRACKET);
                 break;
             case "WINDOW":
                 FunctionWindowConfig window = (FunctionWindowConfig) streamHandler;
-                streamHandlerStringBuilder.append(CodeGeneratorConstants.HASH)
-                        .append(CodeGeneratorConstants.WINDOW)
-                        .append(CodeGeneratorConstants.FULL_STOP)
+                streamHandlerStringBuilder.append(SiddhiCodeConstants.HASH)
+                        .append(SiddhiCodeConstants.WINDOW)
+                        .append(SiddhiCodeConstants.FULL_STOP)
                         .append(window.getValue().getFunction())
-                        .append(CodeGeneratorConstants.OPEN_BRACKET)
+                        .append(SiddhiCodeConstants.OPEN_BRACKET)
                         .append(getParameterList(window.getValue().getParameters()))
-                        .append(CodeGeneratorConstants.CLOSE_BRACKET);
+                        .append(SiddhiCodeConstants.CLOSE_BRACKET);
                 break;
             default:
                 throw new CodeGenerationException("Unidentified StreamHandlerConfig type: "
@@ -420,13 +423,13 @@ public class CodeGeneratorHelper {
 
         switch (joinType.toUpperCase()) {
             case "JOIN":
-                return CodeGeneratorConstants.JOIN;
+                return SiddhiCodeConstants.JOIN;
             case "LEFT_OUTER":
-                return CodeGeneratorConstants.LEFT_OUTER_JOIN;
+                return SiddhiCodeConstants.LEFT_OUTER_JOIN;
             case "RIGHT_OUTER":
-                return CodeGeneratorConstants.RIGHT_OUTER_JOIN;
+                return SiddhiCodeConstants.RIGHT_OUTER_JOIN;
             case "FULL_OUTER":
-                return CodeGeneratorConstants.FULL_OUTER_JOIN;
+                return SiddhiCodeConstants.FULL_OUTER_JOIN;
             default:
                 throw new CodeGenerationException("Invalid Join Type: " + joinType);
         }
@@ -487,8 +490,8 @@ public class CodeGeneratorHelper {
 
         StringBuilder attributesSelectionStringBuilder = new StringBuilder();
 
-        attributesSelectionStringBuilder.append(CodeGeneratorConstants.SELECT)
-                .append(CodeGeneratorConstants.SPACE);
+        attributesSelectionStringBuilder.append(SiddhiCodeConstants.SELECT)
+                .append(SiddhiCodeConstants.SPACE);
 
         if (attributesSelection.getType() == null || attributesSelection.getType().isEmpty()) {
             throw new CodeGenerationException("The Type Of Attribute Selection Cannot Be Null");
@@ -500,7 +503,7 @@ public class CodeGeneratorHelper {
                 attributesSelectionStringBuilder.append(getUserDefinedSelection(userDefinedSelection));
                 break;
             case AttributeSelection.TYPE_ALL:
-                attributesSelectionStringBuilder.append(CodeGeneratorConstants.ALL);
+                attributesSelectionStringBuilder.append(SiddhiCodeConstants.ALL);
                 break;
             default:
                 throw new CodeGenerationException("Undefined Attribute Selection Type");
@@ -531,15 +534,15 @@ public class CodeGeneratorHelper {
             userDefinedSelectionStringBuilder.append(attribute.getExpression());
             if (attribute.getAs() != null && !attribute.getAs().isEmpty()) {
                 if (!attribute.getAs().equals(attribute.getExpression())) {
-                    userDefinedSelectionStringBuilder.append(CodeGeneratorConstants.SPACE)
-                            .append(CodeGeneratorConstants.AS)
-                            .append(CodeGeneratorConstants.SPACE)
+                    userDefinedSelectionStringBuilder.append(SiddhiCodeConstants.SPACE)
+                            .append(SiddhiCodeConstants.AS)
+                            .append(SiddhiCodeConstants.SPACE)
                             .append(attribute.getAs());
                 }
             }
             if (attributesLeft != 1) {
-                userDefinedSelectionStringBuilder.append(CodeGeneratorConstants.COMMA)
-                        .append(CodeGeneratorConstants.SPACE);
+                userDefinedSelectionStringBuilder.append(SiddhiCodeConstants.COMMA)
+                        .append(SiddhiCodeConstants.SPACE);
             }
             attributesLeft--;
         }
@@ -549,24 +552,24 @@ public class CodeGeneratorHelper {
 
     public static String getQueryGroupBy(List<String> groupByList) {
         if (groupByList == null || groupByList.isEmpty()) {
-            return CodeGeneratorConstants.EMPTY_STRING;
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
 
         StringBuilder groupByListStringBuilder = new StringBuilder();
-        groupByListStringBuilder.append(CodeGeneratorConstants.GROUP_BY)
-                .append(CodeGeneratorConstants.SPACE);
+        groupByListStringBuilder.append(SiddhiCodeConstants.GROUP_BY)
+                .append(SiddhiCodeConstants.SPACE);
         groupByListStringBuilder.append(getParameterList(groupByList));
         return groupByListStringBuilder.toString();
     }
 
     public static String getQueryOrderBy(List<QueryOrderByConfig> orderByList) {
         if (orderByList == null || orderByList.isEmpty()) {
-            return CodeGeneratorConstants.EMPTY_STRING;
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
 
         StringBuilder orderByListStringBuilder = new StringBuilder();
-        orderByListStringBuilder.append(CodeGeneratorConstants.ORDER_BY)
-                .append(CodeGeneratorConstants.SPACE);
+        orderByListStringBuilder.append(SiddhiCodeConstants.ORDER_BY)
+                .append(SiddhiCodeConstants.SPACE);
 
         int orderByAttributesLeft = orderByList.size();
         for (QueryOrderByConfig orderByAttribute : orderByList) {
@@ -579,13 +582,13 @@ public class CodeGeneratorHelper {
 
             orderByListStringBuilder.append(orderByAttribute.getValue());
             if (orderByAttribute.getOrder() != null && !orderByAttribute.getOrder().isEmpty()) {
-                orderByListStringBuilder.append(CodeGeneratorConstants.SPACE)
+                orderByListStringBuilder.append(SiddhiCodeConstants.SPACE)
                         .append(orderByAttribute.getOrder());
             }
 
             if (orderByAttributesLeft != 1) {
-                orderByListStringBuilder.append(CodeGeneratorConstants.COMMA)
-                        .append(CodeGeneratorConstants.SPACE);
+                orderByListStringBuilder.append(SiddhiCodeConstants.COMMA)
+                        .append(SiddhiCodeConstants.SPACE);
             }
             orderByAttributesLeft--;
         }
@@ -596,32 +599,32 @@ public class CodeGeneratorHelper {
     public static String getQueryLimit(long limit) {
         if (limit != 0) {
             StringBuilder limitStringBuilder = new StringBuilder();
-            limitStringBuilder.append(CodeGeneratorConstants.LIMIT)
-                    .append(CodeGeneratorConstants.SPACE)
+            limitStringBuilder.append(SiddhiCodeConstants.LIMIT)
+                    .append(SiddhiCodeConstants.SPACE)
                     .append(limit);
             return limitStringBuilder.toString();
         }
-        return CodeGeneratorConstants.EMPTY_STRING;
+        return SiddhiCodeConstants.EMPTY_STRING;
     }
 
     public static String getQueryHaving(String having) {
         if (having == null || having.isEmpty()) {
-            return CodeGeneratorConstants.EMPTY_STRING;
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
 
         StringBuilder havingStringBuilder = new StringBuilder();
-        havingStringBuilder.append(CodeGeneratorConstants.HAVING).append(CodeGeneratorConstants.SPACE).append(having);
+        havingStringBuilder.append(SiddhiCodeConstants.HAVING).append(SiddhiCodeConstants.SPACE).append(having);
 
         return havingStringBuilder.toString();
     }
 
     public static String getQueryOutputRateLimit(String outputRateLimit) {
         if (outputRateLimit == null || outputRateLimit.isEmpty()) {
-            return CodeGeneratorConstants.EMPTY_STRING;
+            return SiddhiCodeConstants.EMPTY_STRING;
         }
         StringBuilder outputRateLimitStringBuilder = new StringBuilder();
-        outputRateLimitStringBuilder.append(CodeGeneratorConstants.OUTPUT)
-                .append(CodeGeneratorConstants.SPACE)
+        outputRateLimitStringBuilder.append(SiddhiCodeConstants.OUTPUT)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(outputRateLimit);
 
         return outputRateLimitStringBuilder.toString();
@@ -669,32 +672,32 @@ public class CodeGeneratorHelper {
 
         StringBuilder insertOutputStringBuilder = new StringBuilder();
 
-        insertOutputStringBuilder.append(CodeGeneratorConstants.INSERT)
-                .append(CodeGeneratorConstants.SPACE);
+        insertOutputStringBuilder.append(SiddhiCodeConstants.INSERT)
+                .append(SiddhiCodeConstants.SPACE);
 
         if (insertOutput.getEventType() != null && !insertOutput.getEventType().isEmpty()) {
             switch (insertOutput.getEventType().toUpperCase()) {
                 case "CURRENT_EVENTS":
-                    insertOutputStringBuilder.append(CodeGeneratorConstants.CURRENT_EVENTS)
-                            .append(CodeGeneratorConstants.SPACE);
+                    insertOutputStringBuilder.append(SiddhiCodeConstants.CURRENT_EVENTS)
+                            .append(SiddhiCodeConstants.SPACE);
                     break;
                 case "EXPIRED_EVENTS":
-                    insertOutputStringBuilder.append(CodeGeneratorConstants.EXPIRED_EVENTS)
-                            .append(CodeGeneratorConstants.SPACE);
+                    insertOutputStringBuilder.append(SiddhiCodeConstants.EXPIRED_EVENTS)
+                            .append(SiddhiCodeConstants.SPACE);
                     break;
                 case "ALL_EVENTS":
-                    insertOutputStringBuilder.append(CodeGeneratorConstants.ALL_EVENTS)
-                            .append(CodeGeneratorConstants.SPACE);
+                    insertOutputStringBuilder.append(SiddhiCodeConstants.ALL_EVENTS)
+                            .append(SiddhiCodeConstants.SPACE);
                     break;
                 default:
                     throw new CodeGenerationException("Unidentified event type: " + insertOutput.getEventType());
             }
         }
 
-        insertOutputStringBuilder.append(CodeGeneratorConstants.INTO)
-                .append(CodeGeneratorConstants.SPACE)
+        insertOutputStringBuilder.append(SiddhiCodeConstants.INTO)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(target)
-                .append(CodeGeneratorConstants.SEMI_COLON);
+                .append(SiddhiCodeConstants.SEMI_COLON);
 
         return insertOutputStringBuilder.toString();
     }
@@ -710,36 +713,36 @@ public class CodeGeneratorHelper {
 
         StringBuilder deleteOutputStringBuilder = new StringBuilder();
 
-        deleteOutputStringBuilder.append(CodeGeneratorConstants.DELETE)
-                .append(CodeGeneratorConstants.SPACE)
+        deleteOutputStringBuilder.append(SiddhiCodeConstants.DELETE)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(target);
 
         if (deleteOutput.getEventType() != null && !deleteOutput.getEventType().isEmpty()) {
             deleteOutputStringBuilder
-                    .append(CodeGeneratorConstants.NEW_LINE)
-                    .append(CodeGeneratorConstants.TAB_SPACE)
-                    .append(CodeGeneratorConstants.FOR);
+                    .append(SiddhiCodeConstants.NEW_LINE)
+                    .append(SiddhiCodeConstants.TAB_SPACE)
+                    .append(SiddhiCodeConstants.FOR);
             switch (deleteOutput.getEventType().toUpperCase()) {
                 case "CURRENT_EVENTS":
-                    deleteOutputStringBuilder.append(CodeGeneratorConstants.CURRENT_EVENTS);
+                    deleteOutputStringBuilder.append(SiddhiCodeConstants.CURRENT_EVENTS);
                     break;
                 case "EXPIRED_EVENTS":
-                    deleteOutputStringBuilder.append(CodeGeneratorConstants.EXPIRED_EVENTS);
+                    deleteOutputStringBuilder.append(SiddhiCodeConstants.EXPIRED_EVENTS);
                     break;
                 case "ALL_EVENTS":
-                    deleteOutputStringBuilder.append(CodeGeneratorConstants.ALL_EVENTS);
+                    deleteOutputStringBuilder.append(SiddhiCodeConstants.ALL_EVENTS);
                     break;
                 default:
                     throw new CodeGenerationException("Unidentified event type: " + deleteOutput.getEventType());
             }
         }
 
-        deleteOutputStringBuilder.append(CodeGeneratorConstants.NEW_LINE)
-                .append(CodeGeneratorConstants.TAB_SPACE)
-                .append(CodeGeneratorConstants.ON)
-                .append(CodeGeneratorConstants.SPACE)
+        deleteOutputStringBuilder.append(SiddhiCodeConstants.NEW_LINE)
+                .append(SiddhiCodeConstants.TAB_SPACE)
+                .append(SiddhiCodeConstants.ON)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(deleteOutput.getOn())
-                .append(CodeGeneratorConstants.SEMI_COLON);
+                .append(SiddhiCodeConstants.SEMI_COLON);
 
         return deleteOutputStringBuilder.toString();
     }
@@ -757,17 +760,17 @@ public class CodeGeneratorHelper {
 
         StringBuilder updateInsertIntoOutputStringBuilder = new StringBuilder();
         if (type.equalsIgnoreCase("UPDATE")) {
-            updateInsertIntoOutputStringBuilder.append(CodeGeneratorConstants.UPDATE);
+            updateInsertIntoOutputStringBuilder.append(SiddhiCodeConstants.UPDATE);
         } else if (type.equalsIgnoreCase("UPDATE_OR_INSERT_INTO")) {
-            updateInsertIntoOutputStringBuilder.append(CodeGeneratorConstants.UPDATE_OR_INSERT_INTO);
+            updateInsertIntoOutputStringBuilder.append(SiddhiCodeConstants.UPDATE_OR_INSERT_INTO);
         }
 
-        updateInsertIntoOutputStringBuilder.append(CodeGeneratorConstants.SPACE)
+        updateInsertIntoOutputStringBuilder.append(SiddhiCodeConstants.SPACE)
                 .append(target)
-                .append(CodeGeneratorConstants.NEW_LINE)
-                .append(CodeGeneratorConstants.TAB_SPACE)
-                .append(CodeGeneratorConstants.SET)
-                .append(CodeGeneratorConstants.SPACE);
+                .append(SiddhiCodeConstants.NEW_LINE)
+                .append(SiddhiCodeConstants.TAB_SPACE)
+                .append(SiddhiCodeConstants.SET)
+                .append(SiddhiCodeConstants.SPACE);
 
         int setAttributesLeft = updateInsertIntoOutput.getSet().size();
         for (SetAttributeConfig setAttribute : updateInsertIntoOutput.getSet()) {
@@ -780,23 +783,23 @@ public class CodeGeneratorHelper {
             }
 
             updateInsertIntoOutputStringBuilder.append(setAttribute.getAttribute())
-                    .append(CodeGeneratorConstants.SPACE)
-                    .append(CodeGeneratorConstants.EQUALS)
-                    .append(CodeGeneratorConstants.SPACE)
+                    .append(SiddhiCodeConstants.SPACE)
+                    .append(SiddhiCodeConstants.EQUALS)
+                    .append(SiddhiCodeConstants.SPACE)
                     .append(setAttribute.getValue());
             if (setAttributesLeft != 1) {
-                updateInsertIntoOutputStringBuilder.append(CodeGeneratorConstants.COMMA)
-                        .append(CodeGeneratorConstants.SPACE);
+                updateInsertIntoOutputStringBuilder.append(SiddhiCodeConstants.COMMA)
+                        .append(SiddhiCodeConstants.SPACE);
             }
             setAttributesLeft--;
         }
 
-        updateInsertIntoOutputStringBuilder.append(CodeGeneratorConstants.NEW_LINE)
-                .append(CodeGeneratorConstants.TAB_SPACE)
-                .append(CodeGeneratorConstants.ON)
-                .append(CodeGeneratorConstants.SPACE)
+        updateInsertIntoOutputStringBuilder.append(SiddhiCodeConstants.NEW_LINE)
+                .append(SiddhiCodeConstants.TAB_SPACE)
+                .append(SiddhiCodeConstants.ON)
+                .append(SiddhiCodeConstants.SPACE)
                 .append(updateInsertIntoOutput.getOn())
-                .append(CodeGeneratorConstants.SEMI_COLON);
+                .append(SiddhiCodeConstants.SEMI_COLON);
 
         return updateInsertIntoOutputStringBuilder.toString();
     }

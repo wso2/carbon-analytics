@@ -908,12 +908,6 @@ public class EditorMicroservice implements Microservice {
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();
-        } catch (IllegalArgumentException e) {
-            log.error("Failed to convert the Siddhi app design view to code");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(e.getMessage())
-                    .build();
         }
     }
 

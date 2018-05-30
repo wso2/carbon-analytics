@@ -19,33 +19,33 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents Siddhi Partition
  */
 public class PartitionConfig extends SiddhiElementConfig {
-    private PartitionMembers members;
-    private PartitionWith partitionWith;
+    private Map<String, List<QueryConfig>> queryLists;
+    private String partitionWith;
     private List<Annotation> annotationList;
 
-    public PartitionConfig(String id,
-                           PartitionMembers members,
-                           PartitionWith partitionWith,
+    public PartitionConfig(String id, Map<String, List<QueryConfig>> queryLists, String partitionWith,
                            List<Annotation> annotationList) {
         super(id);
-        this.members = members;
+        this.queryLists = queryLists;
         this.partitionWith = partitionWith;
         this.annotationList = annotationList;
     }
 
-    public PartitionMembers getMembers() {
-        return members;
+    public Map<String, List<QueryConfig>> getQueryLists() {
+        return queryLists;
     }
 
-    public PartitionWith getPartitionWith() {
+    public String getPartitionWith() {
         return partitionWith;
     }
 
