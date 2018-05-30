@@ -42,14 +42,11 @@ import java.util.Map;
  */
 public class CodeGenerator {
 
-    // TODO: 5/2/18 Look for constants for all the cases in switch case
-    // TODO: 5/24/18 Improve The Information Given In The Error Messages
-
     /**
-     * Converts a EventFlow object to a Siddhi app string
+     * Converts a given EventFlow object to it's Siddhi app string representation
      *
      * @param eventFlow The EventFlow object to be converted
-     * @return The Siddhi app string representation of the given EventFlow object
+     * @return The Siddhi app as a string
      */
     public String generateSiddhiAppCode(EventFlow eventFlow) {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
@@ -59,7 +56,8 @@ public class CodeGenerator {
                 .append(generateStreams(siddhiApp.getStreamList(), siddhiApp.getSourceList(), siddhiApp.getSinkList()))
                 .append(generateTables(siddhiApp.getTableList()))
                 .append(generateWindows(siddhiApp.getWindowList()))
-                .append(generateTriggers(siddhiApp.getTriggerList(), siddhiApp.getSourceList(), siddhiApp.getSinkList()))
+                .append(generateTriggers(siddhiApp.getTriggerList(), siddhiApp.getSourceList(),
+                        siddhiApp.getSinkList()))
                 .append(generateAggregations(siddhiApp.getAggregationList()))
                 .append(generateFunctions(siddhiApp.getFunctionList()))
                 .append(generateQueries(siddhiApp.getQueryLists()))
@@ -69,35 +67,34 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates a string representation of the Siddhi app name and description annotations
-     * based on the given parameters
+     * Generates a string representation of the siddhi app name and description annotations
      *
-     * @param appName        The name of the Siddhi app
-     * @param appDescription The description of the siddhi app
-     * @return The Siddhi annotation representation of the name and the description
+     * @param appName        The app name
+     * @param appDescription The app description
+     * @return The string representation of the siddhi app name and description annotations
      */
     private String generateAppNameAndDescription(String appName, String appDescription) {
         StringBuilder appNameAndDescriptionStringBuilder = new StringBuilder();
 
         if (appName != null && !appName.isEmpty()) {
-            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.APP_NAME)
+            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.APP_NAME_ANNOTATION)
                     .append(appName)
                     .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
                     .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
                     .append(SiddhiStringBuilderConstants.NEW_LINE);
         } else {
-            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_NAME)
+            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_NAME_ANNOTATION)
                     .append(SiddhiStringBuilderConstants.NEW_LINE);
         }
 
         if (appDescription != null && !appDescription.isEmpty()) {
-            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.APP_DESCRIPTION)
+            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.APP_DESCRIPTION_ANNOTATION)
                     .append(appDescription)
                     .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
                     .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
                     .append(SiddhiStringBuilderConstants.NEW_LINE);
         } else {
-            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_DESCRIPTION)
+            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_DESCRIPTION_ANNOTATION)
                     .append(SiddhiStringBuilderConstants.NEW_LINE);
         }
 
@@ -106,9 +103,16 @@ public class CodeGenerator {
         return appNameAndDescriptionStringBuilder.toString();
     }
 
+    /**
+     * Generates a string representation of all the streams in a Siddhi app
+     *
+     * @param streamList A list of StreamConfig objects from the SiddhiAppConfig object
+     * @param sourceList A list of sources from the SiddhiAppConfig object
+     * @param sinkList   A list of sinks from the SiddhiAppConfig object
+     * @return The string representation of the stream definitions
+     */
     private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList,
                                    List<SourceSinkConfig> sinkList) {
-        // TODO source and sink should be somehow connected to a stream over here
         if (streamList == null || streamList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
@@ -118,13 +122,11 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (StreamConfig stream : streamList) {
-            // TODO: 5/29/18 Check for inner streams
             if (stream.isInnerStream()) {
                 break;
             }
 
             for (SourceSinkConfig source : sourceList) {
-                // TODO: 5/29/18 This might have to be .equalsIgnoreCase() Check whether it is possible
                 if (stream.getName().equals(source.getConnectedElementName())) {
                     streamListStringBuilder.append(generateSourceSinkString(source))
                             .append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -147,6 +149,12 @@ public class CodeGenerator {
         return streamListStringBuilder.toString();
     }
 
+    /**
+     * Generates a string representation of all the tables in a Siddhi app
+     *
+     * @param tableList A list of TableConfig objects from the SiddhiAppConfig object
+     * @return The Siddhi string representation of the table definitions
+     */
     private String generateTables(List<TableConfig> tableList) {
         if (tableList == null || tableList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -166,6 +174,12 @@ public class CodeGenerator {
         return tableListStringBuilder.toString();
     }
 
+    /**
+     * Generates a string representation of all the window definitions in a Siddhi app
+     *
+     * @param windowList A list of WindowConfig objects to be converted
+     * @return The Siddhi string representaiotn of all the window definitions
+     */
     private String generateWindows(List<WindowConfig> windowList) {
         if (windowList == null || windowList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -185,9 +199,16 @@ public class CodeGenerator {
         return windowListStringBuilder.toString();
     }
 
+    /**
+     * Generates a string representation of all the trigger definitions in a Siddhi app
+     *
+     * @param triggerList A list of all the TriggerConfig objects to be converted
+     * @param sourceList  A list of all sources in a SiddhiAppConfig object
+     * @param sinkList    A list of all the sinks in a SiddhiAppConfig object
+     * @return The Siddhi string representation of all the trigger definitions
+     */
     private String generateTriggers(List<TriggerConfig> triggerList, List<SourceSinkConfig> sourceList,
                                     List<SourceSinkConfig> sinkList) {
-        // TODO: 5/28/18 NOTE - Triggers can have sources and sinks as well
         if (triggerList == null || triggerList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
@@ -221,6 +242,12 @@ public class CodeGenerator {
         return triggerListStringBuilder.toString();
     }
 
+    /**
+     * Genenerates a string representation of all the aggregation definitions in a Siddhi app
+     *
+     * @param aggregationList A list of AggregationConfig objects to be converted
+     * @return The Siddhi string representation of all the aggregation definitions
+     */
     private String generateAggregations(List<AggregationConfig> aggregationList) {
         if (aggregationList == null || aggregationList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -240,6 +267,12 @@ public class CodeGenerator {
         return aggregationListStringBuilder.toString();
     }
 
+    /**
+     * Generates a string representation of all the function definitions in a Siddhi app
+     *
+     * @param functionList A list of FunctionConfig objects to be converted
+     * @return The Siddhi string representation of all the function definitions
+     */
     private String generateFunctions(List<FunctionConfig> functionList) {
         if (functionList == null || functionList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -259,6 +292,12 @@ public class CodeGenerator {
         return functionListStringBuilder.toString();
     }
 
+    /**
+     * Generates a string representation of all the queries in a Siddhi app
+     *
+     * @param queryLists A list of QueryConfig objects to be converted
+     * @return The Siddhi string representation of the given QueryConfig list
+     */
     private String generateQueries(Map<String, List<QueryConfig>> queryLists) {
         if (queryLists == null || queryLists.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -281,6 +320,12 @@ public class CodeGenerator {
         return queryListStringBuilder.toString();
     }
 
+    /**
+     * Generates a string representation of all the partitions in a Siddhi app
+     *
+     * @param partitionList The list of PartitionConfig objects to be converted
+     * @return The Siddhi string representation of the given PartitionConfig list
+     */
     private String generatePartitions(List<PartitionConfig> partitionList) {
         if (partitionList == null || partitionList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -299,16 +344,16 @@ public class CodeGenerator {
     }
 
     /**
-     * Converts a StreamConfig object to a Siddhi stream definition string
+     * Generates a stream definition string from a StreamConfig object
      *
      * @param stream The StreamConfig object to be converted
-     * @return The stream definition string representation of the given StreamConfig object
+     * @return The converted stream definition string
      */
     private String generateStreamString(StreamConfig stream) {
         if (stream == null) {
-            throw new CodeGenerationException("The StreamConfig instance is null");
+            throw new CodeGenerationException("The given StreamConfig object is null");
         } else if (stream.getName() == null || stream.getName().isEmpty()) {
-            throw new CodeGenerationException("The stream name is null");
+            throw new CodeGenerationException("The stream name for the given StreamConfig object is null/empty");
         }
 
         StringBuilder streamStringBuilder = new StringBuilder();
@@ -326,16 +371,16 @@ public class CodeGenerator {
     }
 
     /**
-     * Converts a TableConfig object to a Siddhi table definition String
+     * Generates a table definition string from a TableConfig object
      *
      * @param table The TableConfig object to be converted
-     * @return The table definition string representation of the given TableConfig object
+     * @return The converted table definition string
      */
     private String generateTableString(TableConfig table) {
         if (table == null) {
-            throw new CodeGenerationException("The given TableConfig instance is null");
+            throw new CodeGenerationException("The given TableConfig object is null");
         } else if (table.getName() == null || table.getName().isEmpty()) {
-            throw new CodeGenerationException("The table name is null");
+            throw new CodeGenerationException("The table name for the given TableConfig object is null/empty");
         }
 
         StringBuilder tableStringBuilder = new StringBuilder();
@@ -354,18 +399,18 @@ public class CodeGenerator {
     }
 
     /**
-     * Converts a WindowConfig object to a Siddhi window definition String
+     * Generates a window definition string from a WindowConfig object
      *
      * @param window The WindowConfig object to be converted
-     * @return The window definition string representation of the given WindowConfig object
+     * @return The converted window definition string
      */
     private String generateWindowString(WindowConfig window) {
         if (window == null) {
-            throw new CodeGenerationException("The given WindowConfig instance is null");
+            throw new CodeGenerationException("The given WindowConfig object is null");
         } else if (window.getName() == null || window.getName().isEmpty()) {
-            throw new CodeGenerationException("Window Name Cannot Be Null");
+            throw new CodeGenerationException("The window name for the given WindowConfig object is null/empty");
         } else if (window.getFunction() == null || window.getFunction().isEmpty()) {
-            throw new CodeGenerationException("Window Function Name Cannot Be Null");
+            throw new CodeGenerationException("The function name for the given WindowConfig object is null/empty");
         }
 
         StringBuilder windowStringBuilder = new StringBuilder();
@@ -384,20 +429,22 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
 
         if (window.getOutputEventType() != null && !window.getOutputEventType().isEmpty()) {
-            windowStringBuilder.append(SiddhiStringBuilderConstants.SPACE);
+            windowStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
+                    .append(SiddhiStringBuilderConstants.OUTPUT)
+                    .append(SiddhiStringBuilderConstants.SPACE);
             switch (window.getOutputEventType().toUpperCase()) {
-                // TODO: 4/26/18 The cases must be constants and not free strings
                 case CodeGeneratorConstants.CURRENT_EVENTS:
-                    windowStringBuilder.append(SiddhiStringBuilderConstants.OUTPUT_CURRENT_EVENTS);
+                    windowStringBuilder.append(SiddhiStringBuilderConstants.CURRENT_EVENTS);
                     break;
                 case CodeGeneratorConstants.EXPIRED_EVENTS:
-                    windowStringBuilder.append(SiddhiStringBuilderConstants.OUTPUT_EXPIRED_EVENTS);
+                    windowStringBuilder.append(SiddhiStringBuilderConstants.EXPIRED_EVENTS);
                     break;
                 case CodeGeneratorConstants.ALL_EVENTS:
-                    windowStringBuilder.append(SiddhiStringBuilderConstants.OUTPUT_ALL_EVENTS);
+                    windowStringBuilder.append(SiddhiStringBuilderConstants.ALL_EVENTS);
                     break;
                 default:
-                    throw new CodeGenerationException("Unidentified output event type: " + window.getOutputEventType());
+                    throw new CodeGenerationException("Unidentified output event type for WindowConfig: "
+                            + window.getOutputEventType());
             }
         }
         windowStringBuilder.append(SiddhiStringBuilderConstants.SEMI_COLON);
@@ -406,18 +453,18 @@ public class CodeGenerator {
     }
 
     /**
-     * Converts a TriggerConfig object to a Siddhi trigger definition String
+     * Generates a trigger definition string from a TriggerConfig object
      *
      * @param trigger The TriggerConfig object to be converted
-     * @return The trigger definition string representation of the given TriggerConfig object
+     * @return The converted trigger definition string
      */
     private String generateTriggerString(TriggerConfig trigger) {
         if (trigger == null) {
-            throw new CodeGenerationException("The TriggerConfig instance is null");
+            throw new CodeGenerationException("The given TriggerConfig object is null");
         } else if (trigger.getName() == null || trigger.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of trigger is null");
+            throw new CodeGenerationException("The trigger name for the given TriggerConfig object is null/empty");
         } else if (trigger.getAt() == null || trigger.getAt().isEmpty()) {
-            throw new CodeGenerationException("The 'at' value of trigger is null");
+            throw new CodeGenerationException("The 'at' value for the given TriggerConfig object is null/empty");
         }
 
         StringBuilder triggerStringBuilder = new StringBuilder();
@@ -435,22 +482,25 @@ public class CodeGenerator {
     }
 
     /**
-     * Converts a AggregationConfig object to a Siddhi aggregation definition String
+     * Generates a aggregation definition string from a AggregationConfig object
      *
      * @param aggregation The AggregationConfig object to be converted
-     * @return The aggregation definition string representation of the given AggregationConfig object
+     * @return The converted aggregation definition string
      */
     private String generateAggregationString(AggregationConfig aggregation) {
         if (aggregation == null) {
-            throw new CodeGenerationException("The AggregationConfig instance is null");
+            throw new CodeGenerationException("The AggregationConfig object is null");
         } else if (aggregation.getName() == null || aggregation.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of aggregation  is null");
+            throw new CodeGenerationException("The aggregation name for the given AggregationConfig" +
+                    " object is null/empty");
         } else if (aggregation.getFrom() == null || aggregation.getFrom().isEmpty()) {
             throw new CodeGenerationException("The input stream for aggregation  is null");
         } else if (aggregation.getAggregateByTimePeriod() == null) {
             throw new CodeGenerationException("The AggregateByTimePeriod instance is null");
-        } else if (aggregation.getAggregateByTimePeriod().getMinValue() == null || aggregation.getAggregateByTimePeriod().getMinValue().isEmpty()) {
-            throw new CodeGenerationException("The aggregate by time period must have atleast one value for aggregation");
+        } else if (aggregation.getAggregateByTimePeriod().getMinValue() == null ||
+                aggregation.getAggregateByTimePeriod().getMinValue().isEmpty()) {
+            throw new CodeGenerationException("The aggregate by time period must have atleast one" +
+                    " value for aggregation");
         }
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
@@ -473,7 +523,6 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE)
                 .append(SiddhiStringBuilderConstants.AGGREGATE);
 
-        // TODO: 5/28/18 Can break this down into smaller methods in the Helper class
         if (aggregation.getAggregateByAttribute() != null && !aggregation.getAggregateByAttribute().isEmpty()) {
             aggregationStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(SiddhiStringBuilderConstants.BY)
@@ -487,7 +536,7 @@ public class CodeGenerator {
                 .append(aggregation.getAggregateByTimePeriod().getMinValue());
 
         if (aggregation.getAggregateByTimePeriod().getMaxValue() != null && !aggregation.getAggregateByTimePeriod().getMaxValue().isEmpty()) {
-            aggregationStringBuilder.append(SiddhiStringBuilderConstants.THRIPPLE_DOTS)
+            aggregationStringBuilder.append(SiddhiStringBuilderConstants.THREE_DOTS)
                     .append(aggregation.getAggregateByTimePeriod().getMaxValue());
         }
 
@@ -496,17 +545,23 @@ public class CodeGenerator {
         return aggregationStringBuilder.toString();
     }
 
+    /**
+     * Generates a function definition string from a FunctionConfig object
+     *
+     * @param function The FunctionConfig object to be converted
+     * @return The converted function definition string
+     */
     private String generateFunctionString(FunctionConfig function) {
         if (function == null) {
-            throw new CodeGenerationException("The given FunctionConfig instance is null");
+            throw new CodeGenerationException("The given FunctionConfig object is null");
         } else if (function.getName() == null || function.getName().isEmpty()) {
-            throw new CodeGenerationException("The given function name is empty");
+            throw new CodeGenerationException("The function name for the given FunctionConfig object is null/empty");
         } else if (function.getScriptType() == null || function.getScriptType().isEmpty()) {
-            throw new CodeGenerationException("The given function script type is empty");
+            throw new CodeGenerationException("The script type for the given FunctionConfig object is null/empty");
         } else if (function.getReturnType() == null || function.getReturnType().isEmpty()) {
-            throw new CodeGenerationException("The given function return type is empty");
+            throw new CodeGenerationException("The return type for the given FunctionConfig is null/empty");
         } else if (function.getBody() == null || function.getBody().isEmpty()) {
-            throw new CodeGenerationException("The given function body is empty");
+            throw new CodeGenerationException("The body for the given FunctionConfig is null/empty");
         }
 
         StringBuilder functionStringBuilder = new StringBuilder();
@@ -533,14 +588,14 @@ public class CodeGenerator {
     }
 
     /**
-     * Converts a QueryConfig object to a Siddhi query definition string
+     * Generates a query definition string from a QueryConfig object
      *
      * @param query The QueryConfig object to be converted
-     * @return The query definition string representation of the given QueryConfig object
+     * @return The converted query definition string
      */
     private String generateQueryString(QueryConfig query) {
         if (query == null) {
-            throw new CodeGenerationException("The Given QueryConfig Object Is Null");
+            throw new CodeGenerationException("The given QueryConfig object is null");
         }
 
         StringBuilder queryStringBuilder = new StringBuilder();
@@ -549,7 +604,6 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE)
                 .append(CodeGeneratorHelper.getQuerySelect(query.getSelect()));
 
-        // TODO: 5/28/18 Can add this to submethods in the Helper as well 
         if (query.getGroupBy() != null && !query.getGroupBy().isEmpty()) {
             queryStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
                     .append(CodeGeneratorHelper.getQueryGroupBy(query.getGroupBy()));
@@ -578,16 +632,17 @@ public class CodeGenerator {
     }
 
     /**
-     * Converts a PartitionConfig object to a Siddhi partition definition string
+     * Generates a partition definition string from a PartitionConfig object
      *
      * @param partition The PartitionConfig object to be converted
-     * @return The partition definition string representation of the given PartitionConfig object
+     * @return The converted partition definition string
      */
     private String generatePartitionString(PartitionConfig partition) {
         if (partition == null) {
-            throw new CodeGenerationException("The given PartitionConfig instance is null");
+            throw new CodeGenerationException("The given PartitionConfig object is null");
         } else if (partition.getPartitionWith() == null || partition.getPartitionWith().isEmpty()) {
-            throw new CodeGenerationException("The 'partitionWith' value for the given PartitionConfig");
+            throw new CodeGenerationException("The 'partitionWith' value for the given" +
+                    " PartitionConfig object is null/empty");
         }
 
         StringBuilder partitionStringBuilder = new StringBuilder();
@@ -607,20 +662,26 @@ public class CodeGenerator {
         return partitionStringBuilder.toString();
     }
 
+    /**
+     * Generates a source/sink definition string from a SourceSinkConfig object
+     *
+     * @param sourceSink The SourceSinkConfig object to be converted
+     * @return The converted source/sink definition string
+     */
     private String generateSourceSinkString(SourceSinkConfig sourceSink) {
         if (sourceSink == null) {
-            throw new CodeGenerationException("The given SourceSinkConfig instance is null");
+            throw new CodeGenerationException("The given SourceSinkConfig object is null");
         } else if (sourceSink.getAnnotationType() == null || sourceSink.getAnnotationType().isEmpty()) {
-            throw new CodeGenerationException("The annotation type for the given SourceSinkConfig is empty");
+            throw new CodeGenerationException("The annotation type for the given SourceSinkConfig object is null/empty");
         } else if (sourceSink.getType() == null || sourceSink.getType().isEmpty()) {
-            throw new CodeGenerationException("The type of source/sink for the given SourceSinkConfig is empty");
+            throw new CodeGenerationException("The type of source/sink for the given SourceSinkConfig is null/empty");
         }
 
         StringBuilder sourceSinkStringBuilder = new StringBuilder();
-        if (sourceSink.getAnnotationType().equalsIgnoreCase("SOURCE")) {
-            sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.SOURCE);
-        } else if (sourceSink.getAnnotationType().equalsIgnoreCase("SINK")) {
-            sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.SINK);
+        if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
+            sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.SOURCE_ANNOTATION);
+        } else if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
+            sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.SINK_ANNOTATION);
         } else {
             throw new CodeGenerationException("Unknown type: " + sourceSink.getType() +
                     ". The SinkSourceConfig can only have type 'SINK' or type 'SOURCE'");

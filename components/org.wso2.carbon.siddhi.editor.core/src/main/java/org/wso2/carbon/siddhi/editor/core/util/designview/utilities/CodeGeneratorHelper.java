@@ -47,16 +47,26 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import java.util.List;
 import java.util.Map;
 
-// TODO: 4/20/18 Check Everywhere for null values
-// TODO: 5/2/18 Look for constants for all the cases in switch case
-// TODO: 5/24/18 Improve The Information Given In The Error Messages
-// todo add class comments for all the classes
-
+/**
+ * Helper that contains generic reusable utility methods
+ * for the CodeGenerator class to build a Siddhi app string
+ */
 public class CodeGeneratorHelper {
 
+    // TODO: 4/20/18 Check Everywhere for null values
+    // TODO: 5/2/18 Look for constants for all the cases in switch case
+    // TODO: 5/24/18 Improve The Information Given In The Error Messages
+
+    /**
+     * Generates a string representation of a list of attributes for a definition
+     * Attributes Example - (name string, age int, ...)
+     *
+     * @param attributes The list of AttributeConfig objects to be converted
+     * @return The converted attributes as a string
+     */
     public static String getAttributes(List<AttributeConfig> attributes) {
         if (attributes == null || attributes.isEmpty()) {
-            throw new CodeGenerationException("The attribute list given cannot be null/empty");
+            throw new CodeGenerationException("The given AttributeConfig list is null/empty");
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -65,9 +75,9 @@ public class CodeGeneratorHelper {
             if (attribute == null) {
                 throw new CodeGenerationException("The attribute value given is null");
             } else if (attribute.getName() == null || attribute.getName().isEmpty()) {
-                throw new CodeGenerationException("The attrubte name given is null");
+                throw new CodeGenerationException("The attribute name given is null");
             } else if (attribute.getType() == null || attribute.getType().isEmpty()) {
-                throw new CodeGenerationException("The attrubte type given is null");
+                throw new CodeGenerationException("The attribute type given is null");
             }
             stringBuilder.append(attribute.getName())
                     .append(SiddhiStringBuilderConstants.SPACE)
@@ -81,6 +91,75 @@ public class CodeGeneratorHelper {
         return stringBuilder.toString();
     }
 
+    /**
+     * Generates a string representation of the annotations of a Siddhi element
+     *
+     * @param annotations The list of AnnotationConfig objects to be converted
+     * @return The string representation of all the annotations
+     */
+    public static String getAnnotations(List<String> annotations) {
+        if (annotations == null || annotations.isEmpty()) {
+            return SiddhiStringBuilderConstants.EMPTY_STRING;
+        }
+
+        StringBuilder annotationsStringBuilder = new StringBuilder();
+        for (String annotation : annotations) {
+            annotationsStringBuilder.append(annotation)
+                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+        }
+
+        return annotationsStringBuilder.toString();
+    }
+
+    /**
+     * Generates a string representation of a Siddhi store annotation
+     *
+     * @param store The StoreConfig instance to be converted
+     * @return The string representation of a store annotation
+     */
+    public static String getStore(StoreConfig store) {
+        if (store == null) {
+            return SiddhiStringBuilderConstants.EMPTY_STRING;
+        } else if (store.getType() == null || store.getType().isEmpty()) {
+            throw new CodeGenerationException("The type value for the given StoreConfig object is null/empty");
+        } else if (store.getOptions() == null || store.getOptions().isEmpty()) {
+            throw new CodeGenerationException("The options map for the given StoreConfig object is null/empty");
+        }
+
+        StringBuilder storeStringBuilder = new StringBuilder();
+
+        storeStringBuilder.append(SiddhiStringBuilderConstants.STORE_ANNOTATION)
+                .append(store.getType())
+                .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
+                .append(SiddhiStringBuilderConstants.COMMA)
+                .append(SiddhiStringBuilderConstants.SPACE);
+        Map<String, String> options = store.getOptions();
+        int optionsLeft = options.size();
+        for (Map.Entry<String, String> entry : options.entrySet()) {
+            storeStringBuilder.append(entry.getKey())
+                    .append(SiddhiStringBuilderConstants.EQUAL)
+                    .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
+                    .append(entry.getValue())
+                    .append(SiddhiStringBuilderConstants.SINGLE_QUOTE);
+            if (optionsLeft != 1) {
+                storeStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
+                        .append(SiddhiStringBuilderConstants.SPACE);
+            }
+            optionsLeft--;
+        }
+        storeStringBuilder.append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
+                .append(SiddhiStringBuilderConstants.NEW_LINE);
+
+        return storeStringBuilder.toString();
+    }
+
+    /**
+     * Generate a string of parameters for a specific window/function
+     * Example of parameter: (10 min, 4, 'regex', ...)
+     *
+     * @param parameters The list of parameters to be converted
+     * @return The string of the parameters separated by a comma(,)
+     */
     public static String getParameterList(List<String> parameters) {
         if (parameters == null || parameters.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -100,52 +179,12 @@ public class CodeGeneratorHelper {
         return parametersStringBuilder.toString();
     }
 
-    public static String getStore(StoreConfig store) {
-        if (store == null) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
-        }
-
-        StringBuilder storeStringBuilder = new StringBuilder();
-
-        storeStringBuilder.append(SiddhiStringBuilderConstants.STORE)
-                .append(store.getType())
-                .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
-                .append(SiddhiStringBuilderConstants.COMMA)
-                .append(SiddhiStringBuilderConstants.SPACE);
-        Map<String, String> options = store.getOptions();
-        int optionsLeft = options.size();
-        for (Map.Entry<String, String> entry : options.entrySet()) {
-            storeStringBuilder.append(entry.getKey())
-                    .append(SiddhiStringBuilderConstants.EQUALS)
-                    .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
-                    .append(entry.getValue())
-                    .append(SiddhiStringBuilderConstants.SINGLE_QUOTE);
-            if (optionsLeft != 1) {
-                storeStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                        .append(SiddhiStringBuilderConstants.SPACE);
-            }
-            optionsLeft--;
-        }
-        storeStringBuilder.append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
-
-        return storeStringBuilder.toString();
-    }
-
-    public static String getAnnotations(List<String> annotations) {
-        if (annotations == null || annotations.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
-        }
-
-        StringBuilder annotationsStringBuilder = new StringBuilder();
-        for (String annotation : annotations) {
-            annotationsStringBuilder.append(annotation)
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
-        }
-
-        return annotationsStringBuilder.toString();
-    }
-
+    /**
+     * Generates a string representation of a list of annotations for an aggregation definition
+     *
+     * @param annotations The list of annotations to be converted
+     * @return The string representation of the annotations for an aggregation defintion
+     */
     public static String getAggregationAnnotations(List<String> annotations) {
         if (annotations == null || annotations.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -153,8 +192,10 @@ public class CodeGeneratorHelper {
 
         StringBuilder annotationsStringBuilder = new StringBuilder();
         for (String annotation : annotations) {
-            // TODO: 5/30/18 explain why we have this if condition
-            if (annotation.toLowerCase().contains("@primarykey")) {
+            // The reason why generating annotations for aggregations is in a different
+            // method is because the '@PrimaryKey' annotation is automatically generated
+            // in Siddhi runtime for Aggregation Definitions. This is done to avoid that.
+            if (annotation.toLowerCase().contains(CodeGeneratorConstants.PRIMARY_KEY_ANNOTATION)) {
                 break;
             }
             annotationsStringBuilder.append(annotation)
@@ -164,6 +205,13 @@ public class CodeGeneratorHelper {
         return annotationsStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a map annotation from a MapperConfig object
+     *
+     * @param mapper         The MapperConfig object to be converted
+     * @param annotationType The annotation type the MapperConfig object belongs to (SINK or SOURCE)
+     * @return The string representation of the MapperConfig object
+     */
     public static String getMapper(MapperConfig mapper, String annotationType) {
         if (mapper.getType() == null || mapper.getType().isEmpty()) {
             // TODO not sure whether to throw an error here or not
@@ -171,7 +219,7 @@ public class CodeGeneratorHelper {
         }
 
         StringBuilder mapperStringBuilder = new StringBuilder();
-        mapperStringBuilder.append(SiddhiStringBuilderConstants.MAP)
+        mapperStringBuilder.append(SiddhiStringBuilderConstants.MAP_ANNOTATION)
                 .append(mapper.getType())
                 .append(SiddhiStringBuilderConstants.SINGLE_QUOTE);
 
@@ -184,11 +232,10 @@ public class CodeGeneratorHelper {
         if (mapper.getAttributes() != null && !mapper.getAttributes().isEmpty()) {
             mapperStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
                     .append(SiddhiStringBuilderConstants.SPACE);
-            //todo shoudnlt SOURCES have attributes and SINK have payload?
             if (annotationType.equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
-                mapperStringBuilder.append(SiddhiStringBuilderConstants.ATTRIBUTES);
+                mapperStringBuilder.append(SiddhiStringBuilderConstants.ATTRIBUTES_ANNOTATION);
             } else if (annotationType.equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
-                mapperStringBuilder.append(SiddhiStringBuilderConstants.PAYLOAD);
+                mapperStringBuilder.append(SiddhiStringBuilderConstants.PAYLOAD_ANNOTATION);
             }
 
             mapperStringBuilder.append(getParameterList(mapper.getAttributes()))
@@ -201,10 +248,10 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Converts a QueryInputConfig object to the input part of a Siddhi query
+     * Generates a string representation of a query input using the given QueryInputConfig object
      *
-     * @param queryInput The QueryInputConfig instance to be converted
-     * @return The query input string representation of the given QueryInputConfig object
+     * @param queryInput The QueryInputConfig object to be converted
+     * @return The string representation of the given QueryInputConfig object
      */
     public static String getQueryInput(QueryInputConfig queryInput) {
         if (queryInput == null) {
@@ -239,10 +286,10 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Converts a WindowFilterProjectionConfig object to a query input of type window, filter or projection string
+     * Generates a Siddhi string representation of the given WindowFilterProjectionConfig object
      *
-     * @param windowFilterProjection The WindowFilterProjection object to be converted
-     * @return The window,filter or projection string representation of the given WindowFilterProjection object
+     * @param windowFilterProjection The WindowFilterProjectCofig to be converted
+     * @return The string representation of the given WindowFilterProjectionConfig object
      */
     private static String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection) {
         // TODO: 5/28/18 Complete this 
@@ -262,10 +309,10 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Converts a JoinConfig object to a query input of type join as a string
+     * Generates a Siddhi string representation of a JoinConfig object
      *
      * @param join The JoinConfig object to be converted
-     * @return The join input string representation of the given JoinConfig object
+     * @return The string representation of the given JoinConfig object
      */
     private static String getJoinQueryInput(JoinConfig join) {
         if (join == null) {
@@ -298,7 +345,7 @@ public class CodeGeneratorHelper {
                 .append(SiddhiStringBuilderConstants.SPACE)
                 .append(join.getOn());
 
-        if (join.getJoinWith().equalsIgnoreCase("AGGREGATION")) {
+        if (join.getJoinWith().equalsIgnoreCase(CodeGeneratorConstants.AGGREGATION)) {
             if (join.getWithin() == null || join.getWithin().isEmpty()) {
                 throw new CodeGenerationException("The 'within' attribute for the given join aggregation query is null");
             } else if (join.getPer() == null || join.getPer().isEmpty()) {
@@ -321,10 +368,10 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Converts a JoinElementConfig object to a Siddhi string representation of that object
+     * Generates a string representation of the given JoinElementConfig object
      *
-     * @param joinElement The JoinElementConfig to be converted
-     * @return The Siddhi string representation of the given JoinElementConfig object
+     * @param joinElement The JoinElementConfig object to be converted
+     * @return The string representation of the given JoinElementConfig object
      */
     private static String getJoinElement(JoinElementConfig joinElement) {
         // TODO: 5/28/18 complete and test this
@@ -354,6 +401,12 @@ public class CodeGeneratorHelper {
         return joinElementStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a list of StreamHandlerConfig objects
+     *
+     * @param streamHandlerList The list of StreamHandlerConfig objects to be converted
+     * @return The result string representation of the list of StreamHandlerConfig objects
+     */
     private static String getStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
         if (streamHandlerList == null || streamHandlerList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -368,6 +421,12 @@ public class CodeGeneratorHelper {
         return streamhandlerListStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a given StreamHandlerConfig object
+     *
+     * @param streamHandler The StreamHandlerConfig object to be converted
+     * @return The string representation of the given StreamHandlerConfig object
+     */
     private static String getStreamHandler(StreamHandlerConfig streamHandler) {
         if (streamHandler == null) {
             throw new CodeGenerationException("Empty StreamHandler Config");
@@ -411,11 +470,10 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Identifies the join type string given and returns the respective Siddhi code snippet for the
-     * given join type
+     * Generates a 'Siddhi' string representation of the given joinType string
      *
-     * @param joinType The identifier for which join type the query has
-     * @return The Siddhi representation of the given join type
+     * @param joinType The join type as a string
+     * @return The Siddhi string representation of the given join type
      */
     private static String getJoinType(String joinType) {
         if (joinType == null || joinType.isEmpty()) {
@@ -437,10 +495,10 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Converts a PatternSequenceConfig object to a Siddhi string representation of a pattern/sequence query input
+     * Generates a Siddhi string representation of a given PatternSequenceConfig object
      *
-     * @param patternSequence The PatternSequenceConfig object to be converted
-     * @return The Siddhi string representation of the given PatternSequenceConfig instance
+     * @param patternSequence The PatterSequenceConfig object to be converted
+     * @return The string representation of the given PatternSequenceConfig object
      */
     private static String getPatternSequenceInput(PatternSequenceConfig patternSequence) {
         // TODO: 5/28/18 Complete and test
@@ -462,6 +520,12 @@ public class CodeGeneratorHelper {
         return logic;
     }
 
+    /**
+     * Generates a Siddhi string representation of a given PatternSequenceConditionConfig object
+     *
+     * @param condition The PatternSequenceConditionConfig object to be converted
+     * @return The Siddhi string representation of the given PatternSequenceConfig object
+     */
     private static String getPatternSequenceConditionLogic(PatternSequenceConditionConfig condition) {
         if (condition == null) {
             throw new CodeGenerationException("The given PatternSequenceConditionConfig instance is null");
@@ -479,10 +543,11 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Converts a AttributesSelectionConfig object to the select section of a Siddhi query as a string
+     * Generates a Siddhi string representation of an AttributesSelectionConfig object
+     * Example For Query Select - select * ...
      *
-     * @param attributesSelection The AttributeSelectionConfig object to be converted
-     * @return The string representation of the select part of a Siddhi query
+     * @param attributesSelection The AttributesSelectionConfig object to be converted
+     * @return The converted Siddhi string representation of the given AttributesSelectionConfig object
      */
     public static String getQuerySelect(AttributesSelectionConfig attributesSelection) {
         if (attributesSelection == null) {
@@ -514,10 +579,11 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Converts a UserDefinedSelectionConfig object to the select part of a Siddhi query
+     * Generates a Siddhi string representation of a UserDefinedSelectionConfig object
+     * Example of the UserDefinedSelectionConfig - select name, avg(age) as avgAge, ...
      *
-     * @param userDefinedSelection The UserDefinedSelectionConfig instance to be converted
-     * @return The string representation of the select part of a Siddhi query
+     * @param userDefinedSelection The UserDefinedSelectionConfig object to be converted
+     * @return The Siddhi string representation of the given UserDefinedSelectionConfig
      */
     private static String getUserDefinedSelection(UserDefinedSelectionConfig userDefinedSelection) {
         // TODO: 4/23/18 Complete to get rid of duplicate code
@@ -551,25 +617,41 @@ public class CodeGeneratorHelper {
         return userDefinedSelectionStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a group by list of a query
+     *
+     * @param groupByList The list of group by attributes to be converted
+     * @return The Siddhi string representation of the given group by list
+     */
     public static String getQueryGroupBy(List<String> groupByList) {
         if (groupByList == null || groupByList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder groupByListStringBuilder = new StringBuilder();
-        groupByListStringBuilder.append(SiddhiStringBuilderConstants.GROUP_BY)
+        groupByListStringBuilder.append(SiddhiStringBuilderConstants.GROUP)
+                .append(SiddhiStringBuilderConstants.SPACE)
+                .append(SiddhiStringBuilderConstants.BY)
                 .append(SiddhiStringBuilderConstants.SPACE);
         groupByListStringBuilder.append(getParameterList(groupByList));
         return groupByListStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a order by list of a query
+     *
+     * @param orderByList The order by list to be converted
+     * @return The Siddhi string representation of the given order by config list
+     */
     public static String getQueryOrderBy(List<QueryOrderByConfig> orderByList) {
         if (orderByList == null || orderByList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder orderByListStringBuilder = new StringBuilder();
-        orderByListStringBuilder.append(SiddhiStringBuilderConstants.ORDER_BY)
+        orderByListStringBuilder.append(SiddhiStringBuilderConstants.ORDER)
+                .append(SiddhiStringBuilderConstants.SPACE)
+                .append(SiddhiStringBuilderConstants.BY)
                 .append(SiddhiStringBuilderConstants.SPACE);
 
         int orderByAttributesLeft = orderByList.size();
@@ -597,6 +679,12 @@ public class CodeGeneratorHelper {
         return orderByListStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of the given limit value
+     *
+     * @param limit The limit value to be converted
+     * @return The Siddhi representation of the given query limit
+     */
     public static String getQueryLimit(long limit) {
         if (limit != 0) {
             StringBuilder limitStringBuilder = new StringBuilder();
@@ -608,6 +696,12 @@ public class CodeGeneratorHelper {
         return SiddhiStringBuilderConstants.EMPTY_STRING;
     }
 
+    /**
+     * Generates a Siddhi string representation of the given having value
+     *
+     * @param having The having value given
+     * @return The Siddhi string representation of the query 'having' value
+     */
     public static String getQueryHaving(String having) {
         if (having == null || having.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -619,6 +713,12 @@ public class CodeGeneratorHelper {
         return havingStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a given query output rate limit
+     *
+     * @param outputRateLimit The output rate limit value given
+     * @return The Siddhi representation of the given output rate limit value
+     */
     public static String getQueryOutputRateLimit(String outputRateLimit) {
         if (outputRateLimit == null || outputRateLimit.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
@@ -631,6 +731,12 @@ public class CodeGeneratorHelper {
         return outputRateLimitStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a QueryOutputConfig object
+     *
+     * @param queryOutput The QueryOutputConfig object to be converted
+     * @return The converted string representation of the given QueryOutputConfig object
+     */
     public static String getQueryOutput(QueryOutputConfig queryOutput) {
         if (queryOutput == null) {
             throw new CodeGenerationException("The QueryOutputInstance Given Is Null");
@@ -661,6 +767,13 @@ public class CodeGeneratorHelper {
         return queryOutputStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a InsertOutputConfig object
+     *
+     * @param insertOutput The InsertOutputConfig object to be converted
+     * @param target The name of the target output definition
+     * @return The Siddhi string representation of the InsertOutputConfig to respective target
+     */
     private static String getInsertOutput(InsertOutputConfig insertOutput, String target) {
         if (insertOutput == null) {
             throw new CodeGenerationException("The InsertOutputConfig instance given is null");
@@ -700,6 +813,13 @@ public class CodeGeneratorHelper {
         return insertOutputStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a DeleteOutputConfig object
+     *
+     * @param deleteOutput The DeleteOutputConfig object to be converted
+     * @param target The name of the target output definition
+     * @return The Siddhi string representation of the DeleteOutputConfig object to the respective target
+     */
     private static String getDeleteOutput(DeleteOutputConfig deleteOutput, String target) {
         if (deleteOutput == null) {
             throw new CodeGenerationException("The given DeleteOutputConfig instance is null");
@@ -745,6 +865,14 @@ public class CodeGeneratorHelper {
         return deleteOutputStringBuilder.toString();
     }
 
+    /**
+     * Generates a Siddhi string representation of a UpdateInsertIntoOutputConfig object
+     *
+     * @param type The type of output object the one is (i.e. Either update|update or insert into)
+     * @param updateInsertIntoOutput The UpdateInsertIntoConfig object to be converted
+     * @param target The name of the target output definition
+     * @return The Siddhi string representation of the UpdateInsertIntoOutputConfig object to the respective target
+     */
     private static String getUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput, String target) {
         if (updateInsertIntoOutput == null) {
             throw new CodeGenerationException("The given UpdateInsertIntoOutputConfig is null");
@@ -782,7 +910,7 @@ public class CodeGeneratorHelper {
 
             updateInsertIntoOutputStringBuilder.append(setAttribute.getAttribute())
                     .append(SiddhiStringBuilderConstants.SPACE)
-                    .append(SiddhiStringBuilderConstants.EQUALS)
+                    .append(SiddhiStringBuilderConstants.EQUAL)
                     .append(SiddhiStringBuilderConstants.SPACE)
                     .append(setAttribute.getValue());
             if (setAttributesLeft != 1) {
@@ -800,6 +928,9 @@ public class CodeGeneratorHelper {
                 .append(SiddhiStringBuilderConstants.SEMI_COLON);
 
         return updateInsertIntoOutputStringBuilder.toString();
+    }
+
+    private CodeGeneratorHelper() {
     }
 
 }

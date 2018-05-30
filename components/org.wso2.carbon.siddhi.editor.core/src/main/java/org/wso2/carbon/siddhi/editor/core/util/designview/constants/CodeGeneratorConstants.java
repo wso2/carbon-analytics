@@ -24,12 +24,8 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
  */
 public class CodeGeneratorConstants {
 
-    public static final String CURRENT_EVENTS = "CURRENT_EVENTS";
-    public static final String EXPIRED_EVENTS = "EXPIRED_EVENTS";
-    public static final String ALL_EVENTS = "ALL_EVENTS";
-
-    public static final String SINK = "SINK";
     public static final String SOURCE = "SOURCE";
+    public static final String SINK = "SINK";
 
     public static final String WINDOW = "WINDOW";
     public static final String FILTER = "FILTER";
@@ -37,6 +33,7 @@ public class CodeGeneratorConstants {
     public static final String PROJECTION = "PROJECTION";
     public static final String PATTERN = "PATTERN";
     public static final String SEQUENCE = "SEQUENCE";
+    public static final String AGGREGATION = "AGGREGATION";
 
     public static final String JOIN = "JOIN";
     public static final String LEFT_OUTER = "LEFT_OUTER";
@@ -48,6 +45,13 @@ public class CodeGeneratorConstants {
     public static final String UPDATE = "UPDATE";
     public static final String UPDATE_OR_INSERT_INTO = "UPDATE_OR_INSERT_INTO";
 
+    public static final String CURRENT_EVENTS = "CURRENT_EVENTS";
+    public static final String EXPIRED_EVENTS = "EXPIRED_EVENTS";
+    public static final String ALL_EVENTS = "ALL_EVENTS";
+
+    public static final String PRIMARY_KEY_ANNOTATION = "@primarykey";
+
     private CodeGeneratorConstants() {
     }
+
 }
