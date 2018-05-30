@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c)  2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -16,7 +16,9 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.sp</groupId>
         <artifactId>wso2sp-solutions</artifactId>
@@ -24,9 +26,9 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>siddhi-execution-country</artifactId>
+    <artifactId>siddhi-execution-word</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Stream Processor - Siddhi Execution Country</name>
+    <name>WSO2 Stream Processor - Siddhi Execution Word</name>
 
     <dependencies>
         <dependency>
@@ -49,7 +51,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -103,13 +104,15 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.extension.siddhi.execution.country.*
+                            org.wso2.extension.siddhi.execution.word,
+                            org.wso2.extension.siddhi.execution.word.*
                         </Export-Package>
                         <Import-Package>
+                            *;resolution:=optional
                         </Import-Package>
                         <Include-Resource>
                             META-INF=target/classes/META-INF,
-                            Countries.csv=target/classes/Countries.csv
+                            words.csv=target/classes/words.csv
                         </Include-Resource>
                     </instructions>
                 </configuration>
