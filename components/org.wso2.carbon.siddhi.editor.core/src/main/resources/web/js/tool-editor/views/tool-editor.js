@@ -152,31 +152,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     }
                     this._sourceView.editorResize();
 
-                    var JSONString = "{" +
-                        " \"siddhiAppConfig\": {" +
-                        "  \"streamList\": []," +
-                        "  \"tableList\": []," +
-                        "  \"windowList\": []," +
-                        "  \"triggerList\": []," +
-                        "  \"aggregationList\": []," +
-                        "  \"functionList\": []," +
-                        "  \"partitionList\": []," +
-                        "  \"sourceList\": []," +
-                        "  \"sinkList\": []," +
-                        "  \"queryLists\": {" +
-                        "   \"WINDOW_FILTER_PROJECTION\": []," +
-                        "   \"PATTERN\": []," +
-                        "   \"SEQUENCE\": []," +
-                        "   \"JOIN\": []" +
-                        "  }," +
-                        "  \"finalElementCount\": 0" +
-                        " }," +
-                        " \"edgeList\": []" +
-                        "}";
-
-                    this.JSONObject = JSON.parse(JSONString);
-                    console.log(this.JSONObject);
-
                     var application = self.options.application;
                     var designView = new DesignView(self.options, application, this.jsPlumbInstance);
                     this._designView = designView;
@@ -185,52 +160,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     var toggleViewButtonDynamicId = "toggle-view-button-" + this._$parent_el.attr('id');
                     toggleViewButton.attr('id', toggleViewButtonDynamicId);
-
-                    this.codeToDesignURL
-                        = window.location.protocol + "//" + window.location.host + "/editor/design-view";
-                    this.designToCodeURL
-                        = window.location.protocol + "//" + window.location.host + "/editor/code-view";
-                    var result = {};
-                    function getDesign(code) {
-                        $.ajax({
-                            type: "POST",
-                            url: self.codeToDesignURL,
-                            data: window.btoa(code),
-                            async: false,
-                            success: function (response) {
-                                result = {status: "success", responseJSON: response};
-                            },
-                            error: function (error) {
-                                if (error.status === 400) {
-                                    result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
-                                } else {
-                                    result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
-                                }
-                            }
-                        });
-                        return result;
-                    }
-
-                    function getCode(designViewJSON) {
-                        $.ajax({
-                            type: "POST",
-                            url: self.designToCodeURL,
-                            data: window.atob(designViewJSON),
-                            async: false,
-                            success: function (response) {
-                                result = {status: "success", responseJSON: response};
-                            },
-                            error: function (error) {
-                                if (error.status === 400) {
-                                    result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
-                                } else {
-                                    result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
-                                }
-                            }
-                        });
-                        return result;
-                    }
-
                     //TODO: add general validation: check whether all required fields in the forms are filled, elements are connected properly(ex: source should be connected to a stream)
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
@@ -238,22 +167,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 alert("Please save the file before switching to the Design View");
                                 return;
                             }
-                            var response = getDesign(self.getContent());
+                            var response = self._designView.getDesign(self.getContent());
                             if (response.status === "success") {
-                                // if (isInitialRender) {
-                                //     isInitialRender = false;
-                                // }
-                                // initialSiddhiCode = self.getContent().replace(/\s+/g, '');
-                                // sourceContainer.hide();
-                                // designContainer.show();
-                                // self._eventFlow.clearContent();
-                                // toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
-                                //     "<span class='toggle-button-text'>Source View</span>");
-                                // setTimeout(function () {
-                                //     self._eventFlow.render(response.responseJSON);
-                                //     self._eventFlow.graphResize();
-                                // }, 250);
-
+                                //TODO: check whether is in initial state inorder to enhance performance
                                 self.JSONObject = response.responseJSON;
                                 sourceContainer.hide();
                                 designView.emptyDesignViewGridContainer();
@@ -261,8 +177,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
                                     "<span class=\"toggle-button-text\">Source View</span>");
                                 designView.renderDesignGrid(self.JSONObject);
-                                //console.log(JSON.stringify(designView.getConfigurationData()));
-                                self.JSONObject = JSON.parse(JSON.stringify(designView.getConfigurationData()));
 
                             } else if (response.status === "fail") {
                                 alert(response.errorMessage);
@@ -274,30 +188,30 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                              * Removed attributes are used only for front end use only.
                              * */
                             function removeUnnecessaryFieldsFromJSON(object) {
-                                // _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function(patternQuery){
-                                //     if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
-                                //         delete patternQuery.queryInput['connectedElementNameList'];
-                                //     }
-                                // });
-                                // _.forEach(object.siddhiAppConfig.queryLists.SEQUENCE, function(sequenceQuery){
-                                //     if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
-                                //         delete sequenceQuery.queryInput['connectedElementNameList'];
-                                //     }
-                                // });
-                                // _.forEach(object.siddhiAppConfig.queryLists.JOIN, function(joinQuery){
-                                //     if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
-                                //         delete joinQuery.queryInput['firstConnectedElement'];
-                                //     }
-                                //     if (joinQuery.queryInput.hasOwnProperty('secondConnectedElement')) {
-                                //         delete joinQuery.queryInput['secondConnectedElement'];
-                                //     }
-                                // });
+                                _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function(patternQuery){
+                                    if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
+                                        delete patternQuery.queryInput['connectedElementNameList'];
+                                    }
+                                });
+                                _.forEach(object.siddhiAppConfig.queryLists.SEQUENCE, function(sequenceQuery){
+                                    if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
+                                        delete sequenceQuery.queryInput['connectedElementNameList'];
+                                    }
+                                });
+                                _.forEach(object.siddhiAppConfig.queryLists.JOIN, function(joinQuery){
+                                    if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
+                                        delete joinQuery.queryInput['firstConnectedElement'];
+                                    }
+                                    if (joinQuery.queryInput.hasOwnProperty('secondConnectedElement')) {
+                                        delete joinQuery.queryInput['secondConnectedElement'];
+                                    }
+                                });
                             }
+                            var JSONValue = designView.getConfigurationData();
+                            removeUnnecessaryFieldsFromJSON(JSONValue);
+                            self.JSONObject = JSON.stringify(JSONValue);
 
-
-                            self.JSONObject = JSON.stringify(designView.getConfigurationData());
-                            removeUnnecessaryFieldsFromJSON(self.JSONObject);
-                            var response = getCode(self.JSONObject);
+                            var response = self._designView.getCode(self.JSONObject);
                             if (response.status === "success") {
                                 designContainer.hide();
                                 designView.emptyDesignViewGridContainer();

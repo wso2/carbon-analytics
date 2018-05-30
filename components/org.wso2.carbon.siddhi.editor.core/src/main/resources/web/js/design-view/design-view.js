@@ -357,5 +357,54 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             }
         };
 
+        DesignView.prototype.getDesign = function (code) {
+            var self = this;
+            var result = {};
+            self.codeToDesignURL = window.location.protocol + "//" + window.location.host + "/editor/design-view";
+            $.ajax({
+                type: "POST",
+                url: self.codeToDesignURL,
+                data: window.btoa(code),
+                async: false,
+                success: function (response) {
+                    result = {status: "success", responseJSON: response};
+                },
+                error: function (error) {
+                    console.log(error);
+                    if (error.status === 400) {
+                        result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                    } else {
+                        result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                    }
+                }
+            });
+            return result;
+        };
+
+        DesignView.prototype.getCode = function (designViewJSON) {
+            var self = this;
+            var result = {};
+            self.designToCodeURL = window.location.protocol + "//" + window.location.host + "/editor/code-view";
+            $.ajax({
+                type: "POST",
+                url: self.designToCodeURL,
+                headers: { 'Content-Type':'application/json' },
+                data: designViewJSON,
+                async: false,
+                success: function (response) {
+                    result = {status: "success", responseJSON: window.atob(response)};
+                },
+                error: function (error) {
+                    console.log(error);
+                    if (error.status === 400) {
+                        result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                    } else {
+                        result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                    }
+                }
+            });
+            return result;
+        };
+
         return DesignView;
     });
