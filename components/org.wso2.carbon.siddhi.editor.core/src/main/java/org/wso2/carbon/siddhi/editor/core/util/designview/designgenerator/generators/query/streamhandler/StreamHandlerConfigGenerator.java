@@ -64,8 +64,9 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates FilterConfig from the given Siddhi Filter
-     * @param filter        Siddhi Filter object
-     * @return              FilterConfig object todo exception comment
+     * @param filter                            Siddhi Filter object
+     * @return                                  FilterConfig object
+     * @throws DesignGenerationException        Error while generating filter
      */
     private FilterConfig generateFilterConfig(Filter filter) throws DesignGenerationException {
         String filterDefinition = ConfigBuildingUtilities.getDefinition(filter, siddhiAppString);
@@ -74,8 +75,9 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates Function config from the given Siddhi StreamFunction
-     * @param streamFunction        Siddhi StreamFunction object
-     * @return                      FunctionWindowConfig object todo exception comment
+     * @param streamFunction                    Siddhi StreamFunction object
+     * @return                                  FunctionWindowConfig object
+     * @throws DesignGenerationException        Error while generating function
      */
     private FunctionWindowConfig generateFunction(StreamFunction streamFunction) throws DesignGenerationException {
         StringBuilder function = new StringBuilder();
@@ -94,8 +96,9 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates Window config from the given Siddhi Window
-     * @param window        Siddhi Window object
-     * @return              FunctionWindowConfig object todo exception comment
+     * @param window                            Siddhi Window object
+     * @return                                  FunctionWindowConfig object
+     * @throws DesignGenerationException        Error while generating window
      */
     private FunctionWindowConfig generateWindow(Window window) throws DesignGenerationException {
         StringBuilder function = new StringBuilder();
@@ -114,8 +117,9 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates a string list of parameters, from the given list of Siddhi Expressions
-     * @param parameters        Siddhi Expressions
-     * @return                  String list of parameters todo exception comment
+     * @param parameters                        Siddhi Expressions
+     * @return                                  String list of parameters
+     * @throws DesignGenerationException        Error while generating parameters
      */
     private List<String> generateParameters(Expression[] parameters) throws DesignGenerationException {
         List<String> parameterStrings = new ArrayList<>();

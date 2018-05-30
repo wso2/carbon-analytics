@@ -41,7 +41,7 @@ public class WindowConfigGenerator {
      * Generates WindowConfig from the given Siddhi WindowDefinition
      * @param windowDefinition                  Siddhi WindowDefinition
      * @return                                  WindowConfig object
-     * @throws DesignGenerationException        Error when generating WindowConfig
+     * @throws DesignGenerationException        Error while generating WindowConfig
      */
     public WindowConfig generateWindowConfig(WindowDefinition windowDefinition) throws DesignGenerationException {
         List<String> parameters = new ArrayList<>();
