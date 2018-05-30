@@ -18,12 +18,14 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregateByTimePeriod;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.aggregation.TimePeriod;
+import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.AggregationDefinition;
 import org.wso2.siddhi.query.api.execution.query.selection.BasicSelector;
 import org.wso2.siddhi.query.api.expression.Variable;
@@ -45,7 +47,7 @@ public class AggregationConfigGenerator {
      * Generates AggregationConfig from the given Siddhi AggregationDefinition
      * @param aggregationDefinition             Siddhi AggregationDefinition object
      * @return                                  AggregationConfig object
-     * @throws DesignGenerationException        Error when generating AggregationConfig
+     * @throws DesignGenerationException        Error while generating AggregationConfig
      */
     public AggregationConfig generateAggregationConfig(AggregationDefinition aggregationDefinition)
             throws DesignGenerationException {
@@ -74,6 +76,19 @@ public class AggregationConfigGenerator {
             aggregateByAttribute = aggregationDefinition.getAggregateAttribute().getAttributeName();
         }
 
+        // 'store' and annotations
+        StoreConfigGenerator storeConfigGenerator = new StoreConfigGenerator();
+        StoreConfig storeConfig = null;
+        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
+        List<String> annotationList = new ArrayList<>();
+        for (Annotation annotation : aggregationDefinition.getAnnotations()) {
+            if (annotation.getName().equalsIgnoreCase("STORE")) {
+                storeConfig = storeConfigGenerator.generateStoreConfig(annotation);
+            } else {
+                annotationList.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
+            }
+        }
+
         return new AggregationConfig(
                 aggregationDefinition.getId(),
                 aggregationDefinition.getId(),
@@ -85,8 +100,7 @@ public class AggregationConfigGenerator {
                         (aggregationTimePeriodDurations.get(0)).name().toLowerCase(),
                         (aggregationTimePeriodDurations.get(aggregationTimePeriodDurations.size() - 1))
                                 .name().toLowerCase()),
-                null, // TODO: 4/6/18 store
-                new AnnotationConfigGenerator()
-                        .generateAnnotationConfigList(aggregationDefinition.getAnnotations()));
+                storeConfig,
+                annotationList);
     }
 }

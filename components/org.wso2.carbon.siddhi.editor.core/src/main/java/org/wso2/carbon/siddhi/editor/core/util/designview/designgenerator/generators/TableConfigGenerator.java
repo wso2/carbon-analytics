@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.definition.TableDefinition;
@@ -35,12 +37,25 @@ public class TableConfigGenerator {
      * @param tableDefinition       Siddhi TableDefinition
      * @return                      TableConfig object
      */
-    public TableConfig generateTableConfig(TableDefinition tableDefinition) {
+    public TableConfig generateTableConfig(TableDefinition tableDefinition) throws DesignGenerationException {
+        // 'store' and annotations
+        StoreConfigGenerator storeConfigGenerator = new StoreConfigGenerator();
+        StoreConfig storeConfig = null;
+        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
+        List<String> annotationList = new ArrayList<>();
+        for (Annotation annotation : tableDefinition.getAnnotations()) {
+            if (annotation.getName().equalsIgnoreCase("STORE")) {
+                storeConfig = storeConfigGenerator.generateStoreConfig(annotation);
+            } else {
+                annotationList.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
+            }
+        }
+
         return new TableConfig(
                 tableDefinition.getId(),
                 tableDefinition.getId(),
                 new AttributeConfigListGenerator().generateAttributeConfigList(tableDefinition.getAttributeList()),
-                null, // TODO store
-                new AnnotationConfigGenerator().generateAnnotationConfigList(tableDefinition.getAnnotations()));
+                storeConfig,
+                annotationList);
     }
 }
