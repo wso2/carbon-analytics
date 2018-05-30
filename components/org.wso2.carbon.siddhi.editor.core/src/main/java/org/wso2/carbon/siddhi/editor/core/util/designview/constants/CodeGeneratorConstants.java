@@ -18,7 +18,35 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
+/**
+ * Contains generic String constants that are used by the
+ * CodeGenerator & CodeGeneratorHelper class
+ */
 public class CodeGeneratorConstants {
+
+    public static final String CURRENT_EVENTS = "CURRENT_EVENTS";
+    public static final String EXPIRED_EVENTS = "EXPIRED_EVENTS";
+    public static final String ALL_EVENTS = "ALL_EVENTS";
+
+    public static final String SINK = "SINK";
+    public static final String SOURCE = "SOURCE";
+
+    public static final String WINDOW = "WINDOW";
+    public static final String FILTER = "FILTER";
+    public static final String FUNCTION = "FUNCTION";
+    public static final String PROJECTION = "PROJECTION";
+    public static final String PATTERN = "PATTERN";
+    public static final String SEQUENCE = "SEQUENCE";
+
+    public static final String JOIN = "JOIN";
+    public static final String LEFT_OUTER = "LEFT_OUTER";
+    public static final String RIGHT_OUTER = "RIGHT_OUTER";
+    public static final String FULL_OUTER = "FULL_OUTER";
+
+    public static final String INSERT = "INSERT";
+    public static final String DELETE = "DELETE";
+    public static final String UPDATE = "UPDATE";
+    public static final String UPDATE_OR_INSERT_INTO = "UPDATE_OR_INSERT_INTO";
 
     private CodeGeneratorConstants() {
     }

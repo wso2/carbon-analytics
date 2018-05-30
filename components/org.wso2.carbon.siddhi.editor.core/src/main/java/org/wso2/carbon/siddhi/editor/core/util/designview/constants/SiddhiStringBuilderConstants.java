@@ -19,10 +19,10 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Contains all the generic string/char values that are needed by
+ * Contains all the generic String/char values that are needed by
  * the CodeGenerator class to build the entire Siddhi app string
  */
-public class SiddhiCodeConstants {
+public class SiddhiStringBuilderConstants {
     // TODO: 5/25/18 Have better names for the constants
     // TODO: 5/3/18 Change the name of the constants class to something else
     public static final char ALL = '*';
@@ -112,10 +112,10 @@ public class SiddhiCodeConstants {
 
     public static final String EMPTY_STRING = "";
 
-    private SiddhiCodeConstants() {
+    private SiddhiStringBuilderConstants() {
     }
 
-    // TODO: 5/25/18 Change the name of this class to SiddhiSyntax and create a new class for SiddhiCodeConstants
+    // TODO: 5/25/18 Change the name of this class to SiddhiSyntax and create a new class for SiddhiStringBuilderConstants
 
     // TODO: 5/4/18 Add another constants class for values that are not used to create the siddhi app
     // use these values for things like switch cases
