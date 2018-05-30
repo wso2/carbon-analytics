@@ -159,6 +159,8 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             });
             _.forEach(configurationData.siddhiAppConfig.tableList, function(table){
                 var tableObject = new Table(table);
+                var storeAnnotation = new StoreAnnotation(table.store);
+                tableObject.setStore(storeAnnotation);
                 addAnnotationsForElement(table, tableObject);
                 addAttributesForElement(table, tableObject);
                 tableObject.setId(newIdBeginningPhrase + tableObject.getId());
