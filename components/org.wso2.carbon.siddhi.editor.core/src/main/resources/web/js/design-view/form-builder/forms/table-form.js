@@ -268,21 +268,24 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                 annotations.push({annotation: savedAnnotation});
             });
 
-            var savedStoreAnnotation = clickedElement.getStore();
-            var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
-            var storeOptions = [];
-            for (var key in savedStoreAnnotationOptions) {
-                if (savedStoreAnnotationOptions.hasOwnProperty(key)) {
-                    storeOptions.push({
-                        key: key,
-                        value: savedStoreAnnotationOptions[key]
-                    });
+            var storeAnnotation = {};
+            if (clickedElement.getStore() !== undefined) {
+                var savedStoreAnnotation = clickedElement.getStore();
+                var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
+                var storeOptions = [];
+                for (var key in savedStoreAnnotationOptions) {
+                    if (savedStoreAnnotationOptions.hasOwnProperty(key)) {
+                        storeOptions.push({
+                            key: key,
+                            value: savedStoreAnnotationOptions[key]
+                        });
+                    }
                 }
+                storeAnnotation = {
+                    annotationType: savedStoreAnnotation.getType(),
+                    storeOptions: storeOptions
+                };
             }
-            var storeAnnotation = {
-                annotationType: savedStoreAnnotation.getType(),
-                storeOptions: storeOptions
-            };
             
             var fillWith = {
                 annotations : annotations,

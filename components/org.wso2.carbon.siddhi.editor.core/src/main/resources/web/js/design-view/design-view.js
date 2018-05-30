@@ -16,14 +16,14 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid',
+define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palette', 'designViewGrid',
         'configurationData', 'appData', 'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation',
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindowOrFunction', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
         'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation',
         'functionDefinition', 'streamHandler', 'storeAnnotation'],
-    function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
+    function (require, log, _, $, alerts, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindowOrFunction, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert,
               QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput,
@@ -356,6 +356,74 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 this.toolPalette.hideToolPalette();
             }
         };
+
+        DesignView.prototype.getDesign = function (code) {
+            var self = this;
+            var result = {};
+            self.codeToDesignURL = window.location.protocol + "//" + window.location.host + "/editor/design-view";
+            $.ajax({
+                type: "POST",
+                url: self.codeToDesignURL,
+                data: window.btoa(code),
+                async: false,
+                success: function (response) {
+                    result = {status: "success", responseJSON: response};
+                },
+                error: function (error) {
+                    console.log(error);
+                    if (error.status === 400) {
+                        result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                    } else {
+                        result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                    }
+                }
+            });
+            return result;
+        };
+
+        DesignView.prototype.getCode = function (designViewJSON) {
+            var self = this;
+            var result = {};
+            self.designToCodeURL = window.location.protocol + "//" + window.location.host + "/editor/code-view";
+            $.ajax({
+                type: "POST",
+                url: self.designToCodeURL,
+                headers: { 'Content-Type':'application/json' },
+                data: designViewJSON,
+                async: false,
+                success: function (response) {
+                    result = {status: "success", responseJSON: window.atob(response)};
+                },
+                error: function (error) {
+                    console.log(error);
+                    if (error.status === 400) {
+                        result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                    } else {
+                        result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                    }
+                }
+            });
+            return result;
+        };
+
+        /**
+         * Display's a warning using the AlertsManager.
+         *
+         * @param message The content to be displayed in the alert
+         */
+        DesignView.prototype.warnAlert = function (message) {
+            alerts.warn(message);
+        };
+
+        /**
+         * Display's a error using the AlertsManager.
+         *
+         * @param message The content to be displayed in the alert
+         */
+        DesignView.prototype.errorAlert = function (message) {
+            alerts.error(message);
+        };
+        //TODO: replace all the alert with the alert library objects
 
         return DesignView;
     });

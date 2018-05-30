@@ -79,7 +79,7 @@ define(
             this.childId = childId;
         };
 
-        Edge.prototype.setchildType = function (childType) {
+        Edge.prototype.setChildType = function (childType) {
             this.childType = childType;
         };
 

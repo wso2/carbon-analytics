@@ -520,21 +520,24 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 annotations.push({annotation: savedAnnotation});
             });
 
-            var savedStoreAnnotation = clickedElement.getStore();
-            var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
-            var storeOptions = [];
-            for (var key in savedStoreAnnotationOptions) {
-                if (savedStoreAnnotationOptions.hasOwnProperty(key)) {
-                    storeOptions.push({
-                        key: key,
-                        value: savedStoreAnnotationOptions[key]
-                    });
+            var storeAnnotation = {};
+            if (clickedElement.getStore() !== undefined) {
+                var savedStoreAnnotation = clickedElement.getStore();
+                var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
+                var storeOptions = [];
+                for (var key in savedStoreAnnotationOptions) {
+                    if (savedStoreAnnotationOptions.hasOwnProperty(key)) {
+                        storeOptions.push({
+                            key: key,
+                            value: savedStoreAnnotationOptions[key]
+                        });
+                    }
                 }
+                storeAnnotation = {
+                    annotationType: savedStoreAnnotation.getType(),
+                    storeOptions: storeOptions
+                };
             }
-            var storeAnnotation = {
-                annotationType: savedStoreAnnotation.getType(),
-                storeOptions: storeOptions
-            };
 
             var name = clickedElement.getName();
             var from = clickedElement.getFrom();
