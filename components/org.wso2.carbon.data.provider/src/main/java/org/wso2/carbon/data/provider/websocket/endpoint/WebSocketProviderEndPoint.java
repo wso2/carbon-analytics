@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.data.provider.websocket.endpoint;
 
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import org.osgi.service.component.annotations.Component;
@@ -34,13 +33,21 @@ import org.wso2.msf4j.websocket.WebSocketEndpoint;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.websocket.*;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -58,7 +65,8 @@ import java.util.regex.Pattern;
 public class WebSocketProviderEndPoint implements WebSocketEndpoint {
     private static final Logger log = LoggerFactory.getLogger(WebSocketProviderEndPoint.class);
     private static final Map<String, ArrayList<WebSocketChannel>> providerMap = new HashMap<>();
-
+    private static final String JSON_REGEX_PATTERN = "\\{\"event\":\\{(.*?)}}";
+    private static final String XML_PATTERN_PATH = "//events/event/*";
 
     @OnOpen
     public static void onOpen(Session session, @PathParam("topic") String topic) {
@@ -67,7 +75,6 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
 
     @OnMessage
     public void onMessage(String message, @PathParam("topic") String topic) {
-        log.info(message);
         if (providerMap.containsKey(topic)) {
             providerMap.get(topic).forEach(channel -> {
                 try {
@@ -106,52 +113,38 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
     }
 
     private JsonElement formatString(String message, String mapping, String topic) {
-
         JsonElement element = new Gson().fromJson("{}", JsonElement.class);
         Pattern pattern = null;
         Matcher matcher = null;
-
         switch (mapping.toLowerCase()) {
             case "text":
                 element = new Gson().fromJson(getJsonString(message, topic), JsonElement.class);
                 break;
             case "json":
-                pattern = Pattern.compile("\\{\"event\":\\{(.*?)}}");
+                pattern = Pattern.compile(JSON_REGEX_PATTERN);
                 matcher = pattern.matcher(message);
-
                 if (matcher.find()) {
                     element = new Gson().fromJson(getJsonString(matcher.group(1), topic), JsonElement.class);
                 }
                 break;
             case "xml":
                 try {
-                    InputSource inputSource = new InputSource(new StringReader(message));
                     DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                    Document document = documentBuilder.parse(inputSource);
-
-                    XPathFactory xPathFactory = XPathFactory.newInstance();
-                    XPath xPath = xPathFactory.newXPath();
-                    XPathExpression expression = xPath.compile("//events/event/*");
-                    Object result = expression.evaluate(document, XPathConstants.NODESET);
-                    NodeList nodeList = (NodeList) result;
-
+                    Document document = documentBuilder.parse(new InputSource(new StringReader(message)));
+                    XPath xPath = XPathFactory.newInstance().newXPath();
+                    XPathExpression expression = xPath.compile(XML_PATTERN_PATH);
+                    NodeList nodeList = (NodeList) expression.evaluate(document, XPathConstants.NODESET);
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.append("{data:[[\"");
-
                     for (int i = 0; i < nodeList.getLength(); i++) {
                         Element el = (Element) nodeList.item(i);
-
                         // seach for the Text children
                         if (el.getFirstChild().getNodeType() == Node.TEXT_NODE)
                             stringBuilder.append(el.getFirstChild().getNodeValue()).append("\",\"");
                     }
-
                     stringBuilder.setLength(stringBuilder.length() - 2);
-
                     stringBuilder.append("]],topic:").append(topic).append("}");
-
                     element = new Gson().fromJson(stringBuilder.toString(), JsonElement.class);
-
                 } catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
                     log.error("Error occurd when parsing xml." + e.getMessage(), e);
                 }
@@ -159,10 +152,8 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
             default:
                 log.error("Invalid mapping provided for the data provider configuration.");
         }
-
         return element;
     }
-
 
     private String getJsonString(String value, String topic) {
         StringBuilder builder = new StringBuilder();
@@ -170,7 +161,6 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
         Arrays.stream(value.trim().split(","))
                 .forEach(keyValuePair -> builder.append(keyValuePair.split(":")[1]).append(","));
         builder.deleteCharAt(builder.length() - 1).append("]],topic:").append(topic).append("}");
-
         return builder.toString();
     }
 }
