@@ -33,6 +33,16 @@ public class ResourceNode implements Serializable {
     private long lastPingTimestamp;
     private int failedPingAttempts;
 
+    public boolean isMetricsUpdated() {
+        return metricsUpdated;
+    }
+
+    private boolean metricsUpdated = false;
+    private double processCPU;
+    private double systemCPU;
+    private double loadAverage;
+    private double memoryUsage;
+
     public ResourceNode(String id) {
         this.id = id;
         this.lastPingTimestamp = System.currentTimeMillis();
@@ -70,6 +80,18 @@ public class ResourceNode implements Serializable {
 
     public void updateLastPingTimestamp() {
         this.lastPingTimestamp = System.currentTimeMillis();
+    }
+
+    public void updateResourceMetrics(WorkerMetrics workerMetrics) {
+        metricsUpdated = true;
+        processCPU = workerMetrics.getProcessCPU();
+        systemCPU = workerMetrics.getSystemCPU();
+        loadAverage = workerMetrics.getLoadAverage();
+        memoryUsage = workerMetrics.getTotalMemory();
+    }
+
+    public double getLoadAverage() {
+        return loadAverage;
     }
 
     public int getFailedPingAttempts() {

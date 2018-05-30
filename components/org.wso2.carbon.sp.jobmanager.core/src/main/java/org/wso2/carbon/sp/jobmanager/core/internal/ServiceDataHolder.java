@@ -21,14 +21,17 @@ package org.wso2.carbon.sp.jobmanager.core.internal;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.sp.jobmanager.core.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.deployment.DeploymentManagerImpl;
 import org.wso2.carbon.sp.jobmanager.core.impl.RDBMSServiceImpl;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
+import org.wso2.carbon.sp.jobmanager.core.util.RoundRobinAllocationAlgorithm;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -50,8 +53,8 @@ public class ServiceDataHolder {
     private static DeploymentManagerImpl deploymentManager;
     private static boolean leader;
     private static PermissionProvider permissionProvider;
-    //newly added
     private static Map<String, String> userDefinedSiddhiApp;
+    private static ResourceAllocationAlgorithm allocationAlgorithm;
 
     public static ScheduledExecutorService getExecutorService() {
         return EXECUTOR_SERVICE;
@@ -159,5 +162,13 @@ public class ServiceDataHolder {
 
     public static void setPermissionProvider(PermissionProvider permissionProvider) {
         ServiceDataHolder.permissionProvider = permissionProvider;
+    }
+
+    public static ResourceAllocationAlgorithm getAllocationAlgorithm() {
+        return allocationAlgorithm;
+    }
+
+    public static void setAllocationAlgorithm(ResourceAllocationAlgorithm allocationAlgorithm) {
+        ServiceDataHolder.allocationAlgorithm = allocationAlgorithm;
     }
 }
