@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.sp.distributed.resource.core.bean;
 
+import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 
 import java.io.Serializable;
 
@@ -38,6 +39,11 @@ public class NodeConfig implements Serializable {
      * EXISTS means there're deployed artifacts.
      */
     private String state;
+
+    /**
+     * Keep the real time metrics details of the resource node.
+     */
+    private WorkerMetrics workerMetrics;
 
     /**
      * Getter for the node id.
@@ -96,6 +102,14 @@ public class NodeConfig implements Serializable {
     public NodeConfig setState(String state) {
         this.state = state;
         return this;
+    }
+
+    public WorkerMetrics getWorkerMetrics() {
+        return workerMetrics;
+    }
+
+    public void setWorkerMetrics(WorkerMetrics workerMetrics) {
+        this.workerMetrics = workerMetrics;
     }
 
     @Override
