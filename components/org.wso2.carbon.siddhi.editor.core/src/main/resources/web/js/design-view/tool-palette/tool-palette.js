@@ -45,91 +45,91 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     id : "source",
                     className : "source-drag",
                     title : "Source",
-                    icon : "/editor/images/source.png"
+                    icon : "/editor/images/source.svg"
                 },
                 {
                     id : "sink",
                     className : "sink-drag",
                     title : "Sink",
-                    icon : "/editor/images/sink.png"
+                    icon : "/editor/images/sink.svg"
                 },
                 {
                     id : "stream",
                     className : "stream-drag",
                     title : "Stream",
-                    icon : "/editor/images/stream.png"
+                    icon : "/editor/images/streams.svg"
                 },
                 {
                     id : "table",
                     className : "table-drag",
                     title : "Table",
-                    icon : "/editor/images/table.png"
+                    icon : "/editor/images/table.svg"
                 },
                 {
                     id : "window",
                     className : "window-drag",
                     title : "Window",
-                    icon : "/editor/images/window.png"
+                    icon : "/editor/images/window-query.svg"
                 },
                 {
                     id : "trigger",
                     className : "trigger-drag",
                     title : "Trigger",
-                    icon : "/editor/images/trigger.png"
+                    icon : "/editor/images/trigger.svg"
                 },
                 {
                     id : "aggregation",
                     className : "aggregation-drag",
                     title : "Aggregation",
-                    icon : "/editor/images/aggregation.png"
+                    icon : "/editor/images/aggregate.svg"
                 },
                 {
                     id : "function",
                     className : "function-drag",
                     title : "Function",
-                    icon : "/editor/images/function.png"
+                    icon : "/editor/images/function.svg"
                 },
                 {
                     id : "projection-query",
                     className : "projection-query-drag",
                     title : "Projection Query",
-                    icon : "/editor/images/projectionQuery.png"
+                    icon : "/editor/images/projection-query.svg"
                 },
                 {
                     id : "filter-query",
                     className : "filter-query-drag",
                     title : "Filter Query",
-                    icon : "/editor/images/filterQuery.png"
+                    icon : "/editor/images/filter-query.svg"
                 },
                 {
                     id : "window-query",
                     className : "window-query-drag",
                     title : "Window Query",
-                    icon : "/editor/images/windowQuery.png"
+                    icon : "/editor/images/window-query.svg"
                 },
                 {
                     id : "join-query",
                     className : "join-query-drag",
                     title : "Join Query",
-                    icon : "/editor/images/join.png"
+                    icon : "/editor/images/join-query.svg"
                 },
                 {
                     id : "pattern-query",
                     className : "pattern-query-drag",
                     title : "Pattern Query",
-                    icon : "/editor/images/patternQuery.png"
+                    icon : "/editor/images/pattern-query.svg"
                 },
                 {
                     id : "sequence-query",
                     className : "sequence-query-drag",
                     title : "Sequence Query",
-                    icon : "/editor/images/sequenceQuery.png"
+                    icon : "/editor/images/sequence-query.svg"
                 },
                 {
                     id : "partition",
                     className : "partition-drag",
                     title : "Partition",
-                    icon : "/editor/images/patternQuery.png"
+                    icon : "/editor/images/partition.svg"
                 }
             ];
 
