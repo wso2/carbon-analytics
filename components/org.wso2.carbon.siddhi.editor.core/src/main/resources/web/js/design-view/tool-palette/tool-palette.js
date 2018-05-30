@@ -69,7 +69,7 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     id : "window",
                     className : "window-drag",
                     title : "Window",
-                    icon : "/editor/images/window-query.svg"
+                    icon : "/editor/images/window.svg"
                 },
                 {
                     id : "trigger",
