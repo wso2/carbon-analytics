@@ -302,7 +302,7 @@ p.node-last-update {
     height: 60px;
     width: 40px;
     float: left;
-    margin: 1px 15px 1px 1px;
+    margin: -2px 15px 1px 1px;
     background: #ccc url("../icons/streams.svg") no-repeat center center;
 }
 
@@ -310,7 +310,7 @@ p.node-last-update {
     height: 60px;
     width: 40px;
     float: left;
-    margin: 1px 15px 1px 1px;
+    margin: -2px 15px 1px 1px;
     background: #ccc url("../icons/table.svg") no-repeat center center;
 }
 
@@ -318,7 +318,7 @@ p.node-last-update {
     height: 60px;
     width: 40px;
     float: left;
-    margin: 1px 15px 1px 1px;
+    margin: -2px 15px 1px 1px;
     background: #ccc url("../icons/trigger.svg") no-repeat center center;
 }
 
@@ -326,7 +326,7 @@ p.node-last-update {
     height: 60px;
     width: 40px;
     float: left;
-    margin: 1px 15px 1px 1px;
+    margin: -2px 15px 1px 1px;
     background: #ccc url("../icons/window.svg") no-repeat center center;
 }
 
@@ -334,7 +334,7 @@ p.node-last-update {
     height: 60px;
     width: 40px;
     float: left;
-    margin: 1px 15px 1px 1px;
+    margin: -2px 15px 1px 1px;
     background: #ccc url("../icons/query.svg") no-repeat center center;
 }
 
@@ -342,7 +342,7 @@ p.node-last-update {
     height: 60px;
     width: 40px;
     float: left;
-    margin: 1px 15px 1px 1px;
+    margin: -2px 15px 1px 1px;
     background: #ccc url("../icons/function.svg") no-repeat center center;
 }
 
@@ -350,7 +350,7 @@ p.node-last-update {
     height: 60px;
     width: 40px;
     float: left;
-    margin: 1px 15px 1px 1px;
+    margin: -2px 15px 1px 1px;
     background: #ccc url("../icons/aggregate.svg") no-repeat center center;
 }
 
@@ -358,7 +358,7 @@ p.node-last-update {
     height: 60px;
     width: 40px;
     float: left;
-    margin: 1px 15px 1px 1px;
+    margin: -2px 15px 1px 1px;
     background: #ccc url("../icons/partition.svg") no-repeat center center;
 }
 
