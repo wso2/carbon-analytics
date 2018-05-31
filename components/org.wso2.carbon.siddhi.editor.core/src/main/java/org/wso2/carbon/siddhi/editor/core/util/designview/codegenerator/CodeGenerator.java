@@ -452,7 +452,7 @@ public class CodeGenerator {
                     windowStringBuilder.append(SiddhiStringBuilderConstants.ALL_EVENTS);
                     break;
                 default:
-                    throw new CodeGenerationException("Unidentified output event type for WindowConfig: "
+                    throw new CodeGenerationException("Unidentified output event type for the WindowConfig object: "
                             + window.getOutputEventType());
             }
         }
@@ -498,18 +498,19 @@ public class CodeGenerator {
      */
     private String generateAggregationString(AggregationConfig aggregation) {
         if (aggregation == null) {
-            throw new CodeGenerationException("The AggregationConfig object is null");
+            throw new CodeGenerationException("The given AggregationConfig object is null");
         } else if (aggregation.getName() == null || aggregation.getName().isEmpty()) {
             throw new CodeGenerationException("The aggregation name for the given AggregationConfig" +
                     " object is null/empty");
         } else if (aggregation.getFrom() == null || aggregation.getFrom().isEmpty()) {
-            throw new CodeGenerationException("The input stream for aggregation  is null");
+            throw new CodeGenerationException("The 'from' value for the given AggregationConfig is null/empty");
         } else if (aggregation.getAggregateByTimePeriod() == null) {
-            throw new CodeGenerationException("The AggregateByTimePeriod instance is null");
+            throw new CodeGenerationException("The AggregateByTimePeriod value for the given" +
+                    " AggregationConfig is null");
         } else if (aggregation.getAggregateByTimePeriod().getMinValue() == null ||
                 aggregation.getAggregateByTimePeriod().getMinValue().isEmpty()) {
-            throw new CodeGenerationException("The aggregate by time period must have atleast one" +
-                    " value for aggregation");
+            throw new CodeGenerationException("The 'aggregateByTimePeriod' of the given AggregationConfig object" +
+                    " must at least have a minimum value");
         }
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
