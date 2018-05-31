@@ -21,7 +21,7 @@ package org.wso2.carbon.sp.jobmanager.core.deployment;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.DeploymentManager;
-import org.wso2.carbon.sp.jobmanager.core.ResourceAllocationAlgorithm;
+import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.ResourcePoolChangeListener;
 import org.wso2.carbon.sp.jobmanager.core.SiddhiAppDeployer;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.DistributedSiddhiQuery;

@@ -32,7 +32,7 @@ public class DeploymentConfig implements Serializable {
     @Element(description = "deployment type (distributed/ha)", required = true)
     private String type;
     @Element(description = "Allocation algorithm", required = true)
-    private String allocationAlgorithm = "org.wso2.carbon.sp.jobmanager.core.util.RoundRobinAllocationAlgorithm";
+    private String allocationAlgorithm = "org.wso2.carbon.sp.jobmanager.core.allocation.RoundRobinAllocationAlgorithm";
     @Element(description = "host:port configurations", required = true)
     private InterfaceConfig httpInterface;
     private int heartbeatInterval = 10000;

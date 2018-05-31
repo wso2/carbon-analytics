@@ -33,7 +33,7 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.sp.jobmanager.core.CoordinatorChangeListener;
-import org.wso2.carbon.sp.jobmanager.core.ResourceAllocationAlgorithm;
+import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApi;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SPSiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
