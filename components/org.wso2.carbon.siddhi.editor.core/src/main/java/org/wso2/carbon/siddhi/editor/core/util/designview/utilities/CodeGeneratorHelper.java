@@ -60,7 +60,7 @@ public class CodeGeneratorHelper {
      * @param attributes The list of AttributeConfig objects to be converted
      * @return The converted attributes as a string
      */
-    public static String getAttributes(List<AttributeConfig> attributes) {
+    public static String getAttributes(List<AttributeConfig> attributes) throws CodeGenerationException {
         if (attributes == null || attributes.isEmpty()) {
             throw new CodeGenerationException("The given AttributeConfig list is null/empty");
         }
@@ -113,7 +113,7 @@ public class CodeGeneratorHelper {
      * @param store The StoreConfig instance to be converted
      * @return The string representation of a store annotation
      */
-    public static String getStore(StoreConfig store) {
+    public static String getStore(StoreConfig store) throws CodeGenerationException {
         if (store == null) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         } else if (store.getType() == null || store.getType().isEmpty()) {
@@ -192,7 +192,7 @@ public class CodeGeneratorHelper {
             // method is because the '@PrimaryKey' annotation is automatically generated
             // in Siddhi runtime for Aggregation Definitions. This is done to avoid that.
             if (annotation.toLowerCase().contains(CodeGeneratorConstants.PRIMARY_KEY_ANNOTATION)) {
-                break;
+                continue;
             }
             annotationsStringBuilder.append(annotation)
                     .append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -208,7 +208,7 @@ public class CodeGeneratorHelper {
      * @param annotationType The annotation type the MapperConfig object belongs to (SINK or SOURCE)
      * @return The string representation of the MapperConfig object
      */
-    public static String getMapper(MapperConfig mapper, String annotationType) {
+    public static String getMapper(MapperConfig mapper, String annotationType) throws CodeGenerationException {
         if (mapper.getType() == null || mapper.getType().isEmpty()) {
             throw new CodeGenerationException("The map type of the given MapperConfig object is null/empty");
         }
@@ -248,7 +248,7 @@ public class CodeGeneratorHelper {
      * @param queryInput The QueryInputConfig object to be converted
      * @return The string representation of the given QueryInputConfig object
      */
-    public static String getQueryInput(QueryInputConfig queryInput) {
+    public static String getQueryInput(QueryInputConfig queryInput) throws CodeGenerationException {
         if (queryInput == null) {
             throw new CodeGenerationException("The given QueryInputConfig object is null");
         } else if (queryInput.getType() == null || queryInput.getType().isEmpty()) {
@@ -286,7 +286,8 @@ public class CodeGeneratorHelper {
      * @param windowFilterProjection The WindowFilterProjectCofig to be converted
      * @return The string representation of the given WindowFilterProjectionConfig object
      */
-    private static String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection) {
+    private static String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection)
+            throws CodeGenerationException {
         if (windowFilterProjection == null) {
             throw new CodeGenerationException("The given WindowFilterProjection object is null");
         } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
@@ -308,7 +309,7 @@ public class CodeGeneratorHelper {
      * @param join The JoinConfig object to be converted
      * @return The string representation of the given JoinConfig object
      */
-    private static String getJoinQueryInput(JoinConfig join) {
+    private static String getJoinQueryInput(JoinConfig join) throws CodeGenerationException {
         if (join == null) {
             throw new CodeGenerationException("The given JoinConfig object is null");
         } else if (join.getJoinWith() == null || join.getJoinType().isEmpty()) {
@@ -370,7 +371,7 @@ public class CodeGeneratorHelper {
      * @param joinElement The JoinElementConfig object to be converted
      * @return The string representation of the given JoinElementConfig object
      */
-    private static String getJoinElement(JoinElementConfig joinElement) {
+    private static String getJoinElement(JoinElementConfig joinElement) throws CodeGenerationException {
         if (joinElement == null) {
             throw new CodeGenerationException("The JoinElementConfig object given is null");
         } else if (joinElement.getFrom() == null || joinElement.getFrom().isEmpty()) {
@@ -403,7 +404,8 @@ public class CodeGeneratorHelper {
      * @param streamHandlerList The list of StreamHandlerConfig objects to be converted
      * @return The result string representation of the list of StreamHandlerConfig objects
      */
-    private static String getStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
+    private static String getStreamHandlerList(List<StreamHandlerConfig> streamHandlerList)
+            throws CodeGenerationException {
         if (streamHandlerList == null || streamHandlerList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
@@ -423,7 +425,7 @@ public class CodeGeneratorHelper {
      * @param streamHandler The StreamHandlerConfig object to be converted
      * @return The string representation of the given StreamHandlerConfig object
      */
-    private static String getStreamHandler(StreamHandlerConfig streamHandler) {
+    private static String getStreamHandler(StreamHandlerConfig streamHandler) throws CodeGenerationException {
         if (streamHandler == null) {
             throw new CodeGenerationException("The given StreamHandlerConfig object is null");
         } else if (streamHandler.getType() == null || streamHandler.getType().isEmpty()) {
@@ -472,7 +474,7 @@ public class CodeGeneratorHelper {
      * @param joinType The join type as a string
      * @return The Siddhi string representation of the given join type
      */
-    private static String getJoinType(String joinType) {
+    private static String getJoinType(String joinType) throws CodeGenerationException {
         if (joinType == null || joinType.isEmpty()) {
             throw new CodeGenerationException("The joinType value for the given join query is null/empty");
         }
@@ -497,7 +499,8 @@ public class CodeGeneratorHelper {
      * @param patternSequence The PatterSequenceConfig object to be converted
      * @return The string representation of the given PatternSequenceConfig object
      */
-    private static String getPatternSequenceInput(PatternSequenceConfig patternSequence) {
+    private static String getPatternSequenceInput(PatternSequenceConfig patternSequence)
+            throws CodeGenerationException {
         if (patternSequence == null) {
             throw new CodeGenerationException("The given PatternSequenceConfig object is null");
         } else if (patternSequence.getLogic() == null || patternSequence.getLogic().isEmpty()) {
@@ -523,7 +526,8 @@ public class CodeGeneratorHelper {
      * @param condition The PatternSequenceConditionConfig object to be converted
      * @return The Siddhi string representation of the given PatternSequenceConfig object
      */
-    private static String getPatternSequenceConditionLogic(PatternSequenceConditionConfig condition) {
+    private static String getPatternSequenceConditionLogic(PatternSequenceConditionConfig condition)
+            throws CodeGenerationException {
         if (condition == null) {
             throw new CodeGenerationException("The given PatternSequenceConditionConfig object is null");
         } else if (condition.getStreamName() == null || condition.getStreamName().isEmpty()) {
@@ -546,7 +550,7 @@ public class CodeGeneratorHelper {
      * @param attributesSelection The AttributesSelectionConfig object to be converted
      * @return The converted Siddhi string representation of the given AttributesSelectionConfig object
      */
-    public static String getQuerySelect(AttributesSelectionConfig attributesSelection) {
+    public static String getQuerySelect(AttributesSelectionConfig attributesSelection) throws CodeGenerationException {
         if (attributesSelection == null) {
             throw new CodeGenerationException("The given AttributeSelectionConfig object is null");
         }
@@ -583,7 +587,8 @@ public class CodeGeneratorHelper {
      * @param userDefinedSelection The UserDefinedSelectionConfig object to be converted
      * @return The Siddhi string representation of the given UserDefinedSelectionConfig
      */
-    private static String getUserDefinedSelection(UserDefinedSelectionConfig userDefinedSelection) {
+    private static String getUserDefinedSelection(UserDefinedSelectionConfig userDefinedSelection)
+            throws CodeGenerationException {
         if (userDefinedSelection == null || userDefinedSelection.getValue() == null ||
                 userDefinedSelection.getValue().isEmpty()) {
             throw new CodeGenerationException("The given UserDefinedSelection object is null/empty");
@@ -641,7 +646,7 @@ public class CodeGeneratorHelper {
      * @param orderByList The order by list to be converted
      * @return The Siddhi string representation of the given order by config list
      */
-    public static String getQueryOrderBy(List<QueryOrderByConfig> orderByList) {
+    public static String getQueryOrderBy(List<QueryOrderByConfig> orderByList) throws CodeGenerationException {
         if (orderByList == null || orderByList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
@@ -736,7 +741,7 @@ public class CodeGeneratorHelper {
      * @param queryOutput The QueryOutputConfig object to be converted
      * @return The converted string representation of the given QueryOutputConfig object
      */
-    public static String getQueryOutput(QueryOutputConfig queryOutput) {
+    public static String getQueryOutput(QueryOutputConfig queryOutput) throws CodeGenerationException {
         if (queryOutput == null) {
             throw new CodeGenerationException("The QueryOutputConfig given is null");
         } else if (queryOutput.getType() == null || queryOutput.getType().isEmpty()) {
@@ -775,7 +780,8 @@ public class CodeGeneratorHelper {
      * @param target       The name of the target output definition
      * @return The Siddhi string representation of the InsertOutputConfig to respective target
      */
-    private static String getInsertOutput(InsertOutputConfig insertOutput, String target) {
+    private static String getInsertOutput(InsertOutputConfig insertOutput, String target)
+            throws CodeGenerationException {
         if (insertOutput == null) {
             throw new CodeGenerationException("The given InsertOutputConfig object is null");
         } else if (target == null || target.isEmpty()) {
@@ -821,7 +827,8 @@ public class CodeGeneratorHelper {
      * @param target       The name of the target output definition
      * @return The Siddhi string representation of the DeleteOutputConfig object to the respective target
      */
-    private static String getDeleteOutput(DeleteOutputConfig deleteOutput, String target) {
+    private static String getDeleteOutput(DeleteOutputConfig deleteOutput, String target)
+            throws CodeGenerationException {
         if (deleteOutput == null) {
             throw new CodeGenerationException("The given DeleteOutputConfig object is null");
         } else if (deleteOutput.getOn() == null || deleteOutput.getOn().isEmpty()) {
@@ -835,30 +842,9 @@ public class CodeGeneratorHelper {
 
         deleteOutputStringBuilder.append(SiddhiStringBuilderConstants.DELETE)
                 .append(SiddhiStringBuilderConstants.SPACE)
-                .append(target);
-
-        if (deleteOutput.getEventType() != null && !deleteOutput.getEventType().isEmpty()) {
-            deleteOutputStringBuilder
-                    .append(SiddhiStringBuilderConstants.NEW_LINE)
-                    .append(SiddhiStringBuilderConstants.TAB_SPACE)
-                    .append(SiddhiStringBuilderConstants.FOR)
-                    .append(SiddhiStringBuilderConstants.SPACE);
-            switch (deleteOutput.getEventType().toUpperCase()) {
-                case CodeGeneratorConstants.CURRENT_EVENTS:
-                    deleteOutputStringBuilder.append(SiddhiStringBuilderConstants.CURRENT_EVENTS);
-                    break;
-                case CodeGeneratorConstants.EXPIRED_EVENTS:
-                    deleteOutputStringBuilder.append(SiddhiStringBuilderConstants.EXPIRED_EVENTS);
-                    break;
-                case CodeGeneratorConstants.ALL_EVENTS:
-                    deleteOutputStringBuilder.append(SiddhiStringBuilderConstants.ALL_EVENTS);
-                    break;
-                default:
-                    throw new CodeGenerationException("Unidentified event type: " + deleteOutput.getEventType());
-            }
-        }
-
-        deleteOutputStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+                .append(target)
+                .append(getForEventType(deleteOutput.getEventType()))
+                .append(SiddhiStringBuilderConstants.NEW_LINE)
                 .append(SiddhiStringBuilderConstants.TAB_SPACE)
                 .append(SiddhiStringBuilderConstants.ON)
                 .append(SiddhiStringBuilderConstants.SPACE)
@@ -877,7 +863,7 @@ public class CodeGeneratorHelper {
      * @return The Siddhi string representation of the UpdateInsertIntoOutputConfig object to the respective target
      */
     private static String getUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput,
-                                          String target) {
+                                          String target) throws CodeGenerationException {
         if (updateInsertIntoOutput == null) {
             throw new CodeGenerationException("The given UpdateInsertIntoOutputConfig object is null");
         } else if (updateInsertIntoOutput.getSet() == null || updateInsertIntoOutput.getSet().isEmpty()) {
@@ -899,6 +885,7 @@ public class CodeGeneratorHelper {
 
         updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                 .append(target)
+                .append(getForEventType(updateInsertIntoOutput.getEventType()))
                 .append(SiddhiStringBuilderConstants.NEW_LINE)
                 .append(SiddhiStringBuilderConstants.TAB_SPACE)
                 .append(SiddhiStringBuilderConstants.SET)
@@ -926,12 +913,46 @@ public class CodeGeneratorHelper {
     }
 
     /**
+     * Generates a Siddhi string representation for a 'for <eventType>' output,
+     * where the <eventType> can be 'CURRENT_EVENTS', 'EXPIRED_EVENTS' or 'ALL_EVENTS'
+     *
+     * @param eventType The event type that is used
+     * @return The string representation for the event type in Siddhi
+     */
+    private static String getForEventType(String eventType) throws CodeGenerationException {
+        if (eventType == null || eventType.isEmpty()) {
+            return SiddhiStringBuilderConstants.EMPTY_STRING;
+        }
+
+        StringBuilder forEventTypeStringBuilder = new StringBuilder();
+        forEventTypeStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
+                .append(SiddhiStringBuilderConstants.FOR)
+                .append(SiddhiStringBuilderConstants.SPACE);
+
+        switch (eventType.toUpperCase()) {
+            case CodeGeneratorConstants.CURRENT_EVENTS:
+                forEventTypeStringBuilder.append(SiddhiStringBuilderConstants.CURRENT_EVENTS);
+                break;
+            case CodeGeneratorConstants.EXPIRED_EVENTS:
+                forEventTypeStringBuilder.append(SiddhiStringBuilderConstants.EXPIRED_EVENTS);
+                break;
+            case CodeGeneratorConstants.ALL_EVENTS:
+                forEventTypeStringBuilder.append(SiddhiStringBuilderConstants.ALL_EVENTS);
+                break;
+            default:
+                throw new CodeGenerationException("Unidentified event type: " + eventType);
+        }
+
+        return forEventTypeStringBuilder.toString();
+    }
+
+    /**
      * Generates a Siddhi string representation of a SetAttributeConfig object
      *
      * @param setAttribute The given SetAttributeConfig object to be converted
      * @return The converted Siddhi string representation of the SetAttributeConfig object
      */
-    private static String getSetAttribute(SetAttributeConfig setAttribute) {
+    private static String getSetAttribute(SetAttributeConfig setAttribute) throws CodeGenerationException {
         if (setAttribute == null) {
             throw new CodeGenerationException("The SetAttributeConfig object given is null in the" +
                     " update output query type");

@@ -22,7 +22,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.exceptions;
  * Represents the exception which occurs during code generation from
  * the 'CodeGenerator' or CodeGeneratorHelper class
  */
-public class CodeGenerationException extends RuntimeException {
+public class CodeGenerationException extends Exception {
 
     public CodeGenerationException(String message) {
         super(message);
