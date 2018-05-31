@@ -31,6 +31,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorHelper;
 
@@ -298,7 +299,7 @@ public class CodeGenerator {
      * @param queryLists A list of QueryConfig objects to be converted
      * @return The Siddhi string representation of the given QueryConfig list
      */
-    private String generateQueries(Map<String, List<QueryConfig>> queryLists) {
+    private String generateQueries(Map<QueryListType, List<QueryConfig>> queryLists) {
         if (queryLists == null || queryLists.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }

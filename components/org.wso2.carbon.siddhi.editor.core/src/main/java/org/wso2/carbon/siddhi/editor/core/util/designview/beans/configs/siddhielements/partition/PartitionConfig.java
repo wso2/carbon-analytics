@@ -20,6 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -29,11 +30,11 @@ import java.util.Map;
  * Represents Siddhi Partition
  */
 public class PartitionConfig extends SiddhiElementConfig {
-    private Map<String, List<QueryConfig>> queryLists;
+    private Map<QueryListType, List<QueryConfig>> queryLists;
     private String partitionWith;
     private List<Annotation> annotationList;
 
-    public PartitionConfig(String id, Map<String, List<QueryConfig>> queryLists, String partitionWith,
+    public PartitionConfig(String id, Map<QueryListType, List<QueryConfig>> queryLists, String partitionWith,
                            List<Annotation> annotationList) {
         super(id);
         this.queryLists = queryLists;
@@ -41,7 +42,7 @@ public class PartitionConfig extends SiddhiElementConfig {
         this.annotationList = annotationList;
     }
 
-    public Map<String, List<QueryConfig>> getQueryLists() {
+    public Map<QueryListType, List<QueryConfig>> getQueryLists() {
         return queryLists;
     }
 
