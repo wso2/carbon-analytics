@@ -49,7 +49,7 @@ body {
 }
 
 .grid-tile-h1 {
-    color: rgba(255,255,255,0.57);
+    color: rgba(255, 255, 255, 0.57);
     text-align: center;
 }
 
@@ -64,12 +64,12 @@ body {
     bottom: 25px;
 }
 
-.navigation-bar{
+.navigation-bar {
     width: 100%;
     background-color: #424242;
 }
 
-.toggle{
+.toggle {
     float: right;
     width: 10%;
     margin-left: 3%;
@@ -113,7 +113,7 @@ body {
     display: inline-block;
 }
 
-.overlay{
+.overlay {
     transition: .5s ease;
     opacity: 0;
     position: absolute;
@@ -122,11 +122,12 @@ body {
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%)
 }
+
 .container:hover .overlay {
     opacity: 1;
 }
 
-.info-card{
+.info-card {
     background-color: #2f96b4 !important;
     width: 40%;
     padding: 15px 0;
@@ -143,11 +144,12 @@ body {
     background-color: #4e4e4e !important;
 }
 
-.add-button-disabled{
+.add-button-disabled {
     background-color: #222222;
     text-align: center;
     padding: 20px;
 }
+
 .worker-tooltip {
     position: relative;
     display: inline-block;
@@ -189,7 +191,8 @@ body {
     height: 60px;
 }
 
-.node-content {height: 50px;
+.node-content {
+    height: 50px;
     line-height: 30px;
 }
 
@@ -219,6 +222,11 @@ body {
 .nodes .label {
     text-align: left;
     width: 500px;
+}
+
+.clusters .cluster rect {
+    fill: #696969;
+    height: 200px;
 }
 
 .edgePath path {
@@ -291,4 +299,159 @@ p.node-last-update {
     display: flex;
     justify-content: center;
     margin: 20px 0;
+}
+
+.stream-indicator {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/streams.svg") no-repeat center center;
+}
+
+.table-indicator {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/table.svg") no-repeat center center;
+}
+
+.trigger-indicator {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/trigger.svg") no-repeat center center;
+}
+
+.window-indicator {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/window.svg") no-repeat center center;
+}
+
+.query-indicator {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/query.svg") no-repeat center center;
+}
+
+.function-indicator {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/function.svg") no-repeat center center;
+}
+
+.aggregation-indicator {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/aggregate.svg") no-repeat center center;
+}
+
+.partition-type-colour {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/partition.svg") no-repeat center center;
+}
+
+.source-indicator {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/source.svg") no-repeat center center;
+}
+
+.sink-indicator {
+    height: 60px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/sink.svg") no-repeat center center;
+}
+
+
+.partition {
+    font-size: 30px;
+    color: #d3d3d3;
+    margin-top: 150%;
+}
+
+.legend {
+    color: #fff;
+    font-size: 14px;
+    text-align: left;
+    float: right;
+    width: 100%;
+    max-width: 440px;
+    padding: 10px;
+    background: #333;
+}
+
+.legend-key {
+    padding: 0 5px;
+    display: inline-block;
+}
+
+.legend-text {
+    line-height: 24px;
+    font-size: 12px;
+}
+
+.legend-colour {
+    width: 15px;
+    height: 15px;
+    float: left;
+    margin: 5px;
+}
+
+.stream-image {
+    background: url("../icons/streams.svg");
+}
+
+.table-image {
+    background: url("../icons/table.svg");
+}
+
+.trigger-image {
+    background: url("../icons/trigger.svg");
+}
+
+.window-image {
+    background: url("../icons/window.svg");
+}
+
+.function-image {
+    background: url("../icons/function.svg");
+}
+
+.aggregation-image {
+    background: url("../icons/aggregate.svg");
+}
+
+.partition-image {
+    background: url("../icons/partition.svg");
+}
+
+.query-image {
+    background: url("../icons/query.svg");
+}
+
+.source-image {
+    background: url("../icons/source.svg");
+}
+
+.sink-image {
+    background: url("../icons/sink.svg");
 }
