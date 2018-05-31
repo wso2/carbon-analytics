@@ -24,6 +24,7 @@ import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPInterfaceConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.ManagerNodeConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.NodeConfig;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
+import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -35,6 +36,8 @@ public class ServiceDataHolder {
     private static ManagerNodeConfig leaderNodeConfig;
     private static NodeConfig currentNodeConfig;
     private static DeploymentMode deploymentMode;
+    private static OperatingSystemMetricSet operatingSystemMetricSet;
+
     private static Set<HTTPInterfaceConfig> resourceManagers = Collections.synchronizedSet(new LinkedHashSet<>());
 
     public static ConfigProvider getConfigProvider() {
@@ -83,5 +86,13 @@ public class ServiceDataHolder {
 
     public static void setResourceManagers(Set<HTTPInterfaceConfig> resourceManagers) {
         ServiceDataHolder.resourceManagers = resourceManagers;
+    }
+
+    public static OperatingSystemMetricSet getOperatingSystemMetricSet() {
+        return operatingSystemMetricSet;
+    }
+
+    public static void setOperatingSystemMetricSet(OperatingSystemMetricSet operatingSystemMetricSet) {
+        ServiceDataHolder.operatingSystemMetricSet = operatingSystemMetricSet;
     }
 }

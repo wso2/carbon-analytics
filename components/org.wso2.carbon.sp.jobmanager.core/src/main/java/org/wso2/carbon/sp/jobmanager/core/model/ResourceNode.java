@@ -32,6 +32,10 @@ public class ResourceNode implements Serializable {
     private InterfaceConfig httpInterface;
     private long lastPingTimestamp;
     private int failedPingAttempts;
+    private double processCPU;
+    private double systemCPU;
+    private double loadAverage;
+    private double memoryUsage;
 
     public ResourceNode(String id) {
         this.id = id;
@@ -72,6 +76,18 @@ public class ResourceNode implements Serializable {
         this.lastPingTimestamp = System.currentTimeMillis();
     }
 
+    public void updateResourceMetrics(WorkerMetrics workerMetrics) {
+        metricsUpdated = true;
+        processCPU = workerMetrics.getProcessCPU();
+        systemCPU = workerMetrics.getSystemCPU();
+        loadAverage = workerMetrics.getLoadAverage();
+        memoryUsage = workerMetrics.getTotalMemory();
+    }
+
+    public double getLoadAverage() {
+        return loadAverage;
+    }
+
     public int getFailedPingAttempts() {
         return failedPingAttempts;
     }
@@ -82,6 +98,20 @@ public class ResourceNode implements Serializable {
 
     public void incrementFailedPingAttempts() {
         failedPingAttempts += 1;
+    }
+
+    public boolean isMetricsUpdated() {
+        return metricsUpdated;
+    }
+
+    private boolean metricsUpdated = false;
+
+    public double getProcessCPU() {
+        return processCPU;
+    }
+
+    public double getSystemCPU() {
+        return systemCPU;
     }
 
     @Override

@@ -120,6 +120,9 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                 InterfaceConfig existingIFace = TypeConverter.convert(existingResourceNode.getHttpInterface());
                 InterfaceConfig currentIFace = nodeConfig.getHttpInterface();
                 if (currentIFace.equals(existingIFace)) {
+                    if (nodeConfig.getWorkerMetrics() != null) {
+                        existingResourceNode.updateResourceMetrics(nodeConfig.getWorkerMetrics());
+                    }
                     existingResourceNode.updateLastPingTimestamp();
                     boolean redeploy = false;
                     if (ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(existingResourceNode.getState())) {

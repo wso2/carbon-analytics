@@ -17,11 +17,14 @@
  */
 package org.wso2.carbon.stream.processor.statistics.bean;
 
+import java.io.Serializable;
+
 /**
  * This is the bean class which keep the statistical details other than metrics.
  */
-public class WorkerStatistics {
-    
+public class WorkerStatistics implements Serializable {
+
+    private static final long serialVersionUID = -300492616653467677L;
     private WorkerMetrics workerMetrics;
     private String haStatus;
     private String runningStatus;
@@ -32,83 +35,83 @@ public class WorkerStatistics {
     private String osName;
     private boolean isInSync;
     private String message;
-    
+
     public WorkerMetrics getWorkerMetrics() {
         return workerMetrics;
     }
-    
+
     public void setWorkerMetrics(WorkerMetrics workerMetrics) {
         this.workerMetrics = workerMetrics;
     }
-    
+
     public String getHaStatus() {
         return haStatus;
     }
-    
+
     public void setHaStatus(String haStatus) {
         this.haStatus = haStatus;
     }
-    
+
     public boolean isStatsEnabled() {
         return isStatsEnabled;
     }
-    
+
     public void setStatsEnabled(boolean statsEnabled) {
         isStatsEnabled = statsEnabled;
     }
-    
+
     public String getClusterID() {
         return clusterID;
     }
-    
+
     public void setClusterID(String clusterID) {
         this.clusterID = clusterID;
     }
-    
+
     public String getLastSyncTime() {
         return lastSyncTime;
     }
-    
+
     public void setLastSyncTime(String lastSyncTime) {
         this.lastSyncTime = lastSyncTime;
     }
-    
+
     public String getRunningStatus() {
         return runningStatus;
     }
-    
+
     public void setRunningStatus(String runningStatus) {
         this.runningStatus = runningStatus;
     }
-    
+
     public String getOsName() {
         return osName;
     }
-    
+
     public void setOsName(String osName) {
         this.osName = osName;
     }
-    
+
     public String getLastSnapshotTime() {
         return lastSnapshotTime;
     }
-    
+
     public void setLastSnapshotTime(String lastSnapshotTime) {
         this.lastSnapshotTime = lastSnapshotTime;
     }
-    
+
     public boolean isInSync() {
         return isInSync;
     }
-    
+
     public void setInSync(boolean inSync) {
         isInSync = inSync;
     }
-    
+
     public String getMessage() {
         return message;
     }
-    
+
     public void setMessage(String message) {
         this.message = message;
     }

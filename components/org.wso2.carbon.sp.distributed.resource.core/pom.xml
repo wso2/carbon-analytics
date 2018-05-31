@@ -77,6 +77,10 @@
             <groupId>commons-io.wso2</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.stream.processor.statistics</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -153,7 +157,5 @@
             <!--!org.wso2.carbon.sp.distributed.resource.core.internal,-->
             org.wso2.carbon.sp.distributed.resource.core.*
         </export.package>
-        <carbon.component>
-        </carbon.component>
     </properties>
 </project>
