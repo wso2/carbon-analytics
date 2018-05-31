@@ -49,7 +49,7 @@ public class CodeGenerator {
      * @param eventFlow The EventFlow object to be converted
      * @return The Siddhi app as a string
      */
-    public String generateSiddhiAppCode(EventFlow eventFlow) {
+    public String generateSiddhiAppCode(EventFlow eventFlow) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
         StringBuilder siddhiAppStringBuilder = new StringBuilder();
         siddhiAppStringBuilder
@@ -113,18 +113,20 @@ public class CodeGenerator {
      * @return The string representation of the stream definitions
      */
     private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList,
-                                   List<SourceSinkConfig> sinkList) {
+                                   List<SourceSinkConfig> sinkList) throws CodeGenerationException {
         if (streamList == null || streamList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder streamListStringBuilder = new StringBuilder();
-        streamListStringBuilder.append("-- Streams")
+        streamListStringBuilder.append(SiddhiStringBuilderConstants.STREAMS_COMMENT)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (StreamConfig stream : streamList) {
             if (stream.isInnerStream()) {
-                break;
+                continue;
+            } else if (stream.getName() == null || stream.getName().isEmpty()) {
+                throw new CodeGenerationException("The name of the given StreamConfig is null/empty");
             }
 
             for (SourceSinkConfig source : sourceList) {
@@ -156,13 +158,13 @@ public class CodeGenerator {
      * @param tableList A list of TableConfig objects from the SiddhiAppConfig object
      * @return The Siddhi string representation of the table definitions
      */
-    private String generateTables(List<TableConfig> tableList) {
+    private String generateTables(List<TableConfig> tableList) throws CodeGenerationException {
         if (tableList == null || tableList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder tableListStringBuilder = new StringBuilder();
-        tableListStringBuilder.append("-- Tables")
+        tableListStringBuilder.append(SiddhiStringBuilderConstants.TABLES_COMMENT)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (TableConfig table : tableList) {
@@ -181,13 +183,13 @@ public class CodeGenerator {
      * @param windowList A list of WindowConfig objects to be converted
      * @return The Siddhi string representaiotn of all the window definitions
      */
-    private String generateWindows(List<WindowConfig> windowList) {
+    private String generateWindows(List<WindowConfig> windowList) throws CodeGenerationException {
         if (windowList == null || windowList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder windowListStringBuilder = new StringBuilder();
-        windowListStringBuilder.append("-- Windows")
+        windowListStringBuilder.append(SiddhiStringBuilderConstants.WINDOWS_COMMENT)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (WindowConfig window : windowList) {
@@ -209,16 +211,18 @@ public class CodeGenerator {
      * @return The Siddhi string representation of all the trigger definitions
      */
     private String generateTriggers(List<TriggerConfig> triggerList, List<SourceSinkConfig> sourceList,
-                                    List<SourceSinkConfig> sinkList) {
+                                    List<SourceSinkConfig> sinkList) throws CodeGenerationException {
         if (triggerList == null || triggerList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder triggerListStringBuilder = new StringBuilder();
-        triggerListStringBuilder.append("-- Triggers")
+        triggerListStringBuilder.append(SiddhiStringBuilderConstants.TRIGGERS_COMMENT)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
-
         for (TriggerConfig trigger : triggerList) {
+            if (trigger.getName() == null || trigger.getName().isEmpty()) {
+                throw new CodeGenerationException("The name of the given TriggerConfig object is null/empty");
+            }
 
             for (SourceSinkConfig source : sourceList) {
                 if (trigger.getName().equals(source.getConnectedElementName())) {
@@ -249,13 +253,13 @@ public class CodeGenerator {
      * @param aggregationList A list of AggregationConfig objects to be converted
      * @return The Siddhi string representation of all the aggregation definitions
      */
-    private String generateAggregations(List<AggregationConfig> aggregationList) {
+    private String generateAggregations(List<AggregationConfig> aggregationList) throws CodeGenerationException {
         if (aggregationList == null || aggregationList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder aggregationListStringBuilder = new StringBuilder();
-        aggregationListStringBuilder.append("-- Aggregations")
+        aggregationListStringBuilder.append(SiddhiStringBuilderConstants.AGGREGATIONS_COMMENT)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (AggregationConfig aggregation : aggregationList) {
@@ -274,13 +278,13 @@ public class CodeGenerator {
      * @param functionList A list of FunctionConfig objects to be converted
      * @return The Siddhi string representation of all the function definitions
      */
-    private String generateFunctions(List<FunctionConfig> functionList) {
+    private String generateFunctions(List<FunctionConfig> functionList) throws CodeGenerationException {
         if (functionList == null || functionList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder functionListStringBuilder = new StringBuilder();
-        functionListStringBuilder.append("-- Functions")
+        functionListStringBuilder.append(SiddhiStringBuilderConstants.FUNCTIONS_COMMENT)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (FunctionConfig function : functionList) {
@@ -299,7 +303,7 @@ public class CodeGenerator {
      * @param queryLists A list of QueryConfig objects to be converted
      * @return The Siddhi string representation of the given QueryConfig list
      */
-    private String generateQueries(Map<QueryListType, List<QueryConfig>> queryLists) {
+    private String generateQueries(Map<QueryListType, List<QueryConfig>> queryLists) throws CodeGenerationException {
         if (queryLists == null || queryLists.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
@@ -312,7 +316,7 @@ public class CodeGenerator {
             if (queryList != null && !queryList.isEmpty()) {
                 if (!hasQueries) {
                     hasQueries = true;
-                    queryListStringBuilder.append("-- Queries")
+                    queryListStringBuilder.append(SiddhiStringBuilderConstants.QUERIES_COMMENT)
                             .append(SiddhiStringBuilderConstants.NEW_LINE);
                 }
 
@@ -335,13 +339,13 @@ public class CodeGenerator {
      * @param partitionList The list of PartitionConfig objects to be converted
      * @return The Siddhi string representation of the given PartitionConfig list
      */
-    private String generatePartitions(List<PartitionConfig> partitionList) {
+    private String generatePartitions(List<PartitionConfig> partitionList) throws CodeGenerationException {
         if (partitionList == null || partitionList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder partitionListStringBuilder = new StringBuilder();
-        partitionListStringBuilder.append("-- Partitions");
+        partitionListStringBuilder.append(SiddhiStringBuilderConstants.PARTITIONS_COMMENT);
         for (PartitionConfig partition : partitionList) {
             partitionListStringBuilder.append(generatePartitionString(partition))
                     .append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -358,7 +362,7 @@ public class CodeGenerator {
      * @param stream The StreamConfig object to be converted
      * @return The converted stream definition string
      */
-    private String generateStreamString(StreamConfig stream) {
+    private String generateStreamString(StreamConfig stream) throws CodeGenerationException {
         if (stream == null) {
             throw new CodeGenerationException("The given StreamConfig object is null");
         } else if (stream.getName() == null || stream.getName().isEmpty()) {
@@ -385,7 +389,7 @@ public class CodeGenerator {
      * @param table The TableConfig object to be converted
      * @return The converted table definition string
      */
-    private String generateTableString(TableConfig table) {
+    private String generateTableString(TableConfig table) throws CodeGenerationException {
         if (table == null) {
             throw new CodeGenerationException("The given TableConfig object is null");
         } else if (table.getName() == null || table.getName().isEmpty()) {
@@ -413,7 +417,7 @@ public class CodeGenerator {
      * @param window The WindowConfig object to be converted
      * @return The converted window definition string
      */
-    private String generateWindowString(WindowConfig window) {
+    private String generateWindowString(WindowConfig window) throws CodeGenerationException {
         if (window == null) {
             throw new CodeGenerationException("The given WindowConfig object is null");
         } else if (window.getName() == null || window.getName().isEmpty()) {
@@ -452,7 +456,7 @@ public class CodeGenerator {
                     windowStringBuilder.append(SiddhiStringBuilderConstants.ALL_EVENTS);
                     break;
                 default:
-                    throw new CodeGenerationException("Unidentified output event type for WindowConfig: "
+                    throw new CodeGenerationException("Unidentified output event type for the WindowConfig object: "
                             + window.getOutputEventType());
             }
         }
@@ -467,7 +471,7 @@ public class CodeGenerator {
      * @param trigger The TriggerConfig object to be converted
      * @return The converted trigger definition string
      */
-    private String generateTriggerString(TriggerConfig trigger) {
+    private String generateTriggerString(TriggerConfig trigger) throws CodeGenerationException {
         if (trigger == null) {
             throw new CodeGenerationException("The given TriggerConfig object is null");
         } else if (trigger.getName() == null || trigger.getName().isEmpty()) {
@@ -496,20 +500,21 @@ public class CodeGenerator {
      * @param aggregation The AggregationConfig object to be converted
      * @return The converted aggregation definition string
      */
-    private String generateAggregationString(AggregationConfig aggregation) {
+    private String generateAggregationString(AggregationConfig aggregation) throws CodeGenerationException {
         if (aggregation == null) {
-            throw new CodeGenerationException("The AggregationConfig object is null");
+            throw new CodeGenerationException("The given AggregationConfig object is null");
         } else if (aggregation.getName() == null || aggregation.getName().isEmpty()) {
             throw new CodeGenerationException("The aggregation name for the given AggregationConfig" +
                     " object is null/empty");
         } else if (aggregation.getFrom() == null || aggregation.getFrom().isEmpty()) {
-            throw new CodeGenerationException("The input stream for aggregation  is null");
+            throw new CodeGenerationException("The 'from' value for the given AggregationConfig is null/empty");
         } else if (aggregation.getAggregateByTimePeriod() == null) {
-            throw new CodeGenerationException("The AggregateByTimePeriod instance is null");
+            throw new CodeGenerationException("The AggregateByTimePeriod value for the given" +
+                    " AggregationConfig is null");
         } else if (aggregation.getAggregateByTimePeriod().getMinValue() == null ||
                 aggregation.getAggregateByTimePeriod().getMinValue().isEmpty()) {
-            throw new CodeGenerationException("The aggregate by time period must have atleast one" +
-                    " value for aggregation");
+            throw new CodeGenerationException("The 'aggregateByTimePeriod' of the given AggregationConfig object" +
+                    " must at least have a minimum value");
         }
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
@@ -563,7 +568,7 @@ public class CodeGenerator {
      * @param function The FunctionConfig object to be converted
      * @return The converted function definition string
      */
-    private String generateFunctionString(FunctionConfig function) {
+    private String generateFunctionString(FunctionConfig function) throws CodeGenerationException {
         if (function == null) {
             throw new CodeGenerationException("The given FunctionConfig object is null");
         } else if (function.getName() == null || function.getName().isEmpty()) {
@@ -605,7 +610,7 @@ public class CodeGenerator {
      * @param query The QueryConfig object to be converted
      * @return The converted query definition string
      */
-    private String generateQueryString(QueryConfig query) {
+    private String generateQueryString(QueryConfig query) throws CodeGenerationException {
         if (query == null) {
             throw new CodeGenerationException("The given QueryConfig object is null");
         }
@@ -649,7 +654,7 @@ public class CodeGenerator {
      * @param partition The PartitionConfig object to be converted
      * @return The converted partition definition string
      */
-    private String generatePartitionString(PartitionConfig partition) {
+    private String generatePartitionString(PartitionConfig partition) throws CodeGenerationException {
         if (partition == null) {
             throw new CodeGenerationException("The given PartitionConfig object is null");
         } else if (partition.getPartitionWith() == null || partition.getPartitionWith().isEmpty()) {
@@ -680,7 +685,7 @@ public class CodeGenerator {
      * @param sourceSink The SourceSinkConfig object to be converted
      * @return The converted source/sink definition string
      */
-    private String generateSourceSinkString(SourceSinkConfig sourceSink) {
+    private String generateSourceSinkString(SourceSinkConfig sourceSink) throws CodeGenerationException {
         if (sourceSink == null) {
             throw new CodeGenerationException("The given SourceSinkConfig object is null");
         } else if (sourceSink.getAnnotationType() == null || sourceSink.getAnnotationType().isEmpty()) {
