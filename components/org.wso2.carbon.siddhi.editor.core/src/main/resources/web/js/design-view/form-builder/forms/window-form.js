@@ -424,7 +424,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
 
                 // update selected window model
                 clickedElement.setName(config.name);
-                clickedElement.setFunction(config.function);
+                clickedElement.setFunction(config.functionName);
                 var parameters = [];
                 _.forEach(config.parameters, function (parameter) {
                     parameters.push(parameter.parameterValue);
