@@ -10,7 +10,7 @@ import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 import java.util.Iterator;
 
 /**
- *
+ * RoundRobin Allocation Algorithm implementation
  */
 public class RoundRobinAllocationAlgorithm implements ResourceAllocationAlgorithm {
     private static final Logger logger = Logger.getLogger(RoundRobinAllocationAlgorithm.class);

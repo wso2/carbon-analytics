@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- *
+ * Allocation algorithm based on CPU utilization implementation
  */
 public class CPUBasedAllocationAlgorithm implements ResourceAllocationAlgorithm {
     private static final Logger logger = Logger.getLogger(CPUBasedAllocationAlgorithm.class);
