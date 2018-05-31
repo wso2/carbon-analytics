@@ -226,8 +226,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 self._sourceView.editorResize();
                                 toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
-                                console.log(JSON.stringify(designView.getConfigurationData()));
-
                             } else if (response.status === "fail") {
                                 self._designView.errorAlert(response.errorMessage);
                             }

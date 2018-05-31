@@ -1069,6 +1069,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             newElement.on('click', '.element-close-icon', function () {
                 var elementId = newElement[0].id;
 
+                //TODO: when removing element first remove connections it has(both in and out connections)
                 if (newElement.hasClass('streamDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeStream(elementId);
                 } else if (newElement.hasClass('tableDrop')) {
