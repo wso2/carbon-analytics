@@ -207,12 +207,19 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     }
                                 });
                             }
-                            var JSONValue = designView.getConfigurationData();
-                            removeUnnecessaryFieldsFromJSON(JSONValue);
-                            self.JSONObject = JSON.stringify(JSONValue);
+                            /*
+                            * this previous configurationData wil be re-assigned to the design view if the getCode()
+                            * method response is unsuccessful. This done inorder to still have the fields removed by
+                            * removeUnnecessaryFieldsFromJSON() method when sending the json to backend
+                            * */
 
-                            var response = self._designView.getCode(self.JSONObject);
+                            var JSONValue = JSON.parse(JSON.stringify(designView.getConfigurationData()));
+                            removeUnnecessaryFieldsFromJSON(JSONValue);
+                            var sendingString = JSON.stringify(JSONValue).replace(/'/gm, "\\\'");
+
+                            var response = self._designView.getCode("'" + sendingString + "'");
                             if (response.status === "success") {
+                                self.setContent(response.responseJSON);
                                 designContainer.hide();
                                 designView.emptyDesignViewGridContainer();
                                 sourceContainer.show();

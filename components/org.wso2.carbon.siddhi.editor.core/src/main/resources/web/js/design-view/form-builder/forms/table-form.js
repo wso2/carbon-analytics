@@ -156,7 +156,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                                             "long",
                                             "float",
                                             "double",
-                                            "boolean"
+                                            "bool"
                                         ],
                                         default: "string"
                                     }
@@ -401,7 +401,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                                             "long",
                                             "float",
                                             "double",
-                                            "boolean"
+                                            "bool"
                                         ],
                                         default: "string"
                                     }

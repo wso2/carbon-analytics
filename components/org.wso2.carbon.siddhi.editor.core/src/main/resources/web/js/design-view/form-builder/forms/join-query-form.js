@@ -152,6 +152,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (firstInputElement.type !== undefined && firstInputElement.type === 'TRIGGER') {
                         firstInputElementType = firstInputElement.type;
                         possibleGroupByAttributes.push(firstInputElementName + '.triggered_time');
+                    } else if(firstInputElement.type !== undefined && firstInputElement.type === 'AGGREGATION') {
+                        firstInputElementType = firstInputElement.type;
+                        if (firstInputElement.element !== undefined) {
+                            _.forEach(firstInputElement.element.getSelect().getValue(), function (selectAttribute) {
+                                possibleGroupByAttributes.push(firstInputElementName + "." + selectAttribute.as);
+                            });
+                        }
                     } else if (firstInputElement.type !== undefined) {
                         firstInputElementType = firstInputElement.type;
                         if (firstInputElement.element !== undefined) {
@@ -164,7 +171,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (secondInputElement.type !== undefined && secondInputElement.type === 'TRIGGER'){
                         secondInputElementType = secondInputElement.type;
                         possibleGroupByAttributes.push(secondInputElementName + '.triggered_time');
-                    }  else if (secondInputElement.type !== undefined) {
+                    } else if(secondInputElement.type !== undefined && secondInputElement.type === 'AGGREGATION') {
+                        secondInputElementType = secondInputElement.type;
+                        if (secondInputElement.element !== undefined) {
+                            _.forEach(secondInputElement.element.getSelect().getValue(), function (selectAttribute) {
+                                possibleGroupByAttributes.push(secondInputElement + "." + selectAttribute.as);
+                            });
+                        }
+                    } else if (secondInputElement.type !== undefined) {
                         secondInputElementType = secondInputElement.type;
                         if (secondInputElement.element !== undefined) {
                             _.forEach(secondInputElement.element.getAttributeList(), function (attribute) {

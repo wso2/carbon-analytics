@@ -136,18 +136,33 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
                 query.setQueryOutput(queryOutputObject);
             }
 
+            // TODO: when saving the optional values(which are required to create objects for them) check whether they
+            // are available and then create object
             _.forEach(configurationData.siddhiAppConfig.sourceList, function(source){
                 var sourceObject = new SourceOrSinkAnnotation(source);
                 sourceObject.setId(newIdBeginningPhrase + sourceObject.getId());
-                var mapperObject = new MapAnnotation(source.map);
-                sourceObject.setMap(mapperObject);
+                if (_.isEmpty(source.map)) {
+                    sourceObject.setMap(undefined);
+                } else {
+                    var mapperObject = new MapAnnotation(source.map);
+                    sourceObject.setMap(mapperObject);
+                }
+                //TODO: Remove isEmpty methods.
+                // var mapperObject = new MapAnnotation(source.map);
+                // sourceObject.setMap(mapperObject);
                 appData.addSource(sourceObject);
             });
             _.forEach(configurationData.siddhiAppConfig.sinkList, function(sink){
                 var sinkObject = new SourceOrSinkAnnotation(sink);
                 sinkObject.setId(newIdBeginningPhrase + sinkObject.getId());
-                var mapperObject = new MapAnnotation(sink.map);
-                sinkObject.setMap(mapperObject);
+                if (_.isEmpty(sink.map)) {
+                    sinkObject.setMap(undefined);
+                } else {
+                    var mapperObject = new MapAnnotation(sink.map);
+                    sinkObject.setMap(mapperObject);
+                }
+                // var mapperObject = new MapAnnotation(sink.map);
+                // sinkObject.setMap(mapperObject);
                 appData.addSink(sinkObject);
             });
             _.forEach(configurationData.siddhiAppConfig.streamList, function(stream){
@@ -159,8 +174,14 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
             });
             _.forEach(configurationData.siddhiAppConfig.tableList, function(table){
                 var tableObject = new Table(table);
-                var storeAnnotation = new StoreAnnotation(table.store);
-                tableObject.setStore(storeAnnotation);
+                if (_.isEmpty(table.store)) {
+                    tableObject.setStore(undefined);
+                } else {
+                    var storeAnnotation = new StoreAnnotation(table.store);
+                    tableObject.setStore(storeAnnotation);
+                }
+                // var storeAnnotation = new StoreAnnotation(table.store);
+                // tableObject.setStore(storeAnnotation);
                 addAnnotationsForElement(table, tableObject);
                 addAttributesForElement(table, tableObject);
                 tableObject.setId(newIdBeginningPhrase + tableObject.getId());
@@ -182,8 +203,14 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
             });
             _.forEach(configurationData.siddhiAppConfig.aggregationList, function(aggregation){
                 var aggregationObject = new Aggregation(aggregation);
-                var storeAnnotation = new StoreAnnotation(aggregation.store);
-                aggregationObject.setStore(storeAnnotation);
+                if (_.isEmpty(aggregation.store)) {
+                    aggregationObject.setStore(undefined);
+                } else {
+                    var storeAnnotation = new StoreAnnotation(aggregation.store);
+                    aggregationObject.setStore(storeAnnotation);
+                }
+                // var storeAnnotation = new StoreAnnotation(aggregation.store);
+                // aggregationObject.setStore(storeAnnotation);
                 addAnnotationsForElement(aggregation, aggregationObject);
                 setSelectForQuery(aggregationObject, aggregation.select);
                 var aggregateByTimePeriodSubElement = new AggregateByTimePeriod(aggregation.aggregateByTimePeriod);
@@ -329,6 +356,10 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
             return this.configurationData;
         };
 
+        DesignView.prototype.setConfigurationData = function (configurationData) {
+            this.configurationData = configurationData;
+        };
+
         DesignView.prototype.emptyDesignViewGridContainer = function () {
             var errMsg = '';
             this.designViewGridContainer = this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
@@ -373,6 +404,12 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
                     console.log(error);
                     if (error.status === 400) {
                         result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                    } else if (error.responseText === "pattern queries are not supported"){
+                        result = {status: "fail", errorMessage: error.responseText};
+                    } else if (error.responseText === "sequence queries are not supported"){
+                        result = {status: "fail", errorMessage: error.responseText};
+                    } else if (error.responseText === "Partitions are not supported"){
+                        result = {status: "fail", errorMessage: error.responseText};
                     } else {
                         result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
                     }
@@ -388,7 +425,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
             $.ajax({
                 type: "POST",
                 url: self.designToCodeURL,
-                headers: { 'Content-Type':'application/json' },
+                contentType: "application/json",
                 data: designViewJSON,
                 async: false,
                 success: function (response) {
