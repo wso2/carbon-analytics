@@ -522,7 +522,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
-
         for (Map.Entry<String, TableDefinition> entry : tableDefinitionMap.entrySet()) {
             if (entry.getKey().equals(inputStream)) {
                 siddhiAppElements.setInputStreamSiddhiApp(String.valueOf(entry.getValue()));
@@ -530,7 +529,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
-
         for (Map.Entry<String, TriggerDefinition> entry : triggerDefinitionMap.entrySet()) {
             if (entry.getKey().equals(inputStream)) {
                 siddhiAppElements.setInputStreamSiddhiApp(getDefinition(entry.getValue(), appData));
@@ -538,7 +536,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
-
         for (Map.Entry<String, WindowDefinition> entry : windowDefinitionMap.entrySet()) {
             if (entry.getKey().equals(inputStream)) {
                 siddhiAppElements.setInputStreamSiddhiApp(getDefinition(entry.getValue(), appData));
@@ -576,7 +573,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
-
         for (Map.Entry<String, TableDefinition> entry : tableDefinitionMap.entrySet()) {
             if (entry.getKey().equals(outputStream)) {
                 siddhiAppElements.setOutputStreamSiddhiApp(String.valueOf(entry.getValue()));
@@ -584,7 +580,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
-
         for (Map.Entry<String, TriggerDefinition> entry : triggerDefinitionMap.entrySet()) {
             if (entry.getKey().equals(outputStream)) {
                 siddhiAppElements.setOutputStreamSiddhiApp(getDefinition(entry.getValue(), appData));
@@ -592,7 +587,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
-
         for (Map.Entry<String, WindowDefinition> entry : windowDefinitionMap.entrySet()) {
             if (entry.getKey().equals(outputStream)) {
                 siddhiAppElements.setOutputStreamSiddhiApp(getDefinition(entry.getValue(), appData));
@@ -600,7 +594,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
-
         for (Map.Entry<String, AggregationDefinition> entry : aggregationDefinitionMap.entrySet()) {
             if (entry.getKey().equals(outputStream)) {
                 siddhiAppElements.setOutputStreamSiddhiApp(getDefinition(entry.getValue(), appData));
