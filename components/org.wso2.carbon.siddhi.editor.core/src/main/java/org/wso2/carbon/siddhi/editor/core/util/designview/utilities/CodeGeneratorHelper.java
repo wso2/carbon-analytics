@@ -593,10 +593,10 @@ public class CodeGeneratorHelper {
             userDefinedSelectionStringBuilder.append(attribute.getExpression());
             if (attribute.getAs() != null && !attribute.getAs().isEmpty() &&
                     !attribute.getAs().equals(attribute.getExpression())) {
-                    userDefinedSelectionStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                            .append(SiddhiStringBuilderConstants.AS)
-                            .append(SiddhiStringBuilderConstants.SPACE)
-                            .append(attribute.getAs());
+                userDefinedSelectionStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
+                        .append(SiddhiStringBuilderConstants.AS)
+                        .append(SiddhiStringBuilderConstants.SPACE)
+                        .append(attribute.getAs());
             }
             if (attributesLeft != 1) {
                 userDefinedSelectionStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
@@ -833,7 +833,8 @@ public class CodeGeneratorHelper {
             deleteOutputStringBuilder
                     .append(SiddhiStringBuilderConstants.NEW_LINE)
                     .append(SiddhiStringBuilderConstants.TAB_SPACE)
-                    .append(SiddhiStringBuilderConstants.FOR);
+                    .append(SiddhiStringBuilderConstants.FOR)
+                    .append(SiddhiStringBuilderConstants.SPACE);
             switch (deleteOutput.getEventType().toUpperCase()) {
                 case CodeGeneratorConstants.CURRENT_EVENTS:
                     deleteOutputStringBuilder.append(SiddhiStringBuilderConstants.CURRENT_EVENTS);
