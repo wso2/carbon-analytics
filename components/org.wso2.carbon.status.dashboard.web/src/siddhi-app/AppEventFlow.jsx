@@ -59,7 +59,7 @@ export default class AppEventFlow extends React.Component {
                     const inputCssClassType = entry.inputStreamType.toLowerCase();
                     inputContainer =
                         `<div id="container" class="node-content" title="${inputStreamSiddhiApp}">
-                            <span class="${inputCssClassType}-indicator" style="border: 3px solid black; margin-left: -1px;"></span>
+                            <span class="${inputCssClassType}-indicator" style="border: 3px solid white; margin-left: -1px;"></span>
                             <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.inputStreamId}</span>
                          </div>`;
                     g.setNode(entry.inputStreamId, {
@@ -76,7 +76,7 @@ export default class AppEventFlow extends React.Component {
                     const outputCssClassNamePrefix = entry.outputStreamType.toLowerCase();
                     outputContainer =
                         `<div id="container" class="node-content" title="${outputStreamSiddhiApp}">
-                            <span class="${outputCssClassNamePrefix}-indicator" style="border: 3px solid black; margin-left: -1px;"></span>
+                            <span class="${outputCssClassNamePrefix}-indicator" style="border: 3px solid white; margin-left: -1px;"></span>
                             <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.outputStreamId}</span>
                          </div>`;
                     g.setNode(entry.outputStreamId, {
@@ -94,7 +94,7 @@ export default class AppEventFlow extends React.Component {
                     if (entry.query !== undefined && entry.partitionType === 'Value Partition' || entry.partitionType === 'Range Partition') {
                         siddhiAppContainer =
                             `<div id="container" class="node-content" title='${entry.partitionQuery}'>
-                                <span class="query-indicator" style="border: 3px solid black; margin-left: -1px;"></span>
+                                <span class="query-indicator" style="border: 3px solid white; margin-left: -1px;"></span>
                                 <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">query</span>
                              </div>`;
                         g.setNode(entry.query, {
@@ -110,7 +110,7 @@ export default class AppEventFlow extends React.Component {
                     } else if (entry.query !== undefined) {
                         siddhiAppContainer =
                             `<div id="container" class="node-content" title='${entry.query}'>
-                                <span class="query-indicator" style="border: 3px solid black; margin-left: -1px;"></span>
+                                <span class="query-indicator" style="border: 3px solid white; margin-left: -1px;"></span>
                                 <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.queryName}</span>
                              </div>`;
                         g.setNode(entry.query, {
@@ -128,7 +128,7 @@ export default class AppEventFlow extends React.Component {
                     if (entry.function !== undefined) {
                         functionContainer =
                             `<div id="container" class="node-content" title="${entry.functionQuery}">
-                                <span class="function-indicator" style="border: 3px solid black; margin-left: -1px;"></span>
+                                <span class="function-indicator" style="border: 3px solid white; margin-left: -1px;"></span>
                                 <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.function}</span>
                              </div>`;
                         g.setNode(entry.function, {
@@ -147,7 +147,7 @@ export default class AppEventFlow extends React.Component {
                         let sourceSiddhiApp = entry.sourceSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
                         sourceContainer =
                             `<div id="container" class="node-content" title="${sourceSiddhiApp}">
-                                <span class="source-indicator" style="border: 3px solid black; margin-left: -1px;"></span>
+                                <span class="source-indicator" style="border: 3px solid white; margin-left: -1px;"></span>
                                 <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.source}</span>
                              </div>`;
                         g.setNode(entry.source, {
@@ -166,7 +166,7 @@ export default class AppEventFlow extends React.Component {
                         let sinkSiddhiApp = entry.sinkSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
                         sinkContainer =
                             `<div id="container" class="node-content" title="${sinkSiddhiApp}">
-                                <span class="sink-indicator" style="border: 3px solid black; margin-left: -1px;"></span>
+                                <span class="sink-indicator" style="border: 3px solid white; margin-left: -1px;"></span>
                                 <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.sink}</span>
                              </div>`;
                         g.setNode(entry.sink, {
@@ -184,7 +184,7 @@ export default class AppEventFlow extends React.Component {
                     if (entry.partitionType === 'Value Partition' || entry.partitionType === 'Range Partition') {
                         partitionType =
                             `<div id="container" class="node-content" title="${entry.partitionTypeQuery}">
-                                <span class="partition-type-colour" style="border: 3px solid black; margin-left: -1px;"></span>
+                                <span class="partition-type-colour" style="border: 3px solid white; margin-left: -1px;"></span>
                                 <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.partitionType}</span>
                              </div>`;
                         g.setNode(entry.partitionType, {
