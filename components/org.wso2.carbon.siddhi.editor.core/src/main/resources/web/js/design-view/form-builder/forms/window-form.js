@@ -109,7 +109,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                                             "long",
                                             "float",
                                             "double",
-                                            "boolean"
+                                            "bool"
                                         ],
                                         default: "string"
                                     }
@@ -345,7 +345,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                                             "long",
                                             "float",
                                             "double",
-                                            "boolean"
+                                            "bool"
                                         ],
                                         default: "string"
                                     }

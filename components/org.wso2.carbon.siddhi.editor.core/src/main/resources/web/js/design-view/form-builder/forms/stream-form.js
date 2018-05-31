@@ -112,7 +112,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                                             "long",
                                             "float",
                                             "double",
-                                            "boolean"
+                                            "bool"
                                         ],
                                         default: "string"
                                     }
@@ -272,7 +272,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                                             "long",
                                             "float",
                                             "double",
-                                            "boolean"
+                                            "bool"
                                         ],
                                         default: "string"
                                     }
