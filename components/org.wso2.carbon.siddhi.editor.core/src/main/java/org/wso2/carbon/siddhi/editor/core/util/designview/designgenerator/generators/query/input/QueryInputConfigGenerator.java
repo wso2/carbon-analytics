@@ -56,8 +56,8 @@ public class QueryInputConfigGenerator {
             return new JoinConfigGenerator().getJoinQueryConfig(queryInputStream, siddhiApp, siddhiAppString);
         } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString()) ||
                 queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
-            // TODO implement
-            throw new DesignGenerationException(queryInputType + " queries are not supported yet");
+            // TODO Add support for Patterns & Sequences
+            throw new DesignGenerationException(queryInputType.toLowerCase() + " queries are not supported");
         }
 
         throw new DesignGenerationException("Unknown type: " + queryInputType);
@@ -74,7 +74,8 @@ public class QueryInputConfigGenerator {
         } else if (queryInputStream instanceof JoinInputStream) {
             return QueryInputType.JOIN.toString();
         } else if (queryInputStream instanceof StateInputStream) {
-            return ((StateInputStream) queryInputStream).getStateType().name(); // PATTERN or SEQUENCE
+            // PATTERN or SEQUENCE
+            return ((StateInputStream) queryInputStream).getStateType().name();
         }
         throw new IllegalArgumentException("Type of query is unknown for generating query input");
     }

@@ -39,28 +39,6 @@ public class QueryConfig extends SiddhiElementConfig {
     private QueryOutputConfig queryOutput;
     private List<String> annotationList;
 
-    public QueryConfig(String id,
-                       QueryInputConfig queryInput,
-                       AttributesSelectionConfig select,
-                       List<String> groupBy,
-                       List<QueryOrderByConfig> orderBy,
-                       long limit,
-                       String having,
-                       String outputRateLimit,
-                       QueryOutputConfig queryOutput,
-                       List<String> annotationList) {
-        super(id);
-        this.queryInput = queryInput;
-        this.select = select;
-        this.groupBy = groupBy;
-        this.orderBy = orderBy;
-        this.limit = limit;
-        this.having = having;
-        this.outputRateLimit = outputRateLimit;
-        this.queryOutput = queryOutput;
-        this.annotationList = annotationList;
-    }
-
     public QueryInputConfig getQueryInput() {
         return queryInput;
     }

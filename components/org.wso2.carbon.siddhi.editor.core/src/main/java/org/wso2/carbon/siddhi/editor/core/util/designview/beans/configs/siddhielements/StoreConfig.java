@@ -27,8 +27,8 @@ public class StoreConfig extends SiddhiElementConfig {
     private String type;
     private Map<String, String> options;
 
-    public StoreConfig(String id, String type, Map<String, String> options) {
-        super(id);
+    public StoreConfig(String type, Map<String, String> options) {
+        super();
         this.type = type;
         this.options = options;
     }

@@ -37,26 +37,6 @@ public class AggregationConfig extends SiddhiElementConfig {
     private StoreConfig store;
     private List<String> annotationList;
 
-    public AggregationConfig(String id,
-                             String name,
-                             String from,
-                             AttributesSelectionConfig select,
-                             List<String> groupBy,
-                             String aggregateByAttribute,
-                             AggregateByTimePeriod aggregateByTimePeriod,
-                             StoreConfig store,
-                             List<String> annotationList) {
-        super(id);
-        this.name = name;
-        this.from = from;
-        this.select = select;
-        this.groupBy = groupBy;
-        this.aggregateByAttribute = aggregateByAttribute;
-        this.aggregateByTimePeriod = aggregateByTimePeriod;
-        this.store = store;
-        this.annotationList = annotationList;
-    }
-
     public String getName() {
         return name;
     }
@@ -87,5 +67,37 @@ public class AggregationConfig extends SiddhiElementConfig {
 
     public List<String> getAnnotationList() {
         return annotationList;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public void setSelect(AttributesSelectionConfig select) {
+        this.select = select;
+    }
+
+    public void setGroupBy(List<String> groupBy) {
+        this.groupBy = groupBy;
+    }
+
+    public void setAggregateByAttribute(String aggregateByAttribute) {
+        this.aggregateByAttribute = aggregateByAttribute;
+    }
+
+    public void setAggregateByTime(AggregateByTimePeriod aggregateByTimePeriod) {
+        this.aggregateByTimePeriod = aggregateByTimePeriod;
+    }
+
+    public void setStore(StoreConfig store) {
+        this.store = store;
+    }
+
+    public void setAnnotationList(List<String> annotationList) {
+        this.annotationList = annotationList;
     }
 }
