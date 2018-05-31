@@ -51,6 +51,8 @@ export default class AppEventFlow extends React.Component {
                     let partitionType;
                     let partitionContainer;
                     let functionContainer;
+                    let sourceContainer;
+                    let sinkContainer;
                     let inputStreamSiddhiApp = entry.inputStreamSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
                     let outputStreamSiddhiApp = entry.outputStreamSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
 
@@ -141,6 +143,44 @@ export default class AppEventFlow extends React.Component {
                         }, {labelStyle: "width:300"});
                     }
 
+                    if (entry.source !== undefined) {
+                        let sourceSiddhiApp = entry.sourceSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
+                        sourceContainer =
+                            `<div id="container" class="node-content" title="${sourceSiddhiApp}">
+                                <span class="source-indicator" style="border: 3px solid black; margin-left: -1px;"></span>
+                                <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.source}</span>
+                             </div>`;
+                        g.setNode(entry.source, {
+                            labelType: "html",
+                            label: sourceContainer,
+                            paddingBottom: 0,
+                            paddingTop: 0,
+                            paddingLeft: 0,
+                            paddingRight: 150,
+                            rx: 0,
+                            ry: 0
+                        }, {labelStyle: "width:300"});
+                    }
+
+                    if (entry.sink !== undefined) {
+                        let sinkSiddhiApp = entry.sinkSiddhiApp.replace(/\'|\"/g, '').replace(/>/g, '\>');
+                        sinkContainer =
+                            `<div id="container" class="node-content" title="${sinkSiddhiApp}">
+                                <span class="sink-indicator" style="border: 3px solid black; margin-left: -1px;"></span>
+                                <span id="myTextInput" class="nodeLabel" style="margin-top: 10px">${entry.sink}</span>
+                             </div>`;
+                        g.setNode(entry.sink, {
+                            labelType: "html",
+                            label: sinkContainer,
+                            paddingBottom: 0,
+                            paddingTop: 0,
+                            paddingLeft: 0,
+                            paddingRight: 150,
+                            rx: 0,
+                            ry: 0
+                        }, {labelStyle: "width:300"});
+                    }
+
                     if (entry.partitionType === 'Value Partition' || entry.partitionType === 'Range Partition') {
                         partitionType =
                             `<div id="container" class="node-content" title="${entry.partitionTypeQuery}">
@@ -196,6 +236,12 @@ export default class AppEventFlow extends React.Component {
                         }
 
                     } else {
+                        if (entry.source !== undefined) {
+                            g.setEdge(entry.source, entry.sourceStream, {
+                                arrowheadStyle: "fill: #bbb",
+                                lineInterpolate: "basis"
+                            });
+                        }
                         if (entry.query !== undefined) {
                             g.setEdge(entry.inputStreamId, entry.query, {
                                 arrowheadStyle: "fill: #bbb",
@@ -216,6 +262,13 @@ export default class AppEventFlow extends React.Component {
 
                         if (entry.function !== undefined) {
                             g.setEdge(entry.function, entry.query, {
+                                arrowheadStyle: "fill: #bbb",
+                                lineInterpolate: "basis"
+                            });
+                        }
+
+                        if (entry.sink !== undefined) {
+                            g.setEdge(entry.sinkStream, entry.sink, {
                                 arrowheadStyle: "fill: #bbb",
                                 lineInterpolate: "basis"
                             });
@@ -242,7 +295,6 @@ export default class AppEventFlow extends React.Component {
                     svg.classed("nodeTree", true);
                     render(inner, g);
                 });
-
             })
             .catch((error) => {
                 if (error.response != null) {

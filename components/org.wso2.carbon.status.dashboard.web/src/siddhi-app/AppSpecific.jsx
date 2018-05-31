@@ -521,6 +521,24 @@ export default class WorkerSpecific extends React.Component {
                         <CardText style={{padding: '80px'}}>
                             <ul class="legend">
                                 <li class="legend-key ">
+                                    <span class="legend-colour source-image" >
+
+                                    </span>
+                                    <span class="legend-text">Source</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour sink-image" >
+
+                                    </span>
+                                    <span class="legend-text">Sink</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour stream-image" >
+
+                                    </span>
+                                    <span class="legend-text">Stream</span>
+                                </li>
+                                <li class="legend-key ">
                                     <span class="legend-colour stream-image" >
 
                                     </span>
