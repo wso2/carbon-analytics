@@ -411,7 +411,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     }
 
     public Response siddhiAppElementsGet(String appName) throws NotFoundException {
-        String jsonString;
         Map<String, SiddhiAppData> siddhiAppDataMap = StreamProcessorDataHolder.getStreamProcessorService()
                 .getSiddhiAppMap();
         if (siddhiAppDataMap.containsKey(appName)) {
@@ -435,7 +434,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             return Response.ok().entity(listOfSiddhiAppElements).build();
         }
 
-        jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+        String jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
                 "There is no Siddhi App exist with provided name : " + appName));
         return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
     }
@@ -564,7 +563,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
      */
     private void loadOutputData(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, String outputStream, String
             appData, SiddhiAppElements siddhiAppElements) {
-        Map<String, StreamDefinition> streamDefinitionMap = (siddhiAppRuntime.getStreamDefinitionMap());
+        Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
         Map<String, TableDefinition> tableDefinitionMap = siddhiAppRuntime.getTableDefinitionMap();
         Map<String, TriggerDefinition> triggerDefinitionMap = siddhiApp.getTriggerDefinitionMap();
         Map<String, WindowDefinition> windowDefinitionMap = siddhiAppRuntime.getWindowDefinitionMap();
@@ -664,7 +663,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             siddhiAppElements.setQueryName(Constants.DEFAULT_QUERY_NAME);
         }
     }
-
 
     /**
      * Obtains the piece of the code from the siddhiAppString variable where the given SiddhiElement object is defined.
