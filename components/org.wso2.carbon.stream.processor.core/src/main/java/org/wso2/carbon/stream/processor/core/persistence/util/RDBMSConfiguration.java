@@ -61,7 +61,11 @@ public class RDBMSConfiguration {
                     replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setSelectLastQuery(queryManager.getQuery(PersistenceConstants.SELECT_LAST_REVISION).
                     replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setSelectRevisionsQuery(queryManager.getQuery(PersistenceConstants.SELECT_REVISIONS).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setDeleteQuery(queryManager.getQuery(PersistenceConstants.DELETE_ROW_FROM_TABLE).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setDeleteOldRevisionsQuery(queryManager.getQuery(PersistenceConstants.DELETE_OLD_REVISIONS).
                     replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setCountQuery(queryManager.getQuery(PersistenceConstants.COUNT_NUMBER_REVISIONS).
                     replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
