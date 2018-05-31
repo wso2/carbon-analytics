@@ -33,6 +33,7 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.sp.jobmanager.core.CoordinatorChangeListener;
+import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApi;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SPSiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
@@ -115,7 +116,8 @@ public class ServiceComponent {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterConfigProvider"
     )
-    protected void registerConfigProvider(ConfigProvider configProvider) throws ResourceManagerException {
+    protected void registerConfigProvider(ConfigProvider configProvider) throws ResourceManagerException,
+            IllegalAccessException, InstantiationException {
         DeploymentConfig deploymentConfig;
         ManagerNode currentNodeConfig;
         ClusterConfig clusterConfig;
@@ -149,6 +151,19 @@ public class ServiceComponent {
                     deploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
                     if (deploymentConfig != null) {
                         ServiceDataHolder.setDeploymentConfig(deploymentConfig);
+                        ResourceAllocationAlgorithm resourceAllocationAlgorithm;
+                        String allocationAlgoClassName = deploymentConfig.getAllocationAlgorithm();
+                        try {
+                            resourceAllocationAlgorithm = (ResourceAllocationAlgorithm)
+                                    Class.forName(allocationAlgoClassName).newInstance();
+                            if (log.isDebugEnabled()) {
+                                log.debug(allocationAlgoClassName + " chosen as Allocation Algorithm");
+                            }
+                            ServiceDataHolder.setAllocationAlgorithm(resourceAllocationAlgorithm);
+                        } catch (ClassNotFoundException e) {
+                            throw new ResourceManagerException("Allocation Algorithm class with name "
+                                    + allocationAlgoClassName + " is invalid. ", e);
+                        }
                         String id = (String) ((Map) configProvider.getConfigurationObject("wso2.carbon"))
                                 .get("id");
                         currentNodeConfig = new ManagerNode().setId(id)

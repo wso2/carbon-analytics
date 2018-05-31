@@ -787,6 +787,27 @@ public class MonitoringRESTApi implements Microservice {
         return workersApi.getClusterResourceNodeDetails(id, getUserName(request));
     }
 
+    @GET
+    @Path("/{id}/siddhi-apps/{appName}/elements")
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Retrieve all the elements of particular siddhi apps",
+            response = ApiResponseMessage.class, tags = {"Workers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully retrieved elements",
+                    response = ApiResponseMessage.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Worker not found.",
+                    response = ApiResponseMessage.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = ApiResponseMessage.class)})
+    public Response getSiddhiAppElements(@Context Request request, @ApiParam(value = "ID of the worker.", required =
+            true) @PathParam("id") String id, @ApiParam(value = "ID of the siddhi app.", required = true) @PathParam
+            ("appName") String appName) throws NotFoundException,IOException {
+        return workersApi.getSiddhiAppElements(id, appName, getUserName(request));
+    }
+
 
     private static String getUserName(Request request) {
         return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();

@@ -34,6 +34,7 @@ import org.wso2.carbon.sp.distributed.resource.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.NodeConfig;
 import org.wso2.carbon.sp.distributed.resource.core.exception.ResourceNodeException;
 import org.wso2.carbon.sp.distributed.resource.core.impl.DistributionResourceServiceImpl;
+import org.wso2.carbon.sp.distributed.resource.core.internal.OSMetricsServiceComponent;
 import org.wso2.carbon.sp.distributed.resource.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.distributed.resource.core.util.HeartbeatSender;
 import org.wso2.carbon.sp.distributed.resource.core.util.ResourceConstants;
@@ -46,15 +47,15 @@ import java.util.Map;
 import java.util.Timer;
 
 /**
- * ServiceComponent for the Resource.
+ * DistributedResourceServiceComponent for the Resource.
  */
 @Component(
         name = "sp.distributed.resource",
-        service = ServiceComponent.class,
+        service = DistributedResourceServiceComponent.class,
         immediate = true
 )
-public class ServiceComponent {
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceComponent.class);
+public class DistributedResourceServiceComponent {
+    private static final Logger LOG = LoggerFactory.getLogger(DistributedResourceServiceComponent.class);
     /**
      * Service registration for distributed service.
      */
@@ -65,7 +66,7 @@ public class ServiceComponent {
     private Timer timer;
 
     /**
-     * Activation method of Resource ServiceComponent. This will be called when all of its references are satisfied.
+     * Activation method of Resource DistributedResourceServiceComponent. This will be called when all of its references are satisfied.
      *
      * @param bundleContext the bundle context instance of this bundle.
      * @throws Exception will be thrown if an issue occurs while executing the activate method.
@@ -85,10 +86,11 @@ public class ServiceComponent {
         }
         distributionServiceRegistration = bundleContext.registerService(
                 DistributionService.class.getName(), new DistributionResourceServiceImpl(), null);
+
     }
 
     /**
-     * This is the deactivation method of ServiceComponent.
+     * This is the deactivation method of DistributedResourceServiceComponent.
      * This will be called when this component is being stopped.
      *
      * @throws Exception will be thrown if an issue occurs while executing the de-activate method.
@@ -173,5 +175,20 @@ public class ServiceComponent {
         ServiceDataHolder.setConfigProvider(null);
         ServiceDataHolder.setDeploymentConfig(null);
         ServiceDataHolder.setCurrentNodeConfig(null);
+    }
+
+    @Reference(
+            name = "OSMetricsServiceComponent",
+            service = OSMetricsServiceComponent.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterOSMetricsServiceComponent"
+    )
+    protected void registerOSMetricsServiceComponent(OSMetricsServiceComponent osMetricsServiceComponent) {
+        //to make to read the metrics MBean name
+    }
+
+    protected void unregisterOSMetricsServiceComponent(OSMetricsServiceComponent osMetricsServiceComponent) {
+
     }
 }

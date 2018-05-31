@@ -17,10 +17,13 @@
  */
 package org.wso2.carbon.stream.processor.statistics.bean;
 
+import java.io.Serializable;
+
 /**
  * This is the bean class use to keep the real time metrics details of the worker node.
  */
-public class WorkerMetrics {
+public class WorkerMetrics implements Serializable {
+    private static final long serialVersionUID = 6279971976317850085L;
     private double processCPU;
     private double systemCPU;
     private double loadAverage;
