@@ -300,66 +300,66 @@ p.node-last-update {
 
 .stream-indicator {
     height: 60px;
-    width: 15px;
+    width: 40px;
     float: left;
-    margin: 1px 40px 1px 1px;
-    background-color: #2196F3;
+    margin: 1px 15px 1px 1px;
+    background: #ccc url("../icons/streams.svg") no-repeat center center;
 }
 
 .table-indicator {
     height: 60px;
-    width: 15px;
+    width: 40px;
     float: left;
-    margin: 1px 40px 1px 1px;
-    background-color: #8BC34A;
+    margin: 1px 15px 1px 1px;
+    background: #ccc url("../icons/table.svg") no-repeat center center;
 }
 
 .trigger-indicator {
     height: 60px;
-    width: 15px;
+    width: 40px;
     float: left;
-    margin: 1px 40px 1px 1px;
-    background-color: #F44336;
+    margin: 1px 15px 1px 1px;
+    background: #ccc url("../icons/trigger.svg") no-repeat center center;
 }
 
 .window-indicator {
     height: 60px;
-    width: 15px;
+    width: 40px;
     float: left;
-    margin: 1px 40px 1px 1px;
-    background-color: #009688;
+    margin: 1px 15px 1px 1px;
+    background: #ccc url("../icons/window.svg") no-repeat center center;
 }
 
 .query-indicator {
     height: 60px;
-    width: 15px;
+    width: 40px;
     float: left;
-    margin: 1px 40px 1px 1px;
-    background-color: #9C27B0;
+    margin: 1px 15px 1px 1px;
+    background: #ccc url("../icons/query.svg") no-repeat center center;
 }
 
 .function-indicator {
     height: 60px;
-    width: 15px;
+    width: 40px;
     float: left;
-    margin: 1px 40px 1px 1px;
-    background-color: #FF5722;
+    margin: 1px 15px 1px 1px;
+    background: #ccc url("../icons/function.svg") no-repeat center center;
 }
 
 .aggregation-indicator {
     height: 60px;
-    width: 15px;
+    width: 40px;
     float: left;
-    margin: 1px 40px 1px 1px;
-    background-color: #FF9800;
+    margin: 1px 15px 1px 1px;
+    background: #ccc url("../icons/aggregate.svg") no-repeat center center;
 }
 
 .partition-type-colour {
     height: 60px;
-    width: 15px;
+    width: 40px;
     float: left;
-    margin: 1px 40px 1px 1px;
-    background-color: #FFEB3B;
+    margin: 1px 15px 1px 1px;
+    background: #ccc url("../icons/partition.svg") no-repeat center center;
 }
 
 .partition {
@@ -394,4 +394,36 @@ p.node-last-update {
     height: 15px;
     float: left;
     margin: 5px;
+}
+
+.stream-image {
+    background: url("../icons/streams.svg");
+}
+
+.table-image {
+    background: url("../icons/table.svg");
+}
+
+.trigger-image {
+    background: url("../icons/trigger.svg");
+}
+
+.window-image {
+    background: url("../icons/window.svg");
+}
+
+.function-image {
+    background: url("../icons/function.svg");
+}
+
+.aggregation-image {
+    background: url("../icons/aggregate.svg");
+}
+
+.partition-image {
+    background: url("../icons/partition.svg");
+}
+
+.query-image {
+    background: url("../icons/query.svg");
 }
