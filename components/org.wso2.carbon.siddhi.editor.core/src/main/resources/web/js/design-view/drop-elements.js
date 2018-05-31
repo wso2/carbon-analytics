@@ -153,7 +153,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection = $('<div class="connectorOutSink">').attr('id', i+"-out" ).addClass('connection');
+            var connection = $('<div class="connectorInSink">').attr('id', i+"-in" ).addClass('connection');
             
             finalElement.append(connection);
 
@@ -168,9 +168,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 containment: true
             });
 
-            self.jsPlumbInstance.makeSource(connection, {
-                deleteEndpointsOnDetach : true,
-                anchor : 'Right',
+            self.jsPlumbInstance.makeTarget(connection, {
+                deleteEndpointsOnDetach:true,
+                anchor: 'Left',
                 maxConnections: 1
             });
         };
