@@ -40,6 +40,12 @@ public class SiddhiAppElements {
     private String partitions;
     private String function;
     private String functionQuery;
+    private String source;
+    private String sourceStream;
+    private String sourceSiddhiApp;
+    private String sink;
+    private String sinkStream;
+    private String sinkSiddhiApp;
 
     public String getPartitions() {
         return partitions;
@@ -161,5 +167,53 @@ public class SiddhiAppElements {
 
     public void setFunctionQuery(String functionQuery) {
         this.functionQuery = functionQuery;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSink() {
+        return sink;
+    }
+
+    public void setSink(String sink) {
+        this.sink = sink;
+    }
+
+    public String getSourceStream() {
+        return sourceStream;
+    }
+
+    public void setSourceStream(String sourceStream) {
+        this.sourceStream = sourceStream;
+    }
+
+    public String getSinkStream() {
+        return sinkStream;
+    }
+
+    public void setSinkStream(String sinkStream) {
+        this.sinkStream = sinkStream;
+    }
+
+    public String getSourceSiddhiApp() {
+        return sourceSiddhiApp;
+    }
+
+    public void setSourceSiddhiApp(String sourceSiddhiApp) {
+        this.sourceSiddhiApp = sourceSiddhiApp;
+    }
+
+    public String getSinkSiddhiApp() {
+        return sinkSiddhiApp;
+    }
+
+    public void setSinkSiddhiApp(String sinkSiddhiApp) {
+        this.sinkSiddhiApp = sinkSiddhiApp;
     }
 }

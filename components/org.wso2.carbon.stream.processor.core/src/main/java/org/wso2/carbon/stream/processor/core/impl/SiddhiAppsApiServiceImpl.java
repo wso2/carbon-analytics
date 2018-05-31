@@ -39,6 +39,8 @@ import org.wso2.carbon.stream.processor.core.model.SiddhiAppStatus;
 import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.stream.input.source.Source;
+import org.wso2.siddhi.core.stream.output.sink.Sink;
 import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.SiddhiElement;
@@ -546,13 +548,15 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             }
         }
 
-        for (Map.Entry<String,AggregationDefinition> entry: aggregationDefinitionMap.entrySet()) {
-            if(entry.getKey().equals(inputStream)) {
+        for (Map.Entry<String, AggregationDefinition> entry : aggregationDefinitionMap.entrySet()) {
+            if (entry.getKey().equals(inputStream)) {
                 siddhiAppElements.setInputStreamSiddhiApp(getDefinition(entry.getValue(), appData));
                 siddhiAppElements.setInputStreamType(Constants.AGGREGATION);
                 break;
             }
         }
+        loadSources(siddhiAppRuntime, siddhiAppElements, inputStream, appData);
+        loadSinks(siddhiAppRuntime, siddhiAppElements, inputStream, appData);
     }
 
     /**
@@ -605,6 +609,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
+        loadSources(siddhiAppRuntime, siddhiAppElements, outputStream, appData);
+        loadSinks(siddhiAppRuntime, siddhiAppElements, outputStream, appData);
     }
 
     /**
@@ -659,6 +665,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         }
     }
 
+
     /**
      * Obtains the piece of the code from the siddhiAppString variable where the given SiddhiElement object is defined.
      *
@@ -694,6 +701,37 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return position;
     }
 
+    /**
+     * Load source related data
+     */
+    private void loadSources(SiddhiAppRuntime siddhiAppRuntime, SiddhiAppElements siddhiAppElements, String stream,
+                             String siddhiApp) {
+        for (List<Source> sources : siddhiAppRuntime.getSources()) {
+            for (Source source : sources) {
+                if (stream.equals(source.getStreamDefinition().getId())) {
+                    siddhiAppElements.setSourceStream(source.getStreamDefinition().getId());
+                    siddhiAppElements.setSource(source.getType());
+                    siddhiAppElements.setSourceSiddhiApp(getDefinition(source.getStreamDefinition(), siddhiApp));
+                }
+            }
+        }
+    }
+
+    /**
+     * Load sink related data
+     */
+    private void loadSinks(SiddhiAppRuntime siddhiAppRuntime, SiddhiAppElements siddhiAppElements, String stream,
+                           String siddhiApp) {
+        for (List<Sink> sinks : siddhiAppRuntime.getSinks()) {
+            for (Sink sink : sinks) {
+                if (stream.equals(sink.getStreamDefinition().getId())) {
+                    siddhiAppElements.setSink(sink.getType());
+                    siddhiAppElements.setSinkStream(sink.getStreamDefinition().getId());
+                    siddhiAppElements.setSinkSiddhiApp(getDefinition(sink.getStreamDefinition(), siddhiApp));
+                }
+            }
+        }
+    }
 
     @Override
     public Response siddhiAppsPost(String body, Request request) throws NotFoundException {
