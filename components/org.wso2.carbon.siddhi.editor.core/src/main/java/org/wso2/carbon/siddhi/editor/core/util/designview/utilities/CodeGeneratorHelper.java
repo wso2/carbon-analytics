@@ -53,10 +53,6 @@ import java.util.Map;
  */
 public class CodeGeneratorHelper {
 
-    // TODO: 4/20/18 Check Everywhere for null values
-    // TODO: 5/2/18 Look for constants for all the cases in switch case
-    // TODO: 5/24/18 Improve The Information Given In The Error Messages
-
     /**
      * Generates a string representation of a list of attributes for a definition
      * Attributes Example - (name string, age int, ...)
@@ -81,7 +77,7 @@ public class CodeGeneratorHelper {
             }
             stringBuilder.append(attribute.getName())
                     .append(SiddhiStringBuilderConstants.SPACE)
-                    .append(attribute.getType());
+                    .append(attribute.getType().toLowerCase());
             if (attributesLeft != 1) {
                 stringBuilder.append(SiddhiStringBuilderConstants.COMMA)
                         .append(SiddhiStringBuilderConstants.SPACE);
@@ -214,8 +210,7 @@ public class CodeGeneratorHelper {
      */
     public static String getMapper(MapperConfig mapper, String annotationType) {
         if (mapper.getType() == null || mapper.getType().isEmpty()) {
-            // TODO not sure whether to throw an error here or not
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
+            throw new CodeGenerationException("The map type of the given MapperConfig object is null/empty");
         }
 
         StringBuilder mapperStringBuilder = new StringBuilder();
@@ -292,7 +287,6 @@ public class CodeGeneratorHelper {
      * @return The string representation of the given WindowFilterProjectionConfig object
      */
     private static String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection) {
-        // TODO: 5/28/18 Complete this 
         if (windowFilterProjection == null) {
             throw new CodeGenerationException("The WindowFilterProjection Instance Is Null");
         } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
@@ -374,7 +368,6 @@ public class CodeGeneratorHelper {
      * @return The string representation of the given JoinElementConfig object
      */
     private static String getJoinElement(JoinElementConfig joinElement) {
-        // TODO: 5/28/18 complete and test this
         if (joinElement == null) {
             throw new CodeGenerationException("The given JoinElementConfig instance given is null");
         } else if (joinElement.getFrom() == null || joinElement.getFrom().isEmpty()) {
@@ -501,7 +494,6 @@ public class CodeGeneratorHelper {
      * @return The string representation of the given PatternSequenceConfig object
      */
     private static String getPatternSequenceInput(PatternSequenceConfig patternSequence) {
-        // TODO: 5/28/18 Complete and test
         if (patternSequence == null) {
             throw new CodeGenerationException("The given PatternSequenceConfig instance is null");
         } else if (patternSequence.getLogic() == null || patternSequence.getLogic().isEmpty()) {
@@ -586,11 +578,11 @@ public class CodeGeneratorHelper {
      * @return The Siddhi string representation of the given UserDefinedSelectionConfig
      */
     private static String getUserDefinedSelection(UserDefinedSelectionConfig userDefinedSelection) {
-        // TODO: 4/23/18 Complete to get rid of duplicate code
         StringBuilder userDefinedSelectionStringBuilder = new StringBuilder();
 
-        if (userDefinedSelection == null || userDefinedSelection.getValue() == null || userDefinedSelection.getValue().isEmpty()) {
-            throw new CodeGenerationException("The given UserDefinedSelection instance is null");
+        if (userDefinedSelection == null || userDefinedSelection.getValue() == null ||
+                userDefinedSelection.getValue().isEmpty()) {
+            throw new CodeGenerationException("The given UserDefinedSelection instance is null/empty");
         }
 
         int attributesLeft = userDefinedSelection.getValue().size();
@@ -599,13 +591,12 @@ public class CodeGeneratorHelper {
                 throw new CodeGenerationException("The given expression of the attribute is null");
             }
             userDefinedSelectionStringBuilder.append(attribute.getExpression());
-            if (attribute.getAs() != null && !attribute.getAs().isEmpty()) {
-                if (!attribute.getAs().equals(attribute.getExpression())) {
+            if (attribute.getAs() != null && !attribute.getAs().isEmpty() &&
+                    !attribute.getAs().equals(attribute.getExpression())) {
                     userDefinedSelectionStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                             .append(SiddhiStringBuilderConstants.AS)
                             .append(SiddhiStringBuilderConstants.SPACE)
                             .append(attribute.getAs());
-                }
             }
             if (attributesLeft != 1) {
                 userDefinedSelectionStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
@@ -656,7 +647,6 @@ public class CodeGeneratorHelper {
 
         int orderByAttributesLeft = orderByList.size();
         for (QueryOrderByConfig orderByAttribute : orderByList) {
-            // TODO: 5/28/18 Can add this to another method to decrease complexity
             if (orderByAttribute == null) {
                 throw new CodeGenerationException("Query Order By Attribute Cannot Be Null");
             } else if (orderByAttribute.getValue() == null || orderByAttribute.getValue().isEmpty()) {
@@ -708,7 +698,9 @@ public class CodeGeneratorHelper {
         }
 
         StringBuilder havingStringBuilder = new StringBuilder();
-        havingStringBuilder.append(SiddhiStringBuilderConstants.HAVING).append(SiddhiStringBuilderConstants.SPACE).append(having);
+        havingStringBuilder.append(SiddhiStringBuilderConstants.HAVING)
+                .append(SiddhiStringBuilderConstants.SPACE)
+                .append(having);
 
         return havingStringBuilder.toString();
     }
@@ -757,8 +749,10 @@ public class CodeGeneratorHelper {
                 break;
             case CodeGeneratorConstants.UPDATE:
             case CodeGeneratorConstants.UPDATE_OR_INSERT_INTO:
-                UpdateInsertIntoOutputConfig updateInsertIntoOutput = (UpdateInsertIntoOutputConfig) queryOutput.getOutput();
-                queryOutputStringBuilder.append(getUpdateOutput(queryOutput.getType(), updateInsertIntoOutput, queryOutput.getTarget()));
+                UpdateInsertIntoOutputConfig updateInsertIntoOutput =
+                        (UpdateInsertIntoOutputConfig) queryOutput.getOutput();
+                queryOutputStringBuilder.append(getUpdateOutput(queryOutput.getType(),
+                        updateInsertIntoOutput, queryOutput.getTarget()));
                 break;
             default:
                 throw new CodeGenerationException("Unidentified query output type: " + queryOutput.getType());
@@ -771,7 +765,7 @@ public class CodeGeneratorHelper {
      * Generates a Siddhi string representation of a InsertOutputConfig object
      *
      * @param insertOutput The InsertOutputConfig object to be converted
-     * @param target The name of the target output definition
+     * @param target       The name of the target output definition
      * @return The Siddhi string representation of the InsertOutputConfig to respective target
      */
     private static String getInsertOutput(InsertOutputConfig insertOutput, String target) {
@@ -817,7 +811,7 @@ public class CodeGeneratorHelper {
      * Generates a Siddhi string representation of a DeleteOutputConfig object
      *
      * @param deleteOutput The DeleteOutputConfig object to be converted
-     * @param target The name of the target output definition
+     * @param target       The name of the target output definition
      * @return The Siddhi string representation of the DeleteOutputConfig object to the respective target
      */
     private static String getDeleteOutput(DeleteOutputConfig deleteOutput, String target) {
@@ -868,12 +862,13 @@ public class CodeGeneratorHelper {
     /**
      * Generates a Siddhi string representation of a UpdateInsertIntoOutputConfig object
      *
-     * @param type The type of output object the one is (i.e. Either update|update or insert into)
+     * @param type                   The type of output object the one is (i.e. Either update|update or insert into)
      * @param updateInsertIntoOutput The UpdateInsertIntoConfig object to be converted
-     * @param target The name of the target output definition
+     * @param target                 The name of the target output definition
      * @return The Siddhi string representation of the UpdateInsertIntoOutputConfig object to the respective target
      */
-    private static String getUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput, String target) {
+    private static String getUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput,
+                                          String target) {
         if (updateInsertIntoOutput == null) {
             throw new CodeGenerationException("The given UpdateInsertIntoOutputConfig is null");
         } else if (updateInsertIntoOutput.getSet() == null || updateInsertIntoOutput.getSet().isEmpty()) {
@@ -900,19 +895,8 @@ public class CodeGeneratorHelper {
 
         int setAttributesLeft = updateInsertIntoOutput.getSet().size();
         for (SetAttributeConfig setAttribute : updateInsertIntoOutput.getSet()) {
-            if (setAttribute == null) {
-                throw new CodeGenerationException("The given SetAttributeConfig instance is null in the update output query type");
-            } else if (setAttribute.getAttribute() == null || setAttribute.getAttribute().isEmpty()) {
-                throw new CodeGenerationException("The given attribute value to be set is null");
-            } else if (setAttribute.getValue() == null || setAttribute.getValue().isEmpty()) {
-                throw new CodeGenerationException("The given value to the value for update query output is null");
-            }
+            updateInsertIntoOutputStringBuilder.append(getSetAttribute(setAttribute));
 
-            updateInsertIntoOutputStringBuilder.append(setAttribute.getAttribute())
-                    .append(SiddhiStringBuilderConstants.SPACE)
-                    .append(SiddhiStringBuilderConstants.EQUAL)
-                    .append(SiddhiStringBuilderConstants.SPACE)
-                    .append(setAttribute.getValue());
             if (setAttributesLeft != 1) {
                 updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
                         .append(SiddhiStringBuilderConstants.SPACE);
@@ -928,6 +912,33 @@ public class CodeGeneratorHelper {
                 .append(SiddhiStringBuilderConstants.SEMI_COLON);
 
         return updateInsertIntoOutputStringBuilder.toString();
+    }
+
+    /**
+     * Generates a Siddhi string representation of a SetAttributeConfig object
+     *
+     * @param setAttribute The given SetAttributeConfig object to be converted
+     * @return The converted Siddhi string representation of the SetAttributeConfig object
+     */
+    private static String getSetAttribute(SetAttributeConfig setAttribute) {
+        if (setAttribute == null) {
+            throw new CodeGenerationException("The given SetAttributeConfig instance is null in the" +
+                    " update output query type");
+        } else if (setAttribute.getAttribute() == null || setAttribute.getAttribute().isEmpty()) {
+            throw new CodeGenerationException("The given attribute value to be set is null");
+        } else if (setAttribute.getValue() == null || setAttribute.getValue().isEmpty()) {
+            throw new CodeGenerationException("The given value to the value for update query output is null");
+        }
+
+        StringBuilder setAttributeStringBuilder = new StringBuilder();
+
+        setAttributeStringBuilder.append(setAttribute.getAttribute())
+                .append(SiddhiStringBuilderConstants.SPACE)
+                .append(SiddhiStringBuilderConstants.EQUAL)
+                .append(SiddhiStringBuilderConstants.SPACE)
+                .append(setAttribute.getValue());
+
+        return setAttributeStringBuilder.toString();
     }
 
     private CodeGeneratorHelper() {
