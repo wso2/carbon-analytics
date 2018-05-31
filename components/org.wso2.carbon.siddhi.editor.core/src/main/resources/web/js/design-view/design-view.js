@@ -329,6 +329,10 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
             return this.configurationData;
         };
 
+        DesignView.prototype.setConfigurationData = function (configurationData) {
+            this.configurationData = configurationData;
+        };
+
         DesignView.prototype.emptyDesignViewGridContainer = function () {
             var errMsg = '';
             this.designViewGridContainer = this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
@@ -388,7 +392,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
             $.ajax({
                 type: "POST",
                 url: self.designToCodeURL,
-                headers: { 'Content-Type':'application/json' },
+                contentType: "application/json",
                 data: designViewJSON,
                 async: false,
                 success: function (response) {
