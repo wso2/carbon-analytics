@@ -348,8 +348,18 @@ td {
 
 .design-view-form-content .well {
     background: transparent;
+    padding: 0;
 }
 
 .design-view-form-content {
     padding: 10px;
+}
+
+select.form-control,
+.btn-group > div {
+    background: #2f2f2f !important;
+}
+
+.design-view-form-content th {
+    color: #fff;
 }
