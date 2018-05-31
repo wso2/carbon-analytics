@@ -391,30 +391,68 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
         DesignView.prototype.getDesign = function (code) {
             var self = this;
             var result = {};
-            self.codeToDesignURL = window.location.protocol + "//" + window.location.host + "/editor/design-view";
-            $.ajax({
-                type: "POST",
-                url: self.codeToDesignURL,
-                data: window.btoa(code),
-                async: false,
-                success: function (response) {
-                    result = {status: "success", responseJSON: response};
-                },
-                error: function (error) {
-                    console.log(error);
-                    if (error.status === 400) {
-                        result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
-                    } else if (error.responseText === "pattern queries are not supported"){
-                        result = {status: "fail", errorMessage: error.responseText};
-                    } else if (error.responseText === "sequence queries are not supported"){
-                        result = {status: "fail", errorMessage: error.responseText};
-                    } else if (error.responseText === "Partitions are not supported"){
-                        result = {status: "fail", errorMessage: error.responseText};
-                    } else {
-                        result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+            // Remove Single Line Comments
+            var regexStr = code.replace(/--.*/g, '');
+            // Remove Multi-line Comments
+            regexStr = regexStr.replace(/\/\*(.|\s)*?\*\//g, '');
+            var regex = /^\s*@\s*app\s*:\s*name\s*\(\s*["|'](.*)["|']\s*\)\s*@\s*app\s*:\s*description\s*\(\s*["|'](.*)["|']\s*\)\s*$/gi;
+            var match = regex.exec(regexStr);
+
+            // check whether Siddhi app is in initial mode(initial Siddhi app template) and if yes then go to the
+            // design view with the no content
+            if (match !== null) {
+                result = {
+                    status: "success",
+                    responseJSON: {
+                        //appName: match[1],
+                        //appDescription: match[2],
+                        "siddhiAppConfig":{
+                            "streamList":[],
+                            "tableList":[],
+                            "windowList":[],
+                            "triggerList":[],
+                            "aggregationList":[],
+                            "functionList":[],
+                            "partitionList":[],
+                            "sourceList":[],
+                            "sinkList":[],
+                            "queryLists":{
+                                "WINDOW_FILTER_PROJECTION":[],
+                                "PATTERN":[],
+                                "SEQUENCE":[],
+                                "JOIN":[]
+                            },
+                            "finalElementCount":0
+                        },
+                        "edgeList":[]
                     }
-                }
-            });
+                };
+            } else {
+                self.codeToDesignURL = window.location.protocol + "//" + window.location.host + "/editor/design-view";
+                $.ajax({
+                    type: "POST",
+                    url: self.codeToDesignURL,
+                    data: window.btoa(code),
+                    async: false,
+                    success: function (response) {
+                        result = {status: "success", responseJSON: response};
+                    },
+                    error: function (error) {
+                        console.log(error);
+                        if (error.status === 400) {
+                            result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                        } else if (error.responseText === "pattern queries are not supported") {
+                            result = {status: "fail", errorMessage: error.responseText};
+                        } else if (error.responseText === "sequence queries are not supported") {
+                            result = {status: "fail", errorMessage: error.responseText};
+                        } else if (error.responseText === "Partitions are not supported") {
+                            result = {status: "fail", errorMessage: error.responseText};
+                        } else {
+                            result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                        }
+                    }
+                });
+            }
             return result;
         };
 
