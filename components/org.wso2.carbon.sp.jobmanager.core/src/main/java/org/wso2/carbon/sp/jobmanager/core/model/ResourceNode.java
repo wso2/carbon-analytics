@@ -32,12 +32,6 @@ public class ResourceNode implements Serializable {
     private InterfaceConfig httpInterface;
     private long lastPingTimestamp;
     private int failedPingAttempts;
-
-    public boolean isMetricsUpdated() {
-        return metricsUpdated;
-    }
-
-    private boolean metricsUpdated = false;
     private double processCPU;
     private double systemCPU;
     private double loadAverage;
@@ -104,6 +98,20 @@ public class ResourceNode implements Serializable {
 
     public void incrementFailedPingAttempts() {
         failedPingAttempts += 1;
+    }
+
+    public boolean isMetricsUpdated() {
+        return metricsUpdated;
+    }
+
+    private boolean metricsUpdated = false;
+
+    public double getProcessCPU() {
+        return processCPU;
+    }
+
+    public double getSystemCPU() {
+        return systemCPU;
     }
 
     @Override
