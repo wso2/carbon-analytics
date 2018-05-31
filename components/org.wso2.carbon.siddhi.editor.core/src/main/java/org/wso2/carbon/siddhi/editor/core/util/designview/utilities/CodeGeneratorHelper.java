@@ -59,6 +59,7 @@ public class CodeGeneratorHelper {
      *
      * @param attributes The list of AttributeConfig objects to be converted
      * @return The converted attributes as a string
+     * @throws CodeGenerationException Error while generating code
      */
     public static String getAttributes(List<AttributeConfig> attributes) throws CodeGenerationException {
         if (attributes == null || attributes.isEmpty()) {
@@ -112,6 +113,7 @@ public class CodeGeneratorHelper {
      *
      * @param store The StoreConfig instance to be converted
      * @return The string representation of a store annotation
+     * @throws CodeGenerationException Error while generating code
      */
     public static String getStore(StoreConfig store) throws CodeGenerationException {
         if (store == null) {
@@ -207,6 +209,7 @@ public class CodeGeneratorHelper {
      * @param mapper         The MapperConfig object to be converted
      * @param annotationType The annotation type the MapperConfig object belongs to (SINK or SOURCE)
      * @return The string representation of the MapperConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     public static String getMapper(MapperConfig mapper, String annotationType) throws CodeGenerationException {
         if (mapper.getType() == null || mapper.getType().isEmpty()) {
@@ -247,6 +250,7 @@ public class CodeGeneratorHelper {
      *
      * @param queryInput The QueryInputConfig object to be converted
      * @return The string representation of the given QueryInputConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     public static String getQueryInput(QueryInputConfig queryInput) throws CodeGenerationException {
         if (queryInput == null) {
@@ -285,6 +289,7 @@ public class CodeGeneratorHelper {
      *
      * @param windowFilterProjection The WindowFilterProjectCofig to be converted
      * @return The string representation of the given WindowFilterProjectionConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection)
             throws CodeGenerationException {
@@ -308,6 +313,7 @@ public class CodeGeneratorHelper {
      *
      * @param join The JoinConfig object to be converted
      * @return The string representation of the given JoinConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getJoinQueryInput(JoinConfig join) throws CodeGenerationException {
         if (join == null) {
@@ -370,6 +376,7 @@ public class CodeGeneratorHelper {
      *
      * @param joinElement The JoinElementConfig object to be converted
      * @return The string representation of the given JoinElementConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getJoinElement(JoinElementConfig joinElement) throws CodeGenerationException {
         if (joinElement == null) {
@@ -403,6 +410,7 @@ public class CodeGeneratorHelper {
      *
      * @param streamHandlerList The list of StreamHandlerConfig objects to be converted
      * @return The result string representation of the list of StreamHandlerConfig objects
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getStreamHandlerList(List<StreamHandlerConfig> streamHandlerList)
             throws CodeGenerationException {
@@ -424,6 +432,7 @@ public class CodeGeneratorHelper {
      *
      * @param streamHandler The StreamHandlerConfig object to be converted
      * @return The string representation of the given StreamHandlerConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getStreamHandler(StreamHandlerConfig streamHandler) throws CodeGenerationException {
         if (streamHandler == null) {
@@ -473,6 +482,7 @@ public class CodeGeneratorHelper {
      *
      * @param joinType The join type as a string
      * @return The Siddhi string representation of the given join type
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getJoinType(String joinType) throws CodeGenerationException {
         if (joinType == null || joinType.isEmpty()) {
@@ -498,6 +508,7 @@ public class CodeGeneratorHelper {
      *
      * @param patternSequence The PatterSequenceConfig object to be converted
      * @return The string representation of the given PatternSequenceConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getPatternSequenceInput(PatternSequenceConfig patternSequence)
             throws CodeGenerationException {
@@ -525,6 +536,7 @@ public class CodeGeneratorHelper {
      *
      * @param condition The PatternSequenceConditionConfig object to be converted
      * @return The Siddhi string representation of the given PatternSequenceConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getPatternSequenceConditionLogic(PatternSequenceConditionConfig condition)
             throws CodeGenerationException {
@@ -549,6 +561,7 @@ public class CodeGeneratorHelper {
      *
      * @param attributesSelection The AttributesSelectionConfig object to be converted
      * @return The converted Siddhi string representation of the given AttributesSelectionConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     public static String getQuerySelect(AttributesSelectionConfig attributesSelection) throws CodeGenerationException {
         if (attributesSelection == null) {
@@ -586,6 +599,7 @@ public class CodeGeneratorHelper {
      *
      * @param userDefinedSelection The UserDefinedSelectionConfig object to be converted
      * @return The Siddhi string representation of the given UserDefinedSelectionConfig
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getUserDefinedSelection(UserDefinedSelectionConfig userDefinedSelection)
             throws CodeGenerationException {
@@ -645,6 +659,7 @@ public class CodeGeneratorHelper {
      *
      * @param orderByList The order by list to be converted
      * @return The Siddhi string representation of the given order by config list
+     * @throws CodeGenerationException Error while generating code
      */
     public static String getQueryOrderBy(List<QueryOrderByConfig> orderByList) throws CodeGenerationException {
         if (orderByList == null || orderByList.isEmpty()) {
@@ -740,6 +755,7 @@ public class CodeGeneratorHelper {
      *
      * @param queryOutput The QueryOutputConfig object to be converted
      * @return The converted string representation of the given QueryOutputConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     public static String getQueryOutput(QueryOutputConfig queryOutput) throws CodeGenerationException {
         if (queryOutput == null) {
@@ -779,6 +795,7 @@ public class CodeGeneratorHelper {
      * @param insertOutput The InsertOutputConfig object to be converted
      * @param target       The name of the target output definition
      * @return The Siddhi string representation of the InsertOutputConfig to respective target
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getInsertOutput(InsertOutputConfig insertOutput, String target)
             throws CodeGenerationException {
@@ -826,6 +843,7 @@ public class CodeGeneratorHelper {
      * @param deleteOutput The DeleteOutputConfig object to be converted
      * @param target       The name of the target output definition
      * @return The Siddhi string representation of the DeleteOutputConfig object to the respective target
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getDeleteOutput(DeleteOutputConfig deleteOutput, String target)
             throws CodeGenerationException {
@@ -861,6 +879,7 @@ public class CodeGeneratorHelper {
      * @param updateInsertIntoOutput The UpdateInsertIntoConfig object to be converted
      * @param target                 The name of the target output definition
      * @return The Siddhi string representation of the UpdateInsertIntoOutputConfig object to the respective target
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput,
                                           String target) throws CodeGenerationException {
@@ -918,6 +937,7 @@ public class CodeGeneratorHelper {
      *
      * @param eventType The event type that is used
      * @return The string representation for the event type in Siddhi
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getForEventType(String eventType) throws CodeGenerationException {
         if (eventType == null || eventType.isEmpty()) {
@@ -951,6 +971,7 @@ public class CodeGeneratorHelper {
      *
      * @param setAttribute The given SetAttributeConfig object to be converted
      * @return The converted Siddhi string representation of the SetAttributeConfig object
+     * @throws CodeGenerationException Error while generating code
      */
     private static String getSetAttribute(SetAttributeConfig setAttribute) throws CodeGenerationException {
         if (setAttribute == null) {

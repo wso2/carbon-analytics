@@ -48,6 +48,7 @@ public class CodeGenerator {
      *
      * @param eventFlow The EventFlow object to be converted
      * @return The Siddhi app as a string
+     * @throws CodeGenerationException Error while generating code
      */
     public String generateSiddhiAppCode(EventFlow eventFlow) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
@@ -108,9 +109,10 @@ public class CodeGenerator {
      * Generates a string representation of all the streams in a Siddhi app
      *
      * @param streamList A list of StreamConfig objects from the SiddhiAppConfig object
-     * @param sourceList A list of sources from the SiddhiAppConfig object
-     * @param sinkList   A list of sinks from the SiddhiAppConfig object
+     * @param sourceList A list of StreamConfig objects from the SiddhiAppConfig object
+     * @param sinkList   A list of StreamConfig objects from the SiddhiAppConfig object
      * @return The string representation of the stream definitions
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList,
                                    List<SourceSinkConfig> sinkList) throws CodeGenerationException {
@@ -154,9 +156,9 @@ public class CodeGenerator {
 
     /**
      * Generates a string representation of all the tables in a Siddhi app
-     *
      * @param tableList A list of TableConfig objects from the SiddhiAppConfig object
      * @return The Siddhi string representation of the table definitions
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateTables(List<TableConfig> tableList) throws CodeGenerationException {
         if (tableList == null || tableList.isEmpty()) {
@@ -182,6 +184,7 @@ public class CodeGenerator {
      *
      * @param windowList A list of WindowConfig objects to be converted
      * @return The Siddhi string representaiotn of all the window definitions
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateWindows(List<WindowConfig> windowList) throws CodeGenerationException {
         if (windowList == null || windowList.isEmpty()) {
@@ -209,6 +212,7 @@ public class CodeGenerator {
      * @param sourceList  A list of all sources in a SiddhiAppConfig object
      * @param sinkList    A list of all the sinks in a SiddhiAppConfig object
      * @return The Siddhi string representation of all the trigger definitions
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateTriggers(List<TriggerConfig> triggerList, List<SourceSinkConfig> sourceList,
                                     List<SourceSinkConfig> sinkList) throws CodeGenerationException {
@@ -248,10 +252,11 @@ public class CodeGenerator {
     }
 
     /**
-     * Genenerates a string representation of all the aggregation definitions in a Siddhi app
+     * Generates a string representation of all the aggregation definitions in a Siddhi app
      *
      * @param aggregationList A list of AggregationConfig objects to be converted
      * @return The Siddhi string representation of all the aggregation definitions
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateAggregations(List<AggregationConfig> aggregationList) throws CodeGenerationException {
         if (aggregationList == null || aggregationList.isEmpty()) {
@@ -277,6 +282,7 @@ public class CodeGenerator {
      *
      * @param functionList A list of FunctionConfig objects to be converted
      * @return The Siddhi string representation of all the function definitions
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateFunctions(List<FunctionConfig> functionList) throws CodeGenerationException {
         if (functionList == null || functionList.isEmpty()) {
@@ -302,6 +308,7 @@ public class CodeGenerator {
      *
      * @param queryLists A list of QueryConfig objects to be converted
      * @return The Siddhi string representation of the given QueryConfig list
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateQueries(Map<QueryListType, List<QueryConfig>> queryLists) throws CodeGenerationException {
         if (queryLists == null || queryLists.isEmpty()) {
@@ -338,6 +345,7 @@ public class CodeGenerator {
      *
      * @param partitionList The list of PartitionConfig objects to be converted
      * @return The Siddhi string representation of the given PartitionConfig list
+     * @throws CodeGenerationException Error while generating code
      */
     private String generatePartitions(List<PartitionConfig> partitionList) throws CodeGenerationException {
         if (partitionList == null || partitionList.isEmpty()) {
@@ -361,6 +369,7 @@ public class CodeGenerator {
      *
      * @param stream The StreamConfig object to be converted
      * @return The converted stream definition string
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateStreamString(StreamConfig stream) throws CodeGenerationException {
         if (stream == null) {
@@ -388,6 +397,7 @@ public class CodeGenerator {
      *
      * @param table The TableConfig object to be converted
      * @return The converted table definition string
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateTableString(TableConfig table) throws CodeGenerationException {
         if (table == null) {
@@ -416,6 +426,7 @@ public class CodeGenerator {
      *
      * @param window The WindowConfig object to be converted
      * @return The converted window definition string
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateWindowString(WindowConfig window) throws CodeGenerationException {
         if (window == null) {
@@ -470,6 +481,7 @@ public class CodeGenerator {
      *
      * @param trigger The TriggerConfig object to be converted
      * @return The converted trigger definition string
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateTriggerString(TriggerConfig trigger) throws CodeGenerationException {
         if (trigger == null) {
@@ -499,6 +511,7 @@ public class CodeGenerator {
      *
      * @param aggregation The AggregationConfig object to be converted
      * @return The converted aggregation definition string
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateAggregationString(AggregationConfig aggregation) throws CodeGenerationException {
         if (aggregation == null) {
@@ -567,6 +580,7 @@ public class CodeGenerator {
      *
      * @param function The FunctionConfig object to be converted
      * @return The converted function definition string
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateFunctionString(FunctionConfig function) throws CodeGenerationException {
         if (function == null) {
@@ -609,6 +623,7 @@ public class CodeGenerator {
      *
      * @param query The QueryConfig object to be converted
      * @return The converted query definition string
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateQueryString(QueryConfig query) throws CodeGenerationException {
         if (query == null) {
@@ -653,6 +668,7 @@ public class CodeGenerator {
      *
      * @param partition The PartitionConfig object to be converted
      * @return The converted partition definition string
+     * @throws CodeGenerationException Error while generating code
      */
     private String generatePartitionString(PartitionConfig partition) throws CodeGenerationException {
         if (partition == null) {
@@ -684,6 +700,7 @@ public class CodeGenerator {
      *
      * @param sourceSink The SourceSinkConfig object to be converted
      * @return The converted source/sink definition string
+     * @throws CodeGenerationException Error while generating code
      */
     private String generateSourceSinkString(SourceSinkConfig sourceSink) throws CodeGenerationException {
         if (sourceSink == null) {

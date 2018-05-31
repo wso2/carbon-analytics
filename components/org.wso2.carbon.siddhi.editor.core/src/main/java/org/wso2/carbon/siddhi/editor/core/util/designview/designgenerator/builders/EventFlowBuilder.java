@@ -67,10 +67,10 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads name & description from the SiddhiApp
+     * Loads name and description from the SiddhiApp
      */
     /**
-     * Loads name & description from the SiddhiApp
+     * Loads name and description from the SiddhiApp
      * @return      A reference to this object
      */
     public EventFlowBuilder loadAppNameAndDescription() {
