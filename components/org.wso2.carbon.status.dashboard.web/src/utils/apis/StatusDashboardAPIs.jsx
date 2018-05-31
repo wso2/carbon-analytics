@@ -205,4 +205,13 @@ export default class StatusDashboardAPIS {
         return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName +
             '/child-apps/' + 'transport')
     }
+
+    /**
+     * This method will return details of Siddhi App elements with given name of a worker with  given worker ID.
+     * @param workerID
+     * @param appName
+     */
+    static getSiddhiAppElementsByName(workerID, appName) {
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName +'/elements');
+    }
 }

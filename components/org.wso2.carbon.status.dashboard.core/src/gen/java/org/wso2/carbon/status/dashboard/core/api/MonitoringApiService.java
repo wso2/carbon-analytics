@@ -96,4 +96,7 @@ public abstract class MonitoringApiService {
     public abstract Response getHASiddhiApps(String username) throws NotFoundException, SQLException;
 
     public abstract Response getAllManagersSiddhiApps(String username) throws NotFoundException, SQLException;
+
+    public abstract Response getSiddhiAppElements(String workerId, String appName, String username) throws
+            NotFoundException, IOException;
 }
