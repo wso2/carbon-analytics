@@ -305,14 +305,22 @@ public class CodeGenerator {
         }
 
         StringBuilder queryListStringBuilder = new StringBuilder();
-        queryListStringBuilder.append("-- Queries")
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
 
+
+        boolean hasQueries = false;
         for (List<QueryConfig> queryList : queryLists.values()) {
-            for (QueryConfig query : queryList) {
-                queryListStringBuilder.append(generateQueryString(query))
-                        .append(SiddhiStringBuilderConstants.NEW_LINE)
-                        .append(SiddhiStringBuilderConstants.NEW_LINE);
+            if (queryList != null && !queryList.isEmpty()) {
+                if (!hasQueries) {
+                    hasQueries = true;
+                    queryListStringBuilder.append("-- Queries")
+                            .append(SiddhiStringBuilderConstants.NEW_LINE);
+                }
+
+                for (QueryConfig query : queryList) {
+                    queryListStringBuilder.append(generateQueryString(query))
+                            .append(SiddhiStringBuilderConstants.NEW_LINE)
+                            .append(SiddhiStringBuilderConstants.NEW_LINE);
+                }
             }
         }
 
@@ -534,11 +542,14 @@ public class CodeGenerator {
         aggregationStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                 .append(SiddhiStringBuilderConstants.EVERY)
                 .append(SiddhiStringBuilderConstants.SPACE)
-                .append(aggregation.getAggregateByTimePeriod().getMinValue());
+                .append(aggregation.getAggregateByTimePeriod().getMinValue().toLowerCase());
 
-        if (aggregation.getAggregateByTimePeriod().getMaxValue() != null && !aggregation.getAggregateByTimePeriod().getMaxValue().isEmpty()) {
+        if (aggregation.getAggregateByTimePeriod().getMaxValue() != null &&
+                !aggregation.getAggregateByTimePeriod().getMaxValue().isEmpty() &&
+                !aggregation.getAggregateByTimePeriod().getMaxValue()
+                        .equalsIgnoreCase(aggregation.getAggregateByTimePeriod().getMinValue())) {
             aggregationStringBuilder.append(SiddhiStringBuilderConstants.THREE_DOTS)
-                    .append(aggregation.getAggregateByTimePeriod().getMaxValue());
+                    .append(aggregation.getAggregateByTimePeriod().getMaxValue().toLowerCase());
         }
 
         aggregationStringBuilder.append(SiddhiStringBuilderConstants.SEMI_COLON);
@@ -575,7 +586,7 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.SPACE)
                 .append(SiddhiStringBuilderConstants.RETURN)
                 .append(SiddhiStringBuilderConstants.SPACE)
-                .append(function.getReturnType())
+                .append(function.getReturnType().toLowerCase())
                 .append(SiddhiStringBuilderConstants.SPACE)
                 .append(SiddhiStringBuilderConstants.OPEN_CURLY_BRACKET)
                 .append(SiddhiStringBuilderConstants.NEW_LINE)

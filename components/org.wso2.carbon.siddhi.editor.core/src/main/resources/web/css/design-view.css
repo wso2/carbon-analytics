@@ -89,7 +89,7 @@
 }
 
 .windowDrop {
-    background-image: url("../images/window-query.svg");
+    background-image: url("../images/window.svg");
 }
 
 .triggerDrop {
@@ -105,7 +105,7 @@
 }
 
 .projectionQueryDrop {
-    background-image: url("../images/projection-query.svg");
+    background-image: url("../images/query.svg");
 }
 
 .filterQueryDrop {
@@ -347,4 +347,8 @@ td {
 
 .design-view-form-content .well {
     background: transparent;
+}
+
+.design-view-form-content {
+    padding: 10px;
 }

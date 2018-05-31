@@ -93,7 +93,7 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     id : "projection-query",
                     className : "projection-query-drag",
                     title : "Projection Query",
-                    icon : "/editor/images/projection-query.svg"
+                    icon : "/editor/images/query.svg"
                 },
                 {
                     id : "filter-query",
