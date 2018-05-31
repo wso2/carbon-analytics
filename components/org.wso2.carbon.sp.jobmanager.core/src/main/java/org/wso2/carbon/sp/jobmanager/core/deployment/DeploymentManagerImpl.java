@@ -21,11 +21,11 @@ package org.wso2.carbon.sp.jobmanager.core.deployment;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.DeploymentManager;
+import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.ResourcePoolChangeListener;
 import org.wso2.carbon.sp.jobmanager.core.SiddhiAppDeployer;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.DistributedSiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
-import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,12 +43,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Implementation regarding deploying siddhi applications in the resource cluster.
+ * Implementation regarding deploying siddhi applications in the resource cluster
  */
 public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolChangeListener {
     private static final Logger LOG = Logger.getLogger(DeploymentManagerImpl.class);
     private final Lock lock = new ReentrantLock();
-    private Iterator resourceIterator;
+    private ResourceAllocationAlgorithm resourceAllocationAlgorithm = ServiceDataHolder.getAllocationAlgorithm();
 
     @Override
     public DeploymentStatus deploy(DistributedSiddhiQuery distributedSiddhiQuery) {
@@ -197,31 +196,6 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                 || waitingAppList.containsKey(parentSiddhiAppName);
     }
 
-    /**
-     * Get an available {@link ResourceNode} in round robin manner.
-     *
-     * @return a {@link ResourceNode}
-     */
-    private ResourceNode getNextResourceNode() {
-        DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
-        ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
-        if (deploymentConfig != null && resourcePool != null) {
-            if (resourcePool.getResourceNodeMap().size() >= deploymentConfig.getMinResourceCount()) {
-                if (resourceIterator == null) {
-                    resourceIterator = resourcePool.getResourceNodeMap().values().iterator();
-                }
-                if (resourceIterator.hasNext()) {
-                    return (ResourceNode) resourceIterator.next();
-                } else {
-                    resourceIterator = resourcePool.getResourceNodeMap().values().iterator();
-                    if (resourceIterator.hasNext()) {
-                        return (ResourceNode) resourceIterator.next();
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     @Override
     public void resourceAdded(ResourceNode resourceNode) {
@@ -233,9 +207,6 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
 
         lock.lock();
         try {
-            // Refresh iterator after the pool change (since new node added).
-            resourceIterator = ServiceDataHolder.getResourcePool().getResourceNodeMap().values().iterator();
-
             for (String parentSiddhiAppName : waitingParentAppNames) {
                 partialAppHoldersOfSiddhiApp = waitingList.getOrDefault(parentSiddhiAppName, Collections.emptyList());
                 deployedCompletely = true;
@@ -281,12 +252,9 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
 
         lock.lock();
         try {
-            // Refresh iterator after the pool change (since node get removed).
-            resourceIterator = ServiceDataHolder.getResourcePool().getResourceNodeMap().values().iterator();
-
             if (affectedPartialApps != null) {
-                LOG.info(String.format("Siddhi apps %s were affected by the removal of node %s. Hence, re-deploying " +
-                        "them in other resource nodes.", affectedPartialApps, resourceNode));
+                LOG.info(String.format("Siddhi apps %s were affected by the removal of node %s. Hence, re-deploying "
+                        + "them in other resource nodes.", affectedPartialApps, resourceNode));
                 rollback(affectedPartialApps);
 
                 affectedPartialApps.forEach(affectedPartialApp -> {
@@ -298,9 +266,10 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                                 affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName(),
                                 deployedNode));
                     } else {
-                        LOG.warn(String.format("Insufficient resources to deploy %s. Therefore, cannot re-balance " +
-                                "Siddhi app %s. Hence, rolling back the deployment and waiting for additional " +
-                                "resources.", affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName()));
+                        LOG.warn(String.format("Insufficient resources to deploy %s. Therefore, cannot re-balance "
+                                        + "Siddhi app %s. Hence, rolling back the deployment and waiting"
+                                        + " for additional resources.", affectedPartialApp.getAppName(),
+                                affectedPartialApp.getParentAppName()));
                         List<SiddhiAppHolder> appHolders = resourcePool.getSiddhiAppHoldersMap()
                                 .remove(affectedPartialApp.getParentAppName());
 
@@ -351,7 +320,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
 
     private ResourceNode deploy(SiddhiQuery siddhiQuery, int retry) {
         ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
-        ResourceNode resourceNode = getNextResourceNode();
+        ResourceNode resourceNode = resourceAllocationAlgorithm.getNextResourceNode();
         ResourceNode deployedNode = null;
         if (resourceNode != null) {
             String appName = SiddhiAppDeployer.deploy(resourceNode, siddhiQuery);

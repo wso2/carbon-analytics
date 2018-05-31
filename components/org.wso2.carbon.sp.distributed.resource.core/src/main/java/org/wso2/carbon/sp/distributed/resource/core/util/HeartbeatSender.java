@@ -19,6 +19,7 @@
 package org.wso2.carbon.sp.distributed.resource.core.util;
 
 import com.google.gson.Gson;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPInterfaceConfig;
@@ -26,12 +27,13 @@ import org.wso2.carbon.sp.distributed.resource.core.bean.HeartbeatResponse;
 import org.wso2.carbon.sp.distributed.resource.core.bean.ManagerNodeConfig;
 import org.wso2.carbon.sp.distributed.resource.core.exception.ResourceNodeException;
 import org.wso2.carbon.sp.distributed.resource.core.internal.ServiceDataHolder;
+import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
+import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
+import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import okhttp3.Response;
 
 /**
  * This will be responsible for discovering the leader, joining the resource pool and keep sending the heartbeats to the
@@ -131,8 +133,23 @@ public class HeartbeatSender extends TimerTask {
      */
     private boolean sendHeartbeat(HTTPInterfaceConfig config) {
         HeartbeatResponse hbRes;
+        WorkerMetrics workerMetrics;
         Response response = null;
         boolean connected = false;
+
+        if (ServiceDataHolder.getOperatingSystemMetricSet() != null) {
+            OperatingSystemMetricSet operatingSystemMetricSet = ServiceDataHolder.getOperatingSystemMetricSet();
+            operatingSystemMetricSet.initConnection();
+            if (operatingSystemMetricSet.isEnableWorkerMetrics()) {
+                try {
+                    workerMetrics = operatingSystemMetricSet.getMetrics().getWorkerMetrics();
+                    ServiceDataHolder.getCurrentNodeConfig().setWorkerMetrics(workerMetrics);
+                } catch (MetricsConfigException e) {
+                    LOG.error("Error retrieving WorkerStatistics from  Resource Node: "
+                            + ServiceDataHolder.getCurrentNodeConfig().getId(), e);
+                }
+            }
+        }
         try {
             /* If this resource node was previously connected to a Leader, and if all the leaders went offline for some
              * reason, then keep retrying for (leader.getHeartbeatInterval() * leader.getHeartbeatMaxRetry()) time,

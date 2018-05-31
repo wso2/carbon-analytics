@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,53 +15,64 @@
  *  limitations under the License.
  *
  */
-package org.wso2.carbon.stream.processor.statistics.bean;
+package org.wso2.carbon.sp.jobmanager.core.model;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
 
 /**
  * This is the bean class use to keep the real time metrics details of the worker node.
  */
-public class WorkerMetrics implements Serializable {
-    private static final long serialVersionUID = 6279971976317850085L;
+@ApiModel(description = "Represents a Resource Node Metrics")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-23T12:20:42.963Z")
+public class WorkerMetrics {
+
+    @JsonProperty("processCPU")
     private double processCPU;
+
+    @JsonProperty("systemCPU")
     private double systemCPU;
+
+    @JsonProperty("loadAverage")
     private double loadAverage;
+
+    @JsonProperty("memoryUsage")
     private double memoryUsage;
-    
-    public WorkerMetrics() {
-    }
-    
+
     public double getProcessCPU() {
         return processCPU;
     }
-    
-    public void setProcessCPU(double processCPU) {
+
+    public WorkerMetrics setProcessCPU(double processCPU) {
         this.processCPU = processCPU;
+        return this;
     }
-    
+
     public double getSystemCPU() {
         return systemCPU;
     }
-    
-    public void setSystemCPU(double systemCPU) {
+
+    public WorkerMetrics setSystemCPU(double systemCPU) {
         this.systemCPU = systemCPU;
+        return this;
     }
-    
+
     public double getLoadAverage() {
         return loadAverage;
     }
-    
-    public void setLoadAverage(double loadAverage) {
+
+    public WorkerMetrics setLoadAverage(double loadAverage) {
         this.loadAverage = loadAverage;
+        return this;
     }
-    
+
     public double getTotalMemory() {
         return memoryUsage;
     }
-    
-    public void setTotalMemory(double memoryUsage) {
+
+    public WorkerMetrics setTotalMemory(double memoryUsage) {
         this.memoryUsage = memoryUsage;
+        return this;
     }
-    
+
 }
