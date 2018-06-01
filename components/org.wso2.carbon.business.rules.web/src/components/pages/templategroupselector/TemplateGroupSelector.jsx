@@ -52,13 +52,20 @@ export default class TemplateGroupSelector extends Component {
             mode: this.props.match.params.mode,
             templateGroups: [],
 
-            // To show Progress or Unauthorized message
+            // Loaded state of page and related Error code
             hasLoaded: false,
             errorCode: BusinessRulesConstants.ERROR_CODES.UNKNOWN,
         };
     }
 
     componentDidMount() {
+        this.loadTemplateGroups();
+    }
+
+    /**
+     * Loads available Template Groups
+     */
+    loadTemplateGroups() {
         new BusinessRulesAPI(BusinessRulesConstants.BASE_URL).getTemplateGroups()
             .then((templateGroupsResponse) => {
                 const filteredTemplateGroups = this.filterTemplateGroups(templateGroupsResponse.data[2]);
@@ -112,16 +119,59 @@ export default class TemplateGroupSelector extends Component {
     }
 
     /**
-     * Returns message, denoting no suitable Template Groups were found
-     * @returns {Component}     Component with message
+     * Returns a Template Group thumbnail, for the given templateGroup object
+     * @param {Object} templateGroup        Object which has details of a Template Group
+     * @returns {Component}                 Link to the Business Rule creation page
      */
-    displayNoTemplateGroupsFound() {
+    displayTemplateGroupThumbnail(templateGroup) {
+        let specificPath;
+        if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
+            specificPath = '/businessRuleFromTemplateForm/';
+        } else {
+            specificPath = '/businessRuleFromScratchForm/';
+        }
+
         return (
-            <Grid item>
-                <Typography>
-                    No Suitable Template Groups found
-                </Typography>
-            </Grid>);
+            <Link
+                to={`${appContext}/${specificPath}/${BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}` +
+                    `/templateGroup/${templateGroup.uuid}` +
+                    `/businessRule/${templateGroup.uuid}`} // TODO check whether '/businessRule/${}' is needed or not
+                style={{ textDecoration: 'none' }}
+            >
+                <TemplateGroupThumbnail
+                    key={templateGroup.uuid}
+                    name={templateGroup.name}
+                    uuid={templateGroup.uuid}
+                    description={templateGroup.description || ''}
+                />
+            </Link>
+        );
+    }
+
+    /**
+     * Returns available template groups when at least one is available, otherwise a message
+     * @returns {Component}     Grid
+     */
+    displayGridContent() {
+        if (this.state.templateGroups.length > 0) {
+            return (
+                <Grid container justify="center" spacing={0}>
+                    {this.state.templateGroups.map(templateGroup =>
+                        (<Grid item key={templateGroup.uuid}>
+                            {this.displayTemplateGroupThumbnail(templateGroup)}
+                        </Grid>))}
+                </Grid>
+            );
+        }
+        return (
+            <Grid container justify="center" spacing={0}>
+                <Grid item>
+                    <Typography>
+                        No Suitable Template Groups found
+                    </Typography>
+                </Grid>
+            </Grid>
+        );
     }
 
     /**
@@ -131,45 +181,6 @@ export default class TemplateGroupSelector extends Component {
     displayContent() {
         if (this.state.hasLoaded) {
             if (this.state.errorCode === BusinessRulesConstants.ERROR_CODES.NONE) {
-                let templateGroups;
-                // Business rule to be created from template
-                if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
-                    templateGroups = this.state.templateGroups.map(templateGroup =>
-                        (<Grid item key={templateGroup.uuid}>
-                            <Link
-                                to={appContext + '/businessRuleFromTemplateForm/' +
-                                BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + '/templateGroup/' +
-                                templateGroup.uuid + '/businessRule/' + templateGroup.uuid}
-                                style={{ textDecoration: 'none' }}
-                            >
-                                <TemplateGroupThumbnail
-                                    key={templateGroup.uuid}
-                                    name={templateGroup.name}
-                                    uuid={templateGroup.uuid}
-                                    description={templateGroup.description ? templateGroup.description : ''}
-                                />
-                            </Link>
-                        </Grid>));
-                } else {
-                    // Business rule to be created from scratch
-                    templateGroups = this.state.templateGroups.map(templateGroup =>
-                        (<Grid item key={templateGroup.uuid}>
-                            <Link
-                                to={appContext + '/businessRuleFromScratchForm/' +
-                                BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + '/templateGroup/' +
-                                templateGroup.uuid + '/businessRule/' + templateGroup.uuid}
-                                style={{ textDecoration: 'none' }}
-                            >
-                                <TemplateGroupThumbnail
-                                    key={templateGroup.uuid}
-                                    name={templateGroup.name}
-                                    uuid={templateGroup.uuid}
-                                    description={templateGroup.description ? templateGroup.description : ''}
-                                />
-                            </Link>
-                        </Grid>));
-                }
-
                 return (
                     <center>
                         <Typography type="headline">
@@ -178,10 +189,7 @@ export default class TemplateGroupSelector extends Component {
                         <br />
                         <Grid container style={Styles.grid.root}>
                             <Grid item xs={12}>
-                                <Grid container justify="center" spacing={0}>
-                                    {(this.state.templateGroups.length > 0) ?
-                                        (templateGroups) : (this.displayNoTemplateGroupsFound())}
-                                </Grid>
+                                {this.displayGridContent()}
                             </Grid>
                         </Grid>
                     </center>
