@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiResponses;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.stream.processor.core.factories.HaApiServiceFactory;
 import org.wso2.carbon.stream.processor.core.model.Error;
-import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestampCollection;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.msf4j.Microservice;
@@ -73,13 +72,12 @@ public class HaApi implements Microservice {
     @ApiResponses(value = {
             @ApiResponse(
                     code = 200,
-                    message = "The state of all Siddhi applications is successfully retrieved.",
-                    response = HAStateSyncObject.class),
+                    message = "The state of all Siddhi applications successfully persisted."),
 
             @ApiResponse(
-                    code = 404,
-                    message = "The state of all Siddhi applications is not successfully retrieved.",
-                    response = Error.class)})
+                    code = 500,
+                    message = "Internal error occured when persisting states of all Siddhi applications."),
+    })
     public Response haStateGet() throws NotFoundException, IOException {
         return delegate.haStateGet();
     }
@@ -90,13 +88,16 @@ public class HaApi implements Microservice {
     @ApiResponses(value = {
             @ApiResponse(
                     code = 200,
-                    message = "The state of the requested Siddhi application is successfully retrieved.",
-                    response = HAStateSyncObject.class),
+                    message = "The state of the requested Siddhi application successfully persisted."),
 
             @ApiResponse(
                     code = 404,
-                    message = "The state of the requested Siddhi application is not successfully retrieved.",
-                    response = Error.class)})
+                    message = "The Siddhi application is not found."),
+
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal error occured when persisting state of the Siddhi application."),
+    })
     public Response haStateGet(@PathParam("siddhiAppName") String siddhiAppName) throws NotFoundException,
             IOException {
         return delegate.haStateGet(siddhiAppName);
