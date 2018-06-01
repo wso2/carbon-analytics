@@ -32,11 +32,13 @@ import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
 import org.wso2.siddhi.core.table.record.RecordTableHandler;
 import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
+import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.Response;
 
@@ -99,9 +101,17 @@ public class HaApiServiceImpl extends HaApiService {
             for (Map.Entry<String, SiddhiAppData> siddhiAppMapEntry : siddhiAppMap.entrySet()) {
                 SiddhiAppRuntime siddhiAppRuntime = siddhiAppMapEntry.getValue().getSiddhiAppRuntime();
                 if (siddhiAppRuntime != null) {
-                    siddhiAppRuntime.persist().getFuture()
-                            .get(StreamProcessorDataHolder.getDeploymentConfig().getLiveSync().getStateSyncTimeout(),
+                    PersistenceReference persistenceReference = siddhiAppRuntime.persist();
+                    Future fullStateFuture = persistenceReference.getFullStateFuture();
+                    if (fullStateFuture != null) {
+                        fullStateFuture.get(StreamProcessorDataHolder.getDeploymentConfig().getLiveSync().getStateSyncTimeout(),
+                                TimeUnit.MILLISECONDS);
+                    } else {
+                        for (Future future: persistenceReference.getIncrementalStateFuture()) {
+                            future.get(StreamProcessorDataHolder.getDeploymentConfig().getLiveSync().getStateSyncTimeout(),
                                     TimeUnit.MILLISECONDS);
+                        }
+                    }
                 } else {
                     log.error("Active Node: Persisting of Siddhi app " + siddhiAppMapEntry.getValue() +
                             " not successful. Check if app deployed properly");
@@ -123,7 +133,15 @@ public class HaApiServiceImpl extends HaApiService {
             SiddhiAppData siddhiAppData =
                     StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap().get(siddhiAppName);
             if (siddhiAppData != null) {
-                siddhiAppData.getSiddhiAppRuntime().persist().getFuture().get(60000, TimeUnit.MILLISECONDS);
+                PersistenceReference persistenceReference = siddhiAppData.getSiddhiAppRuntime().persist();
+                Future fullStateFuture = persistenceReference.getFullStateFuture();
+                if (fullStateFuture != null) {
+                    fullStateFuture.get(60000, TimeUnit.MILLISECONDS);
+                } else {
+                    for (Future future: persistenceReference.getIncrementalStateFuture()) {
+                        future.get(60000, TimeUnit.MILLISECONDS);
+                    }
+                }
             } else {
                 log.warn("Siddhi application " + siddhiAppName + " may not be deployed in active node yet but " +
                         "requested to be persisted from passive node");
