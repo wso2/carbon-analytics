@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
-import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestamps;
 import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestampCollection;
+import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestamps;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
 import org.wso2.siddhi.core.table.record.RecordTableHandler;
@@ -70,7 +70,7 @@ public class PassiveNodeOutputSyncManager implements Runnable {
 
             String url = "http://%s:%d/ha/outputSyncTimestamps";
             URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
-            String httpResponseMessage = RequestUtil.sendRequest(baseURI, username, password);
+            String httpResponseMessage = RequestUtil.requestAndGetResponseMessage(baseURI, username, password);
             if (log.isDebugEnabled()) {
                 log.debug("Passive Node: Accessed active node to retrieve last published timestamps.");
             }

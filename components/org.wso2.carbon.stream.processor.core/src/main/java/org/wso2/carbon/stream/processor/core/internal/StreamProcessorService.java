@@ -29,13 +29,11 @@ import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.RetryRecordTableConnection;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
-import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlreadyExistException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppFilesystemInvoker;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -52,7 +50,6 @@ import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -180,25 +177,20 @@ public class StreamProcessorService {
                             log.info("Live State Sync is Enabled for Passive Node. Restoring Active Node current state "
                                     +
                                     "for " + siddhiAppName);
-                            HAStateSyncObject haStateSyncObject = StreamProcessorDataHolder.getHAManager().
-                                    getActiveNodeSiddhiAppSnapshot(siddhiAppName);
-                            if (haStateSyncObject.hasState()) {
-                                byte[] snapshot = haStateSyncObject.getSnapshotMap().get(siddhiAppName);
+                            boolean isPersisted = StreamProcessorDataHolder
+                                    .getHAManager().persistActiveNode(siddhiAppName);
 
+                            if (isPersisted) {
                                 if (log.isDebugEnabled()) {
                                     log.debug("Snapshot for " + siddhiAppName + " found from Active Node Live State " +
                                             "Sync before deploying app");
                                 }
                                 try {
-                                    byte[] decompressGZIP = CompressionUtil.decompressGZIP(snapshot);
-                                    try {
-                                        siddhiAppRuntime.restore(decompressGZIP);
-                                    } catch (CannotRestoreSiddhiAppStateException e) {
-                                        log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
-                                    }
-                                } catch (IOException e) {
-                                    log.error("Error Decompressing Bytes " + e.getMessage(), e);
+                                    siddhiAppRuntime.restoreLastRevision();
+                                } catch (CannotRestoreSiddhiAppStateException e) {
+                                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
                                 }
+
                             } else {
 
                                 int gracePeriod =
@@ -257,7 +249,7 @@ public class StreamProcessorService {
                             } else {
                                 throw new HAModeException(
                                         "Passive Node Periodic Persistence is Disabled and Live State " +
-                                                "Sync Enabled. Please enable Periodic Persistence.");
+                                                "Sync Disabled. Please enable Periodic Persistence.");
                             }
                         }
                     }
@@ -388,17 +380,11 @@ public class StreamProcessorService {
             @Override
             public void run() {
 
-                HAStateSyncObject haStateSyncObject = StreamProcessorDataHolder.getHAManager().
-                        getActiveNodeSiddhiAppSnapshot(siddhiAppName);
-                if (haStateSyncObject.hasState()) {
-                    byte[] snapshot = haStateSyncObject.getSnapshotMap().get(siddhiAppName);
+                boolean isPersisted =
+                        StreamProcessorDataHolder.getHAManager().persistActiveNode(siddhiAppName);
+                if (isPersisted) {
                     try {
-                        byte[] decompressGZIP = CompressionUtil.decompressGZIP(snapshot);
-                        try {
-                            siddhiAppRuntime.restore(decompressGZIP);
-                        } catch (CannotRestoreSiddhiAppStateException e) {
-                            log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
-                        }
+                        siddhiAppRuntime.restoreLastRevision();
                         siddhiAppRuntime.start();
                         siddhiAppData.setActive(true);
                         siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
@@ -406,8 +392,8 @@ public class StreamProcessorService {
                         siddhiAppMap.put(siddhiAppName, siddhiAppData);
                         log.info("Siddhi App " + siddhiAppName + " deployed successfully after active node sync in "
                                 + gracePeriod / 1000 + " seconds");
-                    } catch (IOException e) {
-                        log.error("Error Decompressing Bytes. " + siddhiAppName + " not deployed", e);
+                    } catch (CannotRestoreSiddhiAppStateException e) {
+                        log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
                     }
                 } else {
                     log.error("Snapshot for " + siddhiAppName + " not found after " + gracePeriod / 1000 + " seconds." +

@@ -6,7 +6,9 @@ queries:
       IS_TABLE_EXISTS:
       SELECT_SNAPSHOT:
       SELECT_LAST_REVISION:
+      SELECT_REVISIONS:
       DELETE_ROW_FROM_TABLE:
+      DELETE_OLD_REVISIONS:
       COUNT_NUMBER_REVISIONS:
 
    type: default
@@ -14,12 +16,14 @@ queries:
 
   -
    mappings:
-      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, siddhiAppName VARCHAR(100), revision VARCHAR(100), snapshot LONGBLOB, PRIMARY KEY (id))
+      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, siddhiAppName VARCHAR(100), revision VARCHAR(300), snapshot LONGBLOB, PRIMARY KEY (id))
       INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (siddhiAppName, revision, snapshot) VALUES (?, ?, ?)
       IS_TABLE_EXISTS: SELECT * FROM {{TABLE_NAME}} limit 1
       SELECT_SNAPSHOT: SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ?
       SELECT_LAST_REVISION: SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id DESC LIMIT 1
+      SELECT_REVISIONS: SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id IN (SELECT id FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id ASC LIMIT ?)
+      DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: h2
@@ -27,12 +31,14 @@ queries:
 
   -
    mappings:
-      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, siddhiAppName VARCHAR(100), revision VARCHAR(100), snapshot LONGBLOB, PRIMARY KEY (id))
+      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, siddhiAppName VARCHAR(100), revision VARCHAR(300), snapshot LONGBLOB, PRIMARY KEY (id))
       INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (siddhiAppName, revision, snapshot) VALUES (?, ?, ?)
       IS_TABLE_EXISTS: SELECT * FROM {{TABLE_NAME}} limit 1
       SELECT_SNAPSHOT: SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ?
       SELECT_LAST_REVISION: SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id DESC LIMIT 1
+      SELECT_REVISIONS: SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ? IS NOT NULL ORDER BY id ASC LIMIT ?
+      DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: mysql
@@ -40,12 +46,14 @@ queries:
 
   -
    mappings:
-      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id serial primary key, siddhiAppName VARCHAR(100), revision VARCHAR(100), snapshot bigint)
+      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id serial primary key, siddhiAppName VARCHAR(100), revision VARCHAR(300), snapshot bigint)
       INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (siddhiAppName, revision, snapshot) VALUES (?, ?, ?)
       IS_TABLE_EXISTS: SELECT 1 FROM {{TABLE_NAME}} LIMIT 1
       SELECT_SNAPSHOT: SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ?
       SELECT_LAST_REVISION: SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id DESC LIMIT 1
+      SELECT_REVISIONS: SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id IN (SELECT id FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id ASC LIMIT ?)
+      DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: postgresql
@@ -53,12 +61,14 @@ queries:
 
   -
    mappings:
-      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL IDENTITY(1,1) PRIMARY KEY, siddhiAppName VARCHAR(100), revision VARCHAR(100), snapshot VARBINARY(8000))
+      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL IDENTITY(1,1) PRIMARY KEY, siddhiAppName VARCHAR(100), revision VARCHAR(300), snapshot VARBINARY(8000))
       INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (siddhiAppName, revision, snapshot) VALUES (?, ?, ?)
       IS_TABLE_EXISTS: SELECT TOP 1 1 FROM {{TABLE_NAME}}
       SELECT_SNAPSHOT: SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ?
       SELECT_LAST_REVISION: SELECT TOP 1 revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id DESC
+      SELECT_REVISIONS: SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id IN (SELECT TOP (?) id FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id ASC)
+      DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: microsoft sql server
@@ -71,7 +81,9 @@ queries:
       IS_TABLE_EXISTS: SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1
       SELECT_SNAPSHOT: SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ?
       SELECT_LAST_REVISION: SELECT revision FROM (SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY revision DESC) WHERE rownum=1
+      SELECT_REVISIONS: SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
       DELETE_ROW_FROM_TABLE: DELETE {{TABLE_NAME}} WHERE revision in (SELECT revision FROM (SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY revision ASC) WHERE rownum<=?)
+      DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision in (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: oracle
