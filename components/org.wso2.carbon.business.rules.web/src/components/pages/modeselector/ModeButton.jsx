@@ -56,22 +56,27 @@ const appContext = window.contextPath;
  * either 'from template' or 'from scratch'
  */
 export default class ModeButton extends Component {
-    render() {
-        let icon;
+    /**
+     * Returns Icon for mode 'from template' or 'from scratch'
+     * @returns {Component}     Icon
+     */
+    displayIcon() {
         if (this.props.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
-            icon = <List />;
-        } else {
-            icon = <Create />;
+            return <List />;
         }
+        return <Create />;
+    }
 
+    render() {
         return (
             <Paper style={styles.paper}>
                 <Link
-                    to={appContext + '/templateGroupSelector/' + this.props.mode}
+                    // to={appContext + '/templateGroupSelector/' + this.props.mode} // TODO do like this in all places
+                    to={`${appContext}/templateGroupSelector/${this.props.mode}`}
                     style={{ textDecoration: 'none' }}
                 >
                     <Button fab style={styles.button}>
-                        {icon}
+                        {this.displayIcon()}
                     </Button>
                 </Link>
                 <br />
