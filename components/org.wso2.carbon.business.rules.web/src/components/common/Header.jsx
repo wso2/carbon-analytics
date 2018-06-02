@@ -129,11 +129,11 @@ export default class Header extends Component {
                         this.setState({ anchorEl: null });
                     }}
                 >
-                    <MenuItem>
-                        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
+                    <Link to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
+                        <MenuItem>
                             Log out
-                        </Link>
-                    </MenuItem>
+                        </MenuItem>
+                    </Link>
                 </Menu>
             </div>
         );
