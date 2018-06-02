@@ -71,7 +71,6 @@ export default class ModeButton extends Component {
         return (
             <Paper style={styles.paper}>
                 <Link
-                    // to={appContext + '/templateGroupSelector/' + this.props.mode} // TODO do like this in all places
                     to={`${appContext}/templateGroupSelector/${this.props.mode}`}
                     style={{ textDecoration: 'none' }}
                 >

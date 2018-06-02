@@ -43,6 +43,18 @@ const appContext = window.contextPath;
  */
 export default class BusinessRule extends Component {
     /**
+     * Gets path for the respective businessRuleType's form
+     * @param {String} businessRuleType     Type of the business rule
+     * @returns {string}                    Path of the business rule form
+     */
+    getFormPath(businessRuleType) {
+        if (businessRuleType === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
+            return 'businessRuleFromTemplateForm';
+        }
+        return 'businessRuleFromScratchForm';
+    }
+
+    /**
      * Handles Deployment Info request
      */
     handleDeploymentInfoRequest() {
@@ -125,10 +137,9 @@ export default class BusinessRule extends Component {
         return (
             <Tooltip id="tooltip-right" title="View" placement="right-end">
                 <Link
-                    to={appContext + '/businessRuleFrom' + (this.props.type.charAt(0).toUpperCase() +
-                        this.props.type.substr(1).toLowerCase()) + 'Form/' +
-                    BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + '/templateGroup/businessRule/' +
-                    this.props.uuid}
+                    to={`${appContext}/${this.getFormPath(this.props.type)}` +
+                    `/${BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}` +
+                    `/templateGroup/businessRule/${this.props.uuid}`}
                     style={{ textDecoration: 'none' }}
                 >
                     <IconButton aria-label="View">
@@ -147,11 +158,9 @@ export default class BusinessRule extends Component {
         return (
             <Tooltip id="tooltip-right" title="Edit" placement="right-end">
                 <Link
-                    to={appContext + '/businessRuleFrom' +
-                    (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase())
-                    + 'Form/' +
-                    BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT + '/templateGroup/businessRule/' +
-                    this.props.uuid}
+                    to={`${appContext}/${this.getFormPath(this.props.type)}}` +
+                    `/${BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT}` +
+                     `/templateGroup/businessRule/${this.props.uuid}`}
                     style={{ textDecoration: 'none' }}
                 >
                     <IconButton aria-label="Edit">

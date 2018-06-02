@@ -565,13 +565,13 @@ export default class BusinessRuleFromScratchForm extends Component {
             } else {
                 this.toggleSnackbar('Failed to create the Business Rule');
                 setTimeout(() => {
-                    window.location.href = appContext + '/businessRulesManager';
+                    window.location.href = `${appContext}/businessRulesManager`;
                 }, 3000);
             }
         } else {
             this.toggleSnackbar('Failed to create the Business Rule');
             setTimeout(() => {
-                window.location.href = appContext + '/businessRulesManager';
+                window.location.href = `${appContext}/businessRulesManager`;
             }, 3000);
         }
     }
@@ -605,7 +605,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                     .then((response) => {
                         this.toggleSnackbar(response.data[1]);
                         setTimeout(() => {
-                            window.location.href = appContext + '/businessRulesManager';
+                            window.location.href = `${appContext}/businessRulesManager`;
                         }, 3000);
                     })
                     .catch((error) => {
@@ -1010,7 +1010,7 @@ export default class BusinessRuleFromScratchForm extends Component {
                                     shouldDeploy,
                                     this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT)}
                         onCancel={() => {
-                            window.location.href = appContext + '/businessRulesManager';
+                            window.location.href = `${appContext}/businessRulesManager`;
                         }}
                     />
                 );
