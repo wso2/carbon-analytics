@@ -73,12 +73,12 @@ const styles = {
  */
 export default class DeploymentInfo extends Component {
     /**
-     * Renders a node that represents a Siddhi app and its status, in the node with the given Host and Port
+     * Renders a Siddhi app's status, in the node with the given Host and Port
      * @param {String} hostAndPort      Host and the Port of the node
      * @param {number} status           Number, which depicts the deployment status of the siddhi app
      * @returns {Component}             Representation of a Siddhi app's deployment status
      */
-    static displayNode(hostAndPort, status) {
+    static displaySiddhiApp(hostAndPort, status) {
         let statusIcon;
         let avatarStyle;
         switch (status) {
@@ -112,50 +112,84 @@ export default class DeploymentInfo extends Component {
             </Tooltip>);
     }
 
+    /**
+     * Renders a node, consisting Siddhi apps
+     * @param {Object} node     Configs of a node
+     * @returns {Component}     Grid containing Siddhi apps
+     */
+    displayNode(node) {
+        return (
+            <Grid item key={node.nodeURL}>
+                <Card style={styles.card}>
+                    <CardContent>
+                        <Typography type="subheading">
+                            {node.nodeURL}
+                        </Typography>
+                        <br />
+                        <div style={styles.root}>
+                            {Object.keys(node.siddhiAppStatuses).map(siddhiAppName =>
+                                (DeploymentInfo.displaySiddhiApp(siddhiAppName,
+                                    node.siddhiAppStatuses[siddhiAppName])))}
+                        </div>
+                    </CardContent>
+                </Card>
+            </Grid>
+        );
+    }
+
+    /**
+     * Displays content of the Dialog
+     * @returns {HTMLElement}       Div containing contents of the dialog
+     */
+    displayContent() {
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.businessRule)) {
+            return (
+                <div>
+                    <DialogTitle>
+                        Deployment Information
+                        <Typography type="body2">
+                            {`${this.props.businessRule[0].name} ` +
+                            `(${BusinessRulesConstants.BUSINESS_RULE_STATUSES[this.props.businessRule[1]]})`}
+                        </Typography>
+                    </DialogTitle>
+                    <DialogContent>
+                        <Grid container style={styles.root}>
+                            <Grid item xs={12}>
+                                <Grid container justify="center" spacing={Number(styles.spacing)}>
+                                    {this.props.info.map(node => (this.displayNode(node)))}
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+                </div>
+            );
+        }
+        return (
+            <div>
+                <DialogTitle>
+                    Unable to load Deployment Information
+                </DialogTitle>
+                <DialogContent>
+                    <Typography type="subheading">
+                        {`Unable to load Deployment Information for business rule: ${this.props.businessRule[0].name}`}
+                    </Typography>
+                </DialogContent>
+            </div>
+        );
+    }
+
     render() {
         return (
             <Dialog open={this.props.open} onRequestClose={() => this.props.onRequestClose()}>
-                {!BusinessRulesUtilityFunctions.isEmpty(this.props.businessRule) ?
-                    (<div>
-                        <DialogTitle>
-                            Deployment Information
-                            <Typography type="body2">
-                                {`${this.props.businessRule[0].name} ` +
-                                `(${BusinessRulesConstants.BUSINESS_RULE_STATUSES[this.props.businessRule[1]]})`}
-                            </Typography>
-                        </DialogTitle>
-                        <DialogContent>
-                            <Grid container style={styles.root}>
-                                <Grid item xs={12}>
-                                    <Grid container justify="center" spacing={Number(styles.spacing)}>
-                                        {this.props.info.map(node =>
-                                            (<Grid item key={node.nodeURL}>
-                                                <Card style={styles.card}>
-                                                    <CardContent>
-                                                        <Typography type="subheading">
-                                                            {node.nodeURL}
-                                                        </Typography>
-                                                        <br />
-                                                        <div style={styles.root}>
-                                                            {Object.keys(node.siddhiAppStatuses).map(siddhiAppName =>
-                                                                (DeploymentInfo.displayNode(siddhiAppName,
-                                                                    node.siddhiAppStatuses[siddhiAppName])))}
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            </Grid>))}
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </DialogContent>
-                    </div>) : (null)}
-            </Dialog>);
+                {this.displayContent()}
+            </Dialog>
+        );
     }
 }
 
 DeploymentInfo.propTypes = {
     open: PropTypes.bool.isRequired,
     onRequestClose: PropTypes.func.isRequired,
-    info: PropTypes.array.isRequired,
-    businessRule: PropTypes.object.isRequired, // TODO if possible, move this into the deploymentStatus object
+    info: PropTypes.object.isRequired,
+    businessRule: PropTypes.object.isRequired,
 };

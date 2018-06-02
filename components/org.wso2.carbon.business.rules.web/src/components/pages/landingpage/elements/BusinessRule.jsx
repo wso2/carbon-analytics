@@ -43,156 +43,179 @@ const appContext = window.contextPath;
  */
 export default class BusinessRule extends Component {
     /**
-     * Re-deploys the business rule
+     * Handles Deployment Info request
+     */
+    handleDeploymentInfoRequest() {
+        this.props.onDeploymentInfoRequest();
+    }
+
+    /**
+     * Handles Re-deploy button click
      */
     handleReDeployButtonClick() {
-        this.props.redeploy(this.props.uuid);
+        this.props.onRedeploy();
     }
 
     /**
-     * Deletes the business rule
+     * Handles Delete button click
      */
     handleDeleteButtonClick() {
-        this.props.showDeleteDialog(this.props.uuid);
+        this.props.onDeleteRequest();
     }
 
     /**
-     * Returns the Retry Deploy button
-     * @returns {HTMLElement}       Retry Deploy button
+     * Returns the Deploy button, with the given title
+     * @param {String} title        Title of the deploy button, denoting its action
+     * @returns {Component}         Tooltip Component, containing IconButton
      */
-    displayRetryDeployButton() {
+    displayDescribedDeployButton(title) {
+        return (
+            <Tooltip id="tooltip-right" title={title} placement="right-end">
+                <IconButton
+                    color="primary"
+                    aria-label={title}
+                    onClick={() => this.handleReDeployButtonClick()}
+                >
+                    <RefreshIcon />
+                </IconButton>
+            </Tooltip>
+        );
+    }
+
+    /**
+     * Returns the Deploy button
+     * @returns {Component}     Retry Deploy button
+     */
+    displayDeployButton() {
         switch (this.props.status) {
             case 1:
-                return (
-                    <Tooltip id="tooltip-right" title="Deploy" placement="right-end">
-                        <IconButton
-                            color="primary"
-                            aria-label="Deploy"
-                            onClick={() => this.handleReDeployButtonClick()}
-                        >
-                            <RefreshIcon />
-                        </IconButton>
-                    </Tooltip>);
+                return this.displayDescribedDeployButton('Deploy');
+            case 3:
+                return this.displayDescribedDeployButton('Retry Un-Deploy');
             case 2:
             case 4:
-                return (
-                    <Tooltip id="tooltip-right" title="Re-Deploy" placement="right-end">
-                        <IconButton
-                            color="primary"
-                            aria-label="ReDeploy"
-                            onClick={() => this.handleReDeployButtonClick()}
-                        >
-                            <RefreshIcon />
-                        </IconButton>
-                    </Tooltip>);
-            case 3:
-                return (
-                    <Tooltip id="tooltip-right" title="Retry Un-deploy" placement="right-end">
-                        <IconButton
-                            color="primary"
-                            aria-label="RetryUndeploy"
-                            onClick={() => this.handleReDeployButtonClick()}
-                        >
-                            <RefreshIcon />
-                        </IconButton>
-                    </Tooltip>);
+                return this.displayDescribedDeployButton('Re-Deploy');
             default:
                 return null;
         }
     }
 
     /**
+     * Returns the Deployment Info button
+     * @returns {Component}     Tooltip Component, containing IconButton
+     */
+    displayDeploymentInfoButton() {
+        return (
+            <Tooltip id="tooltip-right" title="Deployment Info" placement="right-end">
+                <IconButton
+                    aria-label="Deployment Info"
+                    onClick={() => this.handleDeploymentInfoRequest()}
+                >
+                    <DnsIcon />
+                </IconButton>
+            </Tooltip>
+        );
+    }
+
+    /**
+     * Returns the View button
+     * @returns {Component}     Tooltip Component, containing IconButton
+     */
+    displayViewButton() {
+        return (
+            <Tooltip id="tooltip-right" title="View" placement="right-end">
+                <Link
+                    to={appContext + '/businessRuleFrom' + (this.props.type.charAt(0).toUpperCase() +
+                        this.props.type.substr(1).toLowerCase()) + 'Form/' +
+                    BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + '/templateGroup/businessRule/' +
+                    this.props.uuid}
+                    style={{ textDecoration: 'none' }}
+                >
+                    <IconButton aria-label="View">
+                        <VisibilityIcon />
+                    </IconButton>
+                </Link>
+            </Tooltip>
+        );
+    }
+
+    /**
+     * Returns the Edit button
+     * @returns {Component}     Tooltip Component, containing IconButton
+     */
+    displayEditButton() {
+        return (
+            <Tooltip id="tooltip-right" title="Edit" placement="right-end">
+                <Link
+                    to={appContext + '/businessRuleFrom' +
+                    (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase())
+                    + 'Form/' +
+                    BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT + '/templateGroup/businessRule/' +
+                    this.props.uuid}
+                    style={{ textDecoration: 'none' }}
+                >
+                    <IconButton aria-label="Edit">
+                        <EditIcon />
+                    </IconButton>
+                </Link>
+            </Tooltip>
+        );
+    }
+
+    /**
+     * Returns the Delete button
+     * @returns {Component}     Tooltip Component, containing IconButton
+     */
+    displayDeleteButton() {
+        return (
+            <Tooltip id="tooltip-right" title="Delete" placement="right-end">
+                <IconButton aria-label="Delete" onClick={() => this.handleDeleteButtonClick()}>
+                    <DeleteIcon />
+                </IconButton>
+            </Tooltip>
+        );
+    }
+
+    /**
      * Returns Action Buttons of the business rule
-     * @returns {Component}     Action Buttons of the business rule
+     * @returns {Component}     TableCell, containing action buttons of the business rule
      */
     displayActionButtons() {
         if (this.props.permissions === BusinessRulesConstants.USER_PERMISSIONS.MANAGER) {
             // Manager permissions
             return (
                 <TableCell>
-                    <Tooltip id="tooltip-right" title="Deployment Info" placement="right-end">
-                        <IconButton aria-label="View" onClick={() => this.props.showDeploymentInfo(this.props.uuid)}>
-                            <DnsIcon />
-                        </IconButton>
-                    </Tooltip>
+                    {this.displayDeploymentInfoButton()}
                     &nbsp;
-                    <Tooltip id="tooltip-right" title="View" placement="right-end">
-                        <Link
-                            to={appContext + '/businessRuleFrom' + (this.props.type.charAt(0).toUpperCase() +
-                                this.props.type.substr(1).toLowerCase()) + 'Form/' +
-                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + '/templateGroup/businessRule/' +
-                            this.props.uuid}
-                            style={{ textDecoration: 'none' }}
-                        >
-                            <IconButton aria-label="View">
-                                <VisibilityIcon />
-                            </IconButton>
-                        </Link>
-                    </Tooltip>
+                    {this.displayViewButton()}
                     &nbsp;
-                    <Tooltip id="tooltip-right" title="Edit" placement="right-end">
-                        <Link
-                            to={appContext + '/businessRuleFrom' +
-                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase())
-                            + 'Form/' +
-                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT + '/templateGroup/businessRule/' +
-                            this.props.uuid}
-                            style={{ textDecoration: 'none' }}
-                        >
-                            <IconButton aria-label="Edit">
-                                <EditIcon />
-                            </IconButton>
-                        </Link>
-                    </Tooltip>
+                    {this.displayEditButton()}
                     &nbsp;
-                    <Tooltip id="tooltip-right" title="Delete" placement="right-end">
-                        <IconButton aria-label="Delete" onClick={() => this.handleDeleteButtonClick()}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
+                    {this.displayDeleteButton()}
                     &nbsp;
-                    {this.displayRetryDeployButton()}
+                    {this.displayDeployButton()}
                 </TableCell>
             );
         } else {
             // Viewer permissions
             return (
                 <TableCell>
-                    <Tooltip id="tooltip-right" title="Deployment Info" placement="right-end">
-                        <IconButton aria-label="View" onClick={() => this.props.showDeploymentInfo(this.props.uuid)}>
-                            <DnsIcon />
-                        </IconButton>
-                    </Tooltip>
+                    {this.displayDeploymentInfoButton()}
                     &nbsp;
-                    <Tooltip id="tooltip-right" title="View" placement="right-end">
-                        <Link
-                            to={appContext + '/businessRuleFrom' +
-                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) +
-                            'Form/' +
-                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + '/templateGroup/businessRule/' +
-                            this.props.uuid}
-                            style={{ textDecoration: 'none' }}
-                        >
-                            <IconButton aria-label="View">
-                                <VisibilityIcon />
-                            </IconButton>
-                        </Link>
-                    </Tooltip>
+                    {this.displayViewButton()}
                 </TableCell>
             );
         }
     }
 
     render() {
-        const deploymentStatus = BusinessRulesConstants.BUSINESS_RULE_STATUSES[Number(this.props.status)];
-
         return (
             <TableRow>
                 <TableCell>
                     {this.props.name}
                 </TableCell>
                 <TableCell>
-                    {deploymentStatus}
+                    {BusinessRulesConstants.BUSINESS_RULE_STATUSES[Number(this.props.status)]}
                 </TableCell>
                 {this.displayActionButtons()}
             </TableRow>
@@ -214,7 +237,7 @@ BusinessRule.propTypes = {
         BusinessRulesConstants.USER_PERMISSIONS.NONE,
         BusinessRulesConstants.USER_PERMISSIONS.UNSET,
     ]).isRequired,
-    redeploy: PropTypes.func.isRequired,
-    showDeleteDialog: PropTypes.func.isRequired,
-    showDeploymentInfo: PropTypes.func.isRequired,
+    onRedeploy: PropTypes.func.isRequired,
+    onDeleteRequest: PropTypes.func.isRequired,
+    onDeploymentInfoRequest: PropTypes.func.isRequired,
 };

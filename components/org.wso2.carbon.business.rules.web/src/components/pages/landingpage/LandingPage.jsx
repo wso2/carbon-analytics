@@ -260,9 +260,7 @@ export default class LandingPage extends Component {
      * @returns {HTMLElement}       Div containing available business rules, or creation message
      */
     displayAvailableBusinessRules() {
-        const isNoneAvailable = !(this.state.businessRules && this.state.businessRules.length > 0);
-
-        if (!isNoneAvailable) {
+        if (this.state.businessRules && this.state.businessRules.length > 0) {
             return (
                 <div style={styles.container}>
                     {(this.state.permissions === BusinessRulesConstants.USER_PERMISSIONS.MANAGER) ?
@@ -276,25 +274,24 @@ export default class LandingPage extends Component {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {this.state.businessRules.map(businessRule =>
+                            {this.state.businessRules.map(businessRuleAndStatus =>
                                 (<BusinessRule
-                                    key={businessRule[0].uuid}
-                                    name={businessRule[0].name}
-                                    uuid={businessRule[0].uuid}
-                                    type={businessRule[0].type}
-                                    status={businessRule[1]}
+                                    key={businessRuleAndStatus[0].uuid}
+                                    name={businessRuleAndStatus[0].name}
+                                    uuid={businessRuleAndStatus[0].uuid}
+                                    type={businessRuleAndStatus[0].type}
+                                    status={businessRuleAndStatus[1]}
                                     permissions={this.state.permissions}
-                                    redeploy={uuid => this.redeployBusinessRule(uuid)}
-                                    showDeleteDialog={uuid => this.toggleDeleteDialog(uuid)}
-                                    showDeploymentInfo={() => this.showDeploymentInfo(businessRule)}
+                                    onRedeploy={() => this.redeployBusinessRule(businessRuleAndStatus[0].uuid)}
+                                    onDeleteRequest={() => this.toggleDeleteDialog(businessRuleAndStatus[0].uuid)}
+                                    onDeploymentInfoRequest={() => this.showDeploymentInfo(businessRuleAndStatus)}
                                 />))}
                         </TableBody>
                     </Table>
                 </div>
             );
-        } else {
-            return this.displayGetStarted();
         }
+        return this.displayGetStarted();
     }
 
     /**
@@ -314,56 +311,79 @@ export default class LandingPage extends Component {
     }
 
     /**
+     * Returns Snackbar component
+     * @returns {Component}         Snackbar Component
+     */
+    displaySnackbar() {
+        return (
+            <Snackbar
+                autoHideDuration={3500}
+                open={this.state.displaySnackbar}
+                onRequestClose={() => this.toggleSnackbar()}
+                transition={<Slide direction={Styles.snackbar.direction} />}
+                SnackbarContentProps={{
+                    'aria-describedby': 'snackbarMessage',
+                }}
+                message={
+                    <span id="snackbarMessage">
+                        {this.state.snackbarMessage}
+                    </span>
+                }
+            />
+        );
+    }
+
+    /**
+     * Returns Delete Confirmation dialog
+     * @returns {Component}         Dialog Component
+     */
+    displayDeleteConfirmationDialog() {
+        return (
+            <Dialog open={this.state.deleteDialog.isVisible} onRequestClose={() => this.toggleDeleteDialog()}>
+                <DialogTitle>
+                    {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_TITLE}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_CONTENT}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => this.deleteBusinessRule(this.state.deleteDialog.businessRuleUUID)}>
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
+    /**
+     * Returns Deployment Info dialog
+     * @returns {Component}     DeploymentInfo component
+     */
+    displayDeploymentInfoDialog() {
+        return (
+            <DeploymentInfo
+                businessRule={this.state.deploymentInfoDialog.businessRule}
+                info={this.state.deploymentInfoDialog.info}
+                open={this.state.deploymentInfoDialog.isVisible}
+                onRequestClose={() => this.toggleDeploymentInfoView()}
+            />
+        );
+    }
+
+    /**
      * Displays content of the page
      * @returns {HTMLElement}       Content of the page
      */
     displayContent() {
         if (this.state.hasLoaded) {
             if (this.state.errorCode === BusinessRulesConstants.ERROR_CODES.NONE) {
-                // Show snackbar with response message, when this page is rendered after a form submission
-                const snackbar =
-                    (<Snackbar
-                        autoHideDuration={3500}
-                        open={this.state.displaySnackbar}
-                        onRequestClose={() => this.toggleSnackbar()}
-                        transition={<Slide direction={Styles.snackbar.direction} />}
-                        SnackbarContentProps={{
-                            'aria-describedby': 'snackbarMessage',
-                        }}
-                        message={
-                            <span id="snackbarMessage">
-                                {this.state.snackbarMessage}
-                            </span>
-                        }
-                    />);
-
-                const deleteConfirmationDialog =
-                    (<Dialog open={this.state.deleteDialog.isVisible} onRequestClose={() => this.toggleDeleteDialog()}>
-                        <DialogTitle>
-                            {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_TITLE}
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>
-                                {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_CONTENT}
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={() => this.deleteBusinessRule(this.state.deleteDialog.businessRuleUUID)}>
-                                Delete
-                            </Button>
-                        </DialogActions>
-                    </Dialog>);
-
                 return (
                     <div>
-                        {snackbar}
-                        {deleteConfirmationDialog}
-                        <DeploymentInfo
-                            businessRule={this.state.deploymentInfoDialog.businessRule}
-                            info={this.state.deploymentInfoDialog.info}
-                            open={this.state.deploymentInfoDialog.isVisible}
-                            onRequestClose={() => this.toggleDeploymentInfoView()}
-                        />
+                        {this.displaySnackbar()}
+                        {this.displayDeleteConfirmationDialog()}
+                        {this.displayDeploymentInfoDialog()}
                         <center>
                             <div>
                                 {(this.state.businessRules.length > 0) ?
