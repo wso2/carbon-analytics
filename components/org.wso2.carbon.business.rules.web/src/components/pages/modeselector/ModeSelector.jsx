@@ -22,7 +22,7 @@ import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 // App Components
 import Header from '../../common/Header';
-import CreateButton from './ModeButton';
+import ModeButton from './ModeButton';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
 // Styles
@@ -30,25 +30,16 @@ import Styles from '../../../style/Styles';
 import '../../../index.css';
 
 /**
- * Styles related to this component
- */
-const styles = {
-    root: {
-        flexGrow: 1,
-    },
-    spacing: 40,
-};
-
-/**
  * Represents the page that allows to select a mode for creating a business rule
  */
 export default class ModeSelector extends Component {
-    render() {
+    /**
+     * Displays content of the page
+     * @returns {HTMLElement}       Content of the page
+     */
+    displayContent() {
         return (
             <div>
-                <Header />
-                <br />
-                <br />
                 <center>
                     <Typography type="headline">
                         Choose an option
@@ -59,14 +50,14 @@ export default class ModeSelector extends Component {
                         <Grid item xs={12}>
                             <Grid container justify="center" spacing={40}>
                                 <Grid item>
-                                    <CreateButton
+                                    <ModeButton
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
                                         title="From Template"
                                         description="Create a business rule based on an existing template"
                                     />
                                 </Grid>
                                 <Grid item>
-                                    <CreateButton
+                                    <ModeButton
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
                                         title="From Scratch"
                                         description={
@@ -78,6 +69,17 @@ export default class ModeSelector extends Component {
                         </Grid>
                     </Grid>
                 </center>
+            </div>
+        );
+    }
+
+    render() {
+        return (
+            <div>
+                <Header />
+                <br />
+                <br />
+                {this.displayContent()}
             </div>
         );
     }
