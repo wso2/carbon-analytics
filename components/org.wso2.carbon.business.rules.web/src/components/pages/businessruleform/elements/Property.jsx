@@ -30,7 +30,7 @@ import '../../../../index.css';
 /**
  * Represents a property of a rule template from which, inputs are gained
  */
-export default class Property extends Component { // TODO fix primary color
+export default class Property extends Component {
     /**
      * Handles the onChange action of the input field
      * @param {object} event        OnChange event

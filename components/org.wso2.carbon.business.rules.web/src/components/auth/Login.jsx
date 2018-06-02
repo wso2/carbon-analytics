@@ -26,20 +26,11 @@ import { Button, Snackbar, TextField } from 'material-ui';
 import { FormControlLabel, FormGroup } from 'material-ui/Form';
 import Slide from 'material-ui/transitions/Slide';
 import Checkbox from 'material-ui/Checkbox';
-import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
 // App Components
 import FormPanel from '../common/FormPanel';
 import Header from '../common/Header';
 // Auth Utils
 import AuthManager from '../../utils/AuthManager';
-// Custom Theme
-import { Orange } from '../../theme/BusinessRulesManagerColors';
-
-const theme = createMuiTheme({
-    palette: {
-        primary: Orange,
-    },
-});
 
 /**
  * App context
@@ -125,8 +116,7 @@ export default class Login extends Component {
         }
 
         return (
-
-            <MuiThemeProvider muiTheme={theme}>
+            <div>
                 <Header hideUserSettings />
                 <br />
                 <div>
@@ -233,7 +223,7 @@ export default class Login extends Component {
                         }
                     />
                 </div>
-            </MuiThemeProvider>
+            </div>
         );
     }
 }

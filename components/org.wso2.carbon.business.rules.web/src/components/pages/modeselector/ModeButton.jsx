@@ -27,6 +27,8 @@ import Create from 'material-ui-icons/Create';
 import Paper from 'material-ui/Paper';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
+// Custom Theme
+import { PrimaryColor } from '../../../theme/PrimaryColor';
 // CSS
 import '../../../index.css';
 
@@ -37,7 +39,7 @@ const styles = {
     button: {
         height: 100,
         width: 100,
-        color: '#EF6C00',
+        color: PrimaryColor[500],
         backgroundColor: '#212121',
     },
     paper: {

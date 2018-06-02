@@ -22,8 +22,6 @@ import PropTypes from 'prop-types';
 import Qs from 'qs';
 import { Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
-// Material UI Components
-import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
 // App Components
 import BusinessRulesManager from '../pages/landingpage/LandingPage';
 import TemplateGroupSelector from '../pages/templategroupselector/TemplateGroupSelector';
@@ -32,14 +30,6 @@ import BusinessRuleFromScratchForm from '../pages/businessruleform/BusinessRuleF
 import BusinessRuleCreator from '../pages/modeselector/ModeSelector';
 // Auth Utils
 import AuthManager from '../../utils/AuthManager';
-// Custom Theme
-import { Orange } from '../../theme/BusinessRulesManagerColors';
-
-const theme = createMuiTheme({
-    palette: {
-        primary: Orange,
-    },
-});
 
 /**
  * App context
@@ -79,30 +69,28 @@ export default class SecuredRouter extends Component {
 
         return (
             <Switch>
-                <MuiThemeProvider theme={theme}>
-                    <div>
-                        <Redirect to={`${appContext}/businessRulesManager`} />
-                        <Route exact path={`${appContext}/businessRuleCreator`} component={BusinessRuleCreator} />
-                        <Route
-                            exact
-                            path={`${appContext}/businessRuleFromScratchForm/:formMode/` +
-                                'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
-                            component={BusinessRuleFromScratchForm}
-                        />
-                        <Route
-                            exact
-                            path={`${appContext}/businessRuleFromTemplateForm/:formMode/` +
-                                'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
-                            component={BusinessRuleFromTemplateForm}
-                        />
-                        <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager} />
-                        <Route
-                            exact
-                            path={`${appContext}/templateGroupSelector/:mode`}
-                            component={TemplateGroupSelector}
-                        />
-                    </div>
-                </MuiThemeProvider>
+                <div>
+                    <Redirect to={`${appContext}/businessRulesManager`} />
+                    <Route exact path={`${appContext}/businessRuleCreator`} component={BusinessRuleCreator} />
+                    <Route
+                        exact
+                        path={`${appContext}/businessRuleFromScratchForm/:formMode/` +
+                        'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
+                        component={BusinessRuleFromScratchForm}
+                    />
+                    <Route
+                        exact
+                        path={`${appContext}/businessRuleFromTemplateForm/:formMode/` +
+                        'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
+                        component={BusinessRuleFromTemplateForm}
+                    />
+                    <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager} />
+                    <Route
+                        exact
+                        path={`${appContext}/templateGroupSelector/:mode`}
+                        component={TemplateGroupSelector}
+                    />
+                </div>
             </Switch>
         );
     }

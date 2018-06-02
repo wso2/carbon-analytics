@@ -35,6 +35,8 @@ import BusinessRulesUtilityFunctions from '../../../../../utils/BusinessRulesUti
 // App Constants
 import BusinessRulesConstants from '../../../../../constants/BusinessRulesConstants';
 import BusinessRulesMessages from '../../../../../constants/BusinessRulesMessages';
+// Custom Theme
+import { PrimaryColor } from '../../../../../theme/PrimaryColor';
 // Styles
 import Styles from '../../../../../style/Styles';
 import '../../../../../index.css';
@@ -44,7 +46,7 @@ import '../../../../../index.css';
  */
 const styles = {
     addFilterRuleButton: {
-        backgroundColor: '#EF6C00',
+        backgroundColor: PrimaryColor[500],
         color: 'white',
     },
 };
@@ -285,7 +287,7 @@ export default class FilterComponent extends Component {
                     <br />
                     <center>
                         <Typography type="subheading">
-                            No filter has been given
+                            No filters given
                         </Typography>
                     </center>
                     <br />

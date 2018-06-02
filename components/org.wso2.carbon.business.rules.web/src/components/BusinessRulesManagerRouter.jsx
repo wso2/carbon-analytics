@@ -25,11 +25,11 @@ import SecuredRouter from './auth/SecuredRouter';
 import Login from './auth/Login';
 import Logout from './auth/Logout';
 // Custom Theme
-import { Orange } from '../theme/BusinessRulesManagerColors';
+import { PrimaryColor } from '../theme/PrimaryColor';
 
 const theme = createMuiTheme({
     palette: {
-        primary: Orange,
+        primary: PrimaryColor,
     },
 });
 
