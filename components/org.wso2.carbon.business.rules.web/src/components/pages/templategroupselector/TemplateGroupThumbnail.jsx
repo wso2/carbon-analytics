@@ -67,15 +67,7 @@ export default class TemplateGroupThumbnail extends Component {
      * @returns {Object}            Style for the avatar
      */
     generateAvatarStyle(name) {
-        const colors = [
-            '#673AB7',
-            '#3F51B5',
-            '#2196F3',
-            '#009688',
-            '#4CAF50',
-            '#F44336',
-            '#E91E63',
-        ];
+        const colors = ['#673AB7', '#3F51B5', '#2196F3', '#009688', '#4CAF50', '#F44336', '#E91E63'];
         let charCodeSum = 0;
         for (let i = 0; i < name.length; i++) {
             charCodeSum += name.charCodeAt(i);
