@@ -126,9 +126,9 @@ export default class TemplateGroupSelector extends Component {
     displayTemplateGroupThumbnail(templateGroup) {
         let specificPath;
         if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
-            specificPath = '/businessRuleFromTemplateForm/';
+            specificPath = 'businessRuleFromTemplateForm';
         } else {
-            specificPath = '/businessRuleFromScratchForm/';
+            specificPath = 'businessRuleFromScratchForm';
         }
 
         return (

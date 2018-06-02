@@ -158,7 +158,7 @@ export default class BusinessRule extends Component {
         return (
             <Tooltip id="tooltip-right" title="Edit" placement="right-end">
                 <Link
-                    to={`${appContext}/${this.getFormPath(this.props.type)}}` +
+                    to={`${appContext}/${this.getFormPath(this.props.type)}` +
                     `/${BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT}` +
                      `/templateGroup/businessRule/${this.props.uuid}`}
                     style={{ textDecoration: 'none' }}

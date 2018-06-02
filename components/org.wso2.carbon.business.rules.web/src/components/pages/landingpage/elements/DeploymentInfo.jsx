@@ -171,7 +171,7 @@ export default class DeploymentInfo extends Component {
                 </DialogTitle>
                 <DialogContent>
                     <Typography type="subheading">
-                        {`Unable to load Deployment Information for business rule: ${this.props.businessRule[0].name}`}
+                        Unable to load Deployment Information
                     </Typography>
                 </DialogContent>
             </div>
