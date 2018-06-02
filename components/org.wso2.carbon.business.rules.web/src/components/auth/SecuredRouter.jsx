@@ -86,13 +86,13 @@ export default class SecuredRouter extends Component {
                         <Route
                             exact
                             path={`${appContext}/businessRuleFromScratchForm/:formMode/` +
-                                `templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
+                                'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
                             component={BusinessRuleFromScratchForm}
                         />
                         <Route
                             exact
                             path={`${appContext}/businessRuleFromTemplateForm/:formMode/` +
-                                `templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
+                                'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
                             component={BusinessRuleFromTemplateForm}
                         />
                         <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager} />
