@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash'],
-    function (require, log, $, _) {
+define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
+    function (require, log, $, _, PartitionWith) {
 
         /**
          * @class PartitionForm Creates a forms to collect data from a partition
@@ -29,7 +29,7 @@ define(['require', 'log', 'jquery', 'lodash'],
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.consoleListManager = options.application.outputController;
-                this.jsPlumbInstance = options.self.jsPlumbInstance;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
@@ -48,21 +48,46 @@ define(['require', 'log', 'jquery', 'lodash'],
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-            var id = $(element.target).parent().attr('id');
-            var partition = self.configurationData.getSiddhiAppConfig().getPartition(id);
-            var connected= true;
+            var id = $(element).parent().attr('id');
+            var partitionElement = self.configurationData.getSiddhiAppConfig().getPartition(id);
+            var partitionWithList = partitionElement.getPartitionWith();
 
-            if(!(connected)){
+            if(partitionWithList === undefined || partitionWithList.length === 0){
                 alert('Connect a stream for partitioning');
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
+
+                // close the form window
+                self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var fillWith= {};
+
+                var savedAnnotations = partitionElement.getAnnotationList();
+                var annotations = [];
+                _.forEach(savedAnnotations, function (savedAnnotation) {
+                    annotations.push({annotation: savedAnnotation});
+                });
+
+                var partitionKeys = [];
+                for (var i = 0; i < partitionWithList.length; i++) {
+                    var partitionKey = {
+                        expression: partitionWithList[i].getExpression(),
+                        streamName: partitionWithList[i].getStreamName()
+                    };
+                    partitionKeys.push(partitionKey);
+                }
+
+                var fillWith = {
+                    annotations : annotations,
+                    partitionKeys: partitionKeys
+                };
                 var editor = new JSONEditor(formContainer[0], {
                     schema: {
                         type: "object",
-                        title: "Stream",
+                        title: "Partition",
+                        options: {
+                            disable_properties: false
+                        },
                         properties: {
                             annotations: {
                                 propertyOrder: 1,
@@ -127,6 +152,12 @@ define(['require', 'log', 'jquery', 'lodash'],
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
                 });
+                var editorPartitionKeys = editor.getEditor('root.partitionKeys');
+                // disable fields that can not be changed
+                for (var i = 0; i < partitionWithList.length; i++) {
+                    editorPartitionKeys.getEditor('root.partitionKeys.' + i + '.streamName').disable();
+                }
+
                 formContainer.append('<div id="form-submit"><button type="button" ' +
                     'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
@@ -136,6 +167,17 @@ define(['require', 'log', 'jquery', 'lodash'],
                 submitButtonElement.addEventListener('click', function () {
 
                     var config = editor.getValue();
+
+                    partitionElement.clearPartitionWith();
+                    _.forEach(config.partitionKeys, function (partitionKey) {
+                        var partitionWithObject = new PartitionWith(partitionKey);
+                        partitionElement.addPartitionWith(partitionWithObject);
+                    });
+
+                    partitionElement.clearAnnotationList();
+                    _.forEach(config.annotations, function (annotation) {
+                        partitionElement.addAnnotation(annotation.annotation);
+                    });
 
                     // design view container and toggle view button are enabled
                     self.designViewContainer.removeClass('disableContainer');

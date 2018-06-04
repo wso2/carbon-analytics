@@ -141,6 +141,22 @@ define(['require', 'elementUtils'],
             return ElementUtils.prototype.getElement(this.queryLists.JOIN, joinQueryId);
         };
 
+        Partition.prototype.getWindowFilterProjectionQueryList = function () {
+            return this.queryLists.WINDOW_FILTER_PROJECTION;
+        };
+
+        Partition.prototype.getPatternQueryList = function () {
+            return this.queryLists.PATTERN;
+        };
+
+        Partition.prototype.getSequenceQueryList = function () {
+            return this.queryLists.SEQUENCE;
+        };
+
+        Partition.prototype.getJoinQueryList = function () {
+            return this.queryLists.JOIN;
+        };
+
         Partition.prototype.getPartitionWith = function () {
             return this.partitionWith;
         };

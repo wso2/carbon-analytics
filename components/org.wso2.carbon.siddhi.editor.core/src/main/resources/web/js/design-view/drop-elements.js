@@ -1106,22 +1106,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 } else if (newElement.hasClass('sinkDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeSink(elementId);
                 }
+
+                self.jsPlumbInstance.remove(newElement);
                 if(self.jsPlumbInstance.getGroupFor(newElement)){
-                    var queries = self.configurationData.getSiddhiAppConfig()
-                        .getPartition(self.jsPlumbInstance.getGroupFor(newElement).id).getQueries();
-                    var removedQueryIndex = null;
-                    $.each( queries , function (index, query) {
-                        if(query.getId() === $(newElement).attr('id')){
-                            removedQueryIndex = index;
-                        }
-                    });
-                    queries.splice(removedQueryIndex,1);
-                    self.configurationData.getSiddhiAppConfig()
-                        .getPartition(self.jsPlumbInstance.getGroupFor(newElement).id).setQueries(queries);
-                    self.jsPlumbInstance.remove(newElement);
                     self.jsPlumbInstance.removeFromGroup(newElement);
-                } else {
-                    self.jsPlumbInstance.remove(newElement);
                 }
                 self.configurationData.getSiddhiAppConfig()
                     .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);
