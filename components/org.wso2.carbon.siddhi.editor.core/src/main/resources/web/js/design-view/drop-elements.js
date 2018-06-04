@@ -980,6 +980,20 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          */
         DropElements.prototype.dropPartition = function (newAgent, i, mouseTop, mouseLeft, isCodeToDesignMode) {
             var self = this;
+
+            var node = $('<div></div>');
+            node.attr('class', "partitionNameNode");
+            newAgent.append(node);
+            var settingsIconId = "" + i + "-dropPartitionSettingsId";
+            var propertiesIcon = $('<img src="/editor/images/settings.png" id="' + settingsIconId + '" ' +
+                'class="partition-element-prop-icon collapse">');
+            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
+                'class="partition-element-close-icon collapse">').append(propertiesIcon);
+
+            var settingsIconElement = $('#' + settingsIconId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.formBuilder.GeneratePartitionKeyForm(this);
+            });
             var finalElement =  newAgent;
 
             $(finalElement).draggable({
@@ -992,30 +1006,24 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     // });
                 }
             });
-            var x =1;
+
             $(finalElement).resizable();
 
             finalElement.css({
                 'top': mouseTop,
                 'left': mouseLeft
             });
-            var connectionIn;
-            $(finalElement).on('dblclick',function () {
-                connectionIn = $('<div class="connectorInPart" >').attr('id', i + '-pc'+ x);
-                finalElement.append(connectionIn);
-                //
-                self.jsPlumbInstance.makeTarget(connectionIn, {
-                    anchor: 'Left',
-                    maxConnections : 1
-                });
-                self.jsPlumbInstance.makeSource(connectionIn, {
-                    anchor: 'Right'
-                });
 
-                x++;
-                $(connectionIn).on('click', function(endpoint){
-                    self.formBuilder.GeneratePartitionKeyForm(endpoint);
-                });
+            // make a default connection point
+            var connectionIn = $('<div class="connectorInPart" >').attr('id', i + '-pc' + 1);
+            finalElement.append(connectionIn);
+
+            self.jsPlumbInstance.makeTarget(connectionIn, {
+                anchor: 'Left',
+                maxConnections: 1
+            });
+            self.jsPlumbInstance.makeSource(connectionIn, {
+                anchor: 'Right'
             });
 
             $(self.container).append(finalElement);
@@ -1032,11 +1040,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 //add the new partition to the partition array
                 var partitionOptions = {};
                 _.set(partitionOptions, 'id', i);
-                _.set(partitionOptions, 'partition', {
-                    // this will contain json objects { stream : '', property :''}
-                    "with" :[]
-                });
-                _.set(partitionOptions, 'queries', []);
                 var newPartition = new Partition(partitionOptions);
                 newPartition.setId(i);
                 self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
@@ -1053,16 +1056,18 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             newElement.on( "mouseenter", function() {
                 var element = $(this);
                 element.find('.element-prop-icon').show();
-                element.find('.element-conn-icon').show();
                 element.find('.element-close-icon').show();
+                element.find('.partition-element-prop-icon').show();
+                element.find('.partition-element-close-icon').show();
             });
 
             //register event listener to hide configuration icons when mouse is out from the element
             newElement.on( "mouseleave", function() {
                 var element = $(this);
                 element.find('.element-prop-icon').hide();
-                element.find('.element-conn-icon').hide();
                 element.find('.element-close-icon').hide();
+                element.find('.partition-element-prop-icon').hide();
+                element.find('.partition-element-close-icon').hide();
             });
 
             //register event listener to remove the element when the close icon is clicked

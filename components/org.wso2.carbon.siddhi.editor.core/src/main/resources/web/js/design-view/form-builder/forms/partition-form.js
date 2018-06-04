@@ -44,64 +44,88 @@ define(['require', 'log', 'jquery', 'lodash'],
          */
         PartitionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            // design view container and toggle view button are enabled
+            self.designViewContainer.addClass('disableContainer');
+            self.toggleViewButton.addClass('disableContainer');
+
             var id = $(element.target).parent().attr('id');
             var partition = self.configurationData.getSiddhiAppConfig().getPartition(id);
-            var connections = self.jsPlumbInstance.getConnections(element);
-            var connected= false;
-            var connectedStream = null;
-            $.each(connections, function (index, connection) {
-                var target = connection.targetId;
-                if(target.substr(0, target.indexOf('-')) == id){
-                    connected = true;
-                    var source = connection.sourceId;
-                    connectedStream = source.substr(0, source.indexOf('-'));
-                }
-            });
+            var connected= true;
+
             if(!(connected)){
                 alert('Connect a stream for partitioning');
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
-            }
-            else{
+            } else {
                 var fillWith= {};
-                var partitionKeys = partition.getPartition().with;
-                $.each(partitionKeys, function ( index , key) {
-                    if( key.stream == connectedStream){
-                        fillWith ={
-                            stream : (self.configurationData.getSiddhiAppConfig().getStream(connectedStream)).getName(),
-                            property : key.property
-                        }
-                    }
-                });
-
-                // design view container and toggle view button are enabled
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
-
                 var editor = new JSONEditor(formContainer[0], {
-                    ajax: true,//TODO: add annotations for partition
                     schema: {
-                        type: 'object',
-                        title: 'Partition Key',
+                        type: "object",
+                        title: "Stream",
                         properties: {
-                            stream: {
-                                type: 'string',
-                                title: 'Stream',
-                                required: true,
+                            annotations: {
                                 propertyOrder: 1,
-                                template: (self.configurationData.getSiddhiAppConfig().getStream(connectedStream)).getName()
+                                type: "array",
+                                format: "table",
+                                title: "Annotations",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    type: "object",
+                                    title : "Annotation",
+                                    options: {
+                                        disable_properties: true
+                                    },
+                                    properties: {
+                                        annotation: {
+                                            title : "Annotation",
+                                            type: "string",
+                                            minLength: 1
+                                        }
+                                    }
+                                }
                             },
-                            property: {
-                                type: 'string',
-                                title: 'Property',
+                            partitionKeys: {
                                 required: true,
-                                propertyOrder: 2
+                                propertyOrder: 2,
+                                type: "array",
+                                format: "table",
+                                title: "Partition Keys",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    type: "object",
+                                    title : 'Partition Key',
+                                    options: {
+                                        disable_properties: true
+                                    },
+                                    properties: {
+                                        expression: {
+                                            title : 'Expression',
+                                            type: "string",
+                                            minLength: 1,
+                                            required: true
+                                        },
+                                        streamName: {
+                                            title : 'Stream Name',
+                                            type: "string",
+                                            minLength: 1,
+                                            required: true
+                                        }
+                                    }
+                                }
                             }
                         }
                     },
                     startval: fillWith,
-                    disable_properties: true
+                    show_errors: "always",
+                    disable_properties: true,
+                    display_required_only: true,
+                    no_additional_properties: true,
+                    disable_array_delete_all_rows: true,
+                    disable_array_delete_last_row: true,
+                    disable_array_reorder: true
                 });
                 formContainer.append('<div id="form-submit"><button type="button" ' +
                     'class="btn btn-default">Submit</button></div>' +
@@ -112,15 +136,6 @@ define(['require', 'log', 'jquery', 'lodash'],
                 submitButtonElement.addEventListener('click', function () {
 
                     var config = editor.getValue();
-                    $.each(partitionKeys, function ( index , key) {
-                        if( key.stream == connectedStream){
-                            key.property = config.property
-                        }
-                        else {
-                            var key = { stream : connectedStream , property : config.property};
-                            partitionKeys['with'].push(key);
-                        }
-                    });
 
                     // design view container and toggle view button are enabled
                     self.designViewContainer.removeClass('disableContainer');

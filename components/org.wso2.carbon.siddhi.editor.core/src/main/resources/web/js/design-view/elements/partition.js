@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(
-    function () {
+define(['require', 'elementUtils'],
+    function (require, ElementUtils) {
 
         /**
          * @class Partition
@@ -28,41 +28,123 @@ define(
         var Partition = function (options) {
             /*
              Data storing structure as follows.
-
-                "partition": {
-                   "with" :[] // this will contain json objects { stream : '', property :''}
-                },
-                "queries" :[]
+                id*: ‘’,
+                queryLists: [
+                    {
+                        '<queryType>': [{Query JSON},...]
+                    },
+                    ...
+                ],
+                partitionWith*: [
+                    {
+                        streamName*: '',
+                        expression*: ''
+                    },
+                    ...
+                ],
+                annotationList: {Annotation JSON Array}
             */
             if (options !== undefined) {
                 this.id = options.id;
-                this.partition = options.partition;
-                this.queries = options.queries;
             }
+            this.queryLists = {
+                WINDOW_FILTER_PROJECTION: [],
+                PATTERN: [],
+                SEQUENCE: [],
+                JOIN: []
+            };
+            this.partitionWith = [];
+            this.annotationList = [];
+        };
+
+        Partition.prototype.addAnnotation = function (annotation) {
+            this.annotationList.push(annotation);
+        };
+
+        Partition.prototype.addPartitionWith = function (partitionWith) {
+            this.partitionWith.push(partitionWith);
+        };
+
+        Partition.prototype.addWindowFilterProjectionQuery = function (windowFilterProjectionQuery) {
+            this.queryLists.WINDOW_FILTER_PROJECTION.push(windowFilterProjectionQuery);
+        };
+
+        Partition.prototype.addPatternQuery = function (patternQuery) {
+            this.queryLists.PATTERN.push(patternQuery);
+        };
+
+        Partition.prototype.addSequenceQuery = function (sequenceQuery) {
+            this.queryLists.SEQUENCE.push(sequenceQuery);
+        };
+
+        Partition.prototype.addJoinQuery = function (joinQuery) {
+            this.queryLists.JOIN.push(joinQuery);
+        };
+
+        Partition.prototype.clearAnnotationList = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationList);
+        };
+
+        Partition.prototype.clearPartitionWith = function () {
+            ElementUtils.prototype.removeAllElements(this.partitionWith);
+        };
+
+        Partition.prototype.removeWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
+            ElementUtils.prototype
+                .removeElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
+        };
+
+        Partition.prototype.removePatternQuery = function (patternQueryId) {
+            ElementUtils.prototype.removeElement(this.queryLists.PATTERN, patternQueryId);
+        };
+
+        Partition.prototype.removeSequenceQuery = function (sequenceQueryId) {
+            ElementUtils.prototype.removeElement(this.queryLists.SEQUENCE, sequenceQueryId);
+        };
+
+        Partition.prototype.removeJoinQuery = function (joinQueryId) {
+            ElementUtils.prototype.removeElement(this.queryLists.JOIN, joinQueryId);
         };
 
         Partition.prototype.getId = function () {
             return this.id;
         };
 
-        Partition.prototype.getPartition = function () {
-            return this.partition;
+        Partition.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
+            return ElementUtils.prototype
+                .getElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
         };
 
-        Partition.prototype.getQueries = function () {
-            return this.queries;
+        Partition.prototype.getPatternQuery = function (patternQueryId) {
+            return ElementUtils.prototype.getElement(this.queryLists.PATTERN, patternQueryId);
+        };
+
+        Partition.prototype.getSequenceQuery = function (sequenceQueryId) {
+            return ElementUtils.prototype.getElement(this.queryLists.SEQUENCE, sequenceQueryId);
+        };
+
+        Partition.prototype.getJoinQuery = function (joinQueryId) {
+            return ElementUtils.prototype.getElement(this.queryLists.JOIN, joinQueryId);
+        };
+
+        Partition.prototype.getPartitionWith = function () {
+            return this.partitionWith;
+        };
+
+        Partition.prototype.getAnnotationList = function () {
+            return this.annotationList;
         };
 
         Partition.prototype.setId = function (id) {
             this.id = id;
         };
 
-        Partition.prototype.setPartition = function (partition) {
-            this.partition = partition;
+        Partition.prototype.setPartitionWith = function (partitionWith) {
+            this.partitionWith = partitionWith;
         };
 
-        Partition.prototype.setQueries = function (queries) {
-            this.queries = queries;
+        Partition.prototype.setAnnotationList = function (annotationList) {
+            this.annotationList = annotationList;
         };
 
         return Partition;
