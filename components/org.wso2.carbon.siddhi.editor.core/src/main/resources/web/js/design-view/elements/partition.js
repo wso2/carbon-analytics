@@ -29,6 +29,7 @@ define(['require', 'elementUtils'],
             /*
              Data storing structure as follows.
                 id*: ‘’,
+                streamList = [];
                 queryLists: [
                     {
                         '<queryType>': [{Query JSON},...]
@@ -47,6 +48,7 @@ define(['require', 'elementUtils'],
             if (options !== undefined) {
                 this.id = options.id;
             }
+            this.streamList = [];
             this.queryLists = {
                 WINDOW_FILTER_PROJECTION: [],
                 PATTERN: [],
@@ -59,6 +61,10 @@ define(['require', 'elementUtils'],
 
         Partition.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
+        };
+
+        Partition.prototype.addStream = function (stream) {
+            this.streamList.push(stream);
         };
 
         Partition.prototype.addPartitionWith = function (partitionWith) {
@@ -89,6 +95,10 @@ define(['require', 'elementUtils'],
             ElementUtils.prototype.removeAllElements(this.partitionWith);
         };
 
+        Partition.prototype.removeStream = function (streamId) {
+            ElementUtils.prototype.removeElement(this.streamList, streamId);
+        };
+
         Partition.prototype.removeWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
             ElementUtils.prototype
                 .removeElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
@@ -108,6 +118,10 @@ define(['require', 'elementUtils'],
 
         Partition.prototype.getId = function () {
             return this.id;
+        };
+
+        Partition.prototype.getStream = function (streamId) {
+            return ElementUtils.prototype.getElement(this.streamList, streamId);
         };
 
         Partition.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
