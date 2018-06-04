@@ -164,7 +164,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var sourceForm = new SourceForm(formOptions);
-            return sourceForm.generateDefineForm(i, formConsole, formContainer);
+            sourceForm.generateDefineForm(i, formConsole, formContainer);
         };
 
         /**
@@ -199,7 +199,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var sinkForm = new SinkForm(formOptions);
-            return sinkForm.generateDefineForm(i, formConsole, formContainer);
+            sinkForm.generateDefineForm(i, formConsole, formContainer);
         };
 
         /**
