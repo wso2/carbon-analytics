@@ -27,4 +27,8 @@ public class InputFieldTypes {
     public static final String SWITCH = "SWITCH";
     public static final String SQL_CODE = "SQL_CODE";
     public static final String SIDDHI_CODE = "SIDDHI_CODE";
+    public static final String DYNAMIC_SIDDHI_CODE = "DYNAMIC_SIDDHI_CODE";
+    public static final String DYNAMIC_SQL_CODE = "DYNAMIC_SQL_CODE";
+    public static final String DYNAMIC_TEXT_AREA = "DYNAMIC_TEXT_AREA";
+    public static final String DYNAMIC_TEXT_FIELD = "DYNAMIC_TEXT_FIELD";
 }

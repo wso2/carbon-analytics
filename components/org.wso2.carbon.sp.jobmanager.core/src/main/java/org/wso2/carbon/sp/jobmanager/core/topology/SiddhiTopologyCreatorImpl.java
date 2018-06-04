@@ -338,8 +338,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
             if (!isUserGivenTransport(streamDefinition)) {
                 streamDefinition = "${" + streamId + "}" + streamDefinition;
-            } else {
-                validateUserGivenSource(streamDefinitionMap.get(streamId));
             }
             streamDataHolder =
                     new StreamDataHolder(streamDefinition, EventHolder.STREAM, isUserGivenTransport(streamDefinition));
@@ -413,15 +411,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         return streamDataHolder;
     }
 
-    private void validateUserGivenSource(StreamDefinition streamDefinition) {
-        Annotation source = AnnotationHelper.getAnnotation(SiddhiConstants.ANNOTATION_SOURCE, streamDefinition
-                .getAnnotations());
-        if (source != null && !source.getElement(SiddhiConstants.ANNOTATION_ELEMENT_TYPE).equalsIgnoreCase("kafka")) {
-            throw new SiddhiAppValidationException("Stream " + streamDefinition.getId() + " contains a source of type "
-                    + source.getElement("type") + ". Distributed deployment only support sources of type kafka. " +
-                    "Hence either remove the source declaration or change it to type kafka.");
-        }
-    }
 
     /**
      * Transport strategy corresponding to an InputStream is calculated.
@@ -536,8 +525,17 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                 createPassthrough = false;
 
                             }
-                            siddhiQueryGroup2.getInputStreams().get(streamId).setStreamDefinition(runtimeDefinition);
-                            siddhiQueryGroup2.getInputStreams().get(streamId).setUserGiven(false);
+                            InputStreamDataHolder holder1 = siddhiQueryGroup1.getInputStreams().get(streamId);
+                            String consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
+                                    holder1.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
+                            holder1.setStreamDefinition(consumingStream);
+                            holder1.setUserGiven(false);
+
+                            InputStreamDataHolder holder2 = siddhiQueryGroup2.getInputStreams().get(streamId);
+                            consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
+                                    holder2.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
+                            holder2.setStreamDefinition(consumingStream);
+                            holder2.setUserGiven(false);
                         }
                     }
                 }

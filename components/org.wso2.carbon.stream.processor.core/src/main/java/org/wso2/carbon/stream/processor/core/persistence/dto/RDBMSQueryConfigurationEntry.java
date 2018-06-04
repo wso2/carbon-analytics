@@ -32,7 +32,9 @@ public class RDBMSQueryConfigurationEntry {
     private String isTableExistQuery;
     private String selectTableQuery;
     private String selectLastQuery;
+    private String selectRevisionsQuery;
     private String deleteQuery;
+    private String deleteOldRevisionsQuery;
     private String countQuery;
 
     public String getDatabaseName() {
@@ -83,12 +85,28 @@ public class RDBMSQueryConfigurationEntry {
         this.selectLastQuery = selectLastQuery;
     }
 
+    public String getSelectRevisionsQuery() {
+        return selectRevisionsQuery;
+    }
+
+    public void setSelectRevisionsQuery(String selectRevisionsQuery) {
+        this.selectRevisionsQuery = selectRevisionsQuery;
+    }
+
     public String getDeleteQuery() {
         return deleteQuery;
     }
 
     public void setDeleteQuery(String deleteQuery) {
         this.deleteQuery = deleteQuery;
+    }
+
+    public String getDeleteOldRevisionsQuery() {
+        return deleteOldRevisionsQuery;
+    }
+
+    public void setDeleteOldRevisionsQuery(String deleteOldRevisionsQuery) {
+        this.deleteOldRevisionsQuery = deleteOldRevisionsQuery;
     }
 
     public String getCountQuery() {

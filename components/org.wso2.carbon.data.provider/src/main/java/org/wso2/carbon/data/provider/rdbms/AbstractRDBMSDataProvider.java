@@ -104,13 +104,14 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                         (INCREMENTAL_COLUMN_PLACEHOLDER, getRdbmsProviderConfig().getIncrementalColumn())
                         .replace(LIMIT_VALUE_PLACEHOLDER, Long.toString(rdbmsProviderConfig
                                 .getPublishingLimit())).replace(CUSTOM_QUERY_PLACEHOLDER, rdbmsProviderConfig
-                                .getQuery());
+                                .getQuery().getAsJsonObject().get("query").getAsString());
             }
             recordLimitQuery = rdbmsQueryManager.getQuery(RECORD_LIMIT_QUERY);
             if (recordLimitQuery != null) {
                 recordLimitQuery = recordLimitQuery.replace(INCREMENTAL_COLUMN_PLACEHOLDER, rdbmsProviderConfig
                         .getIncrementalColumn()).replace(LIMIT_VALUE_PLACEHOLDER, Long.toString(rdbmsProviderConfig
-                        .getPublishingLimit())).replace(CUSTOM_QUERY_PLACEHOLDER, rdbmsProviderConfig.getQuery());
+                        .getPublishingLimit())).replace(CUSTOM_QUERY_PLACEHOLDER,
+                        rdbmsProviderConfig.getQuery().getAsJsonObject().get("query").getAsString());
                 try {
                     statement = connection.prepareStatement(recordLimitQuery);
                     resultSet = statement.executeQuery();
@@ -265,7 +266,8 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     @Override
     public boolean configValidator(ProviderConfig providerConfig) throws DataProviderException {
         RDBMSDataProviderConf rdbmsDataProviderConf = (RDBMSDataProviderConf) providerConfig;
-        return querySanitizingValidator(rdbmsDataProviderConf.getQuery(), rdbmsDataProviderConf.getTableName());
+        return querySanitizingValidator(rdbmsDataProviderConf.getQuery().getAsJsonObject().get("query").getAsString(),
+                rdbmsDataProviderConf.getTableName());
     }
 
     @Override
@@ -287,7 +289,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         renderingTypes.put("publishingLimit", InputFieldTypes.NUMBER);
         renderingTypes.put("purgingLimit", InputFieldTypes.NUMBER);
         renderingTypes.put("datasourceName", InputFieldTypes.TEXT_FIELD);
-        renderingTypes.put("query", InputFieldTypes.SQL_CODE);
+        renderingTypes.put("queryData", InputFieldTypes.DYNAMIC_SQL_CODE);
         renderingTypes.put("tableName", InputFieldTypes.TEXT_FIELD);
         renderingTypes.put("incrementalColumn", InputFieldTypes.TEXT_FIELD);
         renderingTypes.put("timeColumns", InputFieldTypes.TEXT_FIELD);
@@ -296,7 +298,6 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
 
     @Override
     public void publish(String topic, String sessionId) {
-
     }
 
     @Override
