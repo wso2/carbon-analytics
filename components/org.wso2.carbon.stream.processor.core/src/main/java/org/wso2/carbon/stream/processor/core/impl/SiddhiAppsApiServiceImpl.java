@@ -711,7 +711,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                             listOfSiddhiAppElements.add(siddhiAppElements);
                         }
                     }
-
                 }
             }
         }
