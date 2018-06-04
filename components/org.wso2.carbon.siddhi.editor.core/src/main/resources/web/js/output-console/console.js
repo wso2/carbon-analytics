@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['log', 'backbone','lodash', 'jquery'], function (log, Backbone, _, $) {
+define(['log', 'backbone','lodash'], function (log, Backbone,_) {
 
     var Console = Backbone.View.extend(
         /** @lends Console.prototype */
@@ -58,16 +58,13 @@ define(['log', 'backbone','lodash', 'jquery'], function (log, Backbone, _, $) {
                 _.set(options, 'parent-container', this.getParent().getConsoleContainer());
                 _.set(options, 'cid', this.cid);
 
-                if(this._type === "CONSOLE"){
+                if(this._type == "CONSOLE"){
                     console = this._template.children('div').clone();
-                }else if(this._type === "DEBUG"){
+                }else if(this._type == "DEBUG"){
                     var debugManager = this.app.tabController.activeTab.getSiddhiFileEditor().getDebuggerWrapper();
                     debugManager.initContainerOpts(options);
                     debugManager.render();
                     console = debugManager.getConsole();
-                } else if(this._type === "FORM"){
-                    var formTemplate = $("#form-template");
-                    console = formTemplate.children('div').clone();
                 }
 
                 this.getParent().getConsoleContainer().append(console);

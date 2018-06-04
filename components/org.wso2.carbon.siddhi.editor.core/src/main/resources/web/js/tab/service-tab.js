@@ -49,6 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                 var self = this;
                 Tab.prototype.render.call(this);
                 var serviceEditorOpts = _.get(this.options, 'das_editor');
+                _.set(serviceEditorOpts, 'toolPalette', this.getParent().options.toolPalette);
                 _.set(serviceEditorOpts, 'container', this.$el.get(0));
                 _.set(serviceEditorOpts, 'tabs_container', _.get(this.options, 'tabs_container'));
                 _.set(serviceEditorOpts, 'file', self._file);

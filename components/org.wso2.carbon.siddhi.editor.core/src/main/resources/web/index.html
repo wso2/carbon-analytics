@@ -30,24 +30,16 @@
     <script src="/editor/commons/lib/respond_1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <!-- JSONEditor doesn't suppot AMD/RequireJS -->
-    <script src="/editor/commons/lib/json-editor_v0.7.28/jsoneditor.js"></script>
-    <!-- loading jsPlumb script-->
-    <script src="/editor/commons/lib/jsplumb_v2.6.9/jsplumb.min.js"></script>
-
     <!--<link rel="stylesheet" type="text/css" href="commons/css/sequence_diagram/sequenced-styles.css"/>-->
-
+    <link rel="stylesheet" type="text/css" href="/editor/commons/css/tool-palette.css"/>
     <!--<link rel="stylesheet" type="text/css" href="commons/css/diagram/preview-pane.css"/>-->
     <link rel="stylesheet" type="text/css" href="/editor/css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/debugger.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/console.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/welcome-screen.css"/>
-
-    <link rel="stylesheet" type="text/css" href="/editor/css/design-view.css"/>
-    <link rel="stylesheet" type="text/css" href="/editor/css/tool-palette.css"/>
-
     <!-- CSS For The Design View -->
     <link rel="stylesheet" type="text/css" href="/editor/commons/lib/overlay_scroll/css/OverlayScrollbars.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/css/event-flow.css"/>
 
     <title>Stream Processor Studio</title>
 </head>
@@ -133,6 +125,9 @@
                                 <div class="tab-headers tab-headers-bar">
                                 </div>
                                 <div id="tab-content-wrapper" class="grid-background">
+                                    <!-- Start: tool-palette -->
+                                    <div id="tool-palette-container" style="display: none"></div>
+                                    <!-- End: tool-palette -->
                                     <div class="tab-content tab-content-default "></div>
                                 </div>
                             </div>
@@ -178,12 +173,6 @@
         </div>
 </div>
 <!-- End: Template for console -->
-<div class="hidden">
-    <div id="form-template">
-        <div class="design-view-form-content">
-        </div>
-    </div>
-</div>
 <div class="hidden">
     <div id="debugger-template">
         <div class="output-console-content">
@@ -237,16 +226,68 @@
         <div id="siddhi-editor" class="source-container">
         </div>
         <!-- End Source Container -->
-        <!-- Start: design view container -->
-        <div class="design-view-container" style="display: none">
-            <!-- Start: tool-palette -->
-            <div id="tool-palette-container" class="tool-palette-container"></div>
-            <!-- End: tool-palette -->
-            <!-- Start: design-view-grid-container -->
-            <div id="grid-container" class="grid-container"></div>
-            <!-- End: design-view-grid-container -->
+        <!-- Start Design Container -->
+        <div class="design-container" style="display: none;">
+            <div class="loading-screen">
+                <i class="fw fw-wso2-logo fw-pulse fw-2x"></i>
+            </div>
+            <div class="design-container-data clearfix">
+                <ul class="legend">
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour stream-colour"></span>
+                        <span class="legend-text">Stream</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour source-colour"></span>
+                        <span class="legend-text">Source</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour sink-colour"></span>
+                        <span class="legend-text">Sink</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour table-colour"></span>
+                        <span class="legend-text">Table</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour window-colour"></span>
+                        <span class="legend-text">Window</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour trigger-colour"></span>
+                        <span class="legend-text">Trigger</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour aggregation-colour"></span>
+                        <span class="legend-text">Aggregation</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour function-colour"></span>
+                        <span class="legend-text">Function</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour query-colour"></span>
+                        <span class="legend-text">Query</span>
+                    </li>
+                    <li class="legend-key col-md-3">
+                        <span class="legend-colour partition-type-colour"></span>
+                        <span class="legend-text">Partition</span>
+                    </li>
+                </ul>
+                <div class="siddhi-app-name"></div>
+                <div class="siddhi-app-description"></div>
+            </div>
+            <div class="graph-container">
+                <svg class="siddhi-graph" id="siddhi-graph">
+                    <g></g>
+                </svg>
+            </div>
         </div>
-        <!-- End: design view container -->
+        <!-- End Design Container -->
+        <!-- Start: Preview Container -->
+        <div class="preview-container">
+        </div>
+        <!-- End Preview Container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
             <div class="btn toggle-view-button">
@@ -258,6 +299,7 @@
     </div>
     <!-- End: Tab -->
 </div>
+
 <!-- End: Template for service tab -->
 <div class="hidden">
     <div class="siddhi-app-list">
@@ -1094,12 +1136,12 @@
             jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
             jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
             bootstrap: "commons/lib/theme-wso2-2.0.0/js/bootstrap.min",
-            dagre: "commons/lib/dagre-0.7.4/dagre.min",
             jquery_validate: "commons/lib/jquery_validate/jquery.validate.min",
             jquery_timepicker: "commons/lib/jquery_timepicker/jquery-ui-timepicker-addon",
             log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
             lodash: "commons/lib/lodash_v4.13.1/lodash",
             backbone: "commons/lib/backbone_v1.3.3/backbone",
+            jsplumb: "commons/lib/jsplumb_v2.2.6/jsPlumb-2.2.6-min",
             file_saver: "commons/lib/file_saver/FileSaver",
             mousetrap: "commons/lib/mousetrap_v1.6.0/mousetrap.min",
             mcustom_scroller: "commons/lib/mCustomScrollbar_v3.1.5/js/jquery.mCustomScrollbar",
@@ -1110,6 +1152,8 @@
             nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
             theme_wso2: "commons/lib/theme-wso2-2.0.0/js/theme-wso2.min",
             ace: "commons/lib/ace-editor",
+            d3: "commons/lib/dagre-d3/d3.v3.min",
+            dagre_d3: "commons/lib/dagre-d3/dagre-d3.min",
             overlay_scroller: "commons/lib/overlay_scroll/js/jquery.overlayScrollbars.min",
             //beautify: "commons/lib/beautify",
             ///////////////////////
@@ -1119,7 +1163,7 @@
             menu_bar: "commons/js/menu-bar/menu-bar",
             tool_bar: "commons/js/tool-bar/tool-bar",
             context_menu: "commons/js/context-menu/context-menu",
-            tool_palette: "js/design-view/tool-palette",
+            tool_palette: "js/tool-palette/module",
             tab: "js/tab/",
             toolEditor: "js/tool-editor/module",
             command: "commons/js/command/command",
@@ -1144,62 +1188,7 @@
             console: "js/output-console/console",
             service_console: "js/output-console/service-console-manager",
             debugger_console: "js/debugger/debugger",
-            design_view: "js/design-view/design-view",
-            designViewGrid: "js/design-view/design-grid",
-            dropElements: "js/design-view/drop-elements",
-            configurationData: "js/design-view/configuration-data/configuration-data",
-            appData: "js/design-view/configuration-data/app-data",
-            elementUtils: "js/design-view/elements/element-utils",
-            formBuilder: "js/design-view/form-builder/form-builder",
-            formUtils: "js/design-view/form-builder/form-utils",
-            sourceForm: "js/design-view/form-builder/forms/source-form",
-            sinkForm: "js/design-view/form-builder/forms/sink-form",
-            streamForm: "js/design-view/form-builder/forms/stream-form",
-            tableForm: "js/design-view/form-builder/forms/table-form",
-            windowForm: "js/design-view/form-builder/forms/window-form",
-            aggregationForm: "js/design-view/form-builder/forms/aggregation-form",
-            triggerForm: "js/design-view/form-builder/forms/trigger-form",
-            windowFilterProjectionQueryForm: "js/design-view/form-builder/forms/window-filter-projection-query-form",
-            patternQueryForm: "js/design-view/form-builder/forms/pattern-query-form",
-            sequenceQueryForm: "js/design-view/form-builder/forms/sequence-query-form",
-            joinQueryForm: "js/design-view/form-builder/forms/join-query-form",
-            partitionForm: "js/design-view/form-builder/forms/partition-form",
-            functionForm: "js/design-view/form-builder/forms/function-form",
-            // element data holding objects starts here
-            // annotations
-            sourceOrSinkAnnotation: "js/design-view/elements/annotations/source-or-sink-annotation",
-            mapAnnotation: "js/design-view/elements/annotations/map",
-            storeAnnotation: "js/design-view/elements/annotations/store-annotation",
-            // definitions
-            stream: "js/design-view/elements/definitions/stream",
-            table: "js/design-view/elements/definitions/table",
-            window: "js/design-view/elements/definitions/window",
-            trigger: "js/design-view/elements/definitions/trigger",
-            aggregation: "js/design-view/elements/definitions/aggregation",
-            functionDefinition: "js/design-view/elements/definitions/function",
-            aggregateByTimePeriod: "js/design-view/elements/definitions/aggregation-definition-sub-elements/aggregate-by-time-period",
-            // query sub elements
-            querySelect: "js/design-view/elements/queries/query-sub-elements/query-select/query-select",
-            queryOrderByValue: "js/design-view/elements/queries/query-sub-elements/query-orderBy/query-orderBy-value",
-            queryOutput: "js/design-view/elements/queries/query-sub-elements/query-output/query-output",
-            queryOutputInsert: "js/design-view/elements/queries/query-sub-elements/query-output/query-output-types/query-output-insert",
-            queryOutputDelete: "js/design-view/elements/queries/query-sub-elements/query-output/query-output-types/query-output-delete",
-            queryOutputUpdate: "js/design-view/elements/queries/query-sub-elements/query-output/query-output-types/query-output-update",
-            queryOutputUpdateOrInsertInto: "js/design-view/elements/queries/query-sub-elements/query-output/query-output-types/query-output-update-or-insert-into",
-            // queries
-            joinQuerySource: "js/design-view/elements/queries/query-sub-elements/query-input/join-query-input/sub-elements/join-query-source",
-            joinQueryInput : "js/design-view/elements/queries/query-sub-elements/query-input/join-query-input/join-query-input",
-            partition: "js/design-view/elements/partition",
-            patternOrSequenceQueryInput: "js/design-view/elements/queries/query-sub-elements/query-input/pattern-or-sequence-query-input/pattern-or-sequence-query-input",
-            patternOrSequenceQueryCondition: "js/design-view/elements/queries/query-sub-elements/query-input/pattern-or-sequence-query-input/sub-elements/pattern-or-sequence-query-condition",
-            windowFilterProjectionQueryInput: "js/design-view/elements/queries/query-sub-elements/query-input/window-filter-projection-query/window-filter-projection-query-input",
-            queryWindowOrFunction: "js/design-view/elements/queries/query-sub-elements/query-input/query-window-or-function",
-            streamHandler: "js/design-view/elements/queries/query-sub-elements/query-input/stream-handler",
-            query: "js/design-view/elements/queries/query",
-            edge: "js/design-view/configuration-data/edge",
-            annotation: "js/design-view/elements/annotation",
-            attribute: "js/design-view/elements/attribute"
-            // element data holding objects ends here
+            event_flow: "js/event-flow/event-flow"
         },
         map: {
             "*": {
@@ -1500,6 +1489,10 @@
                                 // relative selector within container for a tab
                                 container: '.source-container'
                             },
+                            design: {
+                                // relative selector within container for a tab
+                                container: '.design-container'
+                            },
                             debug: {
                                 // relative selector within container for a tab
                                 container: '.debug-container'
@@ -1511,26 +1504,6 @@
                             },
                             notifications: {
                                 container: '#notification-container'
-                            },
-                            design_view: {
-                                // relative selector within container for a tab
-                                container: '.design-view-container',
-                                grid_container: '.grid-container',
-                                new_drop_timeout: 3000,
-                                tool_palette: {
-                                    // relative selector within container for design view
-                                    container: ".tool-palette-container",
-                                    toolGroup: {
-                                        tool: {
-                                            containment_element: '#tabs-container',
-                                            cssClass: {
-                                                dragContainer: 'tool-drag-container',
-                                                disabledIconContainer: 'disabled-icon-container',
-                                                disabledIcon: 'fw fw-lg fw-block tool-disabled-icon'
-                                            }
-                                        }
-                                    }
-                                }
                             },
                             source_view: {
                                 // relative selector within container for a tab
@@ -1573,6 +1546,17 @@
                             dialog_boxes:{
                                 parser_error: "#parserErrorModel"
                             }
+                        }
+                    }
+                },
+                tool_palette: {
+                    // relative selector within container for tab controller
+                    container: "#tool-palette-container",
+                    search_bar: {
+                        cssClass: {
+                            search_box: 'search-bar',
+                            search_icon: 'fw fw-search searchIcon',
+                            search_input: 'search-input'
                         }
                     }
                 }

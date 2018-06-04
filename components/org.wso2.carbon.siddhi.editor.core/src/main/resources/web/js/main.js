@@ -16,11 +16,11 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
-        'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
-        'nano_scroller'],
+define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace', 
+        'app/tab/service-tab-list', 'app/tool-palette/tool-palette', 'event_simulator', 
+        'app/output-console/service-console-list-manager', 'nano_scroller'],
 
-    function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
+    function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController, ToolPalette, 
               EventSimulator, OutputController) {
 
         var Application = Backbone.View.extend(
@@ -42,7 +42,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                               if (self.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                                   self.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                               } else {
-                                  //TODO: self.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
+                                  self.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                               }
                           }
                     } );
@@ -68,6 +68,13 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
 
                     this.browserStorage = new Workspace.BrowserStorage('spToolingTempStorage');
 
+                    //init tool palette
+                    var toolPaletteOpts = _.get(this.config, "tab_controller.tool_palette");
+                    _.set(toolPaletteOpts, 'application', this);
+
+
+                    this.toolPalette = new ToolPalette(toolPaletteOpts);
+
                     //init tab controller
                     var tabControlOpts = _.get(this.config, "tab_controller");
                     _.set(tabControlOpts, 'application', this);
@@ -76,6 +83,8 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     _.set(outputConsoleControlOpts, 'application', this);
                     this.outputController = new OutputController(outputConsoleControlOpts);
 
+                    // tab controller will take care of rendering tool palette
+                    _.set(tabControlOpts, 'toolPalette', this.toolPalette);
                     this.tabController = new TabController(tabControlOpts);
                     this.workspaceManager.listenToTabController();
 
@@ -105,23 +114,11 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
 
                     log.debug("start: rendering tab controller");
                     this.tabController.render();
-                    this.addViewSwitchListeners();
                     log.debug("end: rendering tab controller");
 
                     log.debug("start: rendering event simulator control");
                     this.eventSimulator.render();
                     log.debug("end: rendering event simulator control");
-                },
-
-                addViewSwitchListeners: function () {
-                    var self = this;
-                    _.forEach(this.tabController.getTabList(), function (tab) {
-                        if (tab.getTitle() !== "welcome-page") {
-                            tab.getSiddhiFileEditor().on("view-switch", function () {
-                                self.workspaceManager.updateUndoRedoMenus();
-                            });
-                        }
-                    });
                 },
 
                 getOperatingSystem: function(){

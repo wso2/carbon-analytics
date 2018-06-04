@@ -111,12 +111,6 @@ define(['lodash', 'event_channel'],
         this._title.text(_.get(this, 'definition.label'));
     };
 
-    MenuItem.prototype.updateLabel = function(labelText) {
-        if (!_.isNil(labelText)) {
-            this._title.text(labelText);
-        }
-    };
-
     return MenuItem;
-
+        
 });

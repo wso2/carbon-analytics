@@ -31,19 +31,17 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     this._options = options;
                     var self = this;
                     this._activateBtn.on('click', function (e) {
-                        if (self.activeConsole.options._type === "FORM") {
-                            $(self.activeConsole).trigger('close-button-in-form-clicked');
-                        } else {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
-                        }
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
                     });
                     this._clearConsoleBtn.on('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
                         self.application.commandManager.dispatch(_.get(self._options, 'commandClearConsole.id'));
                     });
+
+                    this._activateBtn.attr("data-placement", "right").attr("data-container", "body");
                     if (this.application.isRunningOnMacOS()) {
                         this._activateBtn.attr("title", "Output Console (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
                     } else {
@@ -73,6 +71,8 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             if(activeTab._title != "welcome-page"){
                                 if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                                     activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                                } else {
+                                    activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                                 }
                             }
                         } else {
@@ -114,7 +114,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
 //                              commandManager.dispatch("go-to-welcome-page");
 //                          }
                         }
-                    };
+                    }
 
                     remove();
                 },
@@ -130,16 +130,12 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 },
                 getConsoleForType: function (type, uniqueId) {
                     return _.find(this._consoles, function (console) {
-                        if (type === "DEBUG") {
-                            if (console._uniqueId === uniqueId) {
-                                return console;
-                            }
-                        }else if (type === "FORM") {
-                            if (console._uniqueId === uniqueId) {
+                        if (type == "DEBUG") {
+                            if (console._uniqueId == uniqueId) {
                                 return console;
                             }
                         } else {
-                            if (console.getType() === type) {
+                            if (console.getType() == type) {
                                 return console;
                             }
                         }

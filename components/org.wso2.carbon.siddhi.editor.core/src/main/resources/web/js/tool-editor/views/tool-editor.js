@@ -16,11 +16,11 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager', 'launcher', 'app/debugger/debugger'],
+define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source", '../constants',
+        'undo_manager', 'launcher', 'app/debugger/debugger', 'event_flow'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
-              DebugManager) {
+              DebugManager, EventFlow) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -36,6 +36,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         throw "container is not defined."
                     }
                     var container = $(_.get(options, 'container'));
+                    var toolPallete = $(_.get(options, 'toolPalette'));
                     if (!container.length > 0) {
                         throw "container not found."
                     }
@@ -53,42 +54,20 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var canvasContainer = this._$parent_el.find(_.get(this.options, 'canvas.container'));
                     var previewContainer = this._$parent_el.find(_.get(this.options, 'preview.container'));
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
-                    var designContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
                     var tabContentContainer = $(_.get(this.options, 'tabs_container'));
+                    var toolPallette = _.get(this.options, 'toolPalette._$parent_el');
 
                     if (!canvasContainer.length > 0) {
                         var errMsg = 'cannot find container to render svg';
                         log.error(errMsg);
                         throw errMsg;
                     }
+                    var designViewOpts = {};
+                    _.set(designViewOpts, 'container', canvasContainer.get(0));
 
-                    // check whether design container element exists in dom
-                    if (!designContainer.length > 0) {
-                        errMsg = 'unable to find container for file composer with selector: '
-                            + _.get(this.options, 'design_view.container');
-                        log.error(errMsg);
-                    }
-
-                    var designViewDynamicId = "design-container-" + this._$parent_el.attr('id');
-                    designContainer.attr('id', designViewDynamicId);
-
-                    /*
-                    * Use the below line to assign dynamic id for design grid container and pass the id to initialize
-                    * jsPlumb.
-                    *
-                    * NOTE: jsPlumb is loaded via the index.html as a common script for the entire program. When a new
-                    * tab is created, that tab is initialised with a dedicated jsPlumb instance.
-                    * */
-                    var designGridDynamicId = "design-grid-container-" + this._$parent_el.attr('id');
-                    var designViewGridContainer =
-                        this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
-                    designViewGridContainer.attr('id', designGridDynamicId);
-
-                    // initialise jsPlumb instance for design grid
-                    this.jsPlumbInstance = jsPlumb.getInstance({
-                        Container: designGridDynamicId
-                    });
+                    //use this line to assign dynamic id for canvas and pass the canvas id to initialize jsplumb
+                    canvasContainer.attr('id', 'canvasId1');
 
                     var sourceDynamicId = sourceContainer.attr('id') + this._$parent_el.attr('id');
                     sourceContainer.attr("id", sourceDynamicId);
@@ -116,15 +95,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     canvasContainer.removeClass('show-div').addClass('hide-div');
                     previewContainer.removeClass('show-div').addClass('hide-div');
-                    designContainer.removeClass('show-div').addClass('hide-div');
                     sourceContainer.removeClass('source-view-disabled').addClass('source-view-enabled');
+                    toolPallette.addClass('hide-div');
                     tabContentContainer.removeClass('tab-content-default');
 
                     this._sourceView.on('modified', function (changeEvent) {
                         if (self.getUndoManager().hasUndo()) {
                             // clear undo stack from design view
                             if (!self.getUndoManager().getOperationFactory()
-                                .isSourceModifiedOperation(self.getUndoManager().undoStackTop())) {
+                                    .isSourceModifiedOperation(self.getUndoManager().undoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }
@@ -132,7 +111,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         if (self.getUndoManager().hasRedo()) {
                             // clear redo stack from design view
                             if (!self.getUndoManager().getOperationFactory()
-                                .isSourceModifiedOperation(self.getUndoManager().redoStackTop())) {
+                                    .isSourceModifiedOperation(self.getUndoManager().redoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }
@@ -152,86 +131,51 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     }
                     this._sourceView.editorResize();
 
-                    var application = self.options.application;
-                    var designView = new DesignView(self.options, application, this.jsPlumbInstance);
-                    this._designView = designView;
-                    designView.renderToolPalette();
+                    // Implementation to toggle between the source view and the design view
+                    var designContainer = this._$parent_el.find(_.get(this.options, 'design.container'));
+                    var svgDynamicId = designContainer.find('.siddhi-graph').attr('id') + this._$parent_el.attr('id');
+                    designContainer.find('.siddhi-graph').attr('id', svgDynamicId);
 
+                    this._eventFlow = new EventFlow(designContainer);
+
+                    var isInitialRender = true;
+                    var initialSiddhiCode = this.getContent().replace(/\s+/g, '');
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
-                    var toggleViewButtonDynamicId = "toggle-view-button-" + this._$parent_el.attr('id');
-                    toggleViewButton.attr('id', toggleViewButtonDynamicId);
-                    //TODO: add general validation: check whether all required fields in the forms are filled, elements are connected properly(ex: source should be connected to a stream)
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
-                            if (application.tabController.getActiveTab().getFile().isDirty()) {
-                                self._designView.warnAlert("Please save the file before switching to the Design View");
-                                return;
-                            }
-                            var response = self._designView.getDesign(self.getContent());
-                            if (response.status === "success") {
-                                //TODO: check whether is in initial state inorder to enhance performance
-                                self.JSONObject = response.responseJSON;
+                            if (isInitialRender || (initialSiddhiCode !== self.getContent().replace(/\s+/g, ''))) {
+                                var response = self._eventFlow.fetchJSON(self.getContent());
+                                if (response.status === "success") {
+                                    if (isInitialRender) {
+                                        isInitialRender = false;
+                                    }
+                                    initialSiddhiCode = self.getContent().replace(/\s+/g, '');
+                                    sourceContainer.hide();
+                                    designContainer.show();
+                                    self._eventFlow.clearContent();
+                                    toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
+                                        "<span class='toggle-button-text'>Source View</span>");
+                                    setTimeout(function () {
+                                        self._eventFlow.render(response.responseJSON);
+                                        self._eventFlow.graphResize();
+                                    }, 250);
+                                } else if (response.status === "fail") {
+                                    self._eventFlow.alert(response.errorMessage);
+                                }
+                            } else {
                                 sourceContainer.hide();
-                                designView.emptyDesignViewGridContainer();
                                 designContainer.show();
+                                self._eventFlow.graphResize();
                                 toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
-                                    "<span class=\"toggle-button-text\">Source View</span>");
-                                designView.renderDesignGrid(self.JSONObject);
-
-                            } else if (response.status === "fail") {
-                                self._designView.errorAlert(response.errorMessage);
+                                    "<span class='toggle-button-text'>Source View</span>");
                             }
                         } else if (designContainer.is(':visible')) {
-
-                            /**
-                             * This method removes unnecessary attributes from the json which is sent to backend.
-                             * Removed attributes are used only for front end use only.
-                             * */
-                            function removeUnnecessaryFieldsFromJSON(object) {
-                                _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function(patternQuery){
-                                    if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
-                                        delete patternQuery.queryInput['connectedElementNameList'];
-                                    }
-                                });
-                                _.forEach(object.siddhiAppConfig.queryLists.SEQUENCE, function(sequenceQuery){
-                                    if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
-                                        delete sequenceQuery.queryInput['connectedElementNameList'];
-                                    }
-                                });
-                                _.forEach(object.siddhiAppConfig.queryLists.JOIN, function(joinQuery){
-                                    if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
-                                        delete joinQuery.queryInput['firstConnectedElement'];
-                                    }
-                                    if (joinQuery.queryInput.hasOwnProperty('secondConnectedElement')) {
-                                        delete joinQuery.queryInput['secondConnectedElement'];
-                                    }
-                                });
-                            }
-                            /*
-                            * this previous configurationData wil be re-assigned to the design view if the getCode()
-                            * method response is unsuccessful. This done inorder to still have the fields removed by
-                            * removeUnnecessaryFieldsFromJSON() method when sending the json to backend
-                            * */
-
-                            var JSONValue = JSON.parse(JSON.stringify(designView.getConfigurationData()));
-                            removeUnnecessaryFieldsFromJSON(JSONValue);
-                            var sendingString = JSON.stringify(JSONValue).replace(/'/gm, "\\\'");
-
-                            var response = self._designView.getCode("'" + sendingString + "'");
-                            if (response.status === "success") {
-                                self.setContent(response.responseJSON);
-                                designContainer.hide();
-                                designView.emptyDesignViewGridContainer();
-                                sourceContainer.show();
-                                self._sourceView.editorResize();
-                                toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
-                                    "<span class=\"toggle-button-text\">Design View</span>");
-                            } else if (response.status === "fail") {
-                                self._designView.errorAlert(response.errorMessage);
-                            }
+                            designContainer.hide();
+                            sourceContainer.show();
+                            self._sourceView.editorResize();
+                            toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
+                                "<span class='toggle-button-text'>Design View</span>");
                         }
-                        // NOTE - This trigger should be always handled after the 'if' condition
-                        self.trigger("view-switch");
                     });
                 },
 
@@ -249,8 +193,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     return this._sourceView;
                 },
 
-                getDesignView: function () {
-                    return this._designView;
+                getEventFlow: function () {
+                    return this._eventFlow;
                 },
 
                 getDebuggerWrapper: function () {

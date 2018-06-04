@@ -95,7 +95,7 @@ define(([],function (){
             },
             {
                 id: "format",
-                label: "Reformat Code",
+                label: "Reformat code",
                 command: {
                     id: "format",
                     shortcuts: {
@@ -109,7 +109,7 @@ define(([],function (){
                         }
                     }
                 },
-                disabled: true
+                disabled: false
             }
 
         ]

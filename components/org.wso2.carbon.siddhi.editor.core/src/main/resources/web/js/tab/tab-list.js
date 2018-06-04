@@ -15,8 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
-    function (log, $, _, Backbone, Tab) {
+define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (log, $, _, Backbone, Tab) {
 
     var TabList = Backbone.View.extend(
         /** @lends TabList.prototype */

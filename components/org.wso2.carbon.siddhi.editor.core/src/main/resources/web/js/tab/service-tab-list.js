@@ -112,7 +112,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                           }
                         }
 
-                    };
+                    }
 
                     if(!_.isFunction(tab.getFile)){
                         remove();
@@ -144,12 +144,12 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                                     remove();
                                 }
                                 // saved is false if cancelled. Then don't close the tab
-                            };
+                            }
                             self.commandManager.dispatch('save', {callback: done, tabInstance : tab});
                         } else {
                             remove();
                         }
-                    };
+                    }
 
                     if(isRemovingAll !== undefined && isRemovingAll || isDeletingApp){
                         remove();
