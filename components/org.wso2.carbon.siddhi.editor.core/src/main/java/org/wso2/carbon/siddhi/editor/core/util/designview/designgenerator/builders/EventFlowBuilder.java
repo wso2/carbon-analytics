@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.build
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
@@ -231,7 +232,8 @@ public class EventFlowBuilder {
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
-                siddhiAppConfig.add(queryConfigGenerator.generateQueryConfig((Query) executionElement));
+                QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement);
+                siddhiAppConfig.addQuery(QueryConfigGenerator.getQueryListType(queryConfig), queryConfig);
             } else if (executionElement instanceof Partition) {
                 // TODO: Add support for Partitions
                 throw new DesignGenerationException("Partitions are not supported");
