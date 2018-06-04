@@ -52,11 +52,11 @@
     /* Temp */
     width: calc(100% - 80px);
     position: relative;
-    overflow: scroll; /* This should be applied to design-view-container once the two dedicated sour view/design view buttons are removed */
-    background: linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
+    overflow: scroll;
+    background: linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
     linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
-    linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
-    linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
+    linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, .001) 1px, transparent 1px),
     linear-gradient(transparent 3px, transparent 3px, transparent 78px, transparent 78px),
     linear-gradient(-90deg, transparent 1px, transparent 1px),
     linear-gradient(-90deg, transparent 3px, transparent 3px, transparent 78px, transparent 78px),
@@ -69,7 +69,7 @@
     10px 10px,
     10px 10px,
     10px 10px;
-    background-color: #fff;
+    background-color: #e7eaeb;
 }
 
 .sourceDrop{
