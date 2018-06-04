@@ -431,6 +431,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             }
 
             loadAggregarionData(siddhiApp, siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString);
+            loadSources(siddhiApp, siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString);
+            loadSinks(siddhiApp, siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString);
             return Response.ok().entity(listOfSiddhiAppElements).build();
         }
 
@@ -551,8 +553,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
-        loadSources(siddhiAppRuntime, siddhiAppElements, inputStream, appData);
-        loadSinks(siddhiAppRuntime, siddhiAppElements, inputStream, appData);
+
     }
 
     /**
@@ -601,8 +602,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 break;
             }
         }
-        loadSources(siddhiAppRuntime, siddhiAppElements, outputStream, appData);
-        loadSinks(siddhiAppRuntime, siddhiAppElements, outputStream, appData);
     }
 
     /**
@@ -695,14 +694,24 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Load source related data
      */
-    private void loadSources(SiddhiAppRuntime siddhiAppRuntime, SiddhiAppElements siddhiAppElements, String stream,
-                             String siddhiApp) {
+    private void loadSources(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+            listOfSiddhiAppElements, String siddhiAppString) {
         for (List<Source> sources : siddhiAppRuntime.getSources()) {
             for (Source source : sources) {
-                if (stream.equals(source.getStreamDefinition().getId())) {
-                    siddhiAppElements.setSourceStream(source.getStreamDefinition().getId());
-                    siddhiAppElements.setSource(source.getType());
-                    siddhiAppElements.setSourceSiddhiApp(getDefinition(source.getStreamDefinition(), siddhiApp));
+                for (Annotation annotation : source.getStreamDefinition().getAnnotations()) {
+                    for (Element element: annotation.getElements()) {
+                        if(element.getValue().equals(source.getType())){
+                            SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
+                            siddhiAppElements.setOutputStreamId(source.getStreamDefinition().getId());
+                            siddhiAppElements.setInputStreamId(source.getType());
+                            siddhiAppElements.setInputStreamType(Constants.SOURCE_TYPE);
+                            loadOutputData(siddhiApp, siddhiAppRuntime, source.getStreamDefinition().getId(), siddhiAppString,
+                                    siddhiAppElements);
+                            siddhiAppElements.setInputStreamSiddhiApp(getDefinition(annotation, siddhiAppString));
+                            listOfSiddhiAppElements.add(siddhiAppElements);
+                        }
+                    }
+
                 }
             }
         }
@@ -711,14 +720,23 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Load sink related data
      */
-    private void loadSinks(SiddhiAppRuntime siddhiAppRuntime, SiddhiAppElements siddhiAppElements, String stream,
-                           String siddhiApp) {
+    private void loadSinks(SiddhiApp siddhiApp,SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements> listOfSiddhiAppElements, String
+            siddhiAppString) {
         for (List<Sink> sinks : siddhiAppRuntime.getSinks()) {
             for (Sink sink : sinks) {
-                if (stream.equals(sink.getStreamDefinition().getId())) {
-                    siddhiAppElements.setSink(sink.getType());
-                    siddhiAppElements.setSinkStream(sink.getStreamDefinition().getId());
-                    siddhiAppElements.setSinkSiddhiApp(getDefinition(sink.getStreamDefinition(), siddhiApp));
+                for (Annotation annotation : sink.getStreamDefinition().getAnnotations()) {
+                    for (Element element: annotation.getElements()) {
+                        if(element.getValue().equals(sink.getType())){
+                            SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
+                            siddhiAppElements.setInputStreamId(sink.getStreamDefinition().getId());
+                            loadInputData(siddhiApp, siddhiAppRuntime, sink.getStreamDefinition().getId(), siddhiAppString,
+                                    siddhiAppElements);
+                            siddhiAppElements.setOutputStreamId(sink.getType());
+                            siddhiAppElements.setOutputStreamType(Constants.SINK_TYPE);
+                            siddhiAppElements.setOutputStreamSiddhiApp(getDefinition(annotation, siddhiAppString));
+                            listOfSiddhiAppElements.add(siddhiAppElements);
+                        }
+                    }
                 }
             }
         }
