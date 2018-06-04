@@ -173,9 +173,14 @@ public class JoinConfigGenerator {
                         leftElement,
                         joinInputStream.getType().name(),
                         rightElement,
-                        ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString),
-                        null, // TODO: 4/25/18 confirm whether null or ''
-                        null); // TODO: 4/25/18 confirm whether null or ''
+                        null,
+                        null,
+                        null);
+
+        // Set 'on'
+        if (joinInputStream.getOnCompare() != null) {
+            joinConfig.setOn(ConfigBuildingUtilities.getDefinition(joinInputStream.getOnCompare(), siddhiAppString));
+        }
 
         // 'within' and 'per' can be not null only for Aggregations
         if (joinInputStream.getWithin() != null) {
