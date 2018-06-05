@@ -36,6 +36,7 @@ import org.wso2.carbon.sp.jobmanager.core.bean.KafkaTransportDetails;
 import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerDetails;
+import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppHolder;
 import org.wso2.msf4j.Request;
@@ -265,6 +266,21 @@ public class ManagersApiServiceImpl extends ManagersApiService {
     }
 
     /**
+     * This method checks whether the Current Manager node is the active node.
+     *
+     * @return
+     */
+    public Response isActive() {
+        ManagerNode current = ServiceDataHolder.getCurrentNode();
+        if (current.equals(ServiceDataHolder.getLeaderNode())) {
+            return Response.ok().entity(String.format("Current node: %s is the active manager.", current.getId())).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity(
+                    new ApiResponseMessage(ApiResponseMessage.ERROR, "Not the active node")).build();
+        }
+    }
+
+    /**
      * This method helps to get the kafka sink source details
      *
      * @param siddhiAppHolder
@@ -414,6 +430,20 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     + "details").build();
         } else {
             return getKafkaDetails(appName);
+        }
+    }
+
+    @Override
+    public Response isActive(Request request) throws NotFoundException {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) ||
+                getPermissionProvider()
+                        .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
+                                MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to check cluster "
+                    + "leader.").build();
+        } else {
+            return isActive();
         }
     }
 
