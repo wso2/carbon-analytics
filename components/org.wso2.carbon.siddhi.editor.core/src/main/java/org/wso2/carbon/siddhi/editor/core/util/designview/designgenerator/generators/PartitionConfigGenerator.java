@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionWithElement;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
@@ -25,8 +26,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryL
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Annotation;
+import org.wso2.siddhi.query.api.definition.AbstractDefinition;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
 import org.wso2.siddhi.query.api.execution.partition.PartitionType;
 import org.wso2.siddhi.query.api.execution.partition.RangePartitionType;
@@ -45,10 +49,12 @@ import java.util.Map;
 public class PartitionConfigGenerator {
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
+    private SiddhiAppRuntime siddhiAppRuntime;
 
-    public PartitionConfigGenerator(String siddhiAppString, SiddhiApp siddhiApp) {
+    public PartitionConfigGenerator(String siddhiAppString, SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime) {
         this.siddhiAppString = siddhiAppString;
         this.siddhiApp = siddhiApp;
+        this.siddhiAppRuntime = siddhiAppRuntime;
     }
 
     /**
@@ -60,6 +66,7 @@ public class PartitionConfigGenerator {
     public PartitionConfig generatePartitionConfig(Partition partition) throws DesignGenerationException {
         PartitionConfig partitionConfig = new PartitionConfig();
         partitionConfig.setQueryLists(generateQueryList(partition.getQueryList()));
+        partitionConfig.setStreamList(generateInnerStreams());
         partitionConfig.setPartitionWith(generatePartitionWith(partition.getPartitionTypeMap()));
         partitionConfig.setAnnotationList(generateAnnotations(partition.getAnnotations()));
         return partitionConfig;
@@ -94,6 +101,26 @@ public class PartitionConfigGenerator {
         queryLists.put(QueryListType.PATTERN, new ArrayList<>());
         queryLists.put(QueryListType.SEQUENCE, new ArrayList<>());
         return queryLists;
+    }
+
+    /**
+     * Generates a list of Inner Streams from the given SiddhiAppRuntime
+     * @return      List of inner stream configs
+     */
+    private List<StreamConfig> generateInnerStreams() {
+        StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
+        List<StreamConfig> innerStreams = new ArrayList<>();
+        for (Map<String, AbstractDefinition> abstractDefinitionMap :
+                siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
+            for (AbstractDefinition abstractDefinition : abstractDefinitionMap.values()) {
+                if (abstractDefinition instanceof StreamDefinition) {
+                    innerStreams.add(
+                            streamDefinitionConfigGenerator
+                                    .generateStreamConfig((StreamDefinition) abstractDefinition));
+                }
+            }
+        }
+        return innerStreams;
     }
 
     /**
