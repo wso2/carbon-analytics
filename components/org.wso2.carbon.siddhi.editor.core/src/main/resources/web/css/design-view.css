@@ -35,12 +35,12 @@
 .toggle-view-button {
     transition: 0.15s;
     font-weight: bold;
-    color: white;
+    color: #333;
     background-color: #f57e30;
 }
 
 .toggle-view-button:hover {
-    color: #333;
+    color: #fff;
     transition: 0.15s;
 }
 
@@ -50,7 +50,7 @@
 
 .grid-container {
     /* Temp */
-    width: calc(100% - 80px);
+    width: calc(100% - 156px);
     position: relative;
     overflow: scroll;
     background: linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
@@ -361,4 +361,8 @@ select.form-control,
 
 .design-view-form-content th {
     color: #fff;
+}
+
+.grid-container > div {
+    opacity: 0.7;
 }
