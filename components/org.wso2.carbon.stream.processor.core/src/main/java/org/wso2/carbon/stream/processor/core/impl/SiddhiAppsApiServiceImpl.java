@@ -63,6 +63,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.ws.rs.core.Response;
 
 
@@ -700,7 +701,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             for (Source source : sources) {
                 for (Annotation annotation : source.getStreamDefinition().getAnnotations()) {
                     for (Element element: annotation.getElements()) {
-                        if(element.getValue().equals(source.getType())){
+                        if(Objects.equals(element.getValue(),source.getType())){
                             SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
                             siddhiAppElements.setOutputStreamId(source.getStreamDefinition().getId());
                             siddhiAppElements.setInputStreamId(source.getType());
@@ -725,7 +726,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             for (Sink sink : sinks) {
                 for (Annotation annotation : sink.getStreamDefinition().getAnnotations()) {
                     for (Element element: annotation.getElements()) {
-                        if(element.getValue().equals(sink.getType())){
+                        if(Objects.equals(element.getValue(),sink.getType())){
                             SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
                             siddhiAppElements.setInputStreamId(sink.getStreamDefinition().getId());
                             loadInputData(siddhiApp, siddhiAppRuntime, sink.getStreamDefinition().getId(), siddhiAppString,
