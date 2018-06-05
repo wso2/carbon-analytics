@@ -700,13 +700,14 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         for (List<Source> sources : siddhiAppRuntime.getSources()) {
             for (Source source : sources) {
                 for (Annotation annotation : source.getStreamDefinition().getAnnotations()) {
-                    for (Element element: annotation.getElements()) {
-                        if(Objects.equals(element.getValue(),source.getType())){
+                    for (Element element : annotation.getElements()) {
+                        if (Objects.equals(element.getValue(), source.getType())) {
                             SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
                             siddhiAppElements.setOutputStreamId(source.getStreamDefinition().getId());
                             siddhiAppElements.setInputStreamId(source.getType());
                             siddhiAppElements.setInputStreamType(Constants.SOURCE_TYPE);
-                            loadOutputData(siddhiApp, siddhiAppRuntime, source.getStreamDefinition().getId(), siddhiAppString,
+                            loadOutputData(siddhiApp, siddhiAppRuntime, source.getStreamDefinition().getId(),
+                                    siddhiAppString,
                                     siddhiAppElements);
                             siddhiAppElements.setInputStreamSiddhiApp(getDefinition(annotation, siddhiAppString));
                             listOfSiddhiAppElements.add(siddhiAppElements);
@@ -720,16 +721,18 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Load sink related data
      */
-    private void loadSinks(SiddhiApp siddhiApp,SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements> listOfSiddhiAppElements, String
-            siddhiAppString) {
+    private void loadSinks(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+            listOfSiddhiAppElements, String
+                                   siddhiAppString) {
         for (List<Sink> sinks : siddhiAppRuntime.getSinks()) {
             for (Sink sink : sinks) {
                 for (Annotation annotation : sink.getStreamDefinition().getAnnotations()) {
-                    for (Element element: annotation.getElements()) {
-                        if(Objects.equals(element.getValue(),sink.getType())){
+                    for (Element element : annotation.getElements()) {
+                        if (Objects.equals(element.getValue(), sink.getType())) {
                             SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
                             siddhiAppElements.setInputStreamId(sink.getStreamDefinition().getId());
-                            loadInputData(siddhiApp, siddhiAppRuntime, sink.getStreamDefinition().getId(), siddhiAppString,
+                            loadInputData(siddhiApp, siddhiAppRuntime, sink.getStreamDefinition().getId(),
+                                    siddhiAppString,
                                     siddhiAppElements);
                             siddhiAppElements.setOutputStreamId(sink.getType());
                             siddhiAppElements.setOutputStreamType(Constants.SINK_TYPE);
