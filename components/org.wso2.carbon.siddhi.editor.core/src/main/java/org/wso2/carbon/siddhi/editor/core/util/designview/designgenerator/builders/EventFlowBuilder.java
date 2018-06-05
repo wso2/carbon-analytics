@@ -125,22 +125,6 @@ public class EventFlowBuilder {
                                 .generateStreamConfig(streamDefinitionEntry.getValue()));
             }
         }
-
-        // Inner Streams TODO LOOK INTO
-        for (Map<String, AbstractDefinition> abstractDefinitionMap :
-                siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
-            for (AbstractDefinition abstractDefinition : abstractDefinitionMap.values()) {
-                if (abstractDefinition instanceof StreamDefinition) {
-                    siddhiAppConfig.add(
-                            streamDefinitionConfigGenerator
-                                    .generateStreamConfig((StreamDefinition) abstractDefinition));
-                } else {
-                    throw new DesignGenerationException(
-                            "The partitioned inner stream definition map does not have an instance of class " +
-                                    "'StreamDefinition'");
-                }
-            }
-        }
         return this;
     }
 
