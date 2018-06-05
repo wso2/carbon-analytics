@@ -268,7 +268,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
                 if(file !== undefined){
                     var fileEditor = activeTab.getSiddhiFileEditor();
-                    if (fileEditor === undefined || (fileEditor !== undefined && fileEditor.isInSourceView())) {
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
                         file = activeTab.getFile();
                         if(file.isDirty()){
                             exportMenuItem.disable();
@@ -357,7 +357,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
                 if(file !== undefined){
                     var fileEditor = activeTab.getSiddhiFileEditor();
-                    if (fileEditor === undefined || (fileEditor !== undefined && fileEditor.isInSourceView())) {
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
                         file = activeTab.getFile();
                         if(file.isDirty()){
                             saveMenuItem.enable();
@@ -412,7 +412,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
                 if(file !== undefined){
                     var fileEditor = activeTab.getSiddhiFileEditor();
-                    if (fileEditor === undefined || (fileEditor !== undefined && fileEditor.isInSourceView())) {
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
                         file = activeTab.getFile();
                         if(file.isDirty()){
                             runMenuItem.disable();
