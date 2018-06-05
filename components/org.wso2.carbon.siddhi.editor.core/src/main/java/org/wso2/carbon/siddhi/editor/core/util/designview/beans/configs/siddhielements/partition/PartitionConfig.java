@@ -30,11 +30,16 @@ import java.util.Map;
  */
 public class PartitionConfig extends SiddhiElementConfig {
     private Map<QueryListType, List<QueryConfig>> queryLists;
+    private List<String> innerStreamList;
     private List<PartitionWithElement> partitionWith;
     private List<String> annotationList;
 
     public Map<QueryListType, List<QueryConfig>> getQueryLists() {
         return queryLists;
+    }
+
+    public List<String> getInnerStreamList() {
+        return innerStreamList;
     }
 
     public List<PartitionWithElement> getPartitionWith() {
@@ -47,6 +52,10 @@ public class PartitionConfig extends SiddhiElementConfig {
 
     public void setQueryLists(Map<QueryListType, List<QueryConfig>> queryLists) {
         this.queryLists = queryLists;
+    }
+
+    public void setInnerStreamList(List<String> innerStreamList) {
+        this.innerStreamList = innerStreamList;
     }
 
     public void setPartitionWith(List<PartitionWithElement> partitionWith) {
