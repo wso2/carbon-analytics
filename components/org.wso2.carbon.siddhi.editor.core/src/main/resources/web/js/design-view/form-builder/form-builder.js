@@ -360,24 +360,6 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         };
 
         /**
-         * @function generate the form to define the aggregation once it is dropped on the canvas
-         * @param i id for the element
-         * @returns user given aggregation name
-         */
-        FormBuilder.prototype.DefineAggregation = function (i) {
-            var self = this;
-            var formConsole = this.createTabForForm(i, constants.AGGREGATION);
-            var formContainer = formConsole.getContentContainer();
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            var aggregationForm = new AggregationForm(formOptions);
-            return aggregationForm.generateDefineForm(i, formConsole, formContainer);
-        };
-
-        /**
          * @function generate the form for an existing aggregation
          * @param element selected element(aggregation)
          */

@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder'],
-    function (require, log, _, $, Partition, Stream, Query, FormBuilder) {
+define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation'],
+    function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation) {
 
         /**
          * @class DesignView
@@ -564,8 +564,15 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if(isCodeToDesignMode) {
                 name = aggregationName;
             } else {
-                name = self.formBuilder.DefineAggregation(i);
+                name = "Aggregation";
+                //add the new aggregation element to aggregation list
+                var aggregationOptions = {};
+                _.set(aggregationOptions, 'id', i);
+                _.set(aggregationOptions, 'name', i + '-aggregation');
+                var aggregation = new Aggregation(aggregationOptions);
+                self.configurationData.getSiddhiAppConfig().addAggregation(aggregation);
             }
+
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
             node.attr('id', i+"-nodeInitial");
@@ -610,6 +617,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
             self.jsPlumbInstance.makeTarget(connection1, {
                 deleteEndpointsOnDetach:true,
+                maxConnections: 1,
                 anchor: 'Left'
             });
 
