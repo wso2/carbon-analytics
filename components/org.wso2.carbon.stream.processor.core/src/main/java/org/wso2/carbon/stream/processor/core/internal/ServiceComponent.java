@@ -56,6 +56,7 @@ import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstan
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.StatisticsConfiguration;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
+import org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
 import java.io.File;
@@ -102,25 +103,41 @@ public class ServiceComponent {
         SiddhiManager siddhiManager = new SiddhiManager();
         FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
         siddhiManager.setConfigManager(fileConfigManager);
-        PersistenceStore persistenceStore;
         PersistenceConfigurations persistenceConfigurations = configProvider.getConfigurationObject
                 (PersistenceConfigurations.class);
 
         if (persistenceConfigurations != null && persistenceConfigurations.isEnabled()) {
             String persistenceStoreClassName = persistenceConfigurations.getPersistenceStore();
             try {
-                persistenceStore = (PersistenceStore) Class.forName(persistenceStoreClassName).newInstance();
+                if (Class.forName(persistenceStoreClassName).newInstance() instanceof PersistenceStore) {
+                    PersistenceStore persistenceStore =
+                            (PersistenceStore) Class.forName(persistenceStoreClassName).newInstance();
+                    persistenceStore.setProperties((Map) configProvider.getConfigurationObject(PersistenceConstants.
+                            STATE_PERSISTENCE_NS));
+                    siddhiManager.setPersistenceStore(persistenceStore);
+                } else if (Class.forName(persistenceStoreClassName).newInstance()
+                        instanceof IncrementalPersistenceStore) {
+                    IncrementalPersistenceStore incrementalPersistenceStore =
+                            (IncrementalPersistenceStore) Class.forName(persistenceStoreClassName).newInstance();
+                    incrementalPersistenceStore.setProperties(
+                            (Map) configProvider.getConfigurationObject(PersistenceConstants.STATE_PERSISTENCE_NS));
+                    siddhiManager.setIncrementalPersistenceStore(incrementalPersistenceStore);
+                } else {
+                    throw new PersistenceStoreConfigurationException("Persistence Store class with name "
+                            + persistenceStoreClassName + " is invalid. The given class has to implement either " +
+                            "org.wso2.siddhi.core.util.persistence.PersistenceStore or " +
+                            "org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore.");
+                }
                 if (log.isDebugEnabled()) {
                     log.debug(persistenceStoreClassName + " chosen as persistence store");
                 }
+
             } catch (ClassNotFoundException e) {
                 throw new PersistenceStoreConfigurationException("Persistence Store class with name "
                         + persistenceStoreClassName + " is invalid. ", e);
             }
 
-            persistenceStore.setProperties((Map) configProvider.getConfigurationObject(PersistenceConstants.
-                    STATE_PERSISTENCE_NS));
-            siddhiManager.setPersistenceStore(persistenceStore);
+
             int persistenceInterval = persistenceConfigurations.getIntervalInMin();
             scheduledExecutorService = Executors.newScheduledThreadPool(1);
 

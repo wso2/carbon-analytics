@@ -55,12 +55,21 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.manageConsoles(evt);
             };
 
+            this.listenToViewSwitch = function () {
+                if (!_.isUndefined(app.tabController.getActiveTab())) {
+                    app.tabController.getActiveTab().getSiddhiFileEditor().on("view-switch", function () {
+                        self.updateUndoRedoMenus();
+                    });
+                }
+            };
+
             this.createNewTab = function createNewTab(options) {
                 var editorId = app.config.container;
                 $(editorId).css("display", "block");
                 //Showing menu bar
                 app.tabController.newTab(options);
                 app.outputController.makeInactiveActivateButton();
+                self.listenToViewSwitch();
             };
 
             this.saveFileBrowserBased = function saveFile() {
@@ -194,8 +203,12 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.handleFormat = function () {
-                if(app.tabController.getActiveTab().getTitle() !== "welcome-page"){
-                    app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().format();
+                if(app.tabController.getActiveTab().getTitle() !== "welcome-page") {
+                    if (app.tabController.getActiveTab().getSiddhiFileEditor().isInSourceView()) {
+                        app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().format();
+                    } else {
+                        app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView().autoAlign();
+                    }
                 }
             };
 
@@ -239,6 +252,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             this.manageConsoles = function(evt){
                 if(app.outputController !== undefined){
                     app.outputController.showConsoleByTitle(evt.newActiveTab._title,"DEBUG");
+                    app.outputController.showConsoleByTitle(evt.newActiveTab._title,"FORM");
                     //app.outputController.toggleOutputConsole();
                 }
             };
@@ -273,7 +287,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     redoMenuItem = app.menuBar.getMenuItemByID('edit.redo'),
                     findMenuItem = app.menuBar.getMenuItemByID('edit.find'),
                     findAndReplaceMenuItem = app.menuBar.getMenuItemByID('edit.findAndReplace'),
-                    reformatCodeMenuItem = app.menuBar.getMenuItemByID('edit.format'),
+                    formatMenuItem = app.menuBar.getMenuItemByID('edit.format'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -283,25 +297,40 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if(file !== undefined){
                     var fileEditor = activeTab.getSiddhiFileEditor();
                     if(!_.isUndefined(fileEditor)){
-                        var undoManager = fileEditor.getUndoManager();
-                        findMenuItem.enable();
-                        findAndReplaceMenuItem.enable();
-                        reformatCodeMenuItem.enable();
-                        if (undoManager.hasUndo() && undoManager.undoStackTop().canUndo()) {
-                            undoMenuItem.enable();
-                            undoMenuItem.addLabelSuffix(
-                                undoManager.undoStackTop().getTitle());
+                        if (fileEditor.isInSourceView()) {
+
+                            findMenuItem.enable();
+                            findAndReplaceMenuItem.enable();
+
+                            formatMenuItem.updateLabel("Reformat Code");
+                            formatMenuItem.enable();
+
+                            var undoManager = fileEditor.getUndoManager();
+                            if (undoManager.hasUndo() && undoManager.undoStackTop().canUndo()) {
+                                undoMenuItem.enable();
+                                undoMenuItem.addLabelSuffix(
+                                    undoManager.undoStackTop().getTitle());
+                            } else {
+                                undoMenuItem.disable();
+                                undoMenuItem.clearLabelSuffix();
+                            }
+                            if (undoManager.hasRedo() && undoManager.redoStackTop().canRedo()) {
+                                redoMenuItem.enable();
+                                redoMenuItem.addLabelSuffix(
+                                    undoManager.redoStackTop().getTitle());
+                            } else {
+                                redoMenuItem.disable();
+                                redoMenuItem.clearLabelSuffix();
+                            }
+
                         } else {
                             undoMenuItem.disable();
-                            undoMenuItem.clearLabelSuffix();
-                        }
-                        if (undoManager.hasRedo() && undoManager.redoStackTop().canRedo()) {
-                            redoMenuItem.enable();
-                            redoMenuItem.addLabelSuffix(
-                                undoManager.redoStackTop().getTitle());
-                        } else {
                             redoMenuItem.disable();
-                            redoMenuItem.clearLabelSuffix();
+                            findMenuItem.disable();
+                            findAndReplaceMenuItem.disable();
+
+                            formatMenuItem.updateLabel("Auto-Align");
+                            formatMenuItem.enable();
                         }
                     }
                 } else {
@@ -311,7 +340,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     redoMenuItem.clearLabelSuffix();
                     findMenuItem.disable();
                     findAndReplaceMenuItem.disable();
-                    reformatCodeMenuItem.disable();
+                    formatMenuItem.disable();
                 }
             };
 
