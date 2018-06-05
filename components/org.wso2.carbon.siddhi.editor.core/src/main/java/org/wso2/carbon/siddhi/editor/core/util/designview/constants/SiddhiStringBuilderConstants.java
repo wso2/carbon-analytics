@@ -95,6 +95,7 @@ public class SiddhiStringBuilderConstants {
     public static final String BY = "by";
     public static final String AS = "as";
     public static final String AT = "at";
+    public static final String OF = "of";
     public static final String EVERY = "every";
     public static final String RETURN = "return";
     public static final String LIMIT = "limit";
