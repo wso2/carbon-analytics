@@ -25,6 +25,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
@@ -52,6 +53,7 @@ public class SiddhiAppConfig {
     private List<AggregationConfig> aggregationList = new ArrayList<>();
     private List<FunctionConfig> functionList = new ArrayList<>();
     private Map<QueryListType, List<QueryConfig>> queryLists = new EnumMap<>(QueryListType.class);
+    private List<PartitionConfig> partitionList = new ArrayList<>();
 
     public SiddhiAppConfig() {
         queryLists.put(QueryListType.WINDOW_FILTER_PROJECTION, new ArrayList<>());
@@ -127,6 +129,10 @@ public class SiddhiAppConfig {
 
     public void add(FunctionConfig functionConfig) {
         addElement(functionList, functionConfig);
+    }
+
+    public void add(PartitionConfig partitionConfig) {
+        addElement(partitionList, partitionConfig);
     }
 
     public String getAppName() {

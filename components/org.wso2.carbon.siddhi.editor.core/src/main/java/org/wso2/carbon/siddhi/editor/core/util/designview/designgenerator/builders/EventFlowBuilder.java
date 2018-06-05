@@ -122,18 +122,18 @@ public class EventFlowBuilder {
             if (!isTriggerDefined(streamDefinitionEntry.getKey(), siddhiApp)) {
                 siddhiAppConfig.add(
                         streamDefinitionConfigGenerator
-                                .generateStreamConfig(streamDefinitionEntry.getValue(), false));
+                                .generateStreamConfig(streamDefinitionEntry.getValue()));
             }
         }
 
-        // Inner Streams
+        // Inner Streams TODO LOOK INTO
         for (Map<String, AbstractDefinition> abstractDefinitionMap :
                 siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
             for (AbstractDefinition abstractDefinition : abstractDefinitionMap.values()) {
                 if (abstractDefinition instanceof StreamDefinition) {
                     siddhiAppConfig.add(
                             streamDefinitionConfigGenerator
-                                    .generateStreamConfig((StreamDefinition) abstractDefinition, true));
+                                    .generateStreamConfig((StreamDefinition) abstractDefinition));
                 } else {
                     throw new DesignGenerationException(
                             "The partitioned inner stream definition map does not have an instance of class " +
@@ -230,13 +230,13 @@ public class EventFlowBuilder {
      */
     public EventFlowBuilder loadExecutionElements() throws DesignGenerationException {
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
+        PartitionConfigGenerator partitionConfigGenerator = new PartitionConfigGenerator(siddhiAppString, siddhiApp);
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
                 QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement);
                 siddhiAppConfig.addQuery(QueryConfigGenerator.getQueryListType(queryConfig), queryConfig);
             } else if (executionElement instanceof Partition) {
-                // TODO: Add support for Partitions
-                throw new DesignGenerationException("Partitions are not supported");
+                siddhiAppConfig.add(partitionConfigGenerator.generatePartitionConfig((Partition) executionElement));
             } else {
                 throw new DesignGenerationException("Unable create config for execution element of type unknown");
             }
