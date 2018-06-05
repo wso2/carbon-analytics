@@ -25,28 +25,21 @@ import java.util.List;
  */
 public class StreamConfig extends SiddhiElementConfig {
     private String name;
-    private boolean isInnerStream;
     private List<AttributeConfig> attributeList;
     private List<String> annotationList;
 
     public StreamConfig(String id,
                         String name,
-                        boolean isInnerStream,
                         List<AttributeConfig> attributeList,
                         List<String> annotationList) {
         super(id);
         this.name = name;
-        this.isInnerStream = isInnerStream;
         this.attributeList = attributeList;
         this.annotationList = annotationList;
     }
 
     public String getName() {
         return name;
-    }
-
-    public boolean isInnerStream() {
-        return isInnerStream;
     }
 
     public List<AttributeConfig> getAttributeList() {

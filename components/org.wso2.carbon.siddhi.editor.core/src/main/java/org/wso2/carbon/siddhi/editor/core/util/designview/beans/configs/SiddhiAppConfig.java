@@ -25,10 +25,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 
@@ -55,6 +53,7 @@ public class SiddhiAppConfig {
     private List<AggregationConfig> aggregationList = new ArrayList<>();
     private List<FunctionConfig> functionList = new ArrayList<>();
     private Map<QueryListType, List<QueryConfig>> queryLists = new EnumMap<>(QueryListType.class);
+    private List<PartitionConfig> partitionList = new ArrayList<>();
 
     public SiddhiAppConfig() {
         queryLists.put(QueryListType.WINDOW_FILTER_PROJECTION, new ArrayList<>());
@@ -85,13 +84,9 @@ public class SiddhiAppConfig {
     /**
      * Adds a given QueryConfig object to its specific query list, denoted by the given QueryInputType
      * @param queryListType     Key with which, the specific query list is denoted
-     * @param queryLists        Map of query lists,
-     *                          where key is the type of query list, and value is the specific query list
      * @param queryConfig       QueryConfig object
      */
-    private void addQuery(QueryListType queryListType,
-                          Map<QueryListType, List<QueryConfig>> queryLists,
-                          QueryConfig queryConfig) {
+    public void addQuery(QueryListType queryListType, QueryConfig queryConfig) {
         queryConfig.setId(generateNextElementId());
         queryLists.get(queryListType).add(queryConfig);
     }
@@ -132,21 +127,12 @@ public class SiddhiAppConfig {
         addElement(aggregationList, aggregationConfig);
     }
 
-    public void add(QueryConfig queryConfig) {
-        // Categorize QueryConfig from its Input, and add QueryConfig to the relevant list
-        QueryInputConfig queryInputConfig = queryConfig.getQueryInput();
-        if (queryInputConfig instanceof WindowFilterProjectionConfig) {
-            addQuery(QueryListType.WINDOW_FILTER_PROJECTION, queryLists, queryConfig);
-        } else if (queryInputConfig instanceof JoinConfig) {
-            addQuery(QueryListType.JOIN, queryLists, queryConfig);
-        } else {
-            // TODO add pattern & sequences
-            throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
-        }
-    }
-
     public void add(FunctionConfig functionConfig) {
         addElement(functionList, functionConfig);
+    }
+
+    public void add(PartitionConfig partitionConfig) {
+        addElement(partitionList, partitionConfig);
     }
 
     public String getAppName() {
