@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>analytics-processor-service-stubs</artifactId>
-        <version>1.3.31</version>
+        <version>1.3.32-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
