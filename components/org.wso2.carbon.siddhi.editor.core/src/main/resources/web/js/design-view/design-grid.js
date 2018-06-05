@@ -905,7 +905,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             }
 
             function addMemberToPartitionGroup(self) {
-                // TODO: isInner boolean should be set when adding to the partition.
+                //TODO: check for same connection point connecting to itself scenario. It should be invalid connection.
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
                     // if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                     //     || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)

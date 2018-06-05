@@ -41,8 +41,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                           if(self.tabController.activeTab._title != "welcome-page"){
                               if (self.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                                   self.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                              } else {
-                                  //TODO: self.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                               }
                           }
                     } );

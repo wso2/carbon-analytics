@@ -28,7 +28,9 @@ public class ExecutionInfo {
     private String preparedTableExistenceCheckStatement;
     private String preparedSelectStatement;
     private String preparedSelectLastStatement;
+    private String preparedSelectRevisionsStatement;
     private String preparedDeleteStatement;
+    private String preparedDeleteOldRevisionsStatement;
     private String preparedCountStatement;
 
     private boolean tableExist = false;
@@ -73,12 +75,28 @@ public class ExecutionInfo {
         this.preparedSelectLastStatement = preparedSelectLastStatement;
     }
 
+    public String getPreparedSelectRevisionsStatement() {
+        return preparedSelectRevisionsStatement;
+    }
+
+    public void setPreparedSelectRevisionsStatement(String preparedSelectRevisionsStatement) {
+        this.preparedSelectRevisionsStatement = preparedSelectRevisionsStatement;
+    }
+
     public String getPreparedDeleteStatement() {
         return preparedDeleteStatement;
     }
 
     public void setPreparedDeleteStatement(String preparedDeleteStatement) {
         this.preparedDeleteStatement = preparedDeleteStatement;
+    }
+
+    public String getPreparedDeleteOldRevisionsStatement() {
+        return preparedDeleteOldRevisionsStatement;
+    }
+
+    public void setPreparedDeleteOldRevisionsStatement(String preparedDeleteOldRevisionsStatement) {
+        this.preparedDeleteOldRevisionsStatement = preparedDeleteOldRevisionsStatement;
     }
 
     public String getPreparedCountStatement() {

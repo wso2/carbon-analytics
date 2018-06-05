@@ -52,11 +52,11 @@
     /* Temp */
     width: calc(100% - 80px);
     position: relative;
-    overflow: scroll; /* This should be applied to design-view-container once the two dedicated sour view/design view buttons are removed */
-    background: linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
+    overflow: scroll;
+    background: linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
     linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
-    linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
-    linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
+    linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, .001) 1px, transparent 1px),
     linear-gradient(transparent 3px, transparent 3px, transparent 78px, transparent 78px),
     linear-gradient(-90deg, transparent 1px, transparent 1px),
     linear-gradient(-90deg, transparent 3px, transparent 3px, transparent 78px, transparent 78px),
@@ -69,7 +69,7 @@
     10px 10px,
     10px 10px,
     10px 10px;
-    background-color: #fff;
+    background-color: #e7eaeb;
 }
 
 .sourceDrop{
@@ -213,7 +213,7 @@
 /*
 *Styles for the configuration icons
 */
-.element-prop-icon, .element-conn-icon, .element-close-icon {
+.element-prop-icon, .element-close-icon {
     float: right;
     width: 26px;
     height: 26px;
@@ -227,10 +227,6 @@
 
 .element-prop-icon {
     margin-right: 25px;
-}
-
-.element-conn-icon {
-    margin-right: 50px;
 }
 
 .element-close-icon {
@@ -318,14 +314,33 @@ td {
 }
 
 .aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
-.partitionNameNode, .patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode,
-.functionName {
+.patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode{
     width: inherit;
     height: inherit;
     background-color: transparent;
     border: 1px solid transparent;
     margin-top: -10px;
     font-weight: bolder;
+}
+
+.partition-element-prop-icon, .partition-element-close-icon {
+    float: right;
+    width: 26px;
+    height: 26px;
+    margin-top: 0;
+    background-color: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    color: red;
+    border-radius: 40px;
+}
+
+.partition-element-prop-icon {
+    margin-right: 25px;
+}
+
+.partition-element-close-icon {
+    margin-right: 0;
 }
 
 /* Window Stream */
