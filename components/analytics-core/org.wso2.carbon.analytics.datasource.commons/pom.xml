@@ -3,7 +3,7 @@
     <parent>
         <artifactId>analytics-core</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
-        <version>1.3.31-SNAPSHOT</version>
+        <version>1.3.31</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
