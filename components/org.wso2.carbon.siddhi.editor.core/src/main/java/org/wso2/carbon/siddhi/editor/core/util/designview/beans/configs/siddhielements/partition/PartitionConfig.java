@@ -19,6 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 public class PartitionConfig extends SiddhiElementConfig {
     private Map<QueryListType, List<QueryConfig>> queryLists;
-    private List<String> innerStreamList;
+    private List<StreamConfig> streamList;
     private List<PartitionWithElement> partitionWith;
     private List<String> annotationList;
 
@@ -38,8 +39,8 @@ public class PartitionConfig extends SiddhiElementConfig {
         return queryLists;
     }
 
-    public List<String> getInnerStreamList() {
-        return innerStreamList;
+    public List<StreamConfig> getStreamList() {
+        return streamList;
     }
 
     public List<PartitionWithElement> getPartitionWith() {
@@ -54,8 +55,8 @@ public class PartitionConfig extends SiddhiElementConfig {
         this.queryLists = queryLists;
     }
 
-    public void setInnerStreamList(List<String> innerStreamList) {
-        this.innerStreamList = innerStreamList;
+    public void setStreamList(List<StreamConfig> streamList) {
+        this.streamList = streamList;
     }
 
     public void setPartitionWith(List<PartitionWithElement> partitionWith) {
