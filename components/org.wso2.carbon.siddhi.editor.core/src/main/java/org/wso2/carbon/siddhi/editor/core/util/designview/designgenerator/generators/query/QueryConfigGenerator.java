@@ -22,7 +22,10 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributesSelectionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.QueryInputConfigGenerator;
@@ -176,5 +179,22 @@ public class QueryConfigGenerator {
             return Long.parseLong(ConfigBuildingUtilities.getDefinition(limit, siddhiAppString));
         }
         return 0;
+    }
+
+    /**
+     * Gets the category of the query, for adding and maintaining in relevant lists
+     * @param queryConfig       QueryConfig object
+     * @return                  QueryListType
+     */
+    public static QueryListType getQueryListType(QueryConfig queryConfig) {
+        QueryInputConfig queryInputConfig = queryConfig.getQueryInput();
+        if (queryInputConfig instanceof WindowFilterProjectionConfig) {
+            return QueryListType.WINDOW_FILTER_PROJECTION;
+        } else if (queryInputConfig instanceof JoinConfig) {
+            return QueryListType.JOIN;
+        } else {
+            // TODO add pattern & sequences
+            throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
+        }
     }
 }

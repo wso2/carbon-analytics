@@ -19,10 +19,10 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
@@ -31,26 +31,39 @@ import java.util.Map;
  */
 public class PartitionConfig extends SiddhiElementConfig {
     private Map<QueryListType, List<QueryConfig>> queryLists;
-    private String partitionWith;
-    private List<Annotation> annotationList;
-
-    public PartitionConfig(String id, Map<QueryListType, List<QueryConfig>> queryLists, String partitionWith,
-                           List<Annotation> annotationList) {
-        super(id);
-        this.queryLists = queryLists;
-        this.partitionWith = partitionWith;
-        this.annotationList = annotationList;
-    }
+    private List<StreamConfig> streamList;
+    private List<PartitionWithElement> partitionWith;
+    private List<String> annotationList;
 
     public Map<QueryListType, List<QueryConfig>> getQueryLists() {
         return queryLists;
     }
 
-    public String getPartitionWith() {
+    public List<StreamConfig> getStreamList() {
+        return streamList;
+    }
+
+    public List<PartitionWithElement> getPartitionWith() {
         return partitionWith;
     }
 
-    public List<Annotation> getAnnotationList() {
+    public List<String> getAnnotationList() {
         return annotationList;
+    }
+
+    public void setQueryLists(Map<QueryListType, List<QueryConfig>> queryLists) {
+        this.queryLists = queryLists;
+    }
+
+    public void setStreamList(List<StreamConfig> streamList) {
+        this.streamList = streamList;
+    }
+
+    public void setPartitionWith(List<PartitionWithElement> partitionWith) {
+        this.partitionWith = partitionWith;
+    }
+
+    public void setAnnotationList(List<String> annotationList) {
+        this.annotationList = annotationList;
     }
 }
