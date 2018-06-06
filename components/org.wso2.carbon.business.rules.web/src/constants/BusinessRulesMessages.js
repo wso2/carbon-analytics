@@ -28,9 +28,6 @@ const BusinessRulesMessages = {
     // Business Rule from scratch form
     // Filter component
     RULE_LOGIC_HELPER_TEXT: 'Enter the Rule Logic, referring filter rule numbers. Eg: (1 OR 2) AND (NOT(3))',
-
-    BUSINESS_RULE_DELETION_CONFIRMATION_TITLE: 'Confirm delete',
-    BUSINESS_RULE_DELETION_CONFIRMATION_CONTENT: 'Do you really want to delete this business rule?',
 };
 
 export default BusinessRulesMessages;

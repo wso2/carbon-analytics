@@ -39,7 +39,6 @@ import BusinessRulesUtilityFunctions from '../../../utils/BusinessRulesUtilityFu
 import BusinessRulesAPI from '../../../api/BusinessRulesAPI';
 // App Constants
 import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
-import BusinessRulesMessages from '../../../constants/BusinessRulesMessages';
 // Styles
 import Styles from '../../../style/Styles';
 import '../../../index.css';
@@ -80,7 +79,7 @@ export default class LandingPage extends Component {
 
             // Dialog for deleting a business rule
             deleteDialog: {
-                businessRuleUUID: '',
+                businessRule: {},
                 isVisible: false,
             },
 
@@ -204,15 +203,15 @@ export default class LandingPage extends Component {
     /**
      * Displays the delete dialog for the business rule with the given UUID (if any),
      * otherwise hides it
-     * @param {String} businessRuleUUID     UUID of the business rule
+     * @param {Object} businessRule     Business rule object
      */
-    toggleDeleteDialog(businessRuleUUID) {
+    toggleDeleteDialog(businessRule) {
         const state = this.state;
-        if (businessRuleUUID) {
-            state.deleteDialog.businessRuleUUID = businessRuleUUID;
+        if (businessRule) {
+            state.deleteDialog.businessRule = businessRule;
             state.deleteDialog.isVisible = true;
         } else {
-            state.deleteDialog.businessRuleUUID = '';
+            state.deleteDialog.businessRule = {};
             state.deleteDialog.isVisible = false;
         }
         this.setState(state);
@@ -249,6 +248,12 @@ export default class LandingPage extends Component {
                     <Typography type="subheading">
                         Login with suitable permissions to create one
                     </Typography>
+                    <br />
+                    <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
+                        <Button color="primary">
+                            Login
+                        </Button>
+                    </Link>
                 </Paper>
             );
         }
@@ -283,7 +288,7 @@ export default class LandingPage extends Component {
                                     status={businessRuleAndStatus[1]}
                                     permissions={this.state.permissions}
                                     onRedeploy={() => this.redeployBusinessRule(businessRuleAndStatus[0].uuid)}
-                                    onDeleteRequest={() => this.toggleDeleteDialog(businessRuleAndStatus[0].uuid)}
+                                    onDeleteRequest={() => this.toggleDeleteDialog(businessRuleAndStatus[0])}
                                     onDeploymentInfoRequest={() => this.showDeploymentInfo(businessRuleAndStatus)}
                                 />))}
                         </TableBody>
@@ -302,7 +307,7 @@ export default class LandingPage extends Component {
         return (
             <div style={styles.floatingButton}>
                 <Link to={`${appContext}/businessRuleCreator`} style={{ textDecoration: 'none' }}>
-                    <Button fab color="primary" style={{ float: 'right' }} aria-label="Add">
+                    <Button fab color="primary" aria-label="Add">
                         <AddIcon />
                     </Button>
                 </Link>
@@ -338,23 +343,29 @@ export default class LandingPage extends Component {
      * @returns {Component}         Dialog Component
      */
     displayDeleteConfirmationDialog() {
-        return (
-            <Dialog open={this.state.deleteDialog.isVisible} onRequestClose={() => this.toggleDeleteDialog()}>
-                <DialogTitle>
-                    {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_TITLE}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_CONTENT}
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => this.deleteBusinessRule(this.state.deleteDialog.businessRuleUUID)}>
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        );
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.state.deleteDialog.businessRule)) {
+            return (
+                <Dialog open={this.state.deleteDialog.isVisible} onRequestClose={() => this.toggleDeleteDialog()}>
+                    <DialogTitle>
+                        Confirm Delete
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            {'Do you really want to delete the business rule ' +
+                            `'${this.state.deleteDialog.businessRule.name}'?`}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={() => this.deleteBusinessRule(this.state.deleteDialog.businessRule.uuid)}
+                        >
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            );
+        }
+        return null;
     }
 
     /**

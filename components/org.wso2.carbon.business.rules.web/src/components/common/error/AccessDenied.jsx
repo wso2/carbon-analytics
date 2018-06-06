@@ -17,12 +17,19 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 // Material UI Components
+import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 // Styles
 import Styles from '../../../style/Styles';
 import '../../../index.css';
+
+/**
+ * App context
+ */
+const appContext = window.contextPath;
 
 /**
  * Represents an Access Denied Error message display
@@ -37,6 +44,12 @@ class AccessDenied extends React.Component {
                 <Typography type="subheading">
                     Please login with valid permissions
                 </Typography>
+                <br />
+                <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
+                    <Button color="primary">
+                        Login
+                    </Button>
+                </Link>
             </Paper>
         );
     }

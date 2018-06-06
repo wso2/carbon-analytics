@@ -17,12 +17,19 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 // Material UI Components
+import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 // Styles
 import Styles from '../../../style/Styles';
 import '../../../index.css';
+
+/**
+ * App context
+ */
+const appContext = window.contextPath;
 
 /**
  * Represents a Forbidden Error message display
@@ -35,8 +42,14 @@ class Forbidden extends React.Component {
                     Forbidden
                 </Typography>
                 <Typography type="subheading">
-                    You don't have enough permissions
+                    Please login with enough permissions
                 </Typography>
+                <br />
+                <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
+                    <Button color="primary">
+                        Login
+                    </Button>
+                </Link>
             </Paper>
         );
     }

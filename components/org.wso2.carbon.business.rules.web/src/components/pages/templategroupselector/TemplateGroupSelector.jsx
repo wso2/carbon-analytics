@@ -134,8 +134,7 @@ export default class TemplateGroupSelector extends Component {
         return (
             <Link
                 to={`${appContext}/${specificPath}/${BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}` +
-                    `/templateGroup/${templateGroup.uuid}` +
-                    `/businessRule/${templateGroup.uuid}`} // TODO check whether '/businessRule/${}' is needed or not
+                    `/templateGroup/${templateGroup.uuid}/businessRule`}
                 style={{ textDecoration: 'none' }}
             >
                 <TemplateGroupThumbnail
