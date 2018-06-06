@@ -23,6 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionWithElement;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
@@ -193,7 +194,7 @@ public class CodeGeneratorHelper {
             // The reason why generating annotations for aggregations is in a different
             // method is because the '@PrimaryKey' annotation is automatically generated
             // in Siddhi runtime for Aggregation Definitions. This is done to avoid that.
-            if (annotation.toLowerCase().contains(CodeGeneratorConstants.PRIMARY_KEY_ANNOTATION)) {
+            if (annotation.toUpperCase().contains(CodeGeneratorConstants.PRIMARY_KEY_ANNOTATION)) {
                 continue;
             }
             annotationsStringBuilder.append(annotation)
@@ -322,9 +323,9 @@ public class CodeGeneratorHelper {
             throw new CodeGenerationException("The 'joinWith' value of the given JoinConfig object is null/empty");
         } else if (join.getJoinType() == null || join.getJoinType().isEmpty()) {
             throw new CodeGenerationException("The 'joinType' value for the given JoinConfig object is null/empty");
-        } else if (join.getOn() == null || join.getOn().isEmpty()) {
+        } /*else if (join.getOn() == null || join.getOn().isEmpty()) {
             throw new CodeGenerationException("The 'on' value for the given JoinConfig object is null/empty");
-        } else if (join.getLeft() == null || join.getRight() == null) {
+        }  */ else if (join.getLeft() == null || join.getRight() == null) {
             throw new CodeGenerationException("The left/right JoinElementConfig for the given" +
                     " JoinConfig object is null");
         } else if (join.getLeft().getType() == null || join.getLeft().getType().isEmpty()) {
@@ -340,12 +341,15 @@ public class CodeGeneratorHelper {
                 .append(SiddhiStringBuilderConstants.SPACE)
                 .append(getJoinType(join.getJoinType()))
                 .append(SiddhiStringBuilderConstants.SPACE)
-                .append(getJoinElement(join.getRight()))
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.TAB_SPACE)
-                .append(SiddhiStringBuilderConstants.ON)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(join.getOn());
+                .append(getJoinElement(join.getRight()));
+
+        if (join.getOn() != null && !join.getOn().isEmpty()) {
+            joinStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+                    .append(SiddhiStringBuilderConstants.TAB_SPACE)
+                    .append(SiddhiStringBuilderConstants.ON)
+                    .append(SiddhiStringBuilderConstants.SPACE)
+                    .append(join.getOn());
+        }
 
         if (join.getJoinWith().equalsIgnoreCase(CodeGeneratorConstants.AGGREGATION)) {
             if (join.getWithin() == null || join.getWithin().isEmpty()) {
@@ -994,6 +998,61 @@ public class CodeGeneratorHelper {
                 .append(setAttribute.getValue());
 
         return setAttributeStringBuilder.toString();
+    }
+
+    /**
+     * Generates a string representation of a list of PartitionWithElement objects for a particular partition
+     *
+     * @param partitionWith The List of partitionWithElement objects to be converted
+     * @return The Siddhi string representation of the PartitionWithElement list given
+     * @throws CodeGenerationException Error while generating code
+     */
+    public static String getPartitionWith(List<PartitionWithElement> partitionWith) throws CodeGenerationException {
+        if (partitionWith == null || partitionWith.isEmpty()) {
+            throw new CodeGenerationException("The 'partitionWith' value for the given" +
+                    " PartitionConfig object is null/empty");
+        }
+
+        StringBuilder partitionWithStringBuilder = new StringBuilder();
+        int partitionWithElementsLeft = partitionWith.size();
+        for (PartitionWithElement partitionWithElement: partitionWith) {
+            partitionWithStringBuilder.append(getPartitionWithElement(partitionWithElement));
+            if (partitionWithElementsLeft != 1) {
+                partitionWithStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
+                        .append(SiddhiStringBuilderConstants.SPACE);
+            }
+            partitionWithElementsLeft--;
+        }
+
+        return partitionWithStringBuilder.toString();
+    }
+
+    /**
+     * Generates a string representation of a single PartitionWithElement object
+     *
+     * @param partitionWithElement The PartitionWithElement object to be converted
+     * @return The Siddhi string representation of the given PartitionWithElement object
+     * @throws CodeGenerationException Error while generating code
+     */
+    private static String getPartitionWithElement(PartitionWithElement partitionWithElement)
+            throws CodeGenerationException {
+        if (partitionWithElement == null) {
+            throw new CodeGenerationException("The given PartitionWithElement object is null");
+        } else if (partitionWithElement.getExpression() == null || partitionWithElement.getExpression().isEmpty()) {
+            throw new CodeGenerationException("The 'expression' value of the given PartitionWithElement" +
+                    " object is null/empty");
+        } else if (partitionWithElement.getStreamName() == null || partitionWithElement.getStreamName().isEmpty()) {
+            throw new CodeGenerationException("The stream name of the goven PartitionWithElement is null/empty");
+        }
+
+        StringBuilder partitionWithElementStringBuilder = new StringBuilder();
+        partitionWithElementStringBuilder.append(partitionWithElement.getExpression())
+                .append(SiddhiStringBuilderConstants.SPACE)
+                .append(SiddhiStringBuilderConstants.OF)
+                .append(SiddhiStringBuilderConstants.SPACE)
+                .append(partitionWithElement.getStreamName());
+
+        return partitionWithElementStringBuilder.toString();
     }
 
     private CodeGeneratorHelper() {

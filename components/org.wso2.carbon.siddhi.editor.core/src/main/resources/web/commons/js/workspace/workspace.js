@@ -58,7 +58,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             this.listenToViewSwitch = function () {
                 if (!_.isUndefined(app.tabController.getActiveTab())) {
                     app.tabController.getActiveTab().getSiddhiFileEditor().on("view-switch", function () {
-                        self.updateUndoRedoMenus();
+                        self.updateMenuItems();
                     });
                 }
             };
@@ -267,11 +267,16 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
 
                 if(file !== undefined){
-                    file = activeTab.getFile();
-                    if(file.isDirty()){
-                        exportMenuItem.disable();
-                    } else if(file.isPersisted()){
-                        exportMenuItem.enable();
+                    var fileEditor = activeTab.getSiddhiFileEditor();
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
+                        file = activeTab.getFile();
+                        if(file.isDirty()){
+                            exportMenuItem.disable();
+                        } else if(file.isPersisted()){
+                            exportMenuItem.enable();
+                        } else {
+                            exportMenuItem.disable();
+                        }
                     } else {
                         exportMenuItem.disable();
                     }
@@ -298,10 +303,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     var fileEditor = activeTab.getSiddhiFileEditor();
                     if(!_.isUndefined(fileEditor)){
                         if (fileEditor.isInSourceView()) {
-
                             findMenuItem.enable();
                             findAndReplaceMenuItem.enable();
-
                             formatMenuItem.updateLabel("Reformat Code");
                             formatMenuItem.enable();
 
@@ -322,13 +325,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                                 redoMenuItem.disable();
                                 redoMenuItem.clearLabelSuffix();
                             }
-
                         } else {
                             undoMenuItem.disable();
                             redoMenuItem.disable();
                             findMenuItem.disable();
                             findAndReplaceMenuItem.disable();
-
                             formatMenuItem.updateLabel("Auto-Align");
                             formatMenuItem.enable();
                         }
@@ -355,13 +356,19 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
 
                 if(file !== undefined){
-                    file = activeTab.getFile();
-                    if(file.isDirty()){
-                        saveMenuItem.enable();
-                        saveAsMenuItem.enable();
+                    var fileEditor = activeTab.getSiddhiFileEditor();
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
+                        file = activeTab.getFile();
+                        if(file.isDirty()){
+                            saveMenuItem.enable();
+                            saveAsMenuItem.enable();
+                        } else {
+                            saveMenuItem.disable();
+                            saveAsMenuItem.enable();
+                        }
                     } else {
                         saveMenuItem.disable();
-                        saveAsMenuItem.enable();
+                        saveAsMenuItem.disable();
                     }
                 } else {
                     saveMenuItem.disable();
@@ -404,47 +411,57 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
 
                 if(file !== undefined){
-                    file = activeTab.getFile();
-                    if(file.isDirty()){
+                    var fileEditor = activeTab.getSiddhiFileEditor();
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
+                        file = activeTab.getFile();
+                        if(file.isDirty()){
+                            runMenuItem.disable();
+                            debugMenuItem.disable();
+                            stopMenuItem.disable();
+                            toolBar.disableRunButton();
+                            toolBar.disableDebugButton();
+                            toolBar.disableStopButton();
+                        } else {
+                            if(file.getRunStatus() || file.getDebugStatus()){
+                                runMenuItem.disable();
+                                debugMenuItem.disable();
+                                stopMenuItem.enable();
+                                toolBar.disableRunButton();
+                                toolBar.disableDebugButton();
+                                toolBar.enableStopButton();
+                            } else if(!file.getRunStatus()){
+                                if(!file.getDebugStatus()){
+                                    runMenuItem.enable();
+                                    debugMenuItem.enable();
+                                    stopMenuItem.disable();
+                                    toolBar.enableRunButton();
+                                    toolBar.enableDebugButton();
+                                    toolBar.disableStopButton();
+                                } else{
+                                    stopMenuItem.enable();
+                                    toolBar.enableStopButton();
+                                }
+                            } else if(!file.getDebugStatus()){
+                                if(!file.getRunStatus()){
+                                    runMenuItem.enable();
+                                    debugMenuItem.enable();
+                                    stopMenuItem.disable();
+                                    toolBar.enableRunButton();
+                                    toolBar.enableDebugButton();
+                                    toolBar.disableStopButton();
+                                } else{
+                                    stopMenuItem.enable();
+                                    toolBar.enableStopButton();
+                                }
+                            }
+                        }
+                    } else {
                         runMenuItem.disable();
                         debugMenuItem.disable();
                         stopMenuItem.disable();
                         toolBar.disableRunButton();
                         toolBar.disableDebugButton();
                         toolBar.disableStopButton();
-                    } else {
-                        if(file.getRunStatus() || file.getDebugStatus()){
-                            runMenuItem.disable();
-                            debugMenuItem.disable();
-                            stopMenuItem.enable();
-                            toolBar.disableRunButton();
-                            toolBar.disableDebugButton();
-                            toolBar.enableStopButton();
-                        } else if(!file.getRunStatus()){
-                            if(!file.getDebugStatus()){
-                                runMenuItem.enable();
-                                debugMenuItem.enable();
-                                stopMenuItem.disable();
-                                toolBar.enableRunButton();
-                                toolBar.enableDebugButton();
-                                toolBar.disableStopButton();
-                            } else{
-                                stopMenuItem.enable();
-                                toolBar.enableStopButton();
-                            }
-                        } else if(!file.getDebugStatus()){
-                            if(!file.getRunStatus()){
-                                runMenuItem.enable();
-                                debugMenuItem.enable();
-                                stopMenuItem.disable();
-                                toolBar.enableRunButton();
-                                toolBar.enableDebugButton();
-                                toolBar.disableStopButton();
-                            } else{
-                                stopMenuItem.enable();
-                                toolBar.enableStopButton();
-                            }
-                        }
                     }
                 } else {
                     runMenuItem.disable();
