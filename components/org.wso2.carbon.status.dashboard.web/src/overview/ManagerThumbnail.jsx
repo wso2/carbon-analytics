@@ -363,8 +363,10 @@ export default class ManagerThumbnail extends React.Component {
                 loadTrendImg = <div/>;
             } else {
                 loadAvg = <h1>{this.props.worker.serverDetails.workerMetrics.loadAverage}</h1>;
-                loadTrendImg = loadTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
-                    <TrendDown style={{color: 'green'}}/>
+                {
+                    loadTrendImg = loadTrend === constants.up ? <span style={{color: 'red'}}>˄</span> :
+                        <span style={{color: 'green'}}>˅</span>
+                }
             }
             if (this.props.worker.clusterInfo.haStatus === "Active") {
                 gridTiles =
