@@ -302,7 +302,7 @@ p.node-last-update {
 }
 
 .stream-indicator {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
@@ -310,7 +310,7 @@ p.node-last-update {
 }
 
 .table-indicator {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
@@ -318,7 +318,7 @@ p.node-last-update {
 }
 
 .trigger-indicator {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
@@ -326,7 +326,7 @@ p.node-last-update {
 }
 
 .window-indicator {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
@@ -334,7 +334,7 @@ p.node-last-update {
 }
 
 .query-indicator {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
@@ -342,7 +342,7 @@ p.node-last-update {
 }
 
 .function-indicator {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
@@ -350,7 +350,7 @@ p.node-last-update {
 }
 
 .aggregation-indicator {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
@@ -358,7 +358,7 @@ p.node-last-update {
 }
 
 .partition-type-colour {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
@@ -366,7 +366,7 @@ p.node-last-update {
 }
 
 .source-indicator {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
@@ -374,7 +374,7 @@ p.node-last-update {
 }
 
 .sink-indicator {
-    height: 60px;
+    height: 55px;
     width: 40px;
     float: left;
     margin: -2px 15px 1px 1px;
