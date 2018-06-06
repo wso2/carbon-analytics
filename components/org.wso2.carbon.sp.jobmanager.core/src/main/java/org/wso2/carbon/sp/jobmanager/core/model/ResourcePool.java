@@ -42,6 +42,7 @@ public class ResourcePool implements Serializable {
     private String groupId;
     private ManagerNode leaderNode;
     private Map<String, ResourceNode> resourceNodeMap;
+    private Map<String, ResourceNode> receiverNodeMap;
     /**
      * Map of parentSiddhiAppName -> List of SiddhiAppHolders.
      */
@@ -55,6 +56,7 @@ public class ResourcePool implements Serializable {
     public ResourcePool(String groupId) {
         this.groupId = groupId;
         this.resourceNodeMap = new ConcurrentHashMap<>();
+        this.receiverNodeMap = new ConcurrentHashMap<>();
         this.siddhiAppHoldersMap = new ConcurrentHashMap<>();
         this.appsWaitingForDeploy = new ConcurrentHashMap<>();
     }
@@ -92,6 +94,10 @@ public class ResourcePool implements Serializable {
         return resourceNodeMap;
     }
 
+    public Map<String, ResourceNode> getReceiverNodeMap() {
+        return receiverNodeMap;
+    }
+
     public void setResourceNodeMap(Map<String, ResourceNode> resourceNodeMap) {
         this.resourceNodeMap = resourceNodeMap;
     }
@@ -101,6 +107,18 @@ public class ResourcePool implements Serializable {
         LOG.info(String.format("%s added to the resource pool.", resourceNode));
         persist();
         poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
+    }
+
+    public void setReceiverNodeMap(Map<String, ResourceNode> receiverNodeMap){
+        this.receiverNodeMap = receiverNodeMap;
+    }
+
+    public void addReceiverNode(ResourceNode resourceNode){
+        this.receiverNodeMap.put(resourceNode.getId(),resourceNode);
+        LOG.info(String.format("%s added to the resource pool as a receiver node.", resourceNode));
+        persist();
+        poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
+
     }
 
     public void removeResourceNode(String nodeId) {

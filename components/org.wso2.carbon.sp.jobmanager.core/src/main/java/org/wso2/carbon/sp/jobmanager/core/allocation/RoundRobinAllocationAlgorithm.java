@@ -21,9 +21,9 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
-import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * RoundRobin Allocation Algorithm implementation
@@ -33,18 +33,17 @@ public class RoundRobinAllocationAlgorithm implements ResourceAllocationAlgorith
     private Iterator resourceIterator;
 
     @Override
-    public ResourceNode getNextResourceNode() {
+    public ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap) {
         DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
-        ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
-        if (deploymentConfig != null && resourcePool != null) {
-            if (resourcePool.getResourceNodeMap().size() >= deploymentConfig.getMinResourceCount()) {
+        if (deploymentConfig != null && !resourceNodeMap.isEmpty()) {
+            if (resourceNodeMap.size() >= deploymentConfig.getMinResourceCount()) {
                 if (resourceIterator == null) {
-                    resourceIterator = resourcePool.getResourceNodeMap().values().iterator();
+                    resourceIterator = resourceNodeMap.values().iterator();
                 }
                 if (resourceIterator.hasNext()) {
                     return (ResourceNode) resourceIterator.next();
                 } else {
-                    resourceIterator = resourcePool.getResourceNodeMap().values().iterator();
+                    resourceIterator = resourceNodeMap.values().iterator();
                     if (resourceIterator.hasNext()) {
                         return (ResourceNode) resourceIterator.next();
                     }

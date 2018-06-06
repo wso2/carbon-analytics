@@ -115,7 +115,14 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                 ResourceNode resourceNode = new ResourceNode(nodeConfig.getId());
                 resourceNode.setState(HeartbeatResponse.JoinedStateEnum.EXISTS.toString());
                 resourceNode.setHttpInterface(TypeConverter.convert(nodeConfig.getHttpInterface()));
-                resourcePool.addResourceNode(resourceNode);
+                if (nodeConfig.getWorkerMetrics() != null) {
+                    resourceNode.updateResourceMetrics(nodeConfig.getWorkerMetrics());
+                }
+                if(nodeConfig.isReceiverNode()){
+                    resourcePool.addReceiverNode(resourceNode);
+                } else {
+                    resourcePool.addResourceNode(resourceNode);
+                }
             } else {
                 InterfaceConfig existingIFace = TypeConverter.convert(existingResourceNode.getHttpInterface());
                 InterfaceConfig currentIFace = nodeConfig.getHttpInterface();

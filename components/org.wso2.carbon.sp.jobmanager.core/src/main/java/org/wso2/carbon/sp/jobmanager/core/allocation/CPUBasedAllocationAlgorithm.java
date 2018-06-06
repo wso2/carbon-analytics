@@ -22,7 +22,6 @@ import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
-import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,12 +38,11 @@ public class CPUBasedAllocationAlgorithm implements ResourceAllocationAlgorithm 
     private static final double PROCESS_CPU_WEIGHT = 1;
 
     @Override
-    public ResourceNode getNextResourceNode() {
+    public ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap) {
         DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
-        ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
-        if (deploymentConfig != null && resourcePool != null) {
-            if (resourcePool.getResourceNodeMap().size() >= deploymentConfig.getMinResourceCount()) {
-                Iterator resourceIterator = resourcePool.getResourceNodeMap().values().iterator();
+        if (deploymentConfig != null && !resourceNodeMap.isEmpty()) {
+            if (resourceNodeMap.size() >= deploymentConfig.getMinResourceCount()) {
+                Iterator resourceIterator = resourceNodeMap.values().iterator();
                 return getMaximumResourceNode(resourceIterator);
             } else {
                 logger.error("Minimum resource requirement did not match, hence not deploying the partial siddhi app ");
@@ -71,10 +69,13 @@ public class CPUBasedAllocationAlgorithm implements ResourceAllocationAlgorithm 
                         return e1.getValue().compareTo(e2.getValue());
                     }
                 });
+        if (logger.isDebugEnabled()) {
+            logger.debug("Next node to get allocated is " + node.getKey());
+        }
         return ServiceDataHolder.getResourcePool().getResourceNodeMap().get(node.getKey());
     }
 
-    private double calculateWorkerResourceMeasurement(ResourceNode resourceNode){
+    private double calculateWorkerResourceMeasurement(ResourceNode resourceNode) {
         double processCPU = resourceNode.getProcessCPU();
         double systemCPU = resourceNode.getSystemCPU();
         return (SYSTEM_CPU_WEIGHT * (1 - systemCPU)) + (PROCESS_CPU_WEIGHT * (1 - processCPU));

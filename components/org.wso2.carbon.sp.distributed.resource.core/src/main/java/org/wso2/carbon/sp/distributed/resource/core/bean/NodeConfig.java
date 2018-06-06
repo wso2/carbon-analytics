@@ -46,6 +46,11 @@ public class NodeConfig implements Serializable {
     private WorkerMetrics workerMetrics;
 
     /**
+     * Specify whether the resource node is type, ReceiverNode
+     */
+    private boolean isReceiverNode;
+
+    /**
      * Getter for the node id.
      *
      * @return id.
@@ -111,6 +116,16 @@ public class NodeConfig implements Serializable {
     public void setWorkerMetrics(WorkerMetrics workerMetrics) {
         this.workerMetrics = workerMetrics;
     }
+
+    public boolean isReceiverNode() {
+        return isReceiverNode;
+    }
+
+    public NodeConfig setReceiverNode(boolean receiverNode) {
+        isReceiverNode = receiverNode;
+        return this;
+    }
+
 
     @Override
     public String toString() {

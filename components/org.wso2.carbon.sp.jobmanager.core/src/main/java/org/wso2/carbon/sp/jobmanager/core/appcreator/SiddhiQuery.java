@@ -24,14 +24,17 @@ package org.wso2.carbon.sp.jobmanager.core.appcreator;
 public class SiddhiQuery {
     private String appName;
     private String app;
+    private boolean isReceiverQuery;
+    private int parallelism;
 
     private SiddhiQuery() {
         // Avoiding empty initialization
     }
 
-    public SiddhiQuery(String appName, String app) {
+    public SiddhiQuery(String appName, String app, boolean isReceiverQuery) {
         this.appName = appName;
         this.app = app;
+        this.isReceiverQuery = isReceiverQuery;
     }
 
     public String getAppName() {
@@ -50,6 +53,18 @@ public class SiddhiQuery {
     public SiddhiQuery setApp(String app) {
         this.app = app;
         return this;
+    }
+
+    public boolean isReceiverQuery() {
+        return isReceiverQuery;
+    }
+
+    public int getParallelism() {
+        return parallelism;
+    }
+
+    public void setParallelism(int parallelism) {
+        this.parallelism = parallelism;
     }
 
     @Override
