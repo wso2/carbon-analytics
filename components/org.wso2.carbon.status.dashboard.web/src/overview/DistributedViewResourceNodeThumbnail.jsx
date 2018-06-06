@@ -17,18 +17,18 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link} from 'react-router-dom';
 //Material UI
-import {CardActions, IconButton, Snackbar, Tooltip, Typography} from "material-ui-next";
-import {GridList, GridTile} from "material-ui";
+import {CardActions, IconButton, Snackbar, Tooltip, Typography} from 'material-ui-next';
+import {GridList, GridTile} from 'material-ui';
 
-import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
+import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
 
 //App Components
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import Clock from "./Clock";
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import Clock from './Clock';
 
 const styles = {
     gridList: {width: '100%', height: 150, margin: 0},
