@@ -86,14 +86,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.jsPlumbInstance.importDefaults({
                     PaintStyle: {
                         strokeWidth: 2,
-                        stroke: 'darkblue',
+                        stroke: '#424242',
                         outlineStroke: "transparent",
-                        outlineWidth: "5"
+                        outlineWidth: "3"
                         // lineWidth: 2
                     },
                     HoverPaintStyle: {
-                        strokeStyle: 'darkblue',
-                        strokeWidth: 3
+                        strokeStyle: '#424242',
+                        strokeWidth: 2
                     },
                     Overlays: [["Arrow", {location: 1.0, id: "arrow"}]],
                     DragOptions: {cursor: "crosshair"},
