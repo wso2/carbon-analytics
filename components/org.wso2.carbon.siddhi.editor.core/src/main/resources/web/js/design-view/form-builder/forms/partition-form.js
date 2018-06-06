@@ -29,7 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.consoleListManager = options.application.outputController;
-                this.jsPlumbInstance = options.jsPlumbInstance;
+                this.formUtils = options.formUtils;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
@@ -81,6 +81,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
                     annotations : annotations,
                     partitionKeys: partitionKeys
                 };
+                fillWith = self.formUtils.cleanJSONObject(fillWith);
                 var editor = new JSONEditor(formContainer[0], {
                     schema: {
                         type: "object",
@@ -152,10 +153,9 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
                 });
-                var editorPartitionKeys = editor.getEditor('root.partitionKeys');
                 // disable fields that can not be changed
                 for (var i = 0; i < partitionWithList.length; i++) {
-                    editorPartitionKeys.getEditor('root.partitionKeys.' + i + '.streamName').disable();
+                    editor.getEditor('root.partitionKeys.' + i + '.streamName').disable();
                 }
 
                 formContainer.append(self.formUtils.buildFormButtons(true));

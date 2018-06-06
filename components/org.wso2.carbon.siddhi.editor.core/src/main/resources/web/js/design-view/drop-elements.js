@@ -1061,10 +1061,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 containment: "grid-container",
                 drag:function(){
                     self.jsPlumbInstance.repaintEverything();
-                    // var connections = jsPlumb.getConnections(this);
-                    // $.each( connections, function(index,connection){
-                    //     jsPlumb.repaint(connection);
-                    // });
                 }
             });
 
@@ -1075,17 +1071,38 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 'left': mouseLeft
             });
 
-            // make a default connection point
-            var connectionIn = $('<div class="connectorInPart" >').attr('id', i + '-pc' + 1);
-            finalElement.append(connectionIn);
+            /*
+            * There will be always added a connection point by default. In the code to design mode we add a one extra
+            * connection point in order to user to add additional connection.
+            * */
+            var maxConnectionPoints = 1;
+            if(!isCodeToDesignMode) {
+                //add the new partition to the partition array
+                var partitionOptions = {};
+                _.set(partitionOptions, 'id', i);
+                var newPartition = new Partition(partitionOptions);
+                newPartition.setId(i);
+                self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
+            } else {
+                var partitionObject = self.configurationData.getSiddhiAppConfig().getPartition(i);
+                maxConnectionPoints = partitionObject.getPartitionWith().length + 1;
+            }
 
-            self.jsPlumbInstance.makeTarget(connectionIn, {
-                anchor: 'Left',
-                maxConnections: 1
-            });
-            self.jsPlumbInstance.makeSource(connectionIn, {
-                anchor: 'Right'
-            });
+            var iteratorValue;
+            // make connection points
+            for (iteratorValue = 1; iteratorValue <= maxConnectionPoints; iteratorValue++) {
+
+                var connectionIn = $('<div class="partitionConnectorInPart" >').attr('id', i + '_pc' + iteratorValue);
+                finalElement.append(connectionIn);
+
+                self.jsPlumbInstance.makeTarget(connectionIn, {
+                    anchor: 'Left',
+                    maxConnections: 1
+                });
+                self.jsPlumbInstance.makeSource(connectionIn, {
+                    anchor: 'Right'
+                });
+            }
 
             $(self.container).append(finalElement);
             self.jsPlumbInstance.addGroup({
@@ -1096,15 +1113,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 dropOverride:false,
                 draggable:false
             });
-
-            if(!isCodeToDesignMode) {
-                //add the new partition to the partition array
-                var partitionOptions = {};
-                _.set(partitionOptions, 'id', i);
-                var newPartition = new Partition(partitionOptions);
-                newPartition.setId(i);
-                self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
-            }
         };
 
         /**
