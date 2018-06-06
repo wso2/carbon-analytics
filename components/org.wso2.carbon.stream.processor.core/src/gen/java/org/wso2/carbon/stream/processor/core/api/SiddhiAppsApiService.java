@@ -53,4 +53,6 @@ public abstract class SiddhiAppsApiService {
 
     public abstract Response siddhiAppsStatsEnable(boolean statsEnabled, Request request) throws
             NotFoundException;
+
+    public abstract Response siddhiAppsElementsGet(String appName, Request request) throws NotFoundException;
 }

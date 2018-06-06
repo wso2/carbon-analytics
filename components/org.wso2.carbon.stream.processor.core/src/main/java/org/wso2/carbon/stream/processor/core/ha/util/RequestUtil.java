@@ -21,6 +21,7 @@ package org.wso2.carbon.stream.processor.core.ha.util;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 
@@ -43,9 +44,49 @@ public class RequestUtil {
      * @param uri the desired destination to which the http request should be sent
      * @return String containing the http response
      */
-    public static String sendRequest(URI uri, String username, String password) {
+    public static String requestAndGetResponseMessage(URI uri, String username, String password) {
 
-        HttpResponse response;
+        String content = "";
+        HttpClient client = HttpClients.createDefault();
+        HttpGet get = new HttpGet(uri);
+        get.addHeader("Accept", "application/json");
+        get.addHeader("Authorization", "Basic " + java.util.Base64.getEncoder().
+                encodeToString((username + ":" + password).getBytes(Charset.defaultCharset())));
+        if (log.isDebugEnabled()) {
+            log.debug("Passive Node: Sending GET request to Active Node to URI " + uri);
+        }
+        BufferedReader br = null;
+        InputStreamReader inputStreamReader = null;
+        try {
+            String output;
+            HttpResponse response = client.execute(get);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                inputStreamReader = new InputStreamReader(response.getEntity().getContent(), Charset.defaultCharset());
+                br = new BufferedReader(inputStreamReader);
+                while ((output = br.readLine()) != null) {
+                    content = output;
+                }
+            }
+        } catch (IOException e) {
+            log.error("Passive Node: Error occurred while connecting to Active Node using live state sync.", e);
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+                if (inputStreamReader != null) {
+                    inputStreamReader.close();
+                }
+                ((CloseableHttpClient) client).close();
+            } catch (IOException e) {
+                log.error("Passive Node: Error closing http client after sending request to Active Node to URI " + uri);
+            }
+        }
+        return content;
+    }
+
+    public static int requestAndGetStatusCode(URI uri, String username, String password) {
+
         HttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(uri);
         get.addHeader("Accept", "application/json");
@@ -56,31 +97,17 @@ public class RequestUtil {
         }
 
         try {
-            response = client.execute(get);
-            if (response.getStatusLine().getStatusCode() != 200) {
-                log.error("Failed in connection with active node using live state sync. HTTP error : "
-                        + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
-                return "";
-            }
+            HttpResponse response = client.execute(get);
+            return response.getStatusLine().getStatusCode();
         } catch (IOException e) {
-            log.error("Passive Node: Error occurred while connecting to Active Node using live state sync."
-                    , e);
-            return "";
-        }
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                response.getEntity().getContent(), Charset.defaultCharset()))) {
-            String output;
-            String content = null;
-            while ((output = br.readLine()) != null) {
-                content = output;
+            log.error("Passive Node: Error occurred while connecting to Active Node using live state sync.", e);
+            return 500;
+        } finally {
+            try {
+                ((CloseableHttpClient) client).close();
+            } catch (IOException e) {
+                log.error("Passive Node: Error closing http client after sending request to Active Node to URI " + uri);
             }
-            return content;
-
-        } catch (IOException e) {
-            log.error("Passive Node: Error occurred while reading response from Active Node using live" +
-                    " state sync.", e);
         }
-        return "";
     }
-
 }

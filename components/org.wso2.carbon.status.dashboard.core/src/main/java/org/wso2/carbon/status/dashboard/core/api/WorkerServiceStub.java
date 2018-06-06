@@ -97,4 +97,8 @@ public interface WorkerServiceStub {
     @Headers("Content-Type: application/json")
     @RequestLine("GET /resourceClusterWorkers/clusteredWorkerNodeDetails")
     Response getClusterNodeDetails();
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET siddhi-apps/{appName}/elements")
+    Response getSiddhiAppElements(@Param("appName") String appName);
 }

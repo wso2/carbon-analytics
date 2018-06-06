@@ -35,6 +35,7 @@ import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
 import Error403 from '../error-pages/Error403';
 import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
+import AppEventFlow from "./AppEventFlow";
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
@@ -506,6 +507,74 @@ export default class WorkerSpecific extends React.Component {
                         <CardText>
                             <SyntaxHighlighter language='sql'
                                                style={codeViewStyle}>{this.state.appText}</SyntaxHighlighter>
+                        </CardText>
+                    </Card>
+                </div>
+
+                <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '50%', backgroundColor: "#222222"}}>
+                    <Card style={{backgroundColor: "#282828", height: '50%'}}>
+                        <CardHeader title="Design View" subtitle={this.props.match.params.appName}
+                                    titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
+                        />
+                        <Divider/>
+
+                        <CardText style={{padding: '80px'}}>
+                            <ul class="legend">
+                                <li class="legend-key ">
+                                    <span class="legend-colour source-image" >
+
+                                    </span>
+                                    <span class="legend-text">Source</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour sink-image" >
+
+                                    </span>
+                                    <span class="legend-text">Sink</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour stream-image" >
+
+                                    </span>
+                                    <span class="legend-text">Stream</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour stream-image" >
+
+                                    </span>
+                                    <span class="legend-text">Stream</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour table-image" ></span>
+                                    <span class="legend-text">Table</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour window-image"></span>
+                                    <span class="legend-text">Window</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour trigger-image" ></span>
+                                    <span class="legend-text">Trigger</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour aggregation-image"></span>
+                                    <span class="legend-text">Aggregation</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour function-image"></span>
+                                    <span class="legend-text">Function</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour query-image"></span>
+                                    <span class="legend-text">Query</span>
+                                </li>
+                                <li class="legend-key ">
+                                    <span class="legend-colour partition-image"></span>
+                                    <span class="legend-text">Partition</span>
+                                </li>
+                            </ul>
+
+                            <AppEventFlow id={this.props.match.params.id} appName={this.props.match.params.appName}/>
                         </CardText>
                     </Card>
                 </div>

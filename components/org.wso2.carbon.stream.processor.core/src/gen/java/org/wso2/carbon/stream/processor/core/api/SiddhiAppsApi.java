@@ -214,6 +214,24 @@ public class SiddhiAppsApi implements Microservice {
     }
 
     @GET
+    @Path("/{appName}/elements")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Retrieves the  elements of the specified Siddhi Application.",
+            notes = "Retrieves the elements with the specified name.", response = InlineResponse200.class, tags =
+            {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Application is successfully " +
+                    "retrieved.", response = InlineResponse200.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not found.",
+                    response = InlineResponse200.class)})
+    public Response siddhiAppsElementsGet(
+            @Context Request request,
+            @ApiParam(value = "The name of the Siddhi Application", required = true)
+            @PathParam("appName") String appName) throws NotFoundException {
+        return delegate.siddhiAppsElementsGet(appName, request);
+    }
+
+    @GET
     @Path("/statistics")
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Fetches the statistics details of the Siddhi Applications.",

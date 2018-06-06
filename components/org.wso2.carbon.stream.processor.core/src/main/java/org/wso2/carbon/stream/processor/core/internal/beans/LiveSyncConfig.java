@@ -27,6 +27,7 @@ public class LiveSyncConfig {
     private boolean enabled;
     private String advertisedHost = "";
     private int advertisedPort = 0;
+    private int stateSyncTimeout = 60000;
     private String username;
     private String password;
 
@@ -52,6 +53,14 @@ public class LiveSyncConfig {
 
     public void setAdvertisedPort(int advertisedPort) {
         this.advertisedPort = advertisedPort;
+    }
+
+    public int getStateSyncTimeout() {
+        return stateSyncTimeout;
+    }
+
+    public void setStateSyncTimeout(int stateSyncTimeout) {
+        this.stateSyncTimeout = stateSyncTimeout;
     }
 
     public String getUsername() {

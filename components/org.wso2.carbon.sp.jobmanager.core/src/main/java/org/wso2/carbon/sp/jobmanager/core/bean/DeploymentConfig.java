@@ -31,6 +31,8 @@ public class DeploymentConfig implements Serializable {
     private static final long serialVersionUID = 1L;
     @Element(description = "deployment type (distributed/ha)", required = true)
     private String type;
+    @Element(description = "Allocation algorithm", required = true)
+    private String allocationAlgorithm = "org.wso2.carbon.sp.jobmanager.core.allocation.RoundRobinAllocationAlgorithm";
     @Element(description = "host:port configurations", required = true)
     private InterfaceConfig httpInterface;
     private int heartbeatInterval = 10000;
@@ -121,4 +123,11 @@ public class DeploymentConfig implements Serializable {
         this.zooKeeperConfig = zooKeeperConfig;
     }
 
+    public String getAllocationAlgorithm() {
+        return allocationAlgorithm;
+    }
+
+    public void setAllocationAlgorithm(String allocationAlgorithm) {
+        this.allocationAlgorithm = allocationAlgorithm;
+    }
 }
