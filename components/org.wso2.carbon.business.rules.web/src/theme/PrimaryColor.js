@@ -16,8 +16,20 @@
  *  under the License.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import BusinessRulesManagerRouter from './components/BusinessRulesManagerRouter';
-
-ReactDOM.render(<BusinessRulesManagerRouter />, document.getElementById('root'));
+export const PrimaryColor = {
+    50: '#fbe9e7',
+    100: '#ffccbc',
+    200: '#ffab91',
+    300: '#ff8a65',
+    400: '#ff7043',
+    500: '#ff4f01',
+    600: '#f4511e',
+    700: '#e4501e',
+    800: '#ea5000',
+    900: '#d64a00',
+    A100: '#ff9e80',
+    A200: '#ff6e40',
+    A400: '#f24b00',
+    A700: '#ff6d00',
+    contrastDefaultColor: 'light',
+};

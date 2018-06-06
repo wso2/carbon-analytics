@@ -16,73 +16,53 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 // Material UI Components
 import Typography from 'material-ui/Typography';
-import CreateButton from './CreateButton';
 import Grid from 'material-ui/Grid';
-// App Constants
-import BusinessRulesConstants from '../constants/BusinessRulesConstants';
 // App Components
-import Header from './common/Header';
-// CSS
-import '../index.css';
+import Header from '../../common/Header';
+import ModeButton from './ModeButton';
+// App Constants
+import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
+// Styles
+import Styles from '../../../style/Styles';
+import '../../../index.css';
 
 /**
- * App context.
+ * Represents the page that allows to select a mode for creating a business rule
  */
-const appContext = window.contextPath;
-
-/**
- * Styles related to this component
- */
-const styles = {
-    root: {
-        flexGrow: 1,
-    },
-    control: {
-        padding: 5,
-    },
-    paper: {
-        maxWidth: 400,
-        paddingTop: 30,
-        paddingBottom: 30
-    },
-    spacing: '40'
-};
-
-/**
- * Allows to create a Business Rule either from scratch or from a Template
- */
-class BusinessRuleCreator extends React.Component {
-    render() {
+export default class ModeSelector extends Component {
+    /**
+     * Displays content of the page
+     * @returns {HTMLElement}       Content of the page
+     */
+    displayContent() {
         return (
             <div>
-                <Header />
-                <br />
-                <br />
                 <center>
                     <Typography type="headline">
                         Choose an option
                     </Typography>
-                    <br/>
-                    <br/>
-                    <Grid container style={styles.root}>
+                    <br />
+                    <br />
+                    <Grid container style={Styles.grid.root}>
                         <Grid item xs={12}>
-                            <Grid container justify="center" spacing={Number(styles.spacing)}>
+                            <Grid container justify="center" spacing={40}>
                                 <Grid item>
-                                    <CreateButton
+                                    <ModeButton
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
                                         title="From Template"
                                         description="Create a business rule based on an existing template"
                                     />
                                 </Grid>
                                 <Grid item>
-                                    <CreateButton
+                                    <ModeButton
                                         mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
                                         title="From Scratch"
-                                        description="Create a business rules with templates for input & output,
-                                        and customized filters"
+                                        description={
+                                            'Create a business rules with templates for input & output, ' +
+                                            'and customized filters'}
                                     />
                                 </Grid>
                             </Grid>
@@ -92,6 +72,15 @@ class BusinessRuleCreator extends React.Component {
             </div>
         );
     }
-}
 
-export default BusinessRuleCreator;
+    render() {
+        return (
+            <div>
+                <Header />
+                <br />
+                <br />
+                {this.displayContent()}
+            </div>
+        );
+    }
+}

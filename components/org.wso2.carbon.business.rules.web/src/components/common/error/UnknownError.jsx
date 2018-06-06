@@ -17,7 +17,29 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import BusinessRulesManagerRouter from './components/BusinessRulesManagerRouter';
+// Material UI Components
+import Typography from 'material-ui/Typography';
+import Paper from 'material-ui/Paper';
+// Styles
+import Styles from '../../../style/Styles';
+import '../../../index.css';
 
-ReactDOM.render(<BusinessRulesManagerRouter />, document.getElementById('root'));
+/**
+ * Represents an Unknown Error message display
+ */
+class UnknownError extends React.Component {
+    render() {
+        return (
+            <Paper style={Styles.messageContainer}>
+                <Typography type="title">
+                    Unknown Error
+                </Typography>
+                <Typography type="subheading">
+                    Something went wrong while processing your request
+                </Typography>
+            </Paper>
+        );
+    }
+}
+
+export default UnknownError;

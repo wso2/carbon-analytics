@@ -16,44 +16,29 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 // Material UI Components
 import { CircularProgress } from 'material-ui/Progress';
 import { Typography } from 'material-ui';
 import Paper from 'material-ui/Paper';
-// CSS
-import '../index.css';
+// Styles
+import Styles from '../../style/Styles';
+import '../../index.css';
 
 /**
- * Styles related to this component
+ * Represents the progress display, shown while loading a page
  */
-const styles = {
-    progress: {
-        color: '#EF6C00',
-    },
-    paper: {
-        maxWidth: 400,
-        paddingTop: 30,
-        paddingBottom: 30
-    },
-};
-
-/**
- * Represents circular progress
- */
-class ProgressDisplay extends React.Component {
+export default class ProgressDisplay extends Component {
     render() {
         return (
-            <div>
-                <Paper style={styles.paper}>
-                    <CircularProgress size={50}/>
+            <center>
+                <Paper style={Styles.messageContainer}>
+                    <CircularProgress size={50} />
                     <Typography type="subheading">
                         Please wait
                     </Typography>
                 </Paper>
-            </div>
+            </center>
         );
     }
 }
-
-export default ProgressDisplay;

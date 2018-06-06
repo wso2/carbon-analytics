@@ -14,27 +14,32 @@
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
  *  under the License.
- *
  */
 
-import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-// Auth Utils
-import AuthManager from '../../utils/AuthManager';
-
-/**
- * App context.
- */
-const appContext = window.contextPath;
+import React from 'react';
+// Material UI Components
+import Typography from 'material-ui/Typography';
+import Paper from 'material-ui/Paper';
+// Styles
+import Styles from '../../../style/Styles';
+import '../../../index.css';
 
 /**
- * Logout Component
+ * Represents an Internal Server Error message display
  */
-export default class Logout extends Component {
+class InternalServerError extends React.Component {
     render() {
-        AuthManager.logout();
         return (
-            <Redirect to={{ pathname: `${appContext}/login` }} />
+            <Paper style={Styles.messageContainer}>
+                <Typography type="title">
+                    Internal Server Error
+                </Typography>
+                <Typography type="subheading">
+                    The server has failed to process your request
+                </Typography>
+            </Paper>
         );
     }
 }
+
+export default InternalServerError;
