@@ -18,27 +18,29 @@
 
 package org.wso2.carbon.data.provider.siddhi.config;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.wso2.carbon.data.provider.ProviderConfig;
 
 public class SiddhiDataProviderConfig implements ProviderConfig {
 
     private String siddhiApp;
-    private String query;
+    private JsonElement queryData;
     private int publishingInterval;
 
 
     public SiddhiDataProviderConfig() {
-        this.query = "";
+        this.queryData = new JsonObject();
         this.siddhiApp = "";
         this.publishingInterval = 5;
     }
 
-    public String getQuery() {
-        return query;
+    public JsonElement getQueryData() {
+        return queryData;
     }
 
-    public void setQuery(String query) {
-        this.query = query;
+    public void setQueryData(JsonElement queryData) {
+        this.queryData = queryData;
     }
 
     public String getSiddhiAppContext() {

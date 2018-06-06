@@ -59,10 +59,10 @@ public class DistributionManagerServiceImpl implements DistributionService {
     @Override
     public DeploymentStatus distribute(String userDefinedSiddhiApp) {
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(userDefinedSiddhiApp);
-        List<DeployableSiddhiQueryGroup> deployableQueryGroup = appCreator.createApps(topology);
+        List<DeployableSiddhiQueryGroup> deployableQueryGroupList = appCreator.createApps(topology);
         serviceHolder.put(topology.getName(), userDefinedSiddhiApp);
         ServiceDataHolder.setUserDefinedSiddhiApp(serviceHolder);
-        return deploymentManager.deploy(new DistributedSiddhiQuery(topology.getName(), deployableQueryGroup));
+        return deploymentManager.deploy(new DistributedSiddhiQuery(topology.getName(), deployableQueryGroupList));
     }
 
     @Override

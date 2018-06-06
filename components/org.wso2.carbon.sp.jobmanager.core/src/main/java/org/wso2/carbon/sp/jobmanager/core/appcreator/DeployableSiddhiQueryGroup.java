@@ -28,10 +28,12 @@ public class DeployableSiddhiQueryGroup {
 
     private String groupName;
     private List<SiddhiQuery> siddhiQueries;
+    private boolean isReceiverQueryGroup;
 
     public DeployableSiddhiQueryGroup(String groupName) {
         this.groupName = groupName;
         siddhiQueries = new ArrayList<>();
+        isReceiverQueryGroup = false;
     }
 
     public List<SiddhiQuery> getSiddhiQueries() {
@@ -44,6 +46,14 @@ public class DeployableSiddhiQueryGroup {
 
     public String getGroupName() {
         return groupName;
+    }
+
+    public boolean isReceiverQueryGroup() {
+        return isReceiverQueryGroup;
+    }
+
+    public void setReceiverQueryGroup(boolean receiverQueryGroup) {
+        isReceiverQueryGroup = receiverQueryGroup;
     }
 
     @Override
