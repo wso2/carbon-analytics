@@ -1137,7 +1137,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             // Create a new graph instance
             var graph = new dagre.graphlib.Graph({compound: true});
             // Sets the graph to grow from left to right
-            graph.setGraph({rankdir: "LR"});
+            graph.setGraph({rankdir: 'LR', edgesep: 10, ranksep: 100, nodesep: 50});
             // This sets the default edge label to `null` as edges/arrows in the design view will
             // never have any labels/names to display on the screen
             graph.setDefaultEdgeLabel(function () {

@@ -125,10 +125,8 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (StreamConfig stream : streamList) {
-            if (stream.isInnerStream()) {
-                continue;
-            } else if (stream.getName() == null || stream.getName().isEmpty()) {
-                throw new CodeGenerationException("The name of the given StreamConfig is null/empty");
+            if (stream.getName() == null || stream.getName().isEmpty()) {
+                throw new CodeGenerationException("The name of the given StreamConfig object is null/empty");
             }
 
             for (SourceSinkConfig source : sourceList) {
@@ -682,7 +680,7 @@ public class CodeGenerator {
 
         partitionStringBuilder.append(SiddhiStringBuilderConstants.PARTITION_WITH)
                 .append(SiddhiStringBuilderConstants.OPEN_BRACKET)
-                .append(partition.getPartitionWith())
+                .append(CodeGeneratorHelper.getPartitionWith(partition.getPartitionWith()))
                 .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
                 .append(SiddhiStringBuilderConstants.NEW_LINE)
                 .append(SiddhiStringBuilderConstants.BEGIN)
@@ -706,7 +704,8 @@ public class CodeGenerator {
         if (sourceSink == null) {
             throw new CodeGenerationException("The given SourceSinkConfig object is null");
         } else if (sourceSink.getAnnotationType() == null || sourceSink.getAnnotationType().isEmpty()) {
-            throw new CodeGenerationException("The annotation type for the given SourceSinkConfig object is null/empty");
+            throw new CodeGenerationException("The annotation type for the given" +
+                    " SourceSinkConfig object is null/empty");
         } else if (sourceSink.getType() == null || sourceSink.getType().isEmpty()) {
             throw new CodeGenerationException("The type of source/sink for the given SourceSinkConfig is null/empty");
         }

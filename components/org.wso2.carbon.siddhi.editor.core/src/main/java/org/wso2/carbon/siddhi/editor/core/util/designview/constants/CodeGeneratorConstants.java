@@ -49,7 +49,7 @@ public class CodeGeneratorConstants {
     public static final String EXPIRED_EVENTS = "EXPIRED_EVENTS";
     public static final String ALL_EVENTS = "ALL_EVENTS";
 
-    public static final String PRIMARY_KEY_ANNOTATION = "@primarykey";
+    public static final String PRIMARY_KEY_ANNOTATION = "@PRIMARYKEY";
 
     private CodeGeneratorConstants() {
     }

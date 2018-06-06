@@ -116,7 +116,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     _.forEach(this.tabController.getTabList(), function (tab) {
                         if (tab.getTitle() !== "welcome-page") {
                             tab.getSiddhiFileEditor().on("view-switch", function () {
-                                self.workspaceManager.updateUndoRedoMenus();
+                                self.workspaceManager.updateMenuItems();
                             });
                         }
                     });
