@@ -178,4 +178,8 @@ public class SiddhiAppConfig {
     public List<FunctionConfig> getFunctionList() {
         return functionList;
     }
+
+    public List<PartitionConfig> getPartitionList() {
+        return partitionList;
+    }
 }
