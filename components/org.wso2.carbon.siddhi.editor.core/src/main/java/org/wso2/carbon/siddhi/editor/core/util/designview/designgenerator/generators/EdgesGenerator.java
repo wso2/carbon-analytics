@@ -59,6 +59,7 @@ public class EdgesGenerator {
         edges.addAll(
                 generateJoinQueryEdges(
                         siddhiAppConfig.getQueryLists().get(QueryListType.JOIN)));
+        edges.addAll(generateAggregationEdges(siddhiAppConfig.getAggregationList()));
         return edges;
     }
 
@@ -91,7 +92,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges related to a WindowFilterProjection Queries
+     * Generates Edges related to WindowFilterProjection Queries
      * @param windowFilterProjectionQueryList       List of WindowFilterProjection QueryConfigs
      * @return                                      List of Edges
      * @throws DesignGenerationException            Error while generating edges
@@ -114,7 +115,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges related to a Join Queries
+     * Generates Edges related to Join Queries
      * @param joinQueryList                         List of Join QueryConfigs
      * @return                                      List of Edges
      * @throws DesignGenerationException            Error while generating edges
@@ -137,6 +138,24 @@ public class EdgesGenerator {
                     generateEdge(
                             query,
                             getElementWithStreamName(query.getQueryOutput().getTarget())));
+        }
+        return edges;
+    }
+
+    /**
+     * Generates Edges related to Aggregations
+     * @param aggregationConfigList             List of AggregationConfigs
+     * @return                                  List of Edges
+     * @throws DesignGenerationException        Error while generating Edges
+     */
+    private List<Edge> generateAggregationEdges(List<AggregationConfig> aggregationConfigList)
+        throws DesignGenerationException {
+        List<Edge> edges = new ArrayList<>();
+        for (AggregationConfig aggregation : aggregationConfigList) {
+            edges.add(
+                    generateEdge(
+                            getElementWithStreamName(aggregation.getFrom()),
+                            aggregation));
         }
         return edges;
     }

@@ -112,10 +112,9 @@ public class EventFlowBuilder {
 
     /**
      * Loads Streams from the SiddhiAppRuntime
-     * @return                                  A reference to this object
-     * @throws DesignGenerationException        Error while loading elements
+     * @return      A reference to this object
      */
-    public EventFlowBuilder loadStreams() throws DesignGenerationException {
+    public EventFlowBuilder loadStreams() {
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
         Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
         for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitionMap.entrySet()) {
@@ -214,13 +213,13 @@ public class EventFlowBuilder {
      */
     public EventFlowBuilder loadExecutionElements() throws DesignGenerationException {
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
-        PartitionConfigGenerator partitionConfigGenerator = new PartitionConfigGenerator(siddhiAppString, siddhiApp);
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
                 QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement);
                 siddhiAppConfig.addQuery(QueryConfigGenerator.getQueryListType(queryConfig), queryConfig);
             } else if (executionElement instanceof Partition) {
-                siddhiAppConfig.add(partitionConfigGenerator.generatePartitionConfig((Partition) executionElement));
+                // To disable Partitions in front end
+                throw new DesignGenerationException("Partitions are not supported");
             } else {
                 throw new DesignGenerationException("Unable create config for execution element of type unknown");
             }
