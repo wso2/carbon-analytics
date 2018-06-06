@@ -44,15 +44,16 @@ const constants = {memory: "memory", cpu: "cpu", load: "load", down: "down", up:
 
 const styles = {
     gridList: {width: '100%', height: 150, margin: 0},
+    overviewGridList: {width: '90%', padding: 40},
     smallIcon: {width: 20, height: 20, zIndex: 1, padding: 5},
     overviewLegend: {fontSize: 10, color: '#fff'},
     legendContainer: {width: '100%', textAlign: 'center', position: 'absolute', bottom: 5},
     root: {
-        display: 'flex',
+
         flexWrap: 'wrap',
         justifyContent: 'space-around',
         backgroundColor: '#222222',
-        width: '100%'
+        width: '300%'
     },
     h3: {color: 'white', marginLeft: '4%', backgroundColor: '#222222'},
     h3Title: {color: '#C0C0C0', marginLeft: '4%', backgroundColor: '#222222'},
@@ -213,34 +214,22 @@ export default class ManagerThumbnail extends React.Component {
                 Object.keys(workersList).map((id, workerList) => {
                     if (id === 'ResourceCluster') {
                         return (
-                            <div style={{marginLeft: '-200px', height: '200%'}}>
+                            <div style={{marginLeft: '-8%'}}>
                                 <h4 style={styles.h3Title}>Workers</h4>
-                                <div style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    width: '290%',
-                                    height: '200%',
-                                    padding: '40px',
-                                    justifyContent: 'space-around',
-                                    backgroundColor: '#222222'
-                                }}>
+                                <div style={styles.root}>
 
-                                    <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                    <GridList cols={3} cellHeight='100%' style={styles.overviewGridList}>
                                         {workersList[id].map((worker) => {
                                             if (worker.statusMessage === "Please add the node manually.") {
                                                 return (
-                                                    <div>
-                                                        <DistributedViewResourceNodeThumbnail worker={worker}
-                                                                                              currentTime={new Date()
-                                                                                                  .getTime()}/>
-                                                    </div>
+                                                    <DistributedViewResourceNodeThumbnail worker={worker}
+                                                                                          currentTime={new Date()
+                                                                                              .getTime()}/>
                                                 )
                                             } else {
                                                 return (
-                                                    <div>
-                                                        <WorkerThumbnail worker={worker}
-                                                                         currentTime={new Date().getTime()}/>
-                                                    </div>
+                                                    <WorkerThumbnail worker={worker}
+                                                                     currentTime={new Date().getTime()}/>
                                                 )
                                             }
                                         })}
@@ -273,7 +262,7 @@ export default class ManagerThumbnail extends React.Component {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={98} style={styles.gridList}>
                         <h2 style={{textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>Manager is not
-                                                                                                    reachable!</h2>
+                            reachable!</h2>
                     </GridList>
                 </div>;
                 lastUpdated = "N/A";
@@ -297,7 +286,7 @@ export default class ManagerThumbnail extends React.Component {
             gridTiles = <div>
                 <GridList cols={2} cellHeight={98} style={styles.gridList}>
                     <GridTile>
-                        <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
+                        <div style={{display: 'flex', alignItems: 'center'}}>
                             <h4 style={{
                                 textAlign: 'center',
                                 color: '#dedede',
@@ -411,7 +400,8 @@ export default class ManagerThumbnail extends React.Component {
                                 <GridTile>
                                     <div className="grid-tile-h1" style={{
                                         display: 'flex',
-                                        alignItems: 'center', height: '100%'
+                                        alignItems: 'center', height: '100%',
+                                        justifyContent: 'center'
                                     }}>
                                         {loadAvg}</div>
                                     <div style={styles.legendContainer}>
@@ -537,7 +527,7 @@ export default class ManagerThumbnail extends React.Component {
         ];
         let titleBg = items[2] === 'red' ? '#570404' : '#424242';
         return (
-            <div style={styles.root}>
+            <div style={styles.background}>
                 <Dialog
                     title="Confirmation"
                     actions={actionsButtons}
@@ -581,10 +571,9 @@ export default class ManagerThumbnail extends React.Component {
                           onRequestClose={() => {
                               this.setState({showMsg: false, message: ""})
                           }}/>
-                <div>
 
-                    {this.renderWorkers(this.state.resourceClustersList)}
-                </div>
+                {this.renderWorkers(this.state.resourceClustersList)}
+
             </div>
         );
     }
