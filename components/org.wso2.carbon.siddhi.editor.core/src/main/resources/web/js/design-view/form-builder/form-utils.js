@@ -84,5 +84,20 @@ define(['require', 'lodash'],
             return objectElement;
         };
 
+        /**
+         * @function Builds HTML for form buttons.
+         * @param includeCancel boolean Show cancel button
+         * @returns {string} HTML string
+         */
+        FormUtils.prototype.buildFormButtons = function (includeCancel) {
+            var html = '<div class="query-form-actions">' +
+                '<button type="button" id="btn-submit" class="btn btn-primary">Save</button>';
+            if (includeCancel) {
+                html += '<button type="button" id="btn-cancel" class="btn btn-default">Cancel</button>';
+            }
+            html += '</div>';
+            return html;
+        };
+
         return FormUtils;
     });

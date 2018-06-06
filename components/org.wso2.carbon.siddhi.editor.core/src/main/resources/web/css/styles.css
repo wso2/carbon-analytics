@@ -531,3 +531,8 @@ body.sticky-footer {
   border-radius: .25rem;
   margin-right: 20px;
 }
+
+/* Query form styles */
+.query-form-actions > .btn {
+  margin-right: 5px;
+}
