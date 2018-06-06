@@ -30,7 +30,6 @@ define(['require', 'elementUtils'],
              Data storing structure as follows
                 id: '',
                 name: '',
-                isInnerStream: {boolean},
                 attributeList: [
                     {
                         name: ‘’,
@@ -42,7 +41,6 @@ define(['require', 'elementUtils'],
             if (options !== undefined) {
                 this.id = options.id;
                 this.name = options.name;
-                this.isInnerStream = options.isInnerStream;
             }
             this.attributeList = [];
             this.annotationList = [];
@@ -72,10 +70,6 @@ define(['require', 'elementUtils'],
             return this.name;
         };
 
-        Stream.prototype.getIsInnerStream = function () {
-            return this.isInnerStream;
-        };
-
         Stream.prototype.getAttributeList = function () {
             return this.attributeList;
         };
@@ -90,10 +84,6 @@ define(['require', 'elementUtils'],
 
         Stream.prototype.setName = function (name) {
             this.name = name;
-        };
-
-        Stream.prototype.setIsInnerStream = function (isInnerStream) {
-            this.isInnerStream = isInnerStream;
         };
 
         Stream.prototype.setAttributeList = function (attributeList) {

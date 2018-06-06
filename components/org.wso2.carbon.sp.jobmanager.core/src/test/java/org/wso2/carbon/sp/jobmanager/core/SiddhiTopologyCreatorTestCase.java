@@ -827,8 +827,8 @@ public class SiddhiTopologyCreatorTestCase {
                 + "From filteredStockStream#window.lengthBatch(4)\n"
                 + "Select symbol, avg(price) as avgPrice, quantity\n"
                 + "Insert into #avgPriceStream;\n"
-                + "From #avgPriceStream#window.time(5 min) as a r" +
-                "ight outer join companyTriggerInternalStream#window.length(1)\n"
+                + "From #avgPriceStream#window.time(5 min) as a " +
+                "right outer join companyTriggerInternalStream#window.length(1)\n"
                 + "On (companyTriggerInternalStream.symbol == a.symbol)\n"
                 + "Select a.symbol, a.avgPrice, a.quantity\n"
                 + "Insert into triggeredAvgStream;\n"
@@ -1139,35 +1139,32 @@ public class SiddhiTopologyCreatorTestCase {
     public void testUsergivenSourceNoGroup() {
         //Need to update after fixing the passthrough case
         String siddhiApp = "@App:name('TestPlan12') \n"
-                + "@source(type='kafka', topic.list='TestPlan12.stockStream', group.id='1', threading.option='single"
-                + ".thread', bootstrap.servers='localhost:9092', @map(type='xml'))  "
+                + "@source(type='inMemory', topic='stock', @map(type='json'))  "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
-                + "@source(type='kafka', topic.list='TestPlan12.companyTriggerStream', group.id='1', threading"
-                + ".option='single"
-                + ".thread', bootstrap.servers='localhost:9092', @map(type='xml'))"
+                + "@source(type='inMemory', topic='companyTrigger', @map(type='json'))"
                 + "Define stream companyTriggerStream(symbol string);\n"
-                + "@info(name = 'query1')@dist(parallel='2', execGroup='001')\n"
+                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
                 + "From stockStream[price > 100]\n"
                 + "Select *\n"
                 + "Insert into filteredStockStream;\n"
-                + "@info(name = 'query2')@dist(parallel='2', execGroup='001')\n"
+                + "@info(name = 'query2')@dist(parallel='3', execGroup='001')\n"
                 + "From companyTriggerStream \n"
                 + "Select *\n"
                 + "Insert into SymbolStream;\n"
                 + "@info(name = 'query3')@dist(parallel='3', execGroup='002')\n"
-                + "From stockStream[price < 100]\n"
+                + "From stockStream\n"
                 + "Select *\n"
                 + "Insert into LowStockStream;\n"
                 + "@info(name='query4')@dist(parallel='3', execGroup='002')\n"
                 + "Partition with (symbol of filteredStockStream)\n"
                 + "begin\n"
-                + "From filteredStockStream#window.time(5 min)\n"
+                + "From filteredStockStream#window.lengthBatch(2)\n"
                 + "Select symbol, avg(price) as avgPrice, quantity\n"
                 + "Insert into #avgPriceStream;\n"
                 + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerStream#window.length"
-                + "(1)\n"
+                + "(1) \n"
                 + "On (companyTriggerStream.symbol == a.symbol)\n"
-                + "Select a.symbol, a.avgPrice, a.quantity\n"
+                + "Select a.symbol, a.avgPrice, a.quantity, companyTriggerStream.symbol as sss\n"
                 + "Insert into triggeredAvgStream;\n"
                 + "End;\n";
 
@@ -1175,11 +1172,41 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
-        for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (SiddhiQuery query : group.getSiddhiQueries()) {
-                SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query.getApp());
+        SiddhiManager siddhiManager = new SiddhiManager();
+        try {
+            Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = createSiddhiAppRuntimes(siddhiManager,
+                    queryGroupList);
+
+            for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get("TestPlan12-002")) {
+                runtime.addCallback("triggeredAvgStream", new StreamCallback() {
+                    @Override public void receive(Event[] events) {
+                        EventPrinter.print(events);
+                        count.addAndGet(events.length);
+                        for (Event event : events) {
+                            if (event.getData()[0].equals("WSO2")) {
+                                errorAssertionCount.incrementAndGet();
+                                Assert.assertEquals(event.getData()[1], 225.0);
+                                errorAssertionCount.decrementAndGet();
+                            }
+                        }
+                    }
+                });
             }
+
+
+            InMemoryBroker.publish("stock", "{\"event\":{\"symbol\":\"WSO2\", \"price\":200, \"quantity\":20, \"tier\":\"middleware\"}}");
+            InMemoryBroker.publish("stock", "{\"event\":{\"symbol\":\"WSO2\", \"price\":250, \"quantity\":20, \"tier\":\"middleware\"}}");
+            Thread.sleep(1000);
+            InMemoryBroker.publish("companyTrigger", "{\"event\":{\"symbol\":\"WSO2\"}}");
+
+            SiddhiTestHelper.waitForEvents(100, 1, count, 2000);
+            Assert.assertEquals(count.intValue(), 1);
+            Assert.assertEquals(errorAssertionCount.intValue(), 0, "No assertion errors should occur " +
+                    "inside callbacks");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            siddhiManager.shutdown();
         }
 
     }

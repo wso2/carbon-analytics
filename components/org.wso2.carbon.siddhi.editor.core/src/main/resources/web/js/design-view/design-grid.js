@@ -86,14 +86,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.jsPlumbInstance.importDefaults({
                     PaintStyle: {
                         strokeWidth: 2,
-                        stroke: 'darkblue',
+                        stroke: '#424242',
                         outlineStroke: "transparent",
-                        outlineWidth: "5"
+                        outlineWidth: "3"
                         // lineWidth: 2
                     },
                     HoverPaintStyle: {
-                        strokeStyle: 'darkblue',
-                        strokeWidth: 3
+                        strokeStyle: '#424242',
+                        strokeWidth: 2
                     },
                     Overlays: [["Arrow", {location: 1.0, id: "arrow"}]],
                     DragOptions: {cursor: "crosshair"},
@@ -266,6 +266,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                             connectionValidity = true;
                         }
                     }
+                    else if (targetElement.hasClass(constants.AGGREGATION)) {
+                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
+                            alert("Invalid Connection: Aggregation input should be a stream or trigger");
+                        } else {
+                            connectionValidity = true;
+                        }
+                    }
                     else if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
                         if(!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                             alert("Invalid Connection");
@@ -425,6 +432,17 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         }
                         self.configurationData.getSiddhiAppConfig().getSink(targetId)
                             .setConnectedElementName(connectedElementName);
+                    } else if (targetElement.hasClass(constants.AGGREGATION)
+                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
+                        if (sourceElement.hasClass(constants.STREAM)) {
+                            connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
+                                .getName();
+                        } else if (sourceElement.hasClass(constants.TRIGGER)) {
+                            connectedElementName = self.configurationData.getSiddhiAppConfig().getTrigger(sourceId)
+                                .getName();
+                        }
+                        self.configurationData.getSiddhiAppConfig().getAggregation(targetId)
+                            .setFrom(connectedElementName);
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)) {
@@ -723,9 +741,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))){
                         self.configurationData.getSiddhiAppConfig().getSink(sourceId)
                             .setConnectedElementName(undefined);
-                    }
-
-                    if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
+                    } else if (targetElement.hasClass(constants.AGGREGATION)
+                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
+                        self.configurationData.getSiddhiAppConfig().getAggregation(targetId).setFrom(undefined);
+                    } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)) {
 
@@ -788,14 +807,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
                             model.getQueryInput().removeConnectedElementName(disconnectedElementName);
-                            return;
                         } else if (targetElement.hasClass(constants.SEQUENCE)) {
                             model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
                             model.getQueryInput().removeConnectedElementName(disconnectedElementName);
-                            return;
                         }
-                    }
-                    if (sourceElement.hasClass(constants.STREAM) && targetElement.hasClass(constants.PARTITION)) {
+                    } else if (sourceElement.hasClass(constants.STREAM) && targetElement.hasClass(constants.PARTITION)) {
                         model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
                         if (model !== undefined) {
                             var removedPartitionKey = null;
@@ -880,7 +896,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         }
                     }
 
-                    if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
+                    else if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                         || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                             || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.JOIN)
@@ -905,7 +921,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             }
 
             function addMemberToPartitionGroup(self) {
-                // TODO: isInner boolean should be set when adding to the partition.
+                //TODO: check for same connection point connecting to itself scenario. It should be invalid connection.
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
                     // if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                     //     || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
@@ -1451,16 +1467,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        //TODO: Reduce code duplication. Handle definitions in a one method.
         DesignGrid.prototype.handleAggregation = function (mouseTop, mouseLeft, isCodeToDesignMode, aggregationId, aggregationName) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a stream element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(aggregationId !== undefined) {
                     elementId = aggregationId;

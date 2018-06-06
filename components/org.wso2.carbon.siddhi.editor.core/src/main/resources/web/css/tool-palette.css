@@ -1,31 +1,30 @@
 
 .tool-palette-container{
     border-right: 1px solid #c9c9c9;
-    background-color: #fff;
+    background-color: #e7eaeb;
     height: 100%;
-    width: 80px;
-    overflow-y: scroll;
+    width: 156px;
+    overflow-y: auto;
 }
 
 .tool-group{
     width: 100%;
     border-bottom: 1px solid #e4e4e4;
     overflow: hidden;
-    padding: 0 9px 10px 9px;
+    padding: 10px;
 }
 
 .tool-container {
-    width: 50px;
-    height: 50px;
+    width: 39px;
+    height: 39px;
     margin: 3px;
     float: left;
     cursor: pointer;
-    border-style: solid;
-    border-color: lightgrey;
-    border-width: 1px;
+    border: 1px solid #ccc;
     padding: 3px;
     white-space: nowrap;
     text-align: center;
+    background: #fff;
 }
 
 .tool-image {
@@ -46,4 +45,12 @@
     height: 40px;
     color: darkred;
     display:none;
+}
+
+.tool-container > .tool-image{
+    max-width: 23px;
+    max-height: 24px;
+    display: block;
+    margin: 4px 0 0 4px;
+    opacity: 0.7;
 }

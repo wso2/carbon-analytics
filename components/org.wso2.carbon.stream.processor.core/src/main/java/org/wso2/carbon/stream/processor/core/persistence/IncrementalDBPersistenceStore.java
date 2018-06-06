@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -23,15 +23,19 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.persistence.dto.RDBMSQueryConfigurationEntry;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatabaseUnsupportedException;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatasourceConfigurationException;
 import org.wso2.carbon.stream.processor.core.persistence.util.DBPersistenceStoreUtils;
 import org.wso2.carbon.stream.processor.core.persistence.util.ExecutionInfo;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.carbon.stream.processor.core.persistence.util.RDBMSConfiguration;
-import org.wso2.carbon.stream.processor.core.persistence.dto.RDBMSQueryConfigurationEntry;
-import org.wso2.siddhi.core.util.persistence.PersistenceStore;
+import org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore;
+import org.wso2.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
+import org.wso2.siddhi.core.util.persistence.util.PersistenceHelper;
 
+import javax.sql.DataSource;
+import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -40,39 +44,36 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import javax.sql.DataSource;
-import javax.sql.rowset.serial.SerialBlob;
 
-/**
- * Implementation of Persistence Store that would persist snapshots to an RDBMS instance
- */
-public class DBPersistenceStore implements PersistenceStore {
+public class IncrementalDBPersistenceStore implements IncrementalPersistenceStore {
+    private static final Logger log = Logger.getLogger(IncrementalDBPersistenceStore.class);
 
-    private static final Logger log = Logger.getLogger(DBPersistenceStore.class);
     private static final String MSSQL_DATABASE_TYPE = "microsoft sql server";
     private static final String POSTGRES_DATABASE_TYPE = "postgresql";
 
     private ExecutionInfo executionInfo;
     private String datasourceName;
     private DataSource datasource;
-    private String tableName;
-    private int numberOfRevisionsToKeep;
     private String databaseType;
     private String databaseVersion;
+    private String tableName;
 
     @Override
-    public void save(String siddhiAppName, String revision, byte[] snapshot) {
-        createTableIfNotExist();
-
+    public void save(IncrementalSnapshotInfo incrementalSnapshotInfo, byte[] bytes) {
         byte[] compressedSnapshot;
         try {
-            compressedSnapshot = CompressionUtil.compressGZIP(snapshot);
+            compressedSnapshot = CompressionUtil.compressGZIP(bytes);
         } catch (IOException e) {
             log.error("Error occurred while trying to compress the snapshot. Failed to " +
-                    "persist revision: " + revision + " of Siddhi app: " + siddhiAppName);
+                    "persist revision: " + incrementalSnapshotInfo.getRevision() +
+                    " of Siddhi app: " + incrementalSnapshotInfo.getSiddhiAppId());
             return;
         }
+        DBPersistenceStoreUtils.createTableIfNotExist(executionInfo, datasource, datasourceName, tableName);
+
         Connection con = null;
         PreparedStatement stmt = null;
         try {
@@ -80,13 +81,13 @@ public class DBPersistenceStore implements PersistenceStore {
                 con = datasource.getConnection();
             } catch (SQLException e) {
                 log.error("Cannot establish connection to datasource " + datasourceName +
-                        " while saving revision " + revision, e);
+                        " while saving revision " + incrementalSnapshotInfo.getRevision(), e);
                 return;
             }
             con.setAutoCommit(false);
             stmt = con.prepareStatement(executionInfo.getPreparedInsertStatement());
-            stmt.setString(1, siddhiAppName);
-            stmt.setString(2, revision);
+            stmt.setString(1, incrementalSnapshotInfo.getSiddhiAppId());
+            stmt.setString(2, incrementalSnapshotInfo.getRevision());
             if (databaseType.equals(POSTGRES_DATABASE_TYPE)) {
                 stmt.setBlob(3, new SerialBlob(compressedSnapshot));
             } else {
@@ -97,29 +98,20 @@ public class DBPersistenceStore implements PersistenceStore {
             stmt.executeUpdate();
             con.commit();
             if (log.isDebugEnabled()) {
-                log.debug("Periodic persistence of " + siddhiAppName + " persisted successfully.");
+                log.debug("Periodic persistence of " + incrementalSnapshotInfo.getSiddhiAppId() + " persisted successfully.");
             }
         } catch (SQLException e) {
-            log.error("Error while saving revision" + revision + " of the siddhiApp " +
-                    siddhiAppName + " to the database with datasource name " + datasourceName, e);
+            log.error("Error while saving revision" + incrementalSnapshotInfo.getRevision() + " of the siddhiApp " +
+                    incrementalSnapshotInfo.getSiddhiAppId() + " to the database with datasource name " + datasourceName, e);
         } finally {
             DBPersistenceStoreUtils.cleanupConnections(stmt, con);
         }
-        cleanOldRevisions(siddhiAppName);
+        cleanOldRevisions(incrementalSnapshotInfo);
     }
 
     @Override
-    public void setProperties(Map properties) {
-        Map configurationMap = (Map) properties.get(PersistenceConstants.STATE_PERSISTENCE_CONFIGS);
-        Object numberOfRevisionsObject = properties.get(PersistenceConstants.STATE_PERSISTENCE_REVISIONS_TO_KEEP);
-        if (numberOfRevisionsObject == null || !(numberOfRevisionsObject instanceof Integer)) {
-            numberOfRevisionsToKeep = 3;
-            if (log.isDebugEnabled()) {
-                log.debug("Number of revisions to keep is not set or invalid. Default value will be used.");
-            }
-        } else {
-            numberOfRevisionsToKeep = (int) numberOfRevisionsObject;
-        }
+    public void setProperties(Map map) {
+        Map configurationMap = (Map) map.get(PersistenceConstants.STATE_PERSISTENCE_CONFIGS);
 
         if (configurationMap != null) {
             Object datasourceObject = configurationMap.get("datasource");
@@ -167,12 +159,11 @@ public class DBPersistenceStore implements PersistenceStore {
             throw new DatasourceConfigurationException("Connection cannot be established for datasource " +
                     datasourceName, e);
         }
-
         initializeDatabaseExecutionInfo();
     }
 
     @Override
-    public byte[] load(String siddhiAppName, String revision) {
+    public byte[] load(IncrementalSnapshotInfo incrementalSnapshotInfo) {
         PreparedStatement stmt = null;
         Connection con = null;
         byte[] blobAsBytes = null;
@@ -182,13 +173,13 @@ public class DBPersistenceStore implements PersistenceStore {
                 con = datasource.getConnection();
             } catch (SQLException e) {
                 log.error("Cannot establish connection to datasource " + datasourceName +
-                        " while loading revision " + revision, e);
+                        " while loading revision " + incrementalSnapshotInfo.getRevision(), e);
                 return null;
             }
             con.setAutoCommit(false);
             stmt = con.prepareStatement(executionInfo.getPreparedSelectStatement());
-            stmt.setString(1, revision);
-            stmt.setString(2, siddhiAppName);
+            stmt.setString(1, incrementalSnapshotInfo.getRevision());
+            stmt.setString(2, incrementalSnapshotInfo.getSiddhiAppId());
             try (ResultSet resultSet = stmt.executeQuery()) {
                 con.commit();
                 if (resultSet.next()) {
@@ -203,49 +194,101 @@ public class DBPersistenceStore implements PersistenceStore {
                     try {
                         decompressedSnapshot = CompressionUtil.decompressGZIP(blobAsBytes);
                     } catch (IOException e) {
-                        throw new RuntimeException("Error occurred while trying to decompress the snapshot. " +
-                                "Failed to load revision: " + revision + " of Siddhi app: " + siddhiAppName, e);
+                        throw new RuntimeException("Error occurred while trying to decompress the snapshot. Failed to " +
+                                "load revision: " + incrementalSnapshotInfo.getRevision() + " of Siddhi app: " +
+                                incrementalSnapshotInfo.getSiddhiAppId(), e);
                     }
                 }
             }
         } catch (SQLException e) {
-            log.error("Error while retrieving revision " + revision + " of siddhiApp: " +
-                    siddhiAppName + " from the database with datasource " + datasourceName, e);
+            log.error("Error while retrieving revision " + incrementalSnapshotInfo.getRevision() + " of siddhiApp: " +
+                    incrementalSnapshotInfo.getSiddhiAppId() + " from the database with datasource " + datasourceName, e);
         } finally {
-            cleanupConnections(stmt, con);
+            DBPersistenceStoreUtils.cleanupConnections(stmt, con);
         }
         return decompressedSnapshot;
     }
 
     @Override
+    public List<IncrementalSnapshotInfo> getListOfRevisionsToLoad(long restoreTime, String siddhiAppName) {
+        List<IncrementalSnapshotInfo> results = new ArrayList<>();
+        List<String> revisions = getListOfRevisionsFromDB(siddhiAppName);
+        for (String revision : revisions) {
+            IncrementalSnapshotInfo snapshotInfo = PersistenceHelper.convertRevision(revision);
+            if (snapshotInfo.getTime() <= restoreTime &&
+                    siddhiAppName.equals(snapshotInfo.getSiddhiAppId()) &&
+                    snapshotInfo.getElementId() != null &&
+                    snapshotInfo.getQueryName() != null) {
+                //Note: Here we discard the (items.length == 2) scenario which is handled
+                // by the full snapshot handling
+                if (log.isDebugEnabled()) {
+                    log.debug("List of revisions to load : " + revision);
+                }
+                results.add(snapshotInfo);
+            }
+        }
+        return results;
+    }
+
+    @Override
     public String getLastRevision(String siddhiAppName) {
         createTableIfNotExist();
+        List<String> revisions = getListOfRevisionsFromDB(siddhiAppName);
+        long restoreTime = -1;
+        IncrementalSnapshotInfo snapshotToLoad = null;
+        for (String revision : revisions) {
+            IncrementalSnapshotInfo snapshotInfo = PersistenceHelper.convertRevision(revision);
+            if (snapshotInfo.getTime() > restoreTime &&
+                    siddhiAppName.equals(snapshotInfo.getSiddhiAppId()) &&
+                    snapshotInfo.getElementId() != null &&
+                    snapshotInfo.getQueryName() != null) {
+                //Note: Here we discard the (items.length == 2) scenario which is handled
+                // by the full snapshot handling
+                restoreTime = snapshotInfo.getTime();
+                snapshotToLoad = snapshotInfo;
+            }
+        }
+        if (restoreTime != -1) {
+            if (log.isDebugEnabled()) {
+                log.debug("Latest revision to load: " + restoreTime + PersistenceConstants.REVISION_SEPARATOR +
+                        siddhiAppName);
+            }
+            return restoreTime + PersistenceConstants.REVISION_SEPARATOR + siddhiAppName
+                    + PersistenceConstants.REVISION_SEPARATOR + snapshotToLoad.getQueryName()
+                    + PersistenceConstants.REVISION_SEPARATOR + snapshotToLoad.getElementId()
+                    + PersistenceConstants.REVISION_SEPARATOR + snapshotToLoad.getType();
+        }
+        return null;
+    }
+
+    private List<String> getListOfRevisionsFromDB(String siddhiAppName) {
+        List<String> revisions = new ArrayList<>();
         PreparedStatement stmt = null;
         Connection con = null;
-        String revision = null;
         try {
             try {
                 con = datasource.getConnection();
             } catch (SQLException e) {
                 log.error("Cannot establish connection to datasource " + datasourceName +
-                        " while trying retrieve last revision of " + siddhiAppName, e);
+                        " . Could not load the list of revisions for Siddhi app: " + siddhiAppName, e);
                 return null;
             }
-            stmt = con.prepareStatement(executionInfo.getPreparedSelectLastStatement());
+            con.setAutoCommit(false);
+            stmt = con.prepareStatement(executionInfo.getPreparedSelectRevisionsStatement());
             stmt.setString(1, siddhiAppName);
             try (ResultSet resultSet = stmt.executeQuery()) {
-                if (resultSet.next()) {
-                    revision = String.valueOf(resultSet.getString("revision"));
+                con.commit();
+                while (resultSet.next()) {
+                    revisions.add(String.valueOf(resultSet.getString("revision")));
                 }
             }
         } catch (SQLException e) {
-            log.error("Error while retrieving last revision of siddhiApp: " +
-                    siddhiAppName + "from the database with datasource " + datasourceName, e);
+            log.error("Could not load the list of revisions, for Siddhi app: " + siddhiAppName +
+                    ", from the database with datasource " + datasourceName, e);
         } finally {
-            cleanupConnections(stmt, con);
+            DBPersistenceStoreUtils.cleanupConnections(stmt, con);
         }
-
-        return revision;
+        return revisions;
     }
 
     private void initializeDatabaseExecutionInfo() {
@@ -267,7 +310,69 @@ public class DBPersistenceStore implements PersistenceStore {
         executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
         executionInfo.setPreparedDeleteOldRevisionsStatement(databaseQueryEntries.getDeleteOldRevisionsQuery());
         executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
+    }
 
+    private void cleanOldRevisions(IncrementalSnapshotInfo incrementalSnapshotInfo) {
+        if (incrementalSnapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.BASE) {
+            List<String> allRevisions = getListOfRevisionsFromDB(incrementalSnapshotInfo.getSiddhiAppId());
+            if (allRevisions != null) {
+                String revisionsToClean = getRevisionsToClean(incrementalSnapshotInfo, allRevisions);
+                if (revisionsToClean != null) {
+                    cleanOldRevisionsFromDB(revisionsToClean, incrementalSnapshotInfo.getSiddhiAppId());
+                }
+            }
+        }
+    }
+
+    private void cleanOldRevisionsFromDB(String revisionsToClean, String siddhiAppId) {
+        PreparedStatement stmt = null;
+        Connection con = null;
+        try {
+            con = datasource.getConnection();
+            con.setAutoCommit(false);
+        } catch (SQLException e) {
+            log.error("Cannot establish connection to data source " + datasourceName +
+                    " to clean old revisions", e);
+            return;
+        }
+        try {
+            stmt = con.prepareStatement(executionInfo.getPreparedDeleteOldRevisionsStatement());
+            stmt.setString(1, revisionsToClean);
+            stmt.setString(2, siddhiAppId);
+            stmt.executeUpdate();
+            con.commit();
+        } catch (SQLException e) {
+            log.error("Error in cleaning old revisions of siddhiApp: " +
+                    siddhiAppId + "from the database with datasource " + datasourceName, e);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    log.error("Unable to close statement." + e.getMessage(), e);
+                }
+            }
+            DBPersistenceStoreUtils.cleanupConnections(stmt, con);
+        }
+    }
+
+    private String getRevisionsToClean(IncrementalSnapshotInfo incrementalSnapshotInfo,
+                                       List<String> allRevisions) {
+        StringBuilder revisionsToClean = new StringBuilder();
+        long baseTimeStamp = (incrementalSnapshotInfo.getTime());
+        for (String revision : allRevisions) {
+            IncrementalSnapshotInfo snapshotInfo = PersistenceHelper.convertRevision(revision);
+            if (snapshotInfo.getTime() < baseTimeStamp &&
+                    incrementalSnapshotInfo.getSiddhiAppId().equals(snapshotInfo.getSiddhiAppId()) &&
+                    incrementalSnapshotInfo.getQueryName().equals(snapshotInfo.getQueryName()) &&
+                    incrementalSnapshotInfo.getElementId().equals(snapshotInfo.getElementId())) {
+                revisionsToClean.append(",").append(revision);
+            }
+        }
+        if (revisionsToClean.length() != 0) {
+            return revisionsToClean.substring(1); //removing leading comma
+        }
+        return null;
     }
 
     /**
@@ -293,7 +398,7 @@ public class DBPersistenceStore implements PersistenceStore {
                     if (log.isDebugEnabled()) {
                         log.debug("Table " + tableName + " does not Exist. Table Will be created. ");
                     }
-                    cleanupConnections(stmt, con);
+                    DBPersistenceStoreUtils.cleanupConnections(stmt, con);
                     try {
                         con = datasource.getConnection();
                         stmt = con.createStatement();
@@ -307,79 +412,7 @@ public class DBPersistenceStore implements PersistenceStore {
                     }
                 }
             } finally {
-                cleanupConnections(stmt, con);
-            }
-        }
-    }
-
-    /**
-     * Method to remove revisions that are older than the user specified amount
-     *
-     * @param siddhiAppName is the name of the Siddhi Application whose old revisions to remove
-     */
-    private void cleanOldRevisions(String siddhiAppName) {
-        PreparedStatement stmt = null;
-        Connection con = null;
-        int count = 0;
-
-        try {
-            con = datasource.getConnection();
-            con.setAutoCommit(false);
-        } catch (SQLException e) {
-            log.error("Cannot establish connection to data source " + datasourceName +
-                    " to clean old revisions", e);
-            return;
-        }
-        try {
-            stmt = con.prepareStatement(executionInfo.getPreparedCountStatement());
-            stmt.setString(1, siddhiAppName);
-            try (ResultSet resultSet = stmt.executeQuery()) {
-                if (resultSet.next()) {
-                    count = resultSet.getInt(1);
-                }
-                int numberOfRevisionsToClean = count - numberOfRevisionsToKeep;
-                if (numberOfRevisionsToClean > 0) {
-                    stmt = con.prepareStatement(executionInfo.getPreparedDeleteStatement());
-                    if (databaseType.equals(MSSQL_DATABASE_TYPE)) {
-                        stmt.setInt(1, numberOfRevisionsToClean);
-                        stmt.setString(2, siddhiAppName);
-                    } else {
-                        stmt.setString(1, siddhiAppName);
-                        stmt.setInt(2, numberOfRevisionsToClean);
-                    }
-                    stmt.executeUpdate();
-                    con.commit();
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error in cleaning old revisions of siddhiApp: " +
-                    siddhiAppName + "from the database with datasource " + datasourceName, e);
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    log.error("Unable to close statement." + e.getMessage(), e);
-                }
-            }
-            cleanupConnections(stmt, con);
-        }
-    }
-
-
-    private void cleanupConnections(Statement stmt, Connection connection) {
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (SQLException e) {
-                log.error("Unable to close statement." + e.getMessage(), e);
-            }
-        }
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                log.error("Unable to close connection." + e.getMessage(), e);
+                DBPersistenceStoreUtils.cleanupConnections(stmt, con);
             }
         }
     }

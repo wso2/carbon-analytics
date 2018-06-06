@@ -213,7 +213,7 @@ export default class ManagerThumbnail extends React.Component {
                 Object.keys(workersList).map((id, workerList) => {
                     if (id === 'ResourceCluster') {
                         return (
-                            <div style={{marginLeft: '-90px', height: '200%'}}>
+                            <div style={{marginLeft: '-200px', height: '200%'}}>
                                 <h4 style={styles.h3Title}>Workers</h4>
                                 <div style={{
                                     display: 'flex',

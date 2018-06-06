@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash'],
-    function (require, log, $, _) {
+define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
+    function (require, log, $, _, PartitionWith) {
 
         /**
          * @class PartitionForm Creates a forms to collect data from a partition
@@ -29,7 +29,7 @@ define(['require', 'log', 'jquery', 'lodash'],
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.consoleListManager = options.application.outputController;
-                this.jsPlumbInstance = options.self.jsPlumbInstance;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
@@ -44,65 +44,120 @@ define(['require', 'log', 'jquery', 'lodash'],
          */
         PartitionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            var id = $(element.target).parent().attr('id');
-            var partition = self.configurationData.getSiddhiAppConfig().getPartition(id);
-            var connections = self.jsPlumbInstance.getConnections(element);
-            var connected= false;
-            var connectedStream = null;
-            $.each(connections, function (index, connection) {
-                var target = connection.targetId;
-                if(target.substr(0, target.indexOf('-')) == id){
-                    connected = true;
-                    var source = connection.sourceId;
-                    connectedStream = source.substr(0, source.indexOf('-'));
-                }
-            });
-            if(!(connected)){
+            // design view container and toggle view button are enabled
+            self.designViewContainer.addClass('disableContainer');
+            self.toggleViewButton.addClass('disableContainer');
+
+            var id = $(element).parent().attr('id');
+            var partitionElement = self.configurationData.getSiddhiAppConfig().getPartition(id);
+            var partitionWithList = partitionElement.getPartitionWith();
+
+            if(partitionWithList === undefined || partitionWithList.length === 0){
                 alert('Connect a stream for partitioning');
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
-            }
-            else{
-                var fillWith= {};
-                var partitionKeys = partition.getPartition().with;
-                $.each(partitionKeys, function ( index , key) {
-                    if( key.stream == connectedStream){
-                        fillWith ={
-                            stream : (self.configurationData.getSiddhiAppConfig().getStream(connectedStream)).getName(),
-                            property : key.property
-                        }
-                    }
+
+                // close the form window
+                self.consoleListManager.removeFormConsole(formConsole);
+            } else {
+
+                var savedAnnotations = partitionElement.getAnnotationList();
+                var annotations = [];
+                _.forEach(savedAnnotations, function (savedAnnotation) {
+                    annotations.push({annotation: savedAnnotation});
                 });
 
-                // design view container and toggle view button are enabled
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
+                var partitionKeys = [];
+                for (var i = 0; i < partitionWithList.length; i++) {
+                    var partitionKey = {
+                        expression: partitionWithList[i].getExpression(),
+                        streamName: partitionWithList[i].getStreamName()
+                    };
+                    partitionKeys.push(partitionKey);
+                }
 
+                var fillWith = {
+                    annotations : annotations,
+                    partitionKeys: partitionKeys
+                };
                 var editor = new JSONEditor(formContainer[0], {
-                    ajax: true,//TODO: add annotations for partition
                     schema: {
-                        type: 'object',
-                        title: 'Partition Key',
+                        type: "object",
+                        title: "Partition",
+                        options: {
+                            disable_properties: false
+                        },
                         properties: {
-                            stream: {
-                                type: 'string',
-                                title: 'Stream',
-                                required: true,
+                            annotations: {
                                 propertyOrder: 1,
-                                template: (self.configurationData.getSiddhiAppConfig().getStream(connectedStream)).getName()
+                                type: "array",
+                                format: "table",
+                                title: "Annotations",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    type: "object",
+                                    title : "Annotation",
+                                    options: {
+                                        disable_properties: true
+                                    },
+                                    properties: {
+                                        annotation: {
+                                            title : "Annotation",
+                                            type: "string",
+                                            minLength: 1
+                                        }
+                                    }
+                                }
                             },
-                            property: {
-                                type: 'string',
-                                title: 'Property',
+                            partitionKeys: {
                                 required: true,
-                                propertyOrder: 2
+                                propertyOrder: 2,
+                                type: "array",
+                                format: "table",
+                                title: "Partition Keys",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    type: "object",
+                                    title : 'Partition Key',
+                                    options: {
+                                        disable_properties: true
+                                    },
+                                    properties: {
+                                        expression: {
+                                            title : 'Expression',
+                                            type: "string",
+                                            minLength: 1,
+                                            required: true
+                                        },
+                                        streamName: {
+                                            title : 'Stream Name',
+                                            type: "string",
+                                            minLength: 1,
+                                            required: true
+                                        }
+                                    }
+                                }
                             }
                         }
                     },
                     startval: fillWith,
-                    disable_properties: true
+                    show_errors: "always",
+                    disable_properties: true,
+                    display_required_only: true,
+                    no_additional_properties: true,
+                    disable_array_delete_all_rows: true,
+                    disable_array_delete_last_row: true,
+                    disable_array_reorder: true
                 });
+                var editorPartitionKeys = editor.getEditor('root.partitionKeys');
+                // disable fields that can not be changed
+                for (var i = 0; i < partitionWithList.length; i++) {
+                    editorPartitionKeys.getEditor('root.partitionKeys.' + i + '.streamName').disable();
+                }
+
                 formContainer.append('<div id="form-submit"><button type="button" ' +
                     'class="btn btn-default">Submit</button></div>' +
                     '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
@@ -112,14 +167,16 @@ define(['require', 'log', 'jquery', 'lodash'],
                 submitButtonElement.addEventListener('click', function () {
 
                     var config = editor.getValue();
-                    $.each(partitionKeys, function ( index , key) {
-                        if( key.stream == connectedStream){
-                            key.property = config.property
-                        }
-                        else {
-                            var key = { stream : connectedStream , property : config.property};
-                            partitionKeys['with'].push(key);
-                        }
+
+                    partitionElement.clearPartitionWith();
+                    _.forEach(config.partitionKeys, function (partitionKey) {
+                        var partitionWithObject = new PartitionWith(partitionKey);
+                        partitionElement.addPartitionWith(partitionWithObject);
+                    });
+
+                    partitionElement.clearAnnotationList();
+                    _.forEach(config.annotations, function (annotation) {
+                        partitionElement.addAnnotation(annotation.annotation);
                     });
 
                     // design view container and toggle view button are enabled

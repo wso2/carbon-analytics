@@ -138,6 +138,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
 
             // TODO: when saving the optional values(which are required to create objects for them) check whether they
             // are available and then create object
+            //TODO: Initialising the data should be done in a separate class
             _.forEach(configurationData.siddhiAppConfig.sourceList, function(source){
                 var sourceObject = new SourceOrSinkAnnotation(source);
                 sourceObject.setId(newIdBeginningPhrase + sourceObject.getId());
@@ -291,6 +292,81 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
                 //partitionObject.setId(newIdBeginningPhrase + partitionObject.getId());
                 var partitionObject = new Partition(partition);
                 addAnnotationsForElement(partition, partitionObject);
+
+                //TODO: reduce the code duplication
+                _.forEach(partition.streamList, function(stream){
+                    var streamObject = new Stream(stream);
+                    addAnnotationsForElement(stream, streamObject);
+                    addAttributesForElement(stream, streamObject);
+                    streamObject.setId(newIdBeginningPhrase + streamObject.getId());
+                    partitionObject.addStream(streamObject);
+                });
+
+                _.forEach(partition.queryLists.PATTERN, function(patternQuery){
+                    var patternQueryObject = new Query(patternQuery);
+                    addAnnotationsForElement(patternQuery, patternQueryObject);
+                    var patternQueryInput = new PatternOrSequenceQueryInput(patternQuery.queryInput);
+                    _.forEach(patternQuery.queryInput.conditionList, function(condition){
+                        var patternQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                        setStreamHandlerListForQuery(patternQueryConditionObject, condition.streamHandlerList);
+                        patternQueryInput.addCondition(patternQueryConditionObject);
+                    });
+                    patternQueryObject.setQueryInput(patternQueryInput);
+                    setSelectForQuery(patternQueryObject, patternQuery.select);
+                    setOrderByForQuery(patternQueryObject, patternQuery.orderBy);
+                    setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
+                    patternQueryObject.setId(newIdBeginningPhrase + patternQueryObject.getId());
+                    partitionObject.addPatternQuery(patternQueryObject);
+                });
+                _.forEach(partition.queryLists.SEQUENCE, function(sequenceQuery){
+                    var sequenceQueryObject = new Query(sequenceQuery);
+                    addAnnotationsForElement(sequenceQuery, sequenceQueryObject);
+                    var sequenceQueryInput = new PatternOrSequenceQueryInput(sequenceQuery.queryInput);
+                    _.forEach(sequenceQuery.queryInput.conditionList, function(condition){
+                        var sequenceQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                        setStreamHandlerListForQuery(sequenceQueryConditionObject, condition.streamHandlerList);
+                        sequenceQueryInput.addCondition(sequenceQueryConditionObject);
+                    });
+                    sequenceQueryObject.setQueryInput(sequenceQueryInput);
+                    setSelectForQuery(sequenceQueryObject, sequenceQuery.select);
+                    setOrderByForQuery(sequenceQueryObject, sequenceQuery.orderBy);
+                    setQueryOutputForQuery(sequenceQueryObject, sequenceQuery.queryOutput);
+                    sequenceQueryObject.setId(newIdBeginningPhrase + sequenceQueryObject.getId());
+                    partitionObject.addSequenceQuery(sequenceQueryObject);
+                });
+                _.forEach(partition.queryLists.WINDOW_FILTER_PROJECTION,
+                    function(windowFilterProjectionQuery){
+                        var queryObject = new Query(windowFilterProjectionQuery);
+                        addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
+                        var windowFilterProjectionQueryInput =
+                            new WindowFilterProjectionQueryInput(windowFilterProjectionQuery.queryInput);
+                        setStreamHandlerListForQuery(windowFilterProjectionQueryInput,
+                            windowFilterProjectionQuery.queryInput.streamHandlerList);
+                        queryObject.setQueryInput(windowFilterProjectionQueryInput);
+                        setSelectForQuery(queryObject, windowFilterProjectionQuery.select);
+                        setOrderByForQuery(queryObject, windowFilterProjectionQuery.orderBy);
+                        setQueryOutputForQuery(queryObject, windowFilterProjectionQuery.queryOutput);
+                        queryObject.setId(newIdBeginningPhrase + queryObject.getId());
+                        partitionObject.addWindowFilterProjectionQuery(queryObject);
+                    });
+                _.forEach(partition.queryLists.JOIN, function(joinQuery){
+                    var queryObject = new Query(joinQuery);
+                    addAnnotationsForElement(joinQuery, queryObject);
+                    var joinQueryInput = new JoinQueryInput(joinQuery.queryInput);
+                    var leftSource = new JoinQuerySource(joinQuery.queryInput.left);
+                    setStreamHandlerListForQuery(leftSource, joinQuery.queryInput.left.streamHandlerList);
+                    var rightSource = new JoinQuerySource(joinQuery.queryInput.right);
+                    setStreamHandlerListForQuery(rightSource, joinQuery.queryInput.right.streamHandlerList);
+                    joinQueryInput.setLeft(leftSource);
+                    joinQueryInput.setRight(rightSource);
+                    queryObject.setQueryInput(joinQueryInput);
+                    setSelectForQuery(queryObject, joinQuery.select);
+                    setOrderByForQuery(queryObject, joinQuery.orderBy);
+                    setQueryOutputForQuery(queryObject, joinQuery.queryOutput);
+                    queryObject.setId(newIdBeginningPhrase + queryObject.getId());
+                    partitionObject.addJoinQuery(queryObject);
+                });
+
                 appData.addPartition(partitionObject);
             });
             _.forEach(configurationData.edgeList, function(edge){

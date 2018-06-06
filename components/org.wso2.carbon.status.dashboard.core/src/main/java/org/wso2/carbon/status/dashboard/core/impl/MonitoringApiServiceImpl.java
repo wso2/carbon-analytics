@@ -1633,7 +1633,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             Map<String, List<ManagerOverView>> groupedManagers = new HashMap<>();
             List<NodeConfigurationDetails> managerList = dashboardStore.getAllManagerConfigDetails();
             if (!managerList.isEmpty()) {
-                logger.info(managerList.toString());
                 managerList.parallelStream().forEach(manager -> {
                     try {
                         ManagerOverView managerOverView = new ManagerOverView();
@@ -1785,7 +1784,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             (PROTOCOL + managerURIBody, this.getUsername(), this.getPassword()).getManagerDetails();
                     String responseAppBody = managerResponse.toString();
                     if (managerResponse.status() == 200) {
-                        logger.info(managerResponse.body().toString());
                         return Response.ok().entity(managerResponse.body().toString()).build();
                     } else if (managerResponse.status() == 401) {
                         String jsonString = new Gson().toJson(responseAppBody);
@@ -1880,7 +1878,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             workerURIBody, this.getUsername(), this.getPassword()).getRunTime();
                     String responseAppBody = siddhiAppResponse.toString();
                     if (siddhiAppResponse.status() == 200) {
-                        //logger.info(siddhiAppResponce.body().toString());
                         return Response.ok().entity(siddhiAppResponse.body().toString()).build();
                     } else if (siddhiAppResponse.status() == 401) {
                         String jsonString = new Gson().toJson(responseAppBody);

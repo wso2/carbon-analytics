@@ -148,7 +148,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                 var streamOptions = {};
                 _.set(streamOptions, 'id', i);
                 _.set(streamOptions, 'name', editor.getValue().name);
-                _.set(streamOptions, 'isInnerStream', false);
                 var stream = new Stream(streamOptions);
                 _.forEach(editor.getValue().attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);
