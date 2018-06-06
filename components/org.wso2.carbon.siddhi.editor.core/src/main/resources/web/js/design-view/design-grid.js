@@ -923,40 +923,33 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             function addMemberToPartitionGroup(self) {
                 //TODO: check for same connection point connecting to itself scenario. It should be invalid connection.
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
-                    // if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
-                    //     || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
-                    //     || $(event.el).hasClass(constants.STREAM)) {
-                    //
-                    //     var connections = self.jsPlumbInstance.getConnections(event.el);
-                    //     //TODO: insert into can be connected to a outside(not inner) stream as well
-                    //     if($(event.el).hasClass(constants.STREAM)) {
-                    //
-                    //     }
-                    //     var detachedElement = $(event.el).detach();
-                    //     $(detachedElement).insertBefore($(event.group)[0].getEl());
-                    //     self.autoAlignElements();
-                    //     alert("bc");//TODO: add a proper error message and add align
-                    //     // TODO: stand alone inner stream form should not be displayed
-                    //     var partitionId = $(event.group).attr('id');
-                    //     var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
-                    //     var queries = partition.getQueries();
-                    //     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
-                    //         || $(event.el).hasClass(constants.WINDOW_QUERY)) {
-                    //         queries.push(self.configurationData.getSiddhiAppConfig().getQuery($(event.el).attr('id')));
-                    //         //TODO: set isInner flag true
-                    //         partition.setQueries(queries);
-                    //     }
-                    //     else if ($(event.el).hasClass(constants.JOIN)) {
-                    //         queries.push(self.configurationData.getSiddhiAppConfig().getJoinQuery($(event.el)
-                    //             .attr('id')));
-                    //         partition.setQueries(queries);
-                    //     }
-                    // } else {
-                    //     alert("Invalid element type dropped into partition!");
-                    //     var detachedElement = $(event.el).detach();
-                    //     $(detachedElement).insertBefore($(event.group)[0].getEl());
-                    //     self.autoAlignElements();
-                    // }
+                    var isGroupMemberValid = false;
+                    if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
+                        || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
+                        || $(event.el).hasClass(constants.SEQUENCE) || $(event.el).hasClass(constants.PATTERN)
+                        || $(event.el).hasClass(constants.STREAM)) {
+
+                        var connections = self.jsPlumbInstance.getConnections(event.el);
+                        if (connections.length ===0) {
+                            isGroupMemberValid = true;
+                        }
+                    }
+
+                    if (!isGroupMemberValid) {
+                        alert('This element cannot be added to partition');
+                        self.jsPlumbInstance.removeFromGroup(event.group, event.el, false);
+                        //TODO: insert into can be connected to an outside(not inner) stream as well
+                        //TODO: remove partition warning from service call
+                        var elementClientX = $(event.el).attr('data-x');
+                        var elementClientY = $(event.el).attr('data-y');
+                        var detachedElement = $(event.el).detach();
+                        detachedElement.css({
+                            left: parseInt(elementClientX) - self.canvas.offset().left,
+                            top: parseInt(elementClientY) - self.canvas.offset().top
+                        });
+                        self.canvas.append(detachedElement);
+                        self.jsPlumbInstance.repaintEverything();
+                    }
                 });
             }
 
