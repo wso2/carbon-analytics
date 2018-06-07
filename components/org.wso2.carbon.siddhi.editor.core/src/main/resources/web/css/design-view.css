@@ -219,10 +219,11 @@
     height: 26px;
     background-color: transparent;
     border: 1px solid transparent;
-    margin-top: -65px;
+    margin-top: -70px;
     cursor: pointer;
-    color: red;
+    color: #616161;
     border-radius: 40px;
+    font-size: 14px;
 }
 
 .element-prop-icon {
@@ -331,7 +332,8 @@ td {
     background-color: transparent;
     border: 1px solid transparent;
     cursor: pointer;
-    color: red;
+    color: #616161;
+    font-size: 14px;
     border-radius: 40px;
 }
 
