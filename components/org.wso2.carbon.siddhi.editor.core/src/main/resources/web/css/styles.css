@@ -547,3 +547,7 @@ body.sticky-footer {
 .well {
   border: none;
 }
+
+.table .table {
+  background-color: transparent;
+}
