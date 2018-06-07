@@ -19,6 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents configuration of a Siddhi Stream
@@ -27,6 +28,8 @@ public class StreamConfig extends SiddhiElementConfig {
     private String name;
     private List<AttributeConfig> attributeList;
     private List<String> annotationList;
+    private String partitionId;
+    private Map<String, String> connectorsAndStreams;
 
     public StreamConfig(String id,
                         String name,
@@ -48,5 +51,33 @@ public class StreamConfig extends SiddhiElementConfig {
 
     public List<String> getAnnotationList() {
         return annotationList;
+    }
+
+    public String getPartitionId() {
+        return partitionId;
+    }
+
+    public Map<String, String> getConnectorsAndStreams() {
+        return connectorsAndStreams;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAttributeList(List<AttributeConfig> attributeList) {
+        this.attributeList = attributeList;
+    }
+
+    public void setAnnotationList(List<String> annotationList) {
+        this.annotationList = annotationList;
+    }
+
+    public void setPartitionId(String partitionId) {
+        this.partitionId = partitionId;
+    }
+
+    public void setConnectorsAndStreams(Map<String, String> connectorsAndStreams) {
+        this.connectorsAndStreams = connectorsAndStreams;
     }
 }
