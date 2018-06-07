@@ -30,6 +30,8 @@ public class ResourceNode implements Serializable {
     private String id;
     private String state;
     private InterfaceConfig httpInterface;
+    private boolean isReceiverNode = false;
+    private boolean metricsUpdated = false;
     private long lastPingTimestamp;
     private int failedPingAttempts;
     private double processCPU;
@@ -84,16 +86,20 @@ public class ResourceNode implements Serializable {
         memoryUsage = workerMetrics.getTotalMemory();
     }
 
-    public double getLoadAverage() {
-        return loadAverage;
-    }
-
     public int getFailedPingAttempts() {
         return failedPingAttempts;
     }
 
     public void resetFailedPingAttempts() {
         failedPingAttempts = 0;
+    }
+
+    public boolean isReceiverNode() {
+        return isReceiverNode;
+    }
+
+    public void setReceiverNode(boolean receiverNode) {
+        isReceiverNode = receiverNode;
     }
 
     public void incrementFailedPingAttempts() {
@@ -104,8 +110,6 @@ public class ResourceNode implements Serializable {
         return metricsUpdated;
     }
 
-    private boolean metricsUpdated = false;
-
     public double getProcessCPU() {
         return processCPU;
     }
@@ -113,6 +117,11 @@ public class ResourceNode implements Serializable {
     public double getSystemCPU() {
         return systemCPU;
     }
+
+    public double getLoadAverage() {
+        return loadAverage;
+    }
+
 
     @Override
     public String toString() {
@@ -134,6 +143,9 @@ public class ResourceNode implements Serializable {
             return false;
         }
         if (getState() != null ? !getState().equals(that.getState()) : that.getState() != null) {
+            return false;
+        }
+        if (isReceiverNode() != that.isReceiverNode) {
             return false;
         }
         return getHttpInterface() != null

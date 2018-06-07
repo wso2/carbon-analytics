@@ -102,15 +102,15 @@ public class ResourcePool implements Serializable {
         this.resourceNodeMap = resourceNodeMap;
     }
 
+    public void setReceiverNodeMap(Map<String, ResourceNode> receiverNodeMap){
+        this.receiverNodeMap = receiverNodeMap;
+    }
+
     public void addResourceNode(ResourceNode resourceNode) {
         this.resourceNodeMap.put(resourceNode.getId(), resourceNode);
         LOG.info(String.format("%s added to the resource pool.", resourceNode));
         persist();
         poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
-    }
-
-    public void setReceiverNodeMap(Map<String, ResourceNode> receiverNodeMap){
-        this.receiverNodeMap = receiverNodeMap;
     }
 
     public void addReceiverNode(ResourceNode resourceNode){
@@ -124,6 +124,13 @@ public class ResourcePool implements Serializable {
     public void removeResourceNode(String nodeId) {
         ResourceNode resourceNode = this.resourceNodeMap.remove(nodeId);
         LOG.info(String.format("%s removed from the resource pool.", resourceNode));
+        persist();
+        poolChangeListeners.forEach(listener -> listener.resourceRemoved(resourceNode));
+    }
+
+    public void removeReceiverNode(String nodeId) {
+        ResourceNode resourceNode = this.receiverNodeMap.remove(nodeId);
+        LOG.info(String.format("Receiver node: %s removed from the resource pool.", resourceNode));
         persist();
         poolChangeListeners.forEach(listener -> listener.resourceRemoved(resourceNode));
     }

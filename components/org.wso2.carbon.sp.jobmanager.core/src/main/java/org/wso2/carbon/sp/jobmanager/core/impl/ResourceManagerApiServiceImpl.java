@@ -119,6 +119,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                     resourceNode.updateResourceMetrics(nodeConfig.getWorkerMetrics());
                 }
                 if(nodeConfig.isReceiverNode()){
+                    resourceNode.setReceiverNode(true);
                     resourcePool.addReceiverNode(resourceNode);
                 } else {
                     resourcePool.addResourceNode(resourceNode);
