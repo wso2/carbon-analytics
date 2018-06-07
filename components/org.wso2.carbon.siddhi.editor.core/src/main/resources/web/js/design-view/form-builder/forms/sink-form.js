@@ -52,7 +52,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             var editor = new JSONEditor(formContainer[0], {
                 schema: {
                     type: "object",
-                    title: "Sink Annotation",
+                    title: "Sink",
                     properties: {
                         annotationType: {
                             required: true,
@@ -93,7 +93,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                         },
                         map: {
                             propertyOrder: 3,
-                            title: "Map Annotation",
+                            title: "Map",
                             type: "object",
                             properties: {
                                 annotationType: {
@@ -365,7 +365,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             var editor = new JSONEditor(formContainer[0], {
                 schema: {
                     type: "object",
-                    title: "Sink Annotation",
+                    title: "Sink",
                     properties: {
                         annotationType: {
                             required: true,
@@ -406,7 +406,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                         },
                         map: {
                             propertyOrder: 3,
-                            title: "Map Annotation",
+                            title: "Map",
                             type: "object",
                             properties: {
                                 annotationType: {
