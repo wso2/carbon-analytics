@@ -38,7 +38,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             PATTERN : 'patternQueryDrop',
             SEQUENCE : 'sequenceQueryDrop',
             PARTITION :'partitionDrop',
-            PARTITION_CONNECTION_POINT: 'partitionConnectorInPart'
+            PARTITION_CONNECTION_POINT: 'partition-connector-in-part'
         };
 
         /**
