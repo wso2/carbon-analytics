@@ -63,7 +63,7 @@ public class CodeGenerator {
                 .append(generateAggregations(siddhiApp.getAggregationList()))
                 .append(generateFunctions(siddhiApp.getFunctionList()))
                 .append(generateQueries(siddhiApp.getQueryLists()))
-                .append(generatePartitions(siddhiApp.getPartitionList()));
+                .append(generatePartitions(null));
 
         return siddhiAppStringBuilder.toString();
     }
