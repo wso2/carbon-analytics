@@ -17,36 +17,31 @@
  *
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Qs from 'qs';
 import { Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
 // App Components
-import BusinessRulesManager from '../BusinessRulesManager';
-import TemplateGroupSelector from '../TemplateGroupSelector';
-import BusinessRuleFromTemplateForm from '../BusinessRuleFromTemplateForm';
-import BusinessRuleFromScratchForm from '../BusinessRuleFromScratchForm';
-import BusinessRuleCreator from '../BusinessRuleCreator';
-// Auth Utilities
+import BusinessRulesManager from '../pages/landingpage/LandingPage';
+import TemplateGroupSelector from '../pages/templategroupselector/TemplateGroupSelector';
+import BusinessRuleFromTemplateForm from '../pages/businessruleform/BusinessRuleFromTemplateForm';
+import BusinessRuleFromScratchForm from '../pages/businessruleform/BusinessRuleFromScratchForm';
+import BusinessRuleCreator from '../pages/modeselector/ModeSelector';
+// Auth Utils
 import AuthManager from '../../utils/AuthManager';
-// Custom Theme
-import { createMuiTheme, MuiThemeProvider } from 'material-ui/styles';
-import { Orange } from '../../theme/BusinessRulesManagerColors';
-
-const theme = createMuiTheme({
-    palette: {
-        primary: Orange,
-    },
-});
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 
-export default class SecuredRouter extends React.Component {
+/**
+ * Represents the App's router, which is accessible after a successful login
+ */
+export default class SecuredRouter extends Component {
     componentWillMount() {
-        setInterval(function() {
+        setInterval(() => {
             if (AuthManager.getUser()) {
                 const expiresOn = new Date(AuthManager.getUser().expires);
                 const skew = 100;
@@ -68,28 +63,39 @@ export default class SecuredRouter extends React.Component {
 
             const params = Qs.stringify({ referrer });
             return (
-                <Redirect to={{pathname: `${appContext}/login`, search: params}}/>
+                <Redirect to={{ pathname: `${appContext}/login`, search: params }} />
             );
         }
 
         return (
             <Switch>
-                <MuiThemeProvider theme={theme}>
-                    <div>
-                        <Redirect to={`${appContext}/businessRulesManager`}/>
-                        <Route exact path={`${appContext}/businessRuleCreator`} component={BusinessRuleCreator}/>
-                        <Route exact
-                               path={`${appContext}/businessRuleFromScratchForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
-                               component={BusinessRuleFromScratchForm}/>
-                        <Route exact
-                               path={`${appContext}/businessRuleFromTemplateForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
-                               component={BusinessRuleFromTemplateForm}/>
-                        <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager}/>
-                        <Route exact path={`${appContext}/templateGroupSelector/:mode`}
-                               component={TemplateGroupSelector}/>
-                    </div>
-                </MuiThemeProvider>
+                <div>
+                    <Redirect to={`${appContext}/businessRulesManager`} />
+                    <Route exact path={`${appContext}/businessRuleCreator`} component={BusinessRuleCreator} />
+                    <Route
+                        exact
+                        path={`${appContext}/businessRuleFromScratchForm/:formMode/` +
+                        'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
+                        component={BusinessRuleFromScratchForm}
+                    />
+                    <Route
+                        exact
+                        path={`${appContext}/businessRuleFromTemplateForm/:formMode/` +
+                        'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
+                        component={BusinessRuleFromTemplateForm}
+                    />
+                    <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager} />
+                    <Route
+                        exact
+                        path={`${appContext}/templateGroupSelector/:mode`}
+                        component={TemplateGroupSelector}
+                    />
+                </div>
             </Switch>
         );
     }
 }
+
+SecuredRouter.propTypes = {
+    location: PropTypes.string.isRequired,
+};

@@ -16,7 +16,8 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
@@ -25,9 +26,11 @@ import List from 'material-ui-icons/List';
 import Create from 'material-ui-icons/Create';
 import Paper from 'material-ui/Paper';
 // App Constants
-import BusinessRulesConstants from '../constants/BusinessRulesConstants';
+import BusinessRulesConstants from '../../../constants/BusinessRulesConstants';
+// Custom Theme
+import { PrimaryColor } from '../../../theme/PrimaryColor';
 // CSS
-import '../index.css';
+import '../../../index.css';
 
 /**
  * Styles related to this component
@@ -36,50 +39,45 @@ const styles = {
     button: {
         height: 100,
         width: 100,
-        color: '#EF6C00',
+        color: PrimaryColor[500],
         backgroundColor: '#212121',
     },
     paper: {
         width: 300,
-        padding: 50
-    }
+        padding: 50,
+    },
 };
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 
 /**
- * Represents a Create Button used in the Business Rule Creator, which will direct to
- * the specific create business rule page
+ * Represents a button which allows to select a mode for creating a business rule,
+ * either 'from template' or 'from scratch'
  */
-class CreateButton extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            mode: props.mode,
-            text: props.text,
-            onClick: props.onClick
-        };
+export default class ModeButton extends Component {
+    /**
+     * Returns Icon for mode 'from template' or 'from scratch'
+     * @returns {Component}     Icon
+     */
+    displayIcon() {
+        if (this.props.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
+            return <List />;
+        }
+        return <Create />;
     }
 
     render() {
-        let icon;
-        if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
-            icon = <List />
-        } else {
-            icon = <Create />
-        }
-
         return (
             <Paper style={styles.paper}>
                 <Link
-                    to={appContext + "/templateGroupSelector/" + this.state.mode}
-                    style={{textDecoration: 'none'}}
+                    to={`${appContext}/templateGroupSelector/${this.props.mode}`}
+                    style={{ textDecoration: 'none' }}
                 >
-                    <Button fab style={styles.button} onClick={this.state.onClick}>
-                        {icon}
+                    <Button fab style={styles.button}>
+                        {this.displayIcon()}
                     </Button>
                 </Link>
                 <br />
@@ -92,8 +90,15 @@ class CreateButton extends React.Component {
                     {this.props.description}
                 </Typography>
             </Paper>
-        )
+        );
     }
 }
 
-export default CreateButton;
+ModeButton.propTypes = {
+    mode: PropTypes.oneOf([
+        BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+        BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH,
+    ]).isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+};
