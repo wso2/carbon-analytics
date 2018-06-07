@@ -40,6 +40,7 @@ import org.wso2.siddhi.query.api.expression.Expression;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +51,11 @@ public class PartitionConfigGenerator {
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
     private SiddhiAppRuntime siddhiAppRuntime;
+    private Map<String, String> connectorsAndStreams = new HashMap<>();
 
-    public PartitionConfigGenerator(String siddhiAppString, SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime) {
+    public PartitionConfigGenerator(String siddhiAppString,
+                                    SiddhiApp siddhiApp,
+                                    SiddhiAppRuntime siddhiAppRuntime) {
         this.siddhiAppString = siddhiAppString;
         this.siddhiApp = siddhiApp;
         this.siddhiAppRuntime = siddhiAppRuntime;
@@ -69,6 +73,7 @@ public class PartitionConfigGenerator {
         partitionConfig.setStreamList(generateInnerStreams());
         partitionConfig.setPartitionWith(generatePartitionWith(partition.getPartitionTypeMap()));
         partitionConfig.setAnnotationList(generateAnnotations(partition.getAnnotations()));
+        partitionConfig.setConnectorsAndStreams(connectorsAndStreams);
         return partitionConfig;
     }
 
@@ -114,9 +119,9 @@ public class PartitionConfigGenerator {
                 siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
             for (AbstractDefinition abstractDefinition : abstractDefinitionMap.values()) {
                 if (abstractDefinition instanceof StreamDefinition) {
-                    innerStreams.add(
-                            streamDefinitionConfigGenerator
-                                    .generateStreamConfig((StreamDefinition) abstractDefinition));
+                    StreamConfig streamConfig =
+                            streamDefinitionConfigGenerator.generateStreamConfig((StreamDefinition) abstractDefinition);
+                    innerStreams.add(streamConfig);
                 }
             }
         }
@@ -132,8 +137,13 @@ public class PartitionConfigGenerator {
     private List<PartitionWithElement> generatePartitionWith(Map<String, PartitionType> partitionTypeMap)
             throws DesignGenerationException {
         List<PartitionWithElement> partitionWithElements = new ArrayList<>();
+        int partitionConnectorIdCounter = 0;
         for (Map.Entry<String, PartitionType> partitionWithEntry : partitionTypeMap.entrySet()) {
-            partitionWithElements.add(generatePartitionWithElement(partitionWithEntry));
+            PartitionWithElement partitionWithElement = generatePartitionWithElement(partitionWithEntry);
+            connectorsAndStreams.put(
+                    String.valueOf(++partitionConnectorIdCounter),
+                    partitionWithElement.getStreamName());
+            partitionWithElements.add(partitionWithElement);
         }
         return partitionWithElements;
     }
