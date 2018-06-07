@@ -31,4 +31,6 @@ public class Constants {
     public static final String VALUE_PARTITION_TYPE = "Value Partition";
     public static final String RANGE_PARTITION_TYPE = "Range Partition";
     public static final String DEFAULT_QUERY_NAME = "query";
+    public static final String SOURCE_TYPE = "Source";
+    public static final String SINK_TYPE = "Sink";
 }

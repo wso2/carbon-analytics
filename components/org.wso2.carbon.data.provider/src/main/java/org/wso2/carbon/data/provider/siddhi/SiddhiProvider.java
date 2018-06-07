@@ -51,8 +51,9 @@ public class SiddhiProvider extends AbstractDataProvider {
 
     private static final String PROVIDER_NAME = "SiddhiStoreDataProvider";
     private static final String SIDDHI_APP = "siddhiApp";
-    private static final String STORE_QUERY = "query";
+    private static final String STORE_QUERY = "queryData";
     private static final String PULISHING_INTERVAL = "publishingInterval";
+    private static final String QUERY = "query";
     private SiddhiDataProviderConfig siddhiDataProviderConfig;
     private DataSetMetadata metadata;
     private static SiddhiManager siddhiManager = null;
@@ -63,12 +64,13 @@ public class SiddhiProvider extends AbstractDataProvider {
     @Override
     public DataProvider init(String topic, String sessionId, JsonElement jsonElement) throws DataProviderException {
         this.siddhiDataProviderConfig = new Gson().fromJson(jsonElement, SiddhiDataProviderConfig.class);
-        siddhiDataProviderConfig.setQuery(((JsonObject) jsonElement).get(STORE_QUERY).getAsString());
+        siddhiDataProviderConfig.setQueryData(((JsonObject) jsonElement).get(STORE_QUERY));
         siddhiDataProviderConfig.setSiddhiAppContext(((JsonObject) jsonElement).get(SIDDHI_APP).getAsString());
         super.init(topic, sessionId, siddhiDataProviderConfig);
         SiddhiAppRuntime siddhiAppRuntime = getSiddhiAppRuntime();
         siddhiAppRuntime.start();
-        StoreQuery storeQuery = SiddhiCompiler.parseStoreQuery(siddhiDataProviderConfig.getQuery());
+        StoreQuery storeQuery = SiddhiCompiler.parseStoreQuery(siddhiDataProviderConfig.getQueryData()
+                .getAsJsonObject().get(QUERY).getAsString());
         Attribute[] outputAttributeList = siddhiAppRuntime.getStoreQueryOutputAttributes(storeQuery);
         metadata = new DataSetMetadata(outputAttributeList.length);
         Attribute outputAttribute;
@@ -82,7 +84,8 @@ public class SiddhiProvider extends AbstractDataProvider {
     @Override
     public boolean configValidator(ProviderConfig providerConfig) throws DataProviderException {
         SiddhiDataProviderConfig siddhiDataProviderConfig = (SiddhiDataProviderConfig) providerConfig;
-        return siddhiDataProviderConfig.getSiddhiAppContext() != null && siddhiDataProviderConfig.getQuery() != null;
+        return siddhiDataProviderConfig.getSiddhiAppContext() != null && siddhiDataProviderConfig.getQueryData()
+                .getAsJsonObject().get(QUERY).getAsString() != null;
     }
 
     @Override
@@ -99,14 +102,15 @@ public class SiddhiProvider extends AbstractDataProvider {
     public String providerConfig() {
         Map<String, String> renderingTypes = new HashMap();
         renderingTypes.put(SIDDHI_APP, InputFieldTypes.SIDDHI_CODE);
-        renderingTypes.put(STORE_QUERY, InputFieldTypes.SIDDHI_CODE);
+        renderingTypes.put(STORE_QUERY, InputFieldTypes.DYNAMIC_SIDDHI_CODE);
         renderingTypes.put(PULISHING_INTERVAL, InputFieldTypes.NUMBER);
         return new Gson().toJson(new Object[]{renderingTypes, new SiddhiDataProviderConfig()});
     }
 
     @Override
     public void publish(String topic, String sessionId) {
-        Event[] events = siddhiAppRuntime.query(siddhiDataProviderConfig.getQuery());
+        Event[] events = siddhiAppRuntime.query(siddhiDataProviderConfig.getQueryData().getAsJsonObject().get
+                (QUERY).getAsString());
         ArrayList<Object[]> data = new ArrayList<>();
         for (Event event : events) {
             data.add(event.getData());

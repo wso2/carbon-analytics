@@ -17,28 +17,35 @@
  *
  */
 
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import {Link} from 'react-router-dom';
 //Material UI
-import { CardActions, IconButton, Snackbar, Tooltip, Typography } from "material-ui-next";
-import {GridList, GridTile} from "material-ui";
+import {CardActions, IconButton, Snackbar, Tooltip, Typography} from 'material-ui-next';
+import {GridList, GridTile} from 'material-ui';
 
-import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
+import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
 
 //App Components
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import Clock from "./Clock";
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import Clock from './Clock';
 
 const styles = {
     gridList: {width: '100%', height: 150, margin: 0},
     smallIcon: {width: 20, height: 20, zIndex: 1, padding: 5},
     overviewLegend: {fontSize: 10, color: '#fff'},
+    root: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'left',
+        backgroundColor: '#222222',
+        width: '100%'
+    },
     legendContainer: {width: '100%', textAlign: 'center', position: 'absolute', bottom: 5},
-     };
-const messageBoxStyle = { textAlign: "center", color: "white" };
-const errorMessageStyle = { backgroundColor: "#FF5722", color: "white" };
-const successMessageStyle = { backgroundColor: "#4CAF50", color: "white" };
+};
+const messageBoxStyle = {textAlign: "center", color: "white"};
+const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
+const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 
 export default class DistributedViewResourceNodeThumbnail extends React.Component {
     constructor(props) {
@@ -65,6 +72,7 @@ export default class DistributedViewResourceNodeThumbnail extends React.Componen
                 });
             });
     }
+
     showError(message) {
         this.setState({
             messageStyle: errorMessageStyle,
@@ -82,13 +90,13 @@ export default class DistributedViewResourceNodeThumbnail extends React.Componen
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({ worker: nextProps.worker })
+        this.setState({worker: nextProps.worker})
     }
 
     renderTime(lastUpdate) {
         if (lastUpdate === "#") {
             return (
-                <Clock lastUpdate={this.props.worker.lastUpdate} />
+                <Clock lastUpdate={this.props.worker.lastUpdate}/>
             )
         } else {
             return (
@@ -100,22 +108,24 @@ export default class DistributedViewResourceNodeThumbnail extends React.Componen
     renderGridTile() {
         let gridTiles, lastUpdated, color, haStatus;
 
-            gridTiles = <div>
-                <Link style={{ textDecoration: 'none' }} to={window.contextPath + '/add-worker'}>
-                    <GridList cols={1} cellHeight={98} style={styles.gridList}>
-                        <GridTile>
+        gridTiles = <div>
+            <Link style={{textDecoration: 'none'}} to={window.contextPath + '/add-worker'}>
+                <GridList className={'node-overview'} cols={1} cellHeight={98} style={styles.gridList}>
+                    <GridTile>
+                        <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
                             <h4 style={{
                                 textAlign: 'center',
-                                color: 'white',
-                                padding: 20
-                            }}>Please add the node manually.</h4>
-                        </GridTile>
+                                color: '#dedede',
+                                padding: 0,
+                                margin: '0 100px'
+                            }}>Please add the node manually.</h4></div>
+                    </GridTile>
 
-                    </GridList>
-                </Link>
-            </div>;
-            lastUpdated = "#";
-            color='red';
+                </GridList>
+            </Link>
+        </div>;
+        lastUpdated = "#";
+        color = 'red';
 
         return [gridTiles, lastUpdated, color, haStatus];
     }
@@ -154,8 +164,8 @@ export default class DistributedViewResourceNodeThumbnail extends React.Componen
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle} open={this.state.showMsg}
                           message={this.state.message} autoHideDuration={4000}
                           onRequestClose={() => {
-                              this.setState({ showMsg: false, message: "" })
-                          }} />
+                              this.setState({showMsg: false, message: ""})
+                          }}/>
             </div>
         );
     }

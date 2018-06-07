@@ -17,49 +17,39 @@
  *
  */
 
-import {Button, Snackbar, TextField} from 'material-ui';
 import Qs from 'qs';
-import React from 'react';
-import {Redirect} from 'react-router-dom';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Redirect } from 'react-router-dom';
 // Material UI Components
-import {FormControlLabel, FormGroup} from 'material-ui/Form';
+import { Button, Snackbar, TextField } from 'material-ui';
+import { FormControlLabel, FormGroup } from 'material-ui/Form';
 import Slide from 'material-ui/transitions/Slide';
 import Checkbox from 'material-ui/Checkbox';
 // App Components
 import FormPanel from '../common/FormPanel';
 import Header from '../common/Header';
-// Auth utils
+// Auth Utils
 import AuthManager from '../../utils/AuthManager';
-// Custom Theme
-import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from "../../theme/BusinessRulesManagerColors";
-
-const theme = createMuiTheme({
-    palette: {
-        primary: Orange,
-    },
-});
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 
 const styles = {
-    cookiePolicy: {padding: '10px', backgroundColor: '#fcf8e3', border: '1px solid #faebcc', color: '#8a6d3b',
-        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'},
-    cookiePolicyAnchor: {fontWeight: 'bold', color: '#8a6d3b'}
+    cookiePolicy: { padding: '10px',
+        backgroundColor: '#fcf8e3',
+        border: '1px solid #faebcc',
+        color: '#8a6d3b',
+        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif' },
+    cookiePolicyAnchor: { fontWeight: 'bold', color: '#8a6d3b' },
 };
 
 /**
- * Login page.
+ * Login page
  */
-export default class Login extends React.Component {
-    /**
-     * Constructor.
-     *
-     * @param {{}} props Props
-     */
+export default class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -72,15 +62,15 @@ export default class Login extends React.Component {
         this.authenticate = this.authenticate.bind(this);
     }
 
-    componentWillMount(){
+    componentWillMount() {
         if (AuthManager.isRememberMeSet() && !AuthManager.isLoggedIn()) {
             AuthManager.authenticateWithRefreshToken()
-                .then(() => this.setState({authenticated: true}));
+                .then(() => this.setState({ authenticated: true }));
         }
     }
 
     /**
-     * Extracts the referrer and check whether the user logged-in.
+     * Extracts the referrer and checks whether the user has been logged-in
      */
     componentDidMount() {
         // Extract referrer from the query string.
@@ -97,18 +87,17 @@ export default class Login extends React.Component {
     }
 
     /**
-     * Call authenticate API and authenticate the user.
-     *
-     * @param {{}} e event
+     * Authenticates the user
+     * @param {Object} e    Event
      */
     authenticate(e) {
         e.preventDefault();
         AuthManager
             .authenticate(this.state.username, this.state.password, this.state.rememberMe)
-            .then(() => this.setState({authenticated: true}))
+            .then(() => this.setState({ authenticated: true }))
             .catch((error) => {
                 const errorMessage = error.response && error.response.status === 401 ?
-                    'The username/password is invalid' : 'Unknown error occurred!';;
+                    'The username/password is invalid' : 'Unknown error occurred!';
                 this.setState({
                     username: '',
                     password: '',
@@ -118,22 +107,16 @@ export default class Login extends React.Component {
             });
     }
 
-    /**
-     * Renders the login page.
-     *
-     * @return {XML} HTML content
-     */
     render() {
         // If the user is already authenticated redirect to referrer link.
         if (this.state.authenticated) {
             return (
-                <Redirect to={this.state.referrer}/>
+                <Redirect to={this.state.referrer} />
             );
         }
 
         return (
-
-            <MuiThemeProvider muiTheme={theme}>
+            <div>
                 <Header hideUserSettings />
                 <br />
                 <div>
@@ -152,7 +135,7 @@ export default class Login extends React.Component {
                                 });
                             }}
                         />
-                        <br/>
+                        <br />
                         <TextField
                             fullWidth
                             type="password"
@@ -168,7 +151,7 @@ export default class Login extends React.Component {
                                 });
                             }}
                         />
-                        <br/>
+                        <br />
                         <br />
                         <FormGroup>
                             <FormControlLabel
@@ -178,7 +161,7 @@ export default class Login extends React.Component {
                                         onChange={(e, checked) => {
                                             this.setState({
                                                 rememberMe: checked,
-                                            })
+                                            });
                                         }}
                                         value="rememberMe"
                                     />
@@ -186,8 +169,8 @@ export default class Login extends React.Component {
                                 label="Remember me"
                             />
                         </FormGroup>
-                        <br/>
-                        <br/>
+                        <br />
+                        <br />
                         <Button
                             raised
                             color="primary"
@@ -218,7 +201,8 @@ export default class Login extends React.Component {
                                 <a
                                     style={styles.cookiePolicyAnchor}
                                     href="/policies/privacy-policy"
-                                    target="_blank">
+                                    target="_blank"
+                                >
                                     Privacy Policy
                                 </a>.
                             </div>
@@ -227,19 +211,23 @@ export default class Login extends React.Component {
                     <Snackbar
                         autoHideDuration={3500}
                         open={this.state.showError}
-                        onRequestClose={e => this.setState({showError: false})}
-                        transition={<Slide direction={'up'}/>}
+                        onRequestClose={() => this.setState({ showError: false })}
+                        transition={<Slide direction={'up'} />}
                         SnackbarContentProps={{
                             'aria-describedby': 'snackbarMessage',
                         }}
                         message={
                             <span id="snackbarMessage">
-                        {this.state.error}
-                    </span>
+                                {this.state.error}
+                            </span>
                         }
                     />
                 </div>
-            </MuiThemeProvider>
+            </div>
         );
     }
 }
+
+Login.propTypes = {
+    location: PropTypes.string.isRequired,
+};

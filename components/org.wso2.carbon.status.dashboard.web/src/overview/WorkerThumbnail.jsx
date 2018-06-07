@@ -273,8 +273,10 @@ export default class WorkerThumbnail extends React.Component {
                 loadTrendImg = <div/>;
             } else {
                 loadAvg = <h1 style={{margin: 0}}>{this.props.worker.serverDetails.workerMetrics.loadAverage}</h1>;
-                {loadTrendImg = loadTrend === constants.up ? <span style={{color: 'red'}}>˄</span> :
-                    <span style={{color: 'green'}}>˅</span>}
+                {
+                    loadTrendImg = loadTrend === constants.up ? <span style={{color: 'red'}}>˄</span> :
+                        <span style={{color: 'green'}}>˅</span>
+                }
             }
             gridTiles =
                 <div>
