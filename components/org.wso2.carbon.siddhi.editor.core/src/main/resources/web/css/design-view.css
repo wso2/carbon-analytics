@@ -134,27 +134,26 @@
 
 .streamDrop, .tableDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
 .windowQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop, .sourceDrop, .sinkDrop, .functionDrop {
-    border-radius: 0.5em;
     opacity: 0.8;
     width: 60px;
-    height: 40px;
-    line-height: 80px;
+    height: 60px;
     cursor: pointer;
     text-align: center;
     z-index: 20;
     position: absolute;
-    background-size: 60px 40px;
+    background-color: #fff;
+    background-size: 40px 40px;
     background-repeat: no-repeat;
+    background-position: 10px 10px;
     color: black;
     font-family: helvetica, sans-serif;
-    padding: 0.5em;
     font-size: 0.9em;
     -webkit-transition: -webkit-box-shadow 0.15s ease-in;
     -moz-transition: -moz-box-shadow 0.15s ease-in;
     -o-transition: -o-box-shadow 0.15s ease-in;
     transition: box-shadow 0.15s ease-in;
+    border: 1px solid #ccc;
 }
-
 .partitionDrop {
     border: 1px solid #346789;
     width: 250px;
@@ -186,16 +185,15 @@
 }
 
 .connection {
-    -moz-border-radius: 50px;
-    -webkit-border-radius: 50px;
-    border-radius: 50px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
     font-size: 10px;
     text-align: center;
     cursor: pointer;
     width: 10px;
     height: 10px;
     margin-left: -10px;
-    margin-top: 80px;
     border: 1px solid #000;
     background-color: #424242;
 }
@@ -219,7 +217,7 @@
     height: 26px;
     background-color: transparent;
     border: 1px solid transparent;
-    margin-top: -65px;
+    margin-top: -95px;
     cursor: pointer;
     color: red;
     border-radius: 40px;
@@ -275,15 +273,15 @@ td {
 .connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation,
 .connectorInQuery, .connectorInPatternQuery, .connectorInSequenceQuery, .connectorInJoinQuery, .connectorInSink {
     float: left;
-    margin-top: -43%;
-    margin-left: -13px;
+    margin-top: -53px;
+    margin-left: -5px;
 }
 
 .connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation,
 .connectorOutQuery, .connectorOutPatternQuery, .connectorOutSequenceQuery, .connectorOutJoinQuery, .connectorOutSource {
     float: right;
-    margin-top: -43%;
-    margin-right: -13px;
+    margin-top: -53px;
+    margin-right: -5px;
 }
 
 .connectorIn {
@@ -315,12 +313,21 @@ td {
 
 .aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
 .patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode{
-    width: inherit;
-    height: inherit;
-    background-color: transparent;
-    border: 0;
-    margin-top: 0;
     font-weight: 600;
+    width: 120px;
+    margin-left: -30px;
+    margin-top: 60px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.streamDrop:hover .streamNameNode, .windowDrop:hover .windowNameNode, .sequenceQueryDrop:hover .sequenceQueryNameNode,
+.triggerDrop:hover .triggerNameNode, .aggregationDrop:hover .aggregationNameNode, .functionDrop:hover .functionNameNode,
+.projectionQueryDrop:hover .queryNameNode, .filterQueryDrop:hover .queryNameNode, .windowQueryDrop:hover .queryNameNode,
+.joinQueryDrop:hover .joinQueryNameNode, .patternQueryDrop:hover .patternQueryNameNode, .tableDrop:hover .tableNameNode,
+.sourceDrop:hover .sourceNameNode, .sinkDrop:hover .sinkNameNode {
+    overflow: initial;
 }
 
 .partition-element-prop-icon, .partition-element-close-icon {
@@ -340,7 +347,6 @@ td {
 }
 
 .partition-element-close-icon {
-    margin-right: 0;
 }
 
 /* Window Stream */

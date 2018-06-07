@@ -97,14 +97,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         strokeStyle: '#424242',
                         strokeWidth: 2
                     },
-                    Overlays: [["Arrow", {location: 1.0, id: "arrow"}]],
+                    Overlays: [["Arrow", {location: 1.0, id: "arrow", foldback: 1, width: 8, length: 8}]],
                     DragOptions: {cursor: "crosshair"},
                     Endpoints: [["Dot", {radius: 7}], ["Dot", {radius: 11}]],
                     EndpointStyle: {
                         radius: 3
                     },
                     ConnectionsDetachable: false,
-                    Connector: ["Bezier", {curviness: 50}]
+                    Connector: ["Flowchart", {}]
                 });
 
                 /**
