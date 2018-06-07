@@ -1158,8 +1158,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     self.configurationData.getSiddhiAppConfig().removeSequenceQuery(elementId);
                 } else if (newElement.hasClass('joinQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeJoinQuery(elementId);
-                } else if (newElement.hasClass('partitionDrop')) {
-                    self.configurationData.getSiddhiAppConfig().removePartition(elementId);
                 } else if (newElement.hasClass('sourceDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeSource(elementId);
                 } else if (newElement.hasClass('sinkDrop')) {
@@ -1172,6 +1170,24 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 }
                 self.configurationData.getSiddhiAppConfig()
                     .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);
+            });
+
+            //register event listener to remove the element when the close icon is clicked
+            newElement.on('click', '.partition-element-close-icon', function () {
+                var elementId = newElement[0].id;
+                var partition = self.configurationData.getSiddhiAppConfig().getPartition(elementId);
+                var noOfElementsInsidePartition = partition.getNoOfElementsInPartition();
+                if (newElement.hasClass('partitionDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removePartition(elementId);
+                }
+                self.jsPlumbInstance.remove(newElement);
+                if(self.jsPlumbInstance.getGroupFor(newElement)){
+                    self.jsPlumbInstance.removeFromGroup(newElement);
+                }
+
+                self.configurationData.getSiddhiAppConfig()
+                    .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount()
+                        - noOfElementsInsidePartition);
             });
         };
 
