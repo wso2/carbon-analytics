@@ -380,6 +380,21 @@ define(['require', 'elementUtils', 'lodash'],
                 });
             });
 
+            // check the element in the partitionList
+            if (requestedElement === undefined) {
+                requestedElement = self.getQueryByIdSavedInsideAPartition(elementId);
+            }
+            // search in the inner streams in partitions
+            if (requestedElement === undefined) {
+                var element = self.getStreamSavedInsideAPartition(elementId);
+                if (element !== undefined) {
+                    requestedElement = {
+                        type: 'STREAM',
+                        element: element
+                    };
+                }
+            }
+
             return requestedElement;
         };
 
@@ -530,6 +545,46 @@ define(['require', 'elementUtils', 'lodash'],
                 }
             });
             return isStreamDeleted;
+        };
+
+        /**
+         * @function Checks whether a given query is inside a partition by id and if yes it returns a object with type
+         * and element (ex: {type: type, element: element})
+         * @param queryId id of the query element
+         * @return requestedElement returns undefined if the requested element is not found. Otherwise returns the
+         * requestedElement
+         */
+        AppData.prototype.getQueryByIdSavedInsideAPartition = function (queryId) {
+            var self = this;
+            var element = undefined;
+            var type = undefined;
+            _.forEach(self.partitionList, function (partition) {
+                if (element === undefined) {
+                    element = partition.getWindowFilterProjectionQuery(queryId);
+                    type = 'WINDOW_FILTER_PROJECTION_QUERY';
+                    if (element === undefined) {
+                        element = partition.getPatternQuery(queryId);
+                        type = 'PATTERN_QUERY';
+                    }
+                    if (element === undefined) {
+                        element = partition.getSequenceQuery(queryId);
+                        type = 'SEQUENCE_QUERY';
+                    }
+                    if (element === undefined) {
+                        element = partition.getJoinQuery(queryId);
+                        type = 'JOIN_QUERY';
+                    }
+                }
+            });
+
+            var requestedElement = undefined;
+            if (element !== undefined) {
+                requestedElement = {
+                    type: type,
+                    element: element
+                };
+            }
+            return requestedElement;
         };
 
         return AppData;

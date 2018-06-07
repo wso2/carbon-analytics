@@ -491,7 +491,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+            _.set(formOptions, 'formUtils', self.formUtils);
             var partitionForm = new PartitionForm(formOptions);
             partitionForm.generatePropertiesForm(element, formConsole, formContainer);
         };

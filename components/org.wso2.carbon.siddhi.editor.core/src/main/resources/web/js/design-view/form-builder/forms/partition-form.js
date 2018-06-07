@@ -29,7 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.consoleListManager = options.application.outputController;
-                this.jsPlumbInstance = options.jsPlumbInstance;
+                this.formUtils = options.formUtils;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
@@ -81,6 +81,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
                     annotations : annotations,
                     partitionKeys: partitionKeys
                 };
+                fillWith = self.formUtils.cleanJSONObject(fillWith);
                 var editor = new JSONEditor(formContainer[0], {
                     schema: {
                         type: "object",
@@ -152,18 +153,15 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
                 });
-                var editorPartitionKeys = editor.getEditor('root.partitionKeys');
                 // disable fields that can not be changed
                 for (var i = 0; i < partitionWithList.length; i++) {
-                    editorPartitionKeys.getEditor('root.partitionKeys.' + i + '.streamName').disable();
+                    editor.getEditor('root.partitionKeys.' + i + '.streamName').disable();
                 }
 
-                formContainer.append('<div id="form-submit"><button type="button" ' +
-                    'class="btn btn-default">Submit</button></div>' +
-                    '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+                formContainer.append(self.formUtils.buildFormButtons(true));
 
                 // 'Submit' button action
-                var submitButtonElement = $(formContainer).find('#form-submit')[0];
+                var submitButtonElement = $(formContainer).find('#btn-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
 
                     var config = editor.getValue();
@@ -187,7 +185,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
                     self.consoleListManager.removeFormConsole(formConsole);
                 });
                 // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#form-cancel')[0];
+                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
