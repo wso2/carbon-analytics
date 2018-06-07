@@ -63,7 +63,7 @@ public class CodeGenerator {
                 .append(generateAggregations(siddhiApp.getAggregationList()))
                 .append(generateFunctions(siddhiApp.getFunctionList()))
                 .append(generateQueries(siddhiApp.getQueryLists()))
-                .append(generatePartitions(null));
+                .append(generatePartitions(siddhiApp.getPartitionList()));
 
         return siddhiAppStringBuilder.toString();
     }
@@ -154,6 +154,7 @@ public class CodeGenerator {
 
     /**
      * Generates a string representation of all the tables in a Siddhi app
+     *
      * @param tableList A list of TableConfig objects from the SiddhiAppConfig object
      * @return The Siddhi string representation of the table definitions
      * @throws CodeGenerationException Error while generating code
@@ -325,10 +326,14 @@ public class CodeGenerator {
                             .append(SiddhiStringBuilderConstants.NEW_LINE);
                 }
 
+                int queriesLeft = queryList.size();
                 for (QueryConfig query : queryList) {
-                    queryListStringBuilder.append(generateQueryString(query))
-                            .append(SiddhiStringBuilderConstants.NEW_LINE)
-                            .append(SiddhiStringBuilderConstants.NEW_LINE);
+                    queryListStringBuilder.append(generateQueryString(query));
+                    if (queriesLeft != 1) {
+                        queryListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+                                .append(SiddhiStringBuilderConstants.NEW_LINE);
+                    }
+                    queriesLeft--;
                 }
             }
         }
@@ -351,7 +356,8 @@ public class CodeGenerator {
         }
 
         StringBuilder partitionListStringBuilder = new StringBuilder();
-        partitionListStringBuilder.append(SiddhiStringBuilderConstants.PARTITIONS_COMMENT);
+        partitionListStringBuilder.append(SiddhiStringBuilderConstants.PARTITIONS_COMMENT)
+                .append(SiddhiStringBuilderConstants.NEW_LINE);
         for (PartitionConfig partition : partitionList) {
             partitionListStringBuilder.append(generatePartitionString(partition))
                     .append(SiddhiStringBuilderConstants.NEW_LINE);

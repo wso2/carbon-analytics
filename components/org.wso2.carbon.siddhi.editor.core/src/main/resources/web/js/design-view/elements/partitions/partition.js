@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementUtils'],
-    function (require, ElementUtils) {
+define(['require', 'elementUtils', 'lodash'],
+    function (require, ElementUtils, _) {
 
         /**
          * @class Partition
@@ -93,6 +93,19 @@ define(['require', 'elementUtils'],
 
         Partition.prototype.clearPartitionWith = function () {
             ElementUtils.prototype.removeAllElements(this.partitionWith);
+        };
+
+        Partition.prototype.removePartitionWith = function (partitionWithStreamName) {
+            var self = this;
+            var index = undefined;
+            _.forEach(self.partitionWith, function(partitionWith) {
+                if (partitionWith.getStreamName() === partitionWithStreamName) {
+                    index = self.partitionWith.indexOf(partitionWith);
+                }
+            });
+            if (index > -1) {
+                this.partitionWith.splice(index, 1);
+            }
         };
 
         Partition.prototype.removeStream = function (streamId) {

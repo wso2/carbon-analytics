@@ -536,3 +536,18 @@ body.sticky-footer {
 .query-form-actions > .btn {
   margin-right: 5px;
 }
+
+.design-view-form-content .table-bordered,
+.design-view-form-content .table-bordered > thead > tr > th,
+.design-view-form-content .table-bordered > tbody > tr > td {
+  border-color: #222;
+}
+
+/* Bootstrap overrides */
+.well {
+  border: none;
+}
+
+.table .table {
+  background-color: transparent;
+}

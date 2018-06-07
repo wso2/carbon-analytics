@@ -1082,7 +1082,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             // make connection points
             for (iteratorValue = 1; iteratorValue <= maxConnectionPoints; iteratorValue++) {
 
-                var connectionIn = $('<div class="partitionConnectorInPart" >').attr('id', i + '_pc' + iteratorValue);
+                var connectionIn = $('<div class="partition-connector-in-part" >').attr('id', i + '_pc' + iteratorValue);
                 finalElement.append(connectionIn);
 
                 self.jsPlumbInstance.makeTarget(connectionIn, {

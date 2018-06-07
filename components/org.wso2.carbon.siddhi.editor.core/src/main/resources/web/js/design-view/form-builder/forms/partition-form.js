@@ -118,6 +118,10 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
                                 type: "array",
                                 format: "table",
                                 title: "Partition Keys",
+                                options: {
+                                    disable_array_add: true,
+                                    disable_array_delete: true
+                                },
                                 uniqueItems: true,
                                 minItems: 1,
                                 items: {
