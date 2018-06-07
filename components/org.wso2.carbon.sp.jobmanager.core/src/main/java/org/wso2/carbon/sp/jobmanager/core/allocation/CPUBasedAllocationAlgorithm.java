@@ -36,14 +36,23 @@ public class CPUBasedAllocationAlgorithm implements ResourceAllocationAlgorithm 
     private static final Logger logger = Logger.getLogger(CPUBasedAllocationAlgorithm.class);
     private static final double SYSTEM_CPU_WEIGHT = 1;
     private static final double PROCESS_CPU_WEIGHT = 1;
+    private DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
 
     @Override
     public ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap) {
-        DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
+        long initialTimestamp = System.currentTimeMillis();
         if (deploymentConfig != null && !resourceNodeMap.isEmpty()) {
             if (resourceNodeMap.size() >= deploymentConfig.getMinResourceCount()) {
                 Iterator resourceIterator = resourceNodeMap.values().iterator();
-                return getMaximumResourceNode(resourceIterator);
+                while(true) {
+                    try {
+                        return getMaximumResourceNode(resourceIterator);
+                    } catch (ResourceManagerException e) {
+                        if ((System.currentTimeMillis() - initialTimestamp) >= (deploymentConfig.
+                                getHeartbeatInterval() * 2))
+                            throw e;
+                    }
+                }
             } else {
                 logger.error("Minimum resource requirement did not match, hence not deploying the partial siddhi app ");
             }
@@ -58,9 +67,9 @@ public class CPUBasedAllocationAlgorithm implements ResourceAllocationAlgorithm 
             if (resourceNode.isMetricsUpdated()) {
                 unsortedMap.put(resourceNode.getId(), calculateWorkerResourceMeasurement(resourceNode));
             } else {
-                throw new ResourceManagerException("Metrics needs to be enabled on Resource node: "
-                        + resourceNode.getId() + " to be used with Allocation algorithm class: "
-                        + ServiceDataHolder.getAllocationAlgorithm().getClass().getCanonicalName());
+                    throw new ResourceManagerException("Metrics needs to be enabled on Resource node: "
+                            + resourceNode.getId() + " to be used with Allocation algorithm class: "
+                            + ServiceDataHolder.getAllocationAlgorithm().getClass().getCanonicalName());
             }
         }
         Map.Entry<String, Double> node = Collections.min(unsortedMap.entrySet(),
