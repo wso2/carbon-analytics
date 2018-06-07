@@ -1234,13 +1234,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
         };
 
         /**
-         * @function Auto align the diagram
+         * @function Auto align and center the diagram
          */
         DesignGrid.prototype.autoAlignElements = function () {
             var self = this;
             // Create a new graph instance
             var graph = new dagre.graphlib.Graph({compound: true});
-            // Sets the graph to grow from left to right
+            // Sets the graph to grow from left to right, and also to separate the distance between each node
             graph.setGraph({rankdir: 'LR', edgesep: 10, ranksep: 100, nodesep: 50});
             // This sets the default edge label to `null` as edges/arrows in the design view will
             // never have any labels/names to display on the screen
@@ -1344,38 +1344,46 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             // nodes in the graph should be placed
             dagre.layout(graph);
 
-            var minimumCoordinates = {x: 0, y: 0};
-            var maximumCoordinates = {x: 0, y: 0};
-            var minXVal = 0;
-            var maxXVal = 0;
-            var minYVal = 0;
-            var maxYVal = 0;
-
+            // Set the default minimum and maximum coordinates to zero
+            var minimumCoordinate = {x: 0, y: 0};
+            var maximumCoordinate = {x: 0, y: 0};
+            // Traverse through every node and find the minimum and maximum x & y coordinates
+            // The minimum and maximum x & y coordinates have to be found to obtain the size of the graph
             graph.nodes().forEach(function (nodeId) {
+                // Get the instance of the dagre node of 'nodeId'
                 var node = graph.node(nodeId);
-                if (node.x > maximumCoordinates.x || maximumCoordinates.x === 0) {
-                    maximumCoordinates.x = node.x;
+                // Get the minimum x & y coordinates of the current node
+                var minX = node.x - (node.width / 2);
+                var minY = node.y - (node.height / 2);
+                // Get the maximum x & y coordinates of the current node
+                var maxX = node.x + (node.width / 2);
+                var maxY = node.y + (node.height / 2);
+                // Find the minimum and maximum 'x' coordinates from all nodes
+                if (maxX > maximumCoordinate.x || maximumCoordinate.x === 0) {
+                    maximumCoordinate.x = maxX;
                 }
-                if (node.x < minimumCoordinates.x || minimumCoordinates.x === 0) {
-                    minimumCoordinates.x = node.x;
+                if (minX < minimumCoordinate.x || minimumCoordinate.x === 0) {
+                    minimumCoordinate.x = minX;
                 }
-                if (node.y > maximumCoordinates.y || maximumCoordinates.y === 0) {
-                    maximumCoordinates.y = node.y;
+                // Find the minimum and maximum 'y' coordinates from all the nodes
+                if (maxY > maximumCoordinate.y || maximumCoordinate.y === 0) {
+                    maximumCoordinate.y = maxY;
                 }
-                if (node.y < minimumCoordinates.y || minimumCoordinates.y === 0) {
-                    minimumCoordinates.y = node.y;
+                if (minY < minimumCoordinate.y || minimumCoordinate.y === 0) {
+                    minimumCoordinate.y = minY;
                 }
             });
-            console.log("Design Grid Width-Height: (" + this.designGridContainer.width() + ", " + this.designGridContainer.height() + ")");
-            console.log("Min Positions: (" + minimumCoordinates.x + ", " + minimumCoordinates.y + ")");
-            console.log("Max Positions: (" + maximumCoordinates.x + ", " + maximumCoordinates.y + ")");
-
-            var graphWidth = maximumCoordinates.x - minimumCoordinates.x;
-            var graphHeight = maximumCoordinates.y - minimumCoordinates.y;
-
+            // Obtain the width and the height of the current design-grid instance
             var gridWidth = this.designGridContainer.width();
             var gridHeight = this.designGridContainer.height();
-
+            // The difference in the largest and smallest 'x' coordinates gives the graph width
+            var graphWidth = maximumCoordinate.x - minimumCoordinate.x;
+            // The difference in the largest and smallest 'y' coordinates gives the graph height
+            var graphHeight = maximumCoordinate.y - minimumCoordinate.y;
+            // Set the centerLeft and centerTop coordinates to default 20
+            // NOTE - The 'centerLeft' and 'centerTop' variables are the values that have to be added
+            // to the final 'left' and 'top' CSS positions of the graph to align the graph to the
+            // center of the design-grid
             var centerLeft = 20;
             var centerTop = 20;
             if (gridWidth > graphWidth) {
@@ -1384,9 +1392,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             if (gridHeight > graphHeight) {
                 centerTop = (gridHeight - graphHeight) / 2;
             }
-
-            console.log("Center Left: " + centerLeft);
-            console.log("Center Top: " + centerTop);
 
             // Re-align the elements in the grid based on the graph layout given by dagre
             graph.nodes().forEach(function (nodeId) {
