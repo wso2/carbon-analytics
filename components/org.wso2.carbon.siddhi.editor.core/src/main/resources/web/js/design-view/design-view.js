@@ -291,6 +291,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             _.forEach(configurationData.siddhiAppConfig.partitionList, function(partition){
                 //partitionObject.setId(newIdBeginningPhrase + partitionObject.getId());
                 var partitionObject = new Partition(partition);
+                partitionObject.setId(newIdBeginningPhrase + partitionObject.getId());
                 addAnnotationsForElement(partition, partitionObject);
 
                 _.forEach(partition.partitionWith, function(partitionWith){
