@@ -34,6 +34,7 @@ public class SiddhiQueryGroup {
     private Map<String, InputStreamDataHolder> inputStreams;
     private Map<String, OutputStreamDataHolder> outputStreams;
     private List<String> queryList;
+    private boolean isReceiverQueryGroup;
 
     public SiddhiQueryGroup(String name, int parallelism) {
         this.name = name;
@@ -109,4 +110,11 @@ public class SiddhiQueryGroup {
         return outputStreams;
     }
 
+    public boolean isReceiverQueryGroup() {
+        return isReceiverQueryGroup;
+    }
+
+    public void setReceiverQueryGroup(boolean receiverQueryGroup) {
+        isReceiverQueryGroup = receiverQueryGroup;
+    }
 }

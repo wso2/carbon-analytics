@@ -30,10 +30,10 @@ public class DeployableSiddhiQueryGroup {
     private List<SiddhiQuery> siddhiQueries;
     private boolean isReceiverQueryGroup;
 
-    public DeployableSiddhiQueryGroup(String groupName) {
+    public DeployableSiddhiQueryGroup(String groupName, boolean receiverQueryGroup) {
         this.groupName = groupName;
         siddhiQueries = new ArrayList<>();
-        isReceiverQueryGroup = false;
+        isReceiverQueryGroup = receiverQueryGroup;
     }
 
     public List<SiddhiQuery> getSiddhiQueries() {
