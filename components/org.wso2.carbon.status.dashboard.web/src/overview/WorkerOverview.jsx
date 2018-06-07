@@ -42,7 +42,7 @@ import '../../public/css/dashboard.css';
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
-    gridList: {width: '90%', height: '100%', padding: 40},
+    gridList: {width: '90%', padding: 40},
     h3: {color: '#dedede', marginLeft: '4%', backgroundColor: '#222222'},
     h3Title: {color: '#C0C0C0', marginLeft: '4%', backgroundColor: '#222222'},
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
@@ -337,12 +337,12 @@ export default class WorkerOverview extends React.Component {
 
                 });
             }, parseInt(this.state.pInterval * 1000));
-            this.setState({interval: interval, enableAutoSync: true, btnType:<Sync  color='red'/>});
+            this.setState({interval: interval, enableAutoSync: true, btnType: <Sync color='red'/>});
             window.localStorage.setItem("enableAutoSync", true);
             window.localStorage.setItem("pInterval", this.state.pInterval)
         } else {
             clearInterval(this.state.interval);
-            this.setState({enableAutoSync: false,btnType:<SyncDisabled/>});
+            this.setState({enableAutoSync: false, btnType: <SyncDisabled/>});
             window.localStorage.setItem("enableAutoSync", false)
         }
     }
@@ -408,7 +408,7 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
+                        <div className="toggle" style={{margin: '-36px', marginTop: '-2%', marginRight: '16%'}}>
                             <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
@@ -431,7 +431,7 @@ export default class WorkerOverview extends React.Component {
                                     <Divider inset={true} style={styles.divider}/>
                                     <h3 style={styles.h3Title}>Group Id: {id}</h3>
                                     <div style={styles.root}>
-                                        <GridList className={'node-wrapper'} cols={3} padding={50} cellHeight={300}
+                                        <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
                                                   style={styles.gridList}>
                                             {workersList[id].map((worker) => {
                                                 return (
@@ -452,12 +452,11 @@ export default class WorkerOverview extends React.Component {
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'}
-                                                  cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                                  cols={3} cellHeight='100%' style={styles.gridList}>
                                             {workersList[id].map((worker) => {
                                                 return (
                                                     <WorkerThumbnail worker={worker}
                                                                      currentTime={new Date().getTime()}/>
-
                                                 )
                                             })}
                                         </GridList>
@@ -479,11 +478,9 @@ export default class WorkerOverview extends React.Component {
                                     <Divider inset={true} style={styles.divider}/>
                                     <h3 style={styles.h3Title}>Group Id : {id}</h3>
                                     <h4 style={styles.h3Title}>Managers</h4>
-                                    <div style={{
-                                        display: 'flex', flexWrap: 'wrap', marginTop: '-200px', marginLeft: '-90px',
-                                        width: '90%', height: '100%', padding: '200px'
-                                    }}>
-                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                    <div style={styles.root}>
+                                        <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
+                                                  style={styles.gridList}>
                                             {managerList[id].map((worker) => {
                                                 return (
                                                     <ManagerThumbnail worker={worker}
@@ -497,11 +494,12 @@ export default class WorkerOverview extends React.Component {
                             )
                         } else {
                             return (
-                                <div style={{height: '100%'}}>
+                                <div>
                                     <h3 style={styles.h3}>Managers</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
-                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                        <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
+                                                  style={styles.gridList}>
                                             {managerList[id].map((worker) => {
 
                                                 return (
@@ -524,7 +522,7 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
+                        <div className="toggle" style={{margin: '-36px', marginTop: '-2%', marginRight: '16%'}}>
                             <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
@@ -546,7 +544,7 @@ export default class WorkerOverview extends React.Component {
                                     <h3 style={styles.h3Title}>{id}</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
-                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                        <GridList cols={3} cellHeight='100%' style={styles.gridList}>
                                             {workersList[id].map((worker) => {
                                                 return (
                                                     <WorkerThumbnail worker={worker}
@@ -564,7 +562,7 @@ export default class WorkerOverview extends React.Component {
                                     <h3 style={styles.h3}>{id}</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
-                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                        <GridList cols={3} cellHeight='100%' style={styles.gridList}>
                                             {workersList[id].map((worker) => {
                                                 return (
                                                     <WorkerThumbnail worker={worker}
@@ -585,7 +583,7 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{marginTop: '-2%', marginRight: '16%'}}>
+                        <div className="toggle" style={{margin: '-36px', marginTop: '-2%', marginRight: '16%'}}>
                             <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
@@ -603,15 +601,13 @@ export default class WorkerOverview extends React.Component {
                     {Object.keys(managerList).map((id, workerList) => {
                         if (id !== "Never Reached" && id !== "Not-Reachable") {
                             return (
-                                <div>
+                                <div style={styles.background}>
                                     <Divider inset={true} style={styles.divider}/>
                                     <h3 style={styles.h3Title}>Group Id : {id}</h3>
                                     <h4 style={styles.h3Title}>Managers</h4>
-                                    <div style={{
-                                        display: 'flex', flexWrap: 'wrap', marginTop: '-200px', marginLeft: '-90px',
-                                        width: '90%', height: '100%', padding: '200px'
-                                    }}>
-                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                    <div style={styles.root}>
+
+                                        <GridList cols={3} cellHeight='100%' style={{width: '90%', padding: 40}}>
                                             {managerList[id].map((worker) => {
                                                 return (
                                                     <ManagerThumbnail worker={worker}
@@ -621,15 +617,16 @@ export default class WorkerOverview extends React.Component {
 
                                         </GridList>
                                     </div>
+
                                 </div>
                             )
                         } else {
                             return (
-                                <div style={{height: '100%'}}>
+                                <div style={styles.root}>
                                     <h3 style={styles.h3}>Managers</h3>
                                     <Divider inset={true} style={styles.divider}/>
-                                    <div style={styles.root}>
-                                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                                    <div>
+                                        <GridList cols={3} cellHeight='100%' style={styles.gridList}>
                                             {managerList[id].map((worker) => {
                                                 return (
                                                     <ManagerThumbnail worker={worker}
@@ -676,10 +673,11 @@ export default class WorkerOverview extends React.Component {
                         marginTop: '2%',
                         color: '#dedede',
                         marginLeft: '4%',
-                        backgroundColor: '#222222'
+                        backgroundColor: '#222222',
+                        fontSize: '1.8rem'
                     }}>
                         Node Overview</Typography>
-                    <div style={{marginTop: '-2%', marginRight: '6%'}}>
+                    <div style={{marginTop: '-23px', marginRight: '6%'}}>
                         <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right'}}
                               to={window.contextPath}> &nbsp;&nbsp; NODE VIEW</Link>
 

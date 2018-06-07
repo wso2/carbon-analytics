@@ -76,10 +76,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
             */
             var settingsIconId = ""+ i + "-dropSourceSettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -142,10 +141,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
             */
             var settingsIconId = ""+ i + "-dropSinkSettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -224,10 +222,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              stream (In this case: an Import arrow icon)
             */
             var settingsIconId = ""+ i + "-dropStreamSettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -361,10 +358,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
             */
             var settingsIconId = ""+ i + "-dropTableSettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -442,10 +438,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
             */
             var settingsIconId = ""+ i + "-dropWindowSettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -523,10 +518,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
             */
             var settingsIconId = ""+ i + "-dropTriggerSettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -611,10 +605,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
             */
             var settingsIconId = ""+ i + "-dropAggregationSettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -693,10 +686,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
             */
             var settingsIconId = ""+ i + "-dropFunctionSettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -750,9 +742,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.getSiddhiAppConfig().addWindowFilterProjectionQuery(query);
             }
             var settingsIconId = "" + i + "-dropQuerySettingsId";
-            var propertiesIcon = $('<img src="/editor/images/settings.png" id="' + settingsIconId + '" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
+            var propertiesIcon = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>')
                 .append(propertiesIcon);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
@@ -831,10 +823,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
             */
             var settingsIconId = ""+ i + "-dropPatternQuerySettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -913,10 +904,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed as an alert message
             */
             var settingsIconId = ""+ i + "-dropSequenceQuerySettingsId";
-            var prop = $('<img src="/editor/images/settings.png" id="'+ settingsIconId +'" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="element-close-icon collapse">').append(prop);
+            var prop = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#'+settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -987,9 +977,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.getSiddhiAppConfig().addJoinQuery(query);
             }
             var settingsIconId = "" + i + "-dropJoinQuerySettingsId";
-            var propertiesIcon = $('<img src="/editor/images/settings.png" id="' + settingsIconId + '" ' +
-                'class="element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" class="element-close-icon collapse">')
+            var propertiesIcon = $('<i id="'+ settingsIconId +'" ' +
+                'class="fw fw-settings element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>')
                 .append(propertiesIcon);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
@@ -1046,10 +1036,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('class', "partitionNameNode");
             newAgent.append(node);
             var settingsIconId = "" + i + "-dropPartitionSettingsId";
-            var propertiesIcon = $('<img src="/editor/images/settings.png" id="' + settingsIconId + '" ' +
-                'class="partition-element-prop-icon collapse">');
-            newAgent.append(node).append('<img src="/editor/images/cancel.png" ' +
-                'class="partition-element-close-icon collapse">').append(propertiesIcon);
+            var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
+                'class="fw fw-settings partition-element-prop-icon collapse"></i>');
+            newAgent.append(node).append('<i class="fw fw-delete partition-element-close-icon collapse"></i>')
+                .append(propertiesIcon);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -1061,10 +1051,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 containment: "grid-container",
                 drag:function(){
                     self.jsPlumbInstance.repaintEverything();
-                    // var connections = jsPlumb.getConnections(this);
-                    // $.each( connections, function(index,connection){
-                    //     jsPlumb.repaint(connection);
-                    // });
                 }
             });
 
@@ -1075,17 +1061,38 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 'left': mouseLeft
             });
 
-            // make a default connection point
-            var connectionIn = $('<div class="connectorInPart" >').attr('id', i + '-pc' + 1);
-            finalElement.append(connectionIn);
+            /*
+            * There will be always added a connection point by default. In the code to design mode we add a one extra
+            * connection point in order to user to add additional connection.
+            * */
+            var maxConnectionPoints = 1;
+            if(!isCodeToDesignMode) {
+                //add the new partition to the partition array
+                var partitionOptions = {};
+                _.set(partitionOptions, 'id', i);
+                var newPartition = new Partition(partitionOptions);
+                newPartition.setId(i);
+                self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
+            } else {
+                var partitionObject = self.configurationData.getSiddhiAppConfig().getPartition(i);
+                maxConnectionPoints = partitionObject.getPartitionWith().length + 1;
+            }
 
-            self.jsPlumbInstance.makeTarget(connectionIn, {
-                anchor: 'Left',
-                maxConnections: 1
-            });
-            self.jsPlumbInstance.makeSource(connectionIn, {
-                anchor: 'Right'
-            });
+            var iteratorValue;
+            // make connection points
+            for (iteratorValue = 1; iteratorValue <= maxConnectionPoints; iteratorValue++) {
+
+                var connectionIn = $('<div class="partition-connector-in-part" >').attr('id', i + '_pc' + iteratorValue);
+                finalElement.append(connectionIn);
+
+                self.jsPlumbInstance.makeTarget(connectionIn, {
+                    anchor: 'Left',
+                    maxConnections: 1
+                });
+                self.jsPlumbInstance.makeSource(connectionIn, {
+                    anchor: 'Right'
+                });
+            }
 
             $(self.container).append(finalElement);
             self.jsPlumbInstance.addGroup({
@@ -1096,15 +1103,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 dropOverride:false,
                 draggable:false
             });
-
-            if(!isCodeToDesignMode) {
-                //add the new partition to the partition array
-                var partitionOptions = {};
-                _.set(partitionOptions, 'id', i);
-                var newPartition = new Partition(partitionOptions);
-                newPartition.setId(i);
-                self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
-            }
         };
 
         /**
@@ -1160,8 +1158,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     self.configurationData.getSiddhiAppConfig().removeSequenceQuery(elementId);
                 } else if (newElement.hasClass('joinQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeJoinQuery(elementId);
-                } else if (newElement.hasClass('partitionDrop')) {
-                    self.configurationData.getSiddhiAppConfig().removePartition(elementId);
                 } else if (newElement.hasClass('sourceDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeSource(elementId);
                 } else if (newElement.hasClass('sinkDrop')) {
@@ -1174,6 +1170,24 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 }
                 self.configurationData.getSiddhiAppConfig()
                     .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);
+            });
+
+            //register event listener to remove the element when the close icon is clicked
+            newElement.on('click', '.partition-element-close-icon', function () {
+                var elementId = newElement[0].id;
+                var partition = self.configurationData.getSiddhiAppConfig().getPartition(elementId);
+                var noOfElementsInsidePartition = partition.getNoOfElementsInPartition();
+                if (newElement.hasClass('partitionDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removePartition(elementId);
+                }
+                self.jsPlumbInstance.remove(newElement);
+                if(self.jsPlumbInstance.getGroupFor(newElement)){
+                    self.jsPlumbInstance.removeFromGroup(newElement);
+                }
+
+                self.configurationData.getSiddhiAppConfig()
+                    .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount()
+                        - noOfElementsInsidePartition);
             });
         };
 

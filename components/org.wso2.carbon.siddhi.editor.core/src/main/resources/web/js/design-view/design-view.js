@@ -517,6 +517,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
                         console.log(error);
                         if (error.status === 400) {
                             result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                            //TODO: remove partition warning from service call
                         } else if (error.responseText === "pattern queries are not supported") {
                             result = {status: "fail", errorMessage: error.responseText};
                         } else if (error.responseText === "sequence queries are not supported") {
