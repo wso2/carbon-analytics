@@ -254,23 +254,35 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         && self.jsPlumbInstance.getGroupFor(sourceId) !== undefined) {
                         if (self.jsPlumbInstance.getGroupFor(sourceId) !== self.jsPlumbInstance.getGroupFor(targetId)) {
                             alert("Invalid Connection: Inner Streams are not exposed to outside");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     }
                     else if (targetElement.hasClass(constants.STREAM)
                         && self.jsPlumbInstance.getGroupFor(targetId) !== undefined) {
                         if (self.jsPlumbInstance.getGroupFor(targetId) !== self.jsPlumbInstance.getGroupFor(sourceId)) {
                             alert("Invalid Connection: Inner Streams are not exposed to outside");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     } else if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                         if (!sourceElement.hasClass(constants.STREAM)) {
-                            //TODO: check whether the stream is already connected to a connection point
-                            alert("Invalid Connection: Connect a outer stream");
+                            alert("Invalid Connection: Connect an outer stream");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            var partitionId = targetElement.parent()[0].id;
+                            var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+                            var connectedStreamName
+                                = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                            var isStreamConnected = partition.checkOuterStreamIsAlreadyConnected(connectedStreamName);
+                            if (isStreamConnected) {
+                                alert("Invalid Connection: Stream is already connected to the partition");
+                                return connectionValidity;
+                            } else {
+                                return connectionValidity = true;
+                            }
                         }
                     } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                         // check whether the partition connection point has a valid connection with a outer stream.
@@ -278,7 +290,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         var sourceConnections = self.jsPlumbInstance.getConnections({target: sourceId});
                         if (sourceConnections.length === 0) {
                             alert("Invalid Connection: Connect a outer stream first");
-                            return;
+                            return connectionValidity;
                         }
                         var partitionId = sourceElement.parent()[0].id;
                         if (self.jsPlumbInstance.getGroupFor(targetId) !== self.jsPlumbInstance.getGroupFor(partitionId)) {
@@ -290,41 +302,68 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                                 || targetElement.hasClass(constants.PATTERN)
                                 || targetElement.hasClass(constants.JOIN)
                                 || targetElement.hasClass(constants.SEQUENCE)) {
-                                connectionValidity = true;
+                                return connectionValidity = true;
                             } else {
                                 alert("Invalid Connection: Connect a query inside the partition");
+                                return connectionValidity;
                             }
                         }
                     }
                     else if (sourceElement.hasClass(constants.PARTITION)) {
                         if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') !== sourceId) {
                             alert("Invalid Connection: Connect to a partition query");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     }
                     else if (sourceElement.hasClass(constants.SOURCE)) {
                         if (!targetElement.hasClass(constants.STREAM)) {
                             alert("Invalid Connection: Connect to a stream");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     }
                     else if (targetElement.hasClass(constants.SINK)) {
                         if (!sourceElement.hasClass(constants.STREAM)) {
                             alert("Invalid Connection: Sink input source should be a stream");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     }
                     else if (targetElement.hasClass(constants.AGGREGATION)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                             alert("Invalid Connection: Aggregation input should be a stream or trigger");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     }
-                    else if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
+
+                    // When connecting streams to a query inside the partition if it is connected to the partition
+                    // connection point, it cannot connect to the query directly
+                    if ((targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
+                        || targetElement.hasClass(constants.WINDOW_QUERY) || targetElement.hasClass(constants.JOIN)
+                        || targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE))
+                        && sourceElement.hasClass(constants.STREAM)) {
+                        var querySavedInsideAPartition
+                            = self.configurationData.getSiddhiAppConfig().getQueryByIdSavedInsideAPartition(targetId);
+                        var isQueryInsideAPartition = querySavedInsideAPartition !== undefined;
+                        if (isQueryInsideAPartition) {
+                            var partitionId = (self.jsPlumbInstance.getGroupFor(targetId)).id;
+                            var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+                            var connectedStreamName
+                                = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                            var isStreamConnected = partition.checkOuterStreamIsAlreadyConnected(connectedStreamName);
+                            if (isStreamConnected) {
+                                alert("Invalid Connection: Stream is already connected to the partition");
+                                return connectionValidity;
+                            }
+                        }
+                    }
+                    if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
                         if(!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                             alert("Invalid Connection");
                         } else {
