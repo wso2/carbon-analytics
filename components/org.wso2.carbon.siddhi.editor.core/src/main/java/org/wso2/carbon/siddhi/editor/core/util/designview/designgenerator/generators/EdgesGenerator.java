@@ -22,6 +22,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionWithElement;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
@@ -32,7 +34,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryL
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Generator to create Edges, that connect Siddhi Elements - considered as Nodes
@@ -55,12 +59,26 @@ public class EdgesGenerator {
         edges.addAll(generateSinkEdges(siddhiAppConfig.getSinkList()));
         edges.addAll(
                 generateWindowFilterProjectionQueryEdges(
-                        siddhiAppConfig.getQueryLists().get(QueryListType.WINDOW_FILTER_PROJECTION)));
+                        getCompleteQueryTypeList(QueryListType.WINDOW_FILTER_PROJECTION)));
         edges.addAll(
                 generateJoinQueryEdges(
-                        siddhiAppConfig.getQueryLists().get(QueryListType.JOIN)));
+                        getCompleteQueryTypeList(QueryListType.JOIN)));
         edges.addAll(generateAggregationEdges(siddhiAppConfig.getAggregationList()));
         return edges;
+    }
+
+    /**
+     * Gets complete query list of the given queryListType,
+     * from SiddhiAppConfig's outer level and Partitions
+     * @param queryListType     Type of the QueryList
+     * @return                  List of QueryConfigs
+     */
+    private List<QueryConfig> getCompleteQueryTypeList(QueryListType queryListType) {
+        List<QueryConfig> queryList = new ArrayList<>(siddhiAppConfig.getQueryLists().get(queryListType));
+        for (PartitionConfig partitionConfig : siddhiAppConfig.getPartitionList()) {
+            queryList.addAll(partitionConfig.getQueryLists().get(queryListType));
+        }
+        return queryList;
     }
 
     /**
@@ -102,11 +120,30 @@ public class EdgesGenerator {
         List<Edge> edges = new ArrayList<>();
         for (QueryConfig query : windowFilterProjectionQueryList) {
             // Edge towards Query
-            edges.add(
-                    generateEdge(
-                            getElementWithStreamName(
-                                    ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom()),
-                            query));
+            String inputStreamName = ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom();
+            if (query.getConnectorsAndStreams().values().contains(
+                    ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom())) {
+                // Query connects through a PartitionConnector
+
+                // Edge from Outer Element to PartitionConnector
+                edges.add(
+                        generateEdgeToPartitionConnector(
+                                getElementWithStreamName(inputStreamName),
+                                query.getConnectorIdByStreamName(inputStreamName)));
+
+                // Edge from PartitionConnector to Query
+                edges.add(
+                        generateEdgeFromPartitionConnector(
+                                query.getConnectorIdByStreamName(inputStreamName),
+                                query));
+            } else {
+                // Query doesn't connect through a PartitionConnector
+                // Edge towards Query
+                edges.add(
+                        generateEdge(
+                                getElementWithStreamName(inputStreamName),
+                                query));
+            }
             // Edge from Query
             edges.add(
                     generateEdge(query, getElementWithStreamName(query.getQueryOutput().getTarget()).getId()));
@@ -124,15 +161,43 @@ public class EdgesGenerator {
         List<Edge> edges = new ArrayList<>();
         for (QueryConfig query : joinQueryList) {
             // Edge towards Query (From Left)
-            edges.add(
-                    generateEdge(
-                            getElementWithStreamName(((JoinConfig) (query.getQueryInput())).getLeft().getFrom()),
-                            query));
+            String leftInputStreamName = (((JoinConfig) (query.getQueryInput())).getLeft().getFrom());
+            if (query.getConnectorsAndStreams().values().contains(leftInputStreamName)) {
+                // Edge from Outer Element to PartitionConnector
+                edges.add(
+                        generateEdgeToPartitionConnector(
+                                getElementWithStreamName(leftInputStreamName),
+                                query.getConnectorIdByStreamName(leftInputStreamName)));
+                // Edge from PartitionConnector to Query
+                edges.add(
+                        generateEdgeFromPartitionConnector(
+                                query.getConnectorIdByStreamName(leftInputStreamName),
+                                query));
+            } else {
+                edges.add(
+                        generateEdge(
+                                getElementWithStreamName(((JoinConfig) (query.getQueryInput())).getLeft().getFrom()),
+                                query));
+            }
             // Edge towards Query (From Right)
-            edges.add(
-                    generateEdge(
-                            getElementWithStreamName(((JoinConfig) (query.getQueryInput())).getRight().getFrom()),
-                            query));
+            String rightInputStream = (((JoinConfig) (query.getQueryInput())).getRight().getFrom());
+            if (query.getConnectorsAndStreams().values().contains(rightInputStream)) {
+                // Edge from Outer Element to PartitionConnector
+                edges.add(
+                        generateEdgeToPartitionConnector(
+                                getElementWithStreamName(rightInputStream),
+                                query.getConnectorIdByStreamName(rightInputStream)));
+                // Edge from PartitionConnector to Query
+                edges.add(
+                        generateEdgeFromPartitionConnector(
+                                query.getConnectorIdByStreamName(rightInputStream),
+                                query));
+            } else {
+                edges.add(
+                        generateEdge(
+                                getElementWithStreamName(((JoinConfig) (query.getQueryInput())).getRight().getFrom()),
+                                query));
+            }
             // Edge from Query
             edges.add(
                     generateEdge(
@@ -161,6 +226,40 @@ public class EdgesGenerator {
     }
 
     /**
+     * Generates an Edge between a SiddhiElementConfig parent and PartitionConnector child
+     * @param parentElement                     Parent SiddhiElementConfig
+     * @param partitionConnectorId              Id of the PartitionConnector
+     * @return                                  Edge object
+     * @throws DesignGenerationException        Error while getting type of the parent
+     */
+    private Edge generateEdgeToPartitionConnector(SiddhiElementConfig parentElement,
+                                                  String partitionConnectorId) throws DesignGenerationException {
+        return new Edge(
+                generateEdgeId(parentElement.getId(), partitionConnectorId),
+                parentElement.getId(),
+                getSiddhiElementType(parentElement),
+                partitionConnectorId,
+                NodeType.PARTITION);
+    }
+
+    /**
+     * Generates an Edge between a PartitionConnector parent and SiddhiElementConfig child
+     * @param partitionConnectorId              Id of the PartitionConnector
+     * @param childElement                      Child SiddhiElementConfig
+     * @return                                  Edge object
+     * @throws DesignGenerationException        Error while getting type of the child
+     */
+    private Edge generateEdgeFromPartitionConnector(String partitionConnectorId,
+                                                    SiddhiElementConfig childElement) throws DesignGenerationException {
+        return new Edge(
+                generateEdgeId(partitionConnectorId, childElement.getId()),
+                partitionConnectorId,
+                NodeType.PARTITION,
+                childElement.getId(),
+                getSiddhiElementType(childElement));
+    }
+
+    /**
      * Generates an Edge between corresponding parent and child SiddhiElements.
      * When one of the given parent/child is a SiddhiElement object, the Element is used directly.
      * When one of those is an Id, the respective element for the id is got and used
@@ -172,7 +271,7 @@ public class EdgesGenerator {
     private Edge generateEdge(Object parentElementOrId, Object childElementOrId) throws DesignGenerationException {
         SiddhiElementConfig parentElement = getOrAcceptSiddhiElement(parentElementOrId);
         SiddhiElementConfig childElement = getOrAcceptSiddhiElement(childElementOrId);
-        return generateEdgesForElements(parentElement, childElement);
+        return generateEdgeForElements(parentElement, childElement);
     }
 
     /**
@@ -199,7 +298,7 @@ public class EdgesGenerator {
      * @return                                  Edge object
      * @throws DesignGenerationException        Error while generating config
      */
-    private Edge generateEdgesForElements(SiddhiElementConfig parentElement, SiddhiElementConfig childElement)
+    private Edge generateEdgeForElements(SiddhiElementConfig parentElement, SiddhiElementConfig childElement)
             throws DesignGenerationException {
         NodeType parentType = getSiddhiElementType(parentElement);
         NodeType childType = getSiddhiElementType(childElement);
@@ -239,6 +338,13 @@ public class EdgesGenerator {
                 return aggregationConfig;
             }
         }
+        for (PartitionConfig partitionConfig : siddhiAppConfig.getPartitionList()) {
+            for (StreamConfig streamConfig : partitionConfig.getStreamList()) {
+                if (streamConfig.getName().equals(streamName)) {
+                    return streamConfig;
+                }
+            }
+        }
         throw new DesignGenerationException("Unable to find an element with related stream name '" + streamName + "'");
     }
 
@@ -266,7 +372,16 @@ public class EdgesGenerator {
         siddhiElementLists.addAll(siddhiAppConfig.getTriggerList());
         siddhiElementLists.addAll(siddhiAppConfig.getWindowList());
         siddhiElementLists.addAll(siddhiAppConfig.getAggregationList());
-
+        for (Map.Entry<QueryListType, List<QueryConfig>> queryList : siddhiAppConfig.getQueryLists().entrySet()) {
+            siddhiElementLists.addAll(queryList.getValue());
+        }
+        siddhiElementLists.addAll(siddhiAppConfig.getPartitionList());
+        for (PartitionConfig partitionConfig : siddhiAppConfig.getPartitionList()) {
+            siddhiElementLists.addAll(partitionConfig.getStreamList());
+            for (Map.Entry<QueryListType, List<QueryConfig>> queryList : partitionConfig.getQueryLists().entrySet()) {
+                siddhiElementLists.addAll(queryList.getValue());
+            }
+        }
         for (SiddhiElementConfig siddhiElementConfig : siddhiElementLists) {
             if (siddhiElementConfig.getId().equals(id)) {
                 return siddhiElementConfig;

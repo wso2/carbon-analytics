@@ -31,5 +31,6 @@ public enum NodeType {
     TRIGGER,
     QUERY,
     WINDOW_FILTER_PROJECTION_QUERY,
-    JOIN_QUERY;
+    JOIN_QUERY,
+    PARTITION;
 }
