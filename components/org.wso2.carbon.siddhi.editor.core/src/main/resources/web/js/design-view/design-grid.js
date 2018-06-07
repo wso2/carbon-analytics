@@ -105,7 +105,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         radius: 3
                     },
                     ConnectionsDetachable: false,
-                    Connector: ["Flowchart", {}]
+                    Connector: ["Bezier", {curviness: 25}]
                 });
 
                 /**
