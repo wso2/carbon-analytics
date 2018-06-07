@@ -16,19 +16,19 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palette', 'designViewGrid',
+define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid',
         'configurationData', 'appData', 'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation',
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindowOrFunction', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
         'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation',
-        'functionDefinition', 'streamHandler', 'storeAnnotation'],
-    function (require, log, _, $, alerts, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
+        'functionDefinition', 'streamHandler', 'storeAnnotation', 'partitionWith'],
+    function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindowOrFunction, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert,
               QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput,
               JoinQuerySource, PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation,
-              MapAnnotation, FunctionDefinition, StreamHandler, StoreAnnotation) {
+              MapAnnotation, FunctionDefinition, StreamHandler, StoreAnnotation, PartitionWith) {
 
         /**
          * @class DesignView
@@ -293,6 +293,10 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
                 var partitionObject = new Partition(partition);
                 addAnnotationsForElement(partition, partitionObject);
 
+                _.forEach(partition.partitionWith, function(partitionWith){
+                    var partitionWithObject = new PartitionWith(partitionWith);
+                    partitionObject.addPartitionWith(partitionWithObject);
+                });
                 //TODO: reduce the code duplication
                 _.forEach(partition.streamList, function(stream){
                     var streamObject = new Stream(stream);
@@ -558,23 +562,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
             return result;
         };
 
-        /**
-         * Display's a warning using the AlertsManager.
-         *
-         * @param message The content to be displayed in the alert
-         */
-        DesignView.prototype.warnAlert = function (message) {
-            alerts.warn(message);
-        };
-
-        /**
-         * Display's a error using the AlertsManager.
-         *
-         * @param message The content to be displayed in the alert
-         */
-        DesignView.prototype.errorAlert = function (message) {
-            alerts.error(message);
-        };
         //TODO: replace all the alert with the alert library objects
 
         return DesignView;
