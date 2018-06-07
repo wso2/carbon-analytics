@@ -190,6 +190,23 @@ define(['require', 'elementUtils', 'lodash'],
             this.annotationList = annotationList;
         };
 
+        Partition.prototype.checkOuterStreamIsAlreadyConnected = function (streamName) {
+            var self = this;
+            var isStreamConnected = false;
+            _.forEach(self.partitionWith, function(partitionWith) {
+                if (partitionWith.getStreamName() === streamName) {
+                    isStreamConnected = true;
+                }
+            });
+            return isStreamConnected;
+        };
+
+        Partition.prototype.getNoOfElementsInPartition = function () {
+            var self = this;
+            return self.streamList.length + self.queryLists.WINDOW_FILTER_PROJECTION.length +
+                self.queryLists.JOIN.length + self.queryLists.PATTERN.length + self.queryLists.SEQUENCE.length;
+        };
+
         return Partition;
 
     });
