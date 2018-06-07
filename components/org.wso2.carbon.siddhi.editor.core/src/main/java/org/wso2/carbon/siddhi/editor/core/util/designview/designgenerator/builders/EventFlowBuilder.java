@@ -24,6 +24,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAp
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.*;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -213,13 +214,18 @@ public class EventFlowBuilder {
      */
     public EventFlowBuilder loadExecutionElements() throws DesignGenerationException {
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
+        PartitionConfigGenerator partitionConfigGenerator =
+                new PartitionConfigGenerator(
+                        siddhiAppString,
+                        siddhiApp,
+                        siddhiAppRuntime);
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
                 QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement);
                 siddhiAppConfig.addQuery(QueryConfigGenerator.getQueryListType(queryConfig), queryConfig);
             } else if (executionElement instanceof Partition) {
-                // To disable Partitions in front end
-                throw new DesignGenerationException("Partitions are not supported");
+                siddhiAppConfig.addPartition(
+                        partitionConfigGenerator.generatePartitionConfig((Partition) executionElement));
             } else {
                 throw new DesignGenerationException("Unable create config for execution element of type unknown");
             }
