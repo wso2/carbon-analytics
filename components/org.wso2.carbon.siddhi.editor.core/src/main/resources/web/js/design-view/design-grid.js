@@ -64,6 +64,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             this.currentTabId = this.application.tabController.activeTab.cid;
             this.designViewContainer = $('#design-container-' + this.currentTabId);
             this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
+            this.designGridContainer = $('#design-grid-container-' + this.currentTabId);
         };
 
         DesignGrid.prototype.render = function () {
@@ -1216,13 +1217,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
         };
 
         /**
-         * @function Auto align the diagram
+         * @function Auto align and center the diagram
          */
         DesignGrid.prototype.autoAlignElements = function () {
             var self = this;
             // Create a new graph instance
             var graph = new dagre.graphlib.Graph({compound: true});
-            // Sets the graph to grow from left to right
+            // Sets the graph to grow from left to right, and also to separate the distance between each node
             graph.setGraph({rankdir: 'LR', edgesep: 10, ranksep: 100, nodesep: 50});
             // This sets the default edge label to `null` as edges/arrows in the design view will
             // never have any labels/names to display on the screen
@@ -1326,6 +1327,55 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             // nodes in the graph should be placed
             dagre.layout(graph);
 
+            // Set the default minimum and maximum coordinates to zero
+            var minimumCoordinate = {x: 0, y: 0};
+            var maximumCoordinate = {x: 0, y: 0};
+            // Traverse through every node and find the minimum and maximum x & y coordinates
+            // The minimum and maximum x & y coordinates have to be found to obtain the size of the graph
+            graph.nodes().forEach(function (nodeId) {
+                // Get the instance of the dagre node of 'nodeId'
+                var node = graph.node(nodeId);
+                // Get the minimum x & y coordinates of the current node
+                var minX = node.x - (node.width / 2);
+                var minY = node.y - (node.height / 2);
+                // Get the maximum x & y coordinates of the current node
+                var maxX = node.x + (node.width / 2);
+                var maxY = node.y + (node.height / 2);
+                // Find the minimum and maximum 'x' coordinates from all nodes
+                if (maxX > maximumCoordinate.x || maximumCoordinate.x === 0) {
+                    maximumCoordinate.x = maxX;
+                }
+                if (minX < minimumCoordinate.x || minimumCoordinate.x === 0) {
+                    minimumCoordinate.x = minX;
+                }
+                // Find the minimum and maximum 'y' coordinates from all the nodes
+                if (maxY > maximumCoordinate.y || maximumCoordinate.y === 0) {
+                    maximumCoordinate.y = maxY;
+                }
+                if (minY < minimumCoordinate.y || minimumCoordinate.y === 0) {
+                    minimumCoordinate.y = minY;
+                }
+            });
+            // Obtain the width and the height of the current design-grid instance
+            var gridWidth = this.designGridContainer.width();
+            var gridHeight = this.designGridContainer.height();
+            // The difference in the largest and smallest 'x' coordinates gives the graph width
+            var graphWidth = maximumCoordinate.x - minimumCoordinate.x;
+            // The difference in the largest and smallest 'y' coordinates gives the graph height
+            var graphHeight = maximumCoordinate.y - minimumCoordinate.y;
+            // Set the centerLeft and centerTop coordinates to default 20
+            // NOTE - The 'centerLeft' and 'centerTop' variables are the values that have to be added
+            // to the final 'left' and 'top' CSS positions of the graph to align the graph to the
+            // center of the design-grid
+            var centerLeft = 20;
+            var centerTop = 20;
+            if (gridWidth > graphWidth) {
+                centerLeft = (gridWidth - graphWidth) / 2;
+            }
+            if (gridHeight > graphHeight) {
+                centerTop = (gridHeight - graphHeight) / 2;
+            }
+
             // Re-align the elements in the grid based on the graph layout given by dagre
             graph.nodes().forEach(function (nodeId) {
                 // Get a dagre instance of the node of `nodeId`
@@ -1338,7 +1388,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                 var partitionId = -1;
                 graphJSON.groups.forEach(function (group) {
                     group.children.forEach(function (child) {
-                        if (nodeId == child) {
+                        if (nodeId === child) {
                             isInPartition = true;
                             partitionId = group.id;
                         }
@@ -1353,12 +1403,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                     var partitionNode = graph.node(partitionId);
 
                     // Identify the left and top value
-                    var partitionNodeLeft = partitionNode.x - (partitionNode.width / 2) + 20;
-                    var partitionNodeTop = partitionNode.y - (partitionNode.height / 2) + 20;
+                    var partitionNodeLeft = partitionNode.x - (partitionNode.width / 2) + centerLeft;
+                    var partitionNodeTop = partitionNode.y - (partitionNode.height / 2) + centerTop;
 
                     // Identify the node's left and top position relative to it's partition's top and left position
-                    var left = node.x - (node.width / 2) + 20 - partitionNodeLeft;
-                    var top = node.y - (node.height / 2) + 20 - partitionNodeTop;
+                    var left = node.x - (node.width / 2) + centerLeft - partitionNodeLeft;
+                    var top = node.y - (node.height / 2) + centerTop - partitionNodeTop;
 
                     // Set the inner node's left and top position
                     $node.css("left", left + "px");
@@ -1366,8 +1416,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                 } else {
                     // If the node is not in a partition then it's left and top positions are obtained relative to
                     // the entire grid
-                    var left = node.x - (node.width / 2) + 20;
-                    var top = node.y - (node.height / 2) + 20;
+                    var left = node.x - (node.width / 2) + centerLeft;
+                    var top = node.y - (node.height / 2) + centerTop;
                     // Set the node's left and top positions
                     $node.css("left", left + "px");
                     $node.css("top", top + "px");

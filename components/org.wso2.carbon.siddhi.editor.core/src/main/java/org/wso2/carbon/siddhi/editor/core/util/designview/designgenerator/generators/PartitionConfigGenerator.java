@@ -174,12 +174,11 @@ public class PartitionConfigGenerator {
      */
     private String generateRangePartitionExpression(
             RangePartitionType.RangePartitionProperty[] rangePartitionProperties) throws DesignGenerationException {
-        StringBuilder rangePartitionPropertyExpression = new StringBuilder();
+        List<String> expression = new ArrayList<>();
         for (RangePartitionType.RangePartitionProperty rangePartitionProperty : rangePartitionProperties) {
-            rangePartitionPropertyExpression.append(
-                    ConfigBuildingUtilities.getDefinition(rangePartitionProperty, siddhiAppString));
+            expression.add(ConfigBuildingUtilities.getDefinition(rangePartitionProperty, siddhiAppString));
         }
-        return rangePartitionPropertyExpression.toString();
+        return String.join(" or ", expression);
     }
 
     /**
