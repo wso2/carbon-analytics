@@ -289,7 +289,6 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 appData.addJoinQuery(queryObject);
             });
             _.forEach(configurationData.siddhiAppConfig.partitionList, function(partition){
-                //partitionObject.setId(newIdBeginningPhrase + partitionObject.getId());
                 var partitionObject = new Partition(partition);
                 partitionObject.setId(newIdBeginningPhrase + partitionObject.getId());
                 addAnnotationsForElement(partition, partitionObject);
