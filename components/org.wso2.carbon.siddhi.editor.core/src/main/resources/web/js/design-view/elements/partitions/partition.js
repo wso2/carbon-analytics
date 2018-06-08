@@ -154,6 +154,10 @@ define(['require', 'elementUtils', 'lodash'],
             return ElementUtils.prototype.getElement(this.queryLists.JOIN, joinQueryId);
         };
 
+        Partition.prototype.getStreamList = function () {
+            return this.streamList;
+        };
+
         Partition.prototype.getWindowFilterProjectionQueryList = function () {
             return this.queryLists.WINDOW_FILTER_PROJECTION;
         };

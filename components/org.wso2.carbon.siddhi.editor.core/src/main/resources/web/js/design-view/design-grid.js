@@ -560,7 +560,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
                         var partitionElementSettingsIcon
                             = partitionElement.find('.partition-element-prop-icon');
-                        self.dropElements.formBuilder.GeneratePartitionKeyForm(partitionElementSettingsIcon[0]);
+                        //self.dropElements.formBuilder.GeneratePartitionKeyForm(partitionElementSettingsIcon[0]);
 
                     } else if (sourceElement.hasClass(constants.SOURCE)
                         && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
@@ -602,7 +602,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)
                         || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
-// TODO: when connecting elements(join query) can we connect normal stream and the partitioned version of that stream?
                         if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                             var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
                             var sourceConnectionId = sourceConnection[0].sourceId;
@@ -988,6 +987,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
             function addMemberToPartitionGroup(self) {
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
+                    // check whether member is already added to the group
+                    if (self.jsPlumbInstance.getGroupFor(event.el.id) !== undefined &&
+                        self.jsPlumbInstance.getGroupFor(event.el.id) === event.group) {
+                        return;
+                    }
                     var isGroupMemberValid = false;
                     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                         || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
@@ -1093,7 +1097,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             _.forEach(self.configurationData.getSiddhiAppConfig().getSourceList(), function(source){
                 var sourceId = source.getId();
                 var sourceName = "Source";
-                var array = sourceId.split("-");
+                var array = sourceId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1103,7 +1107,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             _.forEach(self.configurationData.getSiddhiAppConfig().getSinkList(), function(sink){
                 var sinkId = sink.getId();
                 var sinkName = "Sink";
-                var array = sinkId.split("-");
+                var array = sinkId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1113,7 +1117,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             _.forEach(self.configurationData.getSiddhiAppConfig().getStreamList(), function(stream){
                 var streamId = stream.getId();
                 var streamName = stream.getName();
-                var array = streamId.split("-");
+                var array = streamId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1124,7 +1128,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
                 var tableId = table.getId();
                 var tableName = table.getName();
-                var array = tableId.split("-");
+                var array = tableId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1135,7 +1139,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
                 var windowId = window.getId();
                 var windowName = window.getName();
-                var array = windowId.split("-");
+                var array = windowId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1146,7 +1150,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
                 var triggerId = trigger.getId();
                 var triggerName = trigger.getName();
-                var array = triggerId.split("-");
+                var array = triggerId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1157,7 +1161,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
                 var aggregationId = aggregation.getId();
                 var aggregationName = aggregation.getName();
-                var array = aggregationId.split("-");
+                var array = aggregationId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1168,7 +1172,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
                 var functionId = functionObject.getId();
                 var functionName = functionObject.getName();
-                var array = functionId.split("-");
+                var array = functionId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1179,7 +1183,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
                 var patternQueryId = patternQuery.getId();
                 var patternQueryName = "Pattern";
-                var array = patternQueryId.split("-");
+                var array = patternQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1190,7 +1194,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
                 var sequenceQueryId = sequenceQuery.getId();
                 var sequenceQueryName = "Sequence";
-                var array = sequenceQueryId.split("-");
+                var array = sequenceQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1212,7 +1216,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         queryType = constants.WINDOW_QUERY;
                     }
 
-                    var array = queryId.split("-");
+                    var array = queryId.split("_");
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
@@ -1223,7 +1227,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
                 var joinQueryId = joinQuery.getId();
                 var joinQueryName = "Join";
-                var array = joinQueryId.split("-");
+                var array = joinQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1233,26 +1237,118 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             _.forEach(self.configurationData.getSiddhiAppConfig().getPartitionList(), function(partition){
 
                 var partitionId = partition.getId();
-                var array = partitionId.split("-");
+                var array = partitionId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handlePartition(mouseTop, mouseLeft, true, partitionId);
+
+                var jsPlumbPartitionGroup = self.jsPlumbInstance.getGroup(partitionId);
+
+                _.forEach(partition.getStreamList(), function(stream){
+                    var streamId = stream.getId();
+                    var streamName = stream.getName();
+                    var array = streamId.split("_");
+                    var lastArrayEntry = parseInt(array[array.length -1]);
+                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
+
+                    var streamElement = $('#' + streamId)[0];
+                    self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, streamElement);
+                });
+
+                _.forEach(partition.getPatternQueryList(), function(patternQuery){
+
+                    var patternQueryId = patternQuery.getId();
+                    var patternQueryName = "Pattern";
+                    var array = patternQueryId.split("_");
+                    var lastArrayEntry = parseInt(array[array.length -1]);
+                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
+
+                    var patternElement = $('#' + patternQueryId)[0];
+                    self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, patternElement);
+                });
+
+                _.forEach(partition.getSequenceQueryList(), function(sequenceQuery){
+
+                    var sequenceQueryId = sequenceQuery.getId();
+                    var sequenceQueryName = "Sequence";
+                    var array = sequenceQueryId.split("_");
+                    var lastArrayEntry = parseInt(array[array.length -1]);
+                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId);
+
+                    var sequenceElement = $('#' + sequenceQueryId)[0];
+                    self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, sequenceElement);
+                });
+
+                _.forEach(partition.getWindowFilterProjectionQueryList(),
+                    function (windowFilterProjectionQuery) {
+                        var queryId = windowFilterProjectionQuery.getId();
+                        var queryName = "Query";
+                        var querySubType = windowFilterProjectionQuery.getQueryInput().getType();
+
+                        var queryType;
+                        if (querySubType === 'PROJECTION') {
+                            queryType = constants.PROJECTION;
+                        } else if (querySubType === 'FILTER') {
+                            queryType = constants.FILTER;
+                        } else if (querySubType === 'WINDOW') {
+                            queryType = constants.WINDOW_QUERY;
+                        }
+
+                        var array = queryId.split("_");
+                        var lastArrayEntry = parseInt(array[array.length - 1]);
+                        var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                        var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
+                        self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
+
+                        var queryElement = $('#' + queryId)[0];
+                        self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, queryElement);
+                    });
+
+                _.forEach(partition.getJoinQueryList(), function(joinQuery){
+
+                    var joinQueryId = joinQuery.getId();
+                    var joinQueryName = "Join";
+                    var array = joinQueryId.split("_");
+                    var lastArrayEntry = parseInt(array[array.length -1]);
+                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
+
+                    var joinElement = $('#' + joinQueryId)[0];
+                    self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, joinElement);
+                });
             });
 
             _.forEach(self.configurationData.edgeList, function(edge){
+                var targetId;
+                var sourceId;
 
-                var targetId = edge.getChildId();
-                var sourceId = edge.getParentId();
+                if (edge.getChildType() === 'PARTITION') {
+                    targetId = edge.getChildId();
+                    sourceId = edge.getParentId() + '-out';
+                } else if (edge.getParentType() === 'PARTITION') {
+                    targetId = edge.getChildId() + '-in';
+                    sourceId = edge.getParentId();
+                } else {
+                    targetId = edge.getChildId() + '-in';
+                    sourceId = edge.getParentId() + '-out';
+                }
 
                 self.jsPlumbInstance.connect({
-                    source: sourceId+'-out',
-                    target: targetId+'-in'
+                    source: sourceId,
+                    target: targetId
                 });
             });
 
             // re-align the elements
-            self.autoAlignElements();
+            //self.autoAlignElements();
         };
 
         /**
