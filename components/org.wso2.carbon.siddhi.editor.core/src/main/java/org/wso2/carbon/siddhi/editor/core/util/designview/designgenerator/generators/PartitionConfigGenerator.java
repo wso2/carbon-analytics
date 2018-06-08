@@ -26,7 +26,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryL
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
@@ -39,6 +38,7 @@ import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.expression.Expression;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -50,27 +50,32 @@ import java.util.Map;
 public class PartitionConfigGenerator {
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
-    private SiddhiAppRuntime siddhiAppRuntime;
+    private Map<String, Map<String, AbstractDefinition>> partitionedInnerStreamDefinitions;
     private Map<String, String> connectorsAndStreams = new HashMap<>();
 
     public PartitionConfigGenerator(String siddhiAppString,
                                     SiddhiApp siddhiApp,
-                                    SiddhiAppRuntime siddhiAppRuntime) {
+                                    Map<String, Map<String, AbstractDefinition>> partitionedInnerStreamDefinitions) {
         this.siddhiAppString = siddhiAppString;
         this.siddhiApp = siddhiApp;
-        this.siddhiAppRuntime = siddhiAppRuntime;
+        this.partitionedInnerStreamDefinitions = partitionedInnerStreamDefinitions;
     }
 
     /**
      * Generates PartitionConfig object from the given Siddhi Partition
      * @param partition                         Siddhi Partition
+     * @param partitionId                       Id of the Partition against which,
+     *                                          Inner Stream definitions are contained in the respective map
      * @return                                  PartitionConfig object
-     * @throws DesignGenerationException        Error when generating
+     * @throws DesignGenerationException        Error when generating PartitionConfig object
      */
-    public PartitionConfig generatePartitionConfig(Partition partition) throws DesignGenerationException {
+    public PartitionConfig generatePartitionConfig(Partition partition, String partitionId)
+            throws DesignGenerationException {
         PartitionConfig partitionConfig = new PartitionConfig();
         partitionConfig.setQueryLists(generateQueryList(partition.getQueryList()));
-        partitionConfig.setStreamList(generateInnerStreams());
+        partitionConfig.setStreamList(
+                generateInnerStreams(
+                        partitionedInnerStreamDefinitions.get(partitionId).values()));
         partitionConfig.setPartitionWith(generatePartitionWith(partition.getPartitionTypeMap()));
         partitionConfig.setAnnotationList(generateAnnotations(partition.getAnnotations()));
         partitionConfig.setConnectorsAndStreams(connectorsAndStreams);
@@ -109,20 +114,17 @@ public class PartitionConfigGenerator {
     }
 
     /**
-     * Generates a list of Inner Streams from the given SiddhiAppRuntime
-     * @return      List of inner stream configs
+     * Generates a list of StreamConfigs from the given map of Inner Stream definition
+     * @param innerStreamDefinitions        Map of Inner Stream definitions
+     * @return                              List of StreamConfigs
      */
-    private List<StreamConfig> generateInnerStreams() {
+    private List<StreamConfig> generateInnerStreams(Collection<AbstractDefinition> innerStreamDefinitions) {
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
         List<StreamConfig> innerStreams = new ArrayList<>();
-        for (Map<String, AbstractDefinition> abstractDefinitionMap :
-                siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
-            for (AbstractDefinition abstractDefinition : abstractDefinitionMap.values()) {
-                if (abstractDefinition instanceof StreamDefinition) {
-                    StreamConfig streamConfig =
-                            streamDefinitionConfigGenerator.generateStreamConfig((StreamDefinition) abstractDefinition);
-                    innerStreams.add(streamConfig);
-                }
+        for (AbstractDefinition innerStreamDefinition : innerStreamDefinitions) {
+            if (innerStreamDefinition instanceof StreamDefinition) {
+                innerStreams.add(
+                        streamDefinitionConfigGenerator.generateStreamConfig((StreamDefinition) innerStreamDefinition));
             }
         }
         return innerStreams;
