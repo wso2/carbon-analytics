@@ -400,10 +400,24 @@ select.form-control,
     border: 0;
 }
 
-.design-view-form-content {
+.design-view-form-content,
+h3,
+.control-label {
     color: #BDBDBD;
 }
 
 .frm-qry {
     margin-bottom: 20px;
+}
+
+.frm-agr thead tr th:nth-of-type(2) {
+    width: 30%;
+}
+
+.frm-agr table {
+    width: 100% !important;
+}
+
+.form-control[disabled] {
+    opacity: 0.3;
 }
