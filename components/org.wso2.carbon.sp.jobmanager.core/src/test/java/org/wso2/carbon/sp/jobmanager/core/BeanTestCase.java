@@ -109,8 +109,10 @@ public class BeanTestCase {
 
     @Test
     public void testDistributedSiddhiQuery() {
-        DeployableSiddhiQueryGroup deployableSiddhiQueryGroup = new DeployableSiddhiQueryGroup("group-1", false);
-        DeployableSiddhiQueryGroup deployableSiddhiQueryGroup2 = new DeployableSiddhiQueryGroup("group-2", false);
+        DeployableSiddhiQueryGroup deployableSiddhiQueryGroup = new DeployableSiddhiQueryGroup("group-1", false,
+                                                                                               1);
+        DeployableSiddhiQueryGroup deployableSiddhiQueryGroup2 = new DeployableSiddhiQueryGroup("group-2", false,
+                                                                                                1);
         Assert.assertTrue(deployableSiddhiQueryGroup.equals(deployableSiddhiQueryGroup));
         Assert.assertFalse(deployableSiddhiQueryGroup.equals(null));
         Assert.assertFalse(deployableSiddhiQueryGroup.equals(deployableSiddhiQueryGroup2));
