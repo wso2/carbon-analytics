@@ -46,6 +46,9 @@ public class QueryOutputConfigDeSerializer implements JsonDeserializer {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonPrimitive jsonPrimitive = (JsonPrimitive) jsonObject.get(TYPE);
         String queryOutputType = jsonPrimitive.getAsString();
+        if (jsonObject.get(TARGET) == null) {
+            return null;
+        }
         String target = jsonObject.get(TARGET).getAsString();
         if (queryOutputType.equalsIgnoreCase(QueryOutputType.INSERT.toString())) {
             return new QueryOutputConfig(
