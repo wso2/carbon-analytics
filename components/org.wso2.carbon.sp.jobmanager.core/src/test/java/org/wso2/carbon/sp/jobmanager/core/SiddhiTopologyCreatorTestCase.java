@@ -1136,7 +1136,7 @@ public class SiddhiTopologyCreatorTestCase {
      * when user given sources are located in more than 1 execGroup then a passthrough query will be added in a new
      * execGroup.Newly created execGroup will be moved to as the first element of already created passthrough queries
      */
-    @Test(/*dependsOnMethods = "testSinkStreamForSource"*/)
+    @Test(dependsOnMethods = "testSinkStreamForSource")
     public void testUsergivenSourceNoGroup() {
         String siddhiApp = "@App:name('TestPlan12') \n"
                 + "@source(type='inMemory', topic='stock', @map(type='json'))  "
