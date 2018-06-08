@@ -533,11 +533,21 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
                         connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
 
-                        var partitionWithOptions = {};
-                        _.set(partitionWithOptions, 'streamName', connectedElementName);
-                        _.set(partitionWithOptions, 'expression', undefined);
-                        var partitionWithObject = new PartitionWith(partitionWithOptions);
-                        partition.addPartitionWith(partitionWithObject);
+                        /*
+                        * check whether the stream is already connected to partition. This validation is done in the
+                        * checkConnectionValidityBeforeElementDrop() function. But that beforedrop event is triggered
+                        * only when user adds connection. It doesn't fire when we programmatically create connections
+                        * (in this case rendering the design view from code). So we need to do the validation here
+                        * again.
+                        * */
+                        var isStreamConnected = partition.checkOuterStreamIsAlreadyConnected(connectedElementName);
+                        if (!isStreamConnected) {
+                            var partitionWithOptions = {};
+                            _.set(partitionWithOptions, 'streamName', connectedElementName);
+                            _.set(partitionWithOptions, 'expression', undefined);
+                            var partitionWithObject = new PartitionWith(partitionWithOptions);
+                            partition.addPartitionWith(partitionWithObject);
+                        }
 
                         var partitionElement = $('#' + partitionId);
                         var noOfConnectionInParts
