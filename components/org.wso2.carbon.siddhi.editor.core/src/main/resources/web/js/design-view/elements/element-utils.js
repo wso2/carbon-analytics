@@ -48,16 +48,20 @@ define(
          * Removes an element from the array.
          * @param array Array which the element is needed to be removed.
          * @param elementId Id of the element to be removed.
+         * @returns boolean returns whether element is removed or not
          */
         ElementUtils.prototype.removeElement = function (array, elementId) {
+            var isElementRemoved = false;
             array.forEach(function(element){
                 if (element.id === elementId) {
                     var index = array.indexOf(element);
                     if (index > -1) {
                         array.splice(index, 1);
+                        isElementRemoved = true;
                     }
                 }
             });
+            return isElementRemoved;
         };
 
         /**

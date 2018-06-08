@@ -18,25 +18,34 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition;
 
-import java.util.List;
-
 /**
  * Represents Siddhi Partition with element
  */
-public class PartitionWith {
-    private String type;
-    private List<PartitionWithExpression> expressions;
+public class PartitionWithElement {
+    private String expression;
+    private String streamName;
 
-    public PartitionWith(String type, List<PartitionWithExpression> expressions) {
-        this.type = type;
-        this.expressions = expressions;
+    public PartitionWithElement() {
     }
 
-    public String getType() {
-        return type;
+    public PartitionWithElement(String expression, String streamName) {
+        this.expression = expression;
+        this.streamName = streamName;
     }
 
-    public List<PartitionWithExpression> getExpressions() {
-        return expressions;
+    public String getExpression() {
+        return expression;
+    }
+
+    public String getStreamName() {
+        return streamName;
+    }
+
+    public void setExpression(String expression) {
+        this.expression = expression;
+    }
+
+    public void setStreamName(String streamName) {
+        this.streamName = streamName;
     }
 }

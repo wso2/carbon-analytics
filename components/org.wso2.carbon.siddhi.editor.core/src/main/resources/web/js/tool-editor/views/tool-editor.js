@@ -17,10 +17,10 @@
  */
 
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager', 'launcher', 'app/debugger/debugger'],
+        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
-              DebugManager) {
+              DebugManager, DesignViewUtils) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -164,7 +164,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
                             if (application.tabController.getActiveTab().getFile().isDirty()) {
-                                self._designView.warnAlert("Please save the file before switching to the Design View");
+                                DesignViewUtils.prototype.warnAlert("Please save the file before switching to the Design View");
                                 return;
                             }
                             var response = self._designView.getDesign(self.getContent());
@@ -179,7 +179,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 designView.renderDesignGrid(self.JSONObject);
 
                             } else if (response.status === "fail") {
-                                self._designView.errorAlert(response.errorMessage);
+                                DesignViewUtils.prototype.errorAlert(response.errorMessage);
                             }
                         } else if (designContainer.is(':visible')) {
 
@@ -227,7 +227,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
                             } else if (response.status === "fail") {
-                                self._designView.errorAlert(response.errorMessage);
+                                DesignViewUtils.prototype.errorAlert(response.errorMessage);
                             }
                         }
                         // NOTE - This trigger should be always handled after the 'if' condition

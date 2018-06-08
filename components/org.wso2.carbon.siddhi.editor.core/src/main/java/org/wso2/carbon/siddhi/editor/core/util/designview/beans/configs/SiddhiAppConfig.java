@@ -25,15 +25,14 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +54,7 @@ public class SiddhiAppConfig {
     private List<AggregationConfig> aggregationList = new ArrayList<>();
     private List<FunctionConfig> functionList = new ArrayList<>();
     private Map<QueryListType, List<QueryConfig>> queryLists = new EnumMap<>(QueryListType.class);
+    private List<PartitionConfig> partitionList = new ArrayList<>();
 
     public SiddhiAppConfig() {
         queryLists.put(QueryListType.WINDOW_FILTER_PROJECTION, new ArrayList<>());
@@ -72,6 +72,16 @@ public class SiddhiAppConfig {
     }
 
     /**
+     * Returns PartitionConnector id, with the given partition id and connector id
+     * @param partitionId       Id of the PartitionConfig
+     * @param connectorId       Id of the PartitionConnector, within the Partition
+     * @return                  PartitionConnector id
+     */
+    private String generatePartitionConnectorId(String partitionId, String connectorId) {
+        return partitionId + "_pc" + connectorId;
+    }
+
+    /**
      * Adds a given generic type Siddhi ElementConfig, to the given list of the same generic type
      * @param elementList       List to which, the given element config should be added
      * @param elementConfig     Siddhi ElementConfig object
@@ -85,15 +95,43 @@ public class SiddhiAppConfig {
     /**
      * Adds a given QueryConfig object to its specific query list, denoted by the given QueryInputType
      * @param queryListType     Key with which, the specific query list is denoted
-     * @param queryLists        Map of query lists,
-     *                          where key is the type of query list, and value is the specific query list
      * @param queryConfig       QueryConfig object
      */
-    private void addQuery(QueryListType queryListType,
-                          Map<QueryListType, List<QueryConfig>> queryLists,
-                          QueryConfig queryConfig) {
+    public void addQuery(QueryListType queryListType, QueryConfig queryConfig) {
         queryConfig.setId(generateNextElementId());
         queryLists.get(queryListType).add(queryConfig);
+    }
+
+    /**
+     * Adds a given PartitionConfig object to the partitionList
+     * @param partitionConfig       PartitionConfig object
+     */
+    public void addPartition(PartitionConfig partitionConfig) {
+        partitionConfig.setId(generateNextElementId());
+        // Assign connectorsAndStreams with renamed Ids
+        Map<String, String> connectorsAndStreams = new HashMap<>();
+        for (Map.Entry<String, String> connectorAndStream : partitionConfig.getConnectorsAndStreams().entrySet()) {
+            connectorsAndStreams.put(
+                    generatePartitionConnectorId(partitionConfig.getId(), connectorAndStream.getKey()),
+                    connectorAndStream.getValue());
+        }
+        partitionConfig.setConnectorsAndStreams(connectorsAndStreams);
+
+        // Set Partition details for contained for Queries
+        for (List<QueryConfig> queryList : partitionConfig.getQueryLists().values()) {
+            for (QueryConfig queryConfig : queryList) {
+                queryConfig.setId(generateNextElementId());
+                queryConfig.setPartitionId(partitionConfig.getId());
+                queryConfig.setConnectorsAndStreams(connectorsAndStreams);
+            }
+        }
+        // Set Partition details Streams
+        for (StreamConfig streamConfig : partitionConfig.getStreamList()) {
+            streamConfig.setId(generateNextElementId());
+            streamConfig.setPartitionId(partitionConfig.getId());
+            streamConfig.setConnectorsAndStreams(connectorsAndStreams);
+        }
+        partitionList.add(partitionConfig);
     }
 
     public void setAppName(String appName) {
@@ -132,21 +170,12 @@ public class SiddhiAppConfig {
         addElement(aggregationList, aggregationConfig);
     }
 
-    public void add(QueryConfig queryConfig) {
-        // Categorize QueryConfig from its Input, and add QueryConfig to the relevant list
-        QueryInputConfig queryInputConfig = queryConfig.getQueryInput();
-        if (queryInputConfig instanceof WindowFilterProjectionConfig) {
-            addQuery(QueryListType.WINDOW_FILTER_PROJECTION, queryLists, queryConfig);
-        } else if (queryInputConfig instanceof JoinConfig) {
-            addQuery(QueryListType.JOIN, queryLists, queryConfig);
-        } else {
-            // TODO add pattern & sequences
-            throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
-        }
-    }
-
     public void add(FunctionConfig functionConfig) {
         addElement(functionList, functionConfig);
+    }
+
+    public void add(PartitionConfig partitionConfig) {
+        addElement(partitionList, partitionConfig);
     }
 
     public String getAppName() {
@@ -191,5 +220,13 @@ public class SiddhiAppConfig {
 
     public List<FunctionConfig> getFunctionList() {
         return functionList;
+    }
+
+    public List<PartitionConfig> getPartitionList() {
+        return partitionList;
+    }
+
+    public int getFinalElementCount() {
+        return finalElementCount;
     }
 }

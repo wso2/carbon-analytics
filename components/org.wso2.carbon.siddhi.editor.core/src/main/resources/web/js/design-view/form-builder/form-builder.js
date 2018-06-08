@@ -25,7 +25,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
-        //JSONEditor.defaults.options.iconlib = 'bootstrap3';
+        JSONEditor.defaults.options.iconlib = 'bootstrap3';
         JSONEditor.defaults.options.disable_edit_json = true;
         JSONEditor.plugins.sceditor.emoticonsEnabled = true;
         JSONEditor.defaults.options.disable_collapse = true;
@@ -164,7 +164,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var sourceForm = new SourceForm(formOptions);
-            return sourceForm.generateDefineForm(i, formConsole, formContainer);
+            sourceForm.generateDefineForm(i, formConsole, formContainer);
         };
 
         /**
@@ -199,7 +199,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var sinkForm = new SinkForm(formOptions);
-            return sinkForm.generateDefineForm(i, formConsole, formContainer);
+            sinkForm.generateDefineForm(i, formConsole, formContainer);
         };
 
         /**
@@ -360,24 +360,6 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         };
 
         /**
-         * @function generate the form to define the aggregation once it is dropped on the canvas
-         * @param i id for the element
-         * @returns user given aggregation name
-         */
-        FormBuilder.prototype.DefineAggregation = function (i) {
-            var self = this;
-            var formConsole = this.createTabForForm(i, constants.AGGREGATION);
-            var formContainer = formConsole.getContentContainer();
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            var aggregationForm = new AggregationForm(formOptions);
-            return aggregationForm.generateDefineForm(i, formConsole, formContainer);
-        };
-
-        /**
          * @function generate the form for an existing aggregation
          * @param element selected element(aggregation)
          */
@@ -509,7 +491,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+            _.set(formOptions, 'formUtils', self.formUtils);
             var partitionForm = new PartitionForm(formOptions);
             partitionForm.generatePropertiesForm(element, formConsole, formContainer);
         };

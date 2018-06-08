@@ -112,7 +112,7 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                     className : "join-query-drag",
                     title : "Join Query",
                     icon : "/editor/images/join-query.svg"
-                }//, TODO: Uncomment these lines
+                }//,TODO: Uncomment these lines
                 // {
                 //     id : "pattern-query",
                 //     className : "pattern-query-drag",

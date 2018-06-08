@@ -99,7 +99,11 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.removeStream = function (streamId) {
-            ElementUtils.prototype.removeElement(this.streamList, streamId);
+            var isStreamDeleted = ElementUtils.prototype.removeElement(this.streamList, streamId);
+            if(!isStreamDeleted) {
+                isStreamDeleted = this.removeStreamSavedInsideAPartition(streamId);
+            }
+            return isStreamDeleted;
         };
 
         AppData.prototype.removeTable = function (tableId) {
@@ -123,20 +127,38 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.removeWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
-            ElementUtils.prototype
+            var isQueryDeleted = ElementUtils.prototype
                 .removeElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
+            if(!isQueryDeleted) {
+                isQueryDeleted =
+                    this.removeQuerySavedInsideAPartition(windowFilterProjectionQueryId,
+                        'WINDOW_FILTER_PROJECTION_QUERY');
+            }
+            return isQueryDeleted;
         };
 
         AppData.prototype.removePatternQuery = function (patternQueryId) {
-            ElementUtils.prototype.removeElement(this.queryLists.PATTERN, patternQueryId);
+            var isQueryDeleted = ElementUtils.prototype.removeElement(this.queryLists.PATTERN, patternQueryId);
+            if(!isQueryDeleted) {
+                isQueryDeleted = this.removeQuerySavedInsideAPartition(patternQueryId, 'PATTERN_QUERY');
+            }
+            return isQueryDeleted;
         };
 
         AppData.prototype.removeSequenceQuery = function (sequenceQueryId) {
-            ElementUtils.prototype.removeElement(this.queryLists.SEQUENCE, sequenceQueryId);
+            var isQueryDeleted = ElementUtils.prototype.removeElement(this.queryLists.SEQUENCE, sequenceQueryId);
+            if(!isQueryDeleted) {
+                isQueryDeleted = this.removeQuerySavedInsideAPartition(sequenceQueryId, 'SEQUENCE_QUERY');
+            }
+            return isQueryDeleted;
         };
 
         AppData.prototype.removeJoinQuery = function (joinQueryId) {
-            ElementUtils.prototype.removeElement(this.queryLists.JOIN, joinQueryId);
+            var isQueryDeleted = ElementUtils.prototype.removeElement(this.queryLists.JOIN, joinQueryId);
+            if(!isQueryDeleted) {
+                isQueryDeleted = this.removeQuerySavedInsideAPartition(joinQueryId, 'JOIN_QUERY');
+            }
+            return isQueryDeleted;
         };
 
         AppData.prototype.removePartition = function (partitionId) {
@@ -156,7 +178,11 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.getStream = function (streamId) {
-            return ElementUtils.prototype.getElement(this.streamList, streamId);
+            var returnedElement = ElementUtils.prototype.getElement(this.streamList, streamId);
+            if (returnedElement === undefined) {
+                returnedElement = this.getStreamSavedInsideAPartition(streamId);
+            }
+            return returnedElement;
         };
 
         AppData.prototype.getTable = function (tableId) {
@@ -180,20 +206,37 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
-            return ElementUtils.prototype
-                .getElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
+            var returnedElement = ElementUtils.prototype.
+            getElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
+            if (returnedElement === undefined) {
+                returnedElement =
+                    this.getQuerySavedInsideAPartition(windowFilterProjectionQueryId, 'WINDOW_FILTER_PROJECTION_QUERY');
+            }
+            return returnedElement;
         };
 
         AppData.prototype.getPatternQuery = function (patternQueryId) {
-            return ElementUtils.prototype.getElement(this.queryLists.PATTERN, patternQueryId);
+            var returnedElement = ElementUtils.prototype.getElement(this.queryLists.PATTERN, patternQueryId);
+            if (returnedElement === undefined) {
+                returnedElement = this.getQuerySavedInsideAPartition(patternQueryId, 'PATTERN_QUERY');
+            }
+            return returnedElement;
         };
 
         AppData.prototype.getSequenceQuery = function (sequenceQueryId) {
-            return ElementUtils.prototype.getElement(this.queryLists.SEQUENCE, sequenceQueryId);
+            var returnedElement =  ElementUtils.prototype.getElement(this.queryLists.SEQUENCE, sequenceQueryId);
+            if (returnedElement === undefined) {
+                returnedElement = this.getQuerySavedInsideAPartition(sequenceQueryId, 'SEQUENCE_QUERY');
+            }
+            return returnedElement;
         };
 
         AppData.prototype.getJoinQuery = function (joinQueryId) {
-            return ElementUtils.prototype.getElement(this.queryLists.JOIN, joinQueryId);
+            var returnedElement =  ElementUtils.prototype.getElement(this.queryLists.JOIN, joinQueryId);
+            if (returnedElement === undefined) {
+                returnedElement = this.getQuerySavedInsideAPartition(joinQueryId, 'JOIN_QUERY');
+            }
+            return returnedElement;
         };
 
         AppData.prototype.getPartition = function (partitionId) {
@@ -337,6 +380,21 @@ define(['require', 'elementUtils', 'lodash'],
                 });
             });
 
+            // check the element in the partitionList
+            if (requestedElement === undefined) {
+                requestedElement = self.getQueryByIdSavedInsideAPartition(elementId);
+            }
+            // search in the inner streams in partitions
+            if (requestedElement === undefined) {
+                var element = self.getStreamSavedInsideAPartition(elementId);
+                if (element !== undefined) {
+                    requestedElement = {
+                        type: 'STREAM',
+                        element: element
+                    };
+                }
+            }
+
             return requestedElement;
         };
 
@@ -402,6 +460,130 @@ define(['require', 'elementUtils', 'lodash'],
                 });
             });
 
+            return requestedElement;
+        };
+
+        /**
+         * @function Checks whether a given query is inside a partition and if yes it returns
+         * @param queryId id of the query element
+         * @param queryType type of the query
+         * @return requestedElement returns undefined if the requested element is not found. Otherwise returns the
+         * requestedElement
+         */
+        AppData.prototype.getQuerySavedInsideAPartition = function (queryId, queryType) {
+            var self = this;
+            var requestedElement = undefined;
+            _.forEach(self.partitionList, function (partition) {
+                if (requestedElement === undefined) {
+                    if (queryType === 'WINDOW_FILTER_PROJECTION_QUERY') {
+                        requestedElement = partition.getWindowFilterProjectionQuery(queryId);
+                    } else if (queryType === 'PATTERN_QUERY') {
+                        requestedElement = partition.getPatternQuery(queryId);
+                    } else if (queryType === 'SEQUENCE_QUERY') {
+                        requestedElement = partition.getSequenceQuery(queryId);
+                    } else if (queryType === 'JOIN_QUERY') {
+                        requestedElement = partition.getJoinQuery(queryId);
+                    }
+                }
+            });
+            return requestedElement;
+        };
+
+        /**
+         * @function Checks whether a given stream is inside a partition and if yes it returns
+         * @param streamId id of the query element
+         * @return requestedElement returns undefined if the requested element is not found. Otherwise returns the
+         * requestedElement
+         */
+        AppData.prototype.getStreamSavedInsideAPartition = function (streamId) {
+            var self = this;
+            var requestedElement = undefined;
+            _.forEach(self.partitionList, function (partition) {
+                if (requestedElement === undefined) {
+                    requestedElement = partition.getStream(streamId);
+                }
+            });
+            return requestedElement;
+        };
+
+        /**
+         * @function Checks whether a given query is inside a partition and if yes removes it
+         * @param queryId id of the query element
+         * @param queryType type of the query
+         * @return boolean returns false if the element is not found.
+         */
+        AppData.prototype.removeQuerySavedInsideAPartition = function (queryId, queryType) {
+            var self = this;
+            var isQueryDeleted = false;
+            _.forEach(self.partitionList, function (partition) {
+                if (!isQueryDeleted) {
+                    if (queryType === 'WINDOW_FILTER_PROJECTION_QUERY') {
+                        isQueryDeleted = partition.removeWindowFilterProjectionQuery(queryId);
+                    } else if (queryType === 'PATTERN_QUERY') {
+                        isQueryDeleted = partition.removePatternQuery(queryId);
+                    } else if (queryType === 'SEQUENCE_QUERY') {
+                        isQueryDeleted = partition.removeSequenceQuery(queryId);
+                    } else if (queryType === 'JOIN_QUERY') {
+                        isQueryDeleted = partition.removeJoinQuery(queryId);
+                    }
+                }
+            });
+            return isQueryDeleted;
+        };
+
+        /**
+         * @function Checks whether a given stream is inside a partition and if yes removes it
+         * @param streamId id of the stream element
+         * @return boolean returns false if the element is not found.
+         */
+        AppData.prototype.removeStreamSavedInsideAPartition = function (streamId) {
+            var self = this;
+            var isStreamDeleted = false;
+            _.forEach(self.partitionList, function (partition) {
+                if (!isStreamDeleted) {
+                    isStreamDeleted = partition.removeStream(streamId);
+                }
+            });
+            return isStreamDeleted;
+        };
+
+        /**
+         * @function Checks whether a given query is inside a partition by id and if yes it returns a object with type
+         * and element (ex: {type: type, element: element})
+         * @param queryId id of the query element
+         * @return requestedElement returns undefined if the requested element is not found. Otherwise returns the
+         * requestedElement
+         */
+        AppData.prototype.getQueryByIdSavedInsideAPartition = function (queryId) {
+            var self = this;
+            var element = undefined;
+            var type = undefined;
+            _.forEach(self.partitionList, function (partition) {
+                if (element === undefined) {
+                    element = partition.getWindowFilterProjectionQuery(queryId);
+                    type = 'WINDOW_FILTER_PROJECTION_QUERY';
+                    if (element === undefined) {
+                        element = partition.getPatternQuery(queryId);
+                        type = 'PATTERN_QUERY';
+                    }
+                    if (element === undefined) {
+                        element = partition.getSequenceQuery(queryId);
+                        type = 'SEQUENCE_QUERY';
+                    }
+                    if (element === undefined) {
+                        element = partition.getJoinQuery(queryId);
+                        type = 'JOIN_QUERY';
+                    }
+                }
+            });
+
+            var requestedElement = undefined;
+            if (element !== undefined) {
+                requestedElement = {
+                    type: type,
+                    element: element
+                };
+            }
             return requestedElement;
         };
 

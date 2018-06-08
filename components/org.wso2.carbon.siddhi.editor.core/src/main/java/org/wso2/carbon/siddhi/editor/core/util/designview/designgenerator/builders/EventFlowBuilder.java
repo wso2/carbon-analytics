@@ -21,8 +21,10 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.build
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.*;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -111,33 +113,16 @@ public class EventFlowBuilder {
 
     /**
      * Loads Streams from the SiddhiAppRuntime
-     * @return                                  A reference to this object
-     * @throws DesignGenerationException        Error while loading elements
+     * @return      A reference to this object
      */
-    public EventFlowBuilder loadStreams() throws DesignGenerationException {
+    public EventFlowBuilder loadStreams() {
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
         Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
         for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitionMap.entrySet()) {
             if (!isTriggerDefined(streamDefinitionEntry.getKey(), siddhiApp)) {
                 siddhiAppConfig.add(
                         streamDefinitionConfigGenerator
-                                .generateStreamConfig(streamDefinitionEntry.getValue(), false));
-            }
-        }
-
-        // Inner Streams
-        for (Map<String, AbstractDefinition> abstractDefinitionMap :
-                siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().values()) {
-            for (AbstractDefinition abstractDefinition : abstractDefinitionMap.values()) {
-                if (abstractDefinition instanceof StreamDefinition) {
-                    siddhiAppConfig.add(
-                            streamDefinitionConfigGenerator
-                                    .generateStreamConfig((StreamDefinition) abstractDefinition, true));
-                } else {
-                    throw new DesignGenerationException(
-                            "The partitioned inner stream definition map does not have an instance of class " +
-                                    "'StreamDefinition'");
-                }
+                                .generateStreamConfig(streamDefinitionEntry.getValue()));
             }
         }
         return this;
@@ -231,9 +216,9 @@ public class EventFlowBuilder {
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
-                siddhiAppConfig.add(queryConfigGenerator.generateQueryConfig((Query) executionElement));
+                QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement);
+                siddhiAppConfig.addQuery(QueryConfigGenerator.getQueryListType(queryConfig), queryConfig);
             } else if (executionElement instanceof Partition) {
-                // TODO: Add support for Partitions
                 throw new DesignGenerationException("Partitions are not supported");
             } else {
                 throw new DesignGenerationException("Unable create config for execution element of type unknown");

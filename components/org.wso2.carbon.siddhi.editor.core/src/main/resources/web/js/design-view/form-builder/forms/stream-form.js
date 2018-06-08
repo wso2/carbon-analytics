@@ -148,7 +148,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                 var streamOptions = {};
                 _.set(streamOptions, 'id', i);
                 _.set(streamOptions, 'name', editor.getValue().name);
-                _.set(streamOptions, 'isInnerStream', false);
                 var stream = new Stream(streamOptions);
                 _.forEach(editor.getValue().attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);
@@ -289,12 +288,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                 no_additional_properties: true,
                 startval: fillWith
             });
-            formContainer.append('<div id="form-submit"><button type="button" ' +
-                'class="btn btn-default">Submit</button></div>' +
-                '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+            formContainer.append(self.formUtils.buildFormButtons(true));
 
             // 'Submit' button action
-            var submitButtonElement = $(formContainer).find('#form-submit')[0];
+            var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
@@ -335,7 +332,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#form-cancel')[0];
+            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');

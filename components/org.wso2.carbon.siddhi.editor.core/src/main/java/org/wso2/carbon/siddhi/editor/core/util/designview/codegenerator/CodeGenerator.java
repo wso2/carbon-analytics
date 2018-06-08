@@ -63,7 +63,7 @@ public class CodeGenerator {
                 .append(generateAggregations(siddhiApp.getAggregationList()))
                 .append(generateFunctions(siddhiApp.getFunctionList()))
                 .append(generateQueries(siddhiApp.getQueryLists()))
-                .append(generatePartitions(null));
+                .append(generatePartitions(siddhiApp.getPartitionList()));
 
         return siddhiAppStringBuilder.toString();
     }
@@ -125,10 +125,8 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (StreamConfig stream : streamList) {
-            if (stream.isInnerStream()) {
-                continue;
-            } else if (stream.getName() == null || stream.getName().isEmpty()) {
-                throw new CodeGenerationException("The name of the given StreamConfig is null/empty");
+            if (stream.getName() == null || stream.getName().isEmpty()) {
+                throw new CodeGenerationException("The name of the given StreamConfig object is null/empty");
             }
 
             for (SourceSinkConfig source : sourceList) {
@@ -156,6 +154,7 @@ public class CodeGenerator {
 
     /**
      * Generates a string representation of all the tables in a Siddhi app
+     *
      * @param tableList A list of TableConfig objects from the SiddhiAppConfig object
      * @return The Siddhi string representation of the table definitions
      * @throws CodeGenerationException Error while generating code
@@ -327,10 +326,14 @@ public class CodeGenerator {
                             .append(SiddhiStringBuilderConstants.NEW_LINE);
                 }
 
+                int queriesLeft = queryList.size();
                 for (QueryConfig query : queryList) {
-                    queryListStringBuilder.append(generateQueryString(query))
-                            .append(SiddhiStringBuilderConstants.NEW_LINE)
-                            .append(SiddhiStringBuilderConstants.NEW_LINE);
+                    queryListStringBuilder.append(generateQueryString(query));
+                    if (queriesLeft != 1) {
+                        queryListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+                                .append(SiddhiStringBuilderConstants.NEW_LINE);
+                    }
+                    queriesLeft--;
                 }
             }
         }
@@ -353,7 +356,8 @@ public class CodeGenerator {
         }
 
         StringBuilder partitionListStringBuilder = new StringBuilder();
-        partitionListStringBuilder.append(SiddhiStringBuilderConstants.PARTITIONS_COMMENT);
+        partitionListStringBuilder.append(SiddhiStringBuilderConstants.PARTITIONS_COMMENT)
+                .append(SiddhiStringBuilderConstants.NEW_LINE);
         for (PartitionConfig partition : partitionList) {
             partitionListStringBuilder.append(generatePartitionString(partition))
                     .append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -682,7 +686,7 @@ public class CodeGenerator {
 
         partitionStringBuilder.append(SiddhiStringBuilderConstants.PARTITION_WITH)
                 .append(SiddhiStringBuilderConstants.OPEN_BRACKET)
-                .append(partition.getPartitionWith())
+                .append(CodeGeneratorHelper.getPartitionWith(partition.getPartitionWith()))
                 .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
                 .append(SiddhiStringBuilderConstants.NEW_LINE)
                 .append(SiddhiStringBuilderConstants.BEGIN)
@@ -706,7 +710,8 @@ public class CodeGenerator {
         if (sourceSink == null) {
             throw new CodeGenerationException("The given SourceSinkConfig object is null");
         } else if (sourceSink.getAnnotationType() == null || sourceSink.getAnnotationType().isEmpty()) {
-            throw new CodeGenerationException("The annotation type for the given SourceSinkConfig object is null/empty");
+            throw new CodeGenerationException("The annotation type for the given" +
+                    " SourceSinkConfig object is null/empty");
         } else if (sourceSink.getType() == null || sourceSink.getType().isEmpty()) {
             throw new CodeGenerationException("The type of source/sink for the given SourceSinkConfig is null/empty");
         }

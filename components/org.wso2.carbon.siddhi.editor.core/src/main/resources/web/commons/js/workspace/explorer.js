@@ -162,8 +162,6 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                 if(self.application.tabController.activeTab._title != "welcome-page"){
                     if (self.application.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                         self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                    } else {
-                        //TODO: self.application.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                     }
                 }
             });
@@ -189,8 +187,6 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                     if(self.application.tabController.activeTab._title != "welcome-page"){
                         if (self.application.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                             self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                        } else {
-                            //TODO: self.application.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                         }
                     }
                 }

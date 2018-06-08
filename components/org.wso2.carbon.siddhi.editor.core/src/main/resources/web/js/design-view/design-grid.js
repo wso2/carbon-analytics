@@ -15,11 +15,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre', 'edge',
-        'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput'],
+define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElements', 'dagre', 'edge',
+        'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
+        'partitionWith'],
 
-    function (require, log, $, Backbone, _, DropElements, dagre, Edge, WindowFilterProjectionQueryInput,
-              JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput) {
+    function (require, log, $, Backbone, _, alerts, DropElements, dagre, Edge, WindowFilterProjectionQueryInput,
+              JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput, PartitionWith) {
 
         var constants = {
             SOURCE: 'sourceDrop',
@@ -36,7 +37,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             WINDOW_QUERY : 'windowQueryDrop',
             PATTERN : 'patternQueryDrop',
             SEQUENCE : 'sequenceQueryDrop',
-            PARTITION :'partitionDrop'
+            PARTITION :'partitionDrop',
+            PARTITION_CONNECTION_POINT: 'partition-connector-in-part'
         };
 
         /**
@@ -62,6 +64,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             this.currentTabId = this.application.tabController.activeTab.cid;
             this.designViewContainer = $('#design-container-' + this.currentTabId);
             this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
+            this.designGridContainer = $('#design-grid-container-' + this.currentTabId);
         };
 
         DesignGrid.prototype.render = function () {
@@ -86,23 +89,23 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.jsPlumbInstance.importDefaults({
                     PaintStyle: {
                         strokeWidth: 2,
-                        stroke: 'darkblue',
+                        stroke: '#424242',
                         outlineStroke: "transparent",
-                        outlineWidth: "5"
+                        outlineWidth: "3"
                         // lineWidth: 2
                     },
                     HoverPaintStyle: {
-                        strokeStyle: 'darkblue',
-                        strokeWidth: 3
+                        strokeStyle: '#424242',
+                        strokeWidth: 2
                     },
-                    Overlays: [["Arrow", {location: 1.0, id: "arrow"}]],
+                    Overlays: [["Arrow", {location: 1.0, id: "arrow", foldback: 1, width: 8, length: 8}]],
                     DragOptions: {cursor: "crosshair"},
                     Endpoints: [["Dot", {radius: 7}], ["Dot", {radius: 11}]],
                     EndpointStyle: {
                         radius: 3
                     },
                     ConnectionsDetachable: false,
-                    Connector: ["Bezier", {curviness: 50}]
+                    Connector: ["Bezier", {curviness: 25}]
                 });
 
                 /**
@@ -224,49 +227,143 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var connectionValidity = false;
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
+                    /*
+                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                    * explicitly set the targetId.
+                    * */
+                    if (targetId === '') {
+                        targetId = target;
+                    }
                     var targetElement = $('#' + targetId);
 
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
+                    /*
+                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                    * explicitly set the sourceId.
+                    * */
+                    if (sourceId === '') {
+                        sourceId = source;
+                    }
                     var sourceElement = $('#' + sourceId);
 
                     // avoid the expose of inner-streams outside the group
-                    if (sourceElement.hasClass(constants.STREAM) && self.jsPlumbInstance.getGroupFor(sourceId) !== undefined) {
+                    if (sourceElement.hasClass(constants.STREAM)
+                        && self.jsPlumbInstance.getGroupFor(sourceId) !== undefined) {
                         if (self.jsPlumbInstance.getGroupFor(sourceId) !== self.jsPlumbInstance.getGroupFor(targetId)) {
                             alert("Invalid Connection: Inner Streams are not exposed to outside");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     }
-                    else if (targetElement.hasClass(constants.STREAM) && self.jsPlumbInstance.getGroupFor(targetId) !== undefined) {
+                    else if (targetElement.hasClass(constants.STREAM)
+                        && self.jsPlumbInstance.getGroupFor(targetId) !== undefined) {
                         if (self.jsPlumbInstance.getGroupFor(targetId) !== self.jsPlumbInstance.getGroupFor(sourceId)) {
                             alert("Invalid Connection: Inner Streams are not exposed to outside");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
+                        }
+                    } else if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+                        if (!sourceElement.hasClass(constants.STREAM)) {
+                            alert("Invalid Connection: Connect an outer stream");
+                            return connectionValidity;
+                        } else {
+                            var partitionId = targetElement.parent()[0].id;
+                            var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+                            var connectedStreamName
+                                = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                            var isStreamConnected = partition.checkOuterStreamIsAlreadyConnected(connectedStreamName);
+                            if (isStreamConnected) {
+                                alert("Invalid Connection: Stream is already connected to the partition");
+                                return connectionValidity;
+                            } else {
+                                return connectionValidity = true;
+                            }
+                        }
+                    } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+                        // check whether the partition connection point has a valid connection with a outer stream.
+                        // If not display a error message.
+                        var sourceConnections = self.jsPlumbInstance.getConnections({target: sourceId});
+                        if (sourceConnections.length === 0) {
+                            alert("Invalid Connection: Connect a outer stream first");
+                            return connectionValidity;
+                        }
+                        var partitionId = sourceElement.parent()[0].id;
+                        if (self.jsPlumbInstance.getGroupFor(targetId) !== self.jsPlumbInstance.getGroupFor(partitionId)) {
+                            alert("Invalid Connection: Connect a query inside the partition");
+                        } else {
+                            if (targetElement.hasClass(constants.PROJECTION)
+                                || targetElement.hasClass(constants.FILTER)
+                                || targetElement.hasClass(constants.WINDOW_QUERY)
+                                || targetElement.hasClass(constants.PATTERN)
+                                || targetElement.hasClass(constants.JOIN)
+                                || targetElement.hasClass(constants.SEQUENCE)) {
+                                return connectionValidity = true;
+                            } else {
+                                alert("Invalid Connection: Connect a query inside the partition");
+                                return connectionValidity;
+                            }
                         }
                     }
-                    if (sourceElement.hasClass(constants.PARTITION)) {
+                    else if (sourceElement.hasClass(constants.PARTITION)) {
                         if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') !== sourceId) {
                             alert("Invalid Connection: Connect to a partition query");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     }
                     else if (sourceElement.hasClass(constants.SOURCE)) {
                         if (!targetElement.hasClass(constants.STREAM)) {
                             alert("Invalid Connection: Connect to a stream");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     }
                     else if (targetElement.hasClass(constants.SINK)) {
                         if (!sourceElement.hasClass(constants.STREAM)) {
                             alert("Invalid Connection: Sink input source should be a stream");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
                     }
-                    else if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
+                    else if (targetElement.hasClass(constants.AGGREGATION)) {
+                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
+                            alert("Invalid Connection: Aggregation input should be a stream or trigger");
+                            return connectionValidity;
+                        } else {
+                            return connectionValidity = true;
+                        }
+                    }
+
+                    // When connecting streams to a query inside the partition if it is connected to the partition
+                    // connection point, it cannot connect to the query directly
+                    if ((targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
+                        || targetElement.hasClass(constants.WINDOW_QUERY) || targetElement.hasClass(constants.JOIN)
+                        || targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE))
+                        && sourceElement.hasClass(constants.STREAM)) {
+                        var querySavedInsideAPartition
+                            = self.configurationData.getSiddhiAppConfig().getQueryByIdSavedInsideAPartition(targetId);
+                        var isQueryInsideAPartition = querySavedInsideAPartition !== undefined;
+                        if (isQueryInsideAPartition) {
+                            var partitionId = (self.jsPlumbInstance.getGroupFor(targetId)).id;
+                            var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+                            var connectedStreamName
+                                = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                            var isStreamConnected = partition.checkOuterStreamIsAlreadyConnected(connectedStreamName);
+                            if (isStreamConnected) {
+                                alert("Invalid Connection: Stream is already connected to the partition");
+                                return connectionValidity;
+                            }
+                        }
+                    }
+                    if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
                         if(!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                             alert("Invalid Connection");
                         } else {
@@ -361,30 +458,57 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 self.jsPlumbInstance.bind('connection', function (connection) {
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
-                    var targetElement = $('#' + targetId);
                     var targetType;
-                    if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true, true)
-                        !== undefined) {
-                        targetType
-                            = self.configurationData.getSiddhiAppConfig()
-                            .getDefinitionElementById(targetId, true, true).type;
+                    /*
+                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                    * explicitly set the targetId.  Simply if targetId is '' that means this connection is related to a
+                    * partition.
+                    * */
+                    if (targetId === '') {
+                        targetId = target;
+                        targetType = 'PARTITION';
                     } else {
-                        console.log("Target element not found!");
+                        if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true, true)
+                            !== undefined) {
+                            targetType
+                                = self.configurationData.getSiddhiAppConfig()
+                                .getDefinitionElementById(targetId, true, true).type;
+                        } else {
+                            console.log("Target element not found!");
+                        }
                     }
+                    var targetElement = $('#' + targetId);
 
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
-                    var sourceElement = $('#' + sourceId);
                     var sourceType;
-                    if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
-                        !== undefined) {
-                        sourceType
-                            = self.configurationData.getSiddhiAppConfig()
-                            .getDefinitionElementById(sourceId, true, true).type;
+                    /*
+                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                    * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
+                    * partition.
+                    * */
+                    if (sourceId === '') {
+                        sourceId = source;
+                        sourceType = 'PARTITION';
                     } else {
-                        console.log("Source element not found!");
+                        if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
+                            !== undefined) {
+                            sourceType
+                                = self.configurationData.getSiddhiAppConfig()
+                                .getDefinitionElementById(sourceId, true, true).type;
+                        } else {
+                            console.log("Source element not found!");
+                        }
                     }
+                    var sourceElement = $('#' + sourceId);
 
+                    var isConnectionMadeInsideAPartition = false;
+                    if (self.jsPlumbInstance.getGroupFor(sourceId) !== undefined
+                        && self.jsPlumbInstance.getGroupFor(targetId) !== undefined) {
+                        isConnectionMadeInsideAPartition = true;
+                    }
                     // create and add an edge to the edgeList
 
                     var edgeId = ''+ sourceId + '_' + targetId + '';
@@ -403,7 +527,42 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var model;
                     var connectedElementName;
 
-                    if (sourceElement.hasClass(constants.SOURCE)
+                    if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)
+                        && sourceElement.hasClass(constants.STREAM)){
+                        var partitionId = targetElement.parent()[0].id;
+                        var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+                        connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+
+                        var partitionWithOptions = {};
+                        _.set(partitionWithOptions, 'streamName', connectedElementName);
+                        _.set(partitionWithOptions, 'expression', undefined);
+                        var partitionWithObject = new PartitionWith(partitionWithOptions);
+                        partition.addPartitionWith(partitionWithObject);
+
+                        var partitionElement = $('#' + partitionId);
+                        var noOfConnectionInParts
+                            = partitionElement.find('.' + constants.PARTITION_CONNECTION_POINT).length;
+                        var newPartitionConnectorInPartNo = noOfConnectionInParts + 1;
+                        // TODO: write a method which checks for partition connections and gives the new partition connection id
+
+                        var connectionIn =
+                            $('<div class="' + constants.PARTITION_CONNECTION_POINT + '">')
+                            .attr('id', partitionId + '_pc' + newPartitionConnectorInPartNo);
+                        partitionElement.append(connectionIn);
+
+                        self.jsPlumbInstance.makeTarget(connectionIn, {
+                            anchor: 'Left',
+                            maxConnections: 1
+                        });
+                        self.jsPlumbInstance.makeSource(connectionIn, {
+                            anchor: 'Right'
+                        });
+
+                        var partitionElementSettingsIcon
+                            = partitionElement.find('.partition-element-prop-icon');
+                        //self.dropElements.formBuilder.GeneratePartitionKeyForm(partitionElementSettingsIcon[0]);
+
+                    } else if (sourceElement.hasClass(constants.SOURCE)
                         && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
                         if(targetElement.hasClass(constants.STREAM)) {
                             connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(targetId)
@@ -414,6 +573,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         }
                         self.configurationData.getSiddhiAppConfig().getSource(sourceId)
                             .setConnectedElementName(connectedElementName);
+
                     } else if (targetElement.hasClass(constants.SINK)
                         && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))){
                         if(sourceElement.hasClass(constants.STREAM)) {
@@ -425,11 +585,33 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         }
                         self.configurationData.getSiddhiAppConfig().getSink(targetId)
                             .setConnectedElementName(connectedElementName);
+
+                    } else if (targetElement.hasClass(constants.AGGREGATION)
+                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
+                        if (sourceElement.hasClass(constants.STREAM)) {
+                            connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
+                                .getName();
+                        } else if (sourceElement.hasClass(constants.TRIGGER)) {
+                            connectedElementName = self.configurationData.getSiddhiAppConfig().getTrigger(sourceId)
+                                .getName();
+                        }
+                        self.configurationData.getSiddhiAppConfig().getAggregation(targetId)
+                            .setFrom(connectedElementName);
+
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
-                        || sourceElement.hasClass(constants.TRIGGER)) {
-
-                        if (sourceElement.hasClass(constants.STREAM)) {
+                        || sourceElement.hasClass(constants.TRIGGER)
+                        || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+                        if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+                            var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
+                            var sourceConnectionId = sourceConnection[0].sourceId;
+                            var connectedStreamId = sourceConnectionId.substr(0, sourceConnectionId.indexOf('-'));
+                            connectedElementName = self.configurationData.getSiddhiAppConfig()
+                                .getStream(connectedStreamId).getName();
+                            sourceElement = $('#' + connectedStreamId);
+                            sourceId = connectedStreamId;
+                        }
+                        else if (sourceElement.hasClass(constants.STREAM)) {
                             connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
                                 .getName();
                         }
@@ -510,11 +692,18 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 }
                             }
                         }
-                    } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER) ) {
+                    } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)
+                        || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                         if (sourceElement.hasClass(constants.STREAM)) {
                             connectedElementName =
                                 self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
-                        } else {
+                        } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+                            var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
+                            var sourceConnectionId = sourceConnection[0].sourceId;
+                            var connectedStreamId = sourceConnectionId.substr(0, sourceConnectionId.indexOf('-'));
+                            connectedElementName = self.configurationData.getSiddhiAppConfig()
+                                .getStream(connectedStreamId).getName();
+                        }else {
                             connectedElementName =
                                 self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
                         }
@@ -541,83 +730,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 model.setQueryInput(sequenceQueryInputObject);
                             } else {
                                 model.getQueryInput().addConnectedElementName(connectedElementName);
-                            }
-                        }
-                    }
-                    else if (sourceElement.hasClass(constants.STREAM) && targetElement.hasClass(constants.PARTITION)) {
-                        model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
-                        var newPartitionKey = {'stream': sourceId, 'property': undefined};
-                        var partitionKeys = (model.getPartition('partition'));
-                        partitionKeys['with'].push(newPartitionKey);
-
-                        var connectedQueries = self.jsPlumbInstance.getConnections({source: target});
-                        $.each(connectedQueries, function (index, connectedQuery) {
-                            var query = connectedQuery.targetId;
-                            var queryID = query.substr(0, query.indexOf('-'));
-                            var queryElement = $('#' + queryID);
-                            if (queryElement.hasClass(constants.PROJECTION)
-                                || queryElement.hasClass(constants.FILTER)
-                                || queryElement.hasClass(constants.WINDOW_QUERY)) {
-                                model = self.configurationData.getSiddhiAppConfig().getQuery(queryID);
-                                model.setFrom(sourceId);
-                            }
-                            else if (queryElement.hasClass(constants.JOIN)) {
-                                model = self.configurationData.getSiddhiAppConfig().getJoinQuery(queryID);
-                                var streams = model.getFrom();
-                                if (streams === undefined) {
-                                    streams = [sourceId];
-                                } else {
-                                    streams.push(sourceId);
-                                }
-                                model.setFrom(streams);
-                            }
-                            else if (queryElement.hasClass(constants.PATTERN)) {
-                                model = self.configurationData.getSiddhiAppConfig().getPatternQuery(queryID);
-                                var streams = model.getFrom();
-                                if (streams === undefined) {
-                                    streams = [sourceId];
-                                } else {
-                                    streams.push(sourceId);
-                                }
-                                model.setFrom(streams);
-                            }
-                        });
-
-
-                    }
-
-                    else if (sourceElement.hasClass(constants.PARTITION)) {
-                        var connectedStreams = self.jsPlumbInstance.getConnections({target: source});
-                        var streamID = null;
-                        $.each(connectedStreams, function (index, connectedStream) {
-                            var stream = connectedStream.sourceId;
-                            streamID = stream.substr(0, stream.indexOf('-'));
-                        });
-                        if (streamID != null) {
-                            if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                                || targetElement.hasClass(constants.WINDOW_QUERY)) {
-                                model = self.configurationData.getSiddhiAppConfig().getQuery(targetId);
-                                model.setFrom(streamID);
-                            }
-                            else if (targetElement.hasClass(constants.JOIN)) {
-                                model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
-                                var streams = model.getFrom();
-                                if (streams === undefined) {
-                                    streams = [streamID];
-                                } else {
-                                    streams.push(streamID);
-                                }
-                                model.setFrom(streams);
-                            }
-                            else if (targetElement.hasClass(constants.PATTERN)) {
-                                model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                                var streams = model.getFrom();
-                                if (streams === undefined) {
-                                    streams = [streamID];
-                                } else {
-                                    streams.push(streamID);
-                                }
-                                model.setFrom(streams);
                             }
                         }
                     }
@@ -678,21 +790,34 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                                 click: function () {
                                     if (confirm('Are you sure you want to remove the connection?')) {
                                         self.jsPlumbInstance.deleteConnection(connectionObject);
-                                    } else {
-                                    }
+                                    } else {}
                                 }
                             }
                         }
                     ]);
-                    close_icon_overlay.setVisible(false);
-                    // show the close icon when mouse is over the connection
-                    connectionObject.bind('mouseover', function () {
-                        close_icon_overlay.setVisible(true);
-                    });
-                    // hide the close icon when the mouse is not on the connection path
-                    connectionObject.bind('mouseout', function () {
+
+                    //TODO: check the mouse enter and leave events when in a partition
+                    if (isConnectionMadeInsideAPartition) {
                         close_icon_overlay.setVisible(false);
-                    });
+                        // show the close icon when mouse is over the connection
+                        connectionObject.bind('mouseenter', function () {
+                            close_icon_overlay.setVisible(true);
+                        });
+                        // hide the close icon when the mouse is not on the connection path
+                        connectionObject.bind('mouseleave', function () {
+                            close_icon_overlay.setVisible(false);
+                        });
+                    } else {
+                        close_icon_overlay.setVisible(false);
+                        // show the close icon when mouse is over the connection
+                        connectionObject.bind('mouseover', function () {
+                            close_icon_overlay.setVisible(true);
+                        });
+                        // hide the close icon when the mouse is not on the connection path
+                        connectionObject.bind('mouseout', function () {
+                            close_icon_overlay.setVisible(false);
+                        });
+                    }
                 });
             }
 
@@ -702,10 +827,32 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
+                    /*
+                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                    * explicitly set the targetId.  Simply if targetId is '' that means this connection is related to a
+                    * partition.
+                    * */
+                    if (targetId === '') {
+                        targetId = target;
+                    } else {
+                        console.log("Target element not found!");
+                    }
                     var targetElement = $('#' + targetId);
 
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
+                    /*
+                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                    * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
+                    * partition.
+                    * */
+                    if (sourceId === '') {
+                        sourceId = source;
+                    } else {
+                        console.log("Source element not found!");
+                    }
                     var sourceElement = $('#' + sourceId);
 
                     // removing edge from the edgeList
@@ -713,21 +860,44 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     self.configurationData.removeEdge(edgeId);
 
                     var model;
-                    var streams;
 
                     if (sourceElement.hasClass(constants.SOURCE)
                         && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
                         self.configurationData.getSiddhiAppConfig().getSource(sourceId)
                             .setConnectedElementName(undefined);
+
                     } else if (targetElement.hasClass(constants.SINK)
                         && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))){
                         self.configurationData.getSiddhiAppConfig().getSink(sourceId)
                             .setConnectedElementName(undefined);
-                    }
 
-                    if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
+                    } else if (targetElement.hasClass(constants.AGGREGATION)
+                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
+                        self.configurationData.getSiddhiAppConfig().getAggregation(targetId).setFrom(undefined);
+
+                    } else if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)
+                        && sourceElement.hasClass(constants.STREAM)){
+                        var partitionId = targetElement.parent()[0].id;
+                        var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+                        disconnectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+
+                        partition.removePartitionWith(disconnectedElementName);
+                        targetElement.detach();
+
+                    } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
-                        || sourceElement.hasClass(constants.TRIGGER)) {
+                        || sourceElement.hasClass(constants.TRIGGER)
+                        || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+
+                        // if the sourceElement has the class constants.PARTITION_CONNECTION_POINT then that is
+                        // basically a stream. So we replace that sourceElement with the actual stream element.
+                        if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+                            var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
+                            var sourceConnectionId = sourceConnection[0].sourceId;
+                            var connectedStreamId = sourceConnectionId.substr(0, sourceConnectionId.indexOf('-'));
+                            sourceElement = $('#' + connectedStreamId);
+                            sourceId = connectedStreamId;
+                        }
 
                         if ((sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                             || sourceElement.hasClass(constants.TRIGGER))
@@ -774,113 +944,24 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                             }
                             return;
                         }
-                    }
-
-                    var disconnectedElementName;
-                    if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)) {
-                        if (sourceElement.hasClass(constants.STREAM)) {
-                            disconnectedElementName =
-                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
-                        } else {
-                            disconnectedElementName =
-                                self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
-                        }
-                        if (targetElement.hasClass(constants.PATTERN)) {
-                            model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                            model.getQueryInput().removeConnectedElementName(disconnectedElementName);
-                            return;
-                        } else if (targetElement.hasClass(constants.SEQUENCE)) {
-                            model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                            model.getQueryInput().removeConnectedElementName(disconnectedElementName);
-                            return;
-                        }
-                    }
-                    if (sourceElement.hasClass(constants.STREAM) && targetElement.hasClass(constants.PARTITION)) {
-                        model = self.configurationData.getSiddhiAppConfig().getPartition(targetId);
-                        if (model !== undefined) {
-                            var removedPartitionKey = null;
-                            var partitionKeys = (model.getPartition().with);
-                            $.each(partitionKeys, function (index, key) {
-                                if (key.stream === sourceId) {
-                                    removedPartitionKey = index;
-                                }
-                            });
-                            partitionKeys.splice(removedPartitionKey, 1);
-                            var partitionKeysObj = {'with': partitionKeys};
-                            model.setPartition(partitionKeysObj);
-
-                            var connectedQueries = self.jsPlumbInstance.getConnections({source: target});
-                            $.each(connectedQueries, function (index, connectedQuery) {
-                                var query = connectedQuery.targetId;
-                                var queryID = query.substr(0, query.indexOf('-'));
-                                var queryElement = $('#' + queryID);
-                                if (queryElement.hasClass(constants.PROJECTION)
-                                    || queryElement.hasClass(constants.FILTER)
-                                    || queryElement.hasClass(constants.WINDOW_QUERY)) {
-                                    model = self.configurationData.getSiddhiAppConfig().getQuery(queryID);
-                                    if (model !== undefined) {
-                                        model.setFrom(undefined);
-                                    }
-                                }
-                                else if (queryElement.hasClass(constants.JOIN)) {
-                                    model = self.configurationData.getSiddhiAppConfig().getJoinQuery(queryID);
-                                    if (model !== undefined) {
-                                        streams = model.getFrom();
-                                        var removedStream = streams.indexOf(sourceId);
-                                        streams.splice(removedStream, 1);
-                                        model.setFrom(streams);
-                                    }
-                                }
-                                else if (queryElement.hasClass(constants.PATTERN)) {
-                                    model = self.configurationData.getSiddhiAppConfig().getPatternQuery(queryID);
-                                    if (model !== undefined) {
-                                        streams = model.getFrom();
-                                        var removedStream = streams.indexOf(sourceId);
-                                        streams.splice(removedStream, 1);
-                                        model.setFrom(streams);
-                                    }
-                                }
-                            });
-                        }
-
-                    }
-
-                    else if (sourceElement.hasClass(constants.PARTITION)) {
-
-                        var connectedStreams = self.jsPlumbInstance.getConnections({target: source});
-                        var streamID = null;
-                        $.each(connectedStreams, function (index, connectedStream) {
-                            var stream = connectedStream.sourceId;
-                            streamID = stream.substr(0, stream.indexOf('-'));
-                        });
-                        if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                            || targetElement.hasClass(constants.WINDOW_QUERY)) {
-                            model = self.configurationData.getSiddhiAppConfig().getQuery(targetId);
-                            if (model !== undefined) {
-                                model.setFrom(undefined);
+                        var disconnectedElementName;
+                        if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)) {
+                            if (sourceElement.hasClass(constants.STREAM)) {
+                                disconnectedElementName =
+                                    self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                            } else {
+                                disconnectedElementName =
+                                    self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
+                            }
+                            if (targetElement.hasClass(constants.PATTERN)) {
+                                model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
+                                model.getQueryInput().removeConnectedElementName(disconnectedElementName);
+                            } else if (targetElement.hasClass(constants.SEQUENCE)) {
+                                model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
+                                model.getQueryInput().removeConnectedElementName(disconnectedElementName);
                             }
                         }
-                        else if (targetElement.hasClass(constants.JOIN)) {
-                            model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
-                            if (model !== undefined) {
-                                streams = model.getFrom();
-                                var removedStream = streams.indexOf(streamID);
-                                streams.splice(removedStream, 1);
-                                model.setFrom(streams);
-                            }
-                        }
-                        else if (targetElement.hasClass(constants.PATTERN)) {
-                            model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                            if (model !== undefined) {
-                                streams = model.getFrom();
-                                var removedStream = streams.indexOf(streamID);
-                                streams.splice(removedStream, 1);
-                                model.setFrom(streams);
-                            }
-                        }
-                    }
-
-                    if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
+                    } else if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                         || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                             || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.JOIN)
@@ -905,42 +986,97 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             }
 
             function addMemberToPartitionGroup(self) {
-                // TODO: isInner boolean should be set when adding to the partition.
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
-                    // if($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
-                    //     || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
-                    //     || $(event.el).hasClass(constants.STREAM)) {
-                    //
-                    //     var connections = self.jsPlumbInstance.getConnections(event.el);
-                    //     //TODO: insert into can be connected to a outside(not inner) stream as well
-                    //     if($(event.el).hasClass(constants.STREAM)) {
-                    //
-                    //     }
-                    //     var detachedElement = $(event.el).detach();
-                    //     $(detachedElement).insertBefore($(event.group)[0].getEl());
-                    //     self.autoAlignElements();
-                    //     alert("bc");//TODO: add a proper error message and add align
-                    //     // TODO: stand alone inner stream form should not be displayed
-                    //     var partitionId = $(event.group).attr('id');
-                    //     var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
-                    //     var queries = partition.getQueries();
-                    //     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
-                    //         || $(event.el).hasClass(constants.WINDOW_QUERY)) {
-                    //         queries.push(self.configurationData.getSiddhiAppConfig().getQuery($(event.el).attr('id')));
-                    //         //TODO: set isInner flag true
-                    //         partition.setQueries(queries);
-                    //     }
-                    //     else if ($(event.el).hasClass(constants.JOIN)) {
-                    //         queries.push(self.configurationData.getSiddhiAppConfig().getJoinQuery($(event.el)
-                    //             .attr('id')));
-                    //         partition.setQueries(queries);
-                    //     }
-                    // } else {
-                    //     alert("Invalid element type dropped into partition!");
-                    //     var detachedElement = $(event.el).detach();
-                    //     $(detachedElement).insertBefore($(event.group)[0].getEl());
-                    //     self.autoAlignElements();
-                    // }
+                    // check whether member is already added to the group
+                    if (self.jsPlumbInstance.getGroupFor(event.el.id) !== undefined &&
+                        self.jsPlumbInstance.getGroupFor(event.el.id) === event.group) {
+                        return;
+                    }
+                    var isGroupMemberValid = false;
+                    if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
+                        || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
+                        || $(event.el).hasClass(constants.SEQUENCE) || $(event.el).hasClass(constants.PATTERN)
+                        || $(event.el).hasClass(constants.STREAM)) {
+
+                        var elementId = event.el.id;
+                        var sourceConnectionPointId = elementId + '-out';
+                        var targetConnectionPointId = elementId + '-in';
+
+                        var noOfSourceConnections
+                            = self.jsPlumbInstance.getConnections({source: sourceConnectionPointId});
+                        var noOfTargetConnections
+                            = self.jsPlumbInstance.getConnections({target: targetConnectionPointId});
+                        var totalConnection = noOfSourceConnections.length + noOfTargetConnections.length;
+                        if (totalConnection === 0) {
+                            isGroupMemberValid = true;
+
+                            var partitionId = $(event.group).attr('id');
+                            var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+                            if ($(event.el).hasClass(constants.STREAM)) {
+                                var streamObject = self.configurationData.getSiddhiAppConfig().getStream(elementId);
+                                var streamObjectCopy = _.cloneDeep(streamObject);
+                                self.configurationData.getSiddhiAppConfig().removeStream(elementId);
+                                partition.addStream(streamObjectCopy);
+                                
+                            } else if ($(event.el).hasClass(constants.PROJECTION)) {
+                                var projectionQueryObject = self.configurationData.getSiddhiAppConfig()
+                                    .getWindowFilterProjectionQuery(elementId);
+                                var projectionQueryObjectCopy = _.cloneDeep(projectionQueryObject);
+                                self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                                partition.addWindowFilterProjectionQuery(projectionQueryObjectCopy);
+                                
+                            } else if ($(event.el).hasClass(constants.FILTER)) {
+                                var filterQueryObject = self.configurationData.getSiddhiAppConfig()
+                                    .getWindowFilterProjectionQuery(elementId);
+                                var filterQueryObjectCopy = _.cloneDeep(filterQueryObject);
+                                self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                                partition.addWindowFilterProjectionQuery(filterQueryObjectCopy);
+                                
+                            } else if ($(event.el).hasClass(constants.WINDOW_QUERY)) {
+                                var windowQueryObject = self.configurationData.getSiddhiAppConfig()
+                                    .getWindowFilterProjectionQuery(elementId);
+                                var windowQueryObjectCopy = _.cloneDeep(windowQueryObject);
+                                self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                                partition.addWindowFilterProjectionQuery(windowQueryObjectCopy);
+                                
+                            } else if ($(event.el).hasClass(constants.PATTERN)) {
+                                
+                                var patternQueryObject = self.configurationData.getSiddhiAppConfig()
+                                    .getPatternQuery(elementId);
+                                var patternQueryObjectCopy = _.cloneDeep(patternQueryObject);
+                                self.configurationData.getSiddhiAppConfig().removePatternQuery(elementId);
+                                partition.addPatternQuery(patternQueryObjectCopy);
+                                
+                            } else if ($(event.el).hasClass(constants.SEQUENCE)) {
+                                var sequenceQueryObject = self.configurationData.getSiddhiAppConfig()
+                                    .getSequenceQuery(elementId);
+                                var sequenceQueryObjectCopy = _.cloneDeep(sequenceQueryObject);
+                                self.configurationData.getSiddhiAppConfig().removeSequenceQuery(elementId);
+                                partition.addSequenceQuery(sequenceQueryObjectCopy);
+                                
+                            } else if ($(event.el).hasClass(constants.JOIN)) {
+                                var joinQueryObject = self.configurationData.getSiddhiAppConfig()
+                                    .getJoinQuery(elementId);
+                                var joinQueryObjectCopy = _.cloneDeep(joinQueryObject);
+                                self.configurationData.getSiddhiAppConfig().removeJoinQuery(elementId);
+                                partition.addJoinQuery(joinQueryObjectCopy);
+                            }
+                        }
+                    }
+
+                    if (!isGroupMemberValid) {
+                        self.warnAlert('This element cannot be added to partition');
+                        self.jsPlumbInstance.removeFromGroup(event.group, event.el, false);
+                        var elementClientX = $(event.el).attr('data-x');
+                        var elementClientY = $(event.el).attr('data-y');
+                        var detachedElement = $(event.el).detach();
+                        detachedElement.css({
+                            left: parseInt(elementClientX) - self.canvas.offset().left,
+                            top: parseInt(elementClientY) - self.canvas.offset().top
+                        });
+                        self.canvas.append(detachedElement);
+                        self.jsPlumbInstance.repaintEverything();
+                    }
                 });
             }
 
@@ -961,7 +1097,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             _.forEach(self.configurationData.getSiddhiAppConfig().getSourceList(), function(source){
                 var sourceId = source.getId();
                 var sourceName = "Source";
-                var array = sourceId.split("-");
+                var array = sourceId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -971,7 +1107,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             _.forEach(self.configurationData.getSiddhiAppConfig().getSinkList(), function(sink){
                 var sinkId = sink.getId();
                 var sinkName = "Sink";
-                var array = sinkId.split("-");
+                var array = sinkId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -981,7 +1117,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             _.forEach(self.configurationData.getSiddhiAppConfig().getStreamList(), function(stream){
                 var streamId = stream.getId();
                 var streamName = stream.getName();
-                var array = streamId.split("-");
+                var array = streamId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -992,7 +1128,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var tableId = table.getId();
                 var tableName = table.getName();
-                var array = tableId.split("-");
+                var array = tableId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1003,7 +1139,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var windowId = window.getId();
                 var windowName = window.getName();
-                var array = windowId.split("-");
+                var array = windowId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1014,7 +1150,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var triggerId = trigger.getId();
                 var triggerName = trigger.getName();
-                var array = triggerId.split("-");
+                var array = triggerId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1025,7 +1161,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var aggregationId = aggregation.getId();
                 var aggregationName = aggregation.getName();
-                var array = aggregationId.split("-");
+                var array = aggregationId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1036,7 +1172,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var functionId = functionObject.getId();
                 var functionName = functionObject.getName();
-                var array = functionId.split("-");
+                var array = functionId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1047,7 +1183,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var patternQueryId = patternQuery.getId();
                 var patternQueryName = "Pattern";
-                var array = patternQueryId.split("-");
+                var array = patternQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1058,7 +1194,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var sequenceQueryId = sequenceQuery.getId();
                 var sequenceQueryName = "Sequence";
-                var array = sequenceQueryId.split("-");
+                var array = sequenceQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
@@ -1080,7 +1216,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                         queryType = constants.WINDOW_QUERY;
                     }
 
-                    var array = queryId.split("-");
+                    var array = queryId.split("_");
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
@@ -1091,21 +1227,123 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
 
                 var joinQueryId = joinQuery.getId();
                 var joinQueryName = "Join";
-                var array = joinQueryId.split("-");
+                var array = joinQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
                 var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
                 self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
             });
 
-            _.forEach(self.configurationData.edgeList, function(edge){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getPartitionList(), function(partition){
 
-                var targetId = edge.getChildId();
-                var sourceId = edge.getParentId();
+                var partitionId = partition.getId();
+                var array = partitionId.split("_");
+                var lastArrayEntry = parseInt(array[array.length -1]);
+                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                self.handlePartition(mouseTop, mouseLeft, true, partitionId);
+
+                var jsPlumbPartitionGroup = self.jsPlumbInstance.getGroup(partitionId);
+
+                _.forEach(partition.getStreamList(), function(stream){
+                    var streamId = stream.getId();
+                    var streamName = stream.getName();
+                    var array = streamId.split("_");
+                    var lastArrayEntry = parseInt(array[array.length -1]);
+                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
+
+                    var streamElement = $('#' + streamId)[0];
+                    self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, streamElement);
+                });
+
+                _.forEach(partition.getPatternQueryList(), function(patternQuery){
+
+                    var patternQueryId = patternQuery.getId();
+                    var patternQueryName = "Pattern";
+                    var array = patternQueryId.split("_");
+                    var lastArrayEntry = parseInt(array[array.length -1]);
+                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
+
+                    var patternElement = $('#' + patternQueryId)[0];
+                    self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, patternElement);
+                });
+
+                _.forEach(partition.getSequenceQueryList(), function(sequenceQuery){
+
+                    var sequenceQueryId = sequenceQuery.getId();
+                    var sequenceQueryName = "Sequence";
+                    var array = sequenceQueryId.split("_");
+                    var lastArrayEntry = parseInt(array[array.length -1]);
+                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId);
+
+                    var sequenceElement = $('#' + sequenceQueryId)[0];
+                    self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, sequenceElement);
+                });
+
+                _.forEach(partition.getWindowFilterProjectionQueryList(),
+                    function (windowFilterProjectionQuery) {
+                        var queryId = windowFilterProjectionQuery.getId();
+                        var queryName = "Query";
+                        var querySubType = windowFilterProjectionQuery.getQueryInput().getType();
+
+                        var queryType;
+                        if (querySubType === 'PROJECTION') {
+                            queryType = constants.PROJECTION;
+                        } else if (querySubType === 'FILTER') {
+                            queryType = constants.FILTER;
+                        } else if (querySubType === 'WINDOW') {
+                            queryType = constants.WINDOW_QUERY;
+                        }
+
+                        var array = queryId.split("_");
+                        var lastArrayEntry = parseInt(array[array.length - 1]);
+                        var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                        var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
+                        self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
+
+                        var queryElement = $('#' + queryId)[0];
+                        self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, queryElement);
+                    });
+
+                _.forEach(partition.getJoinQueryList(), function(joinQuery){
+
+                    var joinQueryId = joinQuery.getId();
+                    var joinQueryName = "Join";
+                    var array = joinQueryId.split("_");
+                    var lastArrayEntry = parseInt(array[array.length -1]);
+                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
+                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
+
+                    var joinElement = $('#' + joinQueryId)[0];
+                    self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, joinElement);
+                });
+            });
+
+            _.forEach(self.configurationData.edgeList, function(edge){
+                var targetId;
+                var sourceId;
+
+                if (edge.getChildType() === 'PARTITION') {
+                    targetId = edge.getChildId();
+                    sourceId = edge.getParentId() + '-out';
+                } else if (edge.getParentType() === 'PARTITION') {
+                    targetId = edge.getChildId() + '-in';
+                    sourceId = edge.getParentId();
+                } else {
+                    targetId = edge.getChildId() + '-in';
+                    sourceId = edge.getParentId() + '-out';
+                }
 
                 self.jsPlumbInstance.connect({
-                    source: sourceId+'-out',
-                    target: targetId+'-in'
+                    source: sourceId,
+                    target: targetId
                 });
             });
 
@@ -1114,14 +1352,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
         };
 
         /**
-         * @function Auto align the diagram
+         * @function Auto align and center the diagram
          */
         DesignGrid.prototype.autoAlignElements = function () {
             var self = this;
             // Create a new graph instance
             var graph = new dagre.graphlib.Graph({compound: true});
-            // Sets the graph to grow from left to right
-            graph.setGraph({rankdir: "LR"});
+            // Sets the graph to grow from left to right, and also to separate the distance between each node
+            graph.setGraph({rankdir: 'LR', edgesep: 10, ranksep: 100, nodesep: 50});
             // This sets the default edge label to `null` as edges/arrows in the design view will
             // never have any labels/names to display on the screen
             graph.setDefaultEdgeLabel(function () {
@@ -1224,6 +1462,55 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             // nodes in the graph should be placed
             dagre.layout(graph);
 
+            // Set the default minimum and maximum coordinates to zero
+            var minimumCoordinate = {x: 0, y: 0};
+            var maximumCoordinate = {x: 0, y: 0};
+            // Traverse through every node and find the minimum and maximum x & y coordinates
+            // The minimum and maximum x & y coordinates have to be found to obtain the size of the graph
+            graph.nodes().forEach(function (nodeId) {
+                // Get the instance of the dagre node of 'nodeId'
+                var node = graph.node(nodeId);
+                // Get the minimum x & y coordinates of the current node
+                var minX = node.x - (node.width / 2);
+                var minY = node.y - (node.height / 2);
+                // Get the maximum x & y coordinates of the current node
+                var maxX = node.x + (node.width / 2);
+                var maxY = node.y + (node.height / 2);
+                // Find the minimum and maximum 'x' coordinates from all nodes
+                if (maxX > maximumCoordinate.x || maximumCoordinate.x === 0) {
+                    maximumCoordinate.x = maxX;
+                }
+                if (minX < minimumCoordinate.x || minimumCoordinate.x === 0) {
+                    minimumCoordinate.x = minX;
+                }
+                // Find the minimum and maximum 'y' coordinates from all the nodes
+                if (maxY > maximumCoordinate.y || maximumCoordinate.y === 0) {
+                    maximumCoordinate.y = maxY;
+                }
+                if (minY < minimumCoordinate.y || minimumCoordinate.y === 0) {
+                    minimumCoordinate.y = minY;
+                }
+            });
+            // Obtain the width and the height of the current design-grid instance
+            var gridWidth = this.designGridContainer.width();
+            var gridHeight = this.designGridContainer.height();
+            // The difference in the largest and smallest 'x' coordinates gives the graph width
+            var graphWidth = maximumCoordinate.x - minimumCoordinate.x;
+            // The difference in the largest and smallest 'y' coordinates gives the graph height
+            var graphHeight = maximumCoordinate.y - minimumCoordinate.y;
+            // Set the centerLeft and centerTop coordinates to default 20
+            // NOTE - The 'centerLeft' and 'centerTop' variables are the values that have to be added
+            // to the final 'left' and 'top' CSS positions of the graph to align the graph to the
+            // center of the design-grid
+            var centerLeft = 20;
+            var centerTop = 20;
+            if (gridWidth > graphWidth) {
+                centerLeft = (gridWidth - graphWidth) / 2;
+            }
+            if (gridHeight > graphHeight) {
+                centerTop = (gridHeight - graphHeight) / 2;
+            }
+
             // Re-align the elements in the grid based on the graph layout given by dagre
             graph.nodes().forEach(function (nodeId) {
                 // Get a dagre instance of the node of `nodeId`
@@ -1236,7 +1523,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 var partitionId = -1;
                 graphJSON.groups.forEach(function (group) {
                     group.children.forEach(function (child) {
-                        if (nodeId == child) {
+                        if (nodeId === child) {
                             isInPartition = true;
                             partitionId = group.id;
                         }
@@ -1251,12 +1538,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                     var partitionNode = graph.node(partitionId);
 
                     // Identify the left and top value
-                    var partitionNodeLeft = partitionNode.x - (partitionNode.width / 2) + 20;
-                    var partitionNodeTop = partitionNode.y - (partitionNode.height / 2) + 20;
+                    var partitionNodeLeft = partitionNode.x - (partitionNode.width / 2) + centerLeft;
+                    var partitionNodeTop = partitionNode.y - (partitionNode.height / 2) + centerTop;
 
                     // Identify the node's left and top position relative to it's partition's top and left position
-                    var left = node.x - (node.width / 2) + 20 - partitionNodeLeft;
-                    var top = node.y - (node.height / 2) + 20 - partitionNodeTop;
+                    var left = node.x - (node.width / 2) + centerLeft - partitionNodeLeft;
+                    var top = node.y - (node.height / 2) + centerTop - partitionNodeTop;
 
                     // Set the inner node's left and top position
                     $node.css("left", left + "px");
@@ -1264,8 +1551,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
                 } else {
                     // If the node is not in a partition then it's left and top positions are obtained relative to
                     // the entire grid
-                    var left = node.x - (node.width / 2) + 20;
-                    var top = node.y - (node.height / 2) + 20;
+                    var left = node.x - (node.width / 2) + centerLeft;
+                    var top = node.y - (node.height / 2) + centerTop;
                     // Set the node's left and top positions
                     $node.css("left", left + "px");
                     $node.css("top", top + "px");
@@ -1451,16 +1738,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        //TODO: Reduce code duplication. Handle definitions in a one method.
         DesignGrid.prototype.handleAggregation = function (mouseTop, mouseLeft, isCodeToDesignMode, aggregationId, aggregationName) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a stream element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if(aggregationId !== undefined) {
                     elementId = aggregationId;
@@ -1636,7 +1918,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
-            //TODO: connection points should be able to remove( close icon). Then update on connection detach.
         };
 
         DesignGrid.prototype.generateNextNewAgentId = function () {
@@ -1648,6 +1929,24 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'dropElements', 'dagre
         DesignGrid.prototype.getNewAgentId = function () {
             var self = this;
             return self.generateNextNewAgentId();
+        };
+
+        /**
+         * Display's a warning using the AlertsManager.
+         *
+         * @param message The content to be displayed in the alert
+         */
+        DesignGrid.prototype.warnAlert = function (message) {
+            alerts.warn(message);
+        };
+
+        /**
+         * Display's a error using the AlertsManager.
+         *
+         * @param message The content to be displayed in the alert
+         */
+        DesignGrid.prototype.errorAlert = function (message) {
+            alerts.error(message);
         };
 
         return DesignGrid;
