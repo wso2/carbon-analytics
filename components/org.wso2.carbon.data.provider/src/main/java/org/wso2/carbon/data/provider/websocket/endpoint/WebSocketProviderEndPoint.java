@@ -80,7 +80,7 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
                 try {
                     DataProviderEndPoint
                             .sendText(channel.getSessionId(),
-                                    formatString(message, channel.getMapType(), channel.getTopic()).toString());
+                                    formatString(message, channel.getMapType(), channel.getSubscriberTopic()).toString());
                 } catch (IOException e) {
                     log.info("Failed to send the message : " + e.getMessage(), e);
                 }

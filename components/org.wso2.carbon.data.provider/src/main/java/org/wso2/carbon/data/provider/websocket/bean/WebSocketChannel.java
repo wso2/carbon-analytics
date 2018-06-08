@@ -24,6 +24,17 @@ public class WebSocketChannel {
     private String mapType;
     private String topic;
 
+    public WebSocketChannel() {
+        this.mapType = "";
+        this.topic = "";
+    }
+
+    public WebSocketChannel(String subscriberTopic, String sessionId, String mapType, String topic) {
+        this.sessionId = sessionId;
+        this.mapType = mapType;
+        this.topic = topic;
+    }
+
     public String getMapType() {
         return mapType;
     }
