@@ -61,11 +61,11 @@ public class SourceSinkConfigsGenerator {
     /**
      * Generates a list of Source/Sink configs based on the given sourceOrSinkAnnotation,
      * and the given list of Siddhi Sources/Sinks
-     * @param sourceOrSinkAnnotation
-     * @param sourceOrSinkList
-     * @param <T>
-     * @return
-     * @throws DesignGenerationException
+     * @param sourceOrSinkAnnotation            The annotation, whether 'source' or 'sink'
+     * @param sourceOrSinkList                  List of Siddhi Sources/Sinks
+     * @param <T>                               Generic Type that is either a Siddhi Source/Sink
+     * @return                                  List of SourceSinkConfigs
+     * @throws DesignGenerationException        Error while generating Source or Sink Configs
      */
     private <T> List<SourceSinkConfig> generateSourceOrSinkConfigs(
             SourceOrSinkAnnotation sourceOrSinkAnnotation, List<T> sourceOrSinkList) throws DesignGenerationException {
@@ -78,6 +78,14 @@ public class SourceSinkConfigsGenerator {
         return sourceOrSinkConfigs;
     }
 
+    /**
+     * Generates config for a Siddhi Source/Sink
+     * @param annotationType                        The annotation, whether 'source' or 'sink'
+     * @param sourceOrSinkAndConnectedElement       Object which contains the complete details of the Source/Sink,
+     *                                              and the element name, to which it is connected to
+     * @return                                      SourceSinkConfig
+     * @throws DesignGenerationException            Error while generating Source or Sink Configs
+     */
     private SourceSinkConfig generateSourceOrSinkConfig(SourceOrSinkAnnotation annotationType,
                                                         Map.Entry<Annotation, String> sourceOrSinkAndConnectedElement)
             throws DesignGenerationException {
@@ -109,12 +117,20 @@ public class SourceSinkConfigsGenerator {
         return new SourceSinkConfig(annotationType.toString(), connectedElementName, type, options, map);
     }
 
+    /**
+     * Generates config for a Mapper
+     * @param mapAnnotation
+     * @return
+     * @throws DesignGenerationException
+     */
     private MapperConfig generateMapperConfig(Annotation mapAnnotation) throws DesignGenerationException {
         String type = null;
         List<String> options = new ArrayList<>();
         for (Element element : mapAnnotation.getElements()) {
             if (element.getKey().equalsIgnoreCase(TYPE)) {
-                type = element.toString();
+                type = element.getValue();
+            } else {
+                options.add(element.toString());
             }
         }
         if (type == null) {
