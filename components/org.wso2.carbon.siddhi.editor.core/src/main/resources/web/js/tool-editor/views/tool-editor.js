@@ -164,7 +164,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
                             if (application.tabController.getActiveTab().getFile().isDirty()) {
-                                self._designView.warnAlert("Please save the file before switching to the Design View");
+                                DesignViewUtils.prototype.warnAlert("Please save the file before switching to the Design View");
                                 return;
                             }
                             var response = self._designView.getDesign(self.getContent());
