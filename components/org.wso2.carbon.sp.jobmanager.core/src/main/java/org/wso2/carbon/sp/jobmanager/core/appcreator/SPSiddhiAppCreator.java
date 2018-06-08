@@ -289,7 +289,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
             String appName = queryGroupName + "-" + (i + 1);
             valuesMap.put(ResourceManagerConstants.APP_NAME, appName);
             StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
-            queries.add(new SiddhiQuery(appName, substitutor.replace(queryTemplate)));
+            queries.add(new SiddhiQuery(appName, substitutor.replace(queryTemplate),false));
         }
         return queries;
     }

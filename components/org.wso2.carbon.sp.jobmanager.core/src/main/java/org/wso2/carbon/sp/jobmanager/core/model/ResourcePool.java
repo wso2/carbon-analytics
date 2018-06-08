@@ -42,6 +42,7 @@ public class ResourcePool implements Serializable {
     private String groupId;
     private ManagerNode leaderNode;
     private Map<String, ResourceNode> resourceNodeMap;
+    private Map<String, ResourceNode> receiverNodeMap;
     /**
      * Map of parentSiddhiAppName -> List of SiddhiAppHolders.
      */
@@ -55,6 +56,7 @@ public class ResourcePool implements Serializable {
     public ResourcePool(String groupId) {
         this.groupId = groupId;
         this.resourceNodeMap = new ConcurrentHashMap<>();
+        this.receiverNodeMap = new ConcurrentHashMap<>();
         this.siddhiAppHoldersMap = new ConcurrentHashMap<>();
         this.appsWaitingForDeploy = new ConcurrentHashMap<>();
     }
@@ -92,8 +94,16 @@ public class ResourcePool implements Serializable {
         return resourceNodeMap;
     }
 
+    public Map<String, ResourceNode> getReceiverNodeMap() {
+        return receiverNodeMap;
+    }
+
     public void setResourceNodeMap(Map<String, ResourceNode> resourceNodeMap) {
         this.resourceNodeMap = resourceNodeMap;
+    }
+
+    public void setReceiverNodeMap(Map<String, ResourceNode> receiverNodeMap) {
+        this.receiverNodeMap = receiverNodeMap;
     }
 
     public void addResourceNode(ResourceNode resourceNode) {
@@ -103,6 +113,14 @@ public class ResourcePool implements Serializable {
         poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
     }
 
+    public void addReceiverNode(ResourceNode resourceNode) {
+        this.receiverNodeMap.put(resourceNode.getId(), resourceNode);
+        LOG.info(String.format("%s added to the resource pool as a receiver node.", resourceNode));
+        persist();
+        poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
+
+    }
+
     public void removeResourceNode(String nodeId) {
         ResourceNode resourceNode = this.resourceNodeMap.remove(nodeId);
         LOG.info(String.format("%s removed from the resource pool.", resourceNode));
@@ -110,8 +128,20 @@ public class ResourcePool implements Serializable {
         poolChangeListeners.forEach(listener -> listener.resourceRemoved(resourceNode));
     }
 
-    public void notifyResourceNode(String nodeId, boolean redeploy) {
-        ResourceNode resourceNode = resourceNodeMap.get(nodeId);
+    public void removeReceiverNode(String nodeId) {
+        ResourceNode resourceNode = this.receiverNodeMap.remove(nodeId);
+        LOG.info(String.format("Receiver node: %s removed from the resource pool.", resourceNode));
+        persist();
+        poolChangeListeners.forEach(listener -> listener.resourceRemoved(resourceNode));
+    }
+
+    public void notifyResourceNode(String nodeId, boolean redeploy, boolean receiverNode) {
+        ResourceNode resourceNode;
+        if (receiverNode) {
+            resourceNode = receiverNodeMap.get(nodeId);
+        } else {
+            resourceNode = resourceNodeMap.get(nodeId);
+        }
         if (resourceNode != null) {
             List<SiddhiAppHolder> deployedApps = getNodeAppMapping().get(resourceNode);
             if (deployedApps != null && !deployedApps.isEmpty()) {

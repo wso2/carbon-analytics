@@ -53,6 +53,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
 
     @Override
     public Response updateHeartbeat(NodeConfig nodeConfig) {
+        boolean isReceiverNode = nodeConfig.isReceiverNode();
         if (ServiceDataHolder.getCoordinator() == null) { // When clustering is disabled
             ManagerNode leaderNode = ServiceDataHolder.getLeaderNode();
             if (leaderNode == null) {
@@ -106,7 +107,12 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             } else {
                 connectedManagers.add(TypeConverter.convert(ServiceDataHolder.getCurrentNode().getHttpInterface()));
             }
-            ResourceNode existingResourceNode = resourcePool.getResourceNodeMap().get(nodeConfig.getId());
+            ResourceNode existingResourceNode;
+            if (isReceiverNode) {
+                existingResourceNode = resourcePool.getReceiverNodeMap().get(nodeConfig.getId());
+            } else {
+                existingResourceNode = resourcePool.getResourceNodeMap().get(nodeConfig.getId());
+            }
             HeartbeatResponse.JoinedStateEnum joinedState = (existingResourceNode == null)
                     ? HeartbeatResponse.JoinedStateEnum.NEW
                     : HeartbeatResponse.JoinedStateEnum.EXISTS;
@@ -115,7 +121,15 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                 ResourceNode resourceNode = new ResourceNode(nodeConfig.getId());
                 resourceNode.setState(HeartbeatResponse.JoinedStateEnum.EXISTS.toString());
                 resourceNode.setHttpInterface(TypeConverter.convert(nodeConfig.getHttpInterface()));
-                resourcePool.addResourceNode(resourceNode);
+                if (nodeConfig.getWorkerMetrics() != null) {
+                    resourceNode.updateResourceMetrics(nodeConfig.getWorkerMetrics());
+                }
+                if (isReceiverNode) {
+                    resourceNode.setReceiverNode(true);
+                    resourcePool.addReceiverNode(resourceNode);
+                } else {
+                    resourcePool.addResourceNode(resourceNode);
+                }
             } else {
                 InterfaceConfig existingIFace = TypeConverter.convert(existingResourceNode.getHttpInterface());
                 InterfaceConfig currentIFace = nodeConfig.getHttpInterface();
@@ -139,7 +153,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
                         }
                     }
-                    resourcePool.notifyResourceNode(nodeConfig.getId(), redeploy);
+                    resourcePool.notifyResourceNode(nodeConfig.getId(), redeploy, isReceiverNode);
                 } else {
                     // If existing node and the current node have the same nodeId, but different interfaces,
                     // Then reject new node from joining the resource pool.

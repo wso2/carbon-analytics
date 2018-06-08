@@ -50,6 +50,11 @@ public class DeploymentConfig implements Serializable {
     private int leaderRetryInterval = 10000;
 
     /**
+     * Is resource node a ReceiverNode
+     */
+    private boolean isReceiverNode = false;
+
+    /**
      * Getter for the deployment type.
      *
      * @return deployment type.
@@ -121,6 +126,14 @@ public class DeploymentConfig implements Serializable {
         this.leaderRetryInterval = leaderRetryInterval;
     }
 
+    public boolean isReceiverNode() {
+        return isReceiverNode;
+    }
+
+    public void setReceiverNode(boolean receiverNode) {
+        isReceiverNode = receiverNode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -130,6 +143,9 @@ public class DeploymentConfig implements Serializable {
             return false;
         }
         DeploymentConfig that = (DeploymentConfig) o;
+        if (isReceiverNode != that.isReceiverNode) {
+            return false;
+        }
         if (getType() != null
                 ? !getType().equals(that.getType())
                 : that.getType() != null) {

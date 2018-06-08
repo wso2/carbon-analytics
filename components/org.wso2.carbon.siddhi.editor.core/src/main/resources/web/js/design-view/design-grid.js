@@ -533,21 +533,28 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
                         connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
 
-                        var partitionWithOptions = {};
-                        _.set(partitionWithOptions, 'streamName', connectedElementName);
-                        _.set(partitionWithOptions, 'expression', undefined);
-                        var partitionWithObject = new PartitionWith(partitionWithOptions);
-                        partition.addPartitionWith(partitionWithObject);
+                        /*
+                        * check whether the stream is already connected to partition. This validation is done in the
+                        * checkConnectionValidityBeforeElementDrop() function. But that beforedrop event is triggered
+                        * only when user adds connection. It doesn't fire when we programmatically create connections
+                        * (in this case rendering the design view from code). So we need to do the validation here
+                        * again.
+                        * */
+                        var isStreamConnected = partition.checkOuterStreamIsAlreadyConnected(connectedElementName);
+                        if (!isStreamConnected) {
+                            var partitionWithOptions = {};
+                            _.set(partitionWithOptions, 'streamName', connectedElementName);
+                            _.set(partitionWithOptions, 'expression', undefined);
+                            var partitionWithObject = new PartitionWith(partitionWithOptions);
+                            partition.addPartitionWith(partitionWithObject);
+                        }
 
                         var partitionElement = $('#' + partitionId);
-                        var noOfConnectionInParts
-                            = partitionElement.find('.' + constants.PARTITION_CONNECTION_POINT).length;
-                        var newPartitionConnectorInPartNo = noOfConnectionInParts + 1;
-                        // TODO: write a method which checks for partition connections and gives the new partition connection id
+                        var newPartitionConnectorInPartNo = self.generateNextConnectionPointIdForPartition(partitionId);
 
                         var connectionIn =
                             $('<div class="' + constants.PARTITION_CONNECTION_POINT + '">')
-                            .attr('id', partitionId + '_pc' + newPartitionConnectorInPartNo);
+                            .attr('id', newPartitionConnectorInPartNo);
                         partitionElement.append(connectionIn);
 
                         self.jsPlumbInstance.makeTarget(connectionIn, {
@@ -987,11 +994,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
             function addMemberToPartitionGroup(self) {
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
+
+                    var partitionId = $(event.group).attr('id');
+                    var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+
                     // check whether member is already added to the group
-                    if (self.jsPlumbInstance.getGroupFor(event.el.id) !== undefined &&
-                        self.jsPlumbInstance.getGroupFor(event.el.id) === event.group) {
+                    if (partition.isElementInsidePartition(event.el.id)) {
                         return;
                     }
+
                     var isGroupMemberValid = false;
                     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                         || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
@@ -1010,8 +1021,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         if (totalConnection === 0) {
                             isGroupMemberValid = true;
 
-                            var partitionId = $(event.group).attr('id');
-                            var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
                             if ($(event.el).hasClass(constants.STREAM)) {
                                 var streamObject = self.configurationData.getSiddhiAppConfig().getStream(elementId);
                                 var streamObjectCopy = _.cloneDeep(streamObject);
@@ -1384,6 +1393,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PATTERN));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.SEQUENCE));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PARTITION));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PARTITION_CONNECTION_POINT));
 
             // Create an empty JSON to store information of the given graph's nodes, egdes and groups.
             var graphJSON = [];
@@ -1410,10 +1420,18 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             var edges = self.jsPlumbInstance.getAllConnections();
             edges.forEach(function (edge) {
                 // Get the source and target ID from each edge
-                var target = edge.targetId;
                 var source = edge.sourceId;
-                var targetId = target.substr(0, target.indexOf('-'));
+                var target = edge.targetId;
                 var sourceId = source.substr(0, source.indexOf('-'));
+                var targetId = target.substr(0, target.indexOf('-'));
+
+                if (sourceId === undefined || sourceId === "") {
+                    sourceId = source;
+                }
+                if (targetId === undefined || targetId === "") {
+                    targetId = target;
+                }
+
                 // Set the edge to the dagre graph object
                 graph.setEdge(sourceId, targetId);
                 // Set the edge information to the graphJSON object
@@ -1429,7 +1447,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             var groups = [];
             Array.prototype.push.apply(groups, currentTabElement.getElementsByClassName(constants.PARTITION));
             groups.forEach(function (partition) {
-                // Add the group information to the graphJSON obect
+                // Add the group information to the graphJSON object
                 graphJSON.groups[i] = {
                     id: null,
                     children: []
@@ -1929,6 +1947,20 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
         DesignGrid.prototype.getNewAgentId = function () {
             var self = this;
             return self.generateNextNewAgentId();
+        };
+
+        DesignGrid.prototype.generateNextConnectionPointIdForPartition = function (partitionId) {
+            var partitionElement = $('#' + partitionId);
+            var partitionConnections = partitionElement.find('.' + constants.PARTITION_CONNECTION_POINT);
+            var partitionIds = [];
+            _.forEach(partitionConnections, function(connection){
+                partitionIds.push(parseInt((connection.id).slice(-1)));
+            });
+
+            var maxId = partitionIds.reduce(function(a, b) {
+                return Math.max(a, b);
+            });
+            return partitionId + '_pc' + (maxId + 1);
         };
 
         /**
