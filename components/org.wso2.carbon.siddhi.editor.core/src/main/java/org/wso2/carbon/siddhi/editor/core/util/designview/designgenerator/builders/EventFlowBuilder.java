@@ -22,6 +22,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
@@ -133,11 +134,11 @@ public class EventFlowBuilder {
      * Loads Sources from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadSources() {
-        SourceSinkConfigGenerator sourceConfigGenerator = new SourceSinkConfigGenerator();
+    public EventFlowBuilder loadSources() throws DesignGenerationException {
+        SourceSinkConfigsGenerator sourceConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Source> sourceList : siddhiAppRuntime.getSources()) {
-            for (Source source : sourceList) {
-                siddhiAppConfig.addSource(sourceConfigGenerator.generateSourceConfig(source));
+            for (SourceSinkConfig sourceConfig : sourceConfigsGenerator.generateSourceConfigs(sourceList)) {
+                siddhiAppConfig.addSource(sourceConfig);
             }
         }
         return this;
@@ -147,11 +148,11 @@ public class EventFlowBuilder {
      * Loads Sinks from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadSinks() {
-        SourceSinkConfigGenerator sinkConfigGenerator = new SourceSinkConfigGenerator();
+    public EventFlowBuilder loadSinks() throws DesignGenerationException {
+        SourceSinkConfigsGenerator sinkConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Sink> sinkList : siddhiAppRuntime.getSinks()) {
-            for (Sink sink : sinkList) {
-                siddhiAppConfig.addSink(sinkConfigGenerator.generateSinkConfig(sink));
+            for (SourceSinkConfig sinkConfig : sinkConfigsGenerator.generateSinkConfigs(sinkList)) {
+                siddhiAppConfig.addSink(sinkConfig);
             }
         }
         return this;
