@@ -550,14 +550,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         }
 
                         var partitionElement = $('#' + partitionId);
-                        var noOfConnectionInParts
-                            = partitionElement.find('.' + constants.PARTITION_CONNECTION_POINT).length;
-                        var newPartitionConnectorInPartNo = noOfConnectionInParts + 1;
-                        // TODO: write a method which checks for partition connections and gives the new partition connection id
+                        var newPartitionConnectorInPartNo = self.generateNextConnectionPointIdForPartition(partitionId);
 
                         var connectionIn =
                             $('<div class="' + constants.PARTITION_CONNECTION_POINT + '">')
-                            .attr('id', partitionId + '_pc' + newPartitionConnectorInPartNo);
+                            .attr('id', newPartitionConnectorInPartNo);
                         partitionElement.append(connectionIn);
 
                         self.jsPlumbInstance.makeTarget(connectionIn, {
@@ -1939,6 +1936,20 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
         DesignGrid.prototype.getNewAgentId = function () {
             var self = this;
             return self.generateNextNewAgentId();
+        };
+
+        DesignGrid.prototype.generateNextConnectionPointIdForPartition = function (partitionId) {
+            var partitionElement = $('#' + partitionId);
+            var partitionConnections = partitionElement.find('.' + constants.PARTITION_CONNECTION_POINT);
+            var partitionIds = [];
+            _.forEach(partitionConnections, function(connection){
+                partitionIds.push(parseInt((connection.id).slice(-1)));
+            });
+
+            var maxId = partitionIds.reduce(function(a, b) {
+                return Math.max(a, b);
+            });
+            return partitionId + '_pc' + (maxId + 1);
         };
 
         /**
