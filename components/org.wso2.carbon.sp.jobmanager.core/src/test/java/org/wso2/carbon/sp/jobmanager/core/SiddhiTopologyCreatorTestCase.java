@@ -1136,7 +1136,7 @@ public class SiddhiTopologyCreatorTestCase {
      * when user given sources are located in more than 1 execGroup then a passthrough query will be added in a new
      * execGroup.Newly created execGroup will be moved to as the first element of already created passthrough queries
      */
-    @Test(dependsOnMethods = "testSinkStreamForSource")
+    @Test(/*dependsOnMethods = "testSinkStreamForSource"*/)
     public void testUsergivenSourceNoGroup() {
         String siddhiApp = "@App:name('TestPlan12') \n"
                 + "@source(type='inMemory', topic='stock', @map(type='json'))  "
@@ -1174,10 +1174,10 @@ public class SiddhiTopologyCreatorTestCase {
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         Assert.assertTrue(queryGroupList.size() == 4, "Four query groups should be created");
         Assert.assertTrue(queryGroupList.get(0).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
-                "Two passthrough queries should be present in seperate groups");
+                "Two passthrough queries should be present in separate groups");
         Assert.assertTrue(queryGroupList.get(0).isReceiverQueryGroup(), "Receiver type should be set");
         Assert.assertTrue(queryGroupList.get(1).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
-                "Two passthrough queries should be present in seperate groups");
+                "Two passthrough queries should be present in separate groups");
         Assert.assertTrue(queryGroupList.get(1).isReceiverQueryGroup(), "Receiver type should be set");
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
@@ -1342,13 +1342,13 @@ public class SiddhiTopologyCreatorTestCase {
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         Assert.assertTrue(queryGroupList.size() == 5, "Five query groups should be created");
         Assert.assertTrue(queryGroupList.get(0).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
-                "Two passthrough queries should be present in seperate groups");
+                "Two passthrough queries should be present in separate groups");
         Assert.assertTrue(queryGroupList.get(0).isReceiverQueryGroup(), "Receiver type should be set");
         Assert.assertTrue(queryGroupList.get(1).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
-                "Two passthrough queries should be present in seperate groups");
+                "Two passthrough queries should be present in separate groups");
         Assert.assertTrue(queryGroupList.get(1).isReceiverQueryGroup(), "Receiver type should be set");
         Assert.assertTrue(queryGroupList.get(2).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
-                "Two passthrough queries should be present in seperate groups");
+                "Two passthrough queries should be present in separate groups");
         Assert.assertTrue(queryGroupList.get(2).isReceiverQueryGroup(), "Receiver type should be set");
 
     }

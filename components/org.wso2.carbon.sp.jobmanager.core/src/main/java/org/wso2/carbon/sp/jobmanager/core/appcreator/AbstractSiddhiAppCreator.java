@@ -38,7 +38,8 @@ public abstract class AbstractSiddhiAppCreator implements SiddhiAppCreator {
                 ().size());
         for (SiddhiQueryGroup queryGroup : topology.getQueryGroupList()) {
             DeployableSiddhiQueryGroup deployableQueryGroup = new DeployableSiddhiQueryGroup(queryGroup.getName(),
-                                                                    queryGroup.isReceiverQueryGroup());
+                                                                    queryGroup.isReceiverQueryGroup(),
+                                                                    queryGroup.getParallelism());
             deployableQueryGroup.setSiddhiQueries(createApps(topology.getName(), queryGroup));
             deployableSiddhiQueryGroupList.add(deployableQueryGroup);
         }
