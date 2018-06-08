@@ -39,10 +39,10 @@ public class CPUBasedAllocationAlgorithm implements ResourceAllocationAlgorithm 
     private DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
 
     @Override
-    public ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap) {
+    public ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap, int minResourceCount) {
         long initialTimestamp = System.currentTimeMillis();
         if (deploymentConfig != null && !resourceNodeMap.isEmpty()) {
-            if (resourceNodeMap.size() >= deploymentConfig.getMinResourceCount()) {
+            if (resourceNodeMap.size() >= minResourceCount) {
                 Iterator resourceIterator = resourceNodeMap.values().iterator();
                 while(true) {
                     try {
@@ -73,11 +73,7 @@ public class CPUBasedAllocationAlgorithm implements ResourceAllocationAlgorithm 
             }
         }
         Map.Entry<String, Double> node = Collections.min(unsortedMap.entrySet(),
-                new Comparator<Map.Entry<String, Double>>() {
-                    public int compare(Map.Entry<String, Double> e1, Map.Entry<String, Double> e2) {
-                        return e1.getValue().compareTo(e2.getValue());
-                    }
-                });
+                (e1, e2) -> e1.getValue().compareTo(e2.getValue()));
         if (logger.isDebugEnabled()) {
             logger.debug("Next node to get allocated is " + node.getKey());
         }

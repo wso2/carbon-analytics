@@ -28,7 +28,9 @@ public interface ResourceAllocationAlgorithm {
 
     /**
      * Get next ResourceNode to deploy siddhi
-     * @return Resource Node
+     * @param resourceNodeMap ResourceNode Map
+     * @param minResourceCount Minimum resource requirement for SiddhiQuery
+     * @return Elected resource node for next deployment
      */
-    ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap);
+    ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap, int minResourceCount);
 }

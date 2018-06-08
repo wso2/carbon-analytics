@@ -25,7 +25,6 @@ public class SiddhiQuery {
     private String appName;
     private String app;
     private boolean isReceiverQuery;
-    private int parallelism;
 
     private SiddhiQuery() {
         // Avoiding empty initialization
@@ -57,14 +56,6 @@ public class SiddhiQuery {
 
     public boolean isReceiverQuery() {
         return isReceiverQuery;
-    }
-
-    public int getParallelism() {
-        return parallelism;
-    }
-
-    public void setParallelism(int parallelism) {
-        this.parallelism = parallelism;
     }
 
     @Override

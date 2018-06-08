@@ -33,10 +33,10 @@ public class RoundRobinAllocationAlgorithm implements ResourceAllocationAlgorith
     private Iterator resourceIterator;
 
     @Override
-    public ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap) {
+    public ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap, int minResourceCount) {
         DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
         if (deploymentConfig != null && !resourceNodeMap.isEmpty()) {
-            if (resourceNodeMap.size() >= deploymentConfig.getMinResourceCount()) {
+            if (resourceNodeMap.size() >= minResourceCount) {
                 if (resourceIterator == null) {
                     resourceIterator = resourceNodeMap.values().iterator();
                 }
