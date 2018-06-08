@@ -404,3 +404,6 @@ select.form-control,
     color: #BDBDBD;
 }
 
+.frm-qry {
+    margin-bottom: 20px;
+}
