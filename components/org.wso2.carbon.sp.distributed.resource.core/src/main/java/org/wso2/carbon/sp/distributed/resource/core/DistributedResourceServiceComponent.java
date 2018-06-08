@@ -140,7 +140,8 @@ public class DistributedResourceServiceComponent {
                             currentNodeConfig = new NodeConfig()
                                     .setId(id)
                                     .setHttpInterface(deploymentConfig.getHttpInterface())
-                                    .setState(ResourceConstants.STATE_NEW);
+                                    .setState(ResourceConstants.STATE_NEW)
+                                    .setReceiverNode(deploymentConfig.isReceiverNode());
                             ServiceDataHolder.setDeploymentConfig(deploymentConfig);
                             ServiceDataHolder.setCurrentNodeConfig(currentNodeConfig);
                             ServiceDataHolder.setDeploymentMode(DeploymentMode.DISTRIBUTED);

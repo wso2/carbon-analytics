@@ -42,6 +42,9 @@ public class NodeConfig {
     @JsonProperty("WorkerMetrics")
     private WorkerMetrics workerMetrics = null;
 
+    @JsonProperty("isReceiverNode")
+    private boolean isReceiverNode;
+
     public NodeConfig id(String id) {
         this.id = id;
         return this;
@@ -107,6 +110,15 @@ public class NodeConfig {
 
     public void setHttpInterface(InterfaceConfig httpInterface) {
         this.httpInterface = httpInterface;
+    }
+
+    public boolean isReceiverNode() {
+        return isReceiverNode;
+    }
+
+    public NodeConfig setReceiverNode(boolean receiverNode) {
+        this.isReceiverNode = receiverNode;
+        return this;
     }
 
     @Override

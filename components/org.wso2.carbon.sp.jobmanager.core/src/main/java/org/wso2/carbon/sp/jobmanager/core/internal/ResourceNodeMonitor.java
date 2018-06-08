@@ -36,27 +36,40 @@ public class ResourceNodeMonitor implements Runnable {
     public void run() {
         ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
         Map<String, ResourceNode> resourceNodeMap = resourcePool.getResourceNodeMap();
-
-        DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
+        Map<String, ResourceNode> receiverNodeMap = resourcePool.getReceiverNodeMap();
         if (resourceNodeMap != null) {
-            long currentTimestamp = System.currentTimeMillis();
             resourceNodeMap.values().forEach(resourceNode -> {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Current timestamp: " + currentTimestamp);
-                    LOG.debug("Resource Node Last ping timestamp: " + resourceNode.getLastPingTimestamp());
-                    LOG.debug("Time difference " + (currentTimestamp - resourceNode.getLastPingTimestamp()));
-                    LOG.debug("Failed attempts " + resourceNode.getFailedPingAttempts());
-                }
-                if (currentTimestamp - resourceNode.getLastPingTimestamp() >= deploymentConfig.
-                        getHeartbeatInterval() * 2) {
-                    resourceNode.incrementFailedPingAttempts();
-                    if (resourceNode.getFailedPingAttempts() > deploymentConfig.getHeartbeatMaxRetry()) {
-                        resourcePool.removeResourceNode(resourceNode.getId());
-                    }
-                } else {
-                    resourceNode.resetFailedPingAttempts();
-                }
+                checkNodeRemoved(resourcePool, resourceNode);
             });
+        }
+        if (receiverNodeMap != null) {
+            receiverNodeMap.values().forEach(resourceNode -> {
+                checkNodeRemoved(resourcePool, resourceNode);
+            });
+        }
+    }
+
+    private void checkNodeRemoved(ResourcePool resourcePool, ResourceNode resourceNode) {
+        DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
+        long currentTimestamp = System.currentTimeMillis();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Current timestamp: " + currentTimestamp);
+            LOG.debug("Resource Node Last ping timestamp: " + resourceNode.getLastPingTimestamp());
+            LOG.debug("Time difference " + (currentTimestamp - resourceNode.getLastPingTimestamp()));
+            LOG.debug("Failed attempts " + resourceNode.getFailedPingAttempts());
+        }
+        if (currentTimestamp - resourceNode.getLastPingTimestamp() >= deploymentConfig.
+                getHeartbeatInterval() * 2) {
+            resourceNode.incrementFailedPingAttempts();
+            if (resourceNode.getFailedPingAttempts() > deploymentConfig.getHeartbeatMaxRetry()) {
+                if (resourceNode.isReceiverNode()) {
+                    resourcePool.removeReceiverNode(resourceNode.getId());
+                } else {
+                    resourcePool.removeResourceNode(resourceNode.getId());
+                }
+            }
+        } else {
+            resourceNode.resetFailedPingAttempts();
         }
     }
 }
