@@ -215,8 +215,6 @@
     float: right;
     width: 26px;
     height: 26px;
-    background-color: transparent;
-    border: 1px solid transparent;
     margin-top: -95px;
     cursor: pointer;
     color: #616161;
@@ -229,7 +227,7 @@
 }
 
 .element-close-icon {
-    margin-right: 0;
+    margin-right: 5px;
 }
 
 input {
@@ -335,20 +333,14 @@ td {
     float: right;
     width: 26px;
     height: 26px;
-    margin-top: 0;
-    background-color: transparent;
-    border: 1px solid transparent;
+    margin-top: 10px;
     cursor: pointer;
     color: #616161;
     font-size: 14px;
-    border-radius: 40px;
 }
 
 .partition-element-prop-icon {
-    margin-right: 25px;
-}
-
-.partition-element-close-icon {
+    margin-right: 15px;
 }
 
 /* Window Stream */
@@ -383,9 +375,32 @@ select.form-control,
 }
 
 .design-view-form-content th {
-    color: #fff;
+    color: #BDBDBD;
 }
 
 .grid-container > div {
     opacity: 0.7;
 }
+
+.design-view-form-content button i {
+    font-size: 1.1rem;
+}
+
+.section-seperator {
+    border-bottom: 1px solid #424242;
+}
+
+.query-form-actions {
+    margin-top: 10px;
+}
+
+.design-view-form-content .table-bordered > tbody > tr > td,
+.design-view-form-content .table-bordered,
+.design-view-form-content .table-bordered > thead > tr > th {
+    border: 0;
+}
+
+.design-view-form-content {
+    color: #BDBDBD;
+}
+
