@@ -21,16 +21,16 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the visual structure of a Siddhi app, for the design view
  */
 public class EventFlow {
     private SiddhiAppConfig siddhiAppConfig;
-    private List<Edge> edgeList;
+    private Set<Edge> edgeList;
 
-    public EventFlow(SiddhiAppConfig siddhiAppConfig, List<Edge> edgeList) {
+    public EventFlow(SiddhiAppConfig siddhiAppConfig, Set<Edge> edgeList) {
         this.siddhiAppConfig = siddhiAppConfig;
         this.edgeList = edgeList;
     }
@@ -43,11 +43,11 @@ public class EventFlow {
         this.siddhiAppConfig = siddhiAppConfig;
     }
 
-    public List<Edge> getEdgeList() {
+    public Set<Edge> getEdgeList() {
         return edgeList;
     }
 
-    public void setEdgeList(List<Edge> edgeList) {
+    public void setEdgeList(Set<Edge> edgeList) {
         this.edgeList = edgeList;
     }
 }

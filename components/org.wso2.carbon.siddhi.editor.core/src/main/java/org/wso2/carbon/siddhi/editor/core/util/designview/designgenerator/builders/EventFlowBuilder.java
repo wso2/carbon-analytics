@@ -37,9 +37,10 @@ import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
 import org.wso2.siddhi.query.api.execution.query.Query;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Builder to create EventFlow
@@ -50,14 +51,14 @@ public class EventFlowBuilder {
     private SiddhiAppRuntime siddhiAppRuntime;
 
     private SiddhiAppConfig siddhiAppConfig;
-    private List<Edge> edges;
+    private Set<Edge> edges;
 
     public EventFlowBuilder(String siddhiAppString, SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime) {
         this.siddhiAppString = siddhiAppString;
         this.siddhiApp = siddhiApp;
         this.siddhiAppRuntime = siddhiAppRuntime;
         siddhiAppConfig = new SiddhiAppConfig();
-        edges = new ArrayList<>();
+        edges = new HashSet<>();
     }
 
     /**

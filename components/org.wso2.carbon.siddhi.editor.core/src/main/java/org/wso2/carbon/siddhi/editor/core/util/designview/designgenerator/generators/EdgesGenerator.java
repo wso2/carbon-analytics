@@ -23,7 +23,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAp
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionWithElement;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
@@ -34,9 +33,10 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryL
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Generator to create Edges, that connect Siddhi Elements - considered as Nodes
@@ -50,11 +50,11 @@ public class EdgesGenerator {
 
     /**
      * Generates Edges for the elements in the SiddhiAppConfig
-     * @return                                  List of all the Edges
+     * @return                                  Set of all the Edges
      * @throws DesignGenerationException        Error while generating config
      */
-    public List<Edge> generateEdges() throws DesignGenerationException {
-        List<Edge> edges = new ArrayList<>();
+    public Set<Edge> generateEdges() throws DesignGenerationException {
+        Set<Edge> edges = new HashSet<>();
         edges.addAll(generateSourceEdges(siddhiAppConfig.getSourceList()));
         edges.addAll(generateSinkEdges(siddhiAppConfig.getSinkList()));
         edges.addAll(
@@ -84,11 +84,11 @@ public class EdgesGenerator {
     /**
      * Generates Edges related to Sources
      * @param sourceList                        List of Source configs
-     * @return                                  List of Edges
+     * @return                                  Set of Edges
      * @throws DesignGenerationException        Error while generating edges
      */
-    private List<Edge> generateSourceEdges(List<SourceSinkConfig> sourceList) throws DesignGenerationException {
-        List<Edge> edges = new ArrayList<>();
+    private Set<Edge> generateSourceEdges(List<SourceSinkConfig> sourceList) throws DesignGenerationException {
+        Set<Edge> edges = new HashSet<>();
         for (SourceSinkConfig source : sourceList) {
             edges.add(generateEdge(source, getElementWithStreamName(source.getConnectedElementName())));
         }
@@ -98,11 +98,11 @@ public class EdgesGenerator {
     /**
      * Generates Edges related to Sinks
      * @param sinkList                          List of Sink configs
-     * @return                                  List of Edges
+     * @return                                  Set of Edges
      * @throws DesignGenerationException        Error while generating edges
      */
-    private List<Edge> generateSinkEdges(List<SourceSinkConfig> sinkList) throws DesignGenerationException {
-        List<Edge> edges = new ArrayList<>();
+    private Set<Edge> generateSinkEdges(List<SourceSinkConfig> sinkList) throws DesignGenerationException {
+        Set<Edge> edges = new HashSet<>();
         for (SourceSinkConfig sink : sinkList) {
             edges.add(generateEdge(getElementWithStreamName(sink.getConnectedElementName()), sink));
         }
@@ -112,12 +112,12 @@ public class EdgesGenerator {
     /**
      * Generates Edges related to WindowFilterProjection Queries
      * @param windowFilterProjectionQueryList       List of WindowFilterProjection QueryConfigs
-     * @return                                      List of Edges
+     * @return                                      Set of Edges
      * @throws DesignGenerationException            Error while generating edges
      */
-    private List<Edge> generateWindowFilterProjectionQueryEdges(List<QueryConfig> windowFilterProjectionQueryList)
+    private Set<Edge> generateWindowFilterProjectionQueryEdges(List<QueryConfig> windowFilterProjectionQueryList)
             throws DesignGenerationException {
-        List<Edge> edges = new ArrayList<>();
+        Set<Edge> edges = new HashSet<>();
         for (QueryConfig query : windowFilterProjectionQueryList) {
             // Edge towards Query
             String inputStreamName = ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom();
@@ -154,11 +154,11 @@ public class EdgesGenerator {
     /**
      * Generates Edges related to Join Queries
      * @param joinQueryList                         List of Join QueryConfigs
-     * @return                                      List of Edges
+     * @return                                      Set of Edges
      * @throws DesignGenerationException            Error while generating edges
      */
-    private List<Edge> generateJoinQueryEdges(List<QueryConfig> joinQueryList) throws DesignGenerationException {
-        List<Edge> edges = new ArrayList<>();
+    private Set<Edge> generateJoinQueryEdges(List<QueryConfig> joinQueryList) throws DesignGenerationException {
+        Set<Edge> edges = new HashSet<>();
         for (QueryConfig query : joinQueryList) {
             // Edge towards Query (From Left)
             String leftInputStreamName = (((JoinConfig) (query.getQueryInput())).getLeft().getFrom());
@@ -212,12 +212,12 @@ public class EdgesGenerator {
     /**
      * Generates Edges related to Aggregations
      * @param aggregationConfigList             List of AggregationConfigs
-     * @return                                  List of Edges
+     * @return                                  Set of Edges
      * @throws DesignGenerationException        Error while generating Edges
      */
-    private List<Edge> generateAggregationEdges(List<AggregationConfig> aggregationConfigList)
+    private Set<Edge> generateAggregationEdges(List<AggregationConfig> aggregationConfigList)
         throws DesignGenerationException {
-        List<Edge> edges = new ArrayList<>();
+        Set<Edge> edges = new HashSet<>();
         for (AggregationConfig aggregation : aggregationConfigList) {
             edges.add(
                     generateEdge(
