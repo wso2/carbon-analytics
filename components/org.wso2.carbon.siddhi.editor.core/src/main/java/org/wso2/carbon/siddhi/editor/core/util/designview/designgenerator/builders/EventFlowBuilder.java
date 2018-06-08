@@ -213,13 +213,24 @@ public class EventFlowBuilder {
      * @throws DesignGenerationException        Error while loading elements
      */
     public EventFlowBuilder loadExecutionElements() throws DesignGenerationException {
+        Map<String, Map<String, AbstractDefinition>> partitionedInnerStreamDefinitions =
+                siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap();
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
+        PartitionConfigGenerator partitionConfigGenerator =
+                new PartitionConfigGenerator(siddhiAppString, siddhiApp, partitionedInnerStreamDefinitions);
+        int partitionCounter = 0;
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
                 QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement);
                 siddhiAppConfig.addQuery(QueryConfigGenerator.getQueryListType(queryConfig), queryConfig);
             } else if (executionElement instanceof Partition) {
-                throw new DesignGenerationException("Partitions are not supported");
+                String partitionId = (String) partitionedInnerStreamDefinitions.keySet().toArray()[partitionCounter];
+                siddhiAppConfig.addPartition(
+                        partitionConfigGenerator
+                                .generatePartitionConfig(
+                                        ((Partition) executionElement),
+                                        partitionId));
+                partitionCounter++;
             } else {
                 throw new DesignGenerationException("Unable create config for execution element of type unknown");
             }
