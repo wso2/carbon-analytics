@@ -1348,7 +1348,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             });
 
             // re-align the elements
-            //self.autoAlignElements();
+            self.autoAlignElements();
         };
 
         /**
