@@ -20,6 +20,8 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
 
+import java.util.Objects;
+
 /**
  * Represents a connection between two Siddhi app design view elements
  */
@@ -56,5 +58,22 @@ public class Edge {
 
     public NodeType getChildType() {
         return childType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Edge edge = (Edge) o;
+        return Objects.equals(id, edge.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

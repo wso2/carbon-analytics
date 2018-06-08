@@ -1061,11 +1061,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 'left': mouseLeft
             });
 
-            /*
-            * There will be always added a connection point by default. In the code to design mode we add a one extra
-            * connection point in order to user to add additional connection.
-            * */
-            var maxConnectionPoints = 1;
             if(!isCodeToDesignMode) {
                 //add the new partition to the partition array
                 var partitionOptions = {};
@@ -1073,26 +1068,19 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var newPartition = new Partition(partitionOptions);
                 newPartition.setId(i);
                 self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
-            } else {
-                var partitionObject = self.configurationData.getSiddhiAppConfig().getPartition(i);
-                maxConnectionPoints = partitionObject.getPartitionWith().length + 1;
             }
 
-            var iteratorValue;
-            // make connection points
-            for (iteratorValue = 1; iteratorValue <= maxConnectionPoints; iteratorValue++) {
+            // There will be always added a connection point by default
+            var connectionIn = $('<div class="partition-connector-in-part" >').attr('id', i + '_pc' + 1);
+            finalElement.append(connectionIn);
 
-                var connectionIn = $('<div class="partition-connector-in-part" >').attr('id', i + '_pc' + iteratorValue);
-                finalElement.append(connectionIn);
-
-                self.jsPlumbInstance.makeTarget(connectionIn, {
-                    anchor: 'Left',
-                    maxConnections: 1
-                });
-                self.jsPlumbInstance.makeSource(connectionIn, {
-                    anchor: 'Right'
-                });
-            }
+            self.jsPlumbInstance.makeTarget(connectionIn, {
+                anchor: 'Left',
+                maxConnections: 1
+            });
+            self.jsPlumbInstance.makeSource(connectionIn, {
+                anchor: 'Right'
+            });
 
             $(self.container).append(finalElement);
             self.jsPlumbInstance.addGroup({
