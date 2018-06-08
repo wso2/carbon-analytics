@@ -1419,6 +1419,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             i = 0;
             var edges = self.jsPlumbInstance.getAllConnections();
             edges.forEach(function (edge) {
+                // TODO fix the issue with the auto-align for partitions
                 // Get the source and target ID from each edge
                 var source = edge.sourceId;
                 var target = edge.targetId;
