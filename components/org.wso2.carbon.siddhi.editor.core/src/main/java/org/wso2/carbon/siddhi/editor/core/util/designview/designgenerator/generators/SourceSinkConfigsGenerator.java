@@ -119,9 +119,9 @@ public class SourceSinkConfigsGenerator {
 
     /**
      * Generates config for a Mapper
-     * @param mapAnnotation
-     * @return
-     * @throws DesignGenerationException
+     * @param mapAnnotation                     Siddhi annotation that contains details of a Siddhi Mapper
+     * @return                                  MapperConfig object
+     * @throws DesignGenerationException        Error while generating MapperConfig
      */
     private MapperConfig generateMapperConfig(Annotation mapAnnotation) throws DesignGenerationException {
         String type = null;
@@ -143,9 +143,17 @@ public class SourceSinkConfigsGenerator {
         return new MapperConfig(type, options, attributes);
     }
 
+    /**
+     * Generates a map that contains Siddhi Annotation for Source/Sink, and their respective connected element names
+     * @param sourceOrSinkAnnotation            Annotation, that is either 'Source' or 'Sink'
+     * @param sourceOrSinkList                  List of Siddhi Sources/Sinks
+     * @param <T>                               Generic Type for Siddhi Source/Sink
+     * @return                                  Map of Siddhi Annotations for Source/Sink, and connected element names
+     * @throws DesignGenerationException
+     */
     private <T> Map<Annotation, String> getSourceOrSinkAnnotationStreamIdMap(
             SourceOrSinkAnnotation sourceOrSinkAnnotation, List<T> sourceOrSinkList) throws DesignGenerationException {
-        Map<Annotation, String> sinksAndConnectedElements = new HashMap<>();
+        Map<Annotation, String> connectedElements = new HashMap<>();
         for (T sourceOrSink : sourceOrSinkList) {
             List<Annotation> streamDefinitionAnnotations = null;
             String streamId = null;
@@ -164,11 +172,11 @@ public class SourceSinkConfigsGenerator {
             }
             for(Annotation streamDefinitionAnnotation : streamDefinitionAnnotations) {
                 if (streamDefinitionAnnotation.getName().equalsIgnoreCase(sourceOrSinkAnnotation.toString())) {
-                    sinksAndConnectedElements.put(streamDefinitionAnnotation, streamId);
+                    connectedElements.put(streamDefinitionAnnotation, streamId);
                 }
             }
         }
-        return sinksAndConnectedElements;
+        return connectedElements;
     }
 
     private enum SourceOrSinkAnnotation {
