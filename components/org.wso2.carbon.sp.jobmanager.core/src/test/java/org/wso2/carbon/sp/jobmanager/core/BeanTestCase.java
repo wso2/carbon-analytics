@@ -109,8 +109,10 @@ public class BeanTestCase {
 
     @Test
     public void testDistributedSiddhiQuery() {
-        DeployableSiddhiQueryGroup deployableSiddhiQueryGroup = new DeployableSiddhiQueryGroup("group-1");
-        DeployableSiddhiQueryGroup deployableSiddhiQueryGroup2 = new DeployableSiddhiQueryGroup("group-2");
+        DeployableSiddhiQueryGroup deployableSiddhiQueryGroup = new DeployableSiddhiQueryGroup("group-1", false,
+                                                                                               1);
+        DeployableSiddhiQueryGroup deployableSiddhiQueryGroup2 = new DeployableSiddhiQueryGroup("group-2", false,
+                                                                                                1);
         Assert.assertTrue(deployableSiddhiQueryGroup.equals(deployableSiddhiQueryGroup));
         Assert.assertFalse(deployableSiddhiQueryGroup.equals(null));
         Assert.assertFalse(deployableSiddhiQueryGroup.equals(deployableSiddhiQueryGroup2));
@@ -194,7 +196,7 @@ public class BeanTestCase {
         ResourceNode resourceNode = new ResourceNode("resource-1");
         SiddhiAppHolder siddhiAppHolder = new SiddhiAppHolder(
                 "parentAppName", "group-1", "app-1",
-                "@App:name('app-1')", resourceNode);
+                "@App:name('app-1')", resourceNode, false, 0);
         Assert.assertEquals(siddhiAppHolder.getParentAppName(), "parentAppName");
         Assert.assertEquals(siddhiAppHolder.getGroupName(), "group-1");
         Assert.assertEquals(siddhiAppHolder.getAppName(), "app-1");
@@ -216,14 +218,16 @@ public class BeanTestCase {
         Assert.assertFalse(siddhiAppHolder.equals(null));
         Assert.assertTrue(siddhiAppHolder.equals(siddhiAppHolder));
         Assert.assertFalse(siddhiAppHolder.equals(new SiddhiAppHolder(
-                "parent2AppName", null, null, null, null)));
+                "parent2AppName", null, null, null, null,
+                false, 0)));
         Assert.assertFalse(siddhiAppHolder.equals(
                 new SiddhiAppHolder("parent2AppName", "group-2", null, null,
-                                    null)));
+                                    null, false, 0)));
         Assert.assertFalse(siddhiAppHolder.equals(new SiddhiAppHolder(
-                "parent2AppName", "group-2", "app-2", null, null)));
+                "parent2AppName", "group-2", "app-2", null,
+                null, false, 0)));
         Assert.assertTrue(siddhiAppHolder.equals(new SiddhiAppHolder(
                 "parent2AppName", "group-2", "app-2",
-                "@App:name('app-2')", null)));
+                "@App:name('app-2')", null, false, 0)));
     }
 }
