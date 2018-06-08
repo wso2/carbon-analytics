@@ -386,7 +386,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 };
                 self.configurationData.addEdge(new Edge(edgeOptions));
             });
-            //re-shuffle edgeList to include
+            //re-shuffle edgeList to bring forward edges which has partition as child elements
             self.configurationData.getEdgeList().sort(function(a, b){
                 if (a.getChildType() === 'PARTITION' && b.getChildType() !== 'PARTITION') {
                     return 0;

@@ -211,6 +211,20 @@ define(['require', 'elementUtils', 'lodash'],
                 self.queryLists.JOIN.length + self.queryLists.PATTERN.length + self.queryLists.SEQUENCE.length;
         };
 
+        Partition.prototype.isElementInsidePartition = function (elementId) {
+            var self = this;
+            var isElementInsidePartition = false;
+
+            if (self.getWindowFilterProjectionQuery(elementId) !== undefined
+                || self.getJoinQuery(elementId) !== undefined
+                || self.getPatternQuery(elementId) !== undefined
+                || self.getSequenceQuery(elementId) !== undefined
+                || self.getStream(elementId) !== undefined) {
+                isElementInsidePartition =true;
+            }
+            return isElementInsidePartition;
+        };
+
         return Partition;
 
     });

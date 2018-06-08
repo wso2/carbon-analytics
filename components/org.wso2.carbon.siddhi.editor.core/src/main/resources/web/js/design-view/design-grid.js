@@ -994,11 +994,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
 
             function addMemberToPartitionGroup(self) {
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
+
+                    var partitionId = $(event.group).attr('id');
+                    var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+
                     // check whether member is already added to the group
-                    if (self.jsPlumbInstance.getGroupFor(event.el.id) !== undefined &&
-                        self.jsPlumbInstance.getGroupFor(event.el.id) === event.group) {
+                    if (partition.isElementInsidePartition(event.el.id)) {
                         return;
                     }
+
                     var isGroupMemberValid = false;
                     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                         || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
@@ -1017,8 +1021,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         if (totalConnection === 0) {
                             isGroupMemberValid = true;
 
-                            var partitionId = $(event.group).attr('id');
-                            var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
                             if ($(event.el).hasClass(constants.STREAM)) {
                                 var streamObject = self.configurationData.getSiddhiAppConfig().getStream(elementId);
                                 var streamObjectCopy = _.cloneDeep(streamObject);
