@@ -1391,6 +1391,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PATTERN));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.SEQUENCE));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PARTITION));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PARTITION_CONNECTION_POINT));
 
             // Create an empty JSON to store information of the given graph's nodes, egdes and groups.
             var graphJSON = [];
@@ -1417,10 +1418,18 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             var edges = self.jsPlumbInstance.getAllConnections();
             edges.forEach(function (edge) {
                 // Get the source and target ID from each edge
-                var target = edge.targetId;
                 var source = edge.sourceId;
-                var targetId = target.substr(0, target.indexOf('-'));
+                var target = edge.targetId;
                 var sourceId = source.substr(0, source.indexOf('-'));
+                var targetId = target.substr(0, target.indexOf('-'));
+
+                if (sourceId === undefined || sourceId === "") {
+                    sourceId = source;
+                }
+                if (targetId === undefined || targetId === "") {
+                    targetId = target;
+                }
+
                 // Set the edge to the dagre graph object
                 graph.setEdge(sourceId, targetId);
                 // Set the edge information to the graphJSON object
@@ -1436,7 +1445,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
             var groups = [];
             Array.prototype.push.apply(groups, currentTabElement.getElementsByClassName(constants.PARTITION));
             groups.forEach(function (partition) {
-                // Add the group information to the graphJSON obect
+                // Add the group information to the graphJSON object
                 graphJSON.groups[i] = {
                     id: null,
                     children: []
