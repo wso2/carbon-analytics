@@ -460,6 +460,11 @@ define(['require', 'elementUtils', 'lodash'],
                 });
             });
 
+            // check the element in the partitionList
+            if (requestedElement === undefined) {
+                requestedElement = self.getStreamByNameSavedInsideAPartition(elementName);
+            }
+
             return requestedElement;
         };
 
@@ -502,6 +507,29 @@ define(['require', 'elementUtils', 'lodash'],
                 if (requestedElement === undefined) {
                     requestedElement = partition.getStream(streamId);
                 }
+            });
+            return requestedElement;
+        };
+
+        /**
+         * @function Checks whether a given stream name is inside a partition and if yes it returns
+         * @param streamName name of the query element
+         * @return requestedElement returns undefined if the requested element is not found. Otherwise returns the
+         * requestedElement
+         */
+        AppData.prototype.getStreamByNameSavedInsideAPartition = function (streamName) {
+            var self = this;
+            var requestedElement = undefined;
+
+            _.forEach(self.partitionList, function (partition) {
+                _.forEach(partition.getStreamList(), function (stream) {
+                    if (stream.getName().toUpperCase() === streamName.toUpperCase()) {
+                        requestedElement = {
+                            type: 'STREAM',
+                            element: stream
+                        };
+                    }
+                });
             });
             return requestedElement;
         };
