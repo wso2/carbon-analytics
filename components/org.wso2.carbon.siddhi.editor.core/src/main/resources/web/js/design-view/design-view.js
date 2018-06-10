@@ -223,7 +223,5 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             return result;
         };
 
-        //TODO: replace all the alert with the alert library objects
-
         return DesignView;
     });

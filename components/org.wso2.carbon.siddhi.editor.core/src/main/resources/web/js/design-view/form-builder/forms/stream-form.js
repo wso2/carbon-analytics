@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
-    function (require, log, $, _, Attribute, Stream) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designViewUtils'],
+    function (require, log, $, _, Attribute, Stream, DesignViewUtils) {
 
         /**
          * @class StreamForm Creates a forms to collect data from a stream
@@ -141,7 +141,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                 }
                 var isStreamNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
                 if (isStreamNameUsed) {
-                    alert("Stream name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Stream name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 // add the new out stream to the stream array
@@ -301,7 +302,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream'],
                 var isStreamNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
                     clickedElement.getId());
                 if (isStreamNameUsed) {
-                    alert("Stream name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Stream name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 self.designViewContainer.removeClass('disableContainer');

@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
-    function (require, log, $, _, PartitionWith) {
+define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'],
+    function (require, log, $, _, PartitionWith, DesignViewUtils) {
 
         /**
          * @class PartitionForm Creates a forms to collect data from a partition
@@ -53,7 +53,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith'],
             var partitionWithList = partitionElement.getPartitionWith();
 
             if(partitionWithList === undefined || partitionWithList.length === 0){
-                alert('Connect a stream for partitioning');
+                DesignViewUtils.prototype.warnAlert('Connect a stream for partitioning');
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');

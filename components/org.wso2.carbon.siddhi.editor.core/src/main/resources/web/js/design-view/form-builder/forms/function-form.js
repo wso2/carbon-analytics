@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'functionDefinition'],
-    function (require, log, $, _, FunctionDefinition) {
+define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewUtils'],
+    function (require, log, $, _, FunctionDefinition, DesignViewUtils) {
 
         /**
          * @class FunctionForm Creates a forms to collect data from a function
@@ -117,7 +117,8 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition'],
                 }
                 var isFunctionNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
                 if (isFunctionNameUsed) {
-                    alert("Function name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Function name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 // add the new out function to the function array
@@ -250,7 +251,8 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition'],
                 var isFunctionNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
                     clickedElement.getId());
                 if (isFunctionNameUsed) {
-                    alert("Function name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Function name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 self.designViewContainer.removeClass('disableContainer');

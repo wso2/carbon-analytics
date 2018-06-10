@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
-    function (require, log, $, _, Attribute, Window) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designViewUtils'],
+    function (require, log, $, _, Attribute, Window, DesignViewUtils) {
 
         /**
          * @class WindowForm Creates a forms to collect data from a window
@@ -175,7 +175,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 }
                 var isWindowNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
                 if (isWindowNameUsed) {
-                    alert("Window name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Window name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 // add the new out window to the window array
@@ -412,7 +413,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 var isWindowNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
                     clickedElement.getId());
                 if (isWindowNameUsed) {
-                    alert("Window name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Window name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 self.designViewContainer.removeClass('disableContainer');

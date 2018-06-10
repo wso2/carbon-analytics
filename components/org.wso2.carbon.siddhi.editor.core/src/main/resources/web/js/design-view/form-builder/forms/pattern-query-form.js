@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
-        'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction'],
+        'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
-              QueryWindowOrFunction) {
+              QueryWindowOrFunction, DesignViewUtils) {
 
         /**
          * @class PatternQueryForm Creates a forms to collect data from a pattern query
@@ -59,7 +59,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             var clickedElement = self.configurationData.getSiddhiAppConfig().getPatternQuery(id);
             if (clickedElement.getQueryInput() === undefined
                 || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
-                alert('Connect input streams');
+                DesignViewUtils.prototype.warnAlert('Connect input streams');
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
@@ -68,7 +68,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.consoleListManager.removeFormConsole(formConsole);
             } else if (clickedElement.getQueryOutput() === undefined ||
                 clickedElement.getQueryOutput().getTarget() === undefined) {
-                alert('Connect an output element');
+                DesignViewUtils.prototype.warnAlert('Connect an output element');
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');

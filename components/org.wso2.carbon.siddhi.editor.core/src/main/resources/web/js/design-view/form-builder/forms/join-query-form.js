@@ -18,9 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'joinQuerySource', 'streamHandler', 'queryWindowOrFunction'],
+        'joinQuerySource', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
+              DesignViewUtils) {
 
         var constants = {
             LEFT_SOURCE : 'Left Source',
@@ -63,7 +64,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             if (clickedElement.getQueryInput() === undefined
                 || clickedElement.getQueryInput().getFirstConnectedElement() === undefined
                 || clickedElement.getQueryInput().getSecondConnectedElement() === undefined) {
-                alert('Connect two input elements to join query');
+                DesignViewUtils.prototype.warnAlert('Connect two input elements to join query');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
@@ -71,7 +72,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.consoleListManager.removeFormConsole(formConsole);
             } else if (clickedElement.getQueryOutput() === undefined ||
                 clickedElement.getQueryOutput().getTarget() === undefined) {
-                alert('Connect an output element');
+                DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
@@ -1112,17 +1113,21 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             elementType = secondInputElementType;
                         }
                         if (noOfWindowsInSource > 1) {
-                            alert("Only one window can be defined in a join source!");
+                            DesignViewUtils.prototype.errorAlert("Only one window can be defined in a join source!");
                             validity = false;
                         } else if (noOfFiltersInSource > 0
                             && noOfWindowsInSource === 0 && elementType !== 'WINDOW') {
-                            alert("Since a filter is defined, a window is also needed to be defined in join source!");
+                            DesignViewUtils.prototype
+                                .errorAlert("Since a filter is defined, a window is also needed to be defined in " +
+                                    "join source!");
                             validity = false;
                         } else if (noOfWindowsInSource === 1){
                             var streamHandlerListLength = joinConfiguration.streamHandlerList.length;
                             var lastStreamHandlerInList = joinConfiguration.streamHandlerList[streamHandlerListLength-1];
                             if (lastStreamHandlerInList.streamHandler.windowName === undefined) {
-                                alert("Window should be defined as the last stream handler in a join source!");
+                                DesignViewUtils.prototype
+                                    .errorAlert("Window should be defined as the last stream handler in a " +
+                                        "join source!");
                                 validity = false;
                             }
                         }

@@ -15,12 +15,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElements', 'dagre', 'edge',
+define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
         'partitionWith'],
 
-    function (require, log, $, Backbone, _, alerts, DropElements, dagre, Edge, WindowFilterProjectionQueryInput,
-              JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput, PartitionWith) {
+    function (require, log, $, Backbone, _, DesignViewUtils, DropElements, dagre, Edge,
+              WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
+              PartitionWith) {
 
         var constants = {
             SOURCE: 'sourceDrop',
@@ -253,7 +254,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                     if (sourceElement.hasClass(constants.STREAM)
                         && self.jsPlumbInstance.getGroupFor(sourceId) !== undefined) {
                         if (self.jsPlumbInstance.getGroupFor(sourceId) !== self.jsPlumbInstance.getGroupFor(targetId)) {
-                            alert("Invalid Connection: Inner Streams are not exposed to outside");
+                            DesignViewUtils.prototype
+                                .errorAlert("Invalid Connection: Inner Streams are not exposed to outside");
                             return connectionValidity;
                         } else {
                             return connectionValidity = true;
@@ -262,14 +264,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                     else if (targetElement.hasClass(constants.STREAM)
                         && self.jsPlumbInstance.getGroupFor(targetId) !== undefined) {
                         if (self.jsPlumbInstance.getGroupFor(targetId) !== self.jsPlumbInstance.getGroupFor(sourceId)) {
-                            alert("Invalid Connection: Inner Streams are not exposed to outside");
+                            DesignViewUtils.prototype
+                                .errorAlert("Invalid Connection: Inner Streams are not exposed to outside");
                             return connectionValidity;
                         } else {
                             return connectionValidity = true;
                         }
                     } else if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                         if (!sourceElement.hasClass(constants.STREAM)) {
-                            alert("Invalid Connection: Connect an outer stream");
+                            DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect an outer stream");
                             return connectionValidity;
                         } else {
                             var partitionId = targetElement.parent()[0].id;
@@ -278,7 +281,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                                 = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             var isStreamConnected = partition.checkOuterStreamIsAlreadyConnected(connectedStreamName);
                             if (isStreamConnected) {
-                                alert("Invalid Connection: Stream is already connected to the partition");
+                                DesignViewUtils.prototype
+                                    .errorAlert("Invalid Connection: Stream is already connected to the partition");
                                 return connectionValidity;
                             } else {
                                 return connectionValidity = true;
@@ -289,12 +293,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         // If not display a error message.
                         var sourceConnections = self.jsPlumbInstance.getConnections({target: sourceId});
                         if (sourceConnections.length === 0) {
-                            alert("Invalid Connection: Connect a outer stream first");
+                            DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect a outer stream first");
                             return connectionValidity;
                         }
                         var partitionId = sourceElement.parent()[0].id;
-                        if (self.jsPlumbInstance.getGroupFor(targetId) !== self.jsPlumbInstance.getGroupFor(partitionId)) {
-                            alert("Invalid Connection: Connect a query inside the partition");
+                        if (self.jsPlumbInstance.getGroupFor(targetId)
+                            !== self.jsPlumbInstance.getGroupFor(partitionId)) {
+                            DesignViewUtils.prototype
+                                .errorAlert("Invalid Connection: Connect a query inside the partition");
                         } else {
                             if (targetElement.hasClass(constants.PROJECTION)
                                 || targetElement.hasClass(constants.FILTER)
@@ -304,14 +310,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                                 || targetElement.hasClass(constants.SEQUENCE)) {
                                 return connectionValidity = true;
                             } else {
-                                alert("Invalid Connection: Connect a query inside the partition");
+                                DesignViewUtils.prototype
+                                    .errorAlert("Invalid Connection: Connect a query inside the partition");
                                 return connectionValidity;
                             }
                         }
                     }
                     else if (sourceElement.hasClass(constants.PARTITION)) {
                         if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') !== sourceId) {
-                            alert("Invalid Connection: Connect to a partition query");
+                            DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect to a partition query");
                             return connectionValidity;
                         } else {
                             return connectionValidity = true;
@@ -319,7 +326,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                     }
                     else if (sourceElement.hasClass(constants.SOURCE)) {
                         if (!targetElement.hasClass(constants.STREAM)) {
-                            alert("Invalid Connection: Connect to a stream");
+                            DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect to a stream");
                             return connectionValidity;
                         } else {
                             return connectionValidity = true;
@@ -327,7 +334,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                     }
                     else if (targetElement.hasClass(constants.SINK)) {
                         if (!sourceElement.hasClass(constants.STREAM)) {
-                            alert("Invalid Connection: Sink input source should be a stream");
+                            DesignViewUtils.prototype
+                                .errorAlert("Invalid Connection: Sink input source should be a stream");
                             return connectionValidity;
                         } else {
                             return connectionValidity = true;
@@ -335,7 +343,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                     }
                     else if (targetElement.hasClass(constants.AGGREGATION)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
-                            alert("Invalid Connection: Aggregation input should be a stream or trigger");
+                            DesignViewUtils.prototype
+                                .errorAlert("Invalid Connection: Aggregation input should be a stream or trigger");
                             return connectionValidity;
                         } else {
                             return connectionValidity = true;
@@ -358,14 +367,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                                 = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             var isStreamConnected = partition.checkOuterStreamIsAlreadyConnected(connectedStreamName);
                             if (isStreamConnected) {
-                                alert("Invalid Connection: Stream is already connected to the partition");
+                                DesignViewUtils.prototype
+                                    .errorAlert("Invalid Connection: Stream is already connected to the partition");
                                 return connectionValidity;
                             }
                         }
                     }
                     if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
                         if(!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
-                            alert("Invalid Connection");
+                            DesignViewUtils.prototype.errorAlert("Invalid Connection");
                         } else {
                             connectionValidity = true;
                         }
@@ -374,7 +384,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         || targetElement.hasClass(constants.WINDOW_QUERY)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER))) {
-                            alert("Invalid Connection");
+                            DesignViewUtils.prototype.errorAlert("Invalid Connection");
                         } else {
                             connectionValidity = true;
                         }
@@ -383,7 +393,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.TRIGGER)
                             || sourceElement.hasClass(constants.WINDOW))) {
-                            alert("Invalid Connection");
+                            DesignViewUtils.prototype.errorAlert("Invalid Connection");
                         } else {
                             var sourceElementObject =
                                 self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId);
@@ -404,7 +414,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                                 } else if (firstConnectedElement !== undefined
                                     && secondConnectedElement !== undefined) {
                                     connectionValidity = false;
-                                    alert("Only two input elements are allowed to connect in join query!");
+                                    DesignViewUtils.prototype
+                                        .errorAlert("Only two input elements are allowed to connect in join query!");
                                 } else if (firstConnectedElement !== undefined
                                     && secondConnectedElement === undefined) {
                                     var firstElementType = firstConnectedElement.type;
@@ -417,7 +428,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                                         connectionValidity = true;
                                     } else {
                                         connectionValidity = false;
-                                        alert("At least one connected input element in join query should be a stream " +
+                                        DesignViewUtils.prototype
+                                            .errorAlert("At least one connected input element in join query should be a stream " +
                                             "or a trigger or a window!");
                                     }
                                 } else if (firstConnectedElement === undefined
@@ -432,7 +444,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                                         connectionValidity = true;
                                     } else {
                                         connectionValidity = false;
-                                        alert("At least one connected input element in join query should be a stream " +
+                                        DesignViewUtils.prototype
+                                            .errorAlert("At least one connected input element in join query should be a stream " +
                                             "or a trigger or a window!");
                                     }
                                 }
@@ -444,7 +457,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                         || sourceElement.hasClass(constants.JOIN) || sourceElement.hasClass(constants.SEQUENCE)) {
                         if (!(targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                             || targetElement.hasClass(constants.WINDOW))) {
-                            alert("Invalid Connection");
+                            DesignViewUtils.prototype.errorAlert("Invalid Connection");
                         } else {
                             connectionValidity = true;
                         }
@@ -1074,7 +1087,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                     }
 
                     if (!isGroupMemberValid) {
-                        self.warnAlert('This element cannot be added to partition');
+                        DesignViewUtils.prototype.warnAlert('This element cannot be added to partition');
                         self.jsPlumbInstance.removeFromGroup(event.group, event.el, false);
                         var elementClientX = $(event.el).attr('data-x');
                         var elementClientY = $(event.el).attr('data-y');
@@ -1961,24 +1974,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'alerts', 'dropElement
                 return Math.max(a, b);
             });
             return partitionId + '_pc' + (maxId + 1);
-        };
-
-        /**
-         * Display's a warning using the AlertsManager.
-         *
-         * @param message The content to be displayed in the alert
-         */
-        DesignGrid.prototype.warnAlert = function (message) {
-            alerts.warn(message);
-        };
-
-        /**
-         * Display's a error using the AlertsManager.
-         *
-         * @param message The content to be displayed in the alert
-         */
-        DesignGrid.prototype.errorAlert = function (message) {
-            alerts.error(message);
         };
 
         return DesignGrid;

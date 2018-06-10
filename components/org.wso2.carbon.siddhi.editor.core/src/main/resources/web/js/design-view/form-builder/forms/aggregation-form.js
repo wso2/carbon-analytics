@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
-        'elementUtils', 'storeAnnotation'],
+        'elementUtils', 'storeAnnotation', 'designViewUtils'],
     function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils, 
-              StoreAnnotation) {
+              StoreAnnotation, DesignViewUtils) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -59,7 +59,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             }
 
             if (clickedElement.getFrom() === undefined) {
-                alert('Connect an input stream element');
+                DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
@@ -467,7 +467,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     var isAggregationNameUsed =
                         self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name, clickedElement.getId());
                     if (isAggregationNameUsed) {
-                        alert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
+                        DesignViewUtils.prototype
+                            .errorAlert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
                         return;
                     }
 

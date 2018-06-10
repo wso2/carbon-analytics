@@ -18,9 +18,9 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'streamHandler'],
+        'streamHandler', 'designViewUtils'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils) {
 
         var constants = {
             PROJECTION: 'projectionQueryDrop',
@@ -64,7 +64,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQuery(id);
             if (clickedElement.getQueryInput() === undefined
                 || clickedElement.getQueryInput().getFrom() === undefined) {
-                alert('Connect an input element');
+                DesignViewUtils.prototype.warnAlert('Connect an input element');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
@@ -72,7 +72,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.consoleListManager.removeFormConsole(formConsole);
             } else if (clickedElement.getQueryOutput() === undefined ||
                 clickedElement.getQueryOutput().getTarget() === undefined) {
-                alert('Connect an output stream');
+                DesignViewUtils.prototype.warnAlert('Connect an output stream');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
@@ -1121,7 +1121,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     });
 
                     if (numberOfWindows > 1) {
-                        alert('Only one window can be defined!');
+                        DesignViewUtils.prototype.errorAlert('Only one window can be defined!');
                         return;
                     }
                     clickedElement.clearAnnotationList();
