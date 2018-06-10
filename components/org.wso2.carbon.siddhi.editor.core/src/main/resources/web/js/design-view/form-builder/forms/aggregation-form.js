@@ -162,10 +162,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 }
                 fillAggregate = self.formUtils.cleanJSONObject(fillAggregate);
 
-                formContainer.append('<div class="row"><div id="form-aggregation-annotation" ' +
-                    'class="section-seperator col-md-12"></div></div>' +
-                    '<div class="row section-seperator"><div id="form-aggregation-input" class="col-md-3"></div>' +
-                    '<div id="form-aggregation-select" class="col-md-5"></div>' +
+                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                    '<div class="row"><div id="form-aggregation-annotation" class="col-md-12 section-seperator frm-agr"></div></div>' +
+                    '<div class="row"><div id="form-aggregation-input" class="col-md-12"></div></div></div>' +
+                    '<div id="form-aggregation-select" class="col-md-4 frm-agr"></div>' +
                     '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
 
                 var possibleGroupByAttributes = [];
