@@ -156,6 +156,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var name = clickedElement.getName();
             var at = clickedElement.getAt();

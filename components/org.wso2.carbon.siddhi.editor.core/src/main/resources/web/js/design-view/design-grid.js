@@ -52,10 +52,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var errorMessage = 'unable to find design view grid container';
             if (!_.has(options, 'container')) {
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var container = $(_.get(options, 'container'));
             if (!container.length > 0) {
                 log.error(errorMessage);
+                throw errorMessage;
             }
             this.options = options;
             this.configurationData = this.options.configurationData;

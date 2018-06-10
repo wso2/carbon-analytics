@@ -33,13 +33,16 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             var errorMessage2 = 'unable to find application in design-view.js';
             if (!_.has(options, 'container')) {
                 log.error(errorMessage1);
+                throw errorMessage1;
             }
             var container = $(_.get(options, 'container'));
             if (!container.length > 0) {
                 log.error(errorMessage1);
+                throw errorMessage1;
             }
             if (!_.has(options, 'application')) {
                 log.error(errorMessage2);
+                throw errorMessage2;
             }
             this._$parent_el = container;
             this.options = options;
@@ -58,12 +61,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 errMsg = 'unable to find tool palette container with selector: '
                     + _.get(this.options, 'design_view.tool_palette.container');
                 log.error(errMsg);
+                throw errMsg;
             }
             var toolPaletteOpts = _.clone(_.get(this.options, 'design_view.tool_palette'));
             if (toolPaletteOpts === undefined) {
                 errMsg = 'unable to find tool palette with selector: '
                     + _.get(this.options, 'design_view.tool_palette');
                 log.error(errMsg);
+                throw errMsg;
             }
             toolPaletteOpts.container = toolPaletteContainer;
             this.toolPalette = new ToolPalette(toolPaletteOpts);
@@ -108,6 +113,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 errMsg = 'unable to find design view grid container with selector: '
                     + _.get(this.options, 'design_view.grid_container');
                 log.error(errMsg);
+                throw errMsg;
             }
             // remove any child nodes from designViewGridContainer if exists
             this.designViewGridContainer.empty();
@@ -179,7 +185,6 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                         result = {status: "success", responseJSON: response};
                     },
                     error: function (error) {
-                        console.log(error);
                         if (error.status === 400) {
                             result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
                             //TODO: remove partition warning from service call

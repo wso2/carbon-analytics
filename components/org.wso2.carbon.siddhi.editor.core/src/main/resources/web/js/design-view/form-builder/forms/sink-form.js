@@ -300,6 +300,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var type = clickedElement.getType();
             var savedSinkOptions = clickedElement.getOptions();

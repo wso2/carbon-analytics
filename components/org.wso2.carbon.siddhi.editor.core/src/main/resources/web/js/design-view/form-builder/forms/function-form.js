@@ -160,6 +160,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             if(clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var name = clickedElement.getName();
             var scriptType = (clickedElement.getScriptType()).toLowerCase();

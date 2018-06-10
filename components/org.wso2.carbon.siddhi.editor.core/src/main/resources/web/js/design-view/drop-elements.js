@@ -29,10 +29,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var errorMessage = 'unable to find design view container';
             if (!_.has(options, 'container')) {
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var container = $(_.get(options, 'container'));
             if (!container.length > 0) {
                 log.error(errorMessage);
+                throw errorMessage;
             }
             this.configurationData = options.configurationData;
             this.container = options.container;

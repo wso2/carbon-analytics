@@ -56,6 +56,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             if (clickedElement === undefined) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
 
             if (clickedElement.getFrom() === undefined) {
