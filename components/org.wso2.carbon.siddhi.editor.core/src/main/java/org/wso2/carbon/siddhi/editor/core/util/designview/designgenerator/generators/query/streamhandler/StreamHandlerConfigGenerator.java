@@ -45,24 +45,6 @@ public class StreamHandlerConfigGenerator {
     }
 
     /**
-     * Generates StreamHandlerConfig from the given Siddhi StreamHandler
-     * @param streamHandler                     Siddhi StreamHandler object
-     * @return                                  StreamHandlerConfig object
-     * @throws DesignGenerationException        Error while generating config
-     */
-    public StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler)
-            throws DesignGenerationException {
-        if (streamHandler instanceof Filter) {
-            return generateFilterConfig((Filter) streamHandler);
-        } else if (streamHandler instanceof StreamFunction) {
-            return generateFunction((StreamFunction) streamHandler);
-        } else if (streamHandler instanceof Window) {
-            return generateWindow((Window) streamHandler);
-        }
-        throw new DesignGenerationException("Unknown type of StreamHandler for generating config");
-    }
-
-    /**
      * Generates a list of StreamHandlerConfigs, from the given list of Siddhi StreamHandlers
      * @param streamHandlers                    List of Siddhi StreamHandler objects
      * @return                                  List of StreamHandlerConfig objects
@@ -75,6 +57,24 @@ public class StreamHandlerConfigGenerator {
             streamHandlerConfigList.add(generateStreamHandlerConfig(streamHandler));
         }
         return streamHandlerConfigList;
+    }
+
+    /**
+     * Generates StreamHandlerConfig from the given Siddhi StreamHandler
+     * @param streamHandler                     Siddhi StreamHandler object
+     * @return                                  StreamHandlerConfig object
+     * @throws DesignGenerationException        Error while generating config
+     */
+    private StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler)
+            throws DesignGenerationException {
+        if (streamHandler instanceof Filter) {
+            return generateFilterConfig((Filter) streamHandler);
+        } else if (streamHandler instanceof StreamFunction) {
+            return generateFunction((StreamFunction) streamHandler);
+        } else if (streamHandler instanceof Window) {
+            return generateWindow((Window) streamHandler);
+        }
+        throw new DesignGenerationException("Unknown type of StreamHandler for generating config");
     }
 
     /**
