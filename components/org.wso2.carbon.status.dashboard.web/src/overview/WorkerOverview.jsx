@@ -543,7 +543,8 @@ export default class WorkerOverview extends React.Component {
                                     <h3 style={styles.h3Title}>{id}</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
-                                        <GridList cols={3} cellHeight='100%' style={styles.gridList}>
+                                        <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
+                                                  style={styles.gridList}>
                                             {workersList[id].map((worker) => {
                                                 return (
                                                     <WorkerThumbnail worker={worker}
@@ -561,7 +562,8 @@ export default class WorkerOverview extends React.Component {
                                     <h3 style={styles.h3}>{id}</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
-                                        <GridList cols={3} cellHeight='100%' style={styles.gridList}>
+                                        <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
+                                                  style={styles.gridList}>
                                             {workersList[id].map((worker) => {
                                                 return (
                                                     <WorkerThumbnail worker={worker}
@@ -605,7 +607,8 @@ export default class WorkerOverview extends React.Component {
                                     <h3 style={styles.h3Title}>Group Id : {id}</h3>
                                     <h4 style={styles.h3Title}>Managers</h4>
                                     <div style={styles.root}>
-                                        <GridList cols={3} cellHeight='100%' style={styles.gridList}>
+                                        <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
+                                                  style={styles.gridList}>
                                             {managerList[id].map((worker) => {
                                                 return (
                                                     <ManagerThumbnail worker={worker}
@@ -624,7 +627,8 @@ export default class WorkerOverview extends React.Component {
                                     <h3 style={styles.h3Title}>Managers</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
-                                        <GridList cols={3} cellHeight='100%' style={styles.gridList}>
+                                        <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
+                                                  style={styles.gridList}>
                                             {managerList[id].map((worker) => {
                                                 return (
                                                     <ManagerThumbnail worker={worker}
