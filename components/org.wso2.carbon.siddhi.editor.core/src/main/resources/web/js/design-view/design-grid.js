@@ -574,15 +574,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                         self.jsPlumbInstance.makeTarget(connectionIn, {
                             anchor: 'Left',
-                            maxConnections: 1
+                            maxConnections: 1,
+                            deleteEndpointsOnDetach : true
                         });
                         self.jsPlumbInstance.makeSource(connectionIn, {
-                            anchor: 'Right'
+                            anchor: 'Right',
+                            deleteEndpointsOnDetach : true
                         });
-
-                        var partitionElementSettingsIcon
-                            = partitionElement.find('.partition-element-prop-icon');
-                        //self.dropElements.formBuilder.GeneratePartitionKeyForm(partitionElementSettingsIcon[0]);
 
                     } else if (sourceElement.hasClass(constants.SOURCE)
                         && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
@@ -843,6 +841,62 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 });
             }
 
+            // Update the model before detaching a connection
+            function updateModelOnBeforeConnectionDetach() {
+                self.jsPlumbInstance.bind('beforeDetach', function (connection) {
+                    var target = connection.targetId;
+                    var targetId = target.substr(0, target.indexOf('-'));
+                    /*
+                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                    * explicitly set the targetId.  Simply if targetId is '' that means this connection is related to a
+                    * partition.
+                    * */
+                    if (targetId === '') {
+                        targetId = target;
+                    } else if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true, true)
+                        === undefined) {
+                        console.log("Target element not found!");
+                    }
+                    var targetElement = $('#' + targetId);
+
+                    var source = connection.sourceId;
+                    var sourceId = source.substr(0, source.indexOf('-'));
+                    /*
+                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                    * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
+                    * partition.
+                    * */
+                    if (sourceId === '') {
+                        sourceId = source;
+                    } else if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
+                        === undefined) {
+                        console.log("Source element not found!");
+                    }
+                    var sourceElement = $('#' + sourceId);
+
+                    // removing edge from the edgeList
+                    var edgeId = ''+ sourceId + '_' + targetId + '';
+                    self.configurationData.removeEdge(edgeId);
+
+                    if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)
+                        && sourceElement.hasClass(constants.STREAM)) {
+                        var partitionId = targetElement.parent()[0].id;
+                        var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+                        var disconnectedElementName
+                            = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+
+                        partition.removePartitionWith(disconnectedElementName);
+
+                        var connections = self.jsPlumbInstance.getConnections({source: targetId});
+                        _.forEach(connections, function (connection) {
+                            self.jsPlumbInstance.deleteConnection(connection);
+                        });
+                        targetElement.detach();
+                    }
+                });
+            }
             // Update the model when a connection is detached
             function updateModelOnConnectionDetach() {
                 self.jsPlumbInstance.bind('connectionDetached', function (connection) {
@@ -897,22 +951,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                         self.configurationData.getSiddhiAppConfig().getAggregation(targetId).setFrom(undefined);
 
-                    } else if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)
-                        && sourceElement.hasClass(constants.STREAM)){
-                        var partitionId = targetElement.parent()[0].id;
-                        var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
-                        disconnectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
-
-                        partition.removePartitionWith(disconnectedElementName);
-                        targetElement.detach();
-
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)
                         || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
 
                         // if the sourceElement has the class constants.PARTITION_CONNECTION_POINT then that is
-                        // basically a stream. So we replace that sourceElement with the actual stream element.
+                        // basically a stream because a connection point holds a connection to a stream.
+                        // So we replace that sourceElement with the actual stream element.
                         if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                             var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
                             var sourceConnectionId = sourceConnection[0].sourceId;
@@ -1107,6 +1153,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             checkConnectionValidityBeforeElementDrop();
 
             updateModelOnConnectionAttach();
+
+            updateModelOnBeforeConnectionDetach();
 
             updateModelOnConnectionDetach();
 

@@ -1131,7 +1131,27 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             newElement.on('click', '.element-close-icon', function () {
                 var elementId = newElement[0].id;
 
-                //TODO: when removing element first remove connections it has(both in and out connections)
+                /*
+                * before deleting the element data from the data store structure, it is mandatory to delete the element
+                * from jsPlumb because it will fire the 'beforeDetach' and 'connectionDetached' events and it will
+                * update the other elements data connected to current element. ex: when a stream is deleted from a
+                * query, from clause in the query will be updated as undefined.
+                * */
+                var outConnections = self.jsPlumbInstance.getConnections({source: elementId+'-out'});
+                var inConnections = self.jsPlumbInstance.getConnections({source: elementId+'-in'});
+
+                _.forEach(outConnections, function (connection) {
+                    self.jsPlumbInstance.deleteConnection(connection);
+                });
+                _.forEach(inConnections, function (connection) {
+                    self.jsPlumbInstance.deleteConnection(connection);
+                });
+
+                self.jsPlumbInstance.remove(newElement, true);
+                if(self.jsPlumbInstance.getGroupFor(newElement)){
+                    self.jsPlumbInstance.removeFromGroup(newElement);
+                }
+
                 if (newElement.hasClass('streamDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeStream(elementId);
                 } else if (newElement.hasClass('tableDrop')) {
@@ -1162,10 +1182,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     self.configurationData.getSiddhiAppConfig().removeSink(elementId);
                 }
 
-                self.jsPlumbInstance.remove(newElement);
-                if(self.jsPlumbInstance.getGroupFor(newElement)){
-                    self.jsPlumbInstance.removeFromGroup(newElement);
-                }
                 self.configurationData.getSiddhiAppConfig()
                     .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);
             });
@@ -1175,12 +1191,33 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var elementId = newElement[0].id;
                 var partition = self.configurationData.getSiddhiAppConfig().getPartition(elementId);
                 var noOfElementsInsidePartition = partition.getNoOfElementsInPartition();
-                if (newElement.hasClass('partitionDrop')) {
-                    self.configurationData.getSiddhiAppConfig().removePartition(elementId);
-                }
+
+                var partitionConnectionPoints = newElement.find('.partition-connector-in-part');
+
+                _.forEach(partitionConnectionPoints, function (partitionConnectionPoint) {
+                    var outConnections = self.jsPlumbInstance.getConnections({source: partitionConnectionPoint});
+                    var inConnections = self.jsPlumbInstance.getConnections({target: partitionConnectionPoint});
+
+                    _.forEach(outConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
+                    });
+                    _.forEach(inConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
+                    });
+                });
+
+                /*
+                * before deleting the element data from the data store structure, it is mandatory to delete the element
+                * from jsPlumb.
+                * */
+
                 self.jsPlumbInstance.remove(newElement);
                 if(self.jsPlumbInstance.getGroupFor(newElement)){
                     self.jsPlumbInstance.removeFromGroup(newElement);
+                }
+
+                if (newElement.hasClass('partitionDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removePartition(elementId);
                 }
 
                 self.configurationData.getSiddhiAppConfig()
