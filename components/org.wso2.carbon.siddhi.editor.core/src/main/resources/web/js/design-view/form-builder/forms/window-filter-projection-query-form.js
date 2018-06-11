@@ -634,8 +634,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                formContainer.append('<div class="row"><div id="form-query-annotation" class="col-md-12"></div></div>' +
-                    '<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
+                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                    '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
+                    '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
                     '<div id="form-query-output" class="col-md-4"></div></div>');
 
@@ -1059,12 +1060,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     disable_array_reorder: true
                 });
 
-                formContainer.append('<div id="form-submit"><button type="button" ' +
-                    'class="btn btn-default">Submit</button></div>' +
-                    '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+                formContainer.append(self.formUtils.buildFormButtons(true));
 
                 // 'Submit' button action
-                var submitButtonElement = $(formContainer).find('#form-submit')[0];
+                var submitButtonElement = $(formContainer).find('#btn-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
 
                     var annotationErrors = editorAnnotation.validate();
@@ -1249,7 +1248,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#form-cancel')[0];
+                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');

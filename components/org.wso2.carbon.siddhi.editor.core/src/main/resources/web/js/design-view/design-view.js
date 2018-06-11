@@ -16,19 +16,19 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palette', 'designViewGrid',
+define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid',
         'configurationData', 'appData', 'partition', 'query', 'stream', 'table', 'window', 'trigger', 'aggregation',
         'aggregateByTimePeriod', 'windowFilterProjectionQueryInput', 'queryWindowOrFunction', 'edge', 'querySelect',
         'queryOrderByValue', 'queryOutput', 'queryOutputInsert', 'queryOutputDelete', 'queryOutputUpdate',
         'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput', 'joinQuerySource',
         'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation', 'mapAnnotation',
-        'functionDefinition', 'streamHandler', 'storeAnnotation'],
-    function (require, log, _, $, alerts, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
+        'functionDefinition', 'streamHandler', 'storeAnnotation', 'partitionWith'],
+    function (require, log, _, $, ToolPalette, DesignViewGrid, ConfigurationData, AppData, Partition, Query,
               Stream, Table, Window, Trigger, Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput,
               QueryWindowOrFunction, Edge, QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert,
               QueryOutputDelete, QueryOutputUpdate, QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput,
               JoinQuerySource, PatternOrSequenceQueryInput, PatternOrSequenceQueryCondition, SourceOrSinkAnnotation,
-              MapAnnotation, FunctionDefinition, StreamHandler, StoreAnnotation) {
+              MapAnnotation, FunctionDefinition, StreamHandler, StoreAnnotation, PartitionWith) {
 
         /**
          * @class DesignView
@@ -138,6 +138,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
 
             // TODO: when saving the optional values(which are required to create objects for them) check whether they
             // are available and then create object
+            //TODO: Initialising the data should be done in a separate class
             _.forEach(configurationData.siddhiAppConfig.sourceList, function(source){
                 var sourceObject = new SourceOrSinkAnnotation(source);
                 sourceObject.setId(newIdBeginningPhrase + sourceObject.getId());
@@ -288,9 +289,88 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
                 appData.addJoinQuery(queryObject);
             });
             _.forEach(configurationData.siddhiAppConfig.partitionList, function(partition){
-                //partitionObject.setId(newIdBeginningPhrase + partitionObject.getId());
                 var partitionObject = new Partition(partition);
+                partitionObject.setId(newIdBeginningPhrase + partitionObject.getId());
                 addAnnotationsForElement(partition, partitionObject);
+
+                _.forEach(partition.partitionWith, function(partitionWith){
+                    var partitionWithObject = new PartitionWith(partitionWith);
+                    partitionObject.addPartitionWith(partitionWithObject);
+                });
+                //TODO: reduce the code duplication
+                _.forEach(partition.streamList, function(stream){
+                    var streamObject = new Stream(stream);
+                    addAnnotationsForElement(stream, streamObject);
+                    addAttributesForElement(stream, streamObject);
+                    streamObject.setId(newIdBeginningPhrase + streamObject.getId());
+                    partitionObject.addStream(streamObject);
+                });
+
+                _.forEach(partition.queryLists.PATTERN, function(patternQuery){
+                    var patternQueryObject = new Query(patternQuery);
+                    addAnnotationsForElement(patternQuery, patternQueryObject);
+                    var patternQueryInput = new PatternOrSequenceQueryInput(patternQuery.queryInput);
+                    _.forEach(patternQuery.queryInput.conditionList, function(condition){
+                        var patternQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                        setStreamHandlerListForQuery(patternQueryConditionObject, condition.streamHandlerList);
+                        patternQueryInput.addCondition(patternQueryConditionObject);
+                    });
+                    patternQueryObject.setQueryInput(patternQueryInput);
+                    setSelectForQuery(patternQueryObject, patternQuery.select);
+                    setOrderByForQuery(patternQueryObject, patternQuery.orderBy);
+                    setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
+                    patternQueryObject.setId(newIdBeginningPhrase + patternQueryObject.getId());
+                    partitionObject.addPatternQuery(patternQueryObject);
+                });
+                _.forEach(partition.queryLists.SEQUENCE, function(sequenceQuery){
+                    var sequenceQueryObject = new Query(sequenceQuery);
+                    addAnnotationsForElement(sequenceQuery, sequenceQueryObject);
+                    var sequenceQueryInput = new PatternOrSequenceQueryInput(sequenceQuery.queryInput);
+                    _.forEach(sequenceQuery.queryInput.conditionList, function(condition){
+                        var sequenceQueryConditionObject = new PatternOrSequenceQueryCondition(condition);
+                        setStreamHandlerListForQuery(sequenceQueryConditionObject, condition.streamHandlerList);
+                        sequenceQueryInput.addCondition(sequenceQueryConditionObject);
+                    });
+                    sequenceQueryObject.setQueryInput(sequenceQueryInput);
+                    setSelectForQuery(sequenceQueryObject, sequenceQuery.select);
+                    setOrderByForQuery(sequenceQueryObject, sequenceQuery.orderBy);
+                    setQueryOutputForQuery(sequenceQueryObject, sequenceQuery.queryOutput);
+                    sequenceQueryObject.setId(newIdBeginningPhrase + sequenceQueryObject.getId());
+                    partitionObject.addSequenceQuery(sequenceQueryObject);
+                });
+                _.forEach(partition.queryLists.WINDOW_FILTER_PROJECTION,
+                    function(windowFilterProjectionQuery){
+                        var queryObject = new Query(windowFilterProjectionQuery);
+                        addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
+                        var windowFilterProjectionQueryInput =
+                            new WindowFilterProjectionQueryInput(windowFilterProjectionQuery.queryInput);
+                        setStreamHandlerListForQuery(windowFilterProjectionQueryInput,
+                            windowFilterProjectionQuery.queryInput.streamHandlerList);
+                        queryObject.setQueryInput(windowFilterProjectionQueryInput);
+                        setSelectForQuery(queryObject, windowFilterProjectionQuery.select);
+                        setOrderByForQuery(queryObject, windowFilterProjectionQuery.orderBy);
+                        setQueryOutputForQuery(queryObject, windowFilterProjectionQuery.queryOutput);
+                        queryObject.setId(newIdBeginningPhrase + queryObject.getId());
+                        partitionObject.addWindowFilterProjectionQuery(queryObject);
+                    });
+                _.forEach(partition.queryLists.JOIN, function(joinQuery){
+                    var queryObject = new Query(joinQuery);
+                    addAnnotationsForElement(joinQuery, queryObject);
+                    var joinQueryInput = new JoinQueryInput(joinQuery.queryInput);
+                    var leftSource = new JoinQuerySource(joinQuery.queryInput.left);
+                    setStreamHandlerListForQuery(leftSource, joinQuery.queryInput.left.streamHandlerList);
+                    var rightSource = new JoinQuerySource(joinQuery.queryInput.right);
+                    setStreamHandlerListForQuery(rightSource, joinQuery.queryInput.right.streamHandlerList);
+                    joinQueryInput.setLeft(leftSource);
+                    joinQueryInput.setRight(rightSource);
+                    queryObject.setQueryInput(joinQueryInput);
+                    setSelectForQuery(queryObject, joinQuery.select);
+                    setOrderByForQuery(queryObject, joinQuery.orderBy);
+                    setQueryOutputForQuery(queryObject, joinQuery.queryOutput);
+                    queryObject.setId(newIdBeginningPhrase + queryObject.getId());
+                    partitionObject.addJoinQuery(queryObject);
+                });
+
                 appData.addPartition(partitionObject);
             });
             _.forEach(configurationData.edgeList, function(edge){
@@ -305,6 +385,16 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
                     childType: edge.childType
                 };
                 self.configurationData.addEdge(new Edge(edgeOptions));
+            });
+            //re-shuffle edgeList to bring forward edges which has partition as child elements
+            self.configurationData.getEdgeList().sort(function(a, b){
+                if (a.getChildType() === 'PARTITION' && b.getChildType() !== 'PARTITION') {
+                    return 0;
+                } else if (a.getChildType() !== 'PARTITION' && b.getChildType() === 'PARTITION') {
+                    return 1;
+                } else {
+                    return 0;
+                }
             });
         };
 
@@ -441,6 +531,7 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
                         console.log(error);
                         if (error.status === 400) {
                             result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                            //TODO: remove partition warning from service call
                         } else if (error.responseText === "pattern queries are not supported") {
                             result = {status: "fail", errorMessage: error.responseText};
                         } else if (error.responseText === "sequence queries are not supported") {
@@ -481,23 +572,6 @@ define(['require', 'log', 'lodash', 'jquery', 'alerts', 'tool_palette/tool-palet
             return result;
         };
 
-        /**
-         * Display's a warning using the AlertsManager.
-         *
-         * @param message The content to be displayed in the alert
-         */
-        DesignView.prototype.warnAlert = function (message) {
-            alerts.warn(message);
-        };
-
-        /**
-         * Display's a error using the AlertsManager.
-         *
-         * @param message The content to be displayed in the alert
-         */
-        DesignView.prototype.errorAlert = function (message) {
-            alerts.error(message);
-        };
         //TODO: replace all the alert with the alert library objects
 
         return DesignView;

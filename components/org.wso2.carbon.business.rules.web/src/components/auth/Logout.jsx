@@ -17,9 +17,9 @@
  *
  */
 
-import React from 'react';
-import {Redirect} from 'react-router-dom';
-// App Utils
+import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
+// Auth Utils
 import AuthManager from '../../utils/AuthManager';
 
 /**
@@ -28,18 +28,13 @@ import AuthManager from '../../utils/AuthManager';
 const appContext = window.contextPath;
 
 /**
- * Logout.
+ * Logout Component
  */
-export default class Logout extends React.Component {
-    /**
-     * Renders logout component.
-     *
-     * @returns {XML} HTML content
-     */
+export default class Logout extends Component {
     render() {
         AuthManager.logout();
         return (
-            <Redirect to={{pathname: `${appContext}/login`}}/>
+            <Redirect to={{ pathname: `${appContext}/login` }} />
         );
     }
 }

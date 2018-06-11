@@ -77,7 +77,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition'],
                             propertyOrder: 3,
                             required: true,
                             type: "string",
-                            title: "Script Type",
+                            title: "Return Type",
                             enum: [
                                 "int",
                                 "long",
@@ -209,7 +209,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition'],
                             propertyOrder: 3,
                             required: true,
                             type: "string",
-                            title: "Script Type",
+                            title: "Return Type",
                             enum: [
                                 "int",
                                 "long",
@@ -237,12 +237,10 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition'],
                 display_required_only: true,
                 no_additional_properties: true
             });
-            formContainer.append('<div id="form-submit"><button type="button" ' +
-                'class="btn btn-default">Submit</button></div>' +
-                '<div id="form-cancel"><button type="button" class="btn btn-default">Cancel</button></div>');
+            formContainer.append(self.formUtils.buildFormButtons(true));
 
             // 'Submit' button action
-            var submitButtonElement = $(formContainer).find('#form-submit')[0];
+            var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
@@ -274,7 +272,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition'],
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#form-cancel')[0];
+            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');

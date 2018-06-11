@@ -35,12 +35,12 @@
 .toggle-view-button {
     transition: 0.15s;
     font-weight: bold;
-    color: white;
+    color: #333;
     background-color: #f57e30;
 }
 
 .toggle-view-button:hover {
-    color: #333;
+    color: #fff;
     transition: 0.15s;
 }
 
@@ -50,13 +50,13 @@
 
 .grid-container {
     /* Temp */
-    width: calc(100% - 80px);
+    width: calc(100% - 67px);
     position: relative;
-    overflow: scroll; /* This should be applied to design-view-container once the two dedicated sour view/design view buttons are removed */
-    background: linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
+    overflow: auto;
+    background: linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
     linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
-    linear-gradient(-90deg, rgba(0, 0, 0, .03) 1px, transparent 1px),
-    linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
+    linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, .001) 1px, transparent 1px),
     linear-gradient(transparent 3px, transparent 3px, transparent 78px, transparent 78px),
     linear-gradient(-90deg, transparent 1px, transparent 1px),
     linear-gradient(-90deg, transparent 3px, transparent 3px, transparent 78px, transparent 78px),
@@ -69,7 +69,7 @@
     10px 10px,
     10px 10px,
     10px 10px;
-    background-color: #fff;
+    background-color: #e7eaeb;
 }
 
 .sourceDrop{
@@ -134,34 +134,32 @@
 
 .streamDrop, .tableDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
 .windowQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop, .sourceDrop, .sinkDrop, .functionDrop {
-    border-radius: 0.5em;
     opacity: 0.8;
     width: 60px;
-    height: 40px;
-    line-height: 80px;
+    height: 60px;
     cursor: pointer;
     text-align: center;
     z-index: 20;
     position: absolute;
-    background-size: 60px 40px;
+    background-color: #fff;
+    background-size: 40px 40px;
     background-repeat: no-repeat;
+    background-position: 10px 10px;
     color: black;
     font-family: helvetica, sans-serif;
-    padding: 0.5em;
     font-size: 0.9em;
     -webkit-transition: -webkit-box-shadow 0.15s ease-in;
     -moz-transition: -moz-box-shadow 0.15s ease-in;
     -o-transition: -o-box-shadow 0.15s ease-in;
     transition: box-shadow 0.15s ease-in;
+    border: 1px solid #ccc;
 }
-
 .partitionDrop {
     border: 1px solid #346789;
     width: 250px;
     height: 250px;
     border-radius: 0.5em;
     opacity: 0.8;
-    line-height: 80px;
     cursor: move;
     text-align: center;
     z-index: 1;
@@ -186,18 +184,17 @@
 }
 
 .connection {
-    -moz-border-radius: 50px;
-    -webkit-border-radius: 50px;
-    border-radius: 50px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
     font-size: 10px;
     text-align: center;
     cursor: pointer;
     width: 10px;
     height: 10px;
     margin-left: -10px;
-    margin-top: 80px;
-    border: 1px solid darkblue;
-    background-color: darkblue;
+    border: 1px solid #000;
+    background-color: #424242;
 }
 
 .property {
@@ -213,28 +210,23 @@
 /*
 *Styles for the configuration icons
 */
-.element-prop-icon, .element-conn-icon, .element-close-icon {
+.element-prop-icon, .element-close-icon {
     float: right;
     width: 26px;
     height: 26px;
-    background-color: transparent;
-    border: 1px solid transparent;
-    margin-top: -65px;
+    margin-top: -95px;
     cursor: pointer;
-    color: red;
+    color: #616161;
     border-radius: 40px;
+    font-size: 14px;
 }
 
 .element-prop-icon {
     margin-right: 25px;
 }
 
-.element-conn-icon {
-    margin-right: 50px;
-}
-
 .element-close-icon {
-    margin-right: 0;
+    margin-right: 5px;
 }
 
 input {
@@ -279,36 +271,36 @@ td {
 .connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation,
 .connectorInQuery, .connectorInPatternQuery, .connectorInSequenceQuery, .connectorInJoinQuery, .connectorInSink {
     float: left;
-    margin-top: -33%;
-    margin-left: -13px;
+    margin-top: -53px;
+    margin-left: -5px;
 }
 
 .connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation,
 .connectorOutQuery, .connectorOutPatternQuery, .connectorOutSequenceQuery, .connectorOutJoinQuery, .connectorOutSource {
     float: right;
-    margin-top: -33%;
-    margin-right: -13px;
+    margin-top: -53px;
+    margin-right: -5px;
 }
 
 .connectorIn {
     float: left;
-    margin-top: -37%;
+    margin-top: -47%;
     margin-left: -13px;
 }
 
 .connectorOut {
     float: right;
-    margin-top: -37%;
+    margin-top: -47%;
     margin-right: -13px;
 }
 
-.connectorInPart {
+.partition-connector-in-part {
     margin-left: -5px;
     margin-top: 20px;
     width: 15px;
     height: 15px;
-    border: 1px solid darkblue;
-    background-color: darkblue;
+    border: 1px solid #424242;
+    background-color: #424242;
 }
 
 .connectorStream {
@@ -318,14 +310,36 @@ td {
 }
 
 .aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
-.partitionNameNode, .patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode,
-.functionName {
-    width: inherit;
-    height: inherit;
-    background-color: transparent;
-    border: 1px solid transparent;
-    margin-top: -10px;
-    font-weight: bolder;
+.patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode{
+    font-weight: 600;
+    width: 120px;
+    margin-left: -30px;
+    margin-top: 60px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.streamDrop:hover .streamNameNode, .windowDrop:hover .windowNameNode, .sequenceQueryDrop:hover .sequenceQueryNameNode,
+.triggerDrop:hover .triggerNameNode, .aggregationDrop:hover .aggregationNameNode, .functionDrop:hover .functionNameNode,
+.projectionQueryDrop:hover .queryNameNode, .filterQueryDrop:hover .queryNameNode, .windowQueryDrop:hover .queryNameNode,
+.joinQueryDrop:hover .joinQueryNameNode, .patternQueryDrop:hover .patternQueryNameNode, .tableDrop:hover .tableNameNode,
+.sourceDrop:hover .sourceNameNode, .sinkDrop:hover .sinkNameNode {
+    overflow: initial;
+}
+
+.partition-element-prop-icon, .partition-element-close-icon {
+    float: right;
+    width: 26px;
+    height: 26px;
+    margin-top: 10px;
+    cursor: pointer;
+    color: #616161;
+    font-size: 14px;
+}
+
+.partition-element-prop-icon {
+    margin-right: 15px;
 }
 
 /* Window Stream */
@@ -360,5 +374,49 @@ select.form-control,
 }
 
 .design-view-form-content th {
-    color: #fff;
+    color: #BDBDBD;
+}
+
+.grid-container > div {
+    opacity: 0.7;
+}
+
+.design-view-form-content button i {
+    font-size: 1.1rem;
+}
+
+.section-seperator {
+    border-bottom: 1px solid #424242;
+}
+
+.query-form-actions {
+    margin-top: 10px;
+}
+
+.design-view-form-content .table-bordered > tbody > tr > td,
+.design-view-form-content .table-bordered,
+.design-view-form-content .table-bordered > thead > tr > th {
+    border: 0;
+}
+
+.design-view-form-content,
+h3,
+.control-label {
+    color: #BDBDBD;
+}
+
+.frm-qry {
+    margin-bottom: 20px;
+}
+
+.frm-agr thead tr th:nth-of-type(2) {
+    width: 30%;
+}
+
+.frm-agr table {
+    width: 100% !important;
+}
+
+.form-control[disabled] {
+    opacity: 0.3;
 }

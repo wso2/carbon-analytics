@@ -46,6 +46,10 @@ define(['require', 'elementUtils'],
             return ElementUtils.prototype.getElement(this.edgeList, edgeId);
         };
 
+        ConfigurationData.prototype.getEdgeList = function () {
+            return this.edgeList;
+        };
+
         ConfigurationData.prototype.setSiddhiAppConfig = function (siddhiAppConfig) {
             this.siddhiAppConfig = siddhiAppConfig;
         };

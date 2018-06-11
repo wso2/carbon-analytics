@@ -18,6 +18,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import BusinessRulesManagerRouter from './BusinessRulesManagerRouter';
+import BusinessRulesManagerRouter from './components/BusinessRulesManagerRouter';
 
 ReactDOM.render(<BusinessRulesManagerRouter />, document.getElementById('root'));

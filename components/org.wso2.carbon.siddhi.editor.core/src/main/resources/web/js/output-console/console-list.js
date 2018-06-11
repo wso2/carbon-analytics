@@ -85,6 +85,15 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 serviceWrapper.css('height', '100%');
                 if (serviceWrapper.is('.ui-resizable')){
                     serviceWrapper.resizable( "destroy" );
+                    /*
+                    * when resizable method in #service-tabs-wrapper's resizable method is destroyed
+                    * it affects to it's child elements as well. So partitions in the design view also gets affected by
+                    * this and partition's resize handles are also disappears. In order to add them back initialise them
+                    * again.
+                    * */
+                    var partitions = $('.partitionDrop');
+                    partitions.resizable( "destroy" );
+                    partitions.resizable();
                 }
                 var activeTab = self.options.application.tabController.activeTab;
                 if (activeTab !== undefined && activeTab.getTitle() != "welcome-page") {
@@ -106,6 +115,13 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     resize: function( event, ui ) {
                     }
                 });
+                /*
+                * when resizable method in #service-tabs-wrapper's resizable method is given a custom implementation
+                * it affects to it's child elements as well. So partitions in the design view also gets affected by
+                * this and partition's resize handles are also disappears. In order to add them back initialise them
+                * again.
+                * */
+                $('.partitionDrop').resizable();
                 var activeTab = self.options.application.tabController.activeTab;
                 if (activeTab.getTitle() != "welcome-page") {
                     if (activeTab.getSiddhiFileEditor().isInSourceView() !== undefined

@@ -41,8 +41,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                           if(self.tabController.activeTab._title != "welcome-page"){
                               if (self.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                                   self.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                              } else {
-                                  //TODO: self.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                               }
                           }
                     } );
@@ -118,7 +116,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     _.forEach(this.tabController.getTabList(), function (tab) {
                         if (tab.getTitle() !== "welcome-page") {
                             tab.getSiddhiFileEditor().on("view-switch", function () {
-                                self.workspaceManager.updateUndoRedoMenus();
+                                self.workspaceManager.updateMenuItems();
                             });
                         }
                     });

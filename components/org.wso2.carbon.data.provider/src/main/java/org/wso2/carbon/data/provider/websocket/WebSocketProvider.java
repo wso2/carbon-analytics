@@ -46,18 +46,18 @@ public class WebSocketProvider implements DataProvider {
     public DataProvider init(String topic, String sessionId, JsonElement jsonElement) throws DataProviderException {
         webSocketChannel = new Gson().fromJson(jsonElement, WebSocketChannel.class);
         webSocketChannel.setSessionId(sessionId);
-        webSocketChannel.setTopic(topic);
+        webSocketChannel.setSubscriberTopic(topic);
         return this;
     }
 
     @Override
     public void start() {
-        WebSocketProviderEndPoint.subscribeToTopic(webSocketChannel.getSubscriberTopic(), webSocketChannel);
+        WebSocketProviderEndPoint.subscribeToTopic(webSocketChannel.getTopic(), webSocketChannel);
     }
 
     @Override
     public void stop() {
-        WebSocketProviderEndPoint.unsubscribeFromTopic(webSocketChannel.getSubscriberTopic(), webSocketChannel.getSessionId());
+        WebSocketProviderEndPoint.unsubscribeFromTopic(webSocketChannel.getTopic(), webSocketChannel.getSessionId());
     }
 
     @Override

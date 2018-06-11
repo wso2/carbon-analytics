@@ -23,7 +23,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a Siddhi Query
@@ -38,6 +40,8 @@ public class QueryConfig extends SiddhiElementConfig {
     private String outputRateLimit;
     private QueryOutputConfig queryOutput;
     private List<String> annotationList;
+    private String partitionId;
+    private Map<String, String> connectorsAndStreams;
 
     public QueryInputConfig getQueryInput() {
         return queryInput;
@@ -109,5 +113,30 @@ public class QueryConfig extends SiddhiElementConfig {
 
     public void setAnnotationList(List<String> annotationList) {
         this.annotationList = annotationList;
+    }
+
+    public String getPartitionId() {
+        return partitionId;
+    }
+
+    public void setPartitionId(String partitionId) {
+        this.partitionId = partitionId;
+    }
+
+    public Map<String, String> getConnectorsAndStreams() {
+        return connectorsAndStreams;
+    }
+
+    public void setConnectorsAndStreams(Map<String, String> connectorsAndStreams) {
+        this.connectorsAndStreams = connectorsAndStreams;
+    }
+
+    public String getConnectorIdByStreamName(String streamName) {
+        for (Map.Entry<String, String> connectorAndStream : connectorsAndStreams.entrySet()) {
+            if (connectorAndStream.getValue().equals(streamName)) {
+                return connectorAndStream.getKey();
+            }
+        }
+        return null;
     }
 }

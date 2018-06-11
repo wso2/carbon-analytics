@@ -189,4 +189,20 @@ public class ManagersApi implements Microservice {
             @PathParam("appName") String appName) throws NotFoundException {
         return managersApi.getKafkaDetails(appName, request);
     }
+
+    @GET
+    @Path("/isActive")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Check whether the current manager node is the active/leader node ",
+            notes = "" + ".", response = void.class, tags = {"Managers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Current node is not the active node",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class)})
+    public Response isActive(@Context Request request)
+            throws NotFoundException {
+        return managersApi.isActive(request);
+    }
 }
