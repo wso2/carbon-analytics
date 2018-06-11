@@ -51,7 +51,7 @@ public class StreamHandlerConfigGenerator {
      * @throws DesignGenerationException        Error while generating config
      */
     public StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler)
-            throws DesignGenerationException { // TODO Use the below method for lists
+            throws DesignGenerationException {
         if (streamHandler instanceof Filter) {
             return generateFilterConfig((Filter) streamHandler);
         } else if (streamHandler instanceof StreamFunction) {

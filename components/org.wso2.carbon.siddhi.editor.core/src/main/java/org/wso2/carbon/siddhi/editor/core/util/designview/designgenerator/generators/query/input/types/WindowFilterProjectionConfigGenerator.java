@@ -48,16 +48,11 @@ public class WindowFilterProjectionConfigGenerator {
      */
     public WindowFilterProjectionConfig generateWindowFilterProjectionConfig(InputStream queryInputStream)
             throws DesignGenerationException {
-        StreamHandlerConfigGenerator streamHandlerConfigGenerator = new StreamHandlerConfigGenerator(siddhiAppString);
-        List<StreamHandlerConfig> streamHandlerConfigs = new ArrayList<>();
-        for (StreamHandler streamHandler : ((SingleInputStream) queryInputStream).getStreamHandlers()) {
-            streamHandlerConfigs.add(streamHandlerConfigGenerator.generateStreamHandlerConfig(streamHandler));
-        }
-
         return new WindowFilterProjectionConfig(
                 getType(queryInputStream).toString(),
                 queryInputStream.getUniqueStreamIds().get(0),
-                streamHandlerConfigs);
+                new StreamHandlerConfigGenerator(siddhiAppString)
+                        .generateStreamHandlerConfigList(((SingleInputStream) queryInputStream).getStreamHandlers()));
     }
 
     /**
