@@ -297,7 +297,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             var id = $(element).parent().attr('id');
             // retrieve the sink information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getSink(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;

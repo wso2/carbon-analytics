@@ -1138,6 +1138,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 * query, from clause in the query will be updated as undefined.
                 * */
                 var outConnections = self.jsPlumbInstance.getConnections({source: elementId+'-out'});
+
                 var inConnections = self.jsPlumbInstance.getConnections({source: elementId+'-in'});
 
                 _.forEach(outConnections, function (connection) {

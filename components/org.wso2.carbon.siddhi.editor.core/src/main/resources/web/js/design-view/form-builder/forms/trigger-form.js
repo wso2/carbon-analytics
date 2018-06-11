@@ -153,7 +153,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             var id = $(element).parent().attr('id');
             // retrieve the trigger information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;

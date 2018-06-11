@@ -61,17 +61,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getJoinQuery(id);
-            if (clickedElement.getQueryInput() === undefined
-                || clickedElement.getQueryInput().getFirstConnectedElement() === undefined
-                || clickedElement.getQueryInput().getSecondConnectedElement() === undefined) {
+            if (!clickedElement.getQueryInput()
+                || !clickedElement.getQueryInput().getFirstConnectedElement()
+                || !clickedElement.getQueryInput().getSecondConnectedElement()) {
                 DesignViewUtils.prototype.warnAlert('Connect two input elements to join query');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-            } else if (clickedElement.getQueryOutput() === undefined ||
-                clickedElement.getQueryOutput().getTarget() === undefined) {
+            } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
@@ -204,7 +203,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var select = [];
                 var possibleUserDefinedSelectTypeValues = [];
-                if (clickedElement.getSelect() === undefined) {
+                if (!clickedElement.getSelect()) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
                             expression: undefined,
@@ -212,7 +211,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         };
                         select.push(attr);
                     }
-                } else if(clickedElement.getSelect().getValue() === undefined) {
+                } else if(!clickedElement.getSelect().getValue()) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
                             expression: undefined,
@@ -255,7 +254,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         && (output !== undefined)) {
                         // getting the event tpe and pre load it
                         var eventType;
-                        if (output.getEventType() === undefined) {
+                        if (!output.getEventType()) {
                             eventType = 'all events';
                         } else if (output.getEventType() === 'ALL_EVENTS') {
                             eventType = 'all events';
@@ -1124,7 +1123,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         } else if (noOfWindowsInSource === 1){
                             var streamHandlerListLength = joinConfiguration.streamHandlerList.length;
                             var lastStreamHandlerInList = joinConfiguration.streamHandlerList[streamHandlerListLength-1];
-                            if (lastStreamHandlerInList.streamHandler.windowName === undefined) {
+                            if (!lastStreamHandlerInList.streamHandler.windowName) {
                                 DesignViewUtils.prototype
                                     .errorAlert("Window should be defined as the last stream handler in a " +
                                         "join source!");
@@ -1332,7 +1331,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             console.log("Invalid output type for query received!")
                         }
 
-                        if (outputConfig.output.eventType === undefined) {
+                        if (!outputConfig.output.eventType) {
                             outputObject.setEventType(undefined);
                         } else if(outputConfig.output.eventType === "all events"){
                             outputObject.setEventType('ALL_EVENTS');

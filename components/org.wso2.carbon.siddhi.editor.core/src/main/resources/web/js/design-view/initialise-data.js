@@ -178,7 +178,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 addAnnotationsForElement(aggregation, aggregationObject);
                 // select section in the aggregation definition is compulsory. If that is not found there is a error in
                 // backend.
-                if (aggregation.select === undefined) {
+                if (!aggregation.select) {
                     var errMsg = 'Cannot find select section for the aggregation definition:' + aggregation;
                     log.error(errMsg);
                     DesignViewUtils.prototype.errorAlert(errMsg);
@@ -211,7 +211,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
 
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
-                if (windowFilterProjectionQuery.queryInput === undefined) {
+                if (!windowFilterProjectionQuery.queryInput) {
                     var errMsg
                         = 'Cannot find query input section for the windowFIlterProjection query:'
                         + windowFilterProjectionQuery;
@@ -238,7 +238,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 addAnnotationsForElement(patternQuery, patternQueryObject);
 
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
-                if (patternQuery.queryInput === undefined) {
+                if (!patternQuery.queryInput) {
                     var errMsg = 'Cannot find query input section for the pattern query:' + patternQuery;
                     log.error(errMsg);
                     DesignViewUtils.prototype.errorAlert(errMsg);
@@ -266,7 +266,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 addAnnotationsForElement(sequenceQuery, sequenceQueryObject);
 
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
-                if (sequenceQuery.queryInput === undefined) {
+                if (!sequenceQuery.queryInput) {
                     var errMsg = 'Cannot find query input section for the sequence query:' + sequenceQuery;
                     log.error(errMsg);
                     DesignViewUtils.prototype.errorAlert(errMsg);
@@ -295,7 +295,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
                 var errMsg;
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
-                if (joinQuery.queryInput === undefined) {
+                if (!joinQuery.queryInput) {
                     errMsg = 'Cannot find query input section for the join query:' + joinQuery;
                     log.error(errMsg);
                     DesignViewUtils.prototype.errorAlert(errMsg);
@@ -305,7 +305,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 var joinQueryInput = new JoinQueryInput(joinQuery.queryInput);
 
                 // leftStream section in the join query is compulsory. If that is not found there is a error in backend.
-                if (joinQuery.queryInput.left === undefined) {
+                if (!joinQuery.queryInput.left) {
                     errMsg = 'Cannot find left source for join query:' + joinQuery;
                     log.error(errMsg);
                     DesignViewUtils.prototype.errorAlert(errMsg);
@@ -316,7 +316,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 setStreamHandlerListForQuery(leftSource, joinQuery.queryInput.left.streamHandlerList);
 
                 // rightStream section in the join query is compulsory. If that is not found there is a error in backend.
-                if (joinQuery.queryInput.right === undefined) {
+                if (!joinQuery.queryInput.right) {
                     errMsg = 'Cannot find right source for join query:' + joinQuery;
                     log.error(errMsg);
                     DesignViewUtils.prototype.errorAlert(errMsg);
@@ -413,7 +413,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
         // sets the query select(and aggregation definition select) part in a query
         function setSelectForQuery(query, querySelect) {
             // select section in the query/aggregation is compulsory. If that is not found there is a error in backend.
-            if (querySelect === undefined) {
+            if (!querySelect) {
                 var errMsg = 'Cannot find select section for element:' + query;
                 log.error(errMsg);
                 DesignViewUtils.prototype.errorAlert(errMsg);
@@ -436,7 +436,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
         function setQueryOutputForQuery(query, queryOutput) {
             // queryOutput section in the query/aggregation is compulsory. If that is not found there is a error in
             // backend.
-            if (queryOutput === undefined) {
+            if (!queryOutput) {
                 var errMsg = 'Cannot find query output section for query:' + query;
                 log.error(errMsg);
                 DesignViewUtils.prototype.errorAlert(errMsg);

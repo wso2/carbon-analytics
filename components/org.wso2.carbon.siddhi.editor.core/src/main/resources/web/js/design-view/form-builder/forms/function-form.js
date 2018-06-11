@@ -157,7 +157,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             var id = $(element).parent().attr('id');
             // retrieve the function information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getFunction(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;

@@ -53,13 +53,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             var id = $(element).parent().attr('id');
             // retrieve the aggregation information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getAggregation(id);
-            if (clickedElement === undefined) {
+            if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
             }
 
-            if (clickedElement.getFrom() === undefined) {
+            if (!clickedElement.getFrom()) {
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
@@ -135,7 +135,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 }
 
                 var fillAggregate = {};
-                if (aggregateByTimePeriod !== undefined && aggregateByTimePeriod.getMaxValue() === undefined) {
+                if (aggregateByTimePeriod !== undefined && !aggregateByTimePeriod.getMaxValue()) {
                     fillAggregate = {
                         aggregateByAttribute: {
                             attribute: aggregateByAttribute

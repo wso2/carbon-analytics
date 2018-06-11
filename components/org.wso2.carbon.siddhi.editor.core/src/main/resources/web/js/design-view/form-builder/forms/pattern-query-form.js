@@ -57,7 +57,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getPatternQuery(id);
-            if (clickedElement.getQueryInput() === undefined
+            if (!clickedElement.getQueryInput()
                 || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
                 DesignViewUtils.prototype.warnAlert('Connect input streams');
                 // design view container and toggle view button are enabled
@@ -66,8 +66,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-            } else if (clickedElement.getQueryOutput() === undefined ||
-                clickedElement.getQueryOutput().getTarget() === undefined) {
+            } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
@@ -180,7 +179,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var select = [];
                 var possibleUserDefinedSelectTypeValues = [];
-                if (clickedElement.getSelect() === undefined) {
+                if (!clickedElement.getSelect()) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
                             expression: undefined,
@@ -188,7 +187,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         };
                         select.push(attr);
                     }
-                } else if(clickedElement.getSelect().getValue() === undefined) {
+                } else if(!clickedElement.getSelect().getValue()) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
                             expression: undefined,
@@ -231,7 +230,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         && (output !== undefined)) {
                         // getting the event tpe and pre load it
                         var eventType;
-                        if (output.getEventType() === undefined) {
+                        if (!output.getEventType()) {
                             eventType = 'all events';
                         } else if (output.getEventType() === 'ALL_EVENTS') {
                             eventType = 'all events';
@@ -1054,7 +1053,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             console.log("Invalid output type for query received!")
                         }
 
-                        if (outputConfig.output.eventType === undefined) {
+                        if (!outputConfig.output.eventType) {
                             outputObject.setEventType(undefined);
                         } else if(outputConfig.output.eventType === "all events"){
                             outputObject.setEventType('ALL_EVENTS');

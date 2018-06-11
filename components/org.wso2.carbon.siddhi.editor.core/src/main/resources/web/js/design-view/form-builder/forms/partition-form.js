@@ -52,7 +52,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
             var partitionElement = self.configurationData.getSiddhiAppConfig().getPartition(id);
             var partitionWithList = partitionElement.getPartitionWith();
 
-            if(partitionWithList === undefined || partitionWithList.length === 0){
+            if(!partitionWithList || partitionWithList.length === 0){
                 DesignViewUtils.prototype.warnAlert('Connect a stream for partitioning');
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');

@@ -57,14 +57,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             var errMsg = '';
             var toolPaletteContainer =
                 this._$parent_el.find(_.get(this.options, 'design_view.tool_palette.container')).get(0);
-            if (toolPaletteContainer === undefined) {
+            if (!toolPaletteContainer) {
                 errMsg = 'unable to find tool palette container with selector: '
                     + _.get(this.options, 'design_view.tool_palette.container');
                 log.error(errMsg);
                 throw errMsg;
             }
             var toolPaletteOpts = _.clone(_.get(this.options, 'design_view.tool_palette'));
-            if (toolPaletteOpts === undefined) {
+            if (!toolPaletteOpts) {
                 errMsg = 'unable to find tool palette with selector: '
                     + _.get(this.options, 'design_view.tool_palette');
                 log.error(errMsg);

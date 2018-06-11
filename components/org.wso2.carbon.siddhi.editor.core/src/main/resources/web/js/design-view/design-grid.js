@@ -406,12 +406,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             }
                             var joinQuery = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
                             var queryInput = joinQuery.getQueryInput();
-                            if (queryInput === undefined) {
+                            if (!queryInput) {
                                 connectionValidity = true;
                             } else {
                                 var firstConnectedElement = queryInput.getFirstConnectedElement();
                                 var secondConnectedElement = queryInput.getSecondConnectedElement();
-                                if (firstConnectedElement === undefined && secondConnectedElement === undefined) {
+                                if (!firstConnectedElement && !secondConnectedElement) {
                                     connectionValidity = true;
                                 } else if (firstConnectedElement !== undefined
                                     && secondConnectedElement !== undefined) {
@@ -419,7 +419,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     DesignViewUtils.prototype
                                         .errorAlert("Only two input elements are allowed to connect in join query!");
                                 } else if (firstConnectedElement !== undefined
-                                    && secondConnectedElement === undefined) {
+                                    && !secondConnectedElement) {
                                     var firstElementType = firstConnectedElement.type;
                                     if (firstElementType === 'STREAM' || firstElementType === 'TRIGGER'
                                         || firstElementType === 'WINDOW') {
@@ -434,8 +434,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                             .errorAlert("At least one connected input element in join query should be a stream " +
                                             "or a trigger or a window!");
                                     }
-                                } else if (firstConnectedElement === undefined
-                                    && secondConnectedElement !== undefined) {
+                                } else if (!firstConnectedElement && secondConnectedElement !== undefined) {
                                     var secondElementType = secondConnectedElement.type;
                                     if (secondElementType === 'STREAM' || secondElementType === 'TRIGGER'
                                         || secondElementType === 'WINDOW') {
@@ -528,7 +527,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                     var edgeId = ''+ sourceId + '_' + targetId + '';
                     var edgeInTheEdgeList = self.configurationData.getEdge(edgeId);
-                    if(edgeInTheEdgeList === undefined) {
+                    if(!edgeInTheEdgeList) {
                         var edgeOptions = {};
                         _.set(edgeOptions, 'id', edgeId);
                         _.set(edgeOptions, 'childId', targetId);
@@ -669,7 +668,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             if (targetElement.hasClass(constants.WINDOW_QUERY)) {
                                 type = 'WINDOW';
                             }
-                            if (model.getQueryInput() === undefined) {
+                            if (!model.getQueryInput()) {
                                 var queryInputOptions = {};
                                 _.set(queryInputOptions, 'type', type);
                                 _.set(queryInputOptions, 'from', connectedElementName);
@@ -686,7 +685,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                             var sourceElementObject =
                                 self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId);
-                            var connectedElement = undefined;
+                            var connectedElement;
                             if (sourceElementObject !== undefined) {
                                 var connectedElementSourceName = (sourceElementObject.element).getName();
                                 var connectedElementSourceType = sourceElementObject.type;
@@ -695,16 +694,16 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     type: connectedElementSourceType
                                 };
 
-                                if (queryInput === undefined) {
+                                if (!queryInput) {
                                     var joinQueryInput = new JoinQueryInput();
                                     joinQueryInput.setFirstConnectedElement(connectedElement);
                                     model.setQueryInput(joinQueryInput);
                                 } else {
                                     var firstConnectedElement = queryInput.getFirstConnectedElement();
                                     var secondConnectedElement = queryInput.getSecondConnectedElement();
-                                    if (firstConnectedElement === undefined) {
+                                    if (!firstConnectedElement) {
                                         queryInput.setFirstConnectedElement(connectedElement);
-                                    } else if (secondConnectedElement === undefined) {
+                                    } else if (!secondConnectedElement) {
                                         queryInput.setSecondConnectedElement(connectedElement);
                                     } else {
                                         console.log("Error: First and second input elements are already filled in " +
@@ -730,7 +729,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
                         if (targetElement.hasClass(constants.PATTERN)) {
                             model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                            if (model.getQueryInput() === undefined) {
+                            if (!model.getQueryInput()) {
                                 var patternQueryInputOptions = {};
                                 _.set(patternQueryInputOptions, 'type', 'PATTERN');
                                 var patternQueryInputObject =
@@ -742,7 +741,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             }
                         } else if (targetElement.hasClass(constants.SEQUENCE)) {
                             model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                            if (model.getQueryInput() === undefined) {
+                            if (!model.getQueryInput()) {
                                 var sequenceQueryInputOptions = {};
                                 _.set(sequenceQueryInputOptions, 'type', 'SEQUENCE');
                                 var sequenceQueryInputObject =
@@ -787,7 +786,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(sourceId);
                             }
 
-                            if (model.getQueryOutput() === undefined) {
+                            if (!model.getQueryOutput()) {
                                 var queryOutputOptions = {};
                                 _.set(queryOutputOptions, 'target', connectedElementName);
                                 var patternQueryOutputObject = new QueryOutput(queryOutputOptions);
@@ -855,8 +854,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     * */
                     if (targetId === '') {
                         targetId = target;
-                    } else if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true, true)
-                        === undefined) {
+                    } else if (!self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementById(targetId, true, true)) {
                         console.log("Target element not found!");
                     }
                     var targetElement = $('#' + targetId);
@@ -871,8 +870,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     * */
                     if (sourceId === '') {
                         sourceId = source;
-                    } else if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
-                        === undefined) {
+                    } else if (!self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementById(sourceId, true, true)) {
                         console.log("Source element not found!");
                     }
                     var sourceElement = $('#' + sourceId);
@@ -912,8 +911,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     * */
                     if (targetId === '') {
                         targetId = target;
-                    } else if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true, true)
-                            === undefined) {
+                    } else if (!self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementById(targetId, true, true)) {
                         console.log("Target element not found!");
                     }
                     var targetElement = $('#' + targetId);
@@ -928,8 +927,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     * */
                     if (sourceId === '') {
                         sourceId = source;
-                    } else if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
-                        === undefined) {
+                    } else if (!self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementById(sourceId, true, true)) {
                         console.log("Source element not found!");
                     }
                     var sourceElement = $('#' + sourceId);
@@ -986,13 +985,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId);
                             if (sourceElementObject !== undefined) {
                                 var disconnectedElementSourceName = (sourceElementObject.element).getName();
-                                if (queryInput === undefined) {
+                                if (!queryInput) {
                                     console.log("Join query output is undefined!");
                                     return;
                                 }
                                 var firstConnectedElement = queryInput.getFirstConnectedElement();
                                 var secondConnectedElement = queryInput.getSecondConnectedElement();
-                                if (firstConnectedElement === undefined && secondConnectedElement === undefined) {
+                                if (!firstConnectedElement && !secondConnectedElement) {
                                     console.log("firstConnectedElement and secondConnectedElement are undefined!");
                                 } else if (firstConnectedElement !== undefined
                                     && firstConnectedElement.name === disconnectedElementSourceName) {
@@ -1491,10 +1490,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var sourceId = source.substr(0, source.indexOf('-'));
                 var targetId = target.substr(0, target.indexOf('-'));
 
-                if (sourceId === undefined || sourceId === "") {
+                if (!sourceId || sourceId === "") {
                     sourceId = source;
                 }
-                if (targetId === undefined || targetId === "") {
+                if (!targetId || targetId === "") {
                     targetId = target;
                 }
 

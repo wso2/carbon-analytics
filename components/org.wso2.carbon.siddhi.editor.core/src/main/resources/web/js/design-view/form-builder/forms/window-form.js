@@ -236,7 +236,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             var id = $(element).parent().attr('id');
             // retrieve the window information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindow(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
@@ -269,7 +269,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
 
             var outputEventType = '';
             var savedOutputEventType = clickedElement.getOutputEventType();
-            if (savedOutputEventType === undefined) {
+            if (!savedOutputEventType) {
                 outputEventType = 'all events';
             } else if (savedOutputEventType === 'ALL_EVENTS') {
                 outputEventType = 'all events';

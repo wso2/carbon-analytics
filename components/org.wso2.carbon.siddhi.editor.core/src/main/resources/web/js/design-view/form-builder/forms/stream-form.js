@@ -186,7 +186,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var id = $(element).parent().attr('id');
             // retrieve the stream information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;

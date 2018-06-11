@@ -70,7 +70,7 @@ define(['require', 'lodash'],
                     && (objectElement[propertyName] === null
                         || (!_.isNumber(objectElement[propertyName]) && !_.isBoolean(objectElement[propertyName])
                             && _.isEmpty(objectElement[propertyName]))
-                        || objectElement[propertyName] === undefined)) {
+                        || !objectElement[propertyName])) {
                     delete objectElement[propertyName];
                 } else if (objectElement.hasOwnProperty(propertyName)
                     && objectElement[propertyName] instanceof Object) {
