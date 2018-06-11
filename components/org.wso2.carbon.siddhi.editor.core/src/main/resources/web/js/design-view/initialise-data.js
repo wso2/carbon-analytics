@@ -51,27 +51,32 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             self.configurationData = new ConfigurationData(self.appData);
 
             // add definitions to the data storing structure
-            addSourceDefinitions(self.appData, configurationJSON.siddhiAppConfig.sourceList);
-            addSinkDefinitions(self.appData, configurationJSON.siddhiAppConfig.sinkList);
-            addStreamDefinitions(self.appData, configurationJSON.siddhiAppConfig.streamList);
-            addTableDefinitions(self.appData, configurationJSON.siddhiAppConfig.tableList);
-            addWindowDefinitions(self.appData, configurationJSON.siddhiAppConfig.windowList);
-            addTriggerDefinitions(self.appData, configurationJSON.siddhiAppConfig.triggerList);
-            addAggregationDefinitions(self.appData, configurationJSON.siddhiAppConfig.aggregationList);
-            addFunctionDefinitions(self.appData, configurationJSON.siddhiAppConfig.functionList);
+            addSourceDefinitions(self.appData, configurationJSON.siddhiAppConfig.sourceList, self.newIdBeginningPhrase);
+            addSinkDefinitions(self.appData, configurationJSON.siddhiAppConfig.sinkList, self.newIdBeginningPhrase);
+            addStreamDefinitions(self.appData, configurationJSON.siddhiAppConfig.streamList, self.newIdBeginningPhrase);
+            addTableDefinitions(self.appData, configurationJSON.siddhiAppConfig.tableList, self.newIdBeginningPhrase);
+            addWindowDefinitions(self.appData, configurationJSON.siddhiAppConfig.windowList, self.newIdBeginningPhrase);
+            addTriggerDefinitions(self.appData, configurationJSON.siddhiAppConfig.triggerList,
+                self.newIdBeginningPhrase);
+            addAggregationDefinitions(self.appData, configurationJSON.siddhiAppConfig.aggregationList,
+                self.newIdBeginningPhrase);
+            addFunctionDefinitions(self.appData, configurationJSON.siddhiAppConfig.functionList,
+                self.newIdBeginningPhrase);
 
             // add queries to the data storing structure
             addWindowFilterProjectionQueries(self.appData,
-                configurationJSON.siddhiAppConfig.queryLists.WINDOW_FILTER_PROJECTION);
-            addPatternQueries(self.appData, configurationJSON.siddhiAppConfig.queryLists.PATTERN);
-            addSequenceQueries(self.appData, configurationJSON.siddhiAppConfig.queryLists.SEQUENCE);
-            addJoinQueries(self.appData, configurationJSON.siddhiAppConfig.queryLists.JOIN);
+                configurationJSON.siddhiAppConfig.queryLists.WINDOW_FILTER_PROJECTION, self.newIdBeginningPhrase);
+            addPatternQueries(self.appData, configurationJSON.siddhiAppConfig.queryLists.PATTERN,
+                self.newIdBeginningPhrase);
+            addSequenceQueries(self.appData, configurationJSON.siddhiAppConfig.queryLists.SEQUENCE,
+                self.newIdBeginningPhrase);
+            addJoinQueries(self.appData, configurationJSON.siddhiAppConfig.queryLists.JOIN, self.newIdBeginningPhrase);
 
             // add partitions to the data storing structure
-            addPartitions(self.appData, configurationJSON.siddhiAppConfig.partitionList);
+            addPartitions(self.appData, configurationJSON.siddhiAppConfig.partitionList, self.newIdBeginningPhrase);
 
             // add edges to the data storing structure
-            addEdges(self.configurationData, configurationJSON.edgeList);
+            addEdges(self.configurationData, configurationJSON.edgeList, self.newIdBeginningPhrase);
 
             // re-shuffle edgeList to bring forward edges which have 'PARTITION' as child elements
             self.configurationData.getEdgeList().sort(function (a, b) {
@@ -87,11 +92,10 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             return self.configurationData;
         };
 
-        function addSourceDefinitions(mainObject, sourceList) {
-            var self = this;
+        function addSourceDefinitions(mainObject, sourceList, newIdBeginningPhrase) {
             _.forEach(sourceList, function (source) {
                 var sourceObject = new SourceOrSinkAnnotation(source);
-                sourceObject.setId(self.newIdBeginningPhrase + sourceObject.getId());
+                sourceObject.setId(newIdBeginningPhrase + sourceObject.getId());
                 if (_.isEmpty(source.map)) {
                     sourceObject.setMap(undefined);
                 } else {
@@ -102,11 +106,10 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             });
         }
 
-        function addSinkDefinitions(mainObject, sinkList) {
-            var self = this;
+        function addSinkDefinitions(mainObject, sinkList, newIdBeginningPhrase) {
             _.forEach(sinkList, function (sink) {
                 var sinkObject = new SourceOrSinkAnnotation(sink);
-                sinkObject.setId(self.newIdBeginningPhrase + sinkObject.getId());
+                sinkObject.setId(newIdBeginningPhrase + sinkObject.getId());
                 if (_.isEmpty(sink.map)) {
                     sinkObject.setMap(undefined);
                 } else {
@@ -117,19 +120,17 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             });
         }
 
-        function addStreamDefinitions(mainObject, streamList) {
-            var self = this;
+        function addStreamDefinitions(mainObject, streamList, newIdBeginningPhrase) {
             _.forEach(streamList, function (stream) {
                 var streamObject = new Stream(stream);
                 addAnnotationsForElement(stream, streamObject);
                 addAttributesForElement(stream, streamObject);
-                streamObject.setId(self.newIdBeginningPhrase + streamObject.getId());
+                streamObject.setId(newIdBeginningPhrase + streamObject.getId());
                 mainObject.addStream(streamObject);
             });
         }
 
-        function addTableDefinitions(mainObject, tableList) {
-            var self = this;
+        function addTableDefinitions(mainObject, tableList, newIdBeginningPhrase) {
             _.forEach(tableList, function (table) {
                 var tableObject = new Table(table);
                 if (_.isEmpty(table.store)) {
@@ -140,35 +141,32 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 }
                 addAnnotationsForElement(table, tableObject);
                 addAttributesForElement(table, tableObject);
-                tableObject.setId(self.newIdBeginningPhrase + tableObject.getId());
+                tableObject.setId(newIdBeginningPhrase + tableObject.getId());
                 mainObject.addTable(tableObject);
             });
         }
 
-        function addWindowDefinitions(mainObject, windowList) {
-            var self = this;
+        function addWindowDefinitions(mainObject, windowList, newIdBeginningPhrase) {
             _.forEach(windowList, function (window) {
                 var windowObject = new Window(window);
                 addAnnotationsForElement(window, windowObject);
                 addAttributesForElement(window, windowObject);
-                windowObject.setId(self.newIdBeginningPhrase + windowObject.getId());
+                windowObject.setId(newIdBeginningPhrase + windowObject.getId());
                 mainObject.addWindow(windowObject);
             });
         }
 
-        function addTriggerDefinitions(mainObject, triggerList) {
-            var self = this;
+        function addTriggerDefinitions(mainObject, triggerList, newIdBeginningPhrase) {
             _.forEach(triggerList, function (trigger) {
                 var triggerObject = new Trigger(trigger);
                 addAnnotationsForElement(trigger, triggerObject);
                 addAttributesForElement(trigger, triggerObject);
-                triggerObject.setId(self.newIdBeginningPhrase + triggerObject.getId());
+                triggerObject.setId(newIdBeginningPhrase + triggerObject.getId());
                 mainObject.addTrigger(triggerObject);
             });
         }
 
-        function addAggregationDefinitions(mainObject, aggregationList) {
-            var self = this;
+        function addAggregationDefinitions(mainObject, aggregationList, newIdBeginningPhrase) {
             _.forEach(aggregationList, function (aggregation) {
                 var aggregationObject = new Aggregation(aggregation);
                 if (_.isEmpty(aggregation.store)) {
@@ -194,22 +192,20 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                     var aggregateByTimePeriodSubElement = new AggregateByTimePeriod(aggregation.aggregateByTimePeriod);
                     aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriodSubElement);
                 }
-                aggregationObject.setId(self.newIdBeginningPhrase + aggregationObject.getId());
+                aggregationObject.setId(newIdBeginningPhrase + aggregationObject.getId());
                 mainObject.addAggregation(aggregationObject);
             });
         }
 
-        function addFunctionDefinitions(mainObject, functionList) {
-            var self = this;
+        function addFunctionDefinitions(mainObject, functionList, newIdBeginningPhrase) {
             _.forEach(functionList, function (functionJSON) {
                 var functionObject = new FunctionDefinition(functionJSON);
-                functionObject.setId(self.newIdBeginningPhrase + functionObject.getId());
+                functionObject.setId(newIdBeginningPhrase + functionObject.getId());
                 mainObject.addFunction(functionObject);
             });
         }
 
-        function addWindowFilterProjectionQueries(mainObject, windowFilterProjectionQueryList) {
-            var self = this;
+        function addWindowFilterProjectionQueries(mainObject, windowFilterProjectionQueryList, newIdBeginningPhrase) {
             _.forEach(windowFilterProjectionQueryList, function (windowFilterProjectionQuery) {
                 var queryObject = new Query(windowFilterProjectionQuery);
                 addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
@@ -231,13 +227,12 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 setSelectForQuery(queryObject, windowFilterProjectionQuery.select);
                 setOrderByForQuery(queryObject, windowFilterProjectionQuery.orderBy);
                 setQueryOutputForQuery(queryObject, windowFilterProjectionQuery.queryOutput);
-                queryObject.setId(self.newIdBeginningPhrase + queryObject.getId());
+                queryObject.setId(newIdBeginningPhrase + queryObject.getId());
                 mainObject.addWindowFilterProjectionQuery(queryObject);
             });
         }
 
-        function addPatternQueries(mainObject, patternQueryList) {
-            var self = this;
+        function addPatternQueries(mainObject, patternQueryList, newIdBeginningPhrase) {
             _.forEach(patternQueryList, function (patternQuery) {
                 var patternQueryObject = new Query(patternQuery);
                 addAnnotationsForElement(patternQuery, patternQueryObject);
@@ -260,13 +255,12 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 setSelectForQuery(patternQueryObject, patternQuery.select);
                 setOrderByForQuery(patternQueryObject, patternQuery.orderBy);
                 setQueryOutputForQuery(patternQueryObject, patternQuery.queryOutput);
-                patternQueryObject.setId(self.newIdBeginningPhrase + patternQueryObject.getId());
+                patternQueryObject.setId(newIdBeginningPhrase + patternQueryObject.getId());
                 mainObject.addPatternQuery(patternQueryObject);
             });
         }
 
-        function addSequenceQueries(mainObject, sequenceQueryList) {
-            var self = this;
+        function addSequenceQueries(mainObject, sequenceQueryList, newIdBeginningPhrase) {
             _.forEach(sequenceQueryList, function (sequenceQuery) {
                 var sequenceQueryObject = new Query(sequenceQuery);
                 addAnnotationsForElement(sequenceQuery, sequenceQueryObject);
@@ -289,13 +283,12 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 setSelectForQuery(sequenceQueryObject, sequenceQuery.select);
                 setOrderByForQuery(sequenceQueryObject, sequenceQuery.orderBy);
                 setQueryOutputForQuery(sequenceQueryObject, sequenceQuery.queryOutput);
-                sequenceQueryObject.setId(self.newIdBeginningPhrase + sequenceQueryObject.getId());
+                sequenceQueryObject.setId(newIdBeginningPhrase + sequenceQueryObject.getId());
                 mainObject.addSequenceQuery(sequenceQueryObject);
             });
         }
 
-        function addJoinQueries(mainObject, joinQueryList) {
-            var self = this;
+        function addJoinQueries(mainObject, joinQueryList, newIdBeginningPhrase) {
             _.forEach(joinQueryList, function (joinQuery) {
                 var queryObject = new Query(joinQuery);
                 addAnnotationsForElement(joinQuery, queryObject);
@@ -338,15 +331,15 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 setSelectForQuery(queryObject, joinQuery.select);
                 setOrderByForQuery(queryObject, joinQuery.orderBy);
                 setQueryOutputForQuery(queryObject, joinQuery.queryOutput);
-                queryObject.setId(self.newIdBeginningPhrase + queryObject.getId());
+                queryObject.setId(newIdBeginningPhrase + queryObject.getId());
                 mainObject.addJoinQuery(queryObject);
             });
         }
 
-        function addPartitions(mainObject, partitionList) {
+        function addPartitions(mainObject, partitionList, newIdBeginningPhrase) {
             _.forEach(partitionList, function (partition) {
                 var partitionObject = new Partition(partition);
-                partitionObject.setId(self.newIdBeginningPhrase + partitionObject.getId());
+                partitionObject.setId(newIdBeginningPhrase + partitionObject.getId());
                 addAnnotationsForElement(partition, partitionObject);
 
                 _.forEach(partition.partitionWith, function (partitionWith) {
@@ -354,21 +347,22 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                     partitionObject.addPartitionWith(partitionWithObject);
                 });
 
-                addStreamDefinitions(partitionObject, partition.streamList);
+                addStreamDefinitions(partitionObject, partition.streamList, newIdBeginningPhrase);
 
-                addWindowFilterProjectionQueries(partitionObject, partition.queryLists.WINDOW_FILTER_PROJECTION);
-                addPatternQueries(partitionObject, partition.queryLists.PATTERN);
-                addSequenceQueries(partitionObject, partition.queryLists.SEQUENCE);
-                addJoinQueries(partitionObject, partition.queryLists.JOIN);
+                addWindowFilterProjectionQueries(partitionObject, partition.queryLists.WINDOW_FILTER_PROJECTION,
+                    newIdBeginningPhrase);
+                addPatternQueries(partitionObject, partition.queryLists.PATTERN, newIdBeginningPhrase);
+                addSequenceQueries(partitionObject, partition.queryLists.SEQUENCE, newIdBeginningPhrase);
+                addJoinQueries(partitionObject, partition.queryLists.JOIN, newIdBeginningPhrase);
 
                 mainObject.addPartition(partitionObject);
             });
         }
 
-        function addEdges(mainObject, edgeList) {
+        function addEdges(mainObject, edgeList, newIdBeginningPhrase) {
             _.forEach(edgeList, function (edge) {
-                var newParentId = self.newIdBeginningPhrase + edge.parentId;
-                var newChildId = self.newIdBeginningPhrase + edge.childId;
+                var newParentId = newIdBeginningPhrase + edge.parentId;
+                var newChildId = newIdBeginningPhrase + edge.childId;
                 var newEdgeId = newParentId + "_" + newChildId;
                 var edgeOptions = {
                     id: newEdgeId,
