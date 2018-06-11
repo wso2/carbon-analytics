@@ -51,7 +51,7 @@ public class StreamHandlerConfigGenerator {
      * @throws DesignGenerationException        Error while generating config
      */
     public StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler)
-            throws DesignGenerationException {
+            throws DesignGenerationException { // TODO Use the below method for lists
         if (streamHandler instanceof Filter) {
             return generateFilterConfig((Filter) streamHandler);
         } else if (streamHandler instanceof StreamFunction) {
@@ -60,6 +60,21 @@ public class StreamHandlerConfigGenerator {
             return generateWindow((Window) streamHandler);
         }
         throw new DesignGenerationException("Unknown type of StreamHandler for generating config");
+    }
+
+    /**
+     * Generates a list of StreamHandlerConfigs, from the given list of Siddhi StreamHandlers
+     * @param streamHandlers                    List of Siddhi StreamHandler objects
+     * @return                                  List of StreamHandlerConfig objects
+     * @throws DesignGenerationException        Error while generating a StreamHandlerConfig
+     */
+    public List<StreamHandlerConfig> generateStreamHandlerConfigList(List<StreamHandler> streamHandlers)
+            throws DesignGenerationException {
+        List<StreamHandlerConfig> streamHandlerConfigList = new ArrayList<>();
+        for (StreamHandler streamHandler : streamHandlers) {
+            streamHandlerConfigList.add(generateStreamHandlerConfig(streamHandler));
+        }
+        return streamHandlerConfigList;
     }
 
     /**
