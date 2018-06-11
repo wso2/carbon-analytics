@@ -429,7 +429,7 @@ define(['require', 'elementUtils', 'lodash'],
 
             _.forEach(listNames, function (list) {
                 _.forEach(list, function (element) {
-                    if (element.getName().toUpperCase() === elementName.toUpperCase()) {
+                    if (element.getName() === elementName) {
                         var type = '';
                         if (list === streamList) {
                             type = 'STREAM';
@@ -523,7 +523,7 @@ define(['require', 'elementUtils', 'lodash'],
 
             _.forEach(self.partitionList, function (partition) {
                 _.forEach(partition.getStreamList(), function (stream) {
-                    if (stream.getName().toUpperCase() === streamName.toUpperCase()) {
+                    if (stream.getName() === streamName) {
                         requestedElement = {
                             type: 'STREAM',
                             element: stream

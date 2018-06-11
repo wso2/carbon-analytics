@@ -212,7 +212,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             * removeUnnecessaryFieldsFromJSON() method when sending the json to backend
                             * */
 
-                            var JSONValue = JSON.parse(JSON.stringify(designView.getConfigurationData()));
+                            var JSONValue = designView.getConfigurationData();
                             removeUnnecessaryFieldsFromJSON(JSONValue);
                             var sendingString = JSON.stringify(JSONValue).replace(/'/gm, "\\\'");
 
