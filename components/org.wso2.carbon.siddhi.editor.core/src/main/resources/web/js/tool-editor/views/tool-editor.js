@@ -218,7 +218,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                             var JSONValue = JSON.parse(JSON.stringify(designView.getConfigurationData()));
                             removeUnnecessaryFieldsFromJSON(JSONValue);
-                            var sendingString = JSON.stringify(JSONValue).replace(/'/gm, "\\\'");
+                            var sendingString = JSON.stringify(JSONValue)
+                                .replace(/'/gm, "\\\'")
+                                .replace(/\\"/gm, "\\\'");
 
                             var response = self._designView.getCode("'" + sendingString + "'");
                             if (response.status === "success") {
