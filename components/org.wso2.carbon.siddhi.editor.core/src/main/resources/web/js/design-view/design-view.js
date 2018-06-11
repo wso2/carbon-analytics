@@ -151,9 +151,9 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 result = {
                     status: "success",
                     responseJSON: {
-                        //appName: match[1],
-                        //appDescription: match[2],
                         "siddhiAppConfig":{
+                            "siddhiAppName":match[1],
+                            "appAnnotationList":[match[2]],
                             "streamList":[],
                             "tableList":[],
                             "windowList":[],

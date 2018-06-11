@@ -50,6 +50,10 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             self.appData = new AppData();
             self.configurationData = new ConfigurationData(self.appData);
 
+            // set the app name
+            self.appData.setSiddhiAppName(configurationJSON.siddhiAppConfig.siddhiAppName);
+            // add app annotations
+            self.appData.setAppAnnotationList(configurationJSON.siddhiAppConfig.appAnnotationList);
             // add definitions to the data storing structure
             addSourceDefinitions(self.appData, configurationJSON.siddhiAppConfig.sourceList, self.newIdBeginningPhrase);
             addSinkDefinitions(self.appData, configurationJSON.siddhiAppConfig.sinkList, self.newIdBeginningPhrase);
