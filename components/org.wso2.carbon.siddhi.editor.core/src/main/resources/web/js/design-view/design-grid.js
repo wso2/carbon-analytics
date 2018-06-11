@@ -546,7 +546,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         && sourceElement.hasClass(constants.STREAM)){
                         var partitionId = targetElement.parent()[0].id;
                         var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
-                        connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                        connectedElementName
+                            = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
 
                         /*
                         * check whether the stream is already connected to partition. This validation is done in the
@@ -911,7 +912,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     * */
                     if (targetId === '') {
                         targetId = target;
-                    } else {
+                    } else if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true, true)
+                            === undefined) {
                         console.log("Target element not found!");
                     }
                     var targetElement = $('#' + targetId);
@@ -926,7 +928,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     * */
                     if (sourceId === '') {
                         sourceId = source;
-                    } else {
+                    } else if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
+                        === undefined) {
                         console.log("Source element not found!");
                     }
                     var sourceElement = $('#' + sourceId);
@@ -1037,7 +1040,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             || sourceElement.hasClass(constants.SEQUENCE)) {
 
                             if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
-                                || sourceElement.hasClass(constants.WINDOW)) {
+                                || sourceElement.hasClass(constants.WINDOW_QUERY)) {
                                 model = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(sourceId);
                             } else if (sourceElement.hasClass(constants.JOIN)) {
@@ -1791,7 +1794,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        DesignGrid.prototype.handleTrigger = function (mouseTop, mouseLeft, isCodeToDesignMode, triggerId, triggerName) {
+        DesignGrid.prototype.handleTrigger = function (mouseTop, mouseLeft, isCodeToDesignMode, triggerId,
+                                                       triggerName) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -1819,7 +1823,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.dropElements.registerElementEventListeners(newAgent);
         };
 
-        DesignGrid.prototype.handleAggregation = function (mouseTop, mouseLeft, isCodeToDesignMode, aggregationId, aggregationName) {
+        DesignGrid.prototype.handleAggregation = function (mouseTop, mouseLeft, isCodeToDesignMode, aggregationId,
+                                                           aggregationName) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -1837,7 +1842,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.AGGREGATION);
             self.canvas.append(newAgent);
             // Drop the Aggregation element. Inside this a it generates the aggregation definition form.
-            self.dropElements.dropAggregation(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, aggregationName);
+            self.dropElements.dropAggregation(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
+                aggregationName);
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
