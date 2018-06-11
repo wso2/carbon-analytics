@@ -300,11 +300,36 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if(errors.length) {
                     return;
                 }
-                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
-                    clickedElement.getId());
+
+                var streamName;
+                var firstCharacterInStreamName;
+                /*
+                * check whether the stream is inside a partition and if yes check whether it begins with '#'. If not add
+                * '#' to the beginning of the stream name.
+                * */
+                var isStreamSavedInsideAPartition
+                    = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
+                if (isStreamSavedInsideAPartition === undefined) {
+                    firstCharacterInStreamName = (editor.getValue().name).charAt(0);
+                    if (firstCharacterInStreamName === '#') {
+                        DesignViewUtils.prototype.errorAlert("'#' is used to define inner streams only.");
+                        return;
+                    } else {
+                        streamName = editor.getValue().name;
+                    }
+                } else {
+                    firstCharacterInStreamName = (editor.getValue().name).charAt(0);
+                    if (firstCharacterInStreamName !== '#') {
+                        streamName = '#' + editor.getValue().name;
+                    } else {
+                        streamName = editor.getValue().name;
+                    }
+                }
+
+                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUnique(streamName, clickedElement.getId());
                 if (isStreamNameUsed) {
                     DesignViewUtils.prototype
-                        .errorAlert("Stream name \"" + editor.getValue().name + "\" is already used.");
+                        .errorAlert("Stream name \"" + streamName + "\" is already used.");
                     return;
                 }
                 self.designViewContainer.removeClass('disableContainer');
@@ -313,7 +338,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var config = editor.getValue();
 
                 // update selected stream model
-                clickedElement.setName(config.name);
+                clickedElement.setName(streamName);
                 // removing all elements from attribute list
                 clickedElement.clearAttributeList();
                 // adding new attributes to the attribute list
@@ -328,7 +353,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 });
 
                 var textNode = $(element).parent().find('.streamNameNode');
-                textNode.html(config.name);
+                textNode.html(streamName);
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
