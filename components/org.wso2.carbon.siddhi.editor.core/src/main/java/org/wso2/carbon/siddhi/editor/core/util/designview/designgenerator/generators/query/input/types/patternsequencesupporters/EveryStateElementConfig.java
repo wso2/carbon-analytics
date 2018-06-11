@@ -37,8 +37,4 @@ public class EveryStateElementConfig implements StateElementConfig {
     public void setWithin(String within) {
         this.within = within;
     }
-
-    public String getLogic() {
-        return "";
-    }
 }

@@ -28,8 +28,4 @@ public class AbsentStreamStateElementConfig extends StreamStateElementConfig {
     public void setWaitingTime(String waitingTime) {
         this.waitingTime = waitingTime;
     }
-
-    public String getLogic() {
-        return "";
-    }
 }
