@@ -219,6 +219,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             var response = self._designView.getCode("'" + sendingString + "'");
                             if (response.status === "success") {
                                 self.setContent(response.responseJSON);
+                                self.trigger('content-modified');
                                 designContainer.hide();
                                 designView.emptyDesignViewGridContainer();
                                 sourceContainer.show();
