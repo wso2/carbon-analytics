@@ -75,7 +75,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Source Element will
-             be displayed as an alert message
+             be displayed in a form
             */
             var settingsIconId = ""+ i + "-dropSourceSettingsId";
             var prop = $('<i id="'+ settingsIconId +'" ' +
@@ -140,7 +140,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Sink Element will
-             be displayed as an alert message
+             be displayed in a form
             */
             var settingsIconId = ""+ i + "-dropSinkSettingsId";
             var prop = $('<i id="'+ settingsIconId +'" ' +
@@ -219,7 +219,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Stream Element will
-             be displayed as an alert message
+             be displayed in a form
              showIcon --> An icon that elucidates whether the dropped stream element is an Import/Export/Defined
              stream (In this case: an Import arrow icon)
             */
@@ -357,7 +357,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Table Element will
-             be displayed as an alert message
+             be displayed in a form
             */
             var settingsIconId = ""+ i + "-dropTableSettingsId";
             var prop = $('<i id="'+ settingsIconId +'" ' +
@@ -437,7 +437,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Window Element will
-             be displayed as an alert message
+             be displayed as an DesignViewUtils.prototype.warnAlert message
             */
             var settingsIconId = ""+ i + "-dropWindowSettingsId";
             var prop = $('<i id="'+ settingsIconId +'" ' +
@@ -517,7 +517,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Trigger Element will
-             be displayed as an alert message
+             be displayed as an DesignViewUtils.prototype.warnAlert message
             */
             var settingsIconId = ""+ i + "-dropTriggerSettingsId";
             var prop = $('<i id="'+ settingsIconId +'" ' +
@@ -604,7 +604,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Aggregation Element will
-             be displayed as an alert message
+             be displayed as an DesignViewUtils.prototype.warnAlert message
             */
             var settingsIconId = ""+ i + "-dropAggregationSettingsId";
             var prop = $('<i id="'+ settingsIconId +'" ' +
@@ -685,7 +685,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Function Element will
-             be displayed as an alert message
+             be displayed as an DesignViewUtils.prototype.warnAlert message
             */
             var settingsIconId = ""+ i + "-dropFunctionSettingsId";
             var prop = $('<i id="'+ settingsIconId +'" ' +
@@ -822,7 +822,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the PatternQuery Element will
-             be displayed as an alert message
+             be displayed as an DesignViewUtils.prototype.warnAlert message
             */
             var settingsIconId = ""+ i + "-dropPatternQuerySettingsId";
             var prop = $('<i id="'+ settingsIconId +'" ' +
@@ -862,12 +862,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             self.jsPlumbInstance.makeTarget(connection1, {
-                anchor: 'Left'
+                anchor: 'Left',
+                deleteEndpointsOnDetach : true
             });
 
             self.jsPlumbInstance.makeSource(connection2, {
                 anchor: 'Right',
-                maxConnections:1
+                maxConnections:1,
+                deleteEndpointsOnDetach : true
             });
         };
 
@@ -903,7 +905,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             /*
              prop --> When clicked on this icon, a definition and related information of the SequenceQuery Element will
-             be displayed as an alert message
+             be displayed in a form
             */
             var settingsIconId = ""+ i + "-dropSequenceQuerySettingsId";
             var prop = $('<i id="'+ settingsIconId +'" ' +
@@ -943,12 +945,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             self.jsPlumbInstance.makeTarget(connection1, {
-                anchor: 'Left'
+                anchor: 'Left',
+                deleteEndpointsOnDetach : true
             });
 
             self.jsPlumbInstance.makeSource(connection2, {
                 anchor: 'Right',
-                maxConnections:1
+                maxConnections:1,
+                deleteEndpointsOnDetach : true
             });
         };
 
@@ -1013,13 +1017,15 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             self.jsPlumbInstance.makeTarget(connectionIn, {
                 anchor: 'Left',
-                maxConnections:2
+                maxConnections:2,
+                deleteEndpointsOnDetach : true
             });
 
             self.jsPlumbInstance.makeSource(connectionOut, {
                 anchor: 'Right',
                 uniqueEndpoint: true,
-                maxConnections: 1
+                maxConnections: 1,
+                deleteEndpointsOnDetach : true
             });
         };
 
@@ -1078,10 +1084,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             self.jsPlumbInstance.makeTarget(connectionIn, {
                 anchor: 'Left',
-                maxConnections: 1
+                maxConnections: 1,
+                deleteEndpointsOnDetach : true
             });
             self.jsPlumbInstance.makeSource(connectionIn, {
-                anchor: 'Right'
+                anchor: 'Right',
+                deleteEndpointsOnDetach : true
             });
 
             $(self.container).append(finalElement);
