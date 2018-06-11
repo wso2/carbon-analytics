@@ -55,4 +55,18 @@ public class CountStateElementConfig implements StateElementConfig {
     public void setMax(int max) {
         this.max = max;
     }
+
+    @Override
+    public String toString() {
+        return "CountStateElementConfig{" +
+                "streamStateElement=" + streamStateElement +
+                ", within='" + within + '\'' +
+                ", min=" + min +
+                ", max=" + max +
+                '}';
+    }
+
+    public String getLogic() {
+        return "";
+    }
 }

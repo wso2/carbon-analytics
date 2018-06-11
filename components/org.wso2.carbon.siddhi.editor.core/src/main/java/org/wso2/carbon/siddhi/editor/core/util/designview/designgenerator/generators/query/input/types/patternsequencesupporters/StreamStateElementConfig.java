@@ -59,4 +59,18 @@ public class StreamStateElementConfig implements StateElementConfig {
     public void setWithin(String within) {
         this.within = within;
     }
+
+    @Override
+    public String toString() {
+        return "StreamStateElementConfig{" +
+                "streamReference='" + streamReference + '\'' +
+                ", streamName='" + streamName + '\'' +
+                ", streamHandlerList=" + streamHandlerList +
+                ", within='" + within + '\'' +
+                '}';
+    }
+
+    public String getLogic() {
+        return "";
+    }
 }

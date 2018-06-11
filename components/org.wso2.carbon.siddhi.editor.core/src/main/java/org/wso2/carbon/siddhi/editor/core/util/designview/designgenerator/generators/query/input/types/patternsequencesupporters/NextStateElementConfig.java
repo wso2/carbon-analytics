@@ -46,4 +46,8 @@ public class NextStateElementConfig implements StateElementConfig {
     public void setWithin(String within) {
         this.within = within;
     }
+
+    public String getLogic() {
+        return "";
+    }
 }
