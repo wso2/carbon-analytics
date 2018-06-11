@@ -179,7 +179,7 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.getStream = function (streamId) {
             var returnedElement = ElementUtils.prototype.getElement(this.streamList, streamId);
-            if (returnedElement === undefined) {
+            if (!returnedElement) {
                 returnedElement = this.getStreamSavedInsideAPartition(streamId);
             }
             return returnedElement;
@@ -208,7 +208,7 @@ define(['require', 'elementUtils', 'lodash'],
         AppData.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
             var returnedElement = ElementUtils.prototype.
             getElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
-            if (returnedElement === undefined) {
+            if (!returnedElement) {
                 returnedElement =
                     this.getQuerySavedInsideAPartition(windowFilterProjectionQueryId, 'WINDOW_FILTER_PROJECTION_QUERY');
             }
@@ -217,7 +217,7 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.getPatternQuery = function (patternQueryId) {
             var returnedElement = ElementUtils.prototype.getElement(this.queryLists.PATTERN, patternQueryId);
-            if (returnedElement === undefined) {
+            if (!returnedElement) {
                 returnedElement = this.getQuerySavedInsideAPartition(patternQueryId, 'PATTERN_QUERY');
             }
             return returnedElement;
@@ -225,7 +225,7 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.getSequenceQuery = function (sequenceQueryId) {
             var returnedElement =  ElementUtils.prototype.getElement(this.queryLists.SEQUENCE, sequenceQueryId);
-            if (returnedElement === undefined) {
+            if (!returnedElement) {
                 returnedElement = this.getQuerySavedInsideAPartition(sequenceQueryId, 'SEQUENCE_QUERY');
             }
             return returnedElement;
@@ -233,7 +233,7 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.getJoinQuery = function (joinQueryId) {
             var returnedElement =  ElementUtils.prototype.getElement(this.queryLists.JOIN, joinQueryId);
-            if (returnedElement === undefined) {
+            if (!returnedElement) {
                 returnedElement = this.getQuerySavedInsideAPartition(joinQueryId, 'JOIN_QUERY');
             }
             return returnedElement;
@@ -316,7 +316,7 @@ define(['require', 'elementUtils', 'lodash'],
          */
         AppData.prototype.getDefinitionElementById = function (elementId, includeQueryTypes, includeSourceAndSink) {
             var self = this;
-            var requestedElement = undefined;
+            var requestedElement;
             var streamList = self.streamList;
             var tableList = self.tableList;
             var windowList = self.windowList;
@@ -381,11 +381,11 @@ define(['require', 'elementUtils', 'lodash'],
             });
 
             // check the element in the partitionList
-            if (requestedElement === undefined) {
+            if (!requestedElement) {
                 requestedElement = self.getQueryByIdSavedInsideAPartition(elementId);
             }
             // search in the inner streams in partitions
-            if (requestedElement === undefined) {
+            if (!requestedElement) {
                 var element = self.getStreamSavedInsideAPartition(elementId);
                 if (element !== undefined) {
                     requestedElement = {
@@ -406,7 +406,7 @@ define(['require', 'elementUtils', 'lodash'],
          */
         AppData.prototype.getDefinitionElementByName = function (elementName, includeQueryTypes) {
             var self = this;
-            var requestedElement = undefined;
+            var requestedElement;
             var streamList = self.streamList;
             var tableList = self.tableList;
             var windowList = self.windowList;
@@ -460,6 +460,11 @@ define(['require', 'elementUtils', 'lodash'],
                 });
             });
 
+            // check the element in the partitionList
+            if (!requestedElement) {
+                requestedElement = self.getStreamByNameSavedInsideAPartition(elementName);
+            }
+
             return requestedElement;
         };
 
@@ -472,9 +477,9 @@ define(['require', 'elementUtils', 'lodash'],
          */
         AppData.prototype.getQuerySavedInsideAPartition = function (queryId, queryType) {
             var self = this;
-            var requestedElement = undefined;
+            var requestedElement ;
             _.forEach(self.partitionList, function (partition) {
-                if (requestedElement === undefined) {
+                if (!requestedElement) {
                     if (queryType === 'WINDOW_FILTER_PROJECTION_QUERY') {
                         requestedElement = partition.getWindowFilterProjectionQuery(queryId);
                     } else if (queryType === 'PATTERN_QUERY') {
@@ -497,11 +502,34 @@ define(['require', 'elementUtils', 'lodash'],
          */
         AppData.prototype.getStreamSavedInsideAPartition = function (streamId) {
             var self = this;
-            var requestedElement = undefined;
+            var requestedElement;
             _.forEach(self.partitionList, function (partition) {
-                if (requestedElement === undefined) {
+                if (!requestedElement) {
                     requestedElement = partition.getStream(streamId);
                 }
+            });
+            return requestedElement;
+        };
+
+        /**
+         * @function Checks whether a given stream name is inside a partition and if yes it returns
+         * @param streamName name of the query element
+         * @return requestedElement returns undefined if the requested element is not found. Otherwise returns the
+         * requestedElement
+         */
+        AppData.prototype.getStreamByNameSavedInsideAPartition = function (streamName) {
+            var self = this;
+            var requestedElement;
+
+            _.forEach(self.partitionList, function (partition) {
+                _.forEach(partition.getStreamList(), function (stream) {
+                    if (stream.getName().toUpperCase() === streamName.toUpperCase()) {
+                        requestedElement = {
+                            type: 'STREAM',
+                            element: stream
+                        };
+                    }
+                });
             });
             return requestedElement;
         };
@@ -556,28 +584,28 @@ define(['require', 'elementUtils', 'lodash'],
          */
         AppData.prototype.getQueryByIdSavedInsideAPartition = function (queryId) {
             var self = this;
-            var element = undefined;
-            var type = undefined;
+            var element;
+            var type;
             _.forEach(self.partitionList, function (partition) {
-                if (element === undefined) {
+                if (!element) {
                     element = partition.getWindowFilterProjectionQuery(queryId);
                     type = 'WINDOW_FILTER_PROJECTION_QUERY';
-                    if (element === undefined) {
+                    if (!element) {
                         element = partition.getPatternQuery(queryId);
                         type = 'PATTERN_QUERY';
                     }
-                    if (element === undefined) {
+                    if (!element) {
                         element = partition.getSequenceQuery(queryId);
                         type = 'SEQUENCE_QUERY';
                     }
-                    if (element === undefined) {
+                    if (!element) {
                         element = partition.getJoinQuery(queryId);
                         type = 'JOIN_QUERY';
                     }
                 }
             });
 
-            var requestedElement = undefined;
+            var requestedElement;
             if (element !== undefined) {
                 requestedElement = {
                     type: type,
