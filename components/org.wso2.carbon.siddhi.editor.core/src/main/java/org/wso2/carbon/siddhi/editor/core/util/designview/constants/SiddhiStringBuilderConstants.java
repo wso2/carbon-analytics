@@ -28,7 +28,6 @@ public class SiddhiStringBuilderConstants {
     public static final char FULL_STOP = '.';
     public static final char COMMA = ',';
     public static final char EQUAL = '=';
-    public static final char HASH = '#';
     public static final char NEW_LINE = '\n';
     public static final char SEMI_COLON = ';';
     public static final char SINGLE_QUOTE = '\'';
@@ -44,6 +43,7 @@ public class SiddhiStringBuilderConstants {
     public static final String EMPTY_STRING = "";
     public static final String TAB_SPACE = "    ";
     public static final String THREE_DOTS = "...";
+    public static final String HASH = "#";
     // Definition Strings
     public static final String DEFINE_STREAM = "define stream";
     public static final String DEFINE_TABLE = "define table";

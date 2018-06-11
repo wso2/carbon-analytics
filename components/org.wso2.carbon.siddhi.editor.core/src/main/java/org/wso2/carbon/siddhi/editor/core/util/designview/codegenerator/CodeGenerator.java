@@ -28,10 +28,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConditionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
@@ -39,7 +35,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryL
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorHelper;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +126,10 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (StreamConfig stream : streamList) {
+            if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
+                continue;
+            }
+
             if (stream.getName() == null || stream.getName().isEmpty()) {
                 throw new CodeGenerationException("The name of the given StreamConfig object is null/empty");
             }
@@ -686,11 +685,14 @@ public class CodeGenerator {
         } else if (partition.getPartitionWith() == null || partition.getPartitionWith().isEmpty()) {
             throw new CodeGenerationException("The 'partitionWith' value for the given" +
                     " PartitionConfig object is null/empty");
+        } else if (partition.getQueryLists() == null || partition.getQueryLists().isEmpty()) {
+            throw new CodeGenerationException("The query lists of the given partition element is null/empty");
         }
 
         StringBuilder partitionStringBuilder = new StringBuilder();
 
-        partitionStringBuilder.append(SiddhiStringBuilderConstants.PARTITION_WITH)
+        partitionStringBuilder.append(CodeGeneratorHelper.getAnnotations(partition.getAnnotationList()))
+                .append(SiddhiStringBuilderConstants.PARTITION_WITH)
                 .append(SiddhiStringBuilderConstants.OPEN_BRACKET)
                 .append(CodeGeneratorHelper.getPartitionWith(partition.getPartitionWith()))
                 .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
@@ -698,7 +700,6 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.BEGIN)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
-        // todo Do null checks
         List<QueryConfig> queries = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
             queries.addAll(queryList);
@@ -706,7 +707,7 @@ public class CodeGenerator {
 
         if (!queries.isEmpty()) {
             int queriesLeft = queries.size();
-            for (QueryConfig query : orderPartitionQueries(queries)) {
+            for (QueryConfig query : CodeGeneratorHelper.orderPartitionQueries(queries)) {
                 partitionStringBuilder.append(generateQueryString(query))
                         .append(SiddhiStringBuilderConstants.NEW_LINE);
                 if (queriesLeft != 1) {
@@ -767,83 +768,6 @@ public class CodeGenerator {
         sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
 
         return sourceSinkStringBuilder.toString();
-    }
-
-    private List<QueryConfig> orderPartitionQueries(List<QueryConfig> queries) throws CodeGenerationException {
-        // TODO: 6/8/18 Add null checks
-        // TODO: 6/8/18 Clean and optimize code
-        List<QueryConfig> reorderedQueries = new LinkedList<>();
-
-//        for (QueryConfig query: queries) {
-//            if (getInnerInputStreams(query).isEmpty()) {
-//                reorderedQueries.add(query);
-//            } /*else {
-//                queries.add(query);
-//            }*/
-//        }
-
-        while (!queries.isEmpty()) {
-            Iterator<QueryConfig> queryIterator = queries.iterator();
-            while (queryIterator.hasNext()) {
-                QueryConfig query = queryIterator.next();
-                List<String> innerInputStreams = getInnerInputStreams(query);
-                for (QueryConfig reorderedQuery : reorderedQueries) {
-                    String outputStream = reorderedQuery.getQueryOutput().getTarget();
-                    // TODO: 6/8/18 Can use the .contains() method here (check to see whether it is possible)
-                    innerInputStreams.remove(outputStream);
-//                    for (String inputStream : innerInputStreams) {
-//                        if (outputStream.equals(inputStream)) {
-//                            innerInputStreams.remove(outputStream);
-//                            break;
-//                        }
-//                    }
-//                    if outputStream is inner stream
-//                        name of the innser strea,
-//                            innerInputStreams.remove(outputStreamName);
-                }
-                if (innerInputStreams.isEmpty()) {
-                    reorderedQueries.add(query);
-                    queryIterator.remove();
-                }
-            }
-        }
-        return reorderedQueries;
-    }
-
-    private List<String> getInnerInputStreams(QueryConfig query) throws CodeGenerationException {
-        List<String> innerInputStreamList = new LinkedList<>();
-        switch (query.getQueryInput().getType()) {
-            case CodeGeneratorConstants.WINDOW:
-            case CodeGeneratorConstants.FILTER:
-            case CodeGeneratorConstants.PROJECTION:
-                WindowFilterProjectionConfig windowFilterProjection =
-                        (WindowFilterProjectionConfig) query.getQueryInput();
-                if (windowFilterProjection.getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
-                    innerInputStreamList.add(windowFilterProjection.getFrom());
-                }
-                break;
-            case CodeGeneratorConstants.JOIN:
-                JoinConfig join = (JoinConfig) query.getQueryInput();
-                if (join.getLeft().getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
-                    innerInputStreamList.add(join.getLeft().getFrom());
-                }
-                if (join.getRight().getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
-                    innerInputStreamList.add(join.getRight().getFrom());
-                }
-                break;
-            case CodeGeneratorConstants.PATTERN:
-            case CodeGeneratorConstants.SEQUENCE:
-                PatternSequenceConfig patternSequence = (PatternSequenceConfig) query.getQueryInput();
-                for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
-                    if (condition.getStreamName().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
-                        innerInputStreamList.add(condition.getStreamName());
-                    }
-                }
-                break;
-            default:
-                throw new CodeGenerationException("Unidentified Query Type: " + query.getQueryInput().getType());
-        }
-        return innerInputStreamList;
     }
 
 }
