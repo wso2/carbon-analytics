@@ -463,7 +463,6 @@ export default class WorkerOverview extends React.Component {
                                     </div>
                                 </div>
                             )
-
                         }
 
                     })}
@@ -601,13 +600,12 @@ export default class WorkerOverview extends React.Component {
                     {Object.keys(managerList).map((id, workerList) => {
                         if (id !== "Never Reached" && id !== "Not-Reachable") {
                             return (
-                                <div style={styles.background}>
+                                <div>
                                     <Divider inset={true} style={styles.divider}/>
                                     <h3 style={styles.h3Title}>Group Id : {id}</h3>
                                     <h4 style={styles.h3Title}>Managers</h4>
                                     <div style={styles.root}>
-
-                                        <GridList cols={3} cellHeight='100%' style={{width: '90%', padding: 40}}>
+                                        <GridList cols={3} cellHeight='100%' style={styles.gridList}>
                                             {managerList[id].map((worker) => {
                                                 return (
                                                     <ManagerThumbnail worker={worker}
@@ -622,10 +620,10 @@ export default class WorkerOverview extends React.Component {
                             )
                         } else {
                             return (
-                                <div style={styles.root}>
-                                    <h3 style={styles.h3}>Managers</h3>
+                                <div>
+                                    <h3 style={styles.h3Title}>Managers</h3>
                                     <Divider inset={true} style={styles.divider}/>
-                                    <div>
+                                    <div style={styles.root}>
                                         <GridList cols={3} cellHeight='100%' style={styles.gridList}>
                                             {managerList[id].map((worker) => {
                                                 return (
