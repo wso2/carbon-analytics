@@ -29,14 +29,14 @@ define(['require', 'lodash'],
         };
 
         /**
-         * @function check whether given name to the definition element is unique(This will only consider definitions
-         * which creates internal streams for each of them. Function definitions are not considered.)
+         * @function check whether given name to the definition element is used(This will only consider definitions
+         * which creates internal streams in Siddhi for each of them. Function definitions are not considered.)
          * @param elementName given name to the definition element
          * @param skipElementID this element name will be ignored when checking the unique name. This is used when
          *          saving the same name after editing a particular element
          * @return {boolean}
          */
-        FormUtils.prototype.isDefinitionElementNameUnique = function (elementName, skipElementID) {
+        FormUtils.prototype.isDefinitionElementNameUsed = function (elementName, skipElementID) {
             var self = this;
             var isNameUsed = false;
             var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
@@ -60,13 +60,13 @@ define(['require', 'lodash'],
         };
 
         /**
-         * @function check whether given name to the function definition element is unique
+         * @function check whether given name to the function definition element is used.
          * @param elementName given name to the definition element
          * @param skipElementID this element name will be ignored when checking the unique name. This is used when
          *          saving the same name after editing a particular element
          * @return {boolean}
          */
-        FormUtils.prototype.isFunctionDefinitionElementNameUnique = function (elementName, skipElementID) {
+        FormUtils.prototype.isFunctionDefinitionElementNameUsed = function (elementName, skipElementID) {
             var self = this;
             var isNameUsed = false;
             var functionList = self.configurationData.getSiddhiAppConfig().getFunctionList();
@@ -83,14 +83,14 @@ define(['require', 'lodash'],
         };
 
         /**
-         * @function check whether given name to the inner stream definition in query element is unique
+         * @function check whether given name to the inner stream definition in query element is used in the partition.
          * @param partitionId id of the partition element
          * @param elementName given name to the definition element
          * @param skipElementID this element name will be ignored when checking the unique name. This is used when
          *          saving the same name after editing a particular element
          * @return {boolean}
          */
-        FormUtils.prototype.isStreamDefinitionNameInPartitionUnique = function (partitionId, elementName,
+        FormUtils.prototype.isStreamDefinitionNameInPartitionUsed = function (partitionId, elementName,
                                                                                 skipElementID) {
             var self = this;
             var isNameUsed = false;

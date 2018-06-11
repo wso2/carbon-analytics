@@ -115,7 +115,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 if(errors.length) {
                     return;
                 }
-                var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUnique(editor.getValue().name);
+                var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUsed(editor.getValue().name);
                 if (isFunctionNameUsed) {
                     DesignViewUtils.prototype
                         .errorAlert("Function name \"" + editor.getValue().name + "\" is already used.");
@@ -249,7 +249,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 if(errors.length) {
                     return;
                 }
-                var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUnique(editor.getValue().name,
+                var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUsed(editor.getValue().name,
                     clickedElement.getId());
                 if (isFunctionNameUsed) {
                     DesignViewUtils.prototype

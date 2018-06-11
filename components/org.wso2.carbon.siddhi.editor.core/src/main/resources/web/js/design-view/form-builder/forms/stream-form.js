@@ -139,7 +139,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if(errors.length) {
                     return;
                 }
-                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
+                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
                 if (isStreamNameUsed) {
                     DesignViewUtils.prototype
                         .errorAlert("Stream name \"" + editor.getValue().name + "\" is already used.");
@@ -303,6 +303,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
                 var streamName;
                 var firstCharacterInStreamName;
+                var isStreamNameUsed;
                 /*
                 * check whether the stream is inside a partition and if yes check whether it begins with '#'. If not add
                 * '#' to the beginning of the stream name.
@@ -317,6 +318,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     } else {
                         streamName = editor.getValue().name;
                     }
+                    isStreamNameUsed
+                        = self.formUtils.isDefinitionElementNameUsed(streamName, clickedElement.getId());
+                    if (isStreamNameUsed) {
+                        DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" is already defined.");
+                        return;
+                    }
                 } else {
                     firstCharacterInStreamName = (editor.getValue().name).charAt(0);
                     if (firstCharacterInStreamName !== '#') {
@@ -324,14 +331,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     } else {
                         streamName = editor.getValue().name;
                     }
+                    isStreamNameUsed = self.formUtils
+                        .isStreamDefinitionNameInPartitionUsed(streamName, clickedElement.getId());
+                    if (isStreamNameUsed) {
+                        DesignViewUtils.prototype
+                            .errorAlert("Stream name \"" + streamName + "\" is already defined in the partition.");
+                        return;
+                    }
                 }
 
-                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUnique(streamName, clickedElement.getId());
-                if (isStreamNameUsed) {
-                    DesignViewUtils.prototype
-                        .errorAlert("Stream name \"" + streamName + "\" is already used.");
-                    return;
-                }
+
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 

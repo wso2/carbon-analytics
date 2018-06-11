@@ -173,7 +173,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 if(errors.length) {
                     return;
                 }
-                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
+                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
                 if (isWindowNameUsed) {
                     DesignViewUtils.prototype
                         .errorAlert("Window name \"" + editor.getValue().name + "\" is already used.");
@@ -411,7 +411,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 if(errors.length) {
                     return;
                 }
-                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
+                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,
                     clickedElement.getId());
                 if (isWindowNameUsed) {
                     DesignViewUtils.prototype
