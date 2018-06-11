@@ -23,8 +23,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiAnnotationTypes;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AggregationConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.FunctionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.PartitionConfigGenerator;
@@ -39,7 +39,6 @@ import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.stream.input.source.Source;
 import org.wso2.siddhi.core.stream.output.sink.Sink;
 import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.AggregationDefinition;
 import org.wso2.siddhi.query.api.definition.FunctionDefinition;
@@ -84,20 +83,12 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads name and description from the SiddhiApp
-     */
-    /**
-     * Loads name and description from the SiddhiApp
+     * Loads App level Annotations from the Siddhi app
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadAppNameAndDescription() {
-        for (Annotation annotation : siddhiApp.getAnnotations()) {
-            if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationTypes.NAME)) {
-                siddhiAppConfig.setAppName(annotation.getElements().get(0).getValue());
-            } else if (annotation.getName().equalsIgnoreCase(SiddhiAnnotationTypes.DESCRIPTION)) {
-                siddhiAppConfig.setAppDescription(annotation.getElements().get(0).getValue());
-            }
-        }
+    public EventFlowBuilder loadAppAnnotations() {
+        siddhiAppConfig.setAppAnnotationList(
+                new AnnotationConfigGenerator().generateAnnotationConfigList(siddhiApp.getAnnotations()));
         return this;
     }
 
