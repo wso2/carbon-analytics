@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
-        'elementUtils', 'storeAnnotation'],
+        'elementUtils', 'storeAnnotation', 'designViewUtils'],
     function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils, 
-              StoreAnnotation) {
+              StoreAnnotation, DesignViewUtils) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -53,13 +53,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
             var id = $(element).parent().attr('id');
             // retrieve the aggregation information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getAggregation(id);
-            if (clickedElement === undefined) {
+            if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
 
-            if (clickedElement.getFrom() === undefined) {
-                alert('Connect an input stream element');
+            if (!clickedElement.getFrom()) {
+                DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
@@ -134,7 +135,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 }
 
                 var fillAggregate = {};
-                if (aggregateByTimePeriod !== undefined && aggregateByTimePeriod.getMaxValue() === undefined) {
+                if (aggregateByTimePeriod !== undefined && !aggregateByTimePeriod.getMaxValue()) {
                     fillAggregate = {
                         aggregateByAttribute: {
                             attribute: aggregateByAttribute
@@ -162,10 +163,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 }
                 fillAggregate = self.formUtils.cleanJSONObject(fillAggregate);
 
-                formContainer.append('<div class="row"><div id="form-aggregation-annotation" ' +
-                    'class="section-seperator col-md-12"></div></div>' +
-                    '<div class="row section-seperator"><div id="form-aggregation-input" class="col-md-3"></div>' +
-                    '<div id="form-aggregation-select" class="col-md-5"></div>' +
+                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                    '<div class="row"><div id="form-aggregation-annotation" class="col-md-12 section-seperator frm-agr"></div></div>' +
+                    '<div class="row"><div id="form-aggregation-input" class="col-md-12"></div></div></div>' +
+                    '<div id="form-aggregation-select" class="col-md-4 frm-agr"></div>' +
                     '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
 
                 var possibleGroupByAttributes = [];
@@ -467,7 +468,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     var isAggregationNameUsed =
                         self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name, clickedElement.getId());
                     if (isAggregationNameUsed) {
-                        alert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
+                        DesignViewUtils.prototype
+                            .errorAlert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
                         return;
                     }
 

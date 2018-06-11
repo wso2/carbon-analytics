@@ -169,7 +169,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             }
                             var response = self._designView.getDesign(self.getContent());
                             if (response.status === "success") {
-                                //TODO: check whether is in initial state inorder to enhance performance
                                 self.JSONObject = response.responseJSON;
                                 sourceContainer.hide();
                                 designView.emptyDesignViewGridContainer();

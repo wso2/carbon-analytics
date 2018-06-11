@@ -306,9 +306,10 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             var id = $(element).parent().attr('id');
             // retrieve the source information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getSource(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var type = clickedElement.getType();
             var savedSourceOptions = clickedElement.getOptions();

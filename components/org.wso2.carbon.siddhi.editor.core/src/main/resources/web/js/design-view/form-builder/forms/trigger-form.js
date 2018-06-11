@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'trigger'],
-    function (require, log, $, _, Trigger) {
+define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
+    function (require, log, $, _, Trigger, DesignViewUtils) {
 
         /**
          * @class TriggerForm Creates a forms to collect data from a trigger
@@ -112,7 +112,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 }
                 var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
                 if (isTriggerNameUsed) {
-                    alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Trigger name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 // add the new out trigger to the trigger array
@@ -152,9 +153,10 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
             var id = $(element).parent().attr('id');
             // retrieve the trigger information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var name = clickedElement.getName();
             var at = clickedElement.getAt();
@@ -233,7 +235,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
                     clickedElement.getId());
                 if (isTriggerNameUsed) {
-                    alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Trigger name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 self.designViewContainer.removeClass('disableContainer');

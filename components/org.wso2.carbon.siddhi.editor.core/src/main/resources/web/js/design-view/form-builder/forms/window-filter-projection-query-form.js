@@ -18,9 +18,9 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'streamHandler'],
+        'streamHandler', 'designViewUtils'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils) {
 
         var constants = {
             PROJECTION: 'projectionQueryDrop',
@@ -62,17 +62,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQuery(id);
-            if (clickedElement.getQueryInput() === undefined
-                || clickedElement.getQueryInput().getFrom() === undefined) {
-                alert('Connect an input element');
+            if (!clickedElement.getQueryInput() || !clickedElement.getQueryInput().getFrom()) {
+                DesignViewUtils.prototype.warnAlert('Connect an input element');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-            } else if (clickedElement.getQueryOutput() === undefined ||
-                clickedElement.getQueryOutput().getTarget() === undefined) {
-                alert('Connect an output stream');
+            } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
+                DesignViewUtils.prototype.warnAlert('Connect an output stream');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
@@ -193,7 +191,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var select = [];
                 var possibleUserDefinedSelectTypeValues = [];
-                if (clickedElement.getSelect() === undefined) {
+                if (!clickedElement.getSelect()) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
                             expression: undefined,
@@ -201,7 +199,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         };
                         select.push(attr);
                     }
-                } else if(clickedElement.getSelect().getValue() === undefined) {
+                } else if(!clickedElement.getSelect().getValue()) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
                             expression: undefined,
@@ -244,7 +242,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         && (output !== undefined)) {
                         // getting the event tpe and pre load it
                         var eventType;
-                        if (output.getEventType() === undefined) {
+                        if (!output.getEventType()) {
                             eventType = 'all events';
                         } else if (output.getEventType() === 'ALL_EVENTS') {
                             eventType = 'all events';
@@ -635,7 +633,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
-                    '<div class="row"><div id="form-query-annotation" class="col-md-12"></div></div>' +
+                    '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
                     '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
                     '<div id="form-query-output" class="col-md-4"></div></div>');
@@ -1121,7 +1119,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     });
 
                     if (numberOfWindows > 1) {
-                        alert('Only one window can be defined!');
+                        DesignViewUtils.prototype.errorAlert('Only one window can be defined!');
                         return;
                     }
                     clickedElement.clearAnnotationList();
@@ -1226,7 +1224,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             console.log("Invalid output type for query received!")
                         }
 
-                        if (outputConfig.output.eventType === undefined) {
+                        if (!outputConfig.output.eventType) {
                             outputObject.setEventType(undefined);
                         } else if(outputConfig.output.eventType === "all events"){
                             outputObject.setEventType('ALL_EVENTS');

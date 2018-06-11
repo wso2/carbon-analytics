@@ -91,7 +91,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(options, 'appName', siddhiAppName);
 
             var console = this.consoleListManager.getGlobalConsole();
-            if(console === undefined){
+            if(!console){
                 var globalConsoleOptions = {};
                 var opts = {};
                 _.set(opts, '_type', "CONSOLE");
@@ -108,35 +108,35 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var formConsole = this.consoleListManager.newFormConsole(consoleOptions);
             $(formConsole).on( "close-button-in-form-clicked", function() {
                 if(elementType === constants.SOURCE) {
-                    if(self.configurationData.getSiddhiAppConfig().getSource(elementId) === undefined) {
+                    if(!self.configurationData.getSiddhiAppConfig().getSource(elementId)) {
                         $("#"+elementId).remove();
                     }
                 } else if(elementType === constants.SINK) {
-                    if(self.configurationData.getSiddhiAppConfig().getSink(elementId) === undefined) {
+                    if(!self.configurationData.getSiddhiAppConfig().getSink(elementId)) {
                         $("#"+elementId).remove();
                     }
                 } else if(elementType === constants.STREAM) {
-                    if(self.configurationData.getSiddhiAppConfig().getStream(elementId) === undefined) {
+                    if(!self.configurationData.getSiddhiAppConfig().getStream(elementId)) {
                         $("#"+elementId).remove();
                     }
                 } else if(elementType === constants.TABLE) {
-                    if(self.configurationData.getSiddhiAppConfig().getTable(elementId) === undefined) {
+                    if(!self.configurationData.getSiddhiAppConfig().getTable(elementId)) {
                         $("#"+elementId).remove();
                     }
                 } else if(elementType === constants.WINDOW) {
-                    if(self.configurationData.getSiddhiAppConfig().getWindow(elementId) === undefined) {
+                    if(!self.configurationData.getSiddhiAppConfig().getWindow(elementId)) {
                         $("#"+elementId).remove();
                     }
                 } else if(elementType === constants.TRIGGER) {
-                    if(self.configurationData.getSiddhiAppConfig().getTrigger(elementId) === undefined) {
+                    if(!self.configurationData.getSiddhiAppConfig().getTrigger(elementId)) {
                         $("#"+elementId).remove();
                     }
                 } else if(elementType === constants.AGGREGATION) {
-                    if(self.configurationData.getSiddhiAppConfig().getAggregation(elementId) === undefined) {
+                    if(!self.configurationData.getSiddhiAppConfig().getAggregation(elementId)) {
                         $("#"+elementId).remove();
                     }
                 } else if(elementType === constants.FUNCTION) {
-                    if(self.configurationData.getSiddhiAppConfig().getFunction(elementId) === undefined) {
+                    if(!self.configurationData.getSiddhiAppConfig().getFunction(elementId)) {
                         $("#"+elementId).remove();
                     }
                 }
