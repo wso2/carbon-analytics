@@ -233,6 +233,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     designView.emptyDesignViewGridContainer();
                                     sourceContainer.show();
                                     self._sourceView.editorResize();
+                                    self._sourceView.format();
                                     loadingScreen.hide();
                                     // NOTE - This trigger should be always handled at the end of setTimeout()
                                     self.trigger("view-switch");
