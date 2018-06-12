@@ -483,6 +483,12 @@ public class EdgesGenerator {
             if (queryInputConfig instanceof JoinConfig) {
                 return NodeType.JOIN_QUERY;
             }
+            if (queryInputConfig instanceof PatternSequenceConfig) {
+                if (queryInputConfig.getType().equalsIgnoreCase("PATTERN")) {
+                    return NodeType.PATTERN_QUERY;
+                }
+                // TODO add sequence
+            }
             throw new DesignGenerationException("Type is unknown for Query Input");
         }
         throw new DesignGenerationException(
