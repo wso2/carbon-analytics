@@ -180,6 +180,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     designContainer.show();
                                     designView.renderDesignGrid(self.JSONObject);
                                     loadingScreen.hide();
+                                    // NOTE - This trigger should be always handled at the end of setTimeout()
+                                    self.trigger("view-switch");
                                 }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
                                     "<span class=\"toggle-button-text\">Source View</span>");
@@ -232,6 +234,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     sourceContainer.show();
                                     self._sourceView.editorResize();
                                     loadingScreen.hide();
+                                    // NOTE - This trigger should be always handled at the end of setTimeout()
+                                    self.trigger("view-switch");
                                 }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
@@ -239,8 +243,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
                             }
                         }
-                        // NOTE - This trigger should be always handled after the 'if' condition
-                        self.trigger("view-switch");
                     });
                 },
 
