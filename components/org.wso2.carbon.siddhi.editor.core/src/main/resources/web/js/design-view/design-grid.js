@@ -83,13 +83,21 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.set(dropElementsOpts, 'designGrid', self);
             this.dropElements = new DropElements(dropElementsOpts);
             this.canvas = $(self.container);
+            this.canvas.append(createAppAnnotationsButton());
 
-            var settingsButton = $("<div class='btn app-settings-button tool-container' data-placement='bottom' data-toggle='tooltip' title='App Annotations'>" +
-                "<i class='fw fw-settings'></i>" +
-                // "<p class='tool-title'>App Annotations</p>" +
-                "</div>");
-            settingsButton.tooltip();
-            this.canvas.append(settingsButton);
+            /**
+             * Creates a Jquery element for an app annotations settings button
+             *
+             * @returns {*|jQuery|HTMLElement}
+             */
+            function createAppAnnotationsButton() {
+                var appAnnotationsButton = $("<div class='btn app-annotations-button tool-container'" +
+                    " data-placement='bottom' data-toggle='tooltip' title='App Annotations'>" +
+                    "<i class='fw fw-settings'></i>" +
+                    "</div>");
+                appAnnotationsButton.tooltip();
+                return appAnnotationsButton;
+            }
 
             /**
              * @description jsPlumb function opened

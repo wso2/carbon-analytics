@@ -72,11 +72,11 @@
     background-color: #e7eaeb;
 }
 
-.sourceDrop{
+.sourceDrop {
     background-image: url("../images/source.svg");
 }
 
-.sinkDrop{
+.sinkDrop {
     background-image: url("../images/sink.svg");
 }
 
@@ -154,6 +154,7 @@
     transition: box-shadow 0.15s ease-in;
     border: 1px solid #ccc;
 }
+
 .partitionDrop {
     border: 1px solid #346789;
     width: 250px;
@@ -310,7 +311,7 @@ td {
 }
 
 .aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
-.patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode{
+.patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode {
     font-weight: 600;
     width: 120px;
     margin-left: -30px;
@@ -433,7 +434,7 @@ h3,
     padding: 20% 0;
 }
 
-.app-settings-button {
+.app-annotations-button {
     position: absolute;
     top: 3.5%;
     right: 1%;
@@ -443,7 +444,7 @@ h3,
     transition: 0.15s;
 }
 
-.app-settings-button:hover {
+.app-annotations-button:hover {
     color: black;
     transition: 0.15s;
 }
