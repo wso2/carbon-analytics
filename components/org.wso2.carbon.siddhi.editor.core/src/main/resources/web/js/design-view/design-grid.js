@@ -1113,7 +1113,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 // the element to the partition
                                 var isStreamNameUsed
                                     = self.dropElements.formBuilder.formUtils
-                                    .isStreamDefinitionNameInPartitionUsed(partitionId, streamName);
+                                    .isStreamDefinitionNameUsedInPartition(partitionId, streamName);
                                 if (!isStreamNameUsed) {
                                     streamObjectCopy.setName(streamName);
                                     var textNode = $('#' + elementId).parent().find('.streamNameNode');

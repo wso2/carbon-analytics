@@ -333,7 +333,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         streamName = config.name;
                     }
                     isStreamNameUsed = self.formUtils
-                        .isStreamDefinitionNameInPartitionUsed(streamName, id);
+                        .isStreamDefinitionNameUsedInPartition(streamName, id);
                     if (isStreamNameUsed) {
                         DesignViewUtils.prototype
                             .errorAlert("Stream name \"" + streamName + "\" is already defined in the partition.");

@@ -85,14 +85,14 @@ define(['require', 'lodash'],
         };
 
         /**
-         * @function check whether given name to the inner stream definition in query element is used in the partition.
+         * @function check whether given name to the inner stream definition is used in the given partition.
          * @param partitionId id of the partition element
          * @param elementName given name to the definition element
          * @param skipElementID this element name will be ignored when checking the unique name. This is used when
          *          saving the same name after editing a particular element
          * @return {boolean}
          */
-        FormUtils.prototype.isStreamDefinitionNameInPartitionUsed = function (partitionId, elementName,
+        FormUtils.prototype.isStreamDefinitionNameUsedInPartition = function (partitionId, elementName,
                                                                                 skipElementID) {
             var self = this;
             var isNameUsed = false;
