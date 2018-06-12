@@ -50,6 +50,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Helper that contains generic reusable utility methods
@@ -528,13 +530,25 @@ public class CodeGeneratorHelper {
                     " object is null/empty");
         }
 
-        String logic = patternSequence.getLogic();
+        StringBuilder patternSequenceInputStringBuilder = new StringBuilder();
+        patternSequenceInputStringBuilder.append(SiddhiStringBuilderConstants.FROM)
+                .append(SiddhiStringBuilderConstants.SPACE);
 
+        String logic = patternSequence.getLogic();
         for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
-            logic = logic.replace(condition.getConditionId(), getPatternSequenceConditionLogic(condition));
+            if (logic.contains(condition.getConditionId())) {
+                Pattern pattern = Pattern.compile("\\s+not\\s+" + condition.getConditionId());
+                Matcher matcher = pattern.matcher(logic);
+                if (matcher.find()) {
+                    logic = logic.replace(condition.getConditionId(), getPatternSequenceConditionLogic(condition, true));
+                } else {
+                    logic = logic.replace(condition.getConditionId(), getPatternSequenceConditionLogic(condition, false));
+                }
+            }
         }
 
-        return logic;
+        patternSequenceInputStringBuilder.append(logic);
+        return patternSequenceInputStringBuilder.toString();
     }
 
     /**
@@ -544,7 +558,7 @@ public class CodeGeneratorHelper {
      * @return The Siddhi string representation of the given PatternSequenceConfig object
      * @throws CodeGenerationException Error while generating code
      */
-    private static String getPatternSequenceConditionLogic(PatternSequenceConditionConfig condition)
+    private static String getPatternSequenceConditionLogic(PatternSequenceConditionConfig condition, boolean hasNot)
             throws CodeGenerationException {
         if (condition == null) {
             throw new CodeGenerationException("The given PatternSequenceConditionConfig object is null");
@@ -555,6 +569,10 @@ public class CodeGeneratorHelper {
 
         StringBuilder patternSequenceConditionStringBuilder = new StringBuilder();
 
+        if (!hasNot) {
+            patternSequenceConditionStringBuilder.append(condition.getConditionId())
+                    .append(SiddhiStringBuilderConstants.EQUAL);
+        }
         patternSequenceConditionStringBuilder.append(condition.getStreamName())
                 .append(getStreamHandlerList(condition.getStreamHandlerList()));
 

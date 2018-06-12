@@ -83,11 +83,9 @@ public class CodeGenerator {
             appNameStringBuilder.append(SiddhiStringBuilderConstants.APP_NAME_ANNOTATION)
                     .append(appName)
                     .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
-                    .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+                    .append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
         } else {
-            appNameStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_NAME_ANNOTATION)
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+            appNameStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_NAME_ANNOTATION);
         }
 
         appNameStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
