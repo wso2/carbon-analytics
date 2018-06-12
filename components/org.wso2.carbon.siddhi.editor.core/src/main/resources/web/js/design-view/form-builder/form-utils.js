@@ -23,9 +23,11 @@ define(['require', 'lodash'],
          * @class FormUtils Contains utility methods for forms
          * @constructor
          * @param {Object} configurationData Siddhi app data
+         * @param {Object} jsPlumbInstance JsPlumb instance of the current tab
          */
-        var FormUtils = function (configurationData) {
+        var FormUtils = function (configurationData, jsPlumbInstance) {
             this.configurationData = configurationData;
+            this.jsPlumbInstance = jsPlumbInstance;
         };
 
         /**
@@ -147,6 +149,38 @@ define(['require', 'lodash'],
             }
             html += '</div>';
             return html;
+        };
+
+        /**
+         * @function Updates connections of a definition element after the element name is changed.
+         * @param elementId id of the element
+         */
+        FormUtils.prototype.updateConnectionsAfterDefinitionElementNameChange = function (elementId) {
+            var self = this;
+
+            var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
+            var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
+
+            _.forEach(outConnections, function (connection) {
+                self.jsPlumbInstance.deleteConnection(connection);
+            });
+            _.forEach(inConnections, function (connection) {
+                self.jsPlumbInstance.deleteConnection(connection);
+            });
+
+            _.forEach(inConnections, function(inConnection){
+                self.jsPlumbInstance.connect({
+                    source: inConnection.sourceId,
+                    target: inConnection.targetId
+                });
+            });
+
+            _.forEach(outConnections, function(outConnection){
+                self.jsPlumbInstance.connect({
+                    source: outConnection.sourceId,
+                    target: outConnection.targetId
+                });
+            });
         };
 
         return FormUtils;

@@ -301,6 +301,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     return;
                 }
 
+                var config = editor.getValue();
                 var streamName;
                 var firstCharacterInStreamName;
                 var isStreamNameUsed;
@@ -311,28 +312,28 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var isStreamSavedInsideAPartition
                     = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
                 if (isStreamSavedInsideAPartition === undefined) {
-                    firstCharacterInStreamName = (editor.getValue().name).charAt(0);
+                    firstCharacterInStreamName = (config.name).charAt(0);
                     if (firstCharacterInStreamName === '#') {
                         DesignViewUtils.prototype.errorAlert("'#' is used to define inner streams only.");
                         return;
                     } else {
-                        streamName = editor.getValue().name;
+                        streamName = config.name;
                     }
                     isStreamNameUsed
-                        = self.formUtils.isDefinitionElementNameUsed(streamName, clickedElement.getId());
+                        = self.formUtils.isDefinitionElementNameUsed(streamName, id);
                     if (isStreamNameUsed) {
                         DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" is already defined.");
                         return;
                     }
                 } else {
-                    firstCharacterInStreamName = (editor.getValue().name).charAt(0);
+                    firstCharacterInStreamName = (config.name).charAt(0);
                     if (firstCharacterInStreamName !== '#') {
-                        streamName = '#' + editor.getValue().name;
+                        streamName = '#' + config.name;
                     } else {
-                        streamName = editor.getValue().name;
+                        streamName = config.name;
                     }
                     isStreamNameUsed = self.formUtils
-                        .isStreamDefinitionNameInPartitionUsed(streamName, clickedElement.getId());
+                        .isStreamDefinitionNameInPartitionUsed(streamName, id);
                     if (isStreamNameUsed) {
                         DesignViewUtils.prototype
                             .errorAlert("Stream name \"" + streamName + "\" is already defined in the partition.");
@@ -340,14 +341,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     }
                 }
 
-
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
-                var config = editor.getValue();
-
-                // update selected stream model
-                clickedElement.setName(streamName);
+                var previouslySavedName = clickedElement.getName();
+                // update connection related to the element if the name is changed
+                if (previouslySavedName !== streamName) {
+                    // update selected stream model
+                    clickedElement.setName(streamName);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
                 // removing all elements from attribute list
                 clickedElement.clearAttributeList();
                 // adding new attributes to the attribute list

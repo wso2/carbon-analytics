@@ -483,8 +483,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         clickedElement.addAnnotation(annotation.annotation);
                     });
 
-                    // update selected aggregation model
-                    clickedElement.setName(configInput.name);
+                    var previouslySavedName = clickedElement.getName();
+                    // update connection related to the element if the name is changed
+                    if (previouslySavedName !== configInput.name) {
+                        // update selected aggregation model
+                        clickedElement.setName(configInput.name);
+                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                    }
+
                     clickedElement.setFrom(configInput.from);
 
                     // add the store annotation for aggregation
