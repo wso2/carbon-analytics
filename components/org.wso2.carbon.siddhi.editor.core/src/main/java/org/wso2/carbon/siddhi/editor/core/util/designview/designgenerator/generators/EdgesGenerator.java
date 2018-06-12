@@ -129,7 +129,7 @@ public class EdgesGenerator {
             if (query.getPartitionId() != null && query.getConnectorsAndStreams() != null &&
                     query.getConnectorsAndStreams().values().contains(
                         ((WindowFilterProjectionConfig) (query.getQueryInput())).getFrom())) {
-                    // Query Connects through a PartitionConnector
+                    // Query connects through a PartitionConnector
                     // Edge from Outer Element to PartitionConnector
                     edges.add(
                             generateEdgeToPartitionConnector(
@@ -169,6 +169,7 @@ public class EdgesGenerator {
             String leftInputStreamName = (((JoinConfig) (query.getQueryInput())).getLeft().getFrom());
             if (query.getPartitionId() != null && query.getConnectorsAndStreams() != null &&
                     query.getConnectorsAndStreams().values().contains(leftInputStreamName)) {
+                // Query connects through a PartitionConnector
                 // Edge from Outer Element to PartitionConnector
                 edges.add(
                         generateEdgeToPartitionConnector(
@@ -180,15 +181,17 @@ public class EdgesGenerator {
                                 query.getConnectorIdByStreamName(leftInputStreamName),
                                 query));
             } else {
+                // Query doesn't connect through a PartitionConnector
                 edges.add(
                         generateEdge(
-                                getElementWithStreamName(((JoinConfig) (query.getQueryInput())).getLeft().getFrom()),
+                                getElementWithStreamName(leftInputStreamName),
                                 query));
             }
             // Edge towards Query (From Right)
             String rightInputStream = (((JoinConfig) (query.getQueryInput())).getRight().getFrom());
             if (query.getPartitionId() != null && query.getConnectorsAndStreams() != null &&
                     query.getConnectorsAndStreams().values().contains(rightInputStream)) {
+                // Query connects through a PartitionConnector
                 // Edge from Outer Element to PartitionConnector
                 edges.add(
                         generateEdgeToPartitionConnector(
@@ -200,9 +203,10 @@ public class EdgesGenerator {
                                 query.getConnectorIdByStreamName(rightInputStream),
                                 query));
             } else {
+                // Query doesn't connect through a PartitionConnector
                 edges.add(
                         generateEdge(
-                                getElementWithStreamName(((JoinConfig) (query.getQueryInput())).getRight().getFrom()),
+                                getElementWithStreamName(rightInputStream),
                                 query));
             }
             // Edge from Query
