@@ -128,7 +128,7 @@ export default class Login extends Component {
 
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
-                <div>
+                <div className={'login-container'}>
                     <Header title={window.contextPath.substr(1)} hideUserSettings/>
                     <FormPanel title={"Login"}
                                onSubmit={this.authenticate}>

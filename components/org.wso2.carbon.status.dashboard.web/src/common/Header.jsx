@@ -30,6 +30,8 @@ const title = {color: '#EEE', fontSize: 16, height: 40, lineHeight: '40px'};
 const appBar = {backgroundColor: '#1a1a1a', height:40, display:'flex', alignItems:'center'};
 const logoStyle = {margin: '0 15px 0 0', height: 17};
 const accName = {display: 'flex', alignItems: 'center', color: '#EEE', textTransform: 'capitalize'};
+const btnStyle = {width: 'initial', height: 40, padding: '0 0 0 10px'};
+
 /**
  * Header component.
  */
@@ -59,7 +61,7 @@ export default class Header extends Component {
             <div style={accName}>
                 <span>{user.username}</span>
                 <IconMenu
-                    iconButtonElement={<IconButton><AccountCircle/></IconButton>}
+                    iconButtonElement={<IconButton style={btnStyle}><AccountCircle/></IconButton>}
                     targetOrigin={{horizontal: 'right', vertical: 'bottom'}}
                     anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                 >

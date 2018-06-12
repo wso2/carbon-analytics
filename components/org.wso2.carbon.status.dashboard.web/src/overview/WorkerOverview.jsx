@@ -49,7 +49,7 @@ const styles = {
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
     divider: {backgroundColor: '#9E9E9E', width: '90%'},
-    navBtn: {color: '#fff', padding: '0 16px 0 12px', verticalAlign: 'middle'},
+    navBtn: {color: '#BDBDBD', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize', fill: '#BDBDBD'},
     alignCenter: {display: 'flex', alignItems: 'center'},
     addBtn: {
         backgroundColor: '#f17b31',
@@ -337,7 +337,7 @@ export default class WorkerOverview extends React.Component {
 
                 });
             }, parseInt(this.state.pInterval * 1000));
-            this.setState({interval: interval, enableAutoSync: true, btnType: <Sync color='red'/>});
+            this.setState({interval: interval, enableAutoSync: true, btnType: <Sync color='#f17b31'/>});
             window.localStorage.setItem("enableAutoSync", true);
             window.localStorage.setItem("pInterval", this.state.pInterval)
         } else {
@@ -405,18 +405,17 @@ export default class WorkerOverview extends React.Component {
                 (WorkerOverview.hasNodes(this.state.managerClusterList)))) {
             return (
 
-                <div style={styles.background}>
-                    <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
+                <div>
+                    <div style={{height: 20, padding: 20}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{margin: '-36px', marginTop: '-2%', marginRight: '16%'}}>
+                        <div className="toggle">
                             <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
                                 {this.state.btnType}
-                                <h3 style={{
-                                    color: '#dedede',
-                                    backgroundColor: '#222222',
-                                }}><b>Auto-Sync</b></h3>
+                                <Typography style={{
+                                    color: '#E0E0E0'
+                                }}>Auto-Sync</Typography>
                             </Button>
 
                         </div>
@@ -519,17 +518,16 @@ export default class WorkerOverview extends React.Component {
             (!WorkerOverview.hasNodes(this.state.managerClusterList))) {
             return (
                 <div style={styles.background}>
-                    <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
+                    <div style={{height: 20, padding: 20}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{margin: '-36px', marginTop: '-2%', marginRight: '16%'}}>
+                        <div className="toggle">
                             <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
                                 {this.state.btnType}
-                                <h3 style={{
-                                    color: '#dedede',
-                                    backgroundColor: '#222222',
-                                }}><b>Auto-Sync</b></h3>
+                                <Typography style={{
+                                    color: '#E0E0E0'
+                                }}>Auto-Sync</Typography>
                             </Button>
                         </div>
                     </div>
@@ -582,17 +580,16 @@ export default class WorkerOverview extends React.Component {
             (!WorkerOverview.hasNodes(this.state.clustersList))) {
             return (
                 <div style={styles.background}>
-                    <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
+                    <div style={{height: 20, padding: 20}}>
                         {this.renderAddWorkerFlotting()}
-                        <div className="toggle" style={{margin: '-36px', marginTop: '-2%', marginRight: '16%'}}>
+                        <div className="toggle">
                             <Button style={styles.navBtn} onClick={() => {
                                 this.autoSync();
                             }}>
                                 {this.state.btnType}
-                                <h3 style={{
-                                    color: '#dedede',
-                                    backgroundColor: '#222222',
-                                }}><b>Auto-Sync</b></h3>
+                                <Typography style={{
+                                    color: '#E0E0E0'
+                                }}>Auto-Sync</Typography>
                             </Button>
                         </div>
                     </div>
@@ -665,27 +662,31 @@ export default class WorkerOverview extends React.Component {
         }
         if (!this.state.sessionInvalid) {
             return (
-                <div style={styles.background}>
+                <div>
                     <Header/>
                     <div className="navigation-bar">
                         <Button style={styles.navBtn}>
-                            <HomeButton style={{paddingRight: 8, color: '#000'}}/>Overview</Button>
+                            <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                            Overview
+                        </Button>
                     </div>
                     <Typography variant="display2" className={'node-title'} style={{
-                        marginTop: '2%',
+                        marginTop: '20px',
                         color: '#dedede',
-                        marginLeft: '4%',
+                        marginLeft: '24px',
                         backgroundColor: '#222222',
-                        fontSize: '1.8rem'
+                        fontSize: '1.6rem'
                     }}>
-                        Node Overview</Typography>
-                    <div style={{marginTop: '-23px', marginRight: '6%'}}>
-                        <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right'}}
-                              to={window.contextPath}> &nbsp;&nbsp; NODE VIEW</Link>
+                        Node Overview
+                    </Typography>
+                    <div style={{marginTop: '-23px', marginRight: '24px'}}>
+                        <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right', paddingLeft: 10}}
+                              to={window.contextPath}>Node View</Link>
+                        <Typography style={{float: 'right', color: '#757575'}}>|</Typography>
 
-                        <Link style={{textDecoration: 'none', color: '#dedede', float: 'right'}}
+                        <Link style={{textDecoration: 'none', color: '#dedede', float: 'right', paddingRight: 10}}
                               to={window.contextPath + "/siddhi-apps"}>
-                            APP VIEW &nbsp;&nbsp;| </Link>
+                            App View</Link>
 
                     </div>
                     {this.renderWorkers(this.state.clustersList, this.state.managerClusterList)}

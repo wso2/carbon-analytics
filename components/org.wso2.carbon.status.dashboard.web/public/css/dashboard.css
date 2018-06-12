@@ -71,9 +71,7 @@ body {
 
 .toggle {
     float: right;
-    width: 10%;
-    margin-left: 3%;
-    margin-top: -1%;
+    margin: -30px 180px 0 0;
 }
 
 .active-apps {
@@ -455,7 +453,7 @@ p.node-last-update {
 .sink-image {
     background: url("../icons/sink.svg");
 }
-h1 {
+.login-container h1 {
     color: #eee !important;
     font-weight: 400;
 }
