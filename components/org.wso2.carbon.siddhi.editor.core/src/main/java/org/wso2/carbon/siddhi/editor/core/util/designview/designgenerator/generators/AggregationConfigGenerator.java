@@ -19,8 +19,11 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregateByTimePeriod;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.AggregateByTimePeriod;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeInterval;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeRange;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregationByTimeRangeValue;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.aggregation.TimePeriod;
@@ -71,8 +74,7 @@ public class AggregationConfigGenerator {
                 generateAggregateByAttribute(aggregationDefinition.getAggregateAttribute()));
 
         // 'aggregateByTime'
-        aggregationConfig.setAggregateByTime(
-                generateAggregateByTime(aggregationDefinition.getTimePeriod().getDurations()));
+        aggregationConfig.setAggregateByTime(generateAggregateByTime(aggregationDefinition.getTimePeriod()));
 
         // 'store' and annotations
         StoreConfigGenerator storeConfigGenerator = new StoreConfigGenerator();
@@ -107,14 +109,43 @@ public class AggregationConfigGenerator {
     }
 
     /**
-     * Generates AggregateByTimePeriod with the given Siddhi TimePeriod.Duration
-     * @param aggregationTimePeriodDurations        Siddhi TimePeriod.Duration
-     * @return                                      AggregateByTimePeriod object
+     * Generates AggregateByTimePeriod object with the given Siddhi TimePeriod
+     * @param timePeriod                        Siddhi TimePeriod object
+     * @return                                  AggregateByTimePeriod object
+     * @throws DesignGenerationException        Unknown type of TimePeriod operator
      */
-    private AggregateByTimePeriod generateAggregateByTime(List<TimePeriod.Duration> aggregationTimePeriodDurations) {
-        return new AggregateByTimePeriod(
-                (aggregationTimePeriodDurations.get(0)).name(),
-                (aggregationTimePeriodDurations.get(aggregationTimePeriodDurations.size() - 1)).name());
+    private AggregateByTimePeriod generateAggregateByTime(TimePeriod timePeriod) throws DesignGenerationException {
+        if (("INTERVAL").equalsIgnoreCase(timePeriod.getOperator().toString())) {
+            return generateAggregateByTimeInterval(timePeriod.getDurations());
+        } else if (("RANGE").equalsIgnoreCase(timePeriod.getOperator().toString())) {
+            return generateAggregateByTimeRange(timePeriod.getDurations());
+        }
+        throw new DesignGenerationException("Unable to generate AggregateByTime for TimePeriod of type unknown");
+    }
+
+    /**
+     * Generates AggregateByTimeInterval object with the given list of Siddhi TimePeriod.Durations
+     * @param durations         List of Siddhi TimePeriod.Durations
+     * @return                  AggregateByTimeInterval object
+     */
+    private AggregateByTimeInterval generateAggregateByTimeInterval(List<TimePeriod.Duration> durations) {
+        List<String> intervals = new ArrayList<>();
+        for (TimePeriod.Duration duration : durations) {
+            intervals.add(duration.name());
+        }
+        return new AggregateByTimeInterval(intervals);
+    }
+
+    /**
+     * Generates AggregateByTimeRange object with the given list of Siddhi TimePeriod.Durations
+     * @param durations         List of Siddhi TimePeriod.Durations
+     * @return                  AggregateByTimeRange object
+     */
+    private AggregateByTimeRange generateAggregateByTimeRange(List<TimePeriod.Duration> durations) {
+        return new AggregateByTimeRange(
+                new AggregationByTimeRangeValue(
+                        (durations.get(0)).name(),
+                        (durations.get(durations.size() - 1)).name()));
     }
 
     /**
