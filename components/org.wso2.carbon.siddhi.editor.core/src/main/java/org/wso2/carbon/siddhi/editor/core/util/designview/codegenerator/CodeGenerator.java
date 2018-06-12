@@ -53,21 +53,17 @@ public class CodeGenerator {
      */
     public String generateSiddhiAppCode(EventFlow eventFlow) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
-        StringBuilder siddhiAppStringBuilder = new StringBuilder();
-        siddhiAppStringBuilder
-                .append(generateAppName(siddhiApp.getSiddhiAppName()))
-                .append(CodeGeneratorHelper.getAnnotations(siddhiApp.getAppAnnotationList()))
-                .append(generateStreams(siddhiApp.getStreamList(), siddhiApp.getSourceList(), siddhiApp.getSinkList()))
-                .append(generateTables(siddhiApp.getTableList()))
-                .append(generateWindows(siddhiApp.getWindowList()))
-                .append(generateTriggers(siddhiApp.getTriggerList(), siddhiApp.getSourceList(),
-                        siddhiApp.getSinkList()))
-                .append(generateAggregations(siddhiApp.getAggregationList()))
-                .append(generateFunctions(siddhiApp.getFunctionList()))
-                .append(generateQueries(siddhiApp.getQueryLists()))
-                .append(generatePartitions(siddhiApp.getPartitionList()));
-
-        return siddhiAppStringBuilder.toString();
+        return generateAppName(siddhiApp.getSiddhiAppName()) +
+                CodeGeneratorHelper.getAnnotations(siddhiApp.getAppAnnotationList()) +
+                generateStreams(siddhiApp.getStreamList(), siddhiApp.getSourceList(), siddhiApp.getSinkList()) +
+                generateTables(siddhiApp.getTableList()) +
+                generateWindows(siddhiApp.getWindowList()) +
+                generateTriggers(siddhiApp.getTriggerList(), siddhiApp.getSourceList(),
+                        siddhiApp.getSinkList()) +
+                generateAggregations(siddhiApp.getAggregationList()) +
+                generateFunctions(siddhiApp.getFunctionList()) +
+                generateQueries(siddhiApp.getQueryLists()) +
+                generatePartitions(siddhiApp.getPartitionList());
     }
 
     /**
@@ -88,8 +84,6 @@ public class CodeGenerator {
             appNameStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_NAME_ANNOTATION);
         }
 
-        appNameStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
-
         return appNameStringBuilder.toString();
     }
 
@@ -109,34 +103,33 @@ public class CodeGenerator {
         }
 
         StringBuilder streamListStringBuilder = new StringBuilder();
-        streamListStringBuilder.append(SiddhiStringBuilderConstants.STREAMS_COMMENT)
+        streamListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+                .append(SiddhiStringBuilderConstants.NEW_LINE)
+                .append(SiddhiStringBuilderConstants.STREAMS_COMMENT)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (StreamConfig stream : streamList) {
-            if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
+            if (stream == null) {
+                throw new CodeGenerationException("A given stream element is empty");
+            } else if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
                 continue;
-            }
-
-            if (stream.getName() == null || stream.getName().isEmpty()) {
-                throw new CodeGenerationException("The name of the given StreamConfig object is null/empty");
+            } else if (stream.getName() == null || stream.getName().isEmpty()) {
+                throw new CodeGenerationException("The name of a given stream element is empty");
             }
 
             for (SourceSinkConfig source : sourceList) {
                 if (stream.getName().equals(source.getConnectedElementName())) {
-                    streamListStringBuilder.append(generateSourceSinkString(source))
-                            .append(SiddhiStringBuilderConstants.NEW_LINE);
+                    streamListStringBuilder.append(generateSourceSinkString(source));
                 }
             }
 
             for (SourceSinkConfig sink : sinkList) {
                 if (stream.getName().equals(sink.getConnectedElementName())) {
-                    streamListStringBuilder.append(generateSourceSinkString(sink))
-                            .append(SiddhiStringBuilderConstants.NEW_LINE);
+                    streamListStringBuilder.append(generateSourceSinkString(sink));
                 }
             }
 
-            streamListStringBuilder.append(generateStreamString(stream))
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+            streamListStringBuilder.append(generateStreamString(stream));
         }
 
         streamListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -161,8 +154,7 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (TableConfig table : tableList) {
-            tableListStringBuilder.append(generateTableString(table))
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+            tableListStringBuilder.append(generateTableString(table));
         }
 
         tableListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -187,8 +179,7 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (WindowConfig window : windowList) {
-            windowListStringBuilder.append(generateWindowString(window))
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+            windowListStringBuilder.append(generateWindowString(window));
         }
 
         windowListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -215,26 +206,25 @@ public class CodeGenerator {
         triggerListStringBuilder.append(SiddhiStringBuilderConstants.TRIGGERS_COMMENT)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
         for (TriggerConfig trigger : triggerList) {
-            if (trigger.getName() == null || trigger.getName().isEmpty()) {
-                throw new CodeGenerationException("The name of the given TriggerConfig object is null/empty");
+            if (trigger == null) {
+                throw new CodeGenerationException("A given trigger element is empty");
+            } else if (trigger.getName() == null || trigger.getName().isEmpty()) {
+                throw new CodeGenerationException("The name of a given trigger element is empty");
             }
 
             for (SourceSinkConfig source : sourceList) {
                 if (trigger.getName().equals(source.getConnectedElementName())) {
-                    triggerListStringBuilder.append(generateSourceSinkString(source))
-                            .append(SiddhiStringBuilderConstants.NEW_LINE);
+                    triggerListStringBuilder.append(generateSourceSinkString(source));
                 }
             }
 
             for (SourceSinkConfig sink : sinkList) {
                 if (trigger.getName().equals(sink.getConnectedElementName())) {
-                    triggerListStringBuilder.append(generateSourceSinkString(sink))
-                            .append(SiddhiStringBuilderConstants.NEW_LINE);
+                    triggerListStringBuilder.append(generateSourceSinkString(sink));
                 }
             }
 
-            triggerListStringBuilder.append(generateTriggerString(trigger))
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+            triggerListStringBuilder.append(generateTriggerString(trigger));
         }
 
         triggerListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -259,8 +249,7 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (AggregationConfig aggregation : aggregationList) {
-            aggregationListStringBuilder.append(generateAggregationString(aggregation))
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+            aggregationListStringBuilder.append(generateAggregationString(aggregation));
         }
 
         aggregationListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -285,8 +274,7 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
 
         for (FunctionConfig function : functionList) {
-            functionListStringBuilder.append(generateFunctionString(function))
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+            functionListStringBuilder.append(generateFunctionString(function));
         }
 
         functionListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
@@ -318,14 +306,9 @@ public class CodeGenerator {
                             .append(SiddhiStringBuilderConstants.NEW_LINE);
                 }
 
-                int queriesLeft = queryList.size();
                 for (QueryConfig query : queryList) {
-                    queryListStringBuilder.append(generateQueryString(query));
-                    if (queriesLeft != 1) {
-                        queryListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
-                                .append(SiddhiStringBuilderConstants.NEW_LINE);
-                    }
-                    queriesLeft--;
+                    queryListStringBuilder.append(generateQueryString(query))
+                            .append(SiddhiStringBuilderConstants.NEW_LINE);
                 }
             }
         }
@@ -369,23 +352,20 @@ public class CodeGenerator {
      */
     private String generateStreamString(StreamConfig stream) throws CodeGenerationException {
         if (stream == null) {
-            throw new CodeGenerationException("The given StreamConfig object is null");
+            throw new CodeGenerationException("A given stream element is empty");
         } else if (stream.getName() == null || stream.getName().isEmpty()) {
-            throw new CodeGenerationException("The stream name for the given StreamConfig object is null/empty");
+            throw new CodeGenerationException("The name of a given stream element is empty");
         }
 
-        StringBuilder streamStringBuilder = new StringBuilder();
-        streamStringBuilder.append(CodeGeneratorHelper.getAnnotations(stream.getAnnotationList()))
-                .append(SiddhiStringBuilderConstants.DEFINE_STREAM)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(stream.getName())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.OPEN_BRACKET)
-                .append(CodeGeneratorHelper.getAttributes(stream.getAttributeList()))
-                .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiStringBuilderConstants.SEMI_COLON);
-
-        return streamStringBuilder.toString();
+        return CodeGeneratorHelper.getAnnotations(stream.getAnnotationList()) +
+                SiddhiStringBuilderConstants.DEFINE_STREAM +
+                SiddhiStringBuilderConstants.SPACE +
+                stream.getName() +
+                SiddhiStringBuilderConstants.SPACE +
+                SiddhiStringBuilderConstants.OPEN_BRACKET +
+                CodeGeneratorHelper.getAttributes(stream.getAttributeList()) +
+                SiddhiStringBuilderConstants.CLOSE_BRACKET +
+                SiddhiStringBuilderConstants.SEMI_COLON;
     }
 
     /**
@@ -397,24 +377,21 @@ public class CodeGenerator {
      */
     private String generateTableString(TableConfig table) throws CodeGenerationException {
         if (table == null) {
-            throw new CodeGenerationException("The given TableConfig object is null");
+            throw new CodeGenerationException("A given table element is empty");
         } else if (table.getName() == null || table.getName().isEmpty()) {
-            throw new CodeGenerationException("The table name for the given TableConfig object is null/empty");
+            throw new CodeGenerationException("The name of a given table element is empty");
         }
 
-        StringBuilder tableStringBuilder = new StringBuilder();
-        tableStringBuilder.append(CodeGeneratorHelper.getStore(table.getStore()))
-                .append(CodeGeneratorHelper.getAnnotations(table.getAnnotationList()))
-                .append(SiddhiStringBuilderConstants.DEFINE_TABLE)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(table.getName())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.OPEN_BRACKET)
-                .append(CodeGeneratorHelper.getAttributes(table.getAttributeList()))
-                .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiStringBuilderConstants.SEMI_COLON);
-
-        return tableStringBuilder.toString();
+        return CodeGeneratorHelper.getStore(table.getStore()) +
+                CodeGeneratorHelper.getAnnotations(table.getAnnotationList()) +
+                SiddhiStringBuilderConstants.DEFINE_TABLE +
+                SiddhiStringBuilderConstants.SPACE +
+                table.getName() +
+                SiddhiStringBuilderConstants.SPACE +
+                SiddhiStringBuilderConstants.OPEN_BRACKET +
+                CodeGeneratorHelper.getAttributes(table.getAttributeList()) +
+                SiddhiStringBuilderConstants.CLOSE_BRACKET +
+                SiddhiStringBuilderConstants.SEMI_COLON;
     }
 
     /**
@@ -426,11 +403,11 @@ public class CodeGenerator {
      */
     private String generateWindowString(WindowConfig window) throws CodeGenerationException {
         if (window == null) {
-            throw new CodeGenerationException("The given WindowConfig object is null");
+            throw new CodeGenerationException("A given window element is empty");
         } else if (window.getName() == null || window.getName().isEmpty()) {
-            throw new CodeGenerationException("The window name for the given WindowConfig object is null/empty");
+            throw new CodeGenerationException("The name of a given window element is empty");
         } else if (window.getFunction() == null || window.getFunction().isEmpty()) {
-            throw new CodeGenerationException("The function name for the given WindowConfig object is null/empty");
+            throw new CodeGenerationException("The function name of the window " + window.getName() + " is empty");
         }
 
         StringBuilder windowStringBuilder = new StringBuilder();
@@ -463,7 +440,7 @@ public class CodeGenerator {
                     windowStringBuilder.append(SiddhiStringBuilderConstants.ALL_EVENTS);
                     break;
                 default:
-                    throw new CodeGenerationException("Unidentified output event type for the WindowConfig object: "
+                    throw new CodeGenerationException("Unidentified window output event type: "
                             + window.getOutputEventType());
             }
         }
@@ -481,25 +458,22 @@ public class CodeGenerator {
      */
     private String generateTriggerString(TriggerConfig trigger) throws CodeGenerationException {
         if (trigger == null) {
-            throw new CodeGenerationException("The given TriggerConfig object is null");
+            throw new CodeGenerationException("A given trigger element is empty");
         } else if (trigger.getName() == null || trigger.getName().isEmpty()) {
-            throw new CodeGenerationException("The trigger name for the given TriggerConfig object is null/empty");
+            throw new CodeGenerationException("The name of a given trigger element is empty");
         } else if (trigger.getAt() == null || trigger.getAt().isEmpty()) {
-            throw new CodeGenerationException("The 'at' value for the given TriggerConfig object is null/empty");
+            throw new CodeGenerationException("The 'at' value of " + trigger.getName() + " is empty");
         }
 
-        StringBuilder triggerStringBuilder = new StringBuilder();
-        triggerStringBuilder.append(CodeGeneratorHelper.getAnnotations(trigger.getAnnotationList()))
-                .append(SiddhiStringBuilderConstants.DEFINE_TRIGGER)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(trigger.getName())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.AT)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(trigger.getAt())
-                .append(SiddhiStringBuilderConstants.SEMI_COLON);
-
-        return triggerStringBuilder.toString();
+        return CodeGeneratorHelper.getAnnotations(trigger.getAnnotationList()) +
+                SiddhiStringBuilderConstants.DEFINE_TRIGGER +
+                SiddhiStringBuilderConstants.SPACE +
+                trigger.getName() +
+                SiddhiStringBuilderConstants.SPACE +
+                SiddhiStringBuilderConstants.AT +
+                SiddhiStringBuilderConstants.SPACE +
+                trigger.getAt() +
+                SiddhiStringBuilderConstants.SEMI_COLON;
     }
 
     /**
@@ -511,19 +485,18 @@ public class CodeGenerator {
      */
     private String generateAggregationString(AggregationConfig aggregation) throws CodeGenerationException {
         if (aggregation == null) {
-            throw new CodeGenerationException("The given AggregationConfig object is null");
+            throw new CodeGenerationException("A given aggregation element is empty");
         } else if (aggregation.getName() == null || aggregation.getName().isEmpty()) {
-            throw new CodeGenerationException("The aggregation name for the given AggregationConfig" +
-                    " object is null/empty");
+            throw new CodeGenerationException("The name of a given aggregation element is empty");
         } else if (aggregation.getFrom() == null || aggregation.getFrom().isEmpty()) {
-            throw new CodeGenerationException("The 'from' value for the given AggregationConfig is null/empty");
+            throw new CodeGenerationException("The 'from' value of " + aggregation.getName() + " is empty");
         } else if (aggregation.getAggregateByTimePeriod() == null) {
-            throw new CodeGenerationException("The AggregateByTimePeriod value for the given" +
-                    " AggregationConfig is null");
-        } else if (aggregation.getAggregateByTimePeriod().getMinValue() == null ||
-                aggregation.getAggregateByTimePeriod().getMinValue().isEmpty()) {
-            throw new CodeGenerationException("The 'aggregateByTimePeriod' of the given AggregationConfig object" +
-                    " must at least have a minimum value");
+            throw new CodeGenerationException("The 'aggregateByTimePeriod' value of " + aggregation.getName()
+                    + " is empty");
+        } else if (aggregation.getAggregateByTimePeriod().getType() == null
+                || aggregation.getAggregateByTimePeriod().getType().isEmpty()) {
+            throw new CodeGenerationException("The aggregateByTimePeriod 'type' value of "
+                    + aggregation.getName() + " is empty");
         }
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
@@ -532,18 +505,15 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.DEFINE_AGGREGATION)
                 .append(SiddhiStringBuilderConstants.SPACE)
                 .append(aggregation.getName())
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.TAB_SPACE)
+                .append(SiddhiStringBuilderConstants.SPACE)
                 .append(SiddhiStringBuilderConstants.FROM)
                 .append(SiddhiStringBuilderConstants.SPACE)
                 .append(aggregation.getFrom())
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.TAB_SPACE)
+                .append(SiddhiStringBuilderConstants.SPACE)
                 .append(CodeGeneratorHelper.getQuerySelect(aggregation.getSelect()))
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.TAB_SPACE)
+                .append(SiddhiStringBuilderConstants.SPACE)
                 .append(CodeGeneratorHelper.getQueryGroupBy(aggregation.getGroupBy()))
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
+                .append(SiddhiStringBuilderConstants.SPACE)
                 .append(SiddhiStringBuilderConstants.AGGREGATE);
 
         if (aggregation.getAggregateByAttribute() != null && !aggregation.getAggregateByAttribute().isEmpty()) {
@@ -556,17 +526,8 @@ public class CodeGenerator {
         aggregationStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                 .append(SiddhiStringBuilderConstants.EVERY)
                 .append(SiddhiStringBuilderConstants.SPACE)
-                .append(aggregation.getAggregateByTimePeriod().getMinValue().toLowerCase());
-
-        if (aggregation.getAggregateByTimePeriod().getMaxValue() != null &&
-                !aggregation.getAggregateByTimePeriod().getMaxValue().isEmpty() &&
-                !aggregation.getAggregateByTimePeriod().getMaxValue()
-                        .equalsIgnoreCase(aggregation.getAggregateByTimePeriod().getMinValue())) {
-            aggregationStringBuilder.append(SiddhiStringBuilderConstants.THREE_DOTS)
-                    .append(aggregation.getAggregateByTimePeriod().getMaxValue().toLowerCase());
-        }
-
-        aggregationStringBuilder.append(SiddhiStringBuilderConstants.SEMI_COLON);
+                .append(CodeGeneratorHelper.getAggregateByTimePeriod(aggregation.getAggregateByTimePeriod()))
+                .append(SiddhiStringBuilderConstants.SEMI_COLON);
 
         return aggregationStringBuilder.toString();
     }
@@ -580,38 +541,32 @@ public class CodeGenerator {
      */
     private String generateFunctionString(FunctionConfig function) throws CodeGenerationException {
         if (function == null) {
-            throw new CodeGenerationException("The given FunctionConfig object is null");
+            throw new CodeGenerationException("A given function element is empty");
         } else if (function.getName() == null || function.getName().isEmpty()) {
-            throw new CodeGenerationException("The function name for the given FunctionConfig object is null/empty");
+            throw new CodeGenerationException("The name of a given function element is empty");
         } else if (function.getScriptType() == null || function.getScriptType().isEmpty()) {
-            throw new CodeGenerationException("The script type for the given FunctionConfig object is null/empty");
+            throw new CodeGenerationException("The 'script type' of " + function.getName() + " is empty");
         } else if (function.getReturnType() == null || function.getReturnType().isEmpty()) {
-            throw new CodeGenerationException("The return type for the given FunctionConfig is null/empty");
+            throw new CodeGenerationException("The return type of " + function.getName() + " is empty");
         } else if (function.getBody() == null || function.getBody().isEmpty()) {
-            throw new CodeGenerationException("The body for the given FunctionConfig is null/empty");
+            throw new CodeGenerationException("The 'body' value of " + function.getName() + " is empty");
         }
 
-        StringBuilder functionStringBuilder = new StringBuilder();
-        functionStringBuilder.append(SiddhiStringBuilderConstants.DEFINE_FUNCTION)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(function.getName())
-                .append(SiddhiStringBuilderConstants.OPEN_SQUARE_BRACKET)
-                .append(function.getScriptType())
-                .append(SiddhiStringBuilderConstants.CLOSE_SQUARE_BRACKET)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.RETURN)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(function.getReturnType().toLowerCase())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.OPEN_CURLY_BRACKET)
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.TAB_SPACE)
-                .append(function.getBody().trim())
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.CLOSE_CURLY_BRACKET)
-                .append(SiddhiStringBuilderConstants.SEMI_COLON);
-
-        return functionStringBuilder.toString();
+        return SiddhiStringBuilderConstants.DEFINE_FUNCTION +
+                SiddhiStringBuilderConstants.SPACE +
+                function.getName() +
+                SiddhiStringBuilderConstants.OPEN_SQUARE_BRACKET +
+                function.getScriptType() +
+                SiddhiStringBuilderConstants.CLOSE_SQUARE_BRACKET +
+                SiddhiStringBuilderConstants.SPACE +
+                SiddhiStringBuilderConstants.RETURN +
+                SiddhiStringBuilderConstants.SPACE +
+                function.getReturnType().toLowerCase() +
+                SiddhiStringBuilderConstants.SPACE +
+                SiddhiStringBuilderConstants.OPEN_CURLY_BRACKET +
+                function.getBody().trim() +
+                SiddhiStringBuilderConstants.CLOSE_CURLY_BRACKET +
+                SiddhiStringBuilderConstants.SEMI_COLON;
     }
 
     /**
@@ -623,37 +578,37 @@ public class CodeGenerator {
      */
     private String generateQueryString(QueryConfig query) throws CodeGenerationException {
         if (query == null) {
-            throw new CodeGenerationException("The given QueryConfig object is null");
+            throw new CodeGenerationException("A given query element is empty");
         }
 
         StringBuilder queryStringBuilder = new StringBuilder();
         queryStringBuilder.append(CodeGeneratorHelper.getAnnotations(query.getAnnotationList()))
                 .append(CodeGeneratorHelper.getQueryInput(query.getQueryInput()))
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
+                .append(SiddhiStringBuilderConstants.SPACE)
                 .append(CodeGeneratorHelper.getQuerySelect(query.getSelect()));
 
         if (query.getGroupBy() != null && !query.getGroupBy().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryGroupBy(query.getGroupBy()));
         }
         if (query.getOrderBy() != null && !query.getOrderBy().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryOrderBy(query.getOrderBy()));
         }
         if (query.getLimit() != 0) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryLimit(query.getLimit()));
         }
         if (query.getHaving() != null && !query.getHaving().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryHaving(query.getHaving()));
         }
         if (query.getOutputRateLimit() != null && !query.getOutputRateLimit().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryOutputRateLimit(query.getOutputRateLimit()));
         }
 
-        queryStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
+        queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                 .append(CodeGeneratorHelper.getQueryOutput(query.getQueryOutput()));
 
         return queryStringBuilder.toString();
@@ -668,12 +623,11 @@ public class CodeGenerator {
      */
     private String generatePartitionString(PartitionConfig partition) throws CodeGenerationException {
         if (partition == null) {
-            throw new CodeGenerationException("The given PartitionConfig object is null");
+            throw new CodeGenerationException("A given partition object is empty");
         } else if (partition.getPartitionWith() == null || partition.getPartitionWith().isEmpty()) {
-            throw new CodeGenerationException("The 'partitionWith' value for the given" +
-                    " PartitionConfig object is null/empty");
+            throw new CodeGenerationException("The 'partitionWith' value of a given partition element is empty");
         } else if (partition.getQueryLists() == null || partition.getQueryLists().isEmpty()) {
-            throw new CodeGenerationException("The query lists of the given partition element is null/empty");
+            throw new CodeGenerationException("The query lists of a given partition element is empty");
         }
 
         StringBuilder partitionStringBuilder = new StringBuilder();
@@ -683,9 +637,9 @@ public class CodeGenerator {
                 .append(SiddhiStringBuilderConstants.OPEN_BRACKET)
                 .append(CodeGeneratorHelper.getPartitionWith(partition.getPartitionWith()))
                 .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
+                .append(SiddhiStringBuilderConstants.SPACE)
                 .append(SiddhiStringBuilderConstants.BEGIN)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
+                .append(SiddhiStringBuilderConstants.SPACE);
 
         List<QueryConfig> queries = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
@@ -693,14 +647,9 @@ public class CodeGenerator {
         }
 
         if (!queries.isEmpty()) {
-            int queriesLeft = queries.size();
             for (QueryConfig query : CodeGeneratorHelper.orderPartitionQueries(queries)) {
                 partitionStringBuilder.append(generateQueryString(query))
                         .append(SiddhiStringBuilderConstants.NEW_LINE);
-                if (queriesLeft != 1) {
-                    partitionStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
-                }
-                queriesLeft--;
             }
         }
 
@@ -720,12 +669,11 @@ public class CodeGenerator {
      */
     private String generateSourceSinkString(SourceSinkConfig sourceSink) throws CodeGenerationException {
         if (sourceSink == null) {
-            throw new CodeGenerationException("The given SourceSinkConfig object is null");
+            throw new CodeGenerationException("A given source/sink element is empty");
         } else if (sourceSink.getAnnotationType() == null || sourceSink.getAnnotationType().isEmpty()) {
-            throw new CodeGenerationException("The annotation type for the given" +
-                    " SourceSinkConfig object is null/empty");
+            throw new CodeGenerationException("The annotation type for a given source/sink element is empty");
         } else if (sourceSink.getType() == null || sourceSink.getType().isEmpty()) {
-            throw new CodeGenerationException("The type of source/sink for the given SourceSinkConfig is null/empty");
+            throw new CodeGenerationException("The type attribute for a given source/sink element is empty");
         }
 
         StringBuilder sourceSinkStringBuilder = new StringBuilder();
@@ -734,8 +682,7 @@ public class CodeGenerator {
         } else if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
             sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.SINK_ANNOTATION);
         } else {
-            throw new CodeGenerationException("Unknown type: " + sourceSink.getType() +
-                    ". The SinkSourceConfig can only have type 'SINK' or type 'SOURCE'");
+            throw new CodeGenerationException("Unidentified source/sink type: " + sourceSink.getType());
         }
 
         sourceSinkStringBuilder.append(sourceSink.getType())
