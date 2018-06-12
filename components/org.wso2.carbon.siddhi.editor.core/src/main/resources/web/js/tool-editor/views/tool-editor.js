@@ -211,15 +211,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     }
                                 });
                             }
-                            /*
-                            * this previous configurationData wil be re-assigned to the design view if the getCode()
-                            * method response is unsuccessful. This done inorder to still have the fields removed by
-                            * removeUnnecessaryFieldsFromJSON() method when sending the json to backend
-                            * */
 
-                            var JSONValue = designView.getConfigurationData();
-                            removeUnnecessaryFieldsFromJSON(JSONValue);
-                            var sendingString = JSON.stringify(JSONValue)
+                            var configurationCopy = _.cloneDeep(designView.getConfigurationData());
+                            removeUnnecessaryFieldsFromJSON(configurationCopy);
+                            var sendingString = JSON.stringify(configurationCopy)
                                 .replace(/'/gm, "\\\'")
                                 .replace(/\\"/gm, "\\\'");
 
