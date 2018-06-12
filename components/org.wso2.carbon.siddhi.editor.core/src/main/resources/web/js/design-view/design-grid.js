@@ -1066,6 +1066,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         return;
                     }
 
+                    var errorMessage = '';
                     var isGroupMemberValid = false;
                     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                         || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
@@ -1087,9 +1088,28 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             if ($(event.el).hasClass(constants.STREAM)) {
                                 var streamObject = self.configurationData.getSiddhiAppConfig().getStream(elementId);
                                 var streamObjectCopy = _.cloneDeep(streamObject);
-                                self.configurationData.getSiddhiAppConfig().removeStream(elementId);
-                                partition.addStream(streamObjectCopy);
 
+                                var streamName = streamObjectCopy.getName() ;
+                                var firstCharacterInStreamName = (streamName).charAt(0);
+                                if (firstCharacterInStreamName !== '#') {
+                                    streamName = '#' + streamName;
+                                }
+                                // check if there is an inner stream with the same name exists. If yes do not add
+                                // the element to the partition
+                                var isStreamNameUsed
+                                    = self.dropElements.formBuilder.formUtils
+                                    .isStreamDefinitionNameInPartitionUsed(partitionId, streamName);
+                                if (!isStreamNameUsed) {
+                                    streamObjectCopy.setName(streamName);
+                                    var textNode = $('#' + elementId).parent().find('.streamNameNode');
+                                    textNode.html(streamName);
+                                    self.configurationData.getSiddhiAppConfig().removeStream(elementId);
+                                    partition.addStream(streamObjectCopy);
+                                } else {
+                                    isGroupMemberValid = false;
+                                    errorMessage = ' An inner stream with the same name is already added to the ' +
+                                        'partition.';
+                                }
                             } else if ($(event.el).hasClass(constants.PROJECTION)) {
                                 var projectionQueryObject = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(elementId);
@@ -1137,7 +1157,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     }
 
                     if (!isGroupMemberValid) {
-                        DesignViewUtils.prototype.warnAlert('This element cannot be added to partition');
+                        DesignViewUtils.prototype.warnAlert('This element cannot be added to partition.' + errorMessage);
                         self.jsPlumbInstance.removeFromGroup(event.group, event.el, false);
                         var elementClientX = $(event.el).attr('data-x');
                         var elementClientY = $(event.el).attr('data-y');

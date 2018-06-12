@@ -29,30 +29,80 @@ define(['require', 'lodash'],
         };
 
         /**
-         * @function check whether given name to the definition element is unique
+         * @function check whether given name to the definition element is used(This will only consider definitions
+         * which creates internal streams in Siddhi for each of them. Function definitions are not considered.)
          * @param elementName given name to the definition element
          * @param skipElementID this element name will be ignored when checking the unique name. This is used when
          *          saving the same name after editing a particular element
          * @return {boolean}
          */
-        FormUtils.prototype.isDefinitionElementNameUnique = function (elementName, skipElementID) {
+        FormUtils.prototype.isDefinitionElementNameUsed = function (elementName, skipElementID) {
             var self = this;
             var isNameUsed = false;
-            var streamList = self.configurationData.getSiddhiAppConfig().streamList;
-            var tableList = self.configurationData.getSiddhiAppConfig().tableList;
-            var windowList = self.configurationData.getSiddhiAppConfig().windowList;
-            var aggregationList = self.configurationData.getSiddhiAppConfig().aggregationList;
-            var triggerList = self.configurationData.getSiddhiAppConfig().triggerList;
+            var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
+            var tableList = self.configurationData.getSiddhiAppConfig().getTableList();
+            var windowList = self.configurationData.getSiddhiAppConfig().getWindowList();
+            var aggregationList = self.configurationData.getSiddhiAppConfig().getAggregationList();
+            var triggerList = self.configurationData.getSiddhiAppConfig().getTriggerList();
 
             var listNames = [streamList, tableList, windowList, aggregationList, triggerList];
             _.forEach(listNames, function (list) {
                 _.forEach(list, function (element) {
-                    if (element.getName().toUpperCase() === elementName.toUpperCase()) {
+                    if (element.getName() === elementName) {
                         if (!(skipElementID !== undefined && skipElementID === element.getId())) {
                             isNameUsed = true;
                         }
                     }
                 });
+            });
+
+            return isNameUsed;
+        };
+
+        /**
+         * @function check whether given name to the function definition element is used.
+         * @param elementName given name to the definition element
+         * @param skipElementID this element name will be ignored when checking the unique name. This is used when
+         *          saving the same name after editing a particular element
+         * @return {boolean}
+         */
+        FormUtils.prototype.isFunctionDefinitionElementNameUsed = function (elementName, skipElementID) {
+            var self = this;
+            var isNameUsed = false;
+            var functionList = self.configurationData.getSiddhiAppConfig().getFunctionList();
+
+            _.forEach(functionList, function (element) {
+                if (element.getName() === elementName) {
+                    if (!(skipElementID !== undefined && skipElementID === element.getId())) {
+                        isNameUsed = true;
+                    }
+                }
+            });
+
+            return isNameUsed;
+        };
+
+        /**
+         * @function check whether given name to the inner stream definition in query element is used in the partition.
+         * @param partitionId id of the partition element
+         * @param elementName given name to the definition element
+         * @param skipElementID this element name will be ignored when checking the unique name. This is used when
+         *          saving the same name after editing a particular element
+         * @return {boolean}
+         */
+        FormUtils.prototype.isStreamDefinitionNameInPartitionUsed = function (partitionId, elementName,
+                                                                                skipElementID) {
+            var self = this;
+            var isNameUsed = false;
+            var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
+            var streamList = partition.getStreamList();
+
+            _.forEach(streamList, function (element) {
+                if (element.getName() === elementName) {
+                    if (!(skipElementID !== undefined && skipElementID === element.getId())) {
+                        isNameUsed = true;
+                    }
+                }
             });
 
             return isNameUsed;

@@ -151,9 +151,9 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 result = {
                     status: "success",
                     responseJSON: {
-                        //appName: match[1],
-                        //appDescription: match[2],
                         "siddhiAppConfig":{
+                            "siddhiAppName":match[1],
+                            "appAnnotationList":[match[2]],
                             "streamList":[],
                             "tableList":[],
                             "windowList":[],
@@ -185,15 +185,10 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                         result = {status: "success", responseJSON: response};
                     },
                     error: function (error) {
-                        if (error.status === 400) {
-                            result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
-                            //TODO: remove warnings from service call
-                        } else if (error.responseText === "pattern queries are not supported") {
-                            result = {status: "fail", errorMessage: error.responseText};
-                        } else if (error.responseText === "sequence queries are not supported") {
+                        if (error.responseText) {
                             result = {status: "fail", errorMessage: error.responseText};
                         } else {
-                            result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                            result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
                         }
                     }
                 });
@@ -215,11 +210,10 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                     result = {status: "success", responseJSON: window.atob(response)};
                 },
                 error: function (error) {
-                    console.log(error);
-                    if (error.status === 400) {
-                        result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                    if (error.responseText) {
+                        result = {status: "fail", errorMessage: error.responseText};
                     } else {
-                        result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                        result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
                     }
                 }
             });

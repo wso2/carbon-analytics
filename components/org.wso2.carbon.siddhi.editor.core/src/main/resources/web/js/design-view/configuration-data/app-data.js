@@ -23,9 +23,14 @@ define(['require', 'elementUtils', 'lodash'],
          * @class AppData
          * @constructor
          * @class AppData  Holds the data for given Siddhi app
+         * @param options options to instantiate the object
          */
-        var AppData = function () {
+        var AppData = function (options) {
             // initiates the collections
+            if (options !== undefined) {
+                this.siddhiAppName = options.siddhiAppName;
+            }
+            this.appAnnotationList = [];
             this.streamList = [];
             this.tableList = [];
             this.windowList = [];
@@ -44,6 +49,10 @@ define(['require', 'elementUtils', 'lodash'],
             // finalElementCount --> Number of elements that exist on the canvas at the time of saving the model
             this.finalElementCount = 0;
 
+        };
+
+        AppData.prototype.addAppAnnotation = function (annotation) {
+            this.appAnnotationList.push(annotation);
         };
 
         AppData.prototype.addStream = function (stream) {
@@ -96,6 +105,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.addSink = function (sink) {
             this.sinkList.push(sink);
+        };
+
+        AppData.prototype.clearAppAnnotationList = function () {
+            ElementUtils.prototype.removeAllElements(this.appAnnotationList);
         };
 
         AppData.prototype.removeStream = function (streamId) {
@@ -177,6 +190,10 @@ define(['require', 'elementUtils', 'lodash'],
             this.finalElementCount = finalElementCount;
         };
 
+        AppData.prototype.getSiddhiAppName = function () {
+            return this.siddhiAppName;
+        };
+
         AppData.prototype.getStream = function (streamId) {
             var returnedElement = ElementUtils.prototype.getElement(this.streamList, streamId);
             if (!returnedElement) {
@@ -251,6 +268,10 @@ define(['require', 'elementUtils', 'lodash'],
             return ElementUtils.prototype.getElement(this.sinkList, sinkId);
         };
 
+        AppData.prototype.getAppAnnotationList = function () {
+            return this.appAnnotationList;
+        };
+
         AppData.prototype.getStreamList = function () {
             return this.streamList;
         };
@@ -305,6 +326,14 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.getFinalElementCount = function () {
             return this.finalElementCount;
+        };
+
+        AppData.prototype.setSiddhiAppName = function (siddhiAppName) {
+            this.siddhiAppName = siddhiAppName;
+        };
+
+        AppData.prototype.setAppAnnotationList = function (appAnnotationList) {
+            this.appAnnotationList = appAnnotationList;
         };
 
         /**
@@ -429,7 +458,7 @@ define(['require', 'elementUtils', 'lodash'],
 
             _.forEach(listNames, function (list) {
                 _.forEach(list, function (element) {
-                    if (element.getName().toUpperCase() === elementName.toUpperCase()) {
+                    if (element.getName() === elementName) {
                         var type = '';
                         if (list === streamList) {
                             type = 'STREAM';
@@ -523,7 +552,7 @@ define(['require', 'elementUtils', 'lodash'],
 
             _.forEach(self.partitionList, function (partition) {
                 _.forEach(partition.getStreamList(), function (stream) {
-                    if (stream.getName().toUpperCase() === streamName.toUpperCase()) {
+                    if (stream.getName() === streamName) {
                         requestedElement = {
                             type: 'STREAM',
                             element: stream

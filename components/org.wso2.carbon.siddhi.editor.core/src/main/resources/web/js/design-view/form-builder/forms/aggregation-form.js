@@ -466,7 +466,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         return;
                     }
                     var isAggregationNameUsed =
-                        self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name, clickedElement.getId());
+                        self.formUtils.isDefinitionElementNameUsed(editorInput.getValue().name, clickedElement.getId());
                     if (isAggregationNameUsed) {
                         DesignViewUtils.prototype
                             .errorAlert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
