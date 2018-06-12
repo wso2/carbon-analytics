@@ -55,7 +55,8 @@ public class CodeGenerator {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
         StringBuilder siddhiAppStringBuilder = new StringBuilder();
         siddhiAppStringBuilder
-                .append(generateAppNameAndDescription(siddhiApp.getAppName(), siddhiApp.getAppDescription()))
+                .append(generateAppName(siddhiApp.getSiddhiAppName()))
+                .append(CodeGeneratorHelper.getAnnotations(siddhiApp.getAppAnnotationList()))
                 .append(generateStreams(siddhiApp.getStreamList(), siddhiApp.getSourceList(), siddhiApp.getSinkList()))
                 .append(generateTables(siddhiApp.getTableList()))
                 .append(generateWindows(siddhiApp.getWindowList()))
@@ -70,40 +71,28 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates a string representation of the siddhi app name and description annotations
+     * Generates a string representation of the siddhi app name annotation
      *
-     * @param appName        The app name
-     * @param appDescription The app description
-     * @return The string representation of the siddhi app name and description annotations
+     * @param appName The app name
+     * @return The string representation of the siddhi app name annotation
      */
-    private String generateAppNameAndDescription(String appName, String appDescription) {
-        StringBuilder appNameAndDescriptionStringBuilder = new StringBuilder();
+    private String generateAppName(String appName) {
+        StringBuilder appNameStringBuilder = new StringBuilder();
 
         if (appName != null && !appName.isEmpty()) {
-            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.APP_NAME_ANNOTATION)
+            appNameStringBuilder.append(SiddhiStringBuilderConstants.APP_NAME_ANNOTATION)
                     .append(appName)
                     .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
                     .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
                     .append(SiddhiStringBuilderConstants.NEW_LINE);
         } else {
-            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_NAME_ANNOTATION)
+            appNameStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_NAME_ANNOTATION)
                     .append(SiddhiStringBuilderConstants.NEW_LINE);
         }
 
-        if (appDescription != null && !appDescription.isEmpty()) {
-            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.APP_DESCRIPTION_ANNOTATION)
-                    .append(appDescription)
-                    .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
-                    .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
-        } else {
-            appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_DESCRIPTION_ANNOTATION)
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
-        }
+        appNameStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
 
-        appNameAndDescriptionStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
-
-        return appNameAndDescriptionStringBuilder.toString();
+        return appNameStringBuilder.toString();
     }
 
     /**

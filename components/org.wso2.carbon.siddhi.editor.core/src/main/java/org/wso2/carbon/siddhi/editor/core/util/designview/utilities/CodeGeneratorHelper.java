@@ -327,9 +327,7 @@ public class CodeGeneratorHelper {
             throw new CodeGenerationException("The 'joinWith' value of the given JoinConfig object is null/empty");
         } else if (join.getJoinType() == null || join.getJoinType().isEmpty()) {
             throw new CodeGenerationException("The 'joinType' value for the given JoinConfig object is null/empty");
-        } /*else if (join.getOn() == null || join.getOn().isEmpty()) {
-            throw new CodeGenerationException("The 'on' value for the given JoinConfig object is null/empty");
-        }  */ else if (join.getLeft() == null || join.getRight() == null) {
+        } else if (join.getLeft() == null || join.getRight() == null) {
             throw new CodeGenerationException("The left/right JoinElementConfig for the given" +
                     " JoinConfig object is null");
         } else if (join.getLeft().getType() == null || join.getLeft().getType().isEmpty()) {
