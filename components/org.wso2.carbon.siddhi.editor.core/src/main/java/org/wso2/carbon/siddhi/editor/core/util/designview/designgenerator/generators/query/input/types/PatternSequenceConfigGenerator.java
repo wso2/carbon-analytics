@@ -194,6 +194,7 @@ public class PatternSequenceConfigGenerator {
         do {
             eventReference = generateNextStreamReference();
         } while (availableEventReferences.contains(eventReference));
+        availableEventReferences.add(eventReference);
         return eventReference;
     }
 
@@ -236,13 +237,13 @@ public class PatternSequenceConfigGenerator {
      */
     private ElementComponent generateElementComponent(StateElementConfig element) throws DesignGenerationException {
         if (element instanceof CountStateElementConfig) {
-            return generateCountStateElementComponents((CountStateElementConfig) element);
+            return generateCountStateElementComponent((CountStateElementConfig) element);
         } else if (element instanceof EveryStateElementConfig) {
-            return generateEveryStateElementComponents((EveryStateElementConfig) element);
+            return generateEveryStateElementComponent((EveryStateElementConfig) element);
         } else if (element instanceof LogicalStateElementConfig) {
-            return generateLogicalStateElementComponents((LogicalStateElementConfig) element);
+            return generateLogicalStateElementComponent((LogicalStateElementConfig) element);
         } else if (element instanceof StreamStateElementConfig) {
-            return generateStreamStateElementComponents((StreamStateElementConfig) element);
+            return generateStreamStateElementComponent((StreamStateElementConfig) element);
         }
         throw new IllegalArgumentException(
                 "Failed to generate config for Pattern/Sequence element, since type is unknown");
@@ -254,7 +255,7 @@ public class PatternSequenceConfigGenerator {
      * @return                                  ElementComponent object
      * @throws DesignGenerationException        Error while generating ElementComponent
      */
-    private ElementComponent generateCountStateElementComponents(CountStateElementConfig element)
+    private ElementComponent generateCountStateElementComponent(CountStateElementConfig element)
             throws DesignGenerationException {
         PatternSequenceConditionConfig conditionConfig = generateConditionConfig(element);
         // Add condition
@@ -279,7 +280,7 @@ public class PatternSequenceConfigGenerator {
      * @return                                  ElementComponent object
      * @throws DesignGenerationException        Error while generating ElementComponent object
      */
-    private ElementComponent generateEveryStateElementComponents(EveryStateElementConfig element)
+    private ElementComponent generateEveryStateElementComponent(EveryStateElementConfig element)
             throws DesignGenerationException {
         ElementComponent containedElement = generateElementComponent(element.getStateElement());
         // Add conditions
@@ -298,23 +299,21 @@ public class PatternSequenceConfigGenerator {
      * @return                                  ElementComponent object
      * @throws DesignGenerationException        Error while generating ElementComponent object
      */
-    private ElementComponent generateLogicalStateElementComponents(LogicalStateElementConfig element)
+    private ElementComponent generateLogicalStateElementComponent(LogicalStateElementConfig element)
             throws DesignGenerationException {
-        PatternSequenceConditionConfig conditionConfig1 =
-                generateConditionConfig(element.getStreamStateElement1());
-        PatternSequenceConditionConfig conditionConfig2 =
-                generateConditionConfig(element.getStreamStateElement2());
-        // Add conditions
-        List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
-        conditions.add(conditionConfig1);
-        conditions.add(conditionConfig2);
+        ElementComponent condition1Component = generateStreamStateElementComponent(element.getStreamStateElement1());
+        ElementComponent condition2Component = generateStreamStateElementComponent(element.getStreamStateElement2());
         String logicComponentBuilder =
-                generateStreamStateElementComponents(element.getStreamStateElement1()).logicComponent +
+                condition1Component.logicComponent +
                 WHITE_SPACE +
                 element.getType().toLowerCase() +
                 WHITE_SPACE +
-                generateStreamStateElementComponents(element.getStreamStateElement2()).logicComponent +
+                condition2Component.logicComponent +
                 buildWithin(element.getWithin());
+        // Add conditions
+        List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
+        conditions.addAll(condition1Component.conditions);
+        conditions.addAll(condition2Component.conditions);
         return new ElementComponent(conditions, logicComponentBuilder);
     }
 
@@ -324,24 +323,22 @@ public class PatternSequenceConfigGenerator {
      * @return                                  ElementComponent object
      * @throws DesignGenerationException        Error while generating ElementComponent object
      */
-    private ElementComponent generateStreamStateElementComponents(StreamStateElementConfig element)
+    private ElementComponent generateStreamStateElementComponent(StreamStateElementConfig element)
             throws DesignGenerationException {
         PatternSequenceConditionConfig conditionConfig = generateConditionConfig(element);
-        boolean isAbsentStreamStateElementConfig = element instanceof AbsentStreamStateElementConfig;
         StringBuilder logicComponentBuilder = new StringBuilder();
-        if (isAbsentStreamStateElementConfig) {
+        if (element instanceof AbsentStreamStateElementConfig) {
             logicComponentBuilder.append(NOT);
             logicComponentBuilder.append(WHITE_SPACE);
         }
         logicComponentBuilder.append(conditionConfig.getConditionId());
-        if (isAbsentStreamStateElementConfig &&
+        if (element instanceof AbsentStreamStateElementConfig &&
                 ((AbsentStreamStateElementConfig) element).getWaitingTime() != null) {
             logicComponentBuilder.append(WHITE_SPACE);
             logicComponentBuilder.append(FOR);
             logicComponentBuilder.append(WHITE_SPACE);
             logicComponentBuilder.append(((AbsentStreamStateElementConfig) element).getWaitingTime());
         }
-
         logicComponentBuilder.append(buildWithin(element.getWithin()));
         // Add condition
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
@@ -524,7 +521,8 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Represents a State Element component
+     * Represents a State Element component,
+     * which consists of conditions and the logic component belonging to a State Element
      */
     private static class ElementComponent {
         List<PatternSequenceConditionConfig> conditions;
