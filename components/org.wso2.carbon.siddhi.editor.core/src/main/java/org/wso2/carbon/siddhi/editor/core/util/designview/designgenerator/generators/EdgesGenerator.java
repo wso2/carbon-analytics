@@ -26,6 +26,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConditionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
@@ -63,6 +65,9 @@ public class EdgesGenerator {
         edges.addAll(
                 generateJoinQueryEdges(
                         getCompleteQueryTypeList(QueryListType.JOIN)));
+        edges.addAll(
+                generatePatternSequenceQueryEdges(
+                        getCompleteQueryTypeList(QueryListType.PATTERN)));
         edges.addAll(generateAggregationEdges(siddhiAppConfig.getAggregationList()));
         return edges;
     }
@@ -199,6 +204,53 @@ public class EdgesGenerator {
                         generateEdge(
                                 getElementWithStreamName(((JoinConfig) (query.getQueryInput())).getRight().getFrom()),
                                 query));
+            }
+            // Edge from Query
+            edges.add(
+                    generateEdge(
+                            query,
+                            getElementWithStreamName(query.getQueryOutput().getTarget())));
+        }
+        return edges;
+    }
+
+    /**
+     * Generates Edges related to Pattern/Sequence Queries
+     * @param patternSequenceQueryList          List of Pattern/Sequence QueryConfigs
+     * @return                                  Set of Edges
+     * @throws DesignGenerationException        Error while generating edges
+     */
+    private Set<Edge> generatePatternSequenceQueryEdges(List<QueryConfig> patternSequenceQueryList)
+            throws DesignGenerationException {
+        Set<Edge> edges = new HashSet<>();
+        for (QueryConfig query : patternSequenceQueryList) {
+            // Edges towards Query
+            List<String> inputStreamNames = new ArrayList<>();
+            for (PatternSequenceConditionConfig condition :
+                    ((PatternSequenceConfig) (query.getQueryInput())).getConditionList()) {
+                inputStreamNames.add(condition.getStreamName());
+            }
+            for (String inputStreamName : inputStreamNames) {
+                if (query.getPartitionId() != null && query.getConnectorsAndStreams() != null &&
+                        query.getConnectorsAndStreams().values().contains(inputStreamName)) {
+                    // Query connects through a PartitionConnector
+                    // Edge from Outer Element to PartitionConnector
+                    edges.add(
+                            generateEdgeToPartitionConnector(
+                                    getElementWithStreamName(inputStreamName),
+                                    query.getConnectorIdByStreamName(inputStreamName)));
+                    // Edge from PartitionConnector to Query
+                    edges.add(
+                            generateEdgeFromPartitionConnector(
+                                    query.getConnectorIdByStreamName(inputStreamName),
+                                    query));
+                } else {
+                    // Query doesn't connect through a PartitionConnector
+                    edges.add(
+                            generateEdge(
+                                    getElementWithStreamName(inputStreamName),
+                                    query));
+                }
             }
             // Edge from Query
             edges.add(
