@@ -26,9 +26,10 @@ import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 import AuthManager from '../auth/utils/AuthManager';
 import Logo from '../images/wso2-logo.svg';
 
-const title = {color: '#b9b9b9', fontSize: 18, height: 40, lineHeight: 3};
-const appBar = {backgroundColor: '#1a1a1a'};
-const accName = {float: 'left', paddingTop: 15};
+const title = {color: '#EEE', fontSize: 16, height: 40, lineHeight: '40px'};
+const appBar = {backgroundColor: '#1a1a1a', height:40, display:'flex', alignItems:'center'};
+const logoStyle = {margin: '0 15px 0 0', height: 17};
+const accName = {display: 'flex', alignItems: 'center', color: '#EEE', textTransform: 'capitalize'};
 /**
  * Header component.
  */
@@ -55,8 +56,8 @@ export default class Header extends Component {
         }
 
         return (
-            <div>
-                <span style={accName}>{user.username}</span>
+            <div style={accName}>
+                <span>{user.username}</span>
                 <IconMenu
                     iconButtonElement={<IconButton><AccountCircle/></IconButton>}
                     targetOrigin={{horizontal: 'right', vertical: 'bottom'}}
@@ -81,9 +82,10 @@ export default class Header extends Component {
             <AppBar
                 style={appBar}
                 title="Stream Processor Status Dashboard"
-                iconElementLeft={<img height='24' src={Logo}/>}
+                iconElementLeft={<img height='17' src={Logo}/>}
                 titleStyle={title}
-                iconStyleLeft={{margin: '15px 15px 0 0'}}
+                iconStyleLeft={logoStyle}
+                iconStyleRight={{margin: 0}}
                 iconElementRight={this.renderRightLinks()}
             />
         );
