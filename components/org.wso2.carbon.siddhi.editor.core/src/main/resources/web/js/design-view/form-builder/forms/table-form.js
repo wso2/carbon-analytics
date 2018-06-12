@@ -442,8 +442,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
 
                 var config = editor.getValue();
 
-                // update selected table model
-                clickedElement.setName(config.name);
+                var previouslySavedName = clickedElement.getName();
+                // update connection related to the element if the name is changed
+                if (previouslySavedName !== config.name) {
+                    // update selected table model
+                    clickedElement.setName(config.name);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
+
                 // removing all elements from attribute list
                 clickedElement.clearAttributeList();
                 // adding new attributes to the attribute list

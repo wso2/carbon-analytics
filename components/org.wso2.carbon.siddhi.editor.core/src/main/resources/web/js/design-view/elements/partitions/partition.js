@@ -137,6 +137,17 @@ define(['require', 'elementUtils', 'lodash'],
             return ElementUtils.prototype.getElement(this.streamList, streamId);
         };
 
+        Partition.prototype.getStreamByName = function (streamName) {
+            var self = this;
+            var requestedElement;
+            _.forEach(self.streamList, function (stream) {
+                if (stream.getName() === streamName) {
+                    requestedElement = stream;
+                }
+            });
+            return requestedElement;
+        };
+
         Partition.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
             return ElementUtils.prototype
                 .getElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);

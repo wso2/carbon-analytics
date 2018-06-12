@@ -143,10 +143,19 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var outputElementType = undefined;
                 var outputElementAttributesList = [];
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+
                 var firstInputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(firstInputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(firstInputElementName, partitionId);
                 var secondInputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(secondInputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(secondInputElementName, partitionId);
                 if (firstInputElement !== undefined && secondInputElement !== undefined) {
 
                     if (firstInputElement.type !== undefined && firstInputElement.type === 'TRIGGER') {
@@ -189,7 +198,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var outputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(outputElementName, partitionId);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'

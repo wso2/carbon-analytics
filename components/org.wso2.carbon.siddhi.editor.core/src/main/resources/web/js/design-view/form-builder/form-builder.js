@@ -58,8 +58,8 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             this.configurationData = options.configurationData;
             this.application = options.application;
             this.consoleListManager = options.application.outputController;
-            this.formUtils = new FormUtils(this.configurationData);
             this.jsPlumbInstance = options.jsPlumbInstance;
+            this.formUtils = new FormUtils(this.configurationData, this.jsPlumbInstance);
             var currentTabId = this.application.tabController.activeTab.cid;
             this.designViewContainer = $('#design-container-' + currentTabId);
             this.toggleViewButton = $('#toggle-view-button-' + currentTabId);

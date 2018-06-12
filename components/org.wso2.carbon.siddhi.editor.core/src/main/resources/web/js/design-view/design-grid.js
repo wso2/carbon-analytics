@@ -634,6 +634,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)
                         || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+
+                        /*
+                        * Partition connection point represents a stream connection point. so it holds a reference for
+                        * the stream.So that in here we replaces the source element with the actual stream element if a
+                        * connection partition connection pint is found.
+                        * */
                         if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                             var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
                             var sourceConnectionId = sourceConnection[0].sourceId;
@@ -721,18 +727,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     }
                                 }
                             }
-                        } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)
-                            || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+                        } else if (sourceElement.hasClass(constants.STREAM)
+                            || sourceElement.hasClass(constants.TRIGGER)) {
 
                             if (sourceElement.hasClass(constants.STREAM)) {
                                 connectedElementName =
                                     self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
-                            } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
-                                var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
-                                var sourceConnectionId = sourceConnection[0].sourceId;
-                                var connectedStreamId = sourceConnectionId.substr(0, sourceConnectionId.indexOf('-'));
-                                connectedElementName = self.configurationData.getSiddhiAppConfig()
-                                    .getStream(connectedStreamId).getName();
                             } else {
                                 connectedElementName =
                                     self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
@@ -765,7 +765,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             }
                         }
                     }
-
                     else if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                         || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
@@ -1113,7 +1112,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 // the element to the partition
                                 var isStreamNameUsed
                                     = self.dropElements.formBuilder.formUtils
-                                    .isStreamDefinitionNameInPartitionUsed(partitionId, streamName);
+                                    .isStreamDefinitionNameUsedInPartition(partitionId, streamName);
                                 if (!isStreamNameUsed) {
                                     streamObjectCopy.setName(streamName);
                                     var textNode = $('#' + elementId).parent().find('.streamNameNode');

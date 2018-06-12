@@ -161,7 +161,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     var toggleViewButtonDynamicId = "toggle-view-button-" + this._$parent_el.attr('id');
                     toggleViewButton.attr('id', toggleViewButtonDynamicId);
-                    //TODO: add general validation: check whether all required fields in the forms are filled, elements are connected properly(ex: source should be connected to a stream)
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
                             if (application.tabController.getActiveTab().getFile().isDirty()) {

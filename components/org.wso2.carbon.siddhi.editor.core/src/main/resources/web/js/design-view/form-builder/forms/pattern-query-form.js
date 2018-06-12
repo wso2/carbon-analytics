@@ -150,9 +150,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var outputElementType = undefined;
                 var outputElementAttributesList = [];
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+
                 _.forEach(inputStreamNames, function (inputStreamName) {
                     var inputElement =
-                        self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(inputStreamName);
+                        self.configurationData.getSiddhiAppConfig()
+                            .getDefinitionElementByName(inputStreamName, partitionId);
                     if (inputElement !== undefined) {
                         if (inputElement.type === 'TRIGGER') {
                             possibleGroupByAttributes.push(inputStreamName + '.triggered_time');
@@ -165,7 +173,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 var outputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(outputElementName, partitionId);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'

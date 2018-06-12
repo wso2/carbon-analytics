@@ -423,8 +423,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
 
                 var config = editor.getValue();
 
-                // update selected window model
-                clickedElement.setName(config.name);
+                var previouslySavedName = clickedElement.getName();
+                // update connection related to the element if the name is changed
+                if (previouslySavedName !== config.name) {
+                    // update selected window model
+                    clickedElement.setName(config.name);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
+
                 clickedElement.setFunction(config.functionName);
                 var parameters = [];
                 _.forEach(config.parameters, function (parameter) {
