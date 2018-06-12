@@ -153,7 +153,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                     responseJSON: {
                         "siddhiAppConfig":{
                             "siddhiAppName":match[1],
-                            "appAnnotationList":[match[2]],
+                            "appAnnotationList":['@App:description("' + match[2] + '")'],
                             "streamList":[],
                             "tableList":[],
                             "windowList":[],
