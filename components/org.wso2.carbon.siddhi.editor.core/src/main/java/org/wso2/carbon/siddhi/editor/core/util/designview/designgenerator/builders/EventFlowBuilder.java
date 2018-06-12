@@ -96,7 +96,8 @@ public class EventFlowBuilder {
             if (annotation.getName().equalsIgnoreCase("NAME")) {
                 siddhiAppName = annotation.getElements().get(0).getValue();
             } else {
-                appAnnotations.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
+                appAnnotations.add(
+                        "@App:" + annotationConfigGenerator.generateAnnotationConfig(annotation).split("@")[1]);
             }
         }
         siddhiAppConfig.setSiddhiAppName(siddhiAppName);
