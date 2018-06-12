@@ -39,6 +39,7 @@ import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.stream.input.source.Source;
 import org.wso2.siddhi.core.stream.output.sink.Sink;
 import org.wso2.siddhi.query.api.SiddhiApp;
+import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.AggregationDefinition;
 import org.wso2.siddhi.query.api.definition.FunctionDefinition;
@@ -50,6 +51,7 @@ import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
 import org.wso2.siddhi.query.api.execution.query.Query;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +89,18 @@ public class EventFlowBuilder {
      * @return      A reference to this object
      */
     public EventFlowBuilder loadAppAnnotations() {
-        siddhiAppConfig.setAppAnnotationList(
-                new AnnotationConfigGenerator().generateAnnotationConfigList(siddhiApp.getAnnotations()));
+        String siddhiAppName = "";
+        List<String> appAnnotations = new ArrayList<>();
+        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
+        for (Annotation annotation : siddhiApp.getAnnotations()) {
+            if (annotation.getName().equalsIgnoreCase("NAME")) {
+                siddhiAppName = annotation.getElements().get(0).getValue();
+            } else {
+                appAnnotations.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
+            }
+        }
+        siddhiAppConfig.setSiddhiAppName(siddhiAppName);
+        siddhiAppConfig.setAppAnnotationList(appAnnotations);
         return this;
     }
 
