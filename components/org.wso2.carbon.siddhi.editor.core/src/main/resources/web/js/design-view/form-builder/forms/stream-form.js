@@ -332,8 +332,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     } else {
                         streamName = config.name;
                     }
-                    isStreamNameUsed = self.formUtils
-                        .isStreamDefinitionNameUsedInPartition(streamName, id);
+                    var partitionWhereStreamIsSaved
+                        = self.configurationData.getSiddhiAppConfig().getPartitionWhereStreamIsSaved(id);
+                    var partitionId = partitionWhereStreamIsSaved.getId();
+                    isStreamNameUsed
+                        = self.formUtils.isStreamDefinitionNameUsedInPartition(partitionId, streamName, id);
                     if (isStreamNameUsed) {
                         DesignViewUtils.prototype
                             .errorAlert("Stream name \"" + streamName + "\" is already defined in the partition.");

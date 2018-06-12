@@ -636,5 +636,24 @@ define(['require', 'elementUtils', 'lodash'],
             return requestedElement;
         };
 
+        /**
+         * @function Checks whether a given stream is saved inside a partition and if yes it returns the partition
+         * Object
+         * @param streamId id of the stream element
+         * @return requestedElement returns undefined if the requested element is not found. Otherwise returns the
+         * requestedElement
+         */
+        AppData.prototype.getPartitionWhereStreamIsSaved = function (streamId) {
+            var self = this;
+            var requestedElement;
+            _.forEach(self.partitionList, function (partition) {
+                if (!requestedElement && partition.getStream(streamId) !== undefined) {
+                    requestedElement = partition;
+                }
+            });
+
+            return requestedElement;
+        };
+
         return AppData;
     });
