@@ -42,6 +42,7 @@ import java.util.Map;
 public class SiddhiAppConfig {
     private int finalElementCount = 0;
 
+    private String siddhiAppName = "";
     private List<String> appAnnotationList = new ArrayList<>();
     private List<SourceSinkConfig> sourceList = new ArrayList<>();
     private List<SourceSinkConfig> sinkList = new ArrayList<>();
@@ -170,6 +171,14 @@ public class SiddhiAppConfig {
 
     public void setAppAnnotationList(List<String> appAnnotationList) {
         this.appAnnotationList = appAnnotationList;
+    }
+
+    public void setSiddhiAppName(String siddhiAppName) {
+        this.siddhiAppName = siddhiAppName;
+    }
+
+    public String getSiddhiAppName() {
+        return siddhiAppName;
     }
 
     public List<String> getAppAnnotationList() {
