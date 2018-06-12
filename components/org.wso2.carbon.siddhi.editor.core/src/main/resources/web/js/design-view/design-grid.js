@@ -86,7 +86,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
             // configuring the siddhi app level annotations
             var settingsButtonId = self.currentTabId + '-appSettingsId';
-            var settingsButton = $("<div id='"+ settingsButtonId +"' class='btn app-settings-button tool-container' " +
+            var settingsButton = $("<div id='"+ settingsButtonId +"' class='btn app-annotations-button tool-container' " +
                 "data-placement='bottom' data-toggle='tooltip' title='App Annotations'>" +
                 "<i class='fw fw-settings'></i></div>");
             settingsButton.tooltip();
