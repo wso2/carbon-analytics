@@ -360,8 +360,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                formContainer.append('<div class="row"><div id="form-query-annotation" class="col-md-12"></div></div>' +
-                    '<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
+                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                    '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
+                    '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
                     '<div id="form-query-output" class="col-md-4"></div></div>');
 
