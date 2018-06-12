@@ -172,6 +172,10 @@ public class SiddhiAppConfig {
         this.appAnnotationList = appAnnotationList;
     }
 
+    public List<String> getAppAnnotationList() {
+        return appAnnotationList;
+    }
+
     public List<SourceSinkConfig> getSourceList() {
         return sourceList;
     }
