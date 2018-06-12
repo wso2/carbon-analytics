@@ -432,3 +432,18 @@ h3,
     text-align: center;
     padding: 20% 0;
 }
+
+.app-settings-button {
+    position: absolute;
+    top: 3.5%;
+    right: 1%;
+    font-size: 20px;
+    background-color: lightgray;
+    color: floralwhite;
+    transition: 0.15s;
+}
+
+.app-settings-button:hover {
+    color: black;
+    transition: 0.15s;
+}
