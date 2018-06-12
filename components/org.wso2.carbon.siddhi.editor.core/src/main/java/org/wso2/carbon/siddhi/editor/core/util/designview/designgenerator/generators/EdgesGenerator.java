@@ -95,7 +95,7 @@ public class EdgesGenerator {
     private Set<Edge> generateSourceEdges(List<SourceSinkConfig> sourceList) throws DesignGenerationException {
         Set<Edge> edges = new HashSet<>();
         for (SourceSinkConfig source : sourceList) {
-            edges.add(generateEdge(source, getElementWithStreamName(source.getConnectedElementName())));
+            edges.add(generateEdge(source, getElementWithStreamName(source.getConnectedElementName(), null)));
         }
         return edges;
     }
@@ -109,7 +109,7 @@ public class EdgesGenerator {
     private Set<Edge> generateSinkEdges(List<SourceSinkConfig> sinkList) throws DesignGenerationException {
         Set<Edge> edges = new HashSet<>();
         for (SourceSinkConfig sink : sinkList) {
-            edges.add(generateEdge(getElementWithStreamName(sink.getConnectedElementName()), sink));
+            edges.add(generateEdge(getElementWithStreamName(sink.getConnectedElementName(), null), sink));
         }
         return edges;
     }
@@ -133,9 +133,8 @@ public class EdgesGenerator {
                     // Edge from Outer Element to PartitionConnector
                     edges.add(
                             generateEdgeToPartitionConnector(
-                                    getElementWithStreamName(inputStreamName),
+                                    getElementWithStreamName(inputStreamName, query.getPartitionId()),
                                     query.getConnectorIdByStreamName(inputStreamName)));
-
                     // Edge from PartitionConnector to Query
                     edges.add(
                             generateEdgeFromPartitionConnector(
@@ -145,13 +144,14 @@ public class EdgesGenerator {
                 // Query doesn't connect through a PartitionConnector
                 edges.add(
                         generateEdge(
-                                getElementWithStreamName(inputStreamName),
+                                getElementWithStreamName(inputStreamName, query.getPartitionId()),
                                 query));
             }
-
             // Edge from Query
             edges.add(
-                    generateEdge(query, getElementWithStreamName(query.getQueryOutput().getTarget()).getId()));
+                    generateEdge(
+                            query,
+                            getElementWithStreamName(query.getQueryOutput().getTarget(), query.getPartitionId())));
         }
         return edges;
     }
@@ -173,7 +173,7 @@ public class EdgesGenerator {
                 // Edge from Outer Element to PartitionConnector
                 edges.add(
                         generateEdgeToPartitionConnector(
-                                getElementWithStreamName(leftInputStreamName),
+                                getElementWithStreamName(leftInputStreamName, query.getPartitionId()),
                                 query.getConnectorIdByStreamName(leftInputStreamName)));
                 // Edge from PartitionConnector to Query
                 edges.add(
@@ -184,7 +184,7 @@ public class EdgesGenerator {
                 // Query doesn't connect through a PartitionConnector
                 edges.add(
                         generateEdge(
-                                getElementWithStreamName(leftInputStreamName),
+                                getElementWithStreamName(leftInputStreamName, query.getPartitionId()),
                                 query));
             }
             // Edge towards Query (From Right)
@@ -195,7 +195,7 @@ public class EdgesGenerator {
                 // Edge from Outer Element to PartitionConnector
                 edges.add(
                         generateEdgeToPartitionConnector(
-                                getElementWithStreamName(rightInputStream),
+                                getElementWithStreamName(rightInputStream, query.getPartitionId()),
                                 query.getConnectorIdByStreamName(rightInputStream)));
                 // Edge from PartitionConnector to Query
                 edges.add(
@@ -206,14 +206,14 @@ public class EdgesGenerator {
                 // Query doesn't connect through a PartitionConnector
                 edges.add(
                         generateEdge(
-                                getElementWithStreamName(rightInputStream),
+                                getElementWithStreamName(rightInputStream, query.getPartitionId()),
                                 query));
             }
             // Edge from Query
             edges.add(
                     generateEdge(
                             query,
-                            getElementWithStreamName(query.getQueryOutput().getTarget())));
+                            getElementWithStreamName(query.getQueryOutput().getTarget(), query.getPartitionId())));
         }
         return edges;
     }
@@ -241,7 +241,7 @@ public class EdgesGenerator {
                     // Edge from Outer Element to PartitionConnector
                     edges.add(
                             generateEdgeToPartitionConnector(
-                                    getElementWithStreamName(inputStreamName),
+                                    getElementWithStreamName(inputStreamName, query.getPartitionId()),
                                     query.getConnectorIdByStreamName(inputStreamName)));
                     // Edge from PartitionConnector to Query
                     edges.add(
@@ -252,7 +252,7 @@ public class EdgesGenerator {
                     // Query doesn't connect through a PartitionConnector
                     edges.add(
                             generateEdge(
-                                    getElementWithStreamName(inputStreamName),
+                                    getElementWithStreamName(inputStreamName, query.getPartitionId()),
                                     query));
                 }
             }
@@ -260,7 +260,7 @@ public class EdgesGenerator {
             edges.add(
                     generateEdge(
                             query,
-                            getElementWithStreamName(query.getQueryOutput().getTarget())));
+                            getElementWithStreamName(query.getQueryOutput().getTarget(), query.getPartitionId())));
         }
         return edges;
     }
@@ -277,7 +277,7 @@ public class EdgesGenerator {
         for (AggregationConfig aggregation : aggregationConfigList) {
             edges.add(
                     generateEdge(
-                            getElementWithStreamName(aggregation.getFrom()),
+                            getElementWithStreamName(aggregation.getFrom(), null),
                             aggregation));
         }
         return edges;
@@ -367,10 +367,12 @@ public class EdgesGenerator {
     /**
      * Gets SiddhiElementConfig object from the SiddhiAppConfig, which has a related stream with the given name
      * @param streamName                        Name of the SiddhiElementConfig's related stream
+     * @param scopedPartitionId                 Id of the Partition, which is the scope for finding streams
      * @return                                  SiddhiElementConfig object
      * @throws DesignGenerationException        Error while generating config
      */
-    private SiddhiElementConfig getElementWithStreamName(String streamName) throws DesignGenerationException {
+    private SiddhiElementConfig getElementWithStreamName(String streamName, String scopedPartitionId)
+            throws DesignGenerationException {
         for (StreamConfig streamConfig : siddhiAppConfig.getStreamList()) {
             if (streamConfig.getName().equals(streamName)) {
                 return streamConfig;
@@ -396,10 +398,15 @@ public class EdgesGenerator {
                 return aggregationConfig;
             }
         }
-        for (PartitionConfig partitionConfig : siddhiAppConfig.getPartitionList()) {
-            for (StreamConfig streamConfig : partitionConfig.getStreamList()) {
-                if (streamConfig.getName().equals(streamName)) {
-                    return streamConfig;
+        if (scopedPartitionId != null) {
+            // Search only in the scoped Partition
+            for (PartitionConfig partitionConfig : siddhiAppConfig.getPartitionList()) {
+                if (partitionConfig.getId().equals(scopedPartitionId)) {
+                    for (StreamConfig streamConfig : partitionConfig.getStreamList()) {
+                        if (streamConfig.getName().equals(streamName)) {
+                            return streamConfig;
+                        }
+                    }
                 }
             }
         }
