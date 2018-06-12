@@ -311,7 +311,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 * */
                 var isStreamSavedInsideAPartition
                     = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
-                if (isStreamSavedInsideAPartition === undefined) {
+                if (!isStreamSavedInsideAPartition) {
                     firstCharacterInStreamName = (config.name).charAt(0);
                     if (firstCharacterInStreamName === '#') {
                         DesignViewUtils.prototype.errorAlert("'#' is used to define inner streams only.");
