@@ -173,7 +173,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 self.JSONObject = response.responseJSON;
                                 sourceContainer.hide();
                                 loadingScreen.show();
-                                // TODO explain why setTimeout() is used
+                                // The following code has been added to the setTimeout() method because
+                                // the code needs to run asynchronously for the loading screen
                                 setTimeout(function () {
                                     designView.emptyDesignViewGridContainer();
                                     designContainer.show();
@@ -227,7 +228,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             if (response.status === "success") {
                                 designContainer.hide();
                                 loadingScreen.show();
-                                // TODO explain why setTimeout() is used
+                                // The following code has been added to the setTimeout() method because
+                                // the code needs to run asynchronously for the loading screen
                                 setTimeout(function () {
                                     self.setContent(response.responseJSON);
                                     self.trigger('content-modified');
