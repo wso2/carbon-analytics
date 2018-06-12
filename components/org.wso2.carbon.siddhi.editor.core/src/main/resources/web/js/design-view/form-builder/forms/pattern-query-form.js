@@ -433,7 +433,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         },
                                         streamHandlerList: {
                                             propertyOrder: 3,
-                                            required: true,
                                             type: "array",
                                             format: "table",
                                             title: "Stream Handlers",
@@ -444,7 +443,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                                 properties: {
                                                     streamHandler: {
                                                         required: true,
-                                                        title: 'Stream Handler1',
+                                                        title: 'Stream Handler',
                                                         oneOf: [
                                                             {
                                                                 $ref: "#/definitions/filter",

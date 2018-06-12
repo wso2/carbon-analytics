@@ -684,9 +684,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             } else {
                                 model.getQueryInput().setFrom(connectedElementName);
                             }
-                        }
-
-                        if (targetElement.hasClass(constants.JOIN)) {
+                        } else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
                             var queryInput = model.getQueryInput();
 
@@ -718,45 +716,47 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     }
                                 }
                             }
-                        }
-                    } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)
-                        || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
-                        if (sourceElement.hasClass(constants.STREAM)) {
-                            connectedElementName =
-                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
-                        } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
-                            var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
-                            var sourceConnectionId = sourceConnection[0].sourceId;
-                            var connectedStreamId = sourceConnectionId.substr(0, sourceConnectionId.indexOf('-'));
-                            connectedElementName = self.configurationData.getSiddhiAppConfig()
-                                .getStream(connectedStreamId).getName();
-                        }else {
-                            connectedElementName =
-                                self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
-                        }
-                        if (targetElement.hasClass(constants.PATTERN)) {
-                            model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                            if (!model.getQueryInput()) {
-                                var patternQueryInputOptions = {};
-                                _.set(patternQueryInputOptions, 'type', 'PATTERN');
-                                var patternQueryInputObject =
-                                    new PatternOrSequenceQueryInput(patternQueryInputOptions);
-                                patternQueryInputObject.addConnectedElementName(connectedElementName);
-                                model.setQueryInput(patternQueryInputObject);
+                        } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)
+                            || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+
+                            if (sourceElement.hasClass(constants.STREAM)) {
+                                connectedElementName =
+                                    self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
+                            } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+                                var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
+                                var sourceConnectionId = sourceConnection[0].sourceId;
+                                var connectedStreamId = sourceConnectionId.substr(0, sourceConnectionId.indexOf('-'));
+                                connectedElementName = self.configurationData.getSiddhiAppConfig()
+                                    .getStream(connectedStreamId).getName();
                             } else {
-                                model.getQueryInput().addConnectedElementName(connectedElementName);
+                                connectedElementName =
+                                    self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
                             }
-                        } else if (targetElement.hasClass(constants.SEQUENCE)) {
-                            model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                            if (!model.getQueryInput()) {
-                                var sequenceQueryInputOptions = {};
-                                _.set(sequenceQueryInputOptions, 'type', 'SEQUENCE');
-                                var sequenceQueryInputObject =
-                                    new PatternOrSequenceQueryInput(sequenceQueryInputOptions);
-                                sequenceQueryInputObject.addConnectedElementName(connectedElementName);
-                                model.setQueryInput(sequenceQueryInputObject);
-                            } else {
-                                model.getQueryInput().addConnectedElementName(connectedElementName);
+
+                            if (targetElement.hasClass(constants.PATTERN)) {
+                                model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
+                                if (!model.getQueryInput()) {
+                                    var patternQueryInputOptions = {};
+                                    _.set(patternQueryInputOptions, 'type', 'PATTERN');
+                                    var patternQueryInputObject =
+                                        new PatternOrSequenceQueryInput(patternQueryInputOptions);
+                                    patternQueryInputObject.addConnectedElementName(connectedElementName);
+                                    model.setQueryInput(patternQueryInputObject);
+                                } else {
+                                    model.getQueryInput().addConnectedElementName(connectedElementName);
+                                }
+                            } else if (targetElement.hasClass(constants.SEQUENCE)) {
+                                model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
+                                if (!model.getQueryInput()) {
+                                    var sequenceQueryInputOptions = {};
+                                    _.set(sequenceQueryInputOptions, 'type', 'SEQUENCE');
+                                    var sequenceQueryInputObject =
+                                        new PatternOrSequenceQueryInput(sequenceQueryInputOptions);
+                                    sequenceQueryInputObject.addConnectedElementName(connectedElementName);
+                                    model.setQueryInput(sequenceQueryInputObject);
+                                } else {
+                                    model.getQueryInput().addConnectedElementName(connectedElementName);
+                                }
                             }
                         }
                     }
@@ -983,9 +983,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
                             model.getQueryInput().setFrom(undefined);
-                            return;
-                        }
-                        if (targetElement.hasClass(constants.JOIN)) {
+
+                        } else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
                             var queryInput = model.getQueryInput();
                             var sourceElementObject =
@@ -1006,8 +1005,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 } else if (secondConnectedElement !== undefined
                                     && secondConnectedElement.name === disconnectedElementSourceName) {
                                     queryInput.setSecondConnectedElement(undefined);
-                                }else {
+                                } else {
                                     console.log("Error: Disconnected source name not found in join query!");
+                                    return;
                                 }
 
                                 // if left or sources are created then remove data from those sources
@@ -1019,10 +1019,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     queryInput.setRight(undefined);
                                 }
                             }
-                            return;
-                        }
-                        var disconnectedElementName;
-                        if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)) {
+
+                        } else if (sourceElement.hasClass(constants.STREAM)
+                            || sourceElement.hasClass(constants.TRIGGER)) {
+
+                            var disconnectedElementName;
                             if (sourceElement.hasClass(constants.STREAM)) {
                                 disconnectedElementName =
                                     self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
@@ -1030,6 +1031,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 disconnectedElementName =
                                     self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
                             }
+
                             if (targetElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
                                 model.getQueryInput().removeConnectedElementName(disconnectedElementName);
@@ -1038,6 +1040,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 model.getQueryInput().removeConnectedElementName(disconnectedElementName);
                             }
                         }
+
                     } else if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                         || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)

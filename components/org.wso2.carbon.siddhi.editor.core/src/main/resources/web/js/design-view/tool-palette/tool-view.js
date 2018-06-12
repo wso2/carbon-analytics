@@ -32,7 +32,6 @@ define(['require', 'jquery', 'backbone', 'lodash'], function (require, $, Backbo
             var element = this.toolTemplate(this.model.attributes);
             this.$el.replaceWith(element);
             this.setElement(element);
-            //this.$el =
             this.$el.tooltip();
             parent.append(this.$el);
             var className = '.' + this.model.get("className");
