@@ -127,17 +127,11 @@ public class JoinConfigGenerator {
     private JoinElementConfig generateJoinElementConfig(SingleInputStream singleInputStream, String siddhiAppString)
             throws DesignGenerationException {
         JoinElementType joinElementType = getJoinElementType(singleInputStream.getStreamId());
-
-        StreamHandlerConfigGenerator streamHandlerConfigGenerator = new StreamHandlerConfigGenerator(siddhiAppString);
-        List<StreamHandlerConfig> streamHandlerList = new ArrayList<>();
-        for (StreamHandler streamHandler : singleInputStream.getStreamHandlers()) {
-            streamHandlerList.add(streamHandlerConfigGenerator.generateStreamHandlerConfig(streamHandler));
-        }
-
         return new JoinElementConfig(
                 joinElementType.toString(),
                 singleInputStream.getStreamId(),
-                streamHandlerList,
+                new StreamHandlerConfigGenerator(siddhiAppString)
+                        .generateStreamHandlerConfigList(singleInputStream.getStreamHandlers()),
                 singleInputStream.getStreamReferenceId(),
                 false);
     }

@@ -53,7 +53,7 @@ public class AnnotationConfigGenerator {
     }
 
     /**
-     * Generates a string list of annotations, from the given list of Siddhi Annotation
+     * Generates a string list of annotations, from the given list of Siddhi Annotations
      * @param annotations       List of Siddhi Annotation objects
      * @return                  List of strings, each representing an Annotation
      */
