@@ -52,6 +52,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var self = this;
                     var canvasContainer = this._$parent_el.find(_.get(this.options, 'canvas.container'));
                     var previewContainer = this._$parent_el.find(_.get(this.options, 'preview.container'));
+                    var loadingScreen = this._$parent_el.find(_.get(this.options, 'loading_screen.container'));
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
                     var designContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
@@ -171,12 +172,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             if (response.status === "success") {
                                 self.JSONObject = response.responseJSON;
                                 sourceContainer.hide();
-                                designView.emptyDesignViewGridContainer();
-                                designContainer.show();
+                                loadingScreen.show();
+                                setTimeout(function () {
+                                    designView.emptyDesignViewGridContainer();
+                                    designContainer.show();
+                                    designView.renderDesignGrid(self.JSONObject);
+                                    loadingScreen.hide();
+                                }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
                                     "<span class=\"toggle-button-text\">Source View</span>");
-                                designView.renderDesignGrid(self.JSONObject);
-
                             } else if (response.status === "fail") {
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
                             }
@@ -214,16 +218,23 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                             var JSONValue = designView.getConfigurationData();
                             removeUnnecessaryFieldsFromJSON(JSONValue);
-                            var sendingString = JSON.stringify(JSONValue).replace(/'/gm, "\\\'");
+                            var sendingString = JSON.stringify(JSONValue)
+                                .replace(/'/gm, "\\\'")
+                                .replace(/\\"/gm, "\\\'");
 
                             var response = self._designView.getCode("'" + sendingString + "'");
                             if (response.status === "success") {
                                 self.setContent(response.responseJSON);
                                 self.trigger('content-modified');
                                 designContainer.hide();
-                                designView.emptyDesignViewGridContainer();
-                                sourceContainer.show();
-                                self._sourceView.editorResize();
+                                loadingScreen.show();
+                                setTimeout(function () {
+                                    self.setContent(response.responseJSON);
+                                    designView.emptyDesignViewGridContainer();
+                                    sourceContainer.show();
+                                    self._sourceView.editorResize();
+                                    loadingScreen.hide();
+                                }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
                             } else if (response.status === "fail") {

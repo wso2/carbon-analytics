@@ -24,6 +24,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionWithElement;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
@@ -45,12 +46,15 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGenerato
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Helper that contains generic reusable utility methods
- * for the CodeGenerator class to build a Siddhi app string
+ * for the CodeGenerator class to build a Siddhi app string,
+ * mainly to generate strings for sub-elements of a SiddhiAppConfig object
  */
 public class CodeGeneratorHelper {
 
@@ -1015,7 +1019,7 @@ public class CodeGeneratorHelper {
 
         StringBuilder partitionWithStringBuilder = new StringBuilder();
         int partitionWithElementsLeft = partitionWith.size();
-        for (PartitionWithElement partitionWithElement: partitionWith) {
+        for (PartitionWithElement partitionWithElement : partitionWith) {
             partitionWithStringBuilder.append(getPartitionWithElement(partitionWithElement));
             if (partitionWithElementsLeft != 1) {
                 partitionWithStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
@@ -1053,6 +1057,122 @@ public class CodeGeneratorHelper {
                 .append(partitionWithElement.getStreamName());
 
         return partitionWithElementStringBuilder.toString();
+    }
+
+    /**
+     * Obtains a list of queries from a partition and they are reordered in a way that is valid in siddhi.
+     * This is done because the query list may come in an invalid order that cannot be compiled by the Siddhi
+     * runtime.
+     *
+     * @param queries The queries to be ordered
+     * @return The list of given queries in a valid order
+     * @throws CodeGenerationException Error While Reordering Queries
+     */
+    public static List<QueryConfig> orderPartitionQueries(List<QueryConfig> queries) throws CodeGenerationException {
+        if (queries == null) {
+            throw new CodeGenerationException("The given list of queries to re-order is null");
+        }
+        List<QueryConfig> reorderedQueries = new LinkedList<>();
+        while (!queries.isEmpty()) {
+            Iterator<QueryConfig> queryIterator = queries.iterator();
+            while (queryIterator.hasNext()) {
+                QueryConfig query = queryIterator.next();
+                List<String> innerInputStreams = getInnerInputStreams(query);
+                for (QueryConfig reorderedQuery : reorderedQueries) {
+                    String outputStream = reorderedQuery.getQueryOutput().getTarget();
+                    innerInputStreams.remove(outputStream);
+                }
+                if (innerInputStreams.isEmpty()) {
+                    reorderedQueries.add(query);
+                    queryIterator.remove();
+                }
+            }
+        }
+        return reorderedQueries;
+    }
+
+    /**
+     * Obtains a list of input streams of a given QueryConfig object that are inner streams of a partition
+     *
+     * @param query The given QueryConfig object
+     * @return The input streams in the given QueryConfig object that are inner input streams
+     * @throws CodeGenerationException Error while trying to get the inner streams
+     */
+    private static List<String> getInnerInputStreams(QueryConfig query) throws CodeGenerationException {
+        if (query == null) {
+            throw new CodeGenerationException("The given QueryConfig object is null");
+        } else if (query.getQueryInput() == null) {
+            throw new CodeGenerationException("The query input of the given QueryConfig object is null");
+        } else if (query.getQueryInput().getType() == null || query.getQueryInput().getType().isEmpty()) {
+            throw new CodeGenerationException("The type of the query input of the given" +
+                    " QueryConfig object is null/empty");
+        }
+
+        List<String> innerInputStreamList = new LinkedList<>();
+        switch (query.getQueryInput().getType().toUpperCase()) {
+            case CodeGeneratorConstants.WINDOW:
+            case CodeGeneratorConstants.FILTER:
+            case CodeGeneratorConstants.PROJECTION:
+                WindowFilterProjectionConfig windowFilterProjection =
+                        (WindowFilterProjectionConfig) query.getQueryInput();
+                if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
+                    throw new CodeGenerationException("The 'from' value of the given" +
+                            " WindowFilterProjection input is null/empty");
+                }
+
+                if (windowFilterProjection.getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
+                    innerInputStreamList.add(windowFilterProjection.getFrom());
+                }
+                break;
+            case CodeGeneratorConstants.JOIN:
+                JoinConfig join = (JoinConfig) query.getQueryInput();
+                if (join.getLeft() == null) {
+                    throw new CodeGenerationException("The join left element of the given JoinConfig input is null");
+                } else if (join.getRight() == null) {
+                    throw new CodeGenerationException("The join right element of the given JoinConfig input is null");
+                } else if (join.getLeft().getFrom() == null || join.getLeft().getFrom().isEmpty()) {
+                    throw new CodeGenerationException("The left element 'from' value of the given" +
+                            " JoinConfig is null/empty");
+                } else if (join.getRight().getFrom() == null || join.getRight().getFrom().isEmpty()) {
+                    throw new CodeGenerationException("The right element 'from' value of the" +
+                            " given JoinConfig is null/empty");
+                }
+
+                if (join.getLeft().getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
+                    innerInputStreamList.add(join.getLeft().getFrom());
+                }
+                if (join.getRight().getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
+                    innerInputStreamList.add(join.getRight().getFrom());
+                }
+                break;
+            case CodeGeneratorConstants.PATTERN:
+            case CodeGeneratorConstants.SEQUENCE:
+                PatternSequenceConfig patternSequence = (PatternSequenceConfig) query.getQueryInput();
+                if (patternSequence.getConditionList() == null || patternSequence.getConditionList().isEmpty()) {
+                    throw new CodeGenerationException("The condition list of the given " +
+                            "PatternSequenceConfig object is null");
+
+                }
+
+                for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
+                    if (condition == null) {
+                        throw new CodeGenerationException("The condition value of the given" +
+                                " PatterSequenceConfig condition list is null");
+                    } else if (condition.getStreamName() == null || condition.getStreamName().isEmpty()) {
+                        throw new CodeGenerationException("The condition stream name of the given" +
+                                " PatternSequenceConditionConfig is null/empty");
+                    }
+
+                    if (condition.getStreamName().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
+                        innerInputStreamList.add(condition.getStreamName());
+                    }
+                }
+                break;
+            default:
+                throw new CodeGenerationException("Unidentified Query Type: " + query.getQueryInput().getType());
+        }
+
+        return innerInputStreamList;
     }
 
     private CodeGeneratorHelper() {

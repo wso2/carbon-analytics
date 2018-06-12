@@ -234,6 +234,11 @@
         <div class="canvas-container">
         </div>
         <!-- End: Canvas Container -->
+        <!-- Start: loading-screen -->
+        <div class="loading-screen" style="display: none">
+            <i class="fw fw-wso2-logo fw-pulse fw-2x"></i>
+        </div>
+        <!-- End: loading-screen -->
         <!-- Start: Source Container -->
         <div id="siddhi-editor" class="source-container">
         </div>
@@ -1500,6 +1505,10 @@
                             canvas: {
                                 // relative selector within container for a tab
                                 container: '.canvas-container'
+                            },
+                            loading_screen: {
+                                // relative selector within container for a tab
+                                container: '.loading-screen'
                             },
                             source: {
                                 // relative selector within container for a tab
