@@ -28,6 +28,7 @@ import PropTypes from 'prop-types';
 import AuthManager from './utils/AuthManager';
 import FormPanel from '../common/FormPanel';
 import Header from '../common/Header';
+import '../../public/css/dashboard.css';
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const titleStyle = {textAlign: 'center', marginTop: 50, color: '#9c9898'};
@@ -40,10 +41,10 @@ const styles = {
     messageBox: {textAlign: 'center', color: 'white'},
     errorMessage: {backgroundColor: '#333333', color: 'white', border: '2px solid #e74c3c'},
     cookiePolicy: {
-        padding: '10px', backgroundColor: '#fcf8e3', fontFamily: muiTheme.fontFamily,
-        border: '1px solid #faebcc', color: '#8a6d3b'
+        padding: '10px', fontFamily: muiTheme.fontFamily,
+        border: '1px solid #8a6d3b', color: '#8a6d3b'
     },
-    cookiePolicyAnchor: {fontWeight: 'bold', color: '#8a6d3b'}
+    cookiePolicyAnchor: {fontWeight: '400', color: '#0D47A1', fontStyle: 'italic' }
 };
 
 /**
@@ -174,6 +175,7 @@ export default class Login extends Component {
                                 });
                             }}
                             style={{'margin': '30px 0'}}
+                            labelStyle={{color: '#BDBDBD'}}
                         />
                         <br/>
                         <RaisedButton

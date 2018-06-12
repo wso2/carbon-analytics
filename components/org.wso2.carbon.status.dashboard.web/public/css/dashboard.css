@@ -455,3 +455,7 @@ p.node-last-update {
 .sink-image {
     background: url("../icons/sink.svg");
 }
+h1 {
+    color: #eee !important;
+    font-weight: 400;
+}
