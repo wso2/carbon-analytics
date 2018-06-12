@@ -7,7 +7,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
-import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
+import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.factories.FeedApiServiceFactory;
 import org.wso2.carbon.event.simulator.core.model.InlineResponse200;
 import org.wso2.msf4j.Microservice;
@@ -150,7 +150,7 @@ public class FeedApi implements Microservice {
             @ApiParam(value = "Feed Simulation configuration name", required = true)
             @PathParam("simulationName") String simulationName,
             @ApiParam(value = "Simulation object which is need to be updated",
-                    required = true) String body) throws NotFoundException {
+                    required = true) String body) throws NotFoundException, FileOperationsException {
         return delegate.updateFeedSimulation(simulationName, body, request);
     }
 

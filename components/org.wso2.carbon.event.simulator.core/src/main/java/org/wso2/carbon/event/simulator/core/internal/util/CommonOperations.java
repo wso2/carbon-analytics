@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.simulator.core.internal.util;
 
 import org.json.JSONObject;
+import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 
 /**
  * CommonOperations class is used to perform functions common to all validations
@@ -56,6 +57,12 @@ public class CommonOperations {
         return configuration.has(key)
                 && !configuration.isNull(key)
                 && configuration.getJSONArray(key).length() > 0;
+    }
+
+    public static void validatePath(String fileName) throws FileOperationsException {
+        if (fileName.contains("../") || fileName.contains("..\\")) {
+            throw new FileOperationsException("File name contains restricted path elements. : " + fileName);
+        }
     }
 
 }
