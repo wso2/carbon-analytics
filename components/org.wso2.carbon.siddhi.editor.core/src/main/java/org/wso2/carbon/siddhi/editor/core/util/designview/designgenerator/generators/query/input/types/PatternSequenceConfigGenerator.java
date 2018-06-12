@@ -526,7 +526,7 @@ public class PatternSequenceConfigGenerator {
     /**
      * Represents a State Element component
      */
-    private class ElementComponent {
+    private static class ElementComponent {
         List<PatternSequenceConditionConfig> conditions;
         String logicComponent;
 
