@@ -312,9 +312,7 @@ public class PatternSequenceConfigGenerator {
         String logicComponentBuilder =
                 EVERY +
                 WHITE_SPACE +
-                "(" +
                 containedElement.logicComponent +
-                ")" +
                 WHITE_SPACE +
                 buildWithin(element.getWithin());
         return new ElementComponent(conditions, logicComponentBuilder);

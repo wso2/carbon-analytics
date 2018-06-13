@@ -53,9 +53,11 @@ public class QueryInputConfigGenerator {
                     .generateWindowFilterProjectionConfig(queryInputStream);
         } else if (queryInputType == QueryInputType.JOIN) {
             return new JoinConfigGenerator().getJoinQueryConfig(queryInputStream, siddhiApp, siddhiAppString);
-        } else if (queryInputType == QueryInputType.PATTERN || queryInputType == QueryInputType.SEQUENCE) {
+        } else if (queryInputType == QueryInputType.PATTERN) {
             return new PatternSequenceConfigGenerator(siddhiAppString, queryInputType)
                     .generatePatternSequenceConfig(queryInputStream);
+        } else if (queryInputType == QueryInputType.SEQUENCE) {
+            throw new DesignGenerationException("Sequence queries are not supported");
         }
         throw new DesignGenerationException("Unable to generate QueryInputConfig for type: " + queryInputType);
     }
