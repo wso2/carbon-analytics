@@ -22,12 +22,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters.*;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
-import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.SiddhiElement;
-import org.wso2.siddhi.query.api.execution.query.input.state.*;
-import org.wso2.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
 
@@ -70,30 +65,37 @@ public class PatternSequenceConfigGenerator {
      */
     public PatternSequenceConfig generatePatternConfig(InputStream inputStream)
             throws DesignGenerationException {
-        StateElementConfig stateElementConfig =
-                generateStateElementConfig(((StateInputStream) inputStream).getStateElement());
-        traverseInOrder(stateElementConfig);
-        return new PatternSequenceConfig(
-                QueryInputType.PATTERN.toString(),
-                conditionList,
-                String.join(PATTERN_DELIMITER, logicComponentList));
+        return generatePatternSequenceConfig(inputStream, QueryInputType.PATTERN);
     }
 
     /**
-     * Generates config for a Siddhi Sequence Query Input, from the given Siddhi InputStream object
+     * Generates config for a Siddhi Pattern/Sequence Query Input,
+     * from the given Siddhi InputStream object and QueryInputType
      * @param inputStream                       Siddhi InputStream object
+     * @param queryInputType                    QueryInputType
      * @return                                  PatternSequenceConfig object
-     * @throws DesignGenerationException        Error while generating Sequence Query Input
+     * @throws DesignGenerationException        Error while generating Pattern/Sequence Query Input
      */
-    public PatternSequenceConfig generateSequenceConfig(InputStream inputStream)
+    private PatternSequenceConfig generatePatternSequenceConfig(InputStream inputStream, QueryInputType queryInputType)
             throws DesignGenerationException {
-        StateElementConfig stateElementConfig =
-                generateStateElementConfig(((StateInputStream) inputStream).getStateElement());
-        traverseInOrder(stateElementConfig);
+        String delimiter;
+        if (queryInputType == QueryInputType.PATTERN) {
+            delimiter = PATTERN_DELIMITER;
+        } else if (queryInputType == QueryInputType.SEQUENCE) {
+            delimiter = SEQUENCE_DELIMITER;
+        } else {
+            throw new DesignGenerationException("Invalid QueryInputType for generating PatternSequenceConfig");
+        }
+        PatternSequenceConfigTreeInfo patternSequenceConfigTreeInfo =
+                new PatternSequenceConfigTreeInfoGenerator(siddhiAppString)
+                        .generatePatternSequenceConfigTreeInfo(((StateInputStream) inputStream).getStateElement());
+        StateElementConfig patternSequenceConfigTree = patternSequenceConfigTreeInfo.getPatternSequenceConfigTree();
+        availableEventReferences = patternSequenceConfigTreeInfo.getAvailableEventReferences();
+        traverseInOrder(patternSequenceConfigTree);
         return new PatternSequenceConfig(
-                QueryInputType.SEQUENCE.toString(),
+                queryInputType.toString(),
                 conditionList,
-                String.join(SEQUENCE_DELIMITER, logicComponentList));
+                String.join(delimiter, logicComponentList));
     }
 
     /**
@@ -204,16 +206,6 @@ public class PatternSequenceConfigGenerator {
      */
     private String generateNextStreamReference() {
         return "e" + (++eventReferenceCounter);
-    }
-
-    /**
-     * Adds the given stream reference to the list of available stream references
-     * @param streamReference       Stream reference of a Siddhi InputStream when available, or null
-     */
-    private void addToAvailableStreamReferences(String streamReference) {
-        if (streamReference != null) {
-            availableEventReferences.add(streamReference);
-        }
     }
 
     /**
@@ -357,167 +349,6 @@ public class PatternSequenceConfigGenerator {
             return "";
         }
         return WHITE_SPACE + WITHIN + WHITE_SPACE + nullableWithin;
-    }
-
-    /**
-     * Creates a StateElementConfig object from the given Siddhi StateElement object
-     * @param stateElement                      Siddhi StateElement object
-     * @return                                  StateElementConfig object
-     * @throws DesignGenerationException        Error while generating StateElementConfig object
-     */
-    private StateElementConfig generateStateElementConfig(StateElement stateElement) throws DesignGenerationException {
-        if (stateElement instanceof StreamStateElement) {
-            return generateStreamStateElementConfig((StreamStateElement) stateElement);
-        } else if (stateElement instanceof CountStateElement) {
-            return generateCountStateElementConfig((CountStateElement) stateElement);
-        } else if (stateElement instanceof LogicalStateElement) {
-            return generateLogicalStateElementConfig((LogicalStateElement) stateElement);
-        } else if (stateElement instanceof EveryStateElement) {
-            return generateEveryStateElementConfig((EveryStateElement) stateElement);
-        } else if (stateElement instanceof NextStateElement) {
-            return generateNextStateElementConfig((NextStateElement) stateElement);
-        } else {
-            throw new DesignGenerationException("Unknown type of StateElement");
-        }
-    }
-
-    /**
-     * Generates the definition of the given SiddhiElement object, in Siddhi app String.
-     * This method wraps the getDefinition method of the ConfigBuildingUtilities class,
-     * as the returned value should be null - when null is given for the parameter SiddhiElement
-     * @param siddhiElement                     SiddhiElement object
-     * @return                                  Definition of the given SiddhiElement object when not null,
-     *                                          otherwise returns null
-     * @throws DesignGenerationException        Error while getting definition for the non-null SiddhiElement object
-     */
-    private String generateNullableElementDefinition(SiddhiElement siddhiElement) throws DesignGenerationException {
-        if (siddhiElement == null) {
-            return null;
-        }
-        return ConfigBuildingUtilities.getDefinition(siddhiElement, siddhiAppString);
-    }
-
-    /**
-     * Generates config for the given Siddhi StreamStateElement object
-     * @param streamStateElement                Siddhi StreamStateElement object
-     * @return                                  StreamStateElement config
-     * @throws DesignGenerationException        Error while generating StreamStateElement config
-     */
-    private StreamStateElementConfig generateStreamStateElementConfig(StreamStateElement streamStateElement)
-            throws DesignGenerationException {
-        if (streamStateElement instanceof AbsentStreamStateElement) {
-            return generateAbsentStreamStateElementConfig((AbsentStreamStateElement) streamStateElement);
-        }
-        BasicSingleInputStream basicSingleInputStream = streamStateElement.getBasicSingleInputStream();
-
-        StreamStateElementConfig streamStateElementConfig = new StreamStateElementConfig();
-        streamStateElementConfig
-                .setStreamReference(streamStateElement.getBasicSingleInputStream().getStreamReferenceId());
-        streamStateElementConfig.setStreamName(basicSingleInputStream.getStreamId());
-        streamStateElementConfig
-                .setStreamHandlerList(
-                        new StreamHandlerConfigGenerator(siddhiAppString)
-                                .generateStreamHandlerConfigList(basicSingleInputStream.getStreamHandlers()));
-        streamStateElementConfig.setWithin(generateNullableElementDefinition(streamStateElement.getWithin()));
-
-        addToAvailableStreamReferences(streamStateElement.getBasicSingleInputStream().getStreamReferenceId());
-
-        return streamStateElementConfig;
-    }
-
-    /**
-     * Generates config for the given Siddhi CountStateElement object
-     * @param countStateElement                 Siddhi CountStateElement object
-     * @return                                  CountStateElementConfig object
-     * @throws DesignGenerationException        Error while generating CountStateElementConfig object
-     */
-    private CountStateElementConfig generateCountStateElementConfig(CountStateElement countStateElement)
-            throws DesignGenerationException {
-        CountStateElementConfig countStateElementConfig = new CountStateElementConfig();
-        countStateElementConfig
-                .setStreamStateElement(generateStreamStateElementConfig(countStateElement.getStreamStateElement()));
-        countStateElementConfig.setWithin(generateNullableElementDefinition(countStateElement.getWithin()));
-        countStateElementConfig.setMin(countStateElement.getMinCount());
-        countStateElementConfig.setMax(countStateElement.getMaxCount());
-
-        return countStateElementConfig;
-    }
-
-    /**
-     * Generates config for the given Siddhi LogicalStateElement object
-     * @param logicalStateElement               Siddhi LogicalStateElement object
-     * @return                                  LogicalStateElementConfig object
-     * @throws DesignGenerationException        Error while generating LogicalStateElementConfig object
-     */
-    private LogicalStateElementConfig generateLogicalStateElementConfig(LogicalStateElement logicalStateElement)
-            throws DesignGenerationException {
-        LogicalStateElementConfig logicalStateElementConfig = new LogicalStateElementConfig();
-        logicalStateElementConfig
-                .setStreamStateElement1(generateStreamStateElementConfig(logicalStateElement.getStreamStateElement1()));
-        logicalStateElementConfig.setType(logicalStateElement.getType().toString().toLowerCase());
-        logicalStateElementConfig
-                .setStreamStateElement2(generateStreamStateElementConfig(logicalStateElement.getStreamStateElement2()));
-        logicalStateElementConfig.setWithin(generateNullableElementDefinition(logicalStateElement.getWithin()));
-
-        return logicalStateElementConfig;
-    }
-
-    /**
-     * Generates config for the given Siddhi EveryStateElement object
-     * @param everyStateElement                 Siddhi EveryStateElement object
-     * @return                                  EveryStateElementConfig object
-     * @throws DesignGenerationException        Error while generating EveryStateElementConfig object
-     */
-    private EveryStateElementConfig generateEveryStateElementConfig(EveryStateElement everyStateElement)
-            throws DesignGenerationException {
-        EveryStateElementConfig everyStateElementConfig = new EveryStateElementConfig();
-        everyStateElementConfig.setStateElement(generateStateElementConfig(everyStateElement.getStateElement()));
-        everyStateElementConfig.setWithin(generateNullableElementDefinition(everyStateElement.getWithin()));
-
-        return everyStateElementConfig;
-    }
-
-    /**
-     * Generates config for the given Siddhi NextStateElement object
-     * @param nextStateElement                  Siddhi NextStateElement object
-     * @return                                  NextStateElementConfig object
-     * @throws DesignGenerationException        Error while generating NextStateElementConfig object
-     */
-    private NextStateElementConfig generateNextStateElementConfig(NextStateElement nextStateElement)
-            throws DesignGenerationException {
-        NextStateElementConfig nextStateElementConfig = new NextStateElementConfig();
-        nextStateElementConfig.setStateElement(generateStateElementConfig(nextStateElement.getStateElement()));
-        nextStateElementConfig.setNextStateElement(generateStateElementConfig(nextStateElement.getNextStateElement()));
-        nextStateElementConfig.setWithin(generateNullableElementDefinition(nextStateElement.getWithin()));
-
-        return nextStateElementConfig;
-    }
-
-    /**
-     * Generates config for the given Siddhi AbsentStreamStateElement object
-     * @param absentStreamStateElement          Siddhi AbsentStreamStateElement object
-     * @return                                  AbsentStreamStateElementConfig object
-     * @throws DesignGenerationException        Error while generating AbsentStreamStateElementConfig object
-     */
-    private AbsentStreamStateElementConfig generateAbsentStreamStateElementConfig(
-            AbsentStreamStateElement absentStreamStateElement) throws DesignGenerationException {
-        BasicSingleInputStream basicSingleInputStream = absentStreamStateElement.getBasicSingleInputStream();
-        AbsentStreamStateElementConfig absentStreamStateElementConfig = new AbsentStreamStateElementConfig();
-        absentStreamStateElementConfig
-                .setStreamReference(absentStreamStateElement.getBasicSingleInputStream().getStreamReferenceId());
-        absentStreamStateElementConfig.setStreamName(basicSingleInputStream.getStreamId());
-        absentStreamStateElementConfig
-                .setStreamHandlerList(
-                        new StreamHandlerConfigGenerator(siddhiAppString)
-                                .generateStreamHandlerConfigList(basicSingleInputStream.getStreamHandlers()));
-        absentStreamStateElementConfig.setWithin(
-                generateNullableElementDefinition(absentStreamStateElement.getWithin()));
-        absentStreamStateElementConfig
-                .setWaitingTime(generateNullableElementDefinition(absentStreamStateElement.getWaitingTime()));
-
-        addToAvailableStreamReferences(absentStreamStateElement.getBasicSingleInputStream().getStreamReferenceId());
-
-        return absentStreamStateElementConfig;
     }
 
     /**

@@ -57,11 +57,10 @@ public class QueryInputConfigGenerator {
         } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString()) ||
                 queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
             // TODO Add support for Patterns & Sequences
-//            throw new DesignGenerationException(queryInputType.toLowerCase() + " queries are not supported");
-            return new PatternSequenceConfigGenerator(siddhiAppString).generatePatternConfig(queryInputStream);
+            throw new DesignGenerationException(queryInputType.toLowerCase() + " queries are not supported");
         }
 
-        throw new DesignGenerationException("Unknown type: " + queryInputType);
+        throw new DesignGenerationException("Unable to generate QueryInputConfig for type: " + queryInputType);
     }
 
     /**

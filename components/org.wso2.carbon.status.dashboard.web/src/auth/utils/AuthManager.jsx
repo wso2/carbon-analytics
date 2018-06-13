@@ -26,7 +26,7 @@ const sessionUser = 'DASHBOARD_USER';
 /**
  * Name of the refresh token cookie.
  */
-const REFRESH_TOKEN_COOKIE_NAME = 'REFRESH_TOKEN';
+const REFRESH_TOKEN_COOKIE_NAME = 'LRTK';
 const TIMESTAMP_SKEW = 100;
 const REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
 

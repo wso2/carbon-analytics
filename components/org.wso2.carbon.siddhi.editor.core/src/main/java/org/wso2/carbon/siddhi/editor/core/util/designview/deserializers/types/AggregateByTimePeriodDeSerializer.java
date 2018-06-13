@@ -24,30 +24,29 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.FilterConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.FunctionWindowConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.StreamHandlerType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeInterval;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeRange;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AggregationByTimeType;
 
 import java.lang.reflect.Type;
 
 /**
- * De-serializer for StreamHandlerConfig class
+ * De-serializer for AggregateByTimePeriod class
  */
-public class StreamHandlerConfigDeserializer implements JsonDeserializer {
+public class AggregateByTimePeriodDeSerializer implements JsonDeserializer {
     private static final String TYPE = "type";
+
     @Override
     public Object deserialize(
             JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonPrimitive jsonPrimitive = (JsonPrimitive) jsonObject.get(TYPE);
-        String streamHandlerType = jsonPrimitive.getAsString();
-        if (streamHandlerType.equalsIgnoreCase(StreamHandlerType.FILTER.toString())) {
-            return jsonDeserializationContext.deserialize(jsonObject, FilterConfig.class);
-        } else if (streamHandlerType.equalsIgnoreCase(StreamHandlerType.FUNCTION.toString()) ||
-                streamHandlerType.equalsIgnoreCase(StreamHandlerType.WINDOW.toString())) {
-            return jsonDeserializationContext.deserialize(jsonObject, FunctionWindowConfig.class);
+        String attributesSelectionType = jsonPrimitive.getAsString();
+        if (attributesSelectionType.equalsIgnoreCase(AggregationByTimeType.RANGE.toString())) {
+            return jsonDeserializationContext.deserialize(jsonObject, AggregateByTimeRange.class);
+        } else if (attributesSelectionType.equalsIgnoreCase(AggregationByTimeType.INTERVAL.toString())) {
+            return jsonDeserializationContext.deserialize(jsonObject, AggregateByTimeInterval.class);
         }
-        throw new JsonParseException(
-                "Unable to de-serialize the StreamHandlerConfig JSON since its type is unknown");
+        throw new JsonParseException("Unable to de-serialize the AggregateByTimePeriod JSON since its type is unknown");
     }
 }
