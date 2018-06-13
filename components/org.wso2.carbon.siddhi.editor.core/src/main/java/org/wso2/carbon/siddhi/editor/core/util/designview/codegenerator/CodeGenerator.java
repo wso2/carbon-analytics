@@ -591,6 +591,10 @@ public class CodeGenerator {
             queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryGroupBy(query.getGroupBy()));
         }
+        if (query.getHaving() != null && !query.getHaving().isEmpty()) {
+            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
+                    .append(CodeGeneratorHelper.getQueryHaving(query.getHaving()));
+        }
         if (query.getOrderBy() != null && !query.getOrderBy().isEmpty()) {
             queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryOrderBy(query.getOrderBy()));
@@ -598,10 +602,6 @@ public class CodeGenerator {
         if (query.getLimit() != 0) {
             queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryLimit(query.getLimit()));
-        }
-        if (query.getHaving() != null && !query.getHaving().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(CodeGeneratorHelper.getQueryHaving(query.getHaving()));
         }
         if (query.getOutputRateLimit() != null && !query.getOutputRateLimit().isEmpty()) {
             queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
