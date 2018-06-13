@@ -36,7 +36,6 @@ public class PatternSequenceConfigGenerator {
     private static final String PATTERN_DELIMITER = " -> ";
     private static final String SEQUENCE_DELIMITER = " , ";
 
-    // Keywords used in logic
     private static final String WHITE_SPACE = " ";
     private static final String COUNT_MIN = "<";
     private static final String COUNT_MAX = ">";
@@ -45,43 +44,35 @@ public class PatternSequenceConfigGenerator {
     private static final String EVERY = "every";
     private static final String NOT = "not";
     private static final String FOR = "for";
+    private static final String ONE_OR_MORE_POSTFIX_SYMBOL = "+";
+    private static final String ZERO_OR_MORE_POSTFIX_SYMBOL = "*";
+    private static final String ZERO_OR_ONE_POSTFIX_SYMBOL = "?";
 
     private String siddhiAppString;
+    private QueryInputType mode;
     private List<PatternSequenceConditionConfig> conditionList = new ArrayList<>();
     private List<String> logicComponentList = new ArrayList<>();
 
     private List<String> availableEventReferences = new ArrayList<>();
     private int eventReferenceCounter = 0;
 
-    public PatternSequenceConfigGenerator(String siddhiAppString) {
+    public PatternSequenceConfigGenerator(String siddhiAppString, QueryInputType mode) {
         this.siddhiAppString = siddhiAppString;
+        this.mode = mode;
     }
 
     /**
-     * Generates config for a Siddhi Pattern Query Input, from the given Siddhi InputStream object
+     * Generates config for a Siddhi Pattern/Sequence Query Input, from the given Siddhi InputStream object
      * @param inputStream                       Siddhi InputStream object
-     * @return                                  PatternSequenceConfig object
-     * @throws DesignGenerationException        Error while generating Pattern Query Input
-     */
-    public PatternSequenceConfig generatePatternConfig(InputStream inputStream)
-            throws DesignGenerationException {
-        return generatePatternSequenceConfig(inputStream, QueryInputType.PATTERN);
-    }
-
-    /**
-     * Generates config for a Siddhi Pattern/Sequence Query Input,
-     * from the given Siddhi InputStream object and QueryInputType
-     * @param inputStream                       Siddhi InputStream object
-     * @param queryInputType                    QueryInputType
      * @return                                  PatternSequenceConfig object
      * @throws DesignGenerationException        Error while generating Pattern/Sequence Query Input
      */
-    private PatternSequenceConfig generatePatternSequenceConfig(InputStream inputStream, QueryInputType queryInputType)
+    public PatternSequenceConfig generatePatternSequenceConfig(InputStream inputStream)
             throws DesignGenerationException {
         String delimiter;
-        if (queryInputType == QueryInputType.PATTERN) {
+        if (mode == QueryInputType.PATTERN) {
             delimiter = PATTERN_DELIMITER;
-        } else if (queryInputType == QueryInputType.SEQUENCE) {
+        } else if (mode == QueryInputType.SEQUENCE) {
             delimiter = SEQUENCE_DELIMITER;
         } else {
             throw new DesignGenerationException("Invalid QueryInputType for generating PatternSequenceConfig");
@@ -93,7 +84,7 @@ public class PatternSequenceConfigGenerator {
         availableEventReferences = patternSequenceConfigTreeInfo.getAvailableEventReferences();
         traverseInOrder(patternSequenceConfigTree);
         return new PatternSequenceConfig(
-                queryInputType.toString(),
+                mode.toString(),
                 conditionList,
                 String.join(delimiter, logicComponentList));
     }
@@ -176,13 +167,14 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Accepts the given stream reference when not null, or otherwise generates the next un-available stream reference
-     * @param streamReference       Stream Reference String when available, or null
-     * @return                      Accepted/Generated stream reference
+     * Accepts the given stream reference when not null,
+     * otherwise generates the next un-available stream reference
+     * @param nullableStreamReference       Stream Reference String when available, or null
+     * @return                              Accepted/Generated stream reference
      */
-    private String acceptOrGenerateNextStreamReference(String streamReference) {
-        if (streamReference != null) {
-            return streamReference;
+    private String acceptOrGenerateNextStreamReference(String nullableStreamReference) {
+        if (nullableStreamReference != null) {
+            return nullableStreamReference;
         }
         return generateNextUnavailableStreamReference();
     }
@@ -242,6 +234,51 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
+     * Returns the 'min:max' expression with the given parameters
+     * @param min       Min value of a CountStateElement
+     * @param max       Max value of a CountStateElement
+     * @param mode      Whether the stateful query input is Pattern/Sequence
+     * @return          MinMax expression
+     */
+    private static String buildMinMax(int min, int max, QueryInputType mode) {
+        String acceptedMin = String.valueOf(min);
+        String acceptedMax = String.valueOf(max);
+        if (mode == QueryInputType.PATTERN) {
+            if (min == -1) {
+                acceptedMin = "";
+            }
+            if (max == -1) {
+                acceptedMax = "";
+            }
+        } else if (mode == QueryInputType.SEQUENCE) {
+            if (min == 1 && max == -1) {
+                return ONE_OR_MORE_POSTFIX_SYMBOL;
+            } else if (min == 0 && max == -1) {
+                return ZERO_OR_MORE_POSTFIX_SYMBOL;
+            } else if (min == 0 && max == 1) {
+                return ZERO_OR_ONE_POSTFIX_SYMBOL;
+            }
+        }
+        if (acceptedMin.equals(acceptedMax)) {
+            return COUNT_MIN + acceptedMax + COUNT_MAX;
+        }
+        return COUNT_MIN + acceptedMin + COUNT_MIN_MAX_SEPARATOR + acceptedMax + COUNT_MAX;
+    }
+
+    /**
+     * Returns the 'within' expression when the given parameter is not null.
+     * Otherwise, returns an empty string
+     * @param nullableWithin        Value contained in 'within', which might be null
+     * @return                      Within expression
+     */
+    private static String buildWithin(String nullableWithin) {
+        if (nullableWithin == null) {
+            return "";
+        }
+        return WHITE_SPACE + WITHIN + WHITE_SPACE + nullableWithin;
+    }
+
+    /**
      * Generates ElementComponent object for the given CountStateElementConfig object
      * @param element                           CountStateElement object
      * @return                                  ElementComponent object
@@ -255,14 +292,9 @@ public class PatternSequenceConfigGenerator {
         conditions.add(conditionConfig);
         String logicComponentBuilder =
                 conditionConfig.getConditionId() +
-                WHITE_SPACE +
-                COUNT_MIN +
-                element.getMin() +
-                COUNT_MIN_MAX_SEPARATOR +
-                element.getMax() +
-                COUNT_MAX +
-                WHITE_SPACE +
-                buildWithin(element.getWithin());
+                        buildMinMax(element.getMin(), element.getMax(), mode) +
+                        WHITE_SPACE +
+                        buildWithin(element.getWithin());
         return new ElementComponent(conditions, logicComponentBuilder);
     }
 
@@ -281,6 +313,7 @@ public class PatternSequenceConfigGenerator {
                 EVERY +
                 WHITE_SPACE +
                 containedElement.logicComponent +
+                WHITE_SPACE +
                 buildWithin(element.getWithin());
         return new ElementComponent(conditions, logicComponentBuilder);
     }
@@ -336,19 +369,6 @@ public class PatternSequenceConfigGenerator {
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
         conditions.add(conditionConfig);
         return new ElementComponent(conditions, logicComponentBuilder.toString());
-    }
-
-    /**
-     * Returns the 'within' expression when the given parameter is not null.
-     * Otherwise, returns an empty string
-     * @param nullableWithin        Value contained in 'within', which might be null
-     * @return                      Within expression
-     */
-    private static String buildWithin(String nullableWithin) {
-        if (nullableWithin == null) {
-            return "";
-        }
-        return WHITE_SPACE + WITHIN + WHITE_SPACE + nullableWithin;
     }
 
     /**

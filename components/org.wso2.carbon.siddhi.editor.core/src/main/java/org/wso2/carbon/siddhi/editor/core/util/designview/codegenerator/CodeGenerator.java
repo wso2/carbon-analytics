@@ -58,8 +58,7 @@ public class CodeGenerator {
                 generateStreams(siddhiApp.getStreamList(), siddhiApp.getSourceList(), siddhiApp.getSinkList()) +
                 generateTables(siddhiApp.getTableList()) +
                 generateWindows(siddhiApp.getWindowList()) +
-                generateTriggers(siddhiApp.getTriggerList(), siddhiApp.getSourceList(),
-                        siddhiApp.getSinkList()) +
+                generateTriggers(siddhiApp.getTriggerList()) +
                 generateAggregations(siddhiApp.getAggregationList()) +
                 generateFunctions(siddhiApp.getFunctionList()) +
                 generateQueries(siddhiApp.getQueryLists()) +
@@ -191,13 +190,10 @@ public class CodeGenerator {
      * Generates a string representation of all the trigger definitions in a Siddhi app
      *
      * @param triggerList A list of all the TriggerConfig objects to be converted
-     * @param sourceList  A list of all sources in a SiddhiAppConfig object
-     * @param sinkList    A list of all the sinks in a SiddhiAppConfig object
      * @return The Siddhi string representation of all the trigger definitions
      * @throws CodeGenerationException Error while generating code
      */
-    private String generateTriggers(List<TriggerConfig> triggerList, List<SourceSinkConfig> sourceList,
-                                    List<SourceSinkConfig> sinkList) throws CodeGenerationException {
+    private String generateTriggers(List<TriggerConfig> triggerList) throws CodeGenerationException {
         if (triggerList == null || triggerList.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
@@ -206,24 +202,6 @@ public class CodeGenerator {
         triggerListStringBuilder.append(SiddhiStringBuilderConstants.TRIGGERS_COMMENT)
                 .append(SiddhiStringBuilderConstants.NEW_LINE);
         for (TriggerConfig trigger : triggerList) {
-            if (trigger == null) {
-                throw new CodeGenerationException("A given trigger element is empty");
-            } else if (trigger.getName() == null || trigger.getName().isEmpty()) {
-                throw new CodeGenerationException("The name of a given trigger element is empty");
-            }
-
-            for (SourceSinkConfig source : sourceList) {
-                if (trigger.getName().equals(source.getConnectedElementName())) {
-                    triggerListStringBuilder.append(generateSourceSinkString(source));
-                }
-            }
-
-            for (SourceSinkConfig sink : sinkList) {
-                if (trigger.getName().equals(sink.getConnectedElementName())) {
-                    triggerListStringBuilder.append(generateSourceSinkString(sink));
-                }
-            }
-
             triggerListStringBuilder.append(generateTriggerString(trigger));
         }
 
@@ -591,6 +569,10 @@ public class CodeGenerator {
             queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryGroupBy(query.getGroupBy()));
         }
+        if (query.getHaving() != null && !query.getHaving().isEmpty()) {
+            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
+                    .append(CodeGeneratorHelper.getQueryHaving(query.getHaving()));
+        }
         if (query.getOrderBy() != null && !query.getOrderBy().isEmpty()) {
             queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryOrderBy(query.getOrderBy()));
@@ -598,10 +580,6 @@ public class CodeGenerator {
         if (query.getLimit() != 0) {
             queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getQueryLimit(query.getLimit()));
-        }
-        if (query.getHaving() != null && !query.getHaving().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(CodeGeneratorHelper.getQueryHaving(query.getHaving()));
         }
         if (query.getOutputRateLimit() != null && !query.getOutputRateLimit().isEmpty()) {
             queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)

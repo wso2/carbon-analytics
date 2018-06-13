@@ -31,6 +31,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
@@ -65,6 +66,9 @@ public class EdgesGenerator {
         edges.addAll(
                 generateJoinQueryEdges(
                         getCompleteQueryTypeList(QueryListType.JOIN)));
+        edges.addAll(
+                generatePatternSequenceQueryEdges(
+                        getCompleteQueryTypeList(QueryListType.PATTERN)));
         edges.addAll(generateAggregationEdges(siddhiAppConfig.getAggregationList()));
         return edges;
     }
@@ -424,9 +428,7 @@ public class EdgesGenerator {
                 }
             }
         }
-
         List<SiddhiElementConfig> siddhiElementLists = new ArrayList<>();
-
         siddhiElementLists.addAll(siddhiAppConfig.getSinkList());
         siddhiElementLists.addAll(siddhiAppConfig.getSourceList());
         siddhiElementLists.addAll(siddhiAppConfig.getStreamList());
@@ -449,7 +451,6 @@ public class EdgesGenerator {
                 return siddhiElementConfig;
             }
         }
-
         throw new DesignGenerationException("Unable to find element with id '" + id + "'");
     }
 
@@ -488,12 +489,11 @@ public class EdgesGenerator {
                 return NodeType.JOIN_QUERY;
             }
             if (queryInputConfig instanceof PatternSequenceConfig) {
-                if (queryInputConfig.getType().equalsIgnoreCase("PATTERN")) {
+                if (queryInputConfig.getType().equalsIgnoreCase(QueryInputType.PATTERN.toString())) {
                     return NodeType.PATTERN_QUERY;
                 }
-                // TODO add sequence
+                return NodeType.SEQUENCE_QUERY;
             }
-            throw new DesignGenerationException("Type is unknown for Query Input");
         }
         throw new DesignGenerationException(
                 "Type is unknown for Siddhi Element with id '" + siddhiElementConfig.getId() + "'");
