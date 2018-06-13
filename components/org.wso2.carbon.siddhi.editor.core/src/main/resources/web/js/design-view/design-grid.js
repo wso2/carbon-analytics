@@ -299,7 +299,66 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     .errorAlert("Invalid Connection: Stream is already connected to the partition");
                                 return connectionValidity;
                             } else {
-                                return connectionValidity = true;
+
+                                var isStreamDirectlyConnectedToAQuery = false;
+                                _.forEach(partition.getWindowFilterProjectionQueryList(), function (query) {
+                                    if (query.getQueryInput() !== undefined
+                                        && query.getQueryInput().getFrom() !== undefined
+                                        && query.getQueryInput().getFrom() === connectedStreamName) {
+                                        isStreamDirectlyConnectedToAQuery = true;
+                                    }
+                                });
+
+                                _.forEach(partition.getJoinQueryList(), function (query) {
+                                    if (query.getQueryInput() !== undefined) {
+                                        if (query.getQueryInput().getFirstConnectedElement() !== undefined
+                                            && query.getQueryInput().getFirstConnectedElement().type
+                                            === constants.STREAM
+                                            && query.getQueryInput().getFirstConnectedElement().name
+                                            === connectedStreamName) {
+                                            isStreamDirectlyConnectedToAQuery = true;
+
+                                        } else if (query.getQueryInput().getSecondConnectedElement() !== undefined
+                                            && query.getQueryInput().getSecondConnectedElement().type
+                                            === constants.STREAM
+                                            && query.getQueryInput().getSecondConnectedElement().name
+                                            === connectedStreamName) {
+                                            isStreamDirectlyConnectedToAQuery = true;
+                                        }
+                                    }
+                                });
+
+                                _.forEach(partition.getPatternQueryList(), function (query) {
+                                    if (query.getQueryInput() !== undefined) {
+                                        var connectedElementNameList
+                                            = query.getQueryInput().getConnectedElementNameList();
+                                        _.forEach(connectedElementNameList, function (elementName) {
+                                            if (connectedStreamName === elementName) {
+                                                isStreamDirectlyConnectedToAQuery = true;
+                                            }
+                                        });
+                                    }
+                                });
+
+                                _.forEach(partition.getSequenceQueryList(), function (query) {
+                                    if (query.getQueryInput() !== undefined) {
+                                        var connectedElementNameList
+                                            = query.getQueryInput().getConnectedElementNameList();
+                                        _.forEach(connectedElementNameList, function (elementName) {
+                                            if (connectedStreamName === elementName) {
+                                                isStreamDirectlyConnectedToAQuery = true;
+                                            }
+                                        });
+                                    }
+                                });
+
+                                if (isStreamDirectlyConnectedToAQuery) {
+                                    DesignViewUtils.prototype.errorAlert("Invalid Connection: Connected stream is " +
+                                        "already directly connected to a query inside the partition.");
+                                } else {
+                                    connectionValidity = true;
+                                }
+                                return connectionValidity;
                             }
                         }
                     } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
