@@ -112,7 +112,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                                             "long",
                                             "float",
                                             "double",
-                                            "bool"
+                                            "bool",
+                                            "object"
                                         ],
                                         default: "string"
                                     }
@@ -273,7 +274,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                                             "long",
                                             "float",
                                             "double",
-                                            "bool"
+                                            "bool",
+                                            "object"
                                         ],
                                         default: "string"
                                     }
