@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation'],
-    function (require, log, $, _, Attribute,  Table, StoreAnnotation) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'designViewUtils'],
+    function (require, log, $, _, Attribute,  Table, StoreAnnotation, DesignViewUtils) {
 
         /**
          * @class TableForm Creates a forms to collect data from a table
@@ -183,9 +183,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                 if(errors.length) {
                     return;
                 }
-                var isTableNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
+                var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
                 if (isTableNameUsed) {
-                    alert("Table name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Table name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 // add the new out table to the table array
@@ -248,9 +249,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
             var id = $(element).parent().attr('id');
             // retrieve the table information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var name = clickedElement.getName();
             var savedAttributes = clickedElement.getAttributeList();
@@ -428,10 +430,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                 if(errors.length) {
                     return;
                 }
-                var isTableNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
+                var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,
                     clickedElement.getId());
                 if (isTableNameUsed) {
-                    alert("Table name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Table name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 self.designViewContainer.removeClass('disableContainer');
@@ -439,8 +442,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
 
                 var config = editor.getValue();
 
-                // update selected table model
-                clickedElement.setName(config.name);
+                var previouslySavedName = clickedElement.getName();
+                // update connection related to the element if the name is changed
+                if (previouslySavedName !== config.name) {
+                    // update selected table model
+                    clickedElement.setName(config.name);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
+
                 // removing all elements from attribute list
                 clickedElement.clearAttributeList();
                 // adding new attributes to the attribute list

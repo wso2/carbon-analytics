@@ -234,6 +234,11 @@
         <div class="canvas-container">
         </div>
         <!-- End: Canvas Container -->
+        <!-- Start: loading-screen -->
+        <div class="loading-screen" style="display: none">
+            <i class="fw fw-wso2-logo fw-pulse fw-2x"></i>
+        </div>
+        <!-- End: loading-screen -->
         <!-- Start: Source Container -->
         <div id="siddhi-editor" class="source-container">
         </div>
@@ -1146,6 +1151,7 @@
             service_console: "js/output-console/service-console-manager",
             debugger_console: "js/debugger/debugger",
             design_view: "js/design-view/design-view",
+            initialiseData: "js/design-view/initialise-data",
             designViewGrid: "js/design-view/design-grid",
             designViewUtils: "js/design-view/util/design-view-utils",
             dropElements: "js/design-view/drop-elements",
@@ -1167,6 +1173,7 @@
             joinQueryForm: "js/design-view/form-builder/forms/join-query-form",
             partitionForm: "js/design-view/form-builder/forms/partition-form",
             functionForm: "js/design-view/form-builder/forms/function-form",
+            appAnnotationForm: "js/design-view/form-builder/forms/app-annotation-form",
             // element data holding objects starts here
             // annotations
             sourceOrSinkAnnotation: "js/design-view/elements/annotations/source-or-sink-annotation",
@@ -1498,6 +1505,10 @@
                             canvas: {
                                 // relative selector within container for a tab
                                 container: '.canvas-container'
+                            },
+                            loading_screen: {
+                                // relative selector within container for a tab
+                                container: '.loading-screen'
                             },
                             source: {
                                 // relative selector within container for a tab

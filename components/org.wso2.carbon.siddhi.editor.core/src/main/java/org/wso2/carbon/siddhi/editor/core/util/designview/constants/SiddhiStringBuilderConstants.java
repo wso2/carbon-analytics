@@ -28,7 +28,6 @@ public class SiddhiStringBuilderConstants {
     public static final char FULL_STOP = '.';
     public static final char COMMA = ',';
     public static final char EQUAL = '=';
-    public static final char HASH = '#';
     public static final char NEW_LINE = '\n';
     public static final char SEMI_COLON = ';';
     public static final char SINGLE_QUOTE = '\'';
@@ -42,8 +41,8 @@ public class SiddhiStringBuilderConstants {
     public static final char CLOSE_CURLY_BRACKET = '}';
     // General Strings
     public static final String EMPTY_STRING = "";
-    public static final String TAB_SPACE = "    ";
     public static final String THREE_DOTS = "...";
+    public static final String HASH = "#";
     // Definition Strings
     public static final String DEFINE_STREAM = "define stream";
     public static final String DEFINE_TABLE = "define table";
@@ -57,7 +56,6 @@ public class SiddhiStringBuilderConstants {
     public static final String ALL_EVENTS = "all events";
     // Annotation Strings
     public static final String APP_NAME_ANNOTATION = "@App:name('";
-    public static final String APP_DESCRIPTION_ANNOTATION = "@App:description('";
     public static final String SOURCE_ANNOTATION = "@source(type='";
     public static final String SINK_ANNOTATION = "@sink(type='";
     public static final String STORE_ANNOTATION = "@store(type='";
@@ -66,8 +64,6 @@ public class SiddhiStringBuilderConstants {
     public static final String PAYLOAD_ANNOTATION = "@payload(";
     public static final String DEFAULT_APP_NAME_ANNOTATION = APP_NAME_ANNOTATION + "SiddhiApp" +
             SINGLE_QUOTE + CLOSE_BRACKET;
-    public static final String DEFAULT_APP_DESCRIPTION_ANNOTATION = APP_DESCRIPTION_ANNOTATION +
-            "Description of the plan" + SINGLE_QUOTE + CLOSE_BRACKET;
     // Join Strings
     public static final String JOIN = "join";
     public static final String LEFT_OUTER_JOIN = "left outer join";

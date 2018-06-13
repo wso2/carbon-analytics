@@ -49,8 +49,14 @@ define(['require', 'elementUtils'],
                 groupBy: ['value1',...],
                 aggregateByAttribute*: ‘’,
                 aggregateByTimePeriod*: {
-                    minValue*: '', // At least one value should be added, and that will be marked as the minValue
-                    maxValue: '' // Max value is added if the user wants to define a range of timestamps
+                    type*: 'RANGE',
+                    value*: {
+                        min*: '',
+                        max*: ''
+                    }
+                    << or >>
+                    type*: 'INTERVAL',
+                    value*: ['seconds', 'minutes', ...] // At least one value must be available
                 },
                 store: {Store JSON},
                 annotationList: [annotation1, annotation2, ...]

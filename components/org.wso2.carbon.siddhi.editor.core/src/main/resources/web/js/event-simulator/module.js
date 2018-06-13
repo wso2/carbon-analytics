@@ -115,8 +115,6 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                 if(self.application.tabController.activeTab._title != "welcome-page"){
                     if (self.application.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                         self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                    } else {
-                        //TODO: self.application.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                     }
                 }
             });

@@ -28,29 +28,35 @@ define(
         var AggregateByTimePeriod = function (options) {
             /*
              Data storing structure as follows
-                minValue*: '', // At least one value should be added, and that will be marked as the minValue
-                maxValue: '' // Max value is added if the user wants to define a range of timestamps
+                type*: 'RANGE',
+                value*: {
+                    min*: '',
+                    max*: ''
+                }
+                << or >>
+                type*: 'INTERVAL',
+                value*: ['seconds', 'minutes', ...] // At least one value must be available
             */
             if (options !== undefined) {
-                this.minValue = (options.minValue !== undefined)? (options.minValue).toUpperCase() : undefined;
-                this.maxValue = (options.maxValue !== undefined)? (options.maxValue).toUpperCase() : undefined;
+                this.type = (options.type !== undefined)? (options.type).toUpperCase() : undefined;
+                this.value = options.value;
             }
         };
 
-        AggregateByTimePeriod.prototype.getMinValue = function () {
-            return this.minValue;
+        AggregateByTimePeriod.prototype.getType = function () {
+            return this.type.toUpperCase();
         };
 
-        AggregateByTimePeriod.prototype.getMaxValue = function () {
-            return this.maxValue;
+        AggregateByTimePeriod.prototype.getValue = function () {
+            return this.value;
         };
 
-        AggregateByTimePeriod.prototype.setMinValue = function (minValue) {
-            this.minValue = minValue;
+        AggregateByTimePeriod.prototype.setType = function (type) {
+            this.type = type.toUpperCase();
         };
 
-        AggregateByTimePeriod.prototype.setMaxValue = function (maxValue) {
-            this.maxValue = maxValue;
+        AggregateByTimePeriod.prototype.setValue = function (value) {
+            this.value = value;
         };
 
         return AggregateByTimePeriod;

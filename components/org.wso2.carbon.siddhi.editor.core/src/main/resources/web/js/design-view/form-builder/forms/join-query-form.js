@@ -18,9 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'joinQuerySource', 'streamHandler', 'queryWindowOrFunction'],
+        'joinQuerySource', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
+              DesignViewUtils) {
 
         var constants = {
             LEFT_SOURCE : 'Left Source',
@@ -60,18 +61,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getJoinQuery(id);
-            if (clickedElement.getQueryInput() === undefined
-                || clickedElement.getQueryInput().getFirstConnectedElement() === undefined
-                || clickedElement.getQueryInput().getSecondConnectedElement() === undefined) {
-                alert('Connect two input elements to join query');
+            if (!clickedElement.getQueryInput()
+                || !clickedElement.getQueryInput().getFirstConnectedElement()
+                || !clickedElement.getQueryInput().getSecondConnectedElement()) {
+                DesignViewUtils.prototype.warnAlert('Connect two input elements to join query');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-            } else if (clickedElement.getQueryOutput() === undefined ||
-                clickedElement.getQueryOutput().getTarget() === undefined) {
-                alert('Connect an output element');
+            } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
+                DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
@@ -143,10 +143,19 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var outputElementType = undefined;
                 var outputElementAttributesList = [];
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+
                 var firstInputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(firstInputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(firstInputElementName, partitionId);
                 var secondInputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(secondInputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(secondInputElementName, partitionId);
                 if (firstInputElement !== undefined && secondInputElement !== undefined) {
 
                     if (firstInputElement.type !== undefined && firstInputElement.type === 'TRIGGER') {
@@ -189,7 +198,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var outputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(outputElementName, partitionId);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
@@ -203,7 +213,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var select = [];
                 var possibleUserDefinedSelectTypeValues = [];
-                if (clickedElement.getSelect() === undefined) {
+                if (!clickedElement.getSelect()) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
                             expression: undefined,
@@ -211,7 +221,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         };
                         select.push(attr);
                     }
-                } else if(clickedElement.getSelect().getValue() === undefined) {
+                } else if(!clickedElement.getSelect().getValue()) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
                             expression: undefined,
@@ -254,7 +264,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         && (output !== undefined)) {
                         // getting the event tpe and pre load it
                         var eventType;
-                        if (output.getEventType() === undefined) {
+                        if (!output.getEventType()) {
                             eventType = 'all events';
                         } else if (output.getEventType() === 'ALL_EVENTS') {
                             eventType = 'all events';
@@ -557,8 +567,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                formContainer.append('<div class="row"><div id="form-query-annotation" class="col-md-12"></div></div>' +
-                    '<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
+                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                    '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
+                    '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
                     '<div id="form-query-output" class="col-md-4"></div></div>');
 
@@ -1112,17 +1123,21 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             elementType = secondInputElementType;
                         }
                         if (noOfWindowsInSource > 1) {
-                            alert("Only one window can be defined in a join source!");
+                            DesignViewUtils.prototype.errorAlert("Only one window can be defined in a join source!");
                             validity = false;
                         } else if (noOfFiltersInSource > 0
                             && noOfWindowsInSource === 0 && elementType !== 'WINDOW') {
-                            alert("Since a filter is defined, a window is also needed to be defined in join source!");
+                            DesignViewUtils.prototype
+                                .errorAlert("Since a filter is defined, a window is also needed to be defined in " +
+                                    "join source!");
                             validity = false;
                         } else if (noOfWindowsInSource === 1){
                             var streamHandlerListLength = joinConfiguration.streamHandlerList.length;
                             var lastStreamHandlerInList = joinConfiguration.streamHandlerList[streamHandlerListLength-1];
-                            if (lastStreamHandlerInList.streamHandler.windowName === undefined) {
-                                alert("Window should be defined as the last stream handler in a join source!");
+                            if (!lastStreamHandlerInList.streamHandler.windowName) {
+                                DesignViewUtils.prototype
+                                    .errorAlert("Window should be defined as the last stream handler in a " +
+                                        "join source!");
                                 validity = false;
                             }
                         }
@@ -1327,7 +1342,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             console.log("Invalid output type for query received!")
                         }
 
-                        if (outputConfig.output.eventType === undefined) {
+                        if (!outputConfig.output.eventType) {
                             outputObject.setEventType(undefined);
                         } else if(outputConfig.output.eventType === "all events"){
                             outputObject.setEventType('ALL_EVENTS');

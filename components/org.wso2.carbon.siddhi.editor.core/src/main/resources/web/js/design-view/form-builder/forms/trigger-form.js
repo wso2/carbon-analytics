@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'trigger'],
-    function (require, log, $, _, Trigger) {
+define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
+    function (require, log, $, _, Trigger, DesignViewUtils) {
 
         /**
          * @class TriggerForm Creates a forms to collect data from a trigger
@@ -110,9 +110,10 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 if(errors.length) {
                     return;
                 }
-                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
+                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
                 if (isTriggerNameUsed) {
-                    alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Trigger name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 // add the new out trigger to the trigger array
@@ -152,9 +153,10 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
             var id = $(element).parent().attr('id');
             // retrieve the trigger information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var name = clickedElement.getName();
             var at = clickedElement.getAt();
@@ -230,10 +232,11 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
                 if(errors.length) {
                     return;
                 }
-                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
+                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,
                     clickedElement.getId());
                 if (isTriggerNameUsed) {
-                    alert("Trigger name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Trigger name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 self.designViewContainer.removeClass('disableContainer');
@@ -241,8 +244,14 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger'],
 
                 var config = editor.getValue();
 
-                // update selected trigger model
-                clickedElement.setName(config.name);
+                var previouslySavedName = clickedElement.getName();
+                // update connection related to the element if the name is changed
+                if (previouslySavedName !== config.name) {
+                    // update selected trigger model
+                    clickedElement.setName(config.name);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
+
                 clickedElement.setAt(config.at);
 
                 clickedElement.clearAnnotationList();

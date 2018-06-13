@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
-    function (require, log, $, _, Attribute, Window) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designViewUtils'],
+    function (require, log, $, _, Attribute, Window, DesignViewUtils) {
 
         /**
          * @class WindowForm Creates a forms to collect data from a window
@@ -173,9 +173,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 if(errors.length) {
                     return;
                 }
-                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
+                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
                 if (isWindowNameUsed) {
-                    alert("Window name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Window name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 // add the new out window to the window array
@@ -235,9 +236,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
             var id = $(element).parent().attr('id');
             // retrieve the window information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindow(id);
-            if(clickedElement === undefined) {
+            if(!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
+                throw errorMessage;
             }
             var name = clickedElement.getName();
             var savedAttributes = clickedElement.getAttributeList();
@@ -267,7 +269,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
 
             var outputEventType = '';
             var savedOutputEventType = clickedElement.getOutputEventType();
-            if (savedOutputEventType === undefined) {
+            if (!savedOutputEventType) {
                 outputEventType = 'all events';
             } else if (savedOutputEventType === 'ALL_EVENTS') {
                 outputEventType = 'all events';
@@ -409,10 +411,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
                 if(errors.length) {
                     return;
                 }
-                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
+                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,
                     clickedElement.getId());
                 if (isWindowNameUsed) {
-                    alert("Window name \"" + editor.getValue().name + "\" is already used.");
+                    DesignViewUtils.prototype
+                        .errorAlert("Window name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
                 self.designViewContainer.removeClass('disableContainer');
@@ -420,8 +423,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window'],
 
                 var config = editor.getValue();
 
-                // update selected window model
-                clickedElement.setName(config.name);
+                var previouslySavedName = clickedElement.getName();
+                // update connection related to the element if the name is changed
+                if (previouslySavedName !== config.name) {
+                    // update selected window model
+                    clickedElement.setName(config.name);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
+
                 clickedElement.setFunction(config.functionName);
                 var parameters = [];
                 _.forEach(config.parameters, function (parameter) {
