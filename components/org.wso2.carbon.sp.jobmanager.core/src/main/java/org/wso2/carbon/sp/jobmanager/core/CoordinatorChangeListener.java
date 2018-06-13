@@ -78,7 +78,7 @@ public class CoordinatorChangeListener extends MemberEventListener {
         ManagerNode leader = new ManagerNode().setId(nodeId)
                 .setHeartbeatInterval(heartbeatInterval)
                 .setHeartbeatMaxRetry(heartbeatMaxRetry)
-                .setHttpInterface(interfaceConfig);
+                .setHttpsInterface(interfaceConfig);
 
         ServiceDataHolder.isLeader(ServiceDataHolder.getCoordinator().isLeaderNode());
         ServiceDataHolder.setLeaderNode(leader);

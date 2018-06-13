@@ -37,6 +37,9 @@ public class ManagerNodeConfig {
     @JsonProperty("httpInterface")
     private InterfaceConfig httpInterface = null;
 
+    @JsonProperty("httpsInterface")
+    private InterfaceConfig httpsInterface = null;
+
     @JsonProperty("heartbeatInterval")
     private Integer heartbeatInterval = null;
 
@@ -79,6 +82,25 @@ public class ManagerNodeConfig {
 
     public void setHttpInterface(InterfaceConfig httpInterface) {
         this.httpInterface = httpInterface;
+    }
+
+    public ManagerNodeConfig httpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
+        return this;
+    }
+
+    /**
+     * Get httpsInterface
+     *
+     * @return httpsInterface
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public InterfaceConfig getHttpsInterface() {
+        return httpsInterface;
+    }
+
+    public void setHttpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
     }
 
     public ManagerNodeConfig heartbeatInterval(Integer heartbeatInterval) {

@@ -45,7 +45,7 @@ public class HeartbeatSender extends TimerTask {
     /**
      * Heartbeat endpoint template.
      */
-    private static final String HEARTBEAT_ENDPOINT = "http://%s:%s/resourceManager/heartbeat";
+    private static final String HEARTBEAT_ENDPOINT = "https://%s:%s/resourceManager/heartbeat";
     /**
      * Timestamp of the last successful heartbeat.
      */
@@ -99,7 +99,7 @@ public class HeartbeatSender extends TimerTask {
             /* If the LeaderNodeConfig is available, Heartbeat should sent to that Leader Node.
              */
             if (ServiceDataHolder.getLeaderNodeConfig() != null) {
-                heartbeatSent = sendHeartbeat(ServiceDataHolder.getLeaderNodeConfig().getHttpInterface());
+                heartbeatSent = sendHeartbeat(ServiceDataHolder.getLeaderNodeConfig().getHttpsInterface());
             }
             /* At this point check whether the node was able to connect to the leader successfully. If it failed,
              * Then try to connect to the list of manager nodes available.
@@ -225,7 +225,7 @@ public class HeartbeatSender extends TimerTask {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Redirecting to the current leader node at:" + hbRes.getLeader());
                     }
-                    connected = sendHeartbeat(hbRes.getLeader().getHttpInterface());
+                    connected = sendHeartbeat(hbRes.getLeader().getHttpsInterface());
                     break;
                 default:
                     // In case of a 4XX or 5XX, try the next available manager.

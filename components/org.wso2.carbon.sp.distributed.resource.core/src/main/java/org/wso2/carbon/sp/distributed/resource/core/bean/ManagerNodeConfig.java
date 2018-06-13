@@ -73,7 +73,7 @@ public class ManagerNodeConfig extends NodeConfig implements Serializable {
     @Override
     public String toString() {
         return String.format("ManagerNode { id: %s, host: %s, port: %s }",
-                getId(), getHttpInterface().getHost(), getHttpInterface().getPort());
+                getId(), getHttpsInterface().getHost(), getHttpsInterface().getPort());
     }
 
     @Override

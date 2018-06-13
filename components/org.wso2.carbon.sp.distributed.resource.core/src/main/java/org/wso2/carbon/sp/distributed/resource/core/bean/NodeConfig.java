@@ -31,9 +31,13 @@ public class NodeConfig implements Serializable {
      */
     private String id = "wso2-sp";
     /**
-     * Advertised Host:port configurations of the node.
+     * Advertised HTTP Host:port configurations of the node.
      */
     private HTTPInterfaceConfig httpInterface;
+    /**
+     * Advertised HTTPS Host:port configurations of the node.
+     */
+    private HTTPInterfaceConfig httpsInterface;
     /**
      * State of the node representing whether the node is NEW or EXISTS.
      * EXISTS means there're deployed artifacts.
@@ -91,6 +95,26 @@ public class NodeConfig implements Serializable {
     }
 
     /**
+     * Getter for the httpsInterface of the node.
+     *
+     * @return httpsInterface.
+     */
+    public HTTPInterfaceConfig getHttpsInterface() {
+        return httpsInterface;
+    }
+
+    /**
+     * Setter for the httpInterface of the node.
+     *
+     * @param httpsInterface httpsInterface of the node.
+     * @return current {@link NodeConfig}
+     */
+    public NodeConfig setHttpsInterface(HTTPInterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
+        return this;
+    }
+
+    /**
      * Getter for the state of the node.
      *
      * @return httpInterface.
@@ -126,11 +150,10 @@ public class NodeConfig implements Serializable {
         return this;
     }
 
-
     @Override
     public String toString() {
         return String.format("Node { id: %s, host: %s, port: %s, state: %s }",
-                id, httpInterface.getHost(), httpInterface.getPort(), state);
+                id, httpsInterface.getHost(), httpsInterface.getPort(), state);
     }
 
     @Override
@@ -145,6 +168,10 @@ public class NodeConfig implements Serializable {
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) {
             return false;
         }
+        if (getHttpsInterface() != null ? !getHttpsInterface().equals(that.getHttpsInterface())
+                : that.getHttpsInterface() != null) {
+            return false;
+        }
         return getHttpInterface() != null
                 ? getHttpInterface().equals(that.getHttpInterface())
                 : that.getHttpInterface() == null;
@@ -154,6 +181,7 @@ public class NodeConfig implements Serializable {
     public int hashCode() {
         int result = getId() != null ? getId().hashCode() : 0;
         result = 31 * result + (getHttpInterface() != null ? getHttpInterface().hashCode() : 0);
+        result = 31 * result + (getHttpsInterface() != null ? getHttpsInterface().hashCode() : 0);
         return result;
     }
 }

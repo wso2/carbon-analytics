@@ -70,13 +70,15 @@ public class ResourceManagerConstants {
 
     public static final String KEY_NODE_INTERVAL = "heartbeatInterval";
 
-    public static final String KEY_NODE_HOST = "httpInterfaceHost";
+    public static final String KEY_NODE_PROTOCOL = "httpsInterface";
 
-    public static final String KEY_NODE_PORT = "httpInterfacePort";
+    public static final String KEY_NODE_HOST = "httpsInterfaceHost";
 
-    public static final String KEY_NODE_USERNAME = "httpInterfaceUsername";
+    public static final String KEY_NODE_PORT = "httpsInterfacePort";
 
-    public static final String KEY_NODE_PASSWORD = "httpInterfacePassword";
+    public static final String KEY_NODE_USERNAME = "httpsInterfaceUsername";
+
+    public static final String KEY_NODE_PASSWORD = "httpsInterfacePassword";
 
     public static final String TASK_UPSERT_RESOURCE_MAPPING = "Inserting/Updating resource mapping group";
 

@@ -105,7 +105,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                     }
                 }
             } else {
-                connectedManagers.add(TypeConverter.convert(ServiceDataHolder.getCurrentNode().getHttpInterface()));
+                connectedManagers.add(TypeConverter.convert(ServiceDataHolder.getCurrentNode().getHttpsInterface()));
             }
             ResourceNode existingResourceNode;
             if (isReceiverNode) {
@@ -120,7 +120,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             if (existingResourceNode == null) {
                 ResourceNode resourceNode = new ResourceNode(nodeConfig.getId());
                 resourceNode.setState(HeartbeatResponse.JoinedStateEnum.EXISTS.toString());
-                resourceNode.setHttpInterface(TypeConverter.convert(nodeConfig.getHttpInterface()));
+                resourceNode.setHttpsInterface(TypeConverter.convert(nodeConfig.getHttpsInterface()));
                 if (nodeConfig.getWorkerMetrics() != null) {
                     resourceNode.updateResourceMetrics(nodeConfig.getWorkerMetrics());
                 }
@@ -131,8 +131,8 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                     resourcePool.addResourceNode(resourceNode);
                 }
             } else {
-                InterfaceConfig existingIFace = TypeConverter.convert(existingResourceNode.getHttpInterface());
-                InterfaceConfig currentIFace = nodeConfig.getHttpInterface();
+                InterfaceConfig existingIFace = TypeConverter.convert(existingResourceNode.getHttpsInterface());
+                InterfaceConfig currentIFace = nodeConfig.getHttpsInterface();
                 if (currentIFace.equals(existingIFace)) {
                     if (nodeConfig.getWorkerMetrics() != null) {
                         existingResourceNode.updateResourceMetrics(nodeConfig.getWorkerMetrics());

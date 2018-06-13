@@ -39,9 +39,10 @@ public class NodeConfig {
     private StateEnum state = null;
     @JsonProperty("httpInterface")
     private InterfaceConfig httpInterface = null;
+    @JsonProperty("httpsInterface")
+    private InterfaceConfig httpsInterface = null;
     @JsonProperty("WorkerMetrics")
     private WorkerMetrics workerMetrics = null;
-
     @JsonProperty("isReceiverNode")
     private boolean isReceiverNode;
 
@@ -88,9 +89,8 @@ public class NodeConfig {
         return this;
     }
 
-    public NodeConfig workerMetrics(WorkerMetrics workerMetrics) {
-        this.workerMetrics = workerMetrics;
-        return this;
+    public void setHttpInterface(InterfaceConfig httpInterface) {
+        this.httpInterface = httpInterface;
     }
 
     /**
@@ -103,13 +103,33 @@ public class NodeConfig {
         return httpInterface;
     }
 
+    public NodeConfig httpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
+        return this;
+    }
+
+    public void setHttpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
+    }
+
+    /**
+     * Get httpsInterface
+     *
+     * @return httpsInterface
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public InterfaceConfig getHttpsInterface() {
+        return httpsInterface;
+    }
+
+    public NodeConfig workerMetrics(WorkerMetrics workerMetrics) {
+        this.workerMetrics = workerMetrics;
+        return this;
+    }
+
     @ApiModelProperty(required = false, value = "")
     public WorkerMetrics getWorkerMetrics() {
         return workerMetrics;
-    }
-
-    public void setHttpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
     }
 
     public boolean isReceiverNode() {
@@ -149,6 +169,7 @@ public class NodeConfig {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
         sb.append("    httpInterface: ").append(toIndentedString(httpInterface)).append("\n");
+        sb.append("    httpsInterface: ").append(toIndentedString(httpsInterface)).append("\n");
         sb.append("    workerMetrix: ").append(toIndentedString(workerMetrics)).append("\n");
         sb.append("}");
         return sb.toString();

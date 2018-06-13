@@ -36,10 +36,15 @@ public class DeploymentConfig implements Serializable {
     @Element(description = "deployment type (distributed/ha)", required = true)
     private String type;
     /**
-     * Advertised Host:Port configuration of the current node.
+     * Advertised HTTP Host:Port configuration of the current node.
      */
-    @Element(description = "host:port configurations", required = true)
+    @Element(description = "http host:port configurations", required = true)
     private HTTPInterfaceConfig httpInterface;
+    /**
+     * Advertised HTTPS Host:Port configuration of the current node.
+     */
+    @Element(description = "https host:port configurations", required = true)
+    private HTTPInterfaceConfig httpsInterface;
     /**
      * List of {@link HTTPInterfaceConfig} for the resource managers.
      */
@@ -88,6 +93,24 @@ public class DeploymentConfig implements Serializable {
      */
     public void setHttpInterface(HTTPInterfaceConfig httpInterface) {
         this.httpInterface = httpInterface;
+    }
+
+    /**
+     * Getter for the httpsInterface.
+     *
+     * @return httpsInterface of the current node.
+     */
+    public HTTPInterfaceConfig getHttpsInterface() {
+        return httpsInterface;
+    }
+
+    /**
+     * Setter for the httpInterface.
+     *
+     * @param httpsInterface of the current node.
+     */
+    public void setHttpsInterface(HTTPInterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
     }
 
     /**
@@ -156,6 +179,11 @@ public class DeploymentConfig implements Serializable {
                 : that.getHttpInterface() != null) {
             return false;
         }
+        if (getHttpsInterface() != null
+                ? !getHttpsInterface().equals(that.getHttpsInterface())
+                : that.getHttpsInterface() != null) {
+            return false;
+        }
         return getResourceManagers() != null
                 ? getResourceManagers().equals(that.getResourceManagers())
                 : that.getResourceManagers() == null;
@@ -165,6 +193,7 @@ public class DeploymentConfig implements Serializable {
     public int hashCode() {
         int result = getType() != null ? getType().hashCode() : 0;
         result = 31 * result + (getHttpInterface() != null ? getHttpInterface().hashCode() : 0);
+        result = 31 * result + (getHttpsInterface() != null ? getHttpsInterface().hashCode() : 0);
         result = 31 * result + (getResourceManagers() != null ? getResourceManagers().hashCode() : 0);
         return result;
     }
