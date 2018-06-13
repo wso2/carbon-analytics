@@ -47,15 +47,13 @@ public class QueryInputConfigGenerator {
      * @throws DesignGenerationException        Error while generating config
      */
     public QueryInputConfig generateQueryInputConfig(InputStream queryInputStream) throws DesignGenerationException {
-        String queryInputType = getQueryInputType(queryInputStream);
-
-        if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW_FILTER_PROJECTION.toString())) {
+        QueryInputType queryInputType = getQueryInputType(queryInputStream);
+        if (queryInputType == QueryInputType.WINDOW_FILTER_PROJECTION) {
             return new WindowFilterProjectionConfigGenerator(siddhiAppString)
                     .generateWindowFilterProjectionConfig(queryInputStream);
-        } else if (queryInputType.equalsIgnoreCase(QueryInputType.JOIN.toString())) {
+        } else if (queryInputType == QueryInputType.JOIN) {
             return new JoinConfigGenerator().getJoinQueryConfig(queryInputStream, siddhiApp, siddhiAppString);
-        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString()) ||
-                queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
+        } else if (queryInputType == QueryInputType.PATTERN || queryInputType == QueryInputType.SEQUENCE) {
             return new PatternSequenceConfigGenerator(siddhiAppString, queryInputType)
                     .generatePatternSequenceConfig(queryInputStream);
         }
@@ -65,16 +63,16 @@ public class QueryInputConfigGenerator {
     /**
      * Gets the type of the Query's Input, with the given Siddhi InputStream object
      * @param queryInputStream      Siddhi InputStream object, which contains data about the Query's input part
-     * @return                      Type of Query's Input
+     * @return                      QueryInputType
      */
-    private String getQueryInputType(InputStream queryInputStream) {
+    private QueryInputType getQueryInputType(InputStream queryInputStream) {
         if (queryInputStream instanceof SingleInputStream) {
-            return QueryInputType.WINDOW_FILTER_PROJECTION.toString();
+            return QueryInputType.WINDOW_FILTER_PROJECTION;
         } else if (queryInputStream instanceof JoinInputStream) {
-            return QueryInputType.JOIN.toString();
+            return QueryInputType.JOIN;
         } else if (queryInputStream instanceof StateInputStream) {
             // PATTERN or SEQUENCE
-            return ((StateInputStream) queryInputStream).getStateType().name();
+            return QueryInputType.valueOf(((StateInputStream) queryInputStream).getStateType().name());
         }
         throw new IllegalArgumentException("Type of query is unknown for generating query input");
     }

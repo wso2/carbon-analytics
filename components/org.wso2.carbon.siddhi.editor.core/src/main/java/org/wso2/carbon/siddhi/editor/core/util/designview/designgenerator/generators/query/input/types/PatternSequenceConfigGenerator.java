@@ -20,6 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConditionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
@@ -48,16 +49,16 @@ public class PatternSequenceConfigGenerator {
     private static final String ZERO_OR_ONE_POSTFIX_SYMBOL = "?";
 
     private String siddhiAppString;
-    private Mode mode;
+    private QueryInputType mode;
     private List<PatternSequenceConditionConfig> conditionList = new ArrayList<>();
     private List<String> logicComponentList = new ArrayList<>();
 
     private List<String> availableEventReferences = new ArrayList<>();
     private int eventReferenceCounter = 0;
 
-    public PatternSequenceConfigGenerator(String siddhiAppString, String mode) {
+    public PatternSequenceConfigGenerator(String siddhiAppString, QueryInputType mode) {
         this.siddhiAppString = siddhiAppString;
-        this.mode = Mode.valueOf(mode);
+        this.mode = mode;
     }
 
     /**
@@ -69,9 +70,9 @@ public class PatternSequenceConfigGenerator {
     public PatternSequenceConfig generatePatternSequenceConfig(InputStream inputStream)
             throws DesignGenerationException {
         String delimiter;
-        if (mode == Mode.PATTERN) {
+        if (mode == QueryInputType.PATTERN) {
             delimiter = PATTERN_DELIMITER;
-        } else if (mode == Mode.SEQUENCE) {
+        } else if (mode == QueryInputType.SEQUENCE) {
             delimiter = SEQUENCE_DELIMITER;
         } else {
             throw new DesignGenerationException("Invalid QueryInputType for generating PatternSequenceConfig");
@@ -239,17 +240,17 @@ public class PatternSequenceConfigGenerator {
      * @param mode      Whether the stateful query input is Pattern/Sequence
      * @return          MinMax expression
      */
-    private static String buildMinMax(int min, int max, Mode mode) {
+    private static String buildMinMax(int min, int max, QueryInputType mode) {
         String acceptedMin = String.valueOf(min);
         String acceptedMax = String.valueOf(max);
-        if (mode == Mode.PATTERN) {
+        if (mode == QueryInputType.PATTERN) {
             if (min == -1) {
                 acceptedMin = "";
             }
             if (max == -1) {
                 acceptedMax = "";
             }
-        } else if (mode == Mode.SEQUENCE) {
+        } else if (mode == QueryInputType.SEQUENCE) {
             if (min == 1 && max == -1) {
                 return ONE_OR_MORE_POSTFIX_SYMBOL;
             } else if (min == 0 && max == -1) {
@@ -384,13 +385,5 @@ public class PatternSequenceConfigGenerator {
             this.conditions = conditions;
             this.logicComponent = logicComponent;
         }
-    }
-
-    /**
-     * Mode of the Stateful Query, whether Pattern/Sequence
-     */
-    private enum Mode {
-        PATTERN,
-        SEQUENCE
     }
 }
