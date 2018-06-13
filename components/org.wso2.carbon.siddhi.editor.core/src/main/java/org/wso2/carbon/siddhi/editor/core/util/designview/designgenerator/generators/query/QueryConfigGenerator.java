@@ -23,6 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
@@ -192,9 +193,13 @@ public class QueryConfigGenerator {
             return QueryListType.WINDOW_FILTER_PROJECTION;
         } else if (queryInputConfig instanceof JoinConfig) {
             return QueryListType.JOIN;
-        } else {
-            // TODO add pattern & sequences
-            throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
+        } else if (queryInputConfig instanceof PatternSequenceConfig) {
+            if (QueryListType.valueOf(queryInputConfig.getType()) == QueryListType.SEQUENCE) {
+                // TODO add Sequences
+                throw new IllegalArgumentException("Sequence Queries are not supported");
+            }
+            return QueryListType.valueOf(queryInputConfig.getType());
         }
+        throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
     }
 }

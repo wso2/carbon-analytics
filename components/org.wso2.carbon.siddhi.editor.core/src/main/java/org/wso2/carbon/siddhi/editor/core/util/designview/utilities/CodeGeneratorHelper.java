@@ -20,6 +20,9 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.AggregateByTimePeriod;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeInterval;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeRange;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
@@ -50,6 +53,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Helper that contains generic reusable utility methods
@@ -68,25 +73,24 @@ public class CodeGeneratorHelper {
      */
     public static String getAttributes(List<AttributeConfig> attributes) throws CodeGenerationException {
         if (attributes == null || attributes.isEmpty()) {
-            throw new CodeGenerationException("The given AttributeConfig list is null/empty");
+            throw new CodeGenerationException("A given attribute list is empty");
         }
 
         StringBuilder stringBuilder = new StringBuilder();
         int attributesLeft = attributes.size();
         for (AttributeConfig attribute : attributes) {
             if (attribute == null) {
-                throw new CodeGenerationException("The given AttributeConfig object is null");
+                throw new CodeGenerationException("A given attribute element is empty");
             } else if (attribute.getName() == null || attribute.getName().isEmpty()) {
-                throw new CodeGenerationException("The name of the given AttributeConfig object is null/empty");
+                throw new CodeGenerationException("The 'name' of a given attribute element is empty");
             } else if (attribute.getType() == null || attribute.getType().isEmpty()) {
-                throw new CodeGenerationException("The type of the given AttributeConfig object is null/empty");
+                throw new CodeGenerationException("The 'type' value of a given attribute element is empty");
             }
             stringBuilder.append(attribute.getName())
                     .append(SiddhiStringBuilderConstants.SPACE)
                     .append(attribute.getType().toLowerCase());
             if (attributesLeft != 1) {
-                stringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                        .append(SiddhiStringBuilderConstants.SPACE);
+                stringBuilder.append(SiddhiStringBuilderConstants.COMMA);
             }
             attributesLeft--;
         }
@@ -106,8 +110,7 @@ public class CodeGeneratorHelper {
 
         StringBuilder annotationsStringBuilder = new StringBuilder();
         for (String annotation : annotations) {
-            annotationsStringBuilder.append(annotation)
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+            annotationsStringBuilder.append(annotation);
         }
 
         return annotationsStringBuilder.toString();
@@ -124,9 +127,9 @@ public class CodeGeneratorHelper {
         if (store == null) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         } else if (store.getType() == null || store.getType().isEmpty()) {
-            throw new CodeGenerationException("The type for the given StoreConfig object is null/empty");
+            throw new CodeGenerationException("The 'type' value of a given store element is empty");
         } else if (store.getOptions() == null || store.getOptions().isEmpty()) {
-            throw new CodeGenerationException("The options map for the given StoreConfig object is null/empty");
+            throw new CodeGenerationException("The options map of a given store element is empty");
         }
 
         StringBuilder storeStringBuilder = new StringBuilder();
@@ -134,8 +137,7 @@ public class CodeGeneratorHelper {
         storeStringBuilder.append(SiddhiStringBuilderConstants.STORE_ANNOTATION)
                 .append(store.getType())
                 .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
-                .append(SiddhiStringBuilderConstants.COMMA)
-                .append(SiddhiStringBuilderConstants.SPACE);
+                .append(SiddhiStringBuilderConstants.COMMA);
         Map<String, String> options = store.getOptions();
         int optionsLeft = options.size();
         for (Map.Entry<String, String> entry : options.entrySet()) {
@@ -145,13 +147,11 @@ public class CodeGeneratorHelper {
                     .append(entry.getValue())
                     .append(SiddhiStringBuilderConstants.SINGLE_QUOTE);
             if (optionsLeft != 1) {
-                storeStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                        .append(SiddhiStringBuilderConstants.SPACE);
+                storeStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
             }
             optionsLeft--;
         }
-        storeStringBuilder.append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
+        storeStringBuilder.append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
 
         return storeStringBuilder.toString();
     }
@@ -173,8 +173,7 @@ public class CodeGeneratorHelper {
         for (String parameter : parameters) {
             parametersStringBuilder.append(parameter);
             if (parametersLeft != 1) {
-                parametersStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                        .append(SiddhiStringBuilderConstants.SPACE);
+                parametersStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
             }
             parametersLeft--;
         }
@@ -201,8 +200,7 @@ public class CodeGeneratorHelper {
             if (annotation.toUpperCase().contains(CodeGeneratorConstants.PRIMARY_KEY_ANNOTATION)) {
                 continue;
             }
-            annotationsStringBuilder.append(annotation)
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+            annotationsStringBuilder.append(annotation);
         }
 
         return annotationsStringBuilder.toString();
@@ -218,7 +216,7 @@ public class CodeGeneratorHelper {
      */
     public static String getMapper(MapperConfig mapper, String annotationType) throws CodeGenerationException {
         if (mapper.getType() == null || mapper.getType().isEmpty()) {
-            throw new CodeGenerationException("The map type of the given MapperConfig object is null/empty");
+            throw new CodeGenerationException("The map type of a given map element is empty");
         }
 
         StringBuilder mapperStringBuilder = new StringBuilder();
@@ -228,13 +226,11 @@ public class CodeGeneratorHelper {
 
         if (mapper.getOptions() != null && !mapper.getOptions().isEmpty()) {
             mapperStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                    .append(SiddhiStringBuilderConstants.SPACE)
                     .append(getParameterList(mapper.getOptions()));
         }
 
         if (mapper.getAttributes() != null && !mapper.getAttributes().isEmpty()) {
-            mapperStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                    .append(SiddhiStringBuilderConstants.SPACE);
+            mapperStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
             if (annotationType.equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
                 mapperStringBuilder.append(SiddhiStringBuilderConstants.ATTRIBUTES_ANNOTATION);
             } else if (annotationType.equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
@@ -259,9 +255,9 @@ public class CodeGeneratorHelper {
      */
     public static String getQueryInput(QueryInputConfig queryInput) throws CodeGenerationException {
         if (queryInput == null) {
-            throw new CodeGenerationException("The given QueryInputConfig object is null");
+            throw new CodeGenerationException("A given query input element is empty");
         } else if (queryInput.getType() == null || queryInput.getType().isEmpty()) {
-            throw new CodeGenerationException("The type value of the given QueryInputConfig object is null/empty");
+            throw new CodeGenerationException("The 'type' value of a given query input element is empty");
         }
 
         StringBuilder queryInputStringBuilder = new StringBuilder();
@@ -283,7 +279,7 @@ public class CodeGeneratorHelper {
                 queryInputStringBuilder.append(getPatternSequenceInput(patternSequence));
                 break;
             default:
-                throw new CodeGenerationException("Unidentified QueryInputConfig type: " + queryInput.getType());
+                throw new CodeGenerationException("Unidentified query input type: " + queryInput.getType());
         }
 
         return queryInputStringBuilder.toString();
@@ -299,18 +295,15 @@ public class CodeGeneratorHelper {
     private static String getWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection)
             throws CodeGenerationException {
         if (windowFilterProjection == null) {
-            throw new CodeGenerationException("The given WindowFilterProjection object is null");
+            throw new CodeGenerationException("A given window/filter/project element is empty");
         } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
-            throw new CodeGenerationException("The 'from' value of the given WindowFilterProjection object is null");
+            throw new CodeGenerationException("The 'from' value of a given window/filter/project element is empty");
         }
 
-        StringBuilder windowFilterProjectionStringBuilder = new StringBuilder();
-        windowFilterProjectionStringBuilder.append(SiddhiStringBuilderConstants.FROM)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(windowFilterProjection.getFrom())
-                .append(getStreamHandlerList(windowFilterProjection.getStreamHandlerList()));
-
-        return windowFilterProjectionStringBuilder.toString();
+        return SiddhiStringBuilderConstants.FROM +
+                SiddhiStringBuilderConstants.SPACE +
+                windowFilterProjection.getFrom() +
+                getStreamHandlerList(windowFilterProjection.getStreamHandlerList());
     }
 
     /**
@@ -322,18 +315,19 @@ public class CodeGeneratorHelper {
      */
     private static String getJoinQueryInput(JoinConfig join) throws CodeGenerationException {
         if (join == null) {
-            throw new CodeGenerationException("The given JoinConfig object is null");
+            throw new CodeGenerationException("A given join query is empty");
         } else if (join.getJoinWith() == null || join.getJoinType().isEmpty()) {
-            throw new CodeGenerationException("The 'joinWith' value of the given JoinConfig object is null/empty");
+            throw new CodeGenerationException("The 'joinWith' value of a given join query is empty");
         } else if (join.getJoinType() == null || join.getJoinType().isEmpty()) {
-            throw new CodeGenerationException("The 'joinType' value for the given JoinConfig object is null/empty");
+            throw new CodeGenerationException("The 'joinType' value of a given join query is empty");
         } else if (join.getLeft() == null || join.getRight() == null) {
-            throw new CodeGenerationException("The left/right JoinElementConfig for the given" +
-                    " JoinConfig object is null");
+            throw new CodeGenerationException("The left/right join element for a given join query is empty");
         } else if (join.getLeft().getType() == null || join.getLeft().getType().isEmpty()) {
-            throw new CodeGenerationException("The type value of the left JoinElementConfig given is null/empty");
+            throw new CodeGenerationException("The 'type' value of the left join element" +
+                    " of a given join query is empty");
         } else if (join.getRight().getType() == null || join.getRight().getType().isEmpty()) {
-            throw new CodeGenerationException("The type value of the right JoinElementConfig given is null/empty");
+            throw new CodeGenerationException("The 'type' value of the right join element" +
+                    " of a given join query is empty");
         }
 
         StringBuilder joinStringBuilder = new StringBuilder();
@@ -346,8 +340,7 @@ public class CodeGeneratorHelper {
                 .append(getJoinElement(join.getRight()));
 
         if (join.getOn() != null && !join.getOn().isEmpty()) {
-            joinStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
-                    .append(SiddhiStringBuilderConstants.TAB_SPACE)
+            joinStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(SiddhiStringBuilderConstants.ON)
                     .append(SiddhiStringBuilderConstants.SPACE)
                     .append(join.getOn());
@@ -355,20 +348,18 @@ public class CodeGeneratorHelper {
 
         if (join.getJoinWith().equalsIgnoreCase(CodeGeneratorConstants.AGGREGATION)) {
             if (join.getWithin() == null || join.getWithin().isEmpty()) {
-                throw new CodeGenerationException("The 'within' attribute for the given join" +
-                        " aggregation query is null/empty");
+                throw new CodeGenerationException("The 'within' value for a given join" +
+                        " aggregation query is empty");
             } else if (join.getPer() == null || join.getPer().isEmpty()) {
-                throw new CodeGenerationException("The 'per' attribute for the given join " +
-                        "aggregation query is null/empty");
+                throw new CodeGenerationException("The 'per' attribute for a given join " +
+                        "aggregation query is empty");
             }
 
-            joinStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
-                    .append(SiddhiStringBuilderConstants.TAB_SPACE)
+            joinStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                     .append(SiddhiStringBuilderConstants.WITHIN)
                     .append(SiddhiStringBuilderConstants.SPACE)
                     .append(join.getWithin())
-                    .append(SiddhiStringBuilderConstants.NEW_LINE)
-                    .append(SiddhiStringBuilderConstants.TAB_SPACE)
+                    .append(SiddhiStringBuilderConstants.SPACE)
                     .append(SiddhiStringBuilderConstants.PER)
                     .append(SiddhiStringBuilderConstants.SPACE)
                     .append(join.getPer());
@@ -386,9 +377,9 @@ public class CodeGeneratorHelper {
      */
     private static String getJoinElement(JoinElementConfig joinElement) throws CodeGenerationException {
         if (joinElement == null) {
-            throw new CodeGenerationException("The JoinElementConfig object given is null");
+            throw new CodeGenerationException("A given join element is empty");
         } else if (joinElement.getFrom() == null || joinElement.getFrom().isEmpty()) {
-            throw new CodeGenerationException("The 'from' value for the given JoinElementConfig object is null/empty");
+            throw new CodeGenerationException("The 'from' value of a given join element is empty");
         }
 
         StringBuilder joinElementStringBuilder = new StringBuilder();
@@ -442,10 +433,9 @@ public class CodeGeneratorHelper {
      */
     private static String getStreamHandler(StreamHandlerConfig streamHandler) throws CodeGenerationException {
         if (streamHandler == null) {
-            throw new CodeGenerationException("The given StreamHandlerConfig object is null");
+            throw new CodeGenerationException("A given stream handler element is empty");
         } else if (streamHandler.getType() == null || streamHandler.getType().isEmpty()) {
-            throw new CodeGenerationException("The type variable for the given StreamHandlerConfig" +
-                    " object is null/empty");
+            throw new CodeGenerationException("The 'type' value of a given stream handler element is empty");
         }
 
         StringBuilder streamHandlerStringBuilder = new StringBuilder();
@@ -476,8 +466,7 @@ public class CodeGeneratorHelper {
                         .append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
                 break;
             default:
-                throw new CodeGenerationException("Unidentified StreamHandlerConfig type: "
-                        + streamHandler.getType());
+                throw new CodeGenerationException("Unidentified stream handler type: " + streamHandler.getType());
         }
 
         return streamHandlerStringBuilder.toString();
@@ -492,7 +481,7 @@ public class CodeGeneratorHelper {
      */
     private static String getJoinType(String joinType) throws CodeGenerationException {
         if (joinType == null || joinType.isEmpty()) {
-            throw new CodeGenerationException("The joinType value for the given join query is null/empty");
+            throw new CodeGenerationException("The 'joinType' value of a given join query is empty");
         }
 
         switch (joinType.toUpperCase()) {
@@ -519,22 +508,34 @@ public class CodeGeneratorHelper {
     private static String getPatternSequenceInput(PatternSequenceConfig patternSequence)
             throws CodeGenerationException {
         if (patternSequence == null) {
-            throw new CodeGenerationException("The given PatternSequenceConfig object is null");
+            throw new CodeGenerationException("A given pattern/sequence query is empty");
         } else if (patternSequence.getLogic() == null || patternSequence.getLogic().isEmpty()) {
-            throw new CodeGenerationException("The 'logic' attribute for the given " +
-                    "PatternSequenceConfig object is null/empty");
+            throw new CodeGenerationException("The 'logic' value for a given pattern/sequence query is empty");
         } else if (patternSequence.getConditionList() == null || patternSequence.getConditionList().isEmpty()) {
-            throw new CodeGenerationException("The condition list for the given PatternSequenceConfig" +
-                    " object is null/empty");
+            throw new CodeGenerationException("The condition list for a given pattern/sequence query is empty");
         }
+
+        StringBuilder patternSequenceInputStringBuilder = new StringBuilder();
+        patternSequenceInputStringBuilder.append(SiddhiStringBuilderConstants.FROM)
+                .append(SiddhiStringBuilderConstants.SPACE);
 
         String logic = patternSequence.getLogic();
-
         for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
-            logic = logic.replace(condition.getConditionId(), getPatternSequenceConditionLogic(condition));
+            if (logic.contains(condition.getConditionId())) {
+                Pattern pattern = Pattern.compile("\\s+not\\s+" + condition.getConditionId());
+                Matcher matcher = pattern.matcher(logic);
+                if (matcher.find()) {
+                    logic = logic.replace(condition.getConditionId(),
+                            getPatternSequenceConditionLogic(condition, true));
+                } else {
+                    logic = logic.replace(condition.getConditionId(),
+                            getPatternSequenceConditionLogic(condition, false));
+                }
+            }
         }
 
-        return logic;
+        patternSequenceInputStringBuilder.append(logic);
+        return patternSequenceInputStringBuilder.toString();
     }
 
     /**
@@ -544,17 +545,20 @@ public class CodeGeneratorHelper {
      * @return The Siddhi string representation of the given PatternSequenceConfig object
      * @throws CodeGenerationException Error while generating code
      */
-    private static String getPatternSequenceConditionLogic(PatternSequenceConditionConfig condition)
+    private static String getPatternSequenceConditionLogic(PatternSequenceConditionConfig condition, boolean hasNot)
             throws CodeGenerationException {
         if (condition == null) {
-            throw new CodeGenerationException("The given PatternSequenceConditionConfig object is null");
+            throw new CodeGenerationException("A given pattern/sequence query condition is empty");
         } else if (condition.getStreamName() == null || condition.getStreamName().isEmpty()) {
-            throw new CodeGenerationException("The stream name of the given PatternSequenceConditionConfig" +
-                    " object is null/empty");
+            throw new CodeGenerationException("The stream name of a given pattern/sequence query condition is empty");
         }
 
         StringBuilder patternSequenceConditionStringBuilder = new StringBuilder();
 
+        if (!hasNot) {
+            patternSequenceConditionStringBuilder.append(condition.getConditionId())
+                    .append(SiddhiStringBuilderConstants.EQUAL);
+        }
         patternSequenceConditionStringBuilder.append(condition.getStreamName())
                 .append(getStreamHandlerList(condition.getStreamHandlerList()));
 
@@ -571,7 +575,7 @@ public class CodeGeneratorHelper {
      */
     public static String getQuerySelect(AttributesSelectionConfig attributesSelection) throws CodeGenerationException {
         if (attributesSelection == null) {
-            throw new CodeGenerationException("The given AttributeSelectionConfig object is null");
+            throw new CodeGenerationException("A given attribute selection element is empty");
         }
 
         StringBuilder attributesSelectionStringBuilder = new StringBuilder();
@@ -580,7 +584,7 @@ public class CodeGeneratorHelper {
                 .append(SiddhiStringBuilderConstants.SPACE);
 
         if (attributesSelection.getType() == null || attributesSelection.getType().isEmpty()) {
-            throw new CodeGenerationException("The type value of the given AttributeSelectionConfig is null/empty");
+            throw new CodeGenerationException("The 'type' value of a given attribute selection element is empty");
         }
 
         switch (attributesSelection.getType().toUpperCase()) {
@@ -592,7 +596,7 @@ public class CodeGeneratorHelper {
                 attributesSelectionStringBuilder.append(SiddhiStringBuilderConstants.ALL);
                 break;
             default:
-                throw new CodeGenerationException("Undefined Attribute Selection Type:"
+                throw new CodeGenerationException("Undefined attribute selection type:"
                         + attributesSelection.getType());
         }
 
@@ -611,7 +615,7 @@ public class CodeGeneratorHelper {
             throws CodeGenerationException {
         if (userDefinedSelection == null || userDefinedSelection.getValue() == null ||
                 userDefinedSelection.getValue().isEmpty()) {
-            throw new CodeGenerationException("The given UserDefinedSelection object is null/empty");
+            throw new CodeGenerationException("A given user defined selection value is empty");
         }
 
         StringBuilder userDefinedSelectionStringBuilder = new StringBuilder();
@@ -619,8 +623,8 @@ public class CodeGeneratorHelper {
         int attributesLeft = userDefinedSelection.getValue().size();
         for (SelectedAttribute attribute : userDefinedSelection.getValue()) {
             if (attribute.getExpression() == null || attribute.getExpression().isEmpty()) {
-                throw new CodeGenerationException("The 'expression' value for the given" +
-                        " SelectedAttribute object is null/empty");
+                throw new CodeGenerationException("The 'expression' value of a given select" +
+                        " attribute element is empty");
             }
             userDefinedSelectionStringBuilder.append(attribute.getExpression());
             if (attribute.getAs() != null && !attribute.getAs().isEmpty() &&
@@ -631,8 +635,7 @@ public class CodeGeneratorHelper {
                         .append(attribute.getAs());
             }
             if (attributesLeft != 1) {
-                userDefinedSelectionStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                        .append(SiddhiStringBuilderConstants.SPACE);
+                userDefinedSelectionStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
             }
             attributesLeft--;
         }
@@ -651,13 +654,11 @@ public class CodeGeneratorHelper {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
-        StringBuilder groupByListStringBuilder = new StringBuilder();
-        groupByListStringBuilder.append(SiddhiStringBuilderConstants.GROUP)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.BY)
-                .append(SiddhiStringBuilderConstants.SPACE);
-        groupByListStringBuilder.append(getParameterList(groupByList));
-        return groupByListStringBuilder.toString();
+        return SiddhiStringBuilderConstants.GROUP +
+                SiddhiStringBuilderConstants.SPACE +
+                SiddhiStringBuilderConstants.BY +
+                SiddhiStringBuilderConstants.SPACE +
+                getParameterList(groupByList);
     }
 
     /**
@@ -681,9 +682,9 @@ public class CodeGeneratorHelper {
         int orderByAttributesLeft = orderByList.size();
         for (QueryOrderByConfig orderByAttribute : orderByList) {
             if (orderByAttribute == null) {
-                throw new CodeGenerationException("The given QueryOrderByConfig is null");
+                throw new CodeGenerationException("A given query 'order by' value is empty");
             } else if (orderByAttribute.getValue() == null || orderByAttribute.getValue().isEmpty()) {
-                throw new CodeGenerationException("The 'value' for the QueryOrderByConfig object given is null/empty");
+                throw new CodeGenerationException("The 'value' attribute for a given query order by element is empty");
             }
 
             orderByListStringBuilder.append(orderByAttribute.getValue());
@@ -693,8 +694,7 @@ public class CodeGeneratorHelper {
             }
 
             if (orderByAttributesLeft != 1) {
-                orderByListStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                        .append(SiddhiStringBuilderConstants.SPACE);
+                orderByListStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
             }
             orderByAttributesLeft--;
         }
@@ -710,11 +710,9 @@ public class CodeGeneratorHelper {
      */
     public static String getQueryLimit(long limit) {
         if (limit != 0) {
-            StringBuilder limitStringBuilder = new StringBuilder();
-            limitStringBuilder.append(SiddhiStringBuilderConstants.LIMIT)
-                    .append(SiddhiStringBuilderConstants.SPACE)
-                    .append(limit);
-            return limitStringBuilder.toString();
+            return SiddhiStringBuilderConstants.LIMIT +
+                    SiddhiStringBuilderConstants.SPACE +
+                    limit;
         }
         return SiddhiStringBuilderConstants.EMPTY_STRING;
     }
@@ -730,12 +728,9 @@ public class CodeGeneratorHelper {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
 
-        StringBuilder havingStringBuilder = new StringBuilder();
-        havingStringBuilder.append(SiddhiStringBuilderConstants.HAVING)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(having);
-
-        return havingStringBuilder.toString();
+        return SiddhiStringBuilderConstants.HAVING +
+                SiddhiStringBuilderConstants.SPACE +
+                having;
     }
 
     /**
@@ -748,12 +743,10 @@ public class CodeGeneratorHelper {
         if (outputRateLimit == null || outputRateLimit.isEmpty()) {
             return SiddhiStringBuilderConstants.EMPTY_STRING;
         }
-        StringBuilder outputRateLimitStringBuilder = new StringBuilder();
-        outputRateLimitStringBuilder.append(SiddhiStringBuilderConstants.OUTPUT)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(outputRateLimit);
 
-        return outputRateLimitStringBuilder.toString();
+        return SiddhiStringBuilderConstants.OUTPUT +
+                SiddhiStringBuilderConstants.SPACE +
+                outputRateLimit;
     }
 
     /**
@@ -765,9 +758,9 @@ public class CodeGeneratorHelper {
      */
     public static String getQueryOutput(QueryOutputConfig queryOutput) throws CodeGenerationException {
         if (queryOutput == null) {
-            throw new CodeGenerationException("The QueryOutputConfig given is null");
+            throw new CodeGenerationException("A given query output element is empty");
         } else if (queryOutput.getType() == null || queryOutput.getType().isEmpty()) {
-            throw new CodeGenerationException("The type value for the given QueryOutputConfig object is null/empty");
+            throw new CodeGenerationException("The 'type' value of a given query output element is empty");
         }
 
         StringBuilder queryOutputStringBuilder = new StringBuilder();
@@ -806,9 +799,9 @@ public class CodeGeneratorHelper {
     private static String getInsertOutput(InsertOutputConfig insertOutput, String target)
             throws CodeGenerationException {
         if (insertOutput == null) {
-            throw new CodeGenerationException("The given InsertOutputConfig object is null");
+            throw new CodeGenerationException("A given insert query output element is empty");
         } else if (target == null || target.isEmpty()) {
-            throw new CodeGenerationException("The target value for the given query output is null/empty");
+            throw new CodeGenerationException("The 'target' value of a given query output element is empty");
         }
 
         StringBuilder insertOutputStringBuilder = new StringBuilder();
@@ -831,7 +824,8 @@ public class CodeGeneratorHelper {
                             .append(SiddhiStringBuilderConstants.SPACE);
                     break;
                 default:
-                    throw new CodeGenerationException("Unidentified event type: " + insertOutput.getEventType());
+                    throw new CodeGenerationException("Unidentified insert query output event type: "
+                            + insertOutput.getEventType());
             }
         }
 
@@ -854,28 +848,23 @@ public class CodeGeneratorHelper {
     private static String getDeleteOutput(DeleteOutputConfig deleteOutput, String target)
             throws CodeGenerationException {
         if (deleteOutput == null) {
-            throw new CodeGenerationException("The given DeleteOutputConfig object is null");
+            throw new CodeGenerationException("A given delete query output element is empty");
         } else if (deleteOutput.getOn() == null || deleteOutput.getOn().isEmpty()) {
-            throw new CodeGenerationException("The 'on' statement of the given DeleteOutputConfig" +
-                    " object is null/empty");
+            throw new CodeGenerationException("The 'on' statement of a given delete query" +
+                    " output element is null/empty");
         } else if (target == null || target.isEmpty()) {
-            throw new CodeGenerationException("The target value for the given delete query is null/empty");
+            throw new CodeGenerationException("The 'target' value of a given delete query output is empty");
         }
 
-        StringBuilder deleteOutputStringBuilder = new StringBuilder();
-
-        deleteOutputStringBuilder.append(SiddhiStringBuilderConstants.DELETE)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(target)
-                .append(getForEventType(deleteOutput.getEventType()))
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.TAB_SPACE)
-                .append(SiddhiStringBuilderConstants.ON)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(deleteOutput.getOn())
-                .append(SiddhiStringBuilderConstants.SEMI_COLON);
-
-        return deleteOutputStringBuilder.toString();
+        return SiddhiStringBuilderConstants.DELETE +
+                SiddhiStringBuilderConstants.SPACE +
+                target +
+                getForEventType(deleteOutput.getEventType()) +
+                SiddhiStringBuilderConstants.SPACE +
+                SiddhiStringBuilderConstants.ON +
+                SiddhiStringBuilderConstants.SPACE +
+                deleteOutput.getOn() +
+                SiddhiStringBuilderConstants.SEMI_COLON;
     }
 
     /**
@@ -890,15 +879,16 @@ public class CodeGeneratorHelper {
     private static String getUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput,
                                           String target) throws CodeGenerationException {
         if (updateInsertIntoOutput == null) {
-            throw new CodeGenerationException("The given UpdateInsertIntoOutputConfig object is null");
+            throw new CodeGenerationException("A given update/insert query output element is empty");
         } else if (updateInsertIntoOutput.getSet() == null || updateInsertIntoOutput.getSet().isEmpty()) {
-            throw new CodeGenerationException("The SetAttributeConfig list for the given" +
-                    " update/insert query is null/empty");
+            throw new CodeGenerationException("The 'set attribute' list of a given update/insert" +
+                    " query output element is empty");
         } else if (updateInsertIntoOutput.getOn() == null || updateInsertIntoOutput.getOn().isEmpty()) {
-            throw new CodeGenerationException("The 'on' value for the UpdateInsertIntoOutputConfig" +
-                    " object is null/empty");
+            throw new CodeGenerationException("The 'on' value of a given update/insert query" +
+                    " element is empty");
         } else if (target == null || target.isEmpty()) {
-            throw new CodeGenerationException("The given target for the update/insert into query is null/empty");
+            throw new CodeGenerationException("The 'target' value of a given update/insert" +
+                    " query output element is empty");
         }
 
         StringBuilder updateInsertIntoOutputStringBuilder = new StringBuilder();
@@ -911,8 +901,7 @@ public class CodeGeneratorHelper {
         updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                 .append(target)
                 .append(getForEventType(updateInsertIntoOutput.getEventType()))
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.TAB_SPACE)
+                .append(SiddhiStringBuilderConstants.SPACE)
                 .append(SiddhiStringBuilderConstants.SET)
                 .append(SiddhiStringBuilderConstants.SPACE);
 
@@ -921,14 +910,12 @@ public class CodeGeneratorHelper {
             updateInsertIntoOutputStringBuilder.append(getSetAttribute(setAttribute));
 
             if (setAttributesLeft != 1) {
-                updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                        .append(SiddhiStringBuilderConstants.SPACE);
+                updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
             }
             setAttributesLeft--;
         }
 
-        updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.TAB_SPACE)
+        updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                 .append(SiddhiStringBuilderConstants.ON)
                 .append(SiddhiStringBuilderConstants.SPACE)
                 .append(updateInsertIntoOutput.getOn())
@@ -966,7 +953,7 @@ public class CodeGeneratorHelper {
                 forEventTypeStringBuilder.append(SiddhiStringBuilderConstants.ALL_EVENTS);
                 break;
             default:
-                throw new CodeGenerationException("Unidentified event type: " + eventType);
+                throw new CodeGenerationException("Unidentified 'for' event type: " + eventType);
         }
 
         return forEventTypeStringBuilder.toString();
@@ -981,25 +968,18 @@ public class CodeGeneratorHelper {
      */
     private static String getSetAttribute(SetAttributeConfig setAttribute) throws CodeGenerationException {
         if (setAttribute == null) {
-            throw new CodeGenerationException("The SetAttributeConfig object given is null in the" +
-                    " update output query type");
+            throw new CodeGenerationException("A given set attribute element given is empty");
         } else if (setAttribute.getAttribute() == null || setAttribute.getAttribute().isEmpty()) {
-            throw new CodeGenerationException("The 'attribute' value of the given SetAttributeConfig" +
-                    " object is null/empty");
+            throw new CodeGenerationException("The 'attribute' value of a given set attribute element is empty");
         } else if (setAttribute.getValue() == null || setAttribute.getValue().isEmpty()) {
-            throw new CodeGenerationException("The 'value' attribute of the given SetAttributeConfig" +
-                    " object is null/empty");
+            throw new CodeGenerationException("The 'value' attribute of a given set attribute element is empty");
         }
 
-        StringBuilder setAttributeStringBuilder = new StringBuilder();
-
-        setAttributeStringBuilder.append(setAttribute.getAttribute())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.EQUAL)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(setAttribute.getValue());
-
-        return setAttributeStringBuilder.toString();
+        return setAttribute.getAttribute() +
+                SiddhiStringBuilderConstants.SPACE +
+                SiddhiStringBuilderConstants.EQUAL +
+                SiddhiStringBuilderConstants.SPACE +
+                setAttribute.getValue();
     }
 
     /**
@@ -1011,8 +991,7 @@ public class CodeGeneratorHelper {
      */
     public static String getPartitionWith(List<PartitionWithElement> partitionWith) throws CodeGenerationException {
         if (partitionWith == null || partitionWith.isEmpty()) {
-            throw new CodeGenerationException("The 'partitionWith' value for the given" +
-                    " PartitionConfig object is null/empty");
+            throw new CodeGenerationException("A given 'partitionWith' list is empty");
         }
 
         StringBuilder partitionWithStringBuilder = new StringBuilder();
@@ -1020,8 +999,7 @@ public class CodeGeneratorHelper {
         for (PartitionWithElement partitionWithElement : partitionWith) {
             partitionWithStringBuilder.append(getPartitionWithElement(partitionWithElement));
             if (partitionWithElementsLeft != 1) {
-                partitionWithStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                        .append(SiddhiStringBuilderConstants.SPACE);
+                partitionWithStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
             }
             partitionWithElementsLeft--;
         }
@@ -1039,22 +1017,18 @@ public class CodeGeneratorHelper {
     private static String getPartitionWithElement(PartitionWithElement partitionWithElement)
             throws CodeGenerationException {
         if (partitionWithElement == null) {
-            throw new CodeGenerationException("The given PartitionWithElement object is null");
+            throw new CodeGenerationException("A given 'partition with' element is empty");
         } else if (partitionWithElement.getExpression() == null || partitionWithElement.getExpression().isEmpty()) {
-            throw new CodeGenerationException("The 'expression' value of the given PartitionWithElement" +
-                    " object is null/empty");
+            throw new CodeGenerationException("The 'expression' value of a given 'partition with' element is empty");
         } else if (partitionWithElement.getStreamName() == null || partitionWithElement.getStreamName().isEmpty()) {
-            throw new CodeGenerationException("The stream name of the goven PartitionWithElement is null/empty");
+            throw new CodeGenerationException("The stream name of a given 'partition with' element is empty");
         }
 
-        StringBuilder partitionWithElementStringBuilder = new StringBuilder();
-        partitionWithElementStringBuilder.append(partitionWithElement.getExpression())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.OF)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(partitionWithElement.getStreamName());
-
-        return partitionWithElementStringBuilder.toString();
+        return partitionWithElement.getExpression() +
+                SiddhiStringBuilderConstants.SPACE +
+                SiddhiStringBuilderConstants.OF +
+                SiddhiStringBuilderConstants.SPACE +
+                partitionWithElement.getStreamName();
     }
 
     /**
@@ -1068,7 +1042,7 @@ public class CodeGeneratorHelper {
      */
     public static List<QueryConfig> orderPartitionQueries(List<QueryConfig> queries) throws CodeGenerationException {
         if (queries == null) {
-            throw new CodeGenerationException("The given list of queries to re-order is null");
+            throw new CodeGenerationException("A given list of queries for a partition is empty");
         }
         List<QueryConfig> reorderedQueries = new LinkedList<>();
         while (!queries.isEmpty()) {
@@ -1098,12 +1072,11 @@ public class CodeGeneratorHelper {
      */
     private static List<String> getInnerInputStreams(QueryConfig query) throws CodeGenerationException {
         if (query == null) {
-            throw new CodeGenerationException("The given QueryConfig object is null");
+            throw new CodeGenerationException("A given query element is empty");
         } else if (query.getQueryInput() == null) {
-            throw new CodeGenerationException("The query input of the given QueryConfig object is null");
+            throw new CodeGenerationException("The query input of a given query element is empty");
         } else if (query.getQueryInput().getType() == null || query.getQueryInput().getType().isEmpty()) {
-            throw new CodeGenerationException("The type of the query input of the given" +
-                    " QueryConfig object is null/empty");
+            throw new CodeGenerationException("The 'type' value of a given query input element is empty");
         }
 
         List<String> innerInputStreamList = new LinkedList<>();
@@ -1114,8 +1087,8 @@ public class CodeGeneratorHelper {
                 WindowFilterProjectionConfig windowFilterProjection =
                         (WindowFilterProjectionConfig) query.getQueryInput();
                 if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
-                    throw new CodeGenerationException("The 'from' value of the given" +
-                            " WindowFilterProjection input is null/empty");
+                    throw new CodeGenerationException("The 'from' value of a given" +
+                            " window/filter/projection query input is empty");
                 }
 
                 if (windowFilterProjection.getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
@@ -1125,15 +1098,15 @@ public class CodeGeneratorHelper {
             case CodeGeneratorConstants.JOIN:
                 JoinConfig join = (JoinConfig) query.getQueryInput();
                 if (join.getLeft() == null) {
-                    throw new CodeGenerationException("The join left element of the given JoinConfig input is null");
+                    throw new CodeGenerationException("The join left element of a given join query is empty");
                 } else if (join.getRight() == null) {
-                    throw new CodeGenerationException("The join right element of the given JoinConfig input is null");
+                    throw new CodeGenerationException("The join right element of a given join query is empty");
                 } else if (join.getLeft().getFrom() == null || join.getLeft().getFrom().isEmpty()) {
-                    throw new CodeGenerationException("The left element 'from' value of the given" +
-                            " JoinConfig is null/empty");
+                    throw new CodeGenerationException("The left element 'from' value of a given" +
+                            " join query is empty");
                 } else if (join.getRight().getFrom() == null || join.getRight().getFrom().isEmpty()) {
-                    throw new CodeGenerationException("The right element 'from' value of the" +
-                            " given JoinConfig is null/empty");
+                    throw new CodeGenerationException("The right element 'from' value of a" +
+                            " given join query is empty");
                 }
 
                 if (join.getLeft().getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
@@ -1147,18 +1120,17 @@ public class CodeGeneratorHelper {
             case CodeGeneratorConstants.SEQUENCE:
                 PatternSequenceConfig patternSequence = (PatternSequenceConfig) query.getQueryInput();
                 if (patternSequence.getConditionList() == null || patternSequence.getConditionList().isEmpty()) {
-                    throw new CodeGenerationException("The condition list of the given " +
-                            "PatternSequenceConfig object is null");
-
+                    throw new CodeGenerationException("The condition list of a given " +
+                            "pattern/sequence query is empty");
                 }
 
                 for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
                     if (condition == null) {
-                        throw new CodeGenerationException("The condition value of the given" +
-                                " PatterSequenceConfig condition list is null");
+                        throw new CodeGenerationException("The condition value of a given" +
+                                " pattern/sequence condition list is empty");
                     } else if (condition.getStreamName() == null || condition.getStreamName().isEmpty()) {
                         throw new CodeGenerationException("The condition stream name of the given" +
-                                " PatternSequenceConditionConfig is null/empty");
+                                " pattern/sequence query condition is empty");
                     }
 
                     if (condition.getStreamName().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
@@ -1167,10 +1139,61 @@ public class CodeGeneratorHelper {
                 }
                 break;
             default:
-                throw new CodeGenerationException("Unidentified Query Type: " + query.getQueryInput().getType());
+                throw new CodeGenerationException("Unidentified query type: " + query.getQueryInput().getType());
         }
 
         return innerInputStreamList;
+    }
+
+    /**
+     * Generate's a Siddhi string representation of a aggregation's AggregateByTimePeriod object
+     *
+     * @param aggregateByTimePeriod The AggregateByTimePeriod object to be converted
+     * @return The Siddhi string representation of the given AggregateByTimePeriod object
+     * @throws CodeGenerationException Error while generating the code
+     */
+    public static String getAggregateByTimePeriod(AggregateByTimePeriod aggregateByTimePeriod)
+            throws CodeGenerationException {
+        if (aggregateByTimePeriod == null) {
+            throw new CodeGenerationException("A given aggregateByTimePeriod element is empty");
+        } else if (aggregateByTimePeriod.getType() == null || aggregateByTimePeriod.getType().isEmpty()) {
+            throw new CodeGenerationException("The 'type' value of a given aggregateByTimePeriod element is empty");
+        }
+
+        StringBuilder aggregateByTimePeriodStringBuilder = new StringBuilder();
+        switch (aggregateByTimePeriod.getType().toUpperCase()) {
+            case CodeGeneratorConstants.RANGE:
+                AggregateByTimeRange aggregateByTimeRange = (AggregateByTimeRange) aggregateByTimePeriod;
+                if (aggregateByTimeRange.getValue() == null) {
+                    throw new CodeGenerationException("The 'value' attribute of a given aggregateByTimeRange" +
+                            " element is empty");
+                } else if (aggregateByTimeRange.getValue().getMin() == null ||
+                        aggregateByTimeRange.getValue().getMin().isEmpty()) {
+                    throw new CodeGenerationException("The 'min' value of a given" +
+                            " aggregateByTimeRange element is empty");
+                } else if (aggregateByTimeRange.getValue().getMax() == null ||
+                        aggregateByTimeRange.getValue().getMax().isEmpty()) {
+                    throw new CodeGenerationException("The 'max' value of a given" +
+                            " aggregateByTimeRange element is empty");
+                }
+                aggregateByTimePeriodStringBuilder.append(aggregateByTimeRange.getValue().getMin())
+                        .append(SiddhiStringBuilderConstants.THREE_DOTS)
+                        .append(aggregateByTimeRange.getValue().getMax());
+                break;
+            case CodeGeneratorConstants.INTERVAL:
+                AggregateByTimeInterval aggregateByTimeInterval = (AggregateByTimeInterval) aggregateByTimePeriod;
+                if (aggregateByTimeInterval.getValue() == null || aggregateByTimeInterval.getValue().isEmpty()) {
+                    throw new CodeGenerationException("The 'value' attribute of a given" +
+                            " attributeByTimeInterval element is empty");
+                }
+                aggregateByTimePeriodStringBuilder.append(getParameterList(aggregateByTimeInterval.getValue()));
+                break;
+            default:
+                throw new CodeGenerationException("Unidentified aggregateByTimePeriod element type: "
+                        + aggregateByTimePeriod.getType());
+        }
+
+        return aggregateByTimePeriodStringBuilder.toString();
     }
 
     private CodeGeneratorHelper() {

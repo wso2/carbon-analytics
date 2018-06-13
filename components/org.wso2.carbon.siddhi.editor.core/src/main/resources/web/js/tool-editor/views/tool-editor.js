@@ -172,12 +172,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 self.JSONObject = response.responseJSON;
                                 sourceContainer.hide();
                                 loadingScreen.show();
-                                // TODO explain why setTimeout() is used
+                                // The following code has been added to the setTimeout() method because
+                                // the code needs to run asynchronously for the loading screen
                                 setTimeout(function () {
                                     designView.emptyDesignViewGridContainer();
                                     designContainer.show();
                                     designView.renderDesignGrid(self.JSONObject);
                                     loadingScreen.hide();
+                                    // NOTE - This trigger should be always handled at the end of setTimeout()
+                                    self.trigger("view-switch");
                                 }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
                                     "<span class=\"toggle-button-text\">Source View</span>");
@@ -221,14 +224,18 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             if (response.status === "success") {
                                 designContainer.hide();
                                 loadingScreen.show();
-                                // TODO explain why setTimeout() is used
+                                // The following code has been added to the setTimeout() method because
+                                // the code needs to run asynchronously for the loading screen
                                 setTimeout(function () {
                                     self.setContent(response.responseJSON);
                                     self.trigger('content-modified');
                                     designView.emptyDesignViewGridContainer();
                                     sourceContainer.show();
                                     self._sourceView.editorResize();
+                                    self._sourceView.format();
                                     loadingScreen.hide();
+                                    // NOTE - This trigger should be always handled at the end of setTimeout()
+                                    self.trigger("view-switch");
                                 }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
@@ -236,8 +243,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
                             }
                         }
-                        // NOTE - This trigger should be always handled after the 'if' condition
-                        self.trigger("view-switch");
                     });
                 },
 
