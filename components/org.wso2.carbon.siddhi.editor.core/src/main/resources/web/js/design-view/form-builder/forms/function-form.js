@@ -112,7 +112,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
                 var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUsed(editor.getValue().name);
@@ -131,7 +131,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 var functionObject = new FunctionDefinition(functionOptions);
                 self.configurationData.getSiddhiAppConfig().addFunction(functionObject);
 
-                var textNode = $('#'+i).find('.functionNameNode');
+                var textNode = $('#' + i).find('.functionNameNode');
                 textNode.html(editor.getValue().name);
 
                 // close the form window
@@ -157,7 +157,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             var id = $(element).parent().attr('id');
             // retrieve the function information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getFunction(id);
-            if(!clickedElement) {
+            if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
@@ -177,8 +177,8 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             var body = clickedElement.getBody();
 
             var fillWith = {
-                name : name,
-                scriptType : scriptType,
+                name: name,
+                scriptType: scriptType,
                 returnType: returnType,
                 body: body
             };
@@ -246,7 +246,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
                 var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUsed(editor.getValue().name,

@@ -37,8 +37,8 @@ define(
             if (options !== undefined) {
                 this.id = options.id;
                 this.name = options.name;
-                this.scriptType = (options.scriptType !== undefined)? (options.scriptType).toUpperCase() : undefined;
-                this.returnType = (options.returnType !== undefined)? (options.returnType).toUpperCase() : undefined;
+                this.scriptType = (options.scriptType !== undefined) ? (options.scriptType).toUpperCase() : undefined;
+                this.returnType = (options.returnType !== undefined) ? (options.returnType).toUpperCase() : undefined;
                 this.body = options.body;
             }
         };

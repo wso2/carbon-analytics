@@ -207,7 +207,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
                 // add the new out sink to the sink array
@@ -217,7 +217,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 _.set(sinkOptions, 'type', editor.getValue().annotationType.name);
 
                 var annotationOptions = [];
-                if(editor.getValue().annotationOptions !== undefined) {
+                if (editor.getValue().annotationOptions !== undefined) {
                     _.forEach(editor.getValue().annotationOptions, function (option) {
                         annotationOptions.push(option.optionValue);
                     });
@@ -232,7 +232,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     _.set(mapperOptions, 'type', editor.getValue().map.annotationType.name);
 
                     var mapperAnnotationOptions = [];
-                    if(editor.getValue().map.annotationOptions !== undefined) {
+                    if (editor.getValue().map.annotationOptions !== undefined) {
                         _.forEach(editor.getValue().map.annotationOptions, function (option) {
                             mapperAnnotationOptions.push(option.optionValue);
                         });
@@ -297,7 +297,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             var id = $(element).parent().attr('id');
             // retrieve the sink information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getSink(id);
-            if(!clickedElement) {
+            if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
@@ -351,12 +351,12 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 annotationType: {
                     name: type
                 },
-                annotationOptions : sinkOptionsArray,
+                annotationOptions: sinkOptionsArray,
                 map: {
                     annotationType: {
                         name: mapperType
                     },
-                    annotationOptions : mapperOptionsArray,
+                    annotationOptions: mapperOptionsArray,
                     attributeValues: mapperAttributesArray
                 }
             };
@@ -521,7 +521,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
 
@@ -529,7 +529,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 clickedElement.setType(config.annotationType.name);
 
                 var annotationOptions = [];
-                if(config.annotationOptions !== undefined) {
+                if (config.annotationOptions !== undefined) {
                     _.forEach(config.annotationOptions, function (option) {
                         annotationOptions.push(option.optionValue);
                     });
@@ -543,7 +543,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     _.set(mapperOptions, 'type', config.map.annotationType.name);
 
                     var mapperAnnotationOptions = [];
-                    if(config.map.annotationOptions !== undefined) {
+                    if (config.map.annotationOptions !== undefined) {
                         _.forEach(config.map.annotationOptions, function (option) {
                             mapperAnnotationOptions.push(option.optionValue);
                         });

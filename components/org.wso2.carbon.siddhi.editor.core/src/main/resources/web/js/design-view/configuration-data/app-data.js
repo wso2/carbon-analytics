@@ -113,7 +113,7 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.removeStream = function (streamId) {
             var isStreamDeleted = ElementUtils.prototype.removeElement(this.streamList, streamId);
-            if(!isStreamDeleted) {
+            if (!isStreamDeleted) {
                 isStreamDeleted = this.removeStreamSavedInsideAPartition(streamId);
             }
             return isStreamDeleted;
@@ -142,7 +142,7 @@ define(['require', 'elementUtils', 'lodash'],
         AppData.prototype.removeWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
             var isQueryDeleted = ElementUtils.prototype
                 .removeElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
-            if(!isQueryDeleted) {
+            if (!isQueryDeleted) {
                 isQueryDeleted =
                     this.removeQuerySavedInsideAPartition(windowFilterProjectionQueryId,
                         'WINDOW_FILTER_PROJECTION_QUERY');
@@ -152,7 +152,7 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.removePatternQuery = function (patternQueryId) {
             var isQueryDeleted = ElementUtils.prototype.removeElement(this.queryLists.PATTERN, patternQueryId);
-            if(!isQueryDeleted) {
+            if (!isQueryDeleted) {
                 isQueryDeleted = this.removeQuerySavedInsideAPartition(patternQueryId, 'PATTERN_QUERY');
             }
             return isQueryDeleted;
@@ -160,7 +160,7 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.removeSequenceQuery = function (sequenceQueryId) {
             var isQueryDeleted = ElementUtils.prototype.removeElement(this.queryLists.SEQUENCE, sequenceQueryId);
-            if(!isQueryDeleted) {
+            if (!isQueryDeleted) {
                 isQueryDeleted = this.removeQuerySavedInsideAPartition(sequenceQueryId, 'SEQUENCE_QUERY');
             }
             return isQueryDeleted;
@@ -168,7 +168,7 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.removeJoinQuery = function (joinQueryId) {
             var isQueryDeleted = ElementUtils.prototype.removeElement(this.queryLists.JOIN, joinQueryId);
-            if(!isQueryDeleted) {
+            if (!isQueryDeleted) {
                 isQueryDeleted = this.removeQuerySavedInsideAPartition(joinQueryId, 'JOIN_QUERY');
             }
             return isQueryDeleted;
@@ -223,8 +223,8 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.getWindowFilterProjectionQuery = function (windowFilterProjectionQueryId) {
-            var returnedElement = ElementUtils.prototype.
-            getElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
+            var returnedElement = ElementUtils.prototype
+                .getElement(this.queryLists.WINDOW_FILTER_PROJECTION, windowFilterProjectionQueryId);
             if (!returnedElement) {
                 returnedElement =
                     this.getQuerySavedInsideAPartition(windowFilterProjectionQueryId, 'WINDOW_FILTER_PROJECTION_QUERY');
@@ -241,7 +241,7 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.getSequenceQuery = function (sequenceQueryId) {
-            var returnedElement =  ElementUtils.prototype.getElement(this.queryLists.SEQUENCE, sequenceQueryId);
+            var returnedElement = ElementUtils.prototype.getElement(this.queryLists.SEQUENCE, sequenceQueryId);
             if (!returnedElement) {
                 returnedElement = this.getQuerySavedInsideAPartition(sequenceQueryId, 'SEQUENCE_QUERY');
             }
@@ -249,7 +249,7 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.getJoinQuery = function (joinQueryId) {
-            var returnedElement =  ElementUtils.prototype.getElement(this.queryLists.JOIN, joinQueryId);
+            var returnedElement = ElementUtils.prototype.getElement(this.queryLists.JOIN, joinQueryId);
             if (!returnedElement) {
                 returnedElement = this.getQuerySavedInsideAPartition(joinQueryId, 'JOIN_QUERY');
             }
@@ -495,7 +495,7 @@ define(['require', 'elementUtils', 'lodash'],
          */
         AppData.prototype.getQuerySavedInsideAPartition = function (queryId, queryType) {
             var self = this;
-            var requestedElement ;
+            var requestedElement;
             _.forEach(self.partitionList, function (partition) {
                 if (!requestedElement) {
                     if (queryType === 'WINDOW_FILTER_PROJECTION_QUERY') {

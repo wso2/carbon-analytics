@@ -28,7 +28,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          * @param application Application data
          * @param jsPlumbInstance js plumb instance for the design grid
          */
-        var DesignView = function (options, application ,jsPlumbInstance) {
+        var DesignView = function (options, application, jsPlumbInstance) {
             var errorMessage1 = 'unable to find design view container in design-view.js';
             var errorMessage2 = 'unable to find application in design-view.js';
             if (!_.has(options, 'container')) {
@@ -47,7 +47,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             this._$parent_el = container;
             this.options = options;
             this.application = application;
-            this.jsPlumbInstance =jsPlumbInstance;
+            this.jsPlumbInstance = jsPlumbInstance;
         };
 
         /**
@@ -151,27 +151,27 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 result = {
                     status: "success",
                     responseJSON: {
-                        "siddhiAppConfig":{
-                            "siddhiAppName":match[1],
-                            "appAnnotationList":['@App:description("' + match[2] + '")'],
-                            "streamList":[],
-                            "tableList":[],
-                            "windowList":[],
-                            "triggerList":[],
-                            "aggregationList":[],
-                            "functionList":[],
-                            "partitionList":[],
-                            "sourceList":[],
-                            "sinkList":[],
-                            "queryLists":{
-                                "WINDOW_FILTER_PROJECTION":[],
-                                "PATTERN":[],
-                                "SEQUENCE":[],
-                                "JOIN":[]
+                        "siddhiAppConfig": {
+                            "siddhiAppName": match[1],
+                            "appAnnotationList": ['@App:description("' + match[2] + '")'],
+                            "streamList": [],
+                            "tableList": [],
+                            "windowList": [],
+                            "triggerList": [],
+                            "aggregationList": [],
+                            "functionList": [],
+                            "partitionList": [],
+                            "sourceList": [],
+                            "sinkList": [],
+                            "queryLists": {
+                                "WINDOW_FILTER_PROJECTION": [],
+                                "PATTERN": [],
+                                "SEQUENCE": [],
+                                "JOIN": []
                             },
-                            "finalElementCount":0
+                            "finalElementCount": 0
                         },
-                        "edgeList":[]
+                        "edgeList": []
                     }
                 };
             } else {

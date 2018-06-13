@@ -93,7 +93,7 @@ define(['require', 'lodash'],
          * @return {boolean}
          */
         FormUtils.prototype.isStreamDefinitionNameUsedInPartition = function (partitionId, elementName,
-                                                                                skipElementID) {
+                                                                              skipElementID) {
             var self = this;
             var isNameUsed = false;
             var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
@@ -168,14 +168,14 @@ define(['require', 'lodash'],
                 self.jsPlumbInstance.deleteConnection(connection);
             });
 
-            _.forEach(inConnections, function(inConnection){
+            _.forEach(inConnections, function (inConnection) {
                 self.jsPlumbInstance.connect({
                     source: inConnection.sourceId,
                     target: inConnection.targetId
                 });
             });
 
-            _.forEach(outConnections, function(outConnection){
+            _.forEach(outConnections, function (outConnection) {
                 self.jsPlumbInstance.connect({
                     source: outConnection.sourceId,
                     target: outConnection.targetId

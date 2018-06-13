@@ -34,7 +34,7 @@ define(
             */
             if (options !== undefined) {
                 this.type
-                    = (options.type !== undefined)? (options.type).toUpperCase() : undefined;
+                    = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.value = options.value;
             }
         };

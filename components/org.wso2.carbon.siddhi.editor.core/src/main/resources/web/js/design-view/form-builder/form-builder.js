@@ -34,19 +34,19 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         var constants = {
             SOURCE: 'sourceDrop',
             SINK: 'sinkDrop',
-            STREAM : 'streamDrop',
-            TABLE : 'tableDrop',
-            WINDOW :'windowDrop',
-            TRIGGER :'triggerDrop',
-            AGGREGATION : 'aggregationDrop',
-            FUNCTION : 'functionDrop',
-            PROJECTION : 'projectionQueryDrop',
-            FILTER : 'filterQueryDrop',
-            JOIN : 'joinQueryDrop',
-            WINDOW_QUERY : 'windowQueryDrop',
-            PATTERN : 'patternQueryDrop',
-            SEQUENCE : 'sequenceQueryDrop',
-            PARTITION :'partitionDrop'
+            STREAM: 'streamDrop',
+            TABLE: 'tableDrop',
+            WINDOW: 'windowDrop',
+            TRIGGER: 'triggerDrop',
+            AGGREGATION: 'aggregationDrop',
+            FUNCTION: 'functionDrop',
+            PROJECTION: 'projectionQueryDrop',
+            FILTER: 'filterQueryDrop',
+            JOIN: 'joinQueryDrop',
+            WINDOW_QUERY: 'windowQueryDrop',
+            PATTERN: 'patternQueryDrop',
+            SEQUENCE: 'sequenceQueryDrop',
+            PARTITION: 'partitionDrop'
         };
 
         /**
@@ -76,9 +76,9 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var activeTab = this.application.tabController.getActiveTab();
             var siddhiAppName = "";
 
-            if(activeTab.getTitle().lastIndexOf(".siddhi") !== -1){
+            if (activeTab.getTitle().lastIndexOf(".siddhi") !== -1) {
                 siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
-            } else{
+            } else {
                 siddhiAppName = activeTab.getTitle();
             }
 
@@ -91,7 +91,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(options, 'appName', siddhiAppName);
 
             var console = this.consoleListManager.getGlobalConsole();
-            if(!console){
+            if (!console) {
                 var globalConsoleOptions = {};
                 var opts = {};
                 _.set(opts, '_type', "CONSOLE");
@@ -106,38 +106,38 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(options, 'consoleObj', console);
             _.set(consoleOptions, 'consoleOptions', options);
             var formConsole = this.consoleListManager.newFormConsole(consoleOptions);
-            $(formConsole).on( "close-button-in-form-clicked", function() {
-                if(elementType === constants.SOURCE) {
-                    if(!self.configurationData.getSiddhiAppConfig().getSource(elementId)) {
-                        $("#"+elementId).remove();
+            $(formConsole).on("close-button-in-form-clicked", function () {
+                if (elementType === constants.SOURCE) {
+                    if (!self.configurationData.getSiddhiAppConfig().getSource(elementId)) {
+                        $("#" + elementId).remove();
                     }
-                } else if(elementType === constants.SINK) {
-                    if(!self.configurationData.getSiddhiAppConfig().getSink(elementId)) {
-                        $("#"+elementId).remove();
+                } else if (elementType === constants.SINK) {
+                    if (!self.configurationData.getSiddhiAppConfig().getSink(elementId)) {
+                        $("#" + elementId).remove();
                     }
-                } else if(elementType === constants.STREAM) {
-                    if(!self.configurationData.getSiddhiAppConfig().getStream(elementId)) {
-                        $("#"+elementId).remove();
+                } else if (elementType === constants.STREAM) {
+                    if (!self.configurationData.getSiddhiAppConfig().getStream(elementId)) {
+                        $("#" + elementId).remove();
                     }
-                } else if(elementType === constants.TABLE) {
-                    if(!self.configurationData.getSiddhiAppConfig().getTable(elementId)) {
-                        $("#"+elementId).remove();
+                } else if (elementType === constants.TABLE) {
+                    if (!self.configurationData.getSiddhiAppConfig().getTable(elementId)) {
+                        $("#" + elementId).remove();
                     }
-                } else if(elementType === constants.WINDOW) {
-                    if(!self.configurationData.getSiddhiAppConfig().getWindow(elementId)) {
-                        $("#"+elementId).remove();
+                } else if (elementType === constants.WINDOW) {
+                    if (!self.configurationData.getSiddhiAppConfig().getWindow(elementId)) {
+                        $("#" + elementId).remove();
                     }
-                } else if(elementType === constants.TRIGGER) {
-                    if(!self.configurationData.getSiddhiAppConfig().getTrigger(elementId)) {
-                        $("#"+elementId).remove();
+                } else if (elementType === constants.TRIGGER) {
+                    if (!self.configurationData.getSiddhiAppConfig().getTrigger(elementId)) {
+                        $("#" + elementId).remove();
                     }
-                } else if(elementType === constants.AGGREGATION) {
-                    if(!self.configurationData.getSiddhiAppConfig().getAggregation(elementId)) {
-                        $("#"+elementId).remove();
+                } else if (elementType === constants.AGGREGATION) {
+                    if (!self.configurationData.getSiddhiAppConfig().getAggregation(elementId)) {
+                        $("#" + elementId).remove();
                     }
-                } else if(elementType === constants.FUNCTION) {
-                    if(!self.configurationData.getSiddhiAppConfig().getFunction(elementId)) {
-                        $("#"+elementId).remove();
+                } else if (elementType === constants.FUNCTION) {
+                    if (!self.configurationData.getSiddhiAppConfig().getFunction(elementId)) {
+                        $("#" + elementId).remove();
                     }
                 }
                 // close the form window
@@ -235,7 +235,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var sinkForm = new SinkForm(formOptions);
             sinkForm.generatePropertiesForm(element, formConsole, formContainer);
         };
-        
+
         /**
          * @function generate the form to define the stream once it is dropped on the canvas
          * @param i id for the element
@@ -478,7 +478,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var sequenceQueryForm = new SequenceQueryForm(formOptions);
             sequenceQueryForm.generatePropertiesForm(element, formConsole, formContainer);
         };
-        
+
         /**
          * @function generate form for Join Query
          * @param element selected element(query)

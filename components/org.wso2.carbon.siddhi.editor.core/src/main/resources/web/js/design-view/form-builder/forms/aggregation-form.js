@@ -18,7 +18,7 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
         'elementUtils', 'storeAnnotation', 'designViewUtils'],
-    function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils, 
+    function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils,
               StoreAnnotation, DesignViewUtils) {
 
         /**
@@ -142,15 +142,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         },
                         aggregateByTimePeriod: {
                             minValue: (aggregateByTimePeriod.getValue().min).toLowerCase(),
-                            maxValue: (aggregateByTimePeriod.getValue().max !== undefined)?
-                                    (aggregateByTimePeriod.getValue().max).toLowerCase(): undefined
+                            maxValue: (aggregateByTimePeriod.getValue().max !== undefined) ?
+                                (aggregateByTimePeriod.getValue().max).toLowerCase() : undefined
                         }
                     };
                 } else if (aggregateByTimePeriod !== undefined && aggregateByTimePeriod.getType() === 'INTERVAL') {
                     var intervals = [];
                     _.forEach(aggregateByTimePeriod.getValue(), function (intervalValue) {
                         intervals.push({
-                            value : intervalValue.toLowerCase()
+                            value: intervalValue.toLowerCase()
                         });
                     });
                     fillAggregate = {
@@ -603,12 +603,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         aggregateByTimePeriodType = 'RANGE';
                         if (configAggregate.aggregateByTimePeriod.maxValue !== undefined) {
                             value = {
-                                min:  (configAggregate.aggregateByTimePeriod.minValue).toUpperCase(),
-                                max:  (configAggregate.aggregateByTimePeriod.maxValue).toUpperCase()
+                                min: (configAggregate.aggregateByTimePeriod.minValue).toUpperCase(),
+                                max: (configAggregate.aggregateByTimePeriod.maxValue).toUpperCase()
                             };
                         } else {
                             value = {
-                                minValue:  (configAggregate.aggregateByTimePeriod.minValue).toUpperCase()
+                                minValue: (configAggregate.aggregateByTimePeriod.minValue).toUpperCase()
                             };
                         }
                     } else {

@@ -52,7 +52,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
             var partitionElement = self.configurationData.getSiddhiAppConfig().getPartition(id);
             var partitionWithList = partitionElement.getPartitionWith();
 
-            if(!partitionWithList || partitionWithList.length === 0){
+            if (!partitionWithList || partitionWithList.length === 0) {
                 DesignViewUtils.prototype.warnAlert('Connect a stream for partitioning');
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
@@ -78,7 +78,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                 }
 
                 var fillWith = {
-                    annotations : annotations,
+                    annotations: annotations,
                     partitionKeys: partitionKeys
                 };
                 fillWith = self.formUtils.cleanJSONObject(fillWith);
@@ -99,13 +99,13 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                                 minItems: 1,
                                 items: {
                                     type: "object",
-                                    title : "Annotation",
+                                    title: "Annotation",
                                     options: {
                                         disable_properties: true
                                     },
                                     properties: {
                                         annotation: {
-                                            title : "Annotation",
+                                            title: "Annotation",
                                             type: "string",
                                             minLength: 1
                                         }
@@ -126,19 +126,19 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                                 minItems: 1,
                                 items: {
                                     type: "object",
-                                    title : 'Partition Key',
+                                    title: 'Partition Key',
                                     options: {
                                         disable_properties: true
                                     },
                                     properties: {
                                         expression: {
-                                            title : 'Expression',
+                                            title: 'Expression',
                                             type: "string",
                                             minLength: 1,
                                             required: true
                                         },
                                         streamName: {
-                                            title : 'Stream Name',
+                                            title: 'Stream Name',
                                             type: "string",
                                             minLength: 1,
                                             required: true

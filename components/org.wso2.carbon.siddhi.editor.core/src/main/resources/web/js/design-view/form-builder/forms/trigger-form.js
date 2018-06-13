@@ -63,13 +63,13 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -107,7 +107,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
                 var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
@@ -127,7 +127,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 });
                 self.configurationData.getSiddhiAppConfig().addTrigger(trigger);
 
-                var textNode = $('#'+i).find('.triggerNameNode');
+                var textNode = $('#' + i).find('.triggerNameNode');
                 textNode.html(editor.getValue().name);
 
                 // close the form window
@@ -153,7 +153,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             var id = $(element).parent().attr('id');
             // retrieve the trigger information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
-            if(!clickedElement) {
+            if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
@@ -166,9 +166,9 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 annotations.push({annotation: savedAnnotation});
             });
             var fillWith = {
-                annotations : annotations,
-                name : name,
-                at : at
+                annotations: annotations,
+                name: name,
+                at: at
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor(formContainer[0], {
@@ -185,13 +185,13 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -229,7 +229,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
                 var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,

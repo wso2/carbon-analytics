@@ -33,7 +33,7 @@ define(['require', 'elementUtils'],
         ConfigurationData.prototype.addEdge = function (edge) {
             this.edgeList.push(edge);
         };
-        
+
         ConfigurationData.prototype.removeEdge = function (edgeId) {
             ElementUtils.prototype.removeElement(this.edgeList, edgeId);
         };
@@ -53,6 +53,6 @@ define(['require', 'elementUtils'],
         ConfigurationData.prototype.setSiddhiAppConfig = function (siddhiAppConfig) {
             this.siddhiAppConfig = siddhiAppConfig;
         };
-        
+
         return ConfigurationData;
     });

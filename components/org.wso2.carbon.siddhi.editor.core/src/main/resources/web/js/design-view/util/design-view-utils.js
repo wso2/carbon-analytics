@@ -23,7 +23,8 @@ define(['require', 'alerts'],
          * @class DesignViewUtils Contains utility methods related to design view
          * @constructor
          */
-        var DesignViewUtils = function () {};
+        var DesignViewUtils = function () {
+        };
 
         /**
          * Display's a warning using the AlertsManager.

@@ -98,7 +98,7 @@ define(['require', 'elementUtils', 'lodash'],
         Partition.prototype.removePartitionWith = function (partitionWithStreamName) {
             var self = this;
             var index = undefined;
-            _.forEach(self.partitionWith, function(partitionWith) {
+            _.forEach(self.partitionWith, function (partitionWith) {
                 if (partitionWith.getStreamName() === partitionWithStreamName) {
                     index = self.partitionWith.indexOf(partitionWith);
                 }
@@ -208,7 +208,7 @@ define(['require', 'elementUtils', 'lodash'],
         Partition.prototype.checkOuterStreamIsAlreadyConnected = function (streamName) {
             var self = this;
             var isStreamConnected = false;
-            _.forEach(self.partitionWith, function(partitionWith) {
+            _.forEach(self.partitionWith, function (partitionWith) {
                 if (partitionWith.getStreamName() === streamName) {
                     isStreamConnected = true;
                 }
@@ -231,7 +231,7 @@ define(['require', 'elementUtils', 'lodash'],
                 || self.getPatternQuery(elementId) !== undefined
                 || self.getSequenceQuery(elementId) !== undefined
                 || self.getStream(elementId) !== undefined) {
-                isElementInsidePartition =true;
+                isElementInsidePartition = true;
             }
             return isElementInsidePartition;
         };

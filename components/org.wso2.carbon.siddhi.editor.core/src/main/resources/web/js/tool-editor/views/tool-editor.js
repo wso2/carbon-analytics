@@ -194,17 +194,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                              * Removed attributes are used only for front end use only.
                              * */
                             function removeUnnecessaryFieldsFromJSON(object) {
-                                _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function(patternQuery){
+                                _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function (patternQuery) {
                                     if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
                                         delete patternQuery.queryInput['connectedElementNameList'];
                                     }
                                 });
-                                _.forEach(object.siddhiAppConfig.queryLists.SEQUENCE, function(sequenceQuery){
+                                _.forEach(object.siddhiAppConfig.queryLists.SEQUENCE, function (sequenceQuery) {
                                     if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
                                         delete sequenceQuery.queryInput['connectedElementNameList'];
                                     }
                                 });
-                                _.forEach(object.siddhiAppConfig.queryLists.JOIN, function(joinQuery){
+                                _.forEach(object.siddhiAppConfig.queryLists.JOIN, function (joinQuery) {
                                     if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
                                         delete joinQuery.queryInput['firstConnectedElement'];
                                     }

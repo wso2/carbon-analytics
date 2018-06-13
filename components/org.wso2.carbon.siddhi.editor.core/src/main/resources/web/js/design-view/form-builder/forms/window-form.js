@@ -63,13 +63,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -93,7 +93,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 properties: {
                                     name: {
                                         title: "Name",
@@ -134,7 +134,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Parameter',
+                                title: 'Parameter',
                                 properties: {
                                     parameterValue: {
                                         type: "string",
@@ -171,7 +171,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
                 var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
@@ -191,11 +191,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 });
                 _.set(windowOptions, 'parameters', parameters);
                 if (editor.getValue().outputEventType !== undefined) {
-                    if(editor.getValue().outputEventType === "all events"){
+                    if (editor.getValue().outputEventType === "all events") {
                         _.set(windowOptions, 'outputEventType', 'ALL_EVENTS');
-                    } else if(editor.getValue().outputEventType === "current events"){
+                    } else if (editor.getValue().outputEventType === "current events") {
                         _.set(windowOptions, 'outputEventType', 'CURRENT_EVENTS');
-                    } else if(editor.getValue().outputEventType === "expired events"){
+                    } else if (editor.getValue().outputEventType === "expired events") {
                         _.set(windowOptions, 'outputEventType', 'EXPIRED_EVENTS');
                     }
                 } else {
@@ -211,7 +211,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 });
                 self.configurationData.getSiddhiAppConfig().addWindow(window);
 
-                var textNode = $('#'+i).find('.windowNameNode');
+                var textNode = $('#' + i).find('.windowNameNode');
                 textNode.html(editor.getValue().name);
 
                 // close the form window
@@ -237,7 +237,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             var id = $(element).parent().attr('id');
             // retrieve the window information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindow(id);
-            if(!clickedElement) {
+            if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
@@ -281,11 +281,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             }
             var fillWith = {
                 annotations: annotations,
-                name : name,
-                attributes : attributes,
-                functionName : functionName,
-                parameters : parameters,
-                outputEventType : outputEventType
+                name: name,
+                attributes: attributes,
+                functionName: functionName,
+                parameters: parameters,
+                outputEventType: outputEventType
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor(formContainer[0], {
@@ -302,13 +302,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -332,7 +332,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 properties: {
                                     name: {
                                         title: "Name",
@@ -373,7 +373,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Parameter',
+                                title: 'Parameter',
                                 properties: {
                                     parameterValue: {
                                         type: "string",
@@ -410,7 +410,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
                 var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,
@@ -441,11 +441,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 clickedElement.setParameters(parameters);
                 clickedElement.setOutputEventType(config.outputEventType);
                 if (config.outputEventType !== undefined) {
-                    if(config.outputEventType === "all events"){
+                    if (config.outputEventType === "all events") {
                         clickedElement.setOutputEventType('ALL_EVENTS');
-                    } else if(config.outputEventType === "current events"){
+                    } else if (config.outputEventType === "current events") {
                         clickedElement.setOutputEventType('CURRENT_EVENTS');
-                    } else if(config.outputEventType === "expired events"){
+                    } else if (config.outputEventType === "expired events") {
                         clickedElement.setOutputEventType('EXPIRED_EVENTS');
                     }
                 } else {

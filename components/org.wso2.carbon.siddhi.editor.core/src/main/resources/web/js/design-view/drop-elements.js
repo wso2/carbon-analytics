@@ -63,13 +63,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          */
         DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
 
-            var self= this;
-            if(!isCodeToDesignMode) {
+            var self = this;
+            if (!isCodeToDesignMode) {
                 self.formBuilder.DefineSource(i);
             }
             var node = $('<div>' + sourceName + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "sourceNameNode");
 
 
@@ -77,12 +77,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              prop --> When clicked on this icon, a definition and related information of the Source Element will
              be displayed in a form
             */
-            var settingsIconId = ""+ i + "-dropSourceSettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropSourceSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForSources(this);
             });
@@ -92,7 +92,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection = $('<div class="connectorOutSource">').attr('id', i+"-out" ).addClass('connection');
+            var connection = $('<div class="connectorOutSource">').attr('id', i + "-out").addClass('connection');
 
             finalElement.append(connection);
 
@@ -112,12 +112,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             self.jsPlumbInstance.makeSource(connection, {
-                deleteEndpointsOnDetach : true,
-                anchor : 'Right',
+                deleteEndpointsOnDetach: true,
+                anchor: 'Right',
                 maxConnections: 1
             });
         };
-        
+
         /**
          * @function drop the sink element on the canvas
          * @param newAgent new element
@@ -128,26 +128,26 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param sinkName name of the sink
          */
         DropElements.prototype.dropSink = function (newAgent, i, top, left, isCodeToDesignMode, sinkName) {
-            
-            var self= this;
-            if(!isCodeToDesignMode) {
+
+            var self = this;
+            if (!isCodeToDesignMode) {
                 self.formBuilder.DefineSink(i);
             }
             var node = $('<div>' + sinkName + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "sinkNameNode");
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Sink Element will
              be displayed in a form
             */
-            var settingsIconId = ""+ i + "-dropSinkSettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropSinkSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForSinks(this);
             });
@@ -157,8 +157,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection = $('<div class="connectorInSink">').attr('id', i+"-in" ).addClass('connection');
-            
+            var connection = $('<div class="connectorInSink">').attr('id', i + "-in").addClass('connection');
+
             finalElement.append(connection);
 
             finalElement.css({
@@ -177,12 +177,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             self.jsPlumbInstance.makeTarget(connection, {
-                deleteEndpointsOnDetach:true,
+                deleteEndpointsOnDetach: true,
                 anchor: 'Left',
                 maxConnections: 1
             });
         };
-        
+
         /**
          * @function drop the stream element on the canvas
          * @param newAgent new element
@@ -201,12 +201,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              reposition the other appended elements with the length of the Stream name input by the user.
             */
 
-            var self= this;
+            var self = this;
             var name;
-            if(isCodeToDesignMode) {
+            if (isCodeToDesignMode) {
                 name = streamName;
             } else {
-                if(isGenerateStreamFromQueryOutput) {
+                if (isGenerateStreamFromQueryOutput) {
                     name = streamName;
                 } else {
                     name = self.formBuilder.DefineStream(i);
@@ -214,7 +214,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "streamNameNode");
 
             /*
@@ -223,12 +223,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              showIcon --> An icon that elucidates whether the dropped stream element is an Import/Export/Defined
              stream (In this case: an Import arrow icon)
             */
-            var settingsIconId = ""+ i + "-dropStreamSettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropStreamSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForStreams(this);
             });
@@ -238,8 +238,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection1 = $('<div class="connectorInStream">').attr('id', i+"-in" ).addClass('connection');
-            var connection2 = $('<div class="connectorOutStream">').attr('id', i+"-out" ).addClass('connection');
+            var connection1 = $('<div class="connectorInStream">').attr('id', i + "-in").addClass('connection');
+            var connection2 = $('<div class="connectorOutStream">').attr('id', i + "-out").addClass('connection');
 
 
             finalElement.append(connection1);
@@ -261,13 +261,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             self.jsPlumbInstance.makeTarget(connection1, {
-                deleteEndpointsOnDetach:true,
+                deleteEndpointsOnDetach: true,
                 anchor: 'Left'
             });
 
             self.jsPlumbInstance.makeSource(connection2, {
-                deleteEndpointsOnDetach : true,
-                anchor : 'Right'
+                deleteEndpointsOnDetach: true,
+                anchor: 'Right'
             });
         };
 
@@ -279,18 +279,18 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param outStream  name for new output stream
          * @param streamAttributes  projections list for output stream
          */
-        DropElements.prototype.dropStreamFromQuery = function (queryModel, position , queryId, outStream,
+        DropElements.prototype.dropStreamFromQuery = function (queryModel, position, queryId, outStream,
                                                                streamAttributes) {
             var self = this;
             var isStreamNameUsed = false;
             var elementID;
-            _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function(stream){
-                if(stream.getName().toUpperCase() === outStream.toUpperCase()) {
+            _.forEach(self.configurationData.getSiddhiAppConfig().streamList, function (stream) {
+                if (stream.getName().toUpperCase() === outStream.toUpperCase()) {
                     isStreamNameUsed = true;
                     elementID = stream.getId();
                 }
             });
-            if(!isStreamNameUsed) {
+            if (!isStreamNameUsed) {
                 elementID = self.designGrid.getNewAgentId();
                 var newAgent = $('<div>').attr('id', elementID).addClass('streamDrop');
                 $(self.container).append(newAgent);
@@ -320,8 +320,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             // make the connection
             self.jsPlumbInstance.connect({
-                source: queryId+'-out',
-                target: elementID+'-in'
+                source: queryId + '-out',
+                target: elementID + '-in'
             });
             // update the query model with output stream
             queryModel.getQueryOutput().setTarget(outStream);
@@ -343,28 +343,28 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              reposition the other appended elements with the length of the Table name input by the user.
             */
 
-            var self= this;
+            var self = this;
             var name;
-            if(isCodeToDesignMode) {
+            if (isCodeToDesignMode) {
                 name = tableName;
             } else {
-               name = self.formBuilder.DefineTable(i);
+                name = self.formBuilder.DefineTable(i);
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "tableNameNode");
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Table Element will
              be displayed in a form
             */
-            var settingsIconId = ""+ i + "-dropTableSettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropTableSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForTables(this);
             });
@@ -374,8 +374,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection1 = $('<div class="connectorInTable">').attr('id', i+"-in" ).addClass('connection');
-            var connection2 = $('<div class="connectorOutTable">').attr('id', i+"-out" ).addClass('connection');
+            var connection1 = $('<div class="connectorInTable">').attr('id', i + "-in").addClass('connection');
+            var connection2 = $('<div class="connectorOutTable">').attr('id', i + "-out").addClass('connection');
 
 
             finalElement.append(connection1);
@@ -397,13 +397,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             self.jsPlumbInstance.makeTarget(connection1, {
-                deleteEndpointsOnDetach:true,
+                deleteEndpointsOnDetach: true,
                 anchor: 'Left'
             });
 
             self.jsPlumbInstance.makeSource(connection2, {
-                deleteEndpointsOnDetach : true,
-                anchor : 'Right'
+                deleteEndpointsOnDetach: true,
+                anchor: 'Right'
             });
         };
 
@@ -423,28 +423,28 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              reposition the other appended elements with the length of the Window name input by the user.
             */
 
-            var self= this;
+            var self = this;
             var name;
-            if(isCodeToDesignMode) {
+            if (isCodeToDesignMode) {
                 name = windowName;
             } else {
                 name = self.formBuilder.DefineWindow(i);
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "windowNameNode");
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Window Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
             */
-            var settingsIconId = ""+ i + "-dropWindowSettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropWindowSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForWindows(this);
             });
@@ -454,8 +454,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection1 = $('<div class="connectorInWindow">').attr('id', i+"-in" ).addClass('connection');
-            var connection2 = $('<div class="connectorOutWindow">').attr('id', i+"-out" ).addClass('connection');
+            var connection1 = $('<div class="connectorInWindow">').attr('id', i + "-in").addClass('connection');
+            var connection2 = $('<div class="connectorOutWindow">').attr('id', i + "-out").addClass('connection');
 
 
             finalElement.append(connection1);
@@ -477,13 +477,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             self.jsPlumbInstance.makeTarget(connection1, {
-                deleteEndpointsOnDetach:true,
+                deleteEndpointsOnDetach: true,
                 anchor: 'Left'
             });
 
             self.jsPlumbInstance.makeSource(connection2, {
-                deleteEndpointsOnDetach : true,
-                anchor : 'Right'
+                deleteEndpointsOnDetach: true,
+                anchor: 'Right'
             });
         };
 
@@ -503,28 +503,28 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              reposition the other appended elements with the length of the Trigger name input by the user.
             */
 
-            var self= this;
+            var self = this;
             var name;
-            if(isCodeToDesignMode) {
+            if (isCodeToDesignMode) {
                 name = triggerName;
             } else {
                 name = self.formBuilder.DefineTrigger(i);
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "triggerNameNode");
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Trigger Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
             */
-            var settingsIconId = ""+ i + "-dropTriggerSettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropTriggerSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForTriggers(this);
             });
@@ -534,8 +534,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection1 = $('<div class="connectorInTrigger">').attr('id', i+"-in" ).addClass('connection');
-            var connection2 = $('<div class="connectorOutTrigger">').attr('id', i+"-out" ).addClass('connection');
+            var connection1 = $('<div class="connectorInTrigger">').attr('id', i + "-in").addClass('connection');
+            var connection2 = $('<div class="connectorOutTrigger">').attr('id', i + "-out").addClass('connection');
 
 
             finalElement.append(connection1);
@@ -557,13 +557,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             self.jsPlumbInstance.makeTarget(connection1, {
-                deleteEndpointsOnDetach:true,
+                deleteEndpointsOnDetach: true,
                 anchor: 'Left'
             });
 
             self.jsPlumbInstance.makeSource(connection2, {
-                deleteEndpointsOnDetach : true,
-                anchor : 'Right'
+                deleteEndpointsOnDetach: true,
+                anchor: 'Right'
             });
         };
 
@@ -576,16 +576,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param isCodeToDesignMode whether code to design mode is enable or not
          * @param aggregationName name of the aggregation
          */
-        DropElements.prototype.dropAggregation = function (newAgent, i, top, left, isCodeToDesignMode, aggregationName) {
+        DropElements.prototype.dropAggregation = function (newAgent, i, top, left, isCodeToDesignMode,
+                                                           aggregationName) {
             /*
              The node hosts a text node where the Aggregation's name input by the user will be held.
              Rather than simply having a `newAgent.text(aggregationName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Aggregation name input by the user.
             */
 
-            var self= this;
+            var self = this;
             var name;
-            if(isCodeToDesignMode) {
+            if (isCodeToDesignMode) {
                 name = aggregationName;
             } else {
                 name = i;
@@ -599,19 +600,19 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "aggregationNameNode");
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Aggregation Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
             */
-            var settingsIconId = ""+ i + "-dropAggregationSettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropAggregationSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForAggregations(this);
             });
@@ -621,8 +622,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection1 = $('<div class="connectorInAggregation">').attr('id', i+"-in" ).addClass('connection');
-            var connection2 = $('<div class="connectorOutAggregation">').attr('id', i+"-out" ).addClass('connection');
+            var connection1 = $('<div class="connectorInAggregation">').attr('id', i + "-in").addClass('connection');
+            var connection2 = $('<div class="connectorOutAggregation">').attr('id', i + "-out").addClass('connection');
 
 
             finalElement.append(connection1);
@@ -644,14 +645,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             self.jsPlumbInstance.makeTarget(connection1, {
-                deleteEndpointsOnDetach:true,
+                deleteEndpointsOnDetach: true,
                 maxConnections: 1,
                 anchor: 'Left'
             });
 
             self.jsPlumbInstance.makeSource(connection2, {
-                deleteEndpointsOnDetach : true,
-                anchor : 'Right'
+                deleteEndpointsOnDetach: true,
+                anchor: 'Right'
             });
         };
 
@@ -671,28 +672,28 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              reposition the other appended elements with the length of the Function name input by the user.
             */
 
-            var self= this;
+            var self = this;
             var name;
-            if(isCodeToDesignMode) {
+            if (isCodeToDesignMode) {
                 name = functionName;
             } else {
                 name = self.formBuilder.DefineFunction(i);
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "functionNameNode");
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Function Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
             */
-            var settingsIconId = ""+ i + "-dropFunctionSettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropFunctionSettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForFunctions(this);
             });
@@ -744,7 +745,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.getSiddhiAppConfig().addWindowFilterProjectionQuery(query);
             }
             var settingsIconId = "" + i + "-dropQuerySettingsId";
-            var propertiesIcon = $('<i id="'+ settingsIconId +'" ' +
+            var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>')
                 .append(propertiesIcon);
@@ -806,13 +807,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
             */
-            var self= this;
+            var self = this;
             var node = $('<div>' + patternQueryName + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "patternQueryNameNode");
 
-            if(!isCodeToDesignMode) {
+            if (!isCodeToDesignMode) {
                 //add the new join query to the join query array
                 var patternQueryOptions = {};
                 _.set(patternQueryOptions, 'id', i);
@@ -824,12 +825,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              prop --> When clicked on this icon, a definition and related information of the PatternQuery Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
             */
-            var settingsIconId = ""+ i + "-dropPatternQuerySettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropPatternQuerySettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForPatternQueries(this);
             });
@@ -839,8 +840,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection1 = $('<div class="connectorInPatternQuery">').attr('id', i+"-in" ).addClass('connection');
-            var connection2 = $('<div class="connectorOutPatternQuery">').attr('id', i+"-out" ).addClass('connection');
+            var connection1 = $('<div class="connectorInPatternQuery">').attr('id', i + "-in").addClass('connection');
+            var connection2 = $('<div class="connectorOutPatternQuery">').attr('id', i + "-out").addClass('connection');
 
 
             finalElement.append(connection1);
@@ -863,13 +864,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             self.jsPlumbInstance.makeTarget(connection1, {
                 anchor: 'Left',
-                deleteEndpointsOnDetach : true
+                deleteEndpointsOnDetach: true
             });
 
             self.jsPlumbInstance.makeSource(connection2, {
                 anchor: 'Right',
-                maxConnections:1,
-                deleteEndpointsOnDetach : true
+                maxConnections: 1,
+                deleteEndpointsOnDetach: true
             });
         };
 
@@ -889,13 +890,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
             */
-            var self= this;
+            var self = this;
             var node = $('<div>' + sequenceQueryName + '</div>');
             newAgent.append(node);
-            node.attr('id', i+"-nodeInitial");
+            node.attr('id', i + "-nodeInitial");
             node.attr('class', "sequenceQueryNameNode");
 
-            if(!isCodeToDesignMode) {
+            if (!isCodeToDesignMode) {
                 //add the new join query to the join query array
                 var sequenceQueryOptions = {};
                 _.set(sequenceQueryOptions, 'id', i);
@@ -907,12 +908,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              prop --> When clicked on this icon, a definition and related information of the SequenceQuery Element will
              be displayed in a form
             */
-            var settingsIconId = ""+ i + "-dropSequenceQuerySettingsId";
-            var prop = $('<i id="'+ settingsIconId +'" ' +
+            var settingsIconId = "" + i + "-dropSequenceQuerySettingsId";
+            var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
-            var settingsIconElement = $('#'+settingsIconId)[0];
+            var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePropertiesFormForSequenceQueries(this);
             });
@@ -922,8 +923,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            var connection1 = $('<div class="connectorInSequenceQuery">').attr('id', i+"-in" ).addClass('connection');
-            var connection2 = $('<div class="connectorOutSequenceQuery">').attr('id', i+"-out" ).addClass('connection');
+            var connection1 = $('<div class="connectorInSequenceQuery">').attr('id', i + "-in")
+                .addClass('connection');
+            var connection2 = $('<div class="connectorOutSequenceQuery">').attr('id', i + "-out")
+                .addClass('connection');
 
 
             finalElement.append(connection1);
@@ -946,13 +949,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             self.jsPlumbInstance.makeTarget(connection1, {
                 anchor: 'Left',
-                deleteEndpointsOnDetach : true
+                deleteEndpointsOnDetach: true
             });
 
             self.jsPlumbInstance.makeSource(connection2, {
                 anchor: 'Right',
-                maxConnections:1,
-                deleteEndpointsOnDetach : true
+                maxConnections: 1,
+                deleteEndpointsOnDetach: true
             });
         };
 
@@ -983,7 +986,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.getSiddhiAppConfig().addJoinQuery(query);
             }
             var settingsIconId = "" + i + "-dropJoinQuerySettingsId";
-            var propertiesIcon = $('<i id="'+ settingsIconId +'" ' +
+            var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
             newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>')
                 .append(propertiesIcon);
@@ -1017,15 +1020,15 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             self.jsPlumbInstance.makeTarget(connectionIn, {
                 anchor: 'Left',
-                maxConnections:2,
-                deleteEndpointsOnDetach : true
+                maxConnections: 2,
+                deleteEndpointsOnDetach: true
             });
 
             self.jsPlumbInstance.makeSource(connectionOut, {
                 anchor: 'Right',
                 uniqueEndpoint: true,
                 maxConnections: 1,
-                deleteEndpointsOnDetach : true
+                deleteEndpointsOnDetach: true
             });
         };
 
@@ -1053,11 +1056,11 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             settingsIconElement.addEventListener('click', function () {
                 self.formBuilder.GeneratePartitionKeyForm(this);
             });
-            var finalElement =  newAgent;
+            var finalElement = newAgent;
 
             $(finalElement).draggable({
                 containment: "grid-container",
-                drag:function(){
+                drag: function () {
                     self.jsPlumbInstance.repaintEverything();
                 }
             });
@@ -1069,7 +1072,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 'left': mouseLeft
             });
 
-            if(!isCodeToDesignMode) {
+            if (!isCodeToDesignMode) {
                 //add the new partition to the partition array
                 var partitionOptions = {};
                 _.set(partitionOptions, 'id', i);
@@ -1085,21 +1088,21 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             self.jsPlumbInstance.makeTarget(connectionIn, {
                 anchor: 'Left',
                 maxConnections: 1,
-                deleteEndpointsOnDetach : true
+                deleteEndpointsOnDetach: true
             });
             self.jsPlumbInstance.makeSource(connectionIn, {
                 anchor: 'Right',
-                deleteEndpointsOnDetach : true
+                deleteEndpointsOnDetach: true
             });
 
             $(self.container).append(finalElement);
             self.jsPlumbInstance.addGroup({
                 el: $('#' + i)[0],
                 id: i,
-                droppable:true,
-                constrain:true,
-                dropOverride:false,
-                draggable:false
+                droppable: true,
+                constrain: true,
+                dropOverride: false,
+                draggable: false
             });
         };
 
@@ -1110,7 +1113,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         DropElements.prototype.registerElementEventListeners = function (newElement) {
             var self = this;
             //register event listener to show configuration icons when mouse is over the element
-            newElement.on( "mouseenter", function() {
+            newElement.on("mouseenter", function () {
                 var element = $(this);
                 element.find('.element-prop-icon').show();
                 element.find('.element-close-icon').show();
@@ -1119,7 +1122,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             //register event listener to hide configuration icons when mouse is out from the element
-            newElement.on( "mouseleave", function() {
+            newElement.on("mouseleave", function () {
                 var element = $(this);
                 element.find('.element-prop-icon').hide();
                 element.find('.element-close-icon').hide();
@@ -1148,7 +1151,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 });
 
                 self.jsPlumbInstance.remove(newElement, true);
-                if(self.jsPlumbInstance.getGroupFor(newElement)){
+                if (self.jsPlumbInstance.getGroupFor(newElement)) {
                     self.jsPlumbInstance.removeFromGroup(newElement);
                 }
 
@@ -1212,7 +1215,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 * */
 
                 self.jsPlumbInstance.remove(newElement);
-                if(self.jsPlumbInstance.getGroupFor(newElement)){
+                if (self.jsPlumbInstance.getGroupFor(newElement)) {
                     self.jsPlumbInstance.removeFromGroup(newElement);
                 }
 

@@ -96,7 +96,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                     return -1;
                 } else if (a.getChildType() !== 'PARTITION' && b.getChildType() === 'PARTITION') {
                     return 1;
-                } else if(a.getChildType() === 'PARTITION' && b.getChildType() === 'PARTITION'){
+                } else if (a.getChildType() === 'PARTITION' && b.getChildType() === 'PARTITION') {
                     if (a.getChildId() < b.getChildId()) {
                         return -1;
                     } else {

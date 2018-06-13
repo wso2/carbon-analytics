@@ -71,7 +71,7 @@ define(['require', 'elementUtils'],
                 this.aggregateByTimePeriod = options.aggregateByTimePeriod;
                 this.store = options.store;
             }
-            this.annotationList =  [];
+            this.annotationList = [];
         };
 
         Aggregation.prototype.addAnnotation = function (annotation) {

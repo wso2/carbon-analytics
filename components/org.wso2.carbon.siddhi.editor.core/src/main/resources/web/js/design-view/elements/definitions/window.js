@@ -47,10 +47,10 @@ define(['require', 'elementUtils'],
                 this.function = options.function;
                 this.parameters = options.parameters;
                 this.outputEventType
-                    = (options.outputEventType !== undefined)? (options.outputEventType).toUpperCase() : undefined;
+                    = (options.outputEventType !== undefined) ? (options.outputEventType).toUpperCase() : undefined;
             }
             this.attributeList = [];
-            this.annotationList =  [];
+            this.annotationList = [];
         };
 
         Window.prototype.addAttribute = function (attribute) {
@@ -118,7 +118,7 @@ define(['require', 'elementUtils'],
         };
 
         Window.prototype.setOutputEventType = function (outputEventType) {
-            this.outputEventType = outputEventType.toUpperCase();;
+            this.outputEventType = outputEventType.toUpperCase();
         };
 
         Window.prototype.setAnnotationList = function (annotationList) {
