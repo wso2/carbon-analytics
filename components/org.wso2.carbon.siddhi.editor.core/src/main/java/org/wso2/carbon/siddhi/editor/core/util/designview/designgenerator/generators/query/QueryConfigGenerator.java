@@ -163,8 +163,9 @@ public class QueryConfigGenerator {
      * @throws DesignGenerationException        Error while generating 'outputRateLimit' string
      */
     private String generateOutputRateLimit(OutputRate outputRate) throws DesignGenerationException {
+        final String OUTPUT = "output";
         if (outputRate != null) {
-            return ConfigBuildingUtilities.getDefinition(outputRate, siddhiAppString);
+            return ConfigBuildingUtilities.getDefinition(outputRate, siddhiAppString).split(OUTPUT)[1].trim();
         }
         return "";
     }
