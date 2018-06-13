@@ -82,12 +82,26 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             // add edges to the data storing structure
             addEdges(self.configurationData, configurationJSON.edgeList, self.newIdBeginningPhrase);
 
-            // re-shuffle edgeList to bring forward edges which have 'PARTITION' as child elements
+            /*
+            * This sort method brings up the connections which has the 'PARTITION' type as the children type.
+            * This was done because when a connection is made from partition connection point to the inner query,
+            * it is necessary to have a connection from an outer stream to the partition connection point.
+            * Because there can't be a partition connection point without a outer stream connection.(besides the default
+            * partition connection point) Once this sort method is done all connection which have 'STREAM' as the
+            * 'parent' and 'PARTITION'(partition connection point) as the child will come to hte front and when
+            * connections are made these connections will be rendered first.
+            * */
             self.configurationData.getEdgeList().sort(function (a, b) {
                 if (a.getChildType() === 'PARTITION' && b.getChildType() !== 'PARTITION') {
-                    return 0;
+                    return -1;
                 } else if (a.getChildType() !== 'PARTITION' && b.getChildType() === 'PARTITION') {
                     return 1;
+                } else if(a.getChildType() === 'PARTITION' && b.getChildType() === 'PARTITION'){
+                    if (a.getChildId() < b.getChildId()) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
                 } else {
                     return 0;
                 }
