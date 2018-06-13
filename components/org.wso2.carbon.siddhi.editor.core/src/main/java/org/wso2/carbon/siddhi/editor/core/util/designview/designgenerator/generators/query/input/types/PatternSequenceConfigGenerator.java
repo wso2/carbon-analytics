@@ -69,14 +69,7 @@ public class PatternSequenceConfigGenerator {
      */
     public PatternSequenceConfig generatePatternSequenceConfig(InputStream inputStream)
             throws DesignGenerationException {
-        String delimiter;
-        if (mode == QueryInputType.PATTERN) {
-            delimiter = PATTERN_DELIMITER;
-        } else if (mode == QueryInputType.SEQUENCE) {
-            delimiter = SEQUENCE_DELIMITER;
-        } else {
-            throw new DesignGenerationException("Invalid QueryInputType for generating PatternSequenceConfig");
-        }
+        String delimiter = getDelimiter(mode);
         PatternSequenceConfigTreeInfo patternSequenceConfigTreeInfo =
                 new PatternSequenceConfigTreeInfoGenerator(siddhiAppString)
                         .generatePatternSequenceConfigTreeInfo(((StateInputStream) inputStream).getStateElement());
@@ -228,9 +221,26 @@ public class PatternSequenceConfigGenerator {
             return generateLogicalStateElementComponent((LogicalStateElementConfig) element);
         } else if (element instanceof StreamStateElementConfig) {
             return generateStreamStateElementComponent((StreamStateElementConfig) element);
+        } else if (element instanceof NextStateElementConfig) {
+            return generateNextStateElementComponent((NextStateElementConfig) element);
         }
         throw new IllegalArgumentException(
                 "Failed to generate config for Pattern/Sequence element, since type is unknown");
+    }
+
+    /**
+     * Returns the delimiter for the given mode
+     * @param mode                          QueryInputType
+     * @return                              Delimiter for the Pattern/Sequence query
+     * @throws DesignGenerationException    QueryInputType if not one of Pattern and Sequence
+     */
+    private static String getDelimiter(QueryInputType mode) throws DesignGenerationException {
+        if (mode == QueryInputType.PATTERN) {
+            return PATTERN_DELIMITER;
+        } else if (mode == QueryInputType.SEQUENCE) {
+            return SEQUENCE_DELIMITER;
+        }
+        throw new DesignGenerationException("Invalid QueryInputType for generating PatternSequenceConfig");
     }
 
     /**
@@ -316,6 +326,18 @@ public class PatternSequenceConfigGenerator {
                 WHITE_SPACE +
                 buildWithin(element.getWithin());
         return new ElementComponent(conditions, logicComponentBuilder);
+    }
+
+    // This is only applicable for Sequences TODO improve
+    private ElementComponent generateNextStateElementComponent(NextStateElementConfig element)
+            throws DesignGenerationException {
+        ElementComponent stateElement = generateElementComponent(element.getStateElement());
+        ElementComponent nextStateElement = generateElementComponent(element.getNextStateElement());
+        List<PatternSequenceConditionConfig> conditions = new ArrayList<>(stateElement.conditions);
+        conditions.addAll(nextStateElement.conditions);
+        String logicComponent;
+        logicComponent = stateElement.logicComponent + getDelimiter(mode) + nextStateElement.logicComponent;
+        return new ElementComponent(conditions, logicComponent);
     }
 
     /**

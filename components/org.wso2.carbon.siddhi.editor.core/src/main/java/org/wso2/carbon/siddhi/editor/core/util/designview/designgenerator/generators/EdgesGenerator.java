@@ -69,6 +69,9 @@ public class EdgesGenerator {
         edges.addAll(
                 generatePatternSequenceQueryEdges(
                         getCompleteQueryTypeList(QueryListType.PATTERN)));
+        edges.addAll(
+                generatePatternSequenceQueryEdges(
+                        getCompleteQueryTypeList(QueryListType.SEQUENCE)));
         edges.addAll(generateAggregationEdges(siddhiAppConfig.getAggregationList()));
         return edges;
     }
