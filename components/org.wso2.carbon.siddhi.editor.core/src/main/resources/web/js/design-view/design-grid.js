@@ -215,17 +215,17 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                         // If the dropped Element is a Join Query then->
                         else if ($(droppedElement).hasClass('join-query-drag')) {
-                            self.handleJoinQuery(mouseTop, mouseLeft, false, "Join");
+                            self.handleJoinQuery(mouseTop, mouseLeft, false, "Join Query");
                         }
 
                         // If the dropped Element is a Pattern Query then->
                         else if($(droppedElement).hasClass('pattern-query-drag')) {
-                            self.handlePatternQuery(mouseTop, mouseLeft, false, "Pattern");
+                            self.handlePatternQuery(mouseTop, mouseLeft, false, "Pattern Query");
                         }
 
                         // If the dropped Element is a Sequence Query then->
                         else if($(droppedElement).hasClass('sequence-query-drag')) {
-                            self.handleSequenceQuery(mouseTop, mouseLeft, false, "Sequence");
+                            self.handleSequenceQuery(mouseTop, mouseLeft, false, "Sequence Query");
                         }
 
                         // If the dropped Element is a Partition then->
@@ -1349,7 +1349,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.forEach(self.configurationData.getSiddhiAppConfig().getPatternQueryList(), function(patternQuery){
 
                 var patternQueryId = patternQuery.getId();
-                var patternQueryName = "Pattern";
+                var patternQueryName = "Pattern Query";
                 var array = patternQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
@@ -1360,7 +1360,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.forEach(self.configurationData.getSiddhiAppConfig().getSequenceQueryList(), function(sequenceQuery){
 
                 var sequenceQueryId = sequenceQuery.getId();
-                var sequenceQueryName = "Sequence";
+                var sequenceQueryName = "Sequence Query";
                 var array = sequenceQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
@@ -1393,7 +1393,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.forEach(self.configurationData.getSiddhiAppConfig().getJoinQueryList(), function(joinQuery){
 
                 var joinQueryId = joinQuery.getId();
-                var joinQueryName = "Join";
+                var joinQueryName = "Join Query";
                 var array = joinQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length -1]);
                 var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
@@ -1428,7 +1428,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 _.forEach(partition.getPatternQueryList(), function(patternQuery){
 
                     var patternQueryId = patternQuery.getId();
-                    var patternQueryName = "Pattern";
+                    var patternQueryName = "Pattern Query";
                     var array = patternQueryId.split("_");
                     var lastArrayEntry = parseInt(array[array.length -1]);
                     var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
@@ -1442,7 +1442,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 _.forEach(partition.getSequenceQueryList(), function(sequenceQuery){
 
                     var sequenceQueryId = sequenceQuery.getId();
-                    var sequenceQueryName = "Sequence";
+                    var sequenceQueryName = "Sequence Query";
                     var array = sequenceQueryId.split("_");
                     var lastArrayEntry = parseInt(array[array.length -1]);
                     var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
@@ -1481,7 +1481,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 _.forEach(partition.getJoinQueryList(), function(joinQuery){
 
                     var joinQueryId = joinQuery.getId();
-                    var joinQueryName = "Join";
+                    var joinQueryName = "Join Query";
                     var array = joinQueryId.split("_");
                     var lastArrayEntry = parseInt(array[array.length -1]);
                     var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
