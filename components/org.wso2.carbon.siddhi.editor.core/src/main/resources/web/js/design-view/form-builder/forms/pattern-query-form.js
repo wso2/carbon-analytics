@@ -150,9 +150,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var outputElementType = undefined;
                 var outputElementAttributesList = [];
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+
                 _.forEach(inputStreamNames, function (inputStreamName) {
                     var inputElement =
-                        self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(inputStreamName);
+                        self.configurationData.getSiddhiAppConfig()
+                            .getDefinitionElementByName(inputStreamName, partitionId);
                     if (inputElement !== undefined) {
                         if (inputElement.type === 'TRIGGER') {
                             possibleGroupByAttributes.push(inputStreamName + '.triggered_time');
@@ -165,7 +173,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 var outputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(outputElementName, partitionId);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
@@ -354,8 +363,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                formContainer.append('<div class="row"><div id="form-query-annotation" class="col-md-12"></div></div>' +
-                    '<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
+                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                    '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
+                    '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
                     '<div id="form-query-output" class="col-md-4"></div></div>');
 
@@ -433,7 +443,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         },
                                         streamHandlerList: {
                                             propertyOrder: 3,
-                                            required: true,
                                             type: "array",
                                             format: "table",
                                             title: "Stream Handlers",
@@ -444,7 +453,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                                 properties: {
                                                     streamHandler: {
                                                         required: true,
-                                                        title: 'Stream Handler1',
+                                                        title: 'Stream Handler',
                                                         oneOf: [
                                                             {
                                                                 $ref: "#/definitions/filter",

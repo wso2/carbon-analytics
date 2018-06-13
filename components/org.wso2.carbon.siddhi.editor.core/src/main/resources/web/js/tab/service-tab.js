@@ -76,6 +76,10 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                     this.app.commandManager.dispatch(id);
                 }, this);
 
+                toolEditor.on("view-switch", function () {
+                    this.app.workspaceManager.updateMenuItems();
+                }, this);
+
                 this._file.on("dirty-state-change", function () {
                     this.app.workspaceManager.updateSaveMenuItem();
                     this.app.workspaceManager.updateExportMenuItem();

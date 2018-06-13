@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -29,7 +29,7 @@
     position: absolute;
     bottom: 2%;
     right: 2%;
-    z-index: 1;
+    z-index: 23;
 }
 
 .toggle-view-button {
@@ -72,11 +72,11 @@
     background-color: #e7eaeb;
 }
 
-.sourceDrop{
+.sourceDrop {
     background-image: url("../images/source.svg");
 }
 
-.sinkDrop{
+.sinkDrop {
     background-image: url("../images/sink.svg");
 }
 
@@ -154,6 +154,7 @@
     transition: box-shadow 0.15s ease-in;
     border: 1px solid #ccc;
 }
+
 .partitionDrop {
     border: 1px solid #346789;
     width: 250px;
@@ -310,7 +311,7 @@ td {
 }
 
 .aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
-.patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode{
+.patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode {
     font-weight: 600;
     width: 120px;
     margin-left: -30px;
@@ -419,4 +420,31 @@ h3,
 
 .form-control[disabled] {
     opacity: 0.3;
+}
+
+.loading-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 22;
+    background-color: #282828;
+    color: #fff;
+    font-size: 40px;
+    text-align: center;
+    padding: 20% 0;
+}
+
+.app-annotations-button {
+    position: absolute;
+    top: 3.5%;
+    right: 1%;
+    font-size: 20px;
+    background-color: lightgray;
+    color: floralwhite;
+    transition: 0.15s;
+}
+
+.app-annotations-button:hover {
+    color: black;
+    transition: 0.15s;
 }

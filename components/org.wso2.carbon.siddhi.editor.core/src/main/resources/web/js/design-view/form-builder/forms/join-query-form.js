@@ -143,10 +143,19 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var outputElementType = undefined;
                 var outputElementAttributesList = [];
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+
                 var firstInputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(firstInputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(firstInputElementName, partitionId);
                 var secondInputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(secondInputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(secondInputElementName, partitionId);
                 if (firstInputElement !== undefined && secondInputElement !== undefined) {
 
                     if (firstInputElement.type !== undefined && firstInputElement.type === 'TRIGGER') {
@@ -189,7 +198,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var outputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(outputElementName, partitionId);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
@@ -557,8 +567,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                formContainer.append('<div class="row"><div id="form-query-annotation" class="col-md-12"></div></div>' +
-                    '<div class="row"><div id="form-query-input" class="col-md-4"></div>' +
+                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                    '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
+                    '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
                     '<div id="form-query-output" class="col-md-4"></div></div>');
 

@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableForm', 'windowForm', 'aggregationForm',
         'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
-        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm'],
+        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm'],
     function (require, log, $, _, FormUtils, StreamForm, TableForm, WindowForm, AggregationForm, TriggerForm,
               WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
-              SourceForm, SinkForm, FunctionForm) {
+              SourceForm, SinkForm, FunctionForm, AppAnnotationForm) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -58,8 +58,8 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             this.configurationData = options.configurationData;
             this.application = options.application;
             this.consoleListManager = options.application.outputController;
-            this.formUtils = new FormUtils(this.configurationData);
             this.jsPlumbInstance = options.jsPlumbInstance;
+            this.formUtils = new FormUtils(this.configurationData, this.jsPlumbInstance);
             var currentTabId = this.application.tabController.activeTab.cid;
             this.designViewContainer = $('#design-container-' + currentTabId);
             this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
@@ -147,6 +147,23 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
                 self.toggleViewButton.removeClass('disableContainer');
             });
             return formConsole;
+        };
+
+        /**
+         * @function generate the form to add app annotations
+         * @param element the element
+         */
+        FormBuilder.prototype.DefineFormForAppAnnotations = function (element) {
+            var self = this;
+            var formConsole = this.createTabForForm();
+            var formContainer = formConsole.getContentContainer();
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            var appAnnotationForm = new AppAnnotationForm(formOptions);
+            appAnnotationForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
         /**

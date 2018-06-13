@@ -110,7 +110,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 if(errors.length) {
                     return;
                 }
-                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
+                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
                 if (isTriggerNameUsed) {
                     DesignViewUtils.prototype
                         .errorAlert("Trigger name \"" + editor.getValue().name + "\" is already used.");
@@ -232,7 +232,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 if(errors.length) {
                     return;
                 }
-                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
+                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,
                     clickedElement.getId());
                 if (isTriggerNameUsed) {
                     DesignViewUtils.prototype
@@ -244,8 +244,14 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
 
                 var config = editor.getValue();
 
-                // update selected trigger model
-                clickedElement.setName(config.name);
+                var previouslySavedName = clickedElement.getName();
+                // update connection related to the element if the name is changed
+                if (previouslySavedName !== config.name) {
+                    // update selected trigger model
+                    clickedElement.setName(config.name);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
+
                 clickedElement.setAt(config.at);
 
                 clickedElement.clearAnnotationList();

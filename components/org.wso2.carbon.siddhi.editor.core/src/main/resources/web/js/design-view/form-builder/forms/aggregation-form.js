@@ -135,24 +135,29 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 }
 
                 var fillAggregate = {};
-                if (aggregateByTimePeriod !== undefined && !aggregateByTimePeriod.getMaxValue()) {
+                if (aggregateByTimePeriod !== undefined && aggregateByTimePeriod.getType() === 'RANGE') {
                     fillAggregate = {
                         aggregateByAttribute: {
                             attribute: aggregateByAttribute
                         },
                         aggregateByTimePeriod: {
-                            minValue: (aggregateByTimePeriod.getMinValue()).toLowerCase()
+                            minValue: (aggregateByTimePeriod.getValue().min).toLowerCase(),
+                            maxValue: (aggregateByTimePeriod.getValue().max !== undefined)?
+                                    (aggregateByTimePeriod.getValue().max).toLowerCase(): undefined
                         }
                     };
-                } else if (aggregateByTimePeriod !== undefined) {
+                } else if (aggregateByTimePeriod !== undefined && aggregateByTimePeriod.getType() === 'INTERVAL') {
+                    var intervals = [];
+                    _.forEach(aggregateByTimePeriod.getValue(), function (intervalValue) {
+                        intervals.push({
+                            value : intervalValue.toLowerCase()
+                        });
+                    });
                     fillAggregate = {
                         aggregateByAttribute: {
                             attribute: aggregateByAttribute
                         },
-                        aggregateByTimePeriod: {
-                            minValue: (aggregateByTimePeriod.getMinValue()).toLowerCase(),
-                            maxValue: (aggregateByTimePeriod.getMaxValue()).toLowerCase()
-                        }
+                        aggregateByTimePeriod: intervals
                     };
                 } else {
                     fillAggregate = {
@@ -403,15 +408,32 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                 }
                             },
                             aggregateByTimePeriod: {
+                                propertyOrder: 2,
+                                title: "Aggregate By Time Period",
+                                required: true,
+                                oneOf: [
+                                    {
+                                        $ref: "#/definitions/intervalValue",
+                                        title: "Interval"
+                                    },
+                                    {
+                                        $ref: "#/definitions/rangeValue",
+                                        title: "Range"
+                                    }
+                                ]
+                            }
+                        },
+                        definitions: {
+                            rangeValue: {
                                 required: true,
                                 type: "object",
-                                title: "Aggregate by Time Period",
-                                propertyOrder: 2,
+                                title: "Range",
                                 options: {
                                     disable_properties: false
                                 },
                                 properties: {
                                     minValue: {
+                                        propertyOrder: 1,
                                         type: "string",
                                         title: "Starting Time Value",
                                         required: true,
@@ -427,6 +449,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                         default: "seconds"
                                     },
                                     maxValue: {
+                                        propertyOrder: 2,
                                         type: "string",
                                         title: "Ending Time Value",
                                         enum: [
@@ -441,6 +464,37 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                         default: "seconds"
                                     }
                                 }
+                            },
+                            intervalValue: {
+                                required: true,
+                                type: "array",
+                                format: "table",
+                                title: "Intervals",
+                                uniqueItems: true,
+                                minItems: 1,
+                                items: {
+                                    title: "Values",
+                                    type: "object",
+                                    options: {
+                                        disable_properties: true
+                                    },
+                                    properties: {
+                                        value: {
+                                            title: "Value",
+                                            type: "string",
+                                            enum: [
+                                                "seconds",
+                                                "minutes",
+                                                "hours",
+                                                "days",
+                                                "weeks",
+                                                "months",
+                                                "years"
+                                            ],
+                                            default: "seconds"
+                                        }
+                                    }
+                                }
                             }
                         }
                     },
@@ -448,7 +502,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     show_errors: "always",
                     disable_properties: false,
                     display_required_only: true,
-                    no_additional_properties: true
+                    no_additional_properties: true,
+                    disable_array_delete_all_rows: true,
+                    disable_array_delete_last_row: true
                 };
                 var editorAggregate =
                     new JSONEditor($(formContainer).find('#form-aggregation-aggregate')[0], aggregateScheme);
@@ -466,7 +522,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         return;
                     }
                     var isAggregationNameUsed =
-                        self.formUtils.isDefinitionElementNameUnique(editorInput.getValue().name, clickedElement.getId());
+                        self.formUtils.isDefinitionElementNameUsed(editorInput.getValue().name, clickedElement.getId());
                     if (isAggregationNameUsed) {
                         DesignViewUtils.prototype
                             .errorAlert("Aggregation name \"" + editorInput.getValue().name + "\" is already used.");
@@ -483,8 +539,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         clickedElement.addAnnotation(annotation.annotation);
                     });
 
-                    // update selected aggregation model
-                    clickedElement.setName(configInput.name);
+                    var previouslySavedName = clickedElement.getName();
+                    // update connection related to the element if the name is changed
+                    if (previouslySavedName !== configInput.name) {
+                        // update selected aggregation model
+                        clickedElement.setName(configInput.name);
+                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                    }
+
                     clickedElement.setFrom(configInput.from);
 
                     // add the store annotation for aggregation
@@ -535,14 +597,30 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     }
 
                     var aggregateByTimePeriodOptions = {};
-                    _.set(aggregateByTimePeriodOptions, 'minValue',
-                        (configAggregate.aggregateByTimePeriod.minValue).toUpperCase());
-                    if (configAggregate.aggregateByTimePeriod.maxValue !== undefined) {
-                        _.set(aggregateByTimePeriodOptions, 'maxValue',
-                            (configAggregate.aggregateByTimePeriod.maxValue).toUpperCase());
+                    var value;
+                    var aggregateByTimePeriodType;
+                    if (configAggregate.aggregateByTimePeriod.minValue !== undefined) {
+                        aggregateByTimePeriodType = 'RANGE';
+                        if (configAggregate.aggregateByTimePeriod.maxValue !== undefined) {
+                            value = {
+                                min:  (configAggregate.aggregateByTimePeriod.minValue).toUpperCase(),
+                                max:  (configAggregate.aggregateByTimePeriod.maxValue).toUpperCase()
+                            };
+                        } else {
+                            value = {
+                                minValue:  (configAggregate.aggregateByTimePeriod.minValue).toUpperCase()
+                            };
+                        }
                     } else {
-                        _.set(aggregateByTimePeriodOptions, 'maxValue', undefined);
+                        var intervalValues = [];
+                        aggregateByTimePeriodType = 'INTERVAL';
+                        _.forEach(configAggregate.aggregateByTimePeriod, function (intervalValue) {
+                            intervalValues.push((intervalValue.value).toUpperCase());
+                        });
+                        value = intervalValues;
                     }
+                    _.set(aggregateByTimePeriodOptions, 'type', aggregateByTimePeriodType);
+                    _.set(aggregateByTimePeriodOptions, 'value', value);
                     var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                     clickedElement.setAggregateByTimePeriod(aggregateByTimePeriod);
 

@@ -159,8 +159,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var outputElementType = undefined;
                 var outputElementAttributesList = [];
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+
                 var inputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(inputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(inputElementName, partitionId);
                 if (inputElement !== undefined) {
                     if (inputElement.type !== undefined
                         && (inputElement.type === 'STREAM' || inputElement.type === 'WINDOW')) {
@@ -177,7 +185,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var outputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(outputElementName, partitionId);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'

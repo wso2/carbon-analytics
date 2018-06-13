@@ -19,19 +19,9 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Types of nodes in design view, which represent Siddhi app elements
+ * Type of an AggregationByTime Config
  */
-public enum NodeType {
-    STREAM,
-    TABLE,
-    AGGREGATION,
-    WINDOW,
-    SOURCE,
-    SINK,
-    TRIGGER,
-    QUERY,
-    WINDOW_FILTER_PROJECTION_QUERY,
-    JOIN_QUERY,
-    PATTERN_QUERY,
-    PARTITION;
+public enum AggregationByTimeType {
+    INTERVAL,
+    RANGE
 }

@@ -60,7 +60,7 @@ public class QueryInputConfigGenerator {
             throw new DesignGenerationException(queryInputType.toLowerCase() + " queries are not supported");
         }
 
-        throw new DesignGenerationException("Unknown type: " + queryInputType);
+        throw new DesignGenerationException("Unable to generate QueryInputConfig for type: " + queryInputType);
     }
 
     /**

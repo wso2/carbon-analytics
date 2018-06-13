@@ -52,6 +52,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var self = this;
                     var canvasContainer = this._$parent_el.find(_.get(this.options, 'canvas.container'));
                     var previewContainer = this._$parent_el.find(_.get(this.options, 'preview.container'));
+                    var loadingScreen = this._$parent_el.find(_.get(this.options, 'loading_screen.container'));
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
                     var designContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
@@ -160,7 +161,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     var toggleViewButtonDynamicId = "toggle-view-button-" + this._$parent_el.attr('id');
                     toggleViewButton.attr('id', toggleViewButtonDynamicId);
-                    //TODO: add general validation: check whether all required fields in the forms are filled, elements are connected properly(ex: source should be connected to a stream)
                     toggleViewButton.click(function () {
                         if (sourceContainer.is(':visible')) {
                             if (application.tabController.getActiveTab().getFile().isDirty()) {
@@ -171,12 +171,19 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             if (response.status === "success") {
                                 self.JSONObject = response.responseJSON;
                                 sourceContainer.hide();
-                                designView.emptyDesignViewGridContainer();
-                                designContainer.show();
+                                loadingScreen.show();
+                                // The following code has been added to the setTimeout() method because
+                                // the code needs to run asynchronously for the loading screen
+                                setTimeout(function () {
+                                    designView.emptyDesignViewGridContainer();
+                                    designContainer.show();
+                                    designView.renderDesignGrid(self.JSONObject);
+                                    loadingScreen.hide();
+                                    // NOTE - This trigger should be always handled at the end of setTimeout()
+                                    self.trigger("view-switch");
+                                }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
                                     "<span class=\"toggle-button-text\">Source View</span>");
-                                designView.renderDesignGrid(self.JSONObject);
-
                             } else if (response.status === "fail") {
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
                             }
@@ -206,31 +213,36 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     }
                                 });
                             }
-                            /*
-                            * this previous configurationData wil be re-assigned to the design view if the getCode()
-                            * method response is unsuccessful. This done inorder to still have the fields removed by
-                            * removeUnnecessaryFieldsFromJSON() method when sending the json to backend
-                            * */
 
-                            var JSONValue = JSON.parse(JSON.stringify(designView.getConfigurationData()));
-                            removeUnnecessaryFieldsFromJSON(JSONValue);
-                            var sendingString = JSON.stringify(JSONValue).replace(/'/gm, "\\\'");
+                            var configurationCopy = _.cloneDeep(designView.getConfigurationData());
+                            removeUnnecessaryFieldsFromJSON(configurationCopy);
+                            var sendingString = JSON.stringify(configurationCopy)
+                                .replace(/'/gm, "\\\'")
+                                .replace(/\\"/gm, "\\\'");
 
                             var response = self._designView.getCode("'" + sendingString + "'");
                             if (response.status === "success") {
-                                self.setContent(response.responseJSON);
                                 designContainer.hide();
-                                designView.emptyDesignViewGridContainer();
-                                sourceContainer.show();
-                                self._sourceView.editorResize();
+                                loadingScreen.show();
+                                // The following code has been added to the setTimeout() method because
+                                // the code needs to run asynchronously for the loading screen
+                                setTimeout(function () {
+                                    self.setContent(response.responseJSON);
+                                    self.trigger('content-modified');
+                                    designView.emptyDesignViewGridContainer();
+                                    sourceContainer.show();
+                                    self._sourceView.editorResize();
+                                    self._sourceView.format();
+                                    loadingScreen.hide();
+                                    // NOTE - This trigger should be always handled at the end of setTimeout()
+                                    self.trigger("view-switch");
+                                }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
                             } else if (response.status === "fail") {
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
                             }
                         }
-                        // NOTE - This trigger should be always handled after the 'if' condition
-                        self.trigger("view-switch");
                     });
                 },
 

@@ -42,9 +42,8 @@ import java.util.Map;
 public class SiddhiAppConfig {
     private int finalElementCount = 0;
 
-    private String appName = "";
-    private String appDescription = "";
-
+    private String siddhiAppName = "";
+    private List<String> appAnnotationList = new ArrayList<>();
     private List<SourceSinkConfig> sourceList = new ArrayList<>();
     private List<SourceSinkConfig> sinkList = new ArrayList<>();
     private List<StreamConfig> streamList = new ArrayList<>();
@@ -134,14 +133,6 @@ public class SiddhiAppConfig {
         partitionList.add(partitionConfig);
     }
 
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public void setAppDescription(String appDescription) {
-        this.appDescription = appDescription;
-    }
-
     public void addSource(SourceSinkConfig sourceConfig) {
         addElement(sourceList, sourceConfig);
     }
@@ -178,12 +169,20 @@ public class SiddhiAppConfig {
         addElement(partitionList, partitionConfig);
     }
 
-    public String getAppName() {
-        return appName;
+    public void setAppAnnotationList(List<String> appAnnotationList) {
+        this.appAnnotationList = appAnnotationList;
     }
 
-    public String getAppDescription() {
-        return appDescription;
+    public void setSiddhiAppName(String siddhiAppName) {
+        this.siddhiAppName = siddhiAppName;
+    }
+
+    public String getSiddhiAppName() {
+        return siddhiAppName;
+    }
+
+    public List<String> getAppAnnotationList() {
+        return appAnnotationList;
     }
 
     public List<SourceSinkConfig> getSourceList() {

@@ -16,51 +16,47 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence;
+package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 
 import java.util.List;
 
-/**
- * Represents a Condition element of Pattern | Sequence QueryInputConfig
- */
-public class PatternSequenceConditionConfig {
-    private String conditionId;
+public class StreamStateElementConfig implements StateElementConfig {
+    private String streamReference;
     private String streamName;
     private List<StreamHandlerConfig> streamHandlerList;
+    private String within;
 
-    public PatternSequenceConditionConfig() {
+    public String getStreamReference() {
+        return streamReference;
     }
 
-    public PatternSequenceConditionConfig(String conditionId, String streamName,
-                                          List<StreamHandlerConfig> streamHandlerList) {
-        this.conditionId = conditionId;
-        this.streamName = streamName;
-        this.streamHandlerList = streamHandlerList;
-    }
-
-    public String getConditionId() {
-        return conditionId;
+    public void setStreamReference(String streamReference) {
+        this.streamReference = streamReference;
     }
 
     public String getStreamName() {
         return streamName;
     }
 
-    public List<StreamHandlerConfig> getStreamHandlerList() {
-        return streamHandlerList;
-    }
-
-    public void setConditionId(String conditionId) {
-        this.conditionId = conditionId;
-    }
-
     public void setStreamName(String streamName) {
         this.streamName = streamName;
     }
 
+    public List<StreamHandlerConfig> getStreamHandlerList() {
+        return streamHandlerList;
+    }
+
     public void setStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
         this.streamHandlerList = streamHandlerList;
+    }
+
+    public String getWithin() {
+        return within;
+    }
+
+    public void setWithin(String within) {
+        this.within = within;
     }
 }
