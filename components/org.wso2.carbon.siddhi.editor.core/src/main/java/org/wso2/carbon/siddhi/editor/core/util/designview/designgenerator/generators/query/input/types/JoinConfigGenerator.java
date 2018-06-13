@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create JoinQueryConfig with Siddhi elements
+ * Generator to create Join Query Input Config with Siddhi elements
  */
 public class JoinConfigGenerator {
     // Elements of the Join Input Stream

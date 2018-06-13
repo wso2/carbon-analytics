@@ -27,10 +27,11 @@ import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * Generates PatternQueryConfig with given Siddhi elements
+ * Generates Pattern/Sequence Query Input Config with given Siddhi elements
  */
 public class PatternSequenceConfigGenerator {
     private static final String PATTERN_DELIMITER = " -> ";
@@ -202,7 +203,7 @@ public class PatternSequenceConfigGenerator {
     private void addElementComponent(StateElementConfig element) throws DesignGenerationException {
         ElementComponent elementComponent = generateElementComponent(element);
         conditionList.addAll(elementComponent.conditions);
-        logicComponentList.add(elementComponent.logicComponent);
+        logicComponentList.addAll(elementComponent.logicComponents);
     }
 
     /**
@@ -300,12 +301,11 @@ public class PatternSequenceConfigGenerator {
         // Add condition
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
         conditions.add(conditionConfig);
-        String logicComponentBuilder =
+        String logicComponent =
                 conditionConfig.getConditionId() +
-                        buildMinMax(element.getMin(), element.getMax(), mode) +
-                        WHITE_SPACE +
-                        buildWithin(element.getWithin());
-        return new ElementComponent(conditions, logicComponentBuilder);
+                buildMinMax(element.getMin(), element.getMax(), mode) +
+                buildWithin(element.getWithin());
+        return new ElementComponent(conditions, new ArrayList<>(Arrays.asList(logicComponent)));
     }
 
     /**
@@ -319,25 +319,30 @@ public class PatternSequenceConfigGenerator {
         ElementComponent containedElement = generateElementComponent(element.getStateElement());
         // Add conditions
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>(containedElement.conditions);
-        String logicComponentBuilder =
+        String logicComponent =
                 EVERY +
                 WHITE_SPACE +
-                containedElement.logicComponent +
-                WHITE_SPACE +
+                containedElement.getLogicComponentsString(mode) +
                 buildWithin(element.getWithin());
-        return new ElementComponent(conditions, logicComponentBuilder);
+        return new ElementComponent(conditions, new ArrayList<>(Arrays.asList(logicComponent)));
     }
 
-    // This is only applicable for Sequences TODO improve
+    /**
+     * Generates ElementComponent object for the given NextStateElementConfig object
+     * @param element                           NextStateElementConfig object
+     * @return                                  ElementComponent object
+     * @throws DesignGenerationException        Error wihle generating ElementComponent object
+     */
     private ElementComponent generateNextStateElementComponent(NextStateElementConfig element)
             throws DesignGenerationException {
         ElementComponent stateElement = generateElementComponent(element.getStateElement());
         ElementComponent nextStateElement = generateElementComponent(element.getNextStateElement());
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>(stateElement.conditions);
         conditions.addAll(nextStateElement.conditions);
-        String logicComponent;
-        logicComponent = stateElement.logicComponent + getDelimiter(mode) + nextStateElement.logicComponent;
-        return new ElementComponent(conditions, logicComponent);
+        List<String> logicComponents = new ArrayList<>(stateElement.logicComponents);
+        logicComponents.addAll(nextStateElement.logicComponents);
+
+        return new ElementComponent(conditions, logicComponents);
     }
 
     /**
@@ -350,18 +355,18 @@ public class PatternSequenceConfigGenerator {
             throws DesignGenerationException {
         ElementComponent condition1Component = generateStreamStateElementComponent(element.getStreamStateElement1());
         ElementComponent condition2Component = generateStreamStateElementComponent(element.getStreamStateElement2());
-        String logicComponentBuilder =
-                condition1Component.logicComponent +
+        String logicComponent =
+                condition1Component.getLogicComponentsString(mode) +
                 WHITE_SPACE +
                 element.getType().toLowerCase() +
                 WHITE_SPACE +
-                condition2Component.logicComponent +
+                condition2Component.getLogicComponentsString(mode) +
                 buildWithin(element.getWithin());
         // Add conditions
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
         conditions.addAll(condition1Component.conditions);
         conditions.addAll(condition2Component.conditions);
-        return new ElementComponent(conditions, logicComponentBuilder);
+        return new ElementComponent(conditions, new ArrayList<>(Arrays.asList(logicComponent)));
     }
 
     /**
@@ -373,37 +378,41 @@ public class PatternSequenceConfigGenerator {
     private ElementComponent generateStreamStateElementComponent(StreamStateElementConfig element)
             throws DesignGenerationException {
         PatternSequenceConditionConfig conditionConfig = generateConditionConfig(element);
-        StringBuilder logicComponentBuilder = new StringBuilder();
+        StringBuilder logicComponent = new StringBuilder();
         if (element instanceof AbsentStreamStateElementConfig) {
-            logicComponentBuilder.append(NOT);
-            logicComponentBuilder.append(WHITE_SPACE);
+            logicComponent.append(NOT);
+            logicComponent.append(WHITE_SPACE);
         }
-        logicComponentBuilder.append(conditionConfig.getConditionId());
+        logicComponent.append(conditionConfig.getConditionId());
         if (element instanceof AbsentStreamStateElementConfig &&
                 ((AbsentStreamStateElementConfig) element).getWaitingTime() != null) {
-            logicComponentBuilder.append(WHITE_SPACE);
-            logicComponentBuilder.append(FOR);
-            logicComponentBuilder.append(WHITE_SPACE);
-            logicComponentBuilder.append(((AbsentStreamStateElementConfig) element).getWaitingTime());
+            logicComponent.append(WHITE_SPACE);
+            logicComponent.append(FOR);
+            logicComponent.append(WHITE_SPACE);
+            logicComponent.append(((AbsentStreamStateElementConfig) element).getWaitingTime());
         }
-        logicComponentBuilder.append(buildWithin(element.getWithin()));
+        logicComponent.append(buildWithin(element.getWithin()));
         // Add condition
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
         conditions.add(conditionConfig);
-        return new ElementComponent(conditions, logicComponentBuilder.toString());
+        return new ElementComponent(conditions, new ArrayList<>(Arrays.asList(logicComponent.toString())));
     }
 
     /**
      * Represents a State Element component,
-     * which consists of conditions and the logic component belonging to a State Element
+     * which consists of conditions and logic components belonging to a State Element
      */
     private static class ElementComponent {
         List<PatternSequenceConditionConfig> conditions;
-        String logicComponent;
+        List<String> logicComponents;
 
-        private ElementComponent(List<PatternSequenceConditionConfig> conditions, String logicComponent) {
+        private ElementComponent(List<PatternSequenceConditionConfig> conditions, List<String> logicComponents) {
             this.conditions = conditions;
-            this.logicComponent = logicComponent;
+            this.logicComponents = logicComponents;
+        }
+
+        private String getLogicComponentsString(QueryInputType mode) throws DesignGenerationException {
+            return String.join(getDelimiter(mode), logicComponents);
         }
     }
 }

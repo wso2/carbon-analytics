@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generates WindowFilterProjectionConfig with given Siddhi elements
+ * Generates WindowFilterProjection Query Input Config with given Siddhi elements
  */
 public class WindowFilterProjectionConfigGenerator {
     private String siddhiAppString;

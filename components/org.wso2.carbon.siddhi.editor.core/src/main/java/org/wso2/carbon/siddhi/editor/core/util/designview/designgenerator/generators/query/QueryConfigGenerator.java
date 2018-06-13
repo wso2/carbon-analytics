@@ -195,10 +195,6 @@ public class QueryConfigGenerator {
         } else if (queryInputConfig instanceof JoinConfig) {
             return QueryListType.JOIN;
         } else if (queryInputConfig instanceof PatternSequenceConfig) {
-            if (QueryListType.valueOf(queryInputConfig.getType()) == QueryListType.SEQUENCE) {
-                // TODO add Sequences
-                throw new IllegalArgumentException("Sequence Queries are not supported");
-            }
             return QueryListType.valueOf(queryInputConfig.getType());
         }
         throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
