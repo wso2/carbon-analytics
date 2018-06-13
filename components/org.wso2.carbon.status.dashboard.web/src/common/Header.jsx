@@ -27,7 +27,7 @@ import AuthManager from '../auth/utils/AuthManager';
 import Logo from '../images/wso2-logo.svg';
 
 const title = {color: '#EEE', fontSize: 16, height: 40, lineHeight: '40px'};
-const appBar = {backgroundColor: '#1a1a1a', height:40, display:'flex', alignItems:'center'};
+const appBar = {backgroundColor: '#263238', height:40, display:'flex', alignItems:'center'};
 const logoStyle = {margin: '0 15px 0 0', height: 17};
 const accName = {display: 'flex', alignItems: 'center', color: '#EEE', textTransform: 'capitalize'};
 const btnStyle = {width: 'initial', height: 40, padding: '0 0 0 10px'};
