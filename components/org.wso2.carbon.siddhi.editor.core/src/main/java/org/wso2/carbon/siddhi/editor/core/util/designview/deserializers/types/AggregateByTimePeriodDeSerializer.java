@@ -47,6 +47,6 @@ public class AggregateByTimePeriodDeSerializer implements JsonDeserializer {
         } else if (attributesSelectionType.equalsIgnoreCase(AggregationByTimeType.INTERVAL.toString())) {
             return jsonDeserializationContext.deserialize(jsonObject, AggregateByTimeInterval.class);
         }
-        throw new JsonParseException("Unable to parse the AggregateByTimePeriod JSON since its type is unknown");
+        throw new JsonParseException("Unable to de-serialize the AggregateByTimePeriod JSON since its type is unknown");
     }
 }
