@@ -59,7 +59,7 @@ body {
 
 .floating-button {
     position: fixed;
-    right: 100px;
+    right: 30px;
     z-index: 9;
     bottom: 25px;
 }
@@ -71,7 +71,7 @@ body {
 
 .toggle {
     float: right;
-    margin: -30px 180px 0 0;
+    margin: -30px 160px 0 0;
 }
 
 .active-apps {
@@ -453,7 +453,8 @@ p.node-last-update {
 .sink-image {
     background: url("../icons/sink.svg");
 }
-.login-container h1 {
+.login-container h1,
+.addWorker-container h1 {
     color: #eee !important;
     font-weight: 400;
 }

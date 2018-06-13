@@ -35,9 +35,9 @@ const dataConstants = {PAGE_LENGTH: 7};
 
 const styles = {
     h3: {color: '#dedede', marginLeft: '2%', backgroundColor: '#222222'},
-    h3Title: {color: '#C0C0C0', marginLeft: '2%', backgroundColor: '#222222', marginTop: '4%'},
-    navBtn: {color: '#fff', padding: '0 16px 0 12px', verticalAlign: 'middle'},
-    divider: {backgroundColor: '#9E9E9E', width: '95%', marginLeft:'2%'},
+    h3Title: {color: '#dedede', margin: '60px 24px 0 24px', fontWeight: '400', fontSize: '1.17rem'},
+    divider: {backgroundColor: '#9E9E9E', width: 'calc(100% - 48px)', margin: '3px 24px 0 24px'},
+    navBtn: {color: '#BDBDBD', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize'},
     alignCenter: {display: 'flex', alignItems: 'center'},
 };
 
@@ -290,20 +290,29 @@ export default class SiddhiAppTable extends React.Component {
                 <Header/>
                 <div className="navigation-bar">
                     <Button style={styles.navBtn}>
-                        <HomeButton style={{paddingRight: 8, color: '#000'}}/>Overview</Button>
+                        <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                        Overview
+                    </Button>
                 </div>
 
-                <Typography variant="display2" className={'node-title'}
-                            style={{marginTop: '2%', color: '#dedede', marginLeft: '2%', backgroundColor: '#222222'}}>
-                    App Overview</Typography>
+                <Typography variant="display2" className={'node-title'} style={{
+                    marginTop: '20px',
+                    color: '#dedede',
+                    marginLeft: '24px',
+                    fontSize: '1.6rem'
+                }}>
+                    App Overview
+                </Typography>
 
-                <div style={{marginTop: '-2%', marginRight: '5%'}}>
-                    <Link style={{textDecoration: 'none', color: '#dedede', float: 'right'}}
-                          to={window.contextPath}> |&nbsp;&nbsp; NODE VIEW</Link>
+                <div style={{marginTop: '-23px', marginRight: '24px', fontSize: '0.875rem'}}>
+                    <Link style={{textDecoration: 'none', color: '#dedede', float: 'right', paddingLeft: 10}}
+                          to={window.contextPath}>Node View</Link>
 
-                    <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right'}}
+                    <Typography style={{float: 'right', color: '#757575'}}>|</Typography>
+
+                    <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right', paddingRight: 10}}
                           to={window.contextPath + "/siddhi-apps"}>
-                        APP VIEW &nbsp;&nbsp; </Link>
+                        App View</Link>
                 </div>
             </div>
         )

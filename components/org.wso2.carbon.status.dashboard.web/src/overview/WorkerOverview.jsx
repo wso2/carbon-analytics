@@ -42,14 +42,13 @@ import '../../public/css/dashboard.css';
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
-    gridList: {width: '90%', padding: 40},
-    h3: {color: '#dedede', marginLeft: '4%', backgroundColor: '#222222'},
-    h3Title: {color: '#C0C0C0', marginLeft: '4%', backgroundColor: '#222222'},
+    gridList: {width: '100%', padding: '40px 24px', margin: 0},
+    h3Title: {color: '#dedede', marginLeft: '24px', fontWeight: '400'},
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
-    divider: {backgroundColor: '#9E9E9E', width: '90%'},
-    navBtn: {color: '#BDBDBD', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize', fill: '#BDBDBD'},
+    divider: {backgroundColor: '#9E9E9E', width: 'calc(100% - 48px)', margin: '-16px 24px 0 24px'},
+    navBtn: {color: '#BDBDBD', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize'},
     alignCenter: {display: 'flex', alignItems: 'center'},
     addBtn: {
         backgroundColor: '#f17b31',
@@ -95,7 +94,7 @@ export default class WorkerOverview extends React.Component {
             hasViewPermission: true,
             statusMessage: "Currently there are no nodes to display",
             isError: false,
-            btnType: <SyncDisabled/>
+            btnType: <SyncDisabled  color='#BDBDBD'/>
 
         };
         this.autoSync = this.autoSync.bind(this);
@@ -342,7 +341,7 @@ export default class WorkerOverview extends React.Component {
             window.localStorage.setItem("pInterval", this.state.pInterval)
         } else {
             clearInterval(this.state.interval);
-            this.setState({enableAutoSync: false, btnType: <SyncDisabled/>});
+            this.setState({enableAutoSync: false, btnType: <SyncDisabled  color='#BDBDBD'/>});
             window.localStorage.setItem("enableAutoSync", false)
         }
     }
@@ -406,7 +405,7 @@ export default class WorkerOverview extends React.Component {
             return (
 
                 <div>
-                    <div style={{height: 20, padding: 20}}>
+                    <div style={{padding: 20}}>
                         {this.renderAddWorkerFlotting()}
                         <div className="toggle">
                             <Button style={styles.navBtn} onClick={() => {
@@ -493,7 +492,7 @@ export default class WorkerOverview extends React.Component {
                         } else {
                             return (
                                 <div>
-                                    <h3 style={styles.h3}>Managers</h3>
+                                    <h3 style={styles.h3Title}>Managers</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
@@ -518,7 +517,7 @@ export default class WorkerOverview extends React.Component {
             (!WorkerOverview.hasNodes(this.state.managerClusterList))) {
             return (
                 <div style={styles.background}>
-                    <div style={{height: 20, padding: 20}}>
+                    <div style={{padding: 20}}>
                         {this.renderAddWorkerFlotting()}
                         <div className="toggle">
                             <Button style={styles.navBtn} onClick={() => {
@@ -557,7 +556,7 @@ export default class WorkerOverview extends React.Component {
                         } else {
                             return (
                                 <div>
-                                    <h3 style={styles.h3}>{id}</h3>
+                                    <h3 style={styles.h3Title}>{id}</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
@@ -580,7 +579,7 @@ export default class WorkerOverview extends React.Component {
             (!WorkerOverview.hasNodes(this.state.clustersList))) {
             return (
                 <div style={styles.background}>
-                    <div style={{height: 20, padding: 20}}>
+                    <div style={{padding: 20}}>
                         {this.renderAddWorkerFlotting()}
                         <div className="toggle">
                             <Button style={styles.navBtn} onClick={() => {
@@ -679,15 +678,15 @@ export default class WorkerOverview extends React.Component {
                     }}>
                         Node Overview
                     </Typography>
-                    <div style={{marginTop: '-23px', marginRight: '24px'}}>
+                    <div style={{marginTop: '-23px', marginRight: '24px', fontSize: '0.875rem'}}>
                         <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right', paddingLeft: 10}}
                               to={window.contextPath}>Node View</Link>
+
                         <Typography style={{float: 'right', color: '#757575'}}>|</Typography>
 
                         <Link style={{textDecoration: 'none', color: '#dedede', float: 'right', paddingRight: 10}}
                               to={window.contextPath + "/siddhi-apps"}>
                             App View</Link>
-
                     </div>
                     {this.renderWorkers(this.state.clustersList, this.state.managerClusterList)}
                 </div>

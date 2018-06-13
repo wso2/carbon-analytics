@@ -23,9 +23,11 @@ import {Link, Redirect} from 'react-router-dom';
 import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
 import {HttpStatus} from '../utils/Constants';
 import Header from '../common/Header';
+import '../../public/css/dashboard.css';
 // Material UI
 import HomeButton from 'material-ui/svg-icons/action/home';
 import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from 'material-ui';
+import {Button} from 'material-ui-next';
 // CSS
 import '../../public/css/dashboard.css';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
@@ -42,6 +44,18 @@ const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 const buttonStyle = {marginLeft: 10, width: '30%', fontSize: '8px'};
 const popupButtonStyle = {marginLeft: 25, width: '30%', fontSize: '8px'};
 const textField = {width: 650};
+
+const styles = {
+    root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
+    gridList: {width: '100%', padding: '40px 24px', margin: 0},
+    h3Title: {color: '#dedede', marginLeft: '24px', fontWeight: '400'},
+    titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
+    headerStyle: {height: 30, backgroundColor: '#242424'},
+    paper: {height: 50, width: 500, textAlign: 'center'},
+    divider: {backgroundColor: '#9E9E9E', width: 'calc(100% - 48px)', margin: '-22px 24px 0 24px'},
+    navBtn: {color: '#BDBDBD', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#FF5722', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize'},
+};
 
 /**
  * class which manages add worker functionality.
@@ -422,14 +436,17 @@ export default class AddWorker extends React.Component {
 
                     <Header/>
                     <div className="navigation-bar">
-                        <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/>
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath}>
+                            <Button style={styles.navBtn}>
+                                <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                                Overview >
+                            </Button>
                         </Link>
                         <RaisedButton label="Add New" disabled disabledLabelColor='white'
                                       disabledBackgroundColor='#f17b31'/>
                     </div>
                     <MuiThemeProvider muiTheme={muiTheme}>
-                        <div>
+                        <div className="addWorker-container">
                             <FormPanel title={"Let's add a new node"} onSubmit={this._handleSubmit} width={650}>
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
