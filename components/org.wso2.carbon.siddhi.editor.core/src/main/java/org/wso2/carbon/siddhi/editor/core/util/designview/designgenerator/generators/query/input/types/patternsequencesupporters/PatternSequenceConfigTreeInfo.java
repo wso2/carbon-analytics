@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

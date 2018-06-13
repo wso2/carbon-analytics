@@ -23,7 +23,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
