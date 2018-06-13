@@ -141,9 +141,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                             attribute: aggregateByAttribute
                         },
                         aggregateByTimePeriod: {
-                            minValue: (aggregateByTimePeriod.getValue().minValue).toLowerCase(),
-                            maxValue: (aggregateByTimePeriod.getValue().maxValue !== undefined)?
-                                    (aggregateByTimePeriod.getValue().maxValue).toLowerCase(): undefined
+                            minValue: (aggregateByTimePeriod.getValue().min).toLowerCase(),
+                            maxValue: (aggregateByTimePeriod.getValue().max !== undefined)?
+                                    (aggregateByTimePeriod.getValue().max).toLowerCase(): undefined
                         }
                     };
                 } else if (aggregateByTimePeriod !== undefined && aggregateByTimePeriod.getType() === 'INTERVAL') {
@@ -603,8 +603,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         aggregateByTimePeriodType = 'RANGE';
                         if (configAggregate.aggregateByTimePeriod.maxValue !== undefined) {
                             value = {
-                                minValue:  (configAggregate.aggregateByTimePeriod.minValue).toUpperCase(),
-                                maxValue:  (configAggregate.aggregateByTimePeriod.maxValue).toUpperCase()
+                                min:  (configAggregate.aggregateByTimePeriod.minValue).toUpperCase(),
+                                max:  (configAggregate.aggregateByTimePeriod.maxValue).toUpperCase()
                             };
                         } else {
                             value = {
