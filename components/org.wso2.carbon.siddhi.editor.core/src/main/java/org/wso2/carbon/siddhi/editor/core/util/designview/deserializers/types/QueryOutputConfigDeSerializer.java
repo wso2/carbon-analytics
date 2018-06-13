@@ -72,6 +72,6 @@ public class QueryOutputConfigDeSerializer implements JsonDeserializer {
                     jsonDeserializationContext.deserialize(jsonObject.get(OUTPUT), DeleteOutputConfig.class),
                     target);
         }
-        throw new JsonParseException("Unable to parse the QueryOutputConfig JSON since its type is unknown");
+        throw new JsonParseException("Unable to de-serialize the QueryOutputConfig JSON since its type is unknown");
     }
 }
