@@ -54,11 +54,10 @@ public class QueryInputConfigGenerator {
                     .generateWindowFilterProjectionConfig(queryInputStream);
         } else if (queryInputType.equalsIgnoreCase(QueryInputType.JOIN.toString())) {
             return new JoinConfigGenerator().getJoinQueryConfig(queryInputStream, siddhiApp, siddhiAppString);
-        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString())) {
-            return new PatternSequenceConfigGenerator(siddhiAppString).generatePatternConfig(queryInputStream);
-        } else if (queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
-            // TODO Add support for Sequences
-            throw new DesignGenerationException("Sequence queries are not supported");
+        } else if (queryInputType.equalsIgnoreCase(QueryInputType.PATTERN.toString()) ||
+                queryInputType.equalsIgnoreCase(QueryInputType.SEQUENCE.toString())) {
+            // TODO Add support for Patterns & Sequences
+            throw new DesignGenerationException(queryInputType.toLowerCase() + " queries are not supported");
         }
 
         throw new DesignGenerationException("Unable to generate QueryInputConfig for type: " + queryInputType);
