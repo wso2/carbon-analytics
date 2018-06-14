@@ -179,8 +179,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     inputStream, new TypeToken<List<ResourceClusterInfo>>() {
                                     }.getType());
                             for (ResourceClusterInfo clusterInfo : clusterInfos) {
-                                String nodeId = clusterInfo.getNodeId();
-                                ResourceClusteredWorkerNode.add(nodeId);
+                                String workerId = generateWorkerKey(clusterInfo.getHttps_host(), clusterInfo
+                                        .getHttps_port());
+                                ResourceClusteredWorkerNode.add(workerId);
                             }
                         }
                     } catch (feign.RetryableException e) {
@@ -197,7 +198,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
             if (!workerList.isEmpty()) {
                 workerList.parallelStream().forEach(worker -> {
-                    if (!ResourceClusteredWorkerNode.contains(getCarbonID(worker.getWorkerId()))) {
+                    if (!ResourceClusteredWorkerNode.contains(worker.getWorkerId())) {
                         try {
                             WorkerOverview workerOverview = new WorkerOverview();
                             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
@@ -2468,7 +2469,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         for (ResourceClusterInfo clusterInfo : clusterInfos) {
                             if (!storedWorkerList.isEmpty()) {
                                 for (NodeConfigurationDetails worker : storedWorkerList) {
-                                    if (clusterInfo.getNodeId().equals(getCarbonID(worker.getWorkerId()))) {
+                                    if (clusterInfo.getHttps_host().equals(worker.getHost()) && clusterInfo
+                                            .getHttps_port().equals(String.valueOf(worker.getPort()))) {
                                         WorkerOverview workerOverview = new WorkerOverview();
                                         workerOverview.setNodeId(getCarbonID(worker.getWorkerId()));
                                         feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(
@@ -2516,22 +2518,20 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     }
                                 }
                             } else {
-                                WorkerOverview workerOverview = new WorkerOverview();
-                                workerOverview.setNodeId(clusterInfo.getNodeId());
-                                workerOverview.setStatusMessage("Please add the node manually.");
-                                resourceClusterList.add(workerOverview);
+                                addResourceClusterNodes(username, clusterInfo.getHttps_host(), clusterInfo
+                                        .getHttps_port(), resourceClusterList);
                             }
                         }
                         List<String> alreadyExistingResourceNodeNodeId = new ArrayList<>();
                         for (WorkerOverview overview : resourceClusterList) {
-                            alreadyExistingResourceNodeNodeId.add(overview.getNodeId());
+                            alreadyExistingResourceNodeNodeId.add(overview.getWorkerId());
                         }
                         for (ResourceClusterInfo clusterInfo : clusterInfos) {
-                            if (!alreadyExistingResourceNodeNodeId.contains(clusterInfo.getNodeId())) {
-                                WorkerOverview workerOverview = new WorkerOverview();
-                                workerOverview.setNodeId(clusterInfo.getNodeId());
-                                workerOverview.setStatusMessage("Please add the node manually.");
-                                resourceClusterList.add(workerOverview);
+                            String workerId = generateWorkerKey(clusterInfo.getHttps_host(), String.valueOf
+                                    (clusterInfo.getHttps_port()));
+                            if (!alreadyExistingResourceNodeNodeId.contains(workerId)) {
+                                addResourceClusterNodes(username, clusterInfo.getHttps_host(), clusterInfo
+                                        .getHttps_port(), resourceClusterList);
                             }
                         }
 
@@ -2561,6 +2561,60 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             return Response.status(Response.Status.FORBIDDEN).entity("unauthorized user : " + username).build();
         }
     }
+
+    public void addResourceClusterNodes(String username, String host, String port, List<WorkerOverview>
+            resourceClusterList) throws NotFoundException {
+        Node notRegisteredWorker = new Node();
+        String workerId = generateWorkerKey(host, port);
+        notRegisteredWorker.setHost(host);
+        notRegisteredWorker.setPort(Integer.parseInt(port));
+        addWorker(notRegisteredWorker, username);
+        WorkerOverview workerOverview = new WorkerOverview();
+        workerOverview.setNodeId(getCarbonID(workerId));
+        feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(
+                PROTOCOL + generateURLHostPort(host, String.valueOf(
+                        port)), getUsername(), getPassword())
+                .getWorker();
+        if ((workerResponse != null) && (workerResponse.status() == 200)) {
+            Long timeInMillis = System.currentTimeMillis();
+            String responseBody = workerResponse.body().toString();
+            ServerDetails serverDetails = gson.fromJson(
+                    responseBody, ServerDetails.class);
+            String message = serverDetails.getMessage();
+            if (message == null || message.isEmpty()) {
+                workerOverview.setStatusMessage("Success");
+            } else {
+                workerOverview.setStatusMessage(message);
+            }
+            feign.Response activeSiddiAppsResponse = WorkerServiceFactory
+                    .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(
+                            host, String.valueOf(port)),
+                            getUsername(), getPassword()).getSiddhiApps(true);
+            String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body()
+                    .toString();
+            List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody,
+                    new TypeToken<List<String>>() {
+                    }.getType());
+            feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory
+                    .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(
+                            host, String.valueOf(port)),
+                            getUsername(), getPassword()).getSiddhiApps(false);
+            String inactiveSiddiAppsResponseBody =
+                    inactiveSiddiAppsResponse.body().toString();
+            List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody,
+                    new TypeToken<List<String>>() {
+                    }.getType());
+            serverDetails.setSiddhiApps(activeApps.size(), inactiveApps.size());
+            WorkerMetricsSnapshot snapshot = new WorkerMetricsSnapshot(
+                    serverDetails, timeInMillis);
+            WorkerStateHolder.addMetrics(workerId, snapshot);
+            workerOverview.setLastUpdate(timeInMillis);
+            workerOverview.setWorkerId(workerId);
+            workerOverview.setServerDetails(serverDetails);
+            resourceClusterList.add(workerOverview);
+        }
+    }
+
 
     public static StatusDashboardMetricsDBHandler getMetricStore() {
 
@@ -2604,7 +2658,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterServicePermissionGrantService"
     )
-    public void registerServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
+    public void registerServicePermissionGrantService(PermissionGrantServiceComponent
+                                                              permissionGrantServiceComponent) {
 
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) ServicePermissionGrantService");

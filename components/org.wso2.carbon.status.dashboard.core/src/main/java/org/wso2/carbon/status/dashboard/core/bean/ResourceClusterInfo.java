@@ -26,6 +26,8 @@ public class ResourceClusterInfo {
     private String nodeId;
     private String httpHost;
     private String httpPort;
+    private String https_host;
+    private String https_port;
 
     public String getNodeId() {
         return nodeId;
@@ -49,5 +51,21 @@ public class ResourceClusterInfo {
 
     public void setPort(String httpPort) {
         this.httpPort = httpPort;
+    }
+
+    public String getHttps_host() {
+        return https_host;
+    }
+
+    public void setHttps_host(String https_host) {
+        this.https_host = https_host;
+    }
+
+    public String getHttps_port() {
+        return https_port;
+    }
+
+    public void setHttps_port(String https_port) {
+        this.https_port = https_port;
     }
 }
