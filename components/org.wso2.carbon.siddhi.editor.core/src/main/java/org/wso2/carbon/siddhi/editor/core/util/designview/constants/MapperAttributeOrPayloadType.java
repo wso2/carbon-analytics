@@ -19,15 +19,9 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Has types of 'payload' in 'map' of a Siddhi Sink
+ * Has types of 'attributes/payload' in 'map' of a Siddhi Source/Sink
  */
-public class SinkMapPayloadTypes {
-    public static final String MAP = "map";
-    public static final String SINGLE = "single";
-
-    /**
-     * Avoids Instantiation
-     */
-    private SinkMapPayloadTypes() {
-    }
+public enum MapperAttributeOrPayloadType {
+    MAP,
+    LIST;
 }
