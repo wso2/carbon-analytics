@@ -164,12 +164,16 @@ public class ServiceComponent {
                             throw new ResourceManagerException("Allocation Algorithm class with name "
                                     + allocationAlgoClassName + " is invalid. ", e);
                         }
+                        if(deploymentConfig.getHttpsInterface() == null){
+                            log.error(ResourceManagerConstants.KEY_NODE_PROTOCOL + " is not specified " +
+                                    "in deployment.yaml");
+                        }
                         String id = (String) ((Map) configProvider.getConfigurationObject("wso2.carbon"))
                                 .get("id");
                         currentNodeConfig = new ManagerNode().setId(id)
                                 .setHeartbeatInterval(deploymentConfig.getHeartbeatInterval())
                                 .setHeartbeatMaxRetry(deploymentConfig.getHeartbeatMaxRetry())
-                                .setHttpInterface(deploymentConfig.getHttpInterface());
+                                .setHttpsInterface(deploymentConfig.getHttpsInterface());
                         ServiceDataHolder.setCurrentNode(currentNodeConfig);
                         if (ResourceManagerConstants.MODE_DISTRIBUTED.equalsIgnoreCase(deploymentConfig.getType())) {
                             ServiceDataHolder.setDeploymentMode(DeploymentMode.DISTRIBUTED);
@@ -258,12 +262,12 @@ public class ServiceComponent {
                 properties.put(ResourceManagerConstants.KEY_NODE_ID, currentNode.getId());
                 properties.put(ResourceManagerConstants.KEY_NODE_INTERVAL, currentNode.getHeartbeatInterval());
                 properties.put(ResourceManagerConstants.KEY_NODE_MAX_RETRY, currentNode.getHeartbeatMaxRetry());
-                properties.put(ResourceManagerConstants.KEY_NODE_HOST, currentNode.getHttpInterface().getHost());
-                properties.put(ResourceManagerConstants.KEY_NODE_PORT, currentNode.getHttpInterface().getPort());
+                properties.put(ResourceManagerConstants.KEY_NODE_HOST, currentNode.getHttpsInterface().getHost());
+                properties.put(ResourceManagerConstants.KEY_NODE_PORT, currentNode.getHttpsInterface().getPort());
                 properties.put(ResourceManagerConstants.KEY_NODE_USERNAME,
-                        currentNode.getHttpInterface().getUsername());
+                        currentNode.getHttpsInterface().getUsername());
                 properties.put(ResourceManagerConstants.KEY_NODE_PASSWORD,
-                        currentNode.getHttpInterface().getPassword());
+                        currentNode.getHttpsInterface().getPassword());
                 clusterCoordinator.setPropertiesMap(properties);
                 clusterCoordinator.registerEventListener(new CoordinatorChangeListener());
             }
