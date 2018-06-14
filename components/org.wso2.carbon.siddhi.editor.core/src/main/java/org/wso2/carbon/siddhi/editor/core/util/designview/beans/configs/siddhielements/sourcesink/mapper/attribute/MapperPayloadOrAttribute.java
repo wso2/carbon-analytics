@@ -22,20 +22,20 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
  * Represents @attribute or @payload of a Siddhi Source/Sink mapper
  */
 public abstract class MapperPayloadOrAttribute {
-    private String payloadOrAttribute;
+    private String annotationType;
     private String type;
 
-    public MapperPayloadOrAttribute(String payloadOrAttribute, String type) {
-        this.payloadOrAttribute = payloadOrAttribute;
+    public MapperPayloadOrAttribute(String annotationType, String type) {
+        this.annotationType = annotationType;
         this.type = type;
     }
 
-    public String getPayloadOrAttribute() {
-        return payloadOrAttribute;
+    public String getAnnotationType() {
+        return annotationType;
     }
 
-    public void setPayloadOrAttribute(String payloadOrAttribute) {
-        this.payloadOrAttribute = payloadOrAttribute;
+    public void setAnnotationType(String annotationType) {
+        this.annotationType = annotationType;
     }
 
     public String getType() {
