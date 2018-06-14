@@ -54,7 +54,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         WindowFilterProjectionQueryForm.prototype.generatePropertiesForm = function (element, formConsole,
                                                                                      formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Window/Filter/Projection Query </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Query Configuration</h3></div>' +
                 '<div class="define-windowFilterProjection-query"></div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
@@ -352,7 +352,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 if (inputElementType === 'WINDOW') {
                     inputSchema = {
                         type: "object",
-                        title: "Query Input",
+                        title: "Input",
                         required: true,
                         options: {
                             disable_properties: false
@@ -452,7 +452,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 } else {
                     inputSchema = {
                         type: "object",
-                        title: "Query Input",
+                        title: "Input",
                         required: true,
                         options: {
                             disable_properties: false
@@ -650,7 +650,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var editorAnnotation = new JSONEditor($(formContainer).find('#form-query-annotation')[0], {
                     schema: {
                         type: "object",
-                        title: "Query Annotations",
+                        title: "Annotations",
                         properties: {
                             annotations: {
                                 propertyOrder: 1,
@@ -702,7 +702,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             disable_properties: false
                         },
                         type: "object",
-                        title: "Query Select",
+                        title: "Select",
                         properties: {
                             select: {
                                 propertyOrder: 1,
@@ -836,7 +836,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     schema: {
                         required: true,
                         type: "object",
-                        title: "Query Output",
+                        title: "Output",
                         options: {
                             disable_properties: false
                         },

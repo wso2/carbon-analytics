@@ -30,7 +30,15 @@ define(
              Data storing structure as follows
                 type*: ‘’,
                 options: ['option1', 'option2=value2',...],
-                attributes: ['attribute1', 'attribute2=value2',...]
+                attributes: {
+                    type*: ‘MAP’
+                    value*: {Key-Value Pair JSON}
+                }
+                << or >>
+                attributes: {
+                    type*: ‘LIST’
+                    value*: ['value1',...]
+                } NOTE: LIST will contain only one value in sink mapper.
             */
             if (options !== undefined) {
                 this.type = options.type;

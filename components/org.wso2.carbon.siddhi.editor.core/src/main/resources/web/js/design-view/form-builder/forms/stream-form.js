@@ -44,7 +44,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
          */
         StreamForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Stream </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
                 '<div id="define-stream" class="define-stream"></div>');
             formContainer.append(propertyDiv);
 
@@ -181,6 +181,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
          */
         StreamForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
+                '<div id="define-stream" class="define-stream"></div>');
+            formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
