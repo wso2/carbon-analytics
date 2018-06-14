@@ -105,7 +105,7 @@ public class DeploymentConfig implements Serializable {
     }
 
     /**
-     * Setter for the httpInterface.
+     * Setter for the httpsInterface.
      *
      * @param httpsInterface of the current node.
      */
