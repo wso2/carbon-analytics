@@ -18,18 +18,16 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.MapperPayloadOrAttributeType;
-
 import java.util.List;
 
 /**
  * Represents a list of values in the Mapper
  */
-public class MapperListPayloadOrAttributeBody extends MapperPayloadOrAttributeBody {
+public class MapperListPayloadOrAttribute extends MapperPayloadOrAttribute {
     private List<String> value;
 
-    public MapperListPayloadOrAttributeBody(List<String> value) {
-        super(MapperPayloadOrAttributeType.LIST.toString());
+    public MapperListPayloadOrAttribute(String payloadOrAttribute, String type, List<String> value) {
+        super(payloadOrAttribute, type);
         this.value = value;
     }
 
