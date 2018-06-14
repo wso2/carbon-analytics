@@ -494,7 +494,8 @@ a.list-group-item, button.list-group-item {
 .define-stream table,
 .define-window table,
 .define-trigger table,
-.define-table table {
+.define-table table,
+.define-partition table {
     width: 100% !important;
     max-width: 650px !important;
 }

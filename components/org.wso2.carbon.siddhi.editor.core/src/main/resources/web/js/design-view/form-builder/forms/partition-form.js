@@ -45,7 +45,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
         PartitionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Partition Configuration</h3></div>' +
-                '<div class="define-partition"></div>');
+                '<div id="define-partition" class="define-partition"></div>');
             formContainer.append(propertyDiv);
 
             // design view container and toggle view button are enabled
@@ -86,7 +86,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     partitionKeys: partitionKeys
                 };
                 fillWith = self.formUtils.cleanJSONObject(fillWith);
-                var editor = new JSONEditor(formContainer[0], {
+                var editor = new JSONEditor($(formContainer).find('#define-partition')[0], {
                     schema: {
                         type: "object",
                         title: "Partition",
