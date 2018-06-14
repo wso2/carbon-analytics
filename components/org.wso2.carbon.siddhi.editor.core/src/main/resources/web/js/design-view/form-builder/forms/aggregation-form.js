@@ -433,7 +433,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                 type: "object",
                                 title: "Range",
                                 options: {
-                                    disable_properties: false
+                                    disable_properties: true
                                 },
                                 properties: {
                                     minValue: {
@@ -454,6 +454,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                     },
                                     maxValue: {
                                         propertyOrder: 2,
+                                        required: true,
                                         type: "string",
                                         title: "Ending Time Value",
                                         enum: [
