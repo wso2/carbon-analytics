@@ -24,7 +24,7 @@ import java.util.Map;
  * Represents a map of values in the Mapper
  */
 public class MapperMapAttribute extends MapperAttribute {
-    Map<String, String> value;
+    private Map<String, String> value;
 
     public MapperMapAttribute(String type) {
         super(type);

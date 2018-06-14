@@ -24,7 +24,7 @@ import java.util.List;
  * Represents a list of values in the Mapper
  */
 public class MapperListAttribute extends MapperAttribute {
-    List<String> value;
+    private List<String> value;
 
     public MapperListAttribute(String type) {
         super(type);
