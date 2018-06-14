@@ -322,6 +322,22 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     },
                     streamHandlerList: streamHandlerList
                 };
+
+                var inputElementAttributeList;
+                var descriptionForFromElement = 'Attributes { ';
+                if (inputElementType === 'STREAM' || inputElementType === 'WINDOW') {
+                    inputElementAttributeList = (inputElement.element).getAttributeList();
+                    _.forEach(inputElementAttributeList, function (attribute) {
+                        descriptionForFromElement
+                            = descriptionForFromElement + attribute.getName() + ' : ' + attribute.getType() + ', ';
+                    });
+                    descriptionForFromElement
+                        = descriptionForFromElement.substring(0, descriptionForFromElement.length - 2);
+                    descriptionForFromElement = descriptionForFromElement + ' }';
+                } else if (inputElementType === 'TRIGGER') {
+                    descriptionForFromElement = descriptionForFromElement + 'triggered_time : long }';
+                }
+
                 var fillQueryInputWith = self.formUtils.cleanJSONObject(savedQueryInput);
 
                 var fillQueryAnnotation = {
@@ -369,7 +385,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         title: "Window",
                                         type: "string",
                                         template: inputElementName,
-                                        minLength: 1
+                                        minLength: 1,
+                                        description: descriptionForFromElement
                                     }
                                 }
                             },
@@ -469,7 +486,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         title: "Stream/Trigger",
                                         type: "string",
                                         template: inputElementName,
-                                        minLength: 1
+                                        minLength: 1,
+                                        description: descriptionForFromElement
                                     }
                                 }
                             },
