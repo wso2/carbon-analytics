@@ -2083,7 +2083,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     inputStream, new TypeToken<List<ResourceClusterInfo>>() {
                                     }.getType());
                             for (ResourceClusterInfo clusterInfo : clusterInfos) {
-                                String workerId = generateWorkerKey(clusterInfo.getHttps_host(),clusterInfo.getHttps_port());
+                                String workerId = generateWorkerKey(clusterInfo.getHttps_host(), clusterInfo
+                                        .getHttps_port());
                                 ResourceClusteredWorkerNode.add(workerId);
                             }
                         }
@@ -2179,7 +2180,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     inputStream, new TypeToken<List<ResourceClusterInfo>>() {
                                     }.getType());
                             for (ResourceClusterInfo clusterInfo : clusterInfos) {
-                                String workerId = generateWorkerKey(clusterInfo.getHttps_host(),clusterInfo.getHttps_port());
+                                String workerId = generateWorkerKey(clusterInfo.getHttps_host(), clusterInfo
+                                        .getHttps_port());
                                 ResourceClusteredWorkerNode.add(workerId);
                             }
                         }
