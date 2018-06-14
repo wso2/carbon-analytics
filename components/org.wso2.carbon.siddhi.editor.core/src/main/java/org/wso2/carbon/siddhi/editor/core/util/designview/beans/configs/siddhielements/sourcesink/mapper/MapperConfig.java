@@ -28,15 +28,15 @@ import java.util.List;
 public class MapperConfig {
     private String type;
     private List<String> options;
-    private MapperAttribute attributes;
+    private MapperAttribute attribute;
 
     public MapperConfig() {
     }
 
-    public MapperConfig(String type, List<String> options, MapperAttribute attributes) {
+    public MapperConfig(String type, List<String> options, MapperAttribute attribute) {
         this.type = type;
         this.options = options;
-        this.attributes = attributes;
+        this.attribute = attribute;
     }
 
     public String getType() {
@@ -55,11 +55,11 @@ public class MapperConfig {
         this.options = options;
     }
 
-    public MapperAttribute getAttributes() {
-        return attributes;
+    public MapperAttribute getAttribute() {
+        return attribute;
     }
 
-    public void setAttributes(MapperAttribute attributes) {
-        this.attributes = attributes;
+    public void setAttribute(MapperAttribute attribute) {
+        this.attribute = attribute;
     }
 }
