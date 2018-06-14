@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPInterfaceConfig;
+import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPSInterfaceConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.HeartbeatResponse;
 import org.wso2.carbon.sp.distributed.resource.core.bean.ManagerNodeConfig;
 import org.wso2.carbon.sp.distributed.resource.core.exception.ResourceNodeException;
@@ -45,7 +45,7 @@ public class HeartbeatSender extends TimerTask {
     /**
      * Heartbeat endpoint template.
      */
-    private static final String HEARTBEAT_ENDPOINT = "http://%s:%s/resourceManager/heartbeat";
+    private static final String HEARTBEAT_ENDPOINT = "https://%s:%s/resourceManager/heartbeat";
     /**
      * Timestamp of the last successful heartbeat.
      */
@@ -99,13 +99,13 @@ public class HeartbeatSender extends TimerTask {
             /* If the LeaderNodeConfig is available, Heartbeat should sent to that Leader Node.
              */
             if (ServiceDataHolder.getLeaderNodeConfig() != null) {
-                heartbeatSent = sendHeartbeat(ServiceDataHolder.getLeaderNodeConfig().getHttpInterface());
+                heartbeatSent = sendHeartbeat(ServiceDataHolder.getLeaderNodeConfig().getHttpsInterface());
             }
             /* At this point check whether the node was able to connect to the leader successfully. If it failed,
              * Then try to connect to the list of manager nodes available.
              */
             if (!heartbeatSent) {
-                for (HTTPInterfaceConfig i : ServiceDataHolder.getResourceManagers()) {
+                for (HTTPSInterfaceConfig i : ServiceDataHolder.getResourceManagers()) {
                     heartbeatSent = sendHeartbeat(i);
                     if (heartbeatSent) {
                         break;
@@ -131,7 +131,7 @@ public class HeartbeatSender extends TimerTask {
      * @param config host:port configuration of the candidate leader node.
      * @return whether successfully connected to the leader node or not.
      */
-    private boolean sendHeartbeat(HTTPInterfaceConfig config) {
+    private boolean sendHeartbeat(HTTPSInterfaceConfig config) {
         HeartbeatResponse hbRes;
         WorkerMetrics workerMetrics;
         Response response = null;
@@ -171,7 +171,7 @@ public class HeartbeatSender extends TimerTask {
             }
             long startTime = System.currentTimeMillis();
             // Send request to the heartbeat endpoint.
-            response = HTTPClientUtil.doPostRequest(
+            response = HTTPSClientUtil.doPostRequest(
                     String.format(HEARTBEAT_ENDPOINT, config.getHost(), config.getPort()),
                     ServiceDataHolder.getCurrentNodeConfig(), config.getUsername(), config.getPassword()
             );
@@ -225,7 +225,7 @@ public class HeartbeatSender extends TimerTask {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Redirecting to the current leader node at:" + hbRes.getLeader());
                     }
-                    connected = sendHeartbeat(hbRes.getLeader().getHttpInterface());
+                    connected = sendHeartbeat(hbRes.getLeader().getHttpsInterface());
                     break;
                 default:
                     // In case of a 4XX or 5XX, try the next available manager.
