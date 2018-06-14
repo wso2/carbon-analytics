@@ -49,7 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             formContainer.append(propertyDiv);
 
             // generate the form to define a trigger
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
                 schema: {
                     type: "object",
                     title: "Trigger",
@@ -174,7 +174,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 at: at
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
                 schema: {
                     type: "object",
                     title: "Trigger",
