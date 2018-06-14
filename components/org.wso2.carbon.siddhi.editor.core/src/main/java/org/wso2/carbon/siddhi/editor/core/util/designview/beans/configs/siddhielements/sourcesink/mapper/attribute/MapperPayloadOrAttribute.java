@@ -18,26 +18,31 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.MapperPayloadOrAttributeType;
-
-import java.util.Map;
-
 /**
- * Represents a map of values in the Mapper
+ * Represents @attribute or @payload of a Siddhi Source/Sink mapper
  */
-public class MapperMapPayloadOrAttributeBody extends MapperPayloadOrAttributeBody {
-    private Map<String, String> value;
+public abstract class MapperPayloadOrAttribute {
+    private String payloadOrAttribute;
+    private String type;
 
-    public MapperMapPayloadOrAttributeBody(Map<String, String> value) {
-        super(MapperPayloadOrAttributeType.MAP.toString());
-        this.value = value;
+    public MapperPayloadOrAttribute(String payloadOrAttribute, String type) {
+        this.payloadOrAttribute = payloadOrAttribute;
+        this.type = type;
     }
 
-    public Map<String, String> getValue() {
-        return value;
+    public String getPayloadOrAttribute() {
+        return payloadOrAttribute;
     }
 
-    public void setValue(Map<String, String> value) {
-        this.value = value;
+    public void setPayloadOrAttribute(String payloadOrAttribute) {
+        this.payloadOrAttribute = payloadOrAttribute;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

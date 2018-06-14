@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttributeBody;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttribute;
 
 import java.util.List;
 
@@ -28,17 +28,15 @@ import java.util.List;
 public class MapperConfig {
     private String type;
     private List<String> options;
-    private String payloadOrAttribute;
-    private MapperPayloadOrAttributeBody payloadOrAttributeBody;
+    private MapperPayloadOrAttribute payloadOrAttribute;
 
     public MapperConfig() {
     }
 
-    public MapperConfig(String type, String payloadOrAttribute, List<String> options, MapperPayloadOrAttributeBody payloadOrAttributeBody) {
+    public MapperConfig(String type, List<String> options, MapperPayloadOrAttribute payloadOrAttribute) {
         this.type = type;
-        this.payloadOrAttribute = payloadOrAttribute;
         this.options = options;
-        this.payloadOrAttributeBody = payloadOrAttributeBody;
+        this.payloadOrAttribute = payloadOrAttribute;
     }
 
     public String getType() {
@@ -57,19 +55,11 @@ public class MapperConfig {
         this.options = options;
     }
 
-    public String getPayloadOrAttribute() {
+    public MapperPayloadOrAttribute getPayloadOrAttribute() {
         return payloadOrAttribute;
     }
 
-    public void setPayloadOrAttribute(String payloadOrAttribute) {
+    public void setPayloadOrAttribute(MapperPayloadOrAttribute payloadOrAttribute) {
         this.payloadOrAttribute = payloadOrAttribute;
-    }
-
-    public MapperPayloadOrAttributeBody getPayloadOrAttributeBody() {
-        return payloadOrAttributeBody;
-    }
-
-    public void setPayloadOrAttributeBody(MapperPayloadOrAttributeBody payloadOrAttributeBody) {
-        this.payloadOrAttributeBody = payloadOrAttributeBody;
     }
 }
