@@ -290,9 +290,9 @@ public class CodeGeneratorHelper {
                 }
                 int valuesLeft = mapperListAttribute.getValue().size();
                 for (String value : mapperListAttribute.getValue()) {
-                    mapperAttributeStringBuilder.append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
+                    mapperAttributeStringBuilder.append(SiddhiStringBuilderConstants.DOUBLE_QUOTE)
                             .append(value)
-                            .append(SiddhiStringBuilderConstants.SINGLE_QUOTE);
+                            .append(SiddhiStringBuilderConstants.DOUBLE_QUOTE);
                     if (valuesLeft != 1) {
                         mapperAttributeStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
                     }
