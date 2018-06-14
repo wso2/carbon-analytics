@@ -120,10 +120,11 @@ export default class ParentAppTable extends React.Component {
                         </div>
 
                     ) : (
-                        <Link to={window.contextPath + '/worker/' + row.host+"_"+row.port}>
-                        <div style={{height: 24, color: 'white'}}>
-                            {row.host + ":" + row.port}
-                        </div>
+                        <Link style={{textDecoration: 'none'}}
+                              to={window.contextPath + '/worker/' + row.host + "_" + row.port}>
+                            <div style={{height: 24, color: 'white'}}>
+                                {row.host + ":" + row.port}
+                            </div>
                         </Link>
 
                     )}
