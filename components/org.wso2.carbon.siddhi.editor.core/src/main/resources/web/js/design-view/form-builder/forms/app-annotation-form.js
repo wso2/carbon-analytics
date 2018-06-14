@@ -30,9 +30,9 @@ define(['require', 'log', 'jquery', 'lodash'],
                 this.application = options.application;
                 this.consoleListManager = options.application.outputController;
                 this.formUtils = options.formUtils;
-                var currentTabId = this.application.tabController.activeTab.cid;
-                this.designViewContainer = $('#design-container-' + currentTabId);
-                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
+                this.currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + this.currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
             }
         };
 
@@ -129,6 +129,10 @@ define(['require', 'log', 'jquery', 'lodash'],
                 _.forEach(config.annotations, function (annotation) {
                     siddhiAppConfig.addAppAnnotation(annotation.annotation);
                 });
+
+                // update the siddhi app name displayed on the canvas
+                var siddhiAppNameNode = $('#' + self.currentTabId + '-siddhiAppNameId');
+                siddhiAppNameNode.html(config.siddhiApp.name);
 
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');
