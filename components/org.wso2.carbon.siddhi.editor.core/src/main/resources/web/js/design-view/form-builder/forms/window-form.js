@@ -119,7 +119,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                         },
                         functionName: {
                             type: "string",
-                            title: "Function Name",
+                            title: "Window Function Name",
                             minLength: 1,
                             required: true,
                             propertyOrder: 4
@@ -361,7 +361,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                         },
                         functionName: {
                             type: "string",
-                            title: "Function Name",
+                            title: "Window Function Name",
                             minLength: 1,
                             required: true,
                             propertyOrder: 4
