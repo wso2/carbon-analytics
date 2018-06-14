@@ -141,31 +141,47 @@ public class SourceSinkConfigsGenerator {
             throw new DesignGenerationException("Unable to find 'type' of the mapper");
         }
         MapperPayloadOrAttribute payloadOrAttribute =
-                generateMapperAttributeOrPayload(mapAnnotation.getAnnotations().get(0));
+                generateMapperPayloadOrAttributes(mapAnnotation.getAnnotations().get(0));
         return new MapperConfig(type, options, payloadOrAttribute);
     }
 
-    private MapperPayloadOrAttribute generateMapperAttributeOrPayload(Annotation attributeOrPayloadAnnotation) {
+    /**
+     * Generates MapperPayloadOrAttribute object, with the given Siddhi Annotation
+     * @param attributesOrPayloadAnnotation         Siddhi Annotation, denoting @attribute or @payload
+     * @return                                      MapperPayloadOrAttribute object
+     */
+    private MapperPayloadOrAttribute generateMapperPayloadOrAttributes(Annotation attributesOrPayloadAnnotation) {
         List<PayloadOrAttributeElement> elements = new ArrayList<>();
-        for (Element element : attributeOrPayloadAnnotation.getElements()) {
-            elements.add(generatePayloadOrAttributeElement(element));
+        for (Element element : attributesOrPayloadAnnotation.getElements()) {
+            elements.add(generatePayloadOrAttributesElement(element));
         }
-        MapperPayloadOrAttributeType mapperPayloadOrAttributeType = getMapperAttributeOrPayloadType(elements);
-        if (mapperPayloadOrAttributeType == MapperPayloadOrAttributeType.MAP) {
-            return generateMapperMapAttribute(attributeOrPayloadAnnotation.getName(), elements);
+        MapperPayloadOrAttributeType mapperPayloadOrAttributesType = getMapperAttributeOrPayloadType(elements);
+        if (mapperPayloadOrAttributesType == MapperPayloadOrAttributeType.MAP) {
+            return generateMapperMapAttribute(attributesOrPayloadAnnotation.getName(), elements);
         }
-        return generateMapperListAttribute(attributeOrPayloadAnnotation.getName(), elements);
+        return generateMapperListAttribute(attributesOrPayloadAnnotation.getName(), elements);
     }
 
-    private PayloadOrAttributeElement generatePayloadOrAttributeElement(Element element) {
+    /**
+     * Generates a PayloadOrAttributeElement object from the given Siddhi Element object
+     * @param element       Siddhi Element object
+     * @return              PayloadOrAttributeElement object
+     */
+    private PayloadOrAttributeElement generatePayloadOrAttributesElement(Element element) {
         PayloadOrAttributeElement payloadOrAttributeElement = new PayloadOrAttributeElement();
         payloadOrAttributeElement.key = element.getKey();
         payloadOrAttributeElement.value = element.getValue();
         return payloadOrAttributeElement;
     }
 
+    /**
+     * Gets type of the MapperPayloadOrAttribute
+     * @param elements      List of PayloadOrAttributeElements
+     * @return              MapperPayloadOrAttributeType
+     */
     private MapperPayloadOrAttributeType getMapperAttributeOrPayloadType(List<PayloadOrAttributeElement> elements) {
         for (PayloadOrAttributeElement element : elements) {
+            // Either all the keys are null, or all the keys are not null
             if (element.key != null) {
                 return MapperPayloadOrAttributeType.MAP;
             }
@@ -173,6 +189,12 @@ public class SourceSinkConfigsGenerator {
         return MapperPayloadOrAttributeType.LIST;
     }
 
+    /**
+     * Generates a MapperListPayloadOrAttribute object with the given annotation type and list of elements
+     * @param annotationType        Type of the Siddhi annotation, whether 'attributes' or 'payload'
+     * @param elements              List of PayloadOrAttributeElements
+     * @return                      MapperListPayloadOrAttribute object
+     */
     private MapperListPayloadOrAttribute generateMapperListAttribute(
             String annotationType, List<PayloadOrAttributeElement> elements) {
         List<String> values = new ArrayList<>();
@@ -182,6 +204,12 @@ public class SourceSinkConfigsGenerator {
         return new MapperListPayloadOrAttribute(annotationType.toUpperCase(), values);
     }
 
+    /**
+     * Generates a MapperMapPayloadOrAttribute object with the given annotation type and list of elements
+     * @param annotationType        Type of the Siddhi annotation, whether 'attributes' or 'payload'
+     * @param elements              List of PayloadOrAttributeElements
+     * @return                      MapperMapPayloadOrAttribute object
+     */
     private MapperMapPayloadOrAttribute generateMapperMapAttribute(
             String annotationType, List<PayloadOrAttributeElement> elements) {
         Map<String, String> values = new HashMap<>();
@@ -227,11 +255,17 @@ public class SourceSinkConfigsGenerator {
         return connectedElements;
     }
 
+    /**
+     * Represents a PayloadOrAttribute element
+     */
     private class PayloadOrAttributeElement {
         private String key;
         private String value;
     }
 
+    /**
+     * Type of the SourceSinkConfig
+     */
     private enum SourceOrSinkAnnotation {
         SOURCE,
         SINK;
