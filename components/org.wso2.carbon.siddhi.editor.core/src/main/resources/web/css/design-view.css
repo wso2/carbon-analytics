@@ -448,3 +448,7 @@ h3,
     color: black;
     transition: 0.15s;
 }
+
+.siddhi-app-name-node {
+    text-align: center;
+}
