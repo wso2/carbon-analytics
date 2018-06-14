@@ -57,7 +57,7 @@ export default class Login extends Component {
             password: '',
             authenticated: false,
             rememberMe: false,
-            referrer: appContext,
+            referrer: '/',
         };
         this.authenticate = this.authenticate.bind(this);
     }
