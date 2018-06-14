@@ -146,7 +146,21 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 if (_.isEmpty(sink.map)) {
                     sinkObject.setMap(undefined);
                 } else {
-                    var mapperObject = new MapAnnotation(sink.map);
+                    var mapperOptions = {};
+                    _.set(mapperOptions, 'type', sink.map.type);
+                    _.set(mapperOptions, 'options', sink.map.options);
+
+                    if (_.isEmpty(sink.map.payloadOrAttribute)) {
+                        _.set(mapperOptions, 'payloadOrAttribute', undefined);
+                    } else {
+                        var payloadOrAttributeOptions = {};
+                        _.set(payloadOrAttributeOptions, 'annotationType', sink.map.payloadOrAttribute.annotationType);
+                        _.set(payloadOrAttributeOptions, 'type', sink.map.payloadOrAttribute.type);
+                        _.set(payloadOrAttributeOptions, 'value', sink.map.payloadOrAttribute.value);
+                        var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                        _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
+                    }
+                    var mapperObject = new MapAnnotation(mapperOptions);
                     sinkObject.setMap(mapperObject);
                 }
                 mainObject.addSink(sinkObject);

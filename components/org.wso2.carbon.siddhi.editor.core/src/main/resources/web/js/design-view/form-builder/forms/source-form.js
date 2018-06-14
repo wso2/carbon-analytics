@@ -264,7 +264,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValues);
                             payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
 
-                            _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
+
                         } else {
                             var mapperAttributeValuesArray = [];
                             _.forEach(editor.getValue().map.attributeValues, function (attributeValue) {
@@ -276,9 +276,8 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                             _.set(payloadOrAttributeOptions, 'type', 'LIST');
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
                             payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
-
-                            _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
                         }
+                        _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
                     } else {
                         _.set(mapperOptions, 'payloadOrAttribute', undefined);
                     }
@@ -332,7 +331,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             var sourceOptionsArray = [];
             if (savedSourceOptions !== undefined) {
                 _.forEach(savedSourceOptions, function (option) {
-                    sourceOptionsArray.push({optionValue: option})
+                    sourceOptionsArray.push({optionValue: option});
                 });
             }
 
@@ -345,7 +344,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 var savedMapperOptions = map.getOptions();
                 if (savedMapperOptions !== undefined) {
                     _.forEach(savedMapperOptions, function (option) {
-                        mapperOptionsArray.push({optionValue: option})
+                        mapperOptionsArray.push({optionValue: option});
                     });
                 }
 
@@ -366,10 +365,10 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     } else if (savedMapperAttributes.getType() === 'LIST') {
                         attributeValue = savedMapperAttributes.getValue();
                         _.forEach(attributeValue, function (attribute) {
-                            mapperAttributesArray.push({value: attribute})
+                            mapperAttributesArray.push({value: attribute});
                         });
                     } else {
-                        console.log("Unknown mapper attribute type detected!")
+                        console.log("Unknown mapper attribute type detected!");
                     }
                 }
             }
