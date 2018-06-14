@@ -81,6 +81,7 @@
 .console-container > div.output-headers.output-headers-bar > ul > .active > a {
     color: #ccc;
     cursor: default;
+    font-size: 11px;
 }
 
 .console-container > div.output-headers.output-headers-bar > ul > li > a {
@@ -94,6 +95,7 @@
     color: #bdbdbd;
     font-weight: 300;
     display: block;
+    font-size: 12px;
 }
 
 .debuggerToolbar {
@@ -147,6 +149,7 @@
 
 .output-console-content-wrapper > .output-pane.active {
     display: block;
+    font-size: 12px;
 }
 
 .output-console-content pre {

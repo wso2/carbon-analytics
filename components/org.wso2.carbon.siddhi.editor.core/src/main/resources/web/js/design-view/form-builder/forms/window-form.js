@@ -49,7 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             formContainer.append(propertyDiv);
 
             // generate the form to define a window
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
                 schema: {
                     type: "object",
                     title: "Window",
@@ -137,6 +137,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                                 title: 'Parameter',
                                 properties: {
                                     parameterValue: {
+                                        title: "Parameter",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -291,7 +292,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 outputEventType: outputEventType
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
                 schema: {
                     type: "object",
                     title: "Window",
@@ -379,6 +380,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                                 title: 'Parameter',
                                 properties: {
                                     parameterValue: {
+                                        title: "Parameter",
                                         type: "string",
                                         minLength: 1
                                     }
