@@ -87,7 +87,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             // configuring the siddhi app level annotations
             var settingsButtonId = self.currentTabId + '-appSettingsId';
             var settingsButton = $("<div id='" + settingsButtonId + "' " +
-                "class='btn app-annotations-button tool-container' " +
+                "class='btn app-annotations-button' " +
                 "data-placement='bottom' data-toggle='tooltip' title='App Annotations'>" +
                 "<i class='fw fw-settings'></i></div>");
             settingsButton.tooltip();
@@ -96,6 +96,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             settingsIconElement.addEventListener('click', function () {
                 self.dropElements.formBuilder.DefineFormForAppAnnotations(this);
             });
+
+            // add a text field to display the siddhi app name
+            var siddhiAppNameNodeId = self.currentTabId + '-siddhiAppNameId';
+            var siddhiAppName = self.configurationData.getSiddhiAppConfig().getSiddhiAppName();
+            var siddhiAppNameNode = $("<div id='" + siddhiAppNameNodeId + "' " +
+                "class='siddhi-app-name-node'>" + siddhiAppName + "</div>");
+            self.canvas.append(siddhiAppNameNode);
 
             /**
              * @description jsPlumb function opened

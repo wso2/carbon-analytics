@@ -437,14 +437,65 @@ h3,
 .app-annotations-button {
     position: fixed;
     top: 70px;
-    right: 1%;
+    right: 15px;
     font-size: 20px;
-    background-color: lightgray;
-    color: floralwhite;
+    color: #757575;
     transition: 0.15s;
 }
 
 .app-annotations-button:hover {
     color: black;
-    transition: 0.15s;
+}
+
+.siddhi-app-name-node {
+    position: fixed;
+    right: 60px;
+    top: 77px;
+    opacity: 1 !important;
+    font-size: 14px;
+}
+
+.design-view-form-content h3 {
+    font-size: 14px;
+}
+
+.design-view-form-content .form-control {
+    max-width: 500px;
+}
+
+.list-group-item {
+    background: #37474F;
+    color: #E0E0E0;
+    border: 0;
+    margin-bottom: 0;
+}
+
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+    background: #9E9E9E;
+    border: 0;
+    color: #212121;
+    font-weight: 500;;
+}
+
+a.list-group-item, button.list-group-item {
+    color: #E0E0E0;
+}
+
+.design-view-form-content .btn {
+    font-size: 12px;
+}
+
+.design-view-form-content select,
+.design-view-form-content p {
+    font-size: 12px;
+}
+
+#form-query-annotation table,
+.define-stream table,
+.define-window table,
+.define-trigger table,
+.define-table table,
+.define-partition table {
+    width: 100% !important;
+    max-width: 650px !important;
 }

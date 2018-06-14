@@ -31,6 +31,7 @@ public class SiddhiStringBuilderConstants {
     public static final char NEW_LINE = '\n';
     public static final char SEMI_COLON = ';';
     public static final char SINGLE_QUOTE = '\'';
+    public static final char DOUBLE_QUOTE = '\"';
     public static final char SPACE = ' ';
     // Brackets
     public static final char OPEN_BRACKET = '(';

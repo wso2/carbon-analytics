@@ -665,16 +665,15 @@ public class CodeGenerator {
 
         sourceSinkStringBuilder.append(sourceSink.getType())
                 .append(SiddhiStringBuilderConstants.SINGLE_QUOTE);
+
         if (sourceSink.getOptions() != null && !sourceSink.getOptions().isEmpty()) {
             sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                    .append(SiddhiStringBuilderConstants.SPACE)
                     .append(CodeGeneratorHelper.getParameterList(sourceSink.getOptions()));
         }
 
         if (sourceSink.getMap() != null) {
             sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                    .append(SiddhiStringBuilderConstants.SPACE)
-                    .append(CodeGeneratorHelper.getMapper(sourceSink.getMap(), sourceSink.getAnnotationType()));
+                    .append(CodeGeneratorHelper.getMapper(sourceSink.getMap()));
         }
 
         sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.CLOSE_BRACKET);

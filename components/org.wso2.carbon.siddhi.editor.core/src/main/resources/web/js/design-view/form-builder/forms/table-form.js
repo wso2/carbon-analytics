@@ -44,12 +44,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
          */
         TableForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Table </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Table Configuration</h3></div>' +
                 '<div id="define-table" class="define-table"></div>');
             formContainer.append(propertyDiv);
 
             // generate the form to define a table
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-table')[0], {
                 schema: {
                     type: "object",
                     title: "Table",
@@ -244,6 +244,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
          */
         TableForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Table Configuration</h3></div>' +
+                '<div id="define-table" class="define-table"></div>');
+            formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
@@ -297,7 +300,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                 attributes: attributes
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-table')[0], {
                 schema: {
                     type: "object",
                     title: "Table",

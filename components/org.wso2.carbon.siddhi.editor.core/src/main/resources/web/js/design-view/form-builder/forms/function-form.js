@@ -44,7 +44,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
          */
         FunctionForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Function </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Function Configuration</h3></div>' +
                 '<div id="define-function" class="define-function"></div>');
             formContainer.append(propertyDiv);
 
@@ -151,6 +151,10 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
          */
         FunctionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Function Configuration</h3></div>' +
+                '<div id="define-function" class="define-function"></div>');
+            formContainer.append(propertyDiv);
+
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 

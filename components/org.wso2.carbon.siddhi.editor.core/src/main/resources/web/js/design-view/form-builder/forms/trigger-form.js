@@ -44,12 +44,12 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
          */
         TriggerForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Trigger </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
                 '<div id="define-trigger" class="define-trigger"></div>');
             formContainer.append(propertyDiv);
 
             // generate the form to define a trigger
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
                 schema: {
                     type: "object",
                     title: "Trigger",
@@ -147,6 +147,9 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
          */
         TriggerForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
+                '<div id="define-trigger" class="define-trigger"></div>');
+            formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
@@ -171,7 +174,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 at: at
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
                 schema: {
                     type: "object",
                     title: "Trigger",
