@@ -20,7 +20,7 @@ package org.wso2.carbon.sp.distributed.resource.core.internal;
 
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.sp.distributed.resource.core.bean.DeploymentConfig;
-import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPInterfaceConfig;
+import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPSInterfaceConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.ManagerNodeConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.NodeConfig;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
@@ -38,7 +38,7 @@ public class ServiceDataHolder {
     private static DeploymentMode deploymentMode;
     private static OperatingSystemMetricSet operatingSystemMetricSet;
 
-    private static Set<HTTPInterfaceConfig> resourceManagers = Collections.synchronizedSet(new LinkedHashSet<>());
+    private static Set<HTTPSInterfaceConfig> resourceManagers = Collections.synchronizedSet(new LinkedHashSet<>());
 
     public static ConfigProvider getConfigProvider() {
         return configProvider;
@@ -80,11 +80,11 @@ public class ServiceDataHolder {
         ServiceDataHolder.deploymentMode = deploymentMode;
     }
 
-    public static Set<HTTPInterfaceConfig> getResourceManagers() {
+    public static Set<HTTPSInterfaceConfig> getResourceManagers() {
         return resourceManagers;
     }
 
-    public static void setResourceManagers(Set<HTTPInterfaceConfig> resourceManagers) {
+    public static void setResourceManagers(Set<HTTPSInterfaceConfig> resourceManagers) {
         ServiceDataHolder.resourceManagers = resourceManagers;
     }
 

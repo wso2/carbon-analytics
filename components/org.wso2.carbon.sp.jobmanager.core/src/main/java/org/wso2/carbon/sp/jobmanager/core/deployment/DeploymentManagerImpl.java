@@ -132,13 +132,13 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
     private DeploymentStatus getDeploymentStatus(boolean isDeployed, List<SiddhiAppHolder> siddhiAppHolders) {
         Map<String, List<String>> deploymentDataMap = new HashMap<>();
         for (SiddhiAppHolder appHolder : siddhiAppHolders) {
-            if (appHolder.getDeployedNode() != null && appHolder.getDeployedNode().getHttpInterface() != null) {
+            if (appHolder.getDeployedNode() != null && appHolder.getDeployedNode().getHttpsInterface() != null) {
                 if (deploymentDataMap.containsKey(appHolder.getGroupName())) {
                     deploymentDataMap.get(appHolder.getGroupName())
-                            .add(appHolder.getDeployedNode().getHttpInterface().getHost());
+                            .add(appHolder.getDeployedNode().getHttpsInterface().getHost());
                 } else {
                     List<String> hosts = new ArrayList<>();
-                    hosts.add(appHolder.getDeployedNode().getHttpInterface().getHost());
+                    hosts.add(appHolder.getDeployedNode().getHttpsInterface().getHost());
                     deploymentDataMap.put(appHolder.getGroupName(), hosts);
                 }
             }

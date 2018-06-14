@@ -29,7 +29,7 @@ public class ResourceNode implements Serializable {
     private static final long serialVersionUID = 7198320219118722368L;
     private String id;
     private String state;
-    private InterfaceConfig httpInterface;
+    private InterfaceConfig httpsInterface;
     private boolean isReceiverNode = false;
     private boolean metricsUpdated = false;
     private long lastPingTimestamp;
@@ -61,13 +61,12 @@ public class ResourceNode implements Serializable {
         this.state = state;
     }
 
-
-    public InterfaceConfig getHttpInterface() {
-        return httpInterface;
+    public InterfaceConfig getHttpsInterface() {
+        return httpsInterface;
     }
 
-    public void setHttpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
+    public void setHttpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
     }
 
     public long getLastPingTimestamp() {
@@ -126,7 +125,7 @@ public class ResourceNode implements Serializable {
     @Override
     public String toString() {
         return String.format("ResourceNode { id: %s, host: %s, port: %s }",
-                getId(), getHttpInterface().getHost(), getHttpInterface().getPort());
+                getId(), getHttpsInterface().getHost(), getHttpsInterface().getPort());
     }
 
     @Override
@@ -148,15 +147,15 @@ public class ResourceNode implements Serializable {
         if (isReceiverNode() != that.isReceiverNode) {
             return false;
         }
-        return getHttpInterface() != null
-                ? getHttpInterface().equals(that.getHttpInterface()) : that.getHttpInterface() == null;
+        return getHttpsInterface() != null
+                ? getHttpsInterface().equals(that.getHttpsInterface()) : that.getHttpsInterface() == null;
     }
 
     @Override
     public int hashCode() {
         // Do not consider lastPingTimestamp and failedPingAttempts for the hash method.
         int result = getId() != null ? getId().hashCode() : 0;
-        result = 31 * result + (getHttpInterface() != null ? getHttpInterface().hashCode() : 0);
+        result = 31 * result + (getHttpsInterface() != null ? getHttpsInterface().hashCode() : 0);
         return result;
     }
 }

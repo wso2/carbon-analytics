@@ -23,7 +23,7 @@ import okhttp3.Response;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
-import org.wso2.carbon.sp.jobmanager.core.util.HTTPClientUtil;
+import org.wso2.carbon.sp.jobmanager.core.util.HTTPSClientUtil;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class SiddhiAppDeployer {
     private static final Logger LOG = Logger.getLogger(SiddhiAppDeployer.class);
-    private static final String SERVICE_ENDPOINT = "http://%s:%s/siddhi-apps%s";
+    private static final String SERVICE_ENDPOINT = "https://%s:%s/siddhi-apps%s";
 
     /**
      * Deploy Siddhi app and return it's name
@@ -46,19 +46,20 @@ public class SiddhiAppDeployer {
     public static String deploy(ResourceNode node, SiddhiQuery siddhiQuery) {
         Response response = null;
         try {
-            response = HTTPClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
-                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
-                    siddhiQuery.getApp(), node.getHttpInterface().getUsername(), node.getHttpInterface().getPassword());
+            response = HTTPSClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
+                    node.getHttpsInterface().getHost(), node.getHttpsInterface().getPort(), ""),
+                    siddhiQuery.getApp(), node.getHttpsInterface().getUsername(),
+                    node.getHttpsInterface().getPassword());
             if (response.code() == 201) {
                 String locationHeader = response.header("Location", null);
                 return (locationHeader != null && !locationHeader.isEmpty())
                         ? locationHeader.substring(locationHeader.lastIndexOf('/') + 1) : null;
             } else if (response.code() == 409) {
                 response.close();
-                response = HTTPClientUtil.doPutRequest(String.format(SERVICE_ENDPOINT,
-                        node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
-                        siddhiQuery.getApp(), node.getHttpInterface().getUsername(),
-                        node.getHttpInterface().getPassword());
+                response = HTTPSClientUtil.doPutRequest(String.format(SERVICE_ENDPOINT,
+                        node.getHttpsInterface().getHost(), node.getHttpsInterface().getPort(), ""),
+                        siddhiQuery.getApp(), node.getHttpsInterface().getUsername(),
+                        node.getHttpsInterface().getPassword());
                 if (response.code() == 200) {
                     return siddhiQuery.getAppName();
                 } else {
@@ -89,9 +90,9 @@ public class SiddhiAppDeployer {
     public static boolean unDeploy(ResourceNode node, String siddhiAppName) {
         Response response = null;
         try {
-            response = HTTPClientUtil.doDeleteRequest(String.format(SERVICE_ENDPOINT,
-                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), "/" + siddhiAppName),
-                    node.getHttpInterface().getUsername(), node.getHttpInterface().getPassword()
+            response = HTTPSClientUtil.doDeleteRequest(String.format(SERVICE_ENDPOINT,
+                    node.getHttpsInterface().getHost(), node.getHttpsInterface().getPort(), "/" + siddhiAppName),
+                    node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword()
             );
             return response.code() == 200;
         } catch (IOException e) {
@@ -116,9 +117,9 @@ public class SiddhiAppDeployer {
         Response response = null;
         String[] apps = new String[0];
         try {
-            response = HTTPClientUtil.doGetRequest(String.format(SERVICE_ENDPOINT,
-                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
-                    node.getHttpInterface().getUsername(), node.getHttpInterface().getPassword()
+            response = HTTPSClientUtil.doGetRequest(String.format(SERVICE_ENDPOINT,
+                    node.getHttpsInterface().getHost(), node.getHttpsInterface().getPort(), ""),
+                    node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword()
             );
             if (response.code() == 200) {
                 apps = new Gson().fromJson(response.body().string(), String[].class);

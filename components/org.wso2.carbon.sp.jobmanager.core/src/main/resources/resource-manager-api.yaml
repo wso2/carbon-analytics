@@ -94,11 +94,11 @@ definitions:
         enum:
           - NEW
           - EXISTS
-      httpInterface:
+      httpsInterface:
         $ref: '#/definitions/InterfaceConfig'
     required:
       - id
-      - httpInterface
+      - httpsInterface
   HeartbeatResponse:
     description: Response for joining the resource pool or heartbeat update.
     properties:
@@ -123,7 +123,7 @@ definitions:
     properties:
       id:
         type: string
-      httpInterface:
+      httpsInterface:
         $ref: '#/definitions/InterfaceConfig'
       heartbeatInterval:
         type: integer
@@ -131,7 +131,7 @@ definitions:
         type: integer
     required:
       - id
-      - httpInterface
+      - httspInterface
       - heartbeatInterval
       - heartbeatMaxRetry
   Deployment:

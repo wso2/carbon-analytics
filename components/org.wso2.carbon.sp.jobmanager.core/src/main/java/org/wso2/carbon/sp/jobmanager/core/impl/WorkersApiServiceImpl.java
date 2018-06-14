@@ -74,8 +74,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         List<Map<String,String>> resourceNodeDetailMap = new ArrayList<>();
         for (Map.Entry<String, ResourceNode> resourceNodeEntry : clusteredWorkerList.entrySet()) {
             Map<String,String> clusteredResourceNode = new HashMap<>();
-            clusteredResourceNode.put(Constants.HTTP_HOST,resourceNodeEntry.getValue().getHttpInterface().getHost());
-            clusteredResourceNode.put(Constants.HTTP_PORT,String.valueOf(resourceNodeEntry.getValue().getHttpInterface().getPort()));
+            clusteredResourceNode.put(Constants.HTTPS_HOST,resourceNodeEntry.getValue().getHttpsInterface().getHost());
+            clusteredResourceNode.put(Constants.HTTPS_PORT,String.valueOf(resourceNodeEntry.getValue()
+                    .getHttpsInterface().getPort()));
             clusteredResourceNode.put(Constants.NODE_ID, resourceNodeEntry.getValue().getId());
             resourceNodeDetailMap.add(clusteredResourceNode);
         }
