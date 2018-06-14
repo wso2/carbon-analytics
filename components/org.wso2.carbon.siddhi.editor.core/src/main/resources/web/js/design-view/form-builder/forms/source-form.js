@@ -208,7 +208,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
                     if (editor.getValue().map.attributeValues !== undefined) {
                         var mapperAttributesValues = [];
-                        _.forEach(config.map.attributeValues, function (attribute) {
+                        _.forEach(editor.getValue().map.attributeValues, function (attribute) {
                             mapperAttributesValues.push(attribute.attributeValue);
                         });
                         _.set(mapperOptions, 'attributes', mapperAttributesValues);
