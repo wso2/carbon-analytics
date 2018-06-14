@@ -425,7 +425,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         disable_properties: false
                                     },
                                     title: 'condition',
-                                    headerTemplate: "Condition" + "{{i1}}",
+                                    headerTemplate: "c" + "{{i1}}",
                                     properties: {
                                         conditionId: {
                                             type: 'string',
