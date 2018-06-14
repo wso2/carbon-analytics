@@ -44,7 +44,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
          */
         WindowForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Window </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div>' +
                 '<div id="define-window" class="define-window"></div>');
             formContainer.append(propertyDiv);
 
@@ -231,6 +231,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
          */
         WindowForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div>' +
+                '<div id="define-window" class="define-window"></div>');
+            formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 

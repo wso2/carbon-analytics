@@ -44,7 +44,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
          */
         TableForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Table </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Table Configuration</h3></div>' +
                 '<div id="define-table" class="define-table"></div>');
             formContainer.append(propertyDiv);
 
@@ -244,6 +244,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
          */
         TableForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Table Configuration</h3></div>' +
+                '<div id="define-table" class="define-table"></div>');
+            formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 

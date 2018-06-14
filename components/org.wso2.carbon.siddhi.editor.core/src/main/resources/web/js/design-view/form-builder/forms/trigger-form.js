@@ -44,7 +44,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
          */
         TriggerForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Trigger </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
                 '<div id="define-trigger" class="define-trigger"></div>');
             formContainer.append(propertyDiv);
 
@@ -147,6 +147,9 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
          */
         TriggerForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
+                '<div id="define-trigger" class="define-trigger"></div>');
+            formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 

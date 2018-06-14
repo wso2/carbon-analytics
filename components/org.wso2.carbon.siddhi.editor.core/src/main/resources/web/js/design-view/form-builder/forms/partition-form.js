@@ -44,6 +44,10 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
          */
         PartitionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Partition Configuration</h3></div>' +
+                '<div class="define-partition"></div>');
+            formContainer.append(propertyDiv);
+
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -117,7 +121,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                                 propertyOrder: 2,
                                 type: "array",
                                 format: "table",
-                                title: "Partition Keys",
+                                title: "Partition By",
                                 options: {
                                     disable_array_add: true,
                                     disable_array_delete: true
