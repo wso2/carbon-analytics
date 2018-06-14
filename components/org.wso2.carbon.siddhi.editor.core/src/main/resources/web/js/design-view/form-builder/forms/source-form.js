@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation'],
-    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation) {
+define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute'],
+    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute) {
 
         /**
          * @class SourceForm Creates a forms to collect data from a source
@@ -250,29 +250,37 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
                     var mapperAttributeValues = {};
                     if (editor.getValue().map.attributeValues !== undefined) {
+                        var payloadOrAttributeOptions;
+                        var payloadOrAttributeObject;
                         // if key is defined then mapper annotations values are saved as a map. Otherwise as a list.
                         if (editor.getValue().map.attributeValues[0].key !== undefined) {
                             _.forEach(editor.getValue().map.attributeValues, function (attributeValue) {
                                 mapperAttributeValues[attributeValue.key] = attributeValue.value;
                             });
-                            var attributes = {
-                                type: "MAP",
-                                value: mapperAttributeValues
-                            };
-                            _.set(mapperOptions, 'attributes', attributes);
+
+                            payloadOrAttributeOptions = {};
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTE');
+                            _.set(payloadOrAttributeOptions, 'type', 'MAP');
+                            _.set(payloadOrAttributeOptions, 'value', mapperAttributeValues);
+                            payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+
+                            _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
                         } else {
                             var mapperAttributeValuesArray = [];
                             _.forEach(editor.getValue().map.attributeValues, function (attributeValue) {
                                 mapperAttributeValuesArray.push(attributeValue.value);
                             });
-                            var attributes = {
-                                type: "LIST",
-                                value: mapperAttributeValuesArray
-                            };
-                            _.set(mapperOptions, 'attributes', attributes);
+
+                            payloadOrAttributeOptions = {};
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTE');
+                            _.set(payloadOrAttributeOptions, 'type', 'LIST');
+                            _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
+                            payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+
+                            _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
                         }
                     } else {
-                        _.set(mapperOptions, 'attributes', undefined);
+                        _.set(mapperOptions, 'payloadOrAttribute', undefined);
                     }
 
                     var mapperObject = new MapAnnotation(mapperOptions);
@@ -297,7 +305,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
         /**
          * @function generate properties form for a source
          * @param element selected element(source)
-         * @param formConsole Console which holds the form
+         * @param formConsole Consolev which holds the form
          * @param formContainer Container which holds the form
          */
         SourceForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
@@ -341,19 +349,23 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     });
                 }
 
-                var savedMapperAttributes = map.getAttributes();
-                if (savedMapperAttributes !== undefined) {
-                    if (savedMapperAttributes.type === 'MAP') {
-                        for (var key in savedMapperAttributes.value) {
-                            if (savedMapperAttributes.value.hasOwnProperty(key)) {
+                var savedMapperAttributes = map.getPayloadOrAttribute();
+                if (savedMapperAttributes !== undefined && savedMapperAttributes.getAnnotationType() !== undefined
+                    && savedMapperAttributes.getAnnotationType() === 'ATTRIBUTE') {
+                    var attributeValue;
+                    if (savedMapperAttributes.getType() === 'MAP') {
+                        attributeValue = savedMapperAttributes.getValue();
+                        for (var key in attributeValue) {
+                            if (attributeValue.hasOwnProperty(key)) {
                                 mapperAttributesArray.push({
                                     key: key,
-                                    value: savedMapperAttributes.value[key]
+                                    value: attributeValue[key]
                                 });
                             }
                         }
-                    } else if (savedMapperAttributes.type === 'LIST') {
-                        _.forEach(savedMapperAttributes.value, function (attribute) {
+                    } else if (savedMapperAttributes.getType() === 'LIST') {
+                        attributeValue = savedMapperAttributes.getValue();
+                        _.forEach(attributeValue, function (attribute) {
                             mapperAttributesArray.push({value: attribute})
                         });
                     } else {
@@ -573,31 +585,40 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     } else {
                         _.set(mapperOptions, 'options', undefined);
                     }
+
+                    var mapperAttributeValues = {};
                     if (config.map.attributeValues !== undefined) {
+                        var payloadOrAttributeOptions;
+                        var payloadOrAttributeObject;
                         // if key is defined then mapper annotations values are saved as a map. Otherwise as a list.
                         if (config.map.attributeValues[0].key !== undefined) {
-                            var mapperAttributesValues = {};
                             _.forEach(config.map.attributeValues, function (attributeValue) {
-                                mapperAttributesValues[attributeValue.key] = attributeValue.value;
+                                mapperAttributeValues[attributeValue.key] = attributeValue.value;
                             });
-                            var attributes = {
-                                type: "MAP",
-                                value: mapperAttributesValues
-                            };
-                            _.set(mapperOptions, 'attributes', attributes);
+
+                            payloadOrAttributeOptions = {};
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTE');
+                            _.set(payloadOrAttributeOptions, 'type', 'MAP');
+                            _.set(payloadOrAttributeOptions, 'value', mapperAttributeValues);
+                            payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+
+                            _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
                         } else {
-                            var mapperAttributesValueArray = [];
-                            _.forEach(config.map.attributeValues, function (annotationValue) {
-                                mapperAttributesValueArray.push(annotationValue.value);
+                            var mapperAttributeValuesArray = [];
+                            _.forEach(config.map.attributeValues, function (attributeValue) {
+                                mapperAttributeValuesArray.push(attributeValue.value);
                             });
-                            var attributes = {
-                                type: "LIST",
-                                value: mapperAttributesValueArray
-                            };
-                            _.set(mapperOptions, 'attributes', attributes);
+
+                            payloadOrAttributeOptions = {};
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTE');
+                            _.set(payloadOrAttributeOptions, 'type', 'LIST');
+                            _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
+                            payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+
+                            _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
                         }
                     } else {
-                        _.set(mapperOptions, 'attributes', undefined);
+                        _.set(mapperOptions, 'payloadOrAttribute', undefined);
                     }
 
                     var mapperObject = new MapAnnotation(mapperOptions);
