@@ -94,7 +94,7 @@ export default class WorkerOverview extends React.Component {
             hasViewPermission: true,
             statusMessage: "Currently there are no nodes to display",
             isError: false,
-            btnType: <SyncDisabled  color='#BDBDBD'/>
+            btnType: <SyncDisabled color='#BDBDBD'/>
 
         };
         this.autoSync = this.autoSync.bind(this);
@@ -341,7 +341,7 @@ export default class WorkerOverview extends React.Component {
             window.localStorage.setItem("pInterval", this.state.pInterval)
         } else {
             clearInterval(this.state.interval);
-            this.setState({enableAutoSync: false, btnType: <SyncDisabled  color='#BDBDBD'/>});
+            this.setState({enableAutoSync: false, btnType: <SyncDisabled color='#BDBDBD'/>});
             window.localStorage.setItem("enableAutoSync", false)
         }
     }
@@ -424,10 +424,15 @@ export default class WorkerOverview extends React.Component {
                         if (id !== "Single Node Deployments" && id !== "Never Reached" && id !== " ") {
                             return (
                                 <div>
-                                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
+                                    <Typography variant="headline" className={'app-title'} style={{
+                                        color: '#dedede',
+                                        marginLeft: '24px',
+                                        fontWeight: '400',
+                                        fontSize: '1.25rem'
+                                    }}>HA
                                         Deployments</Typography>
-                                    <Divider inset={true} style={styles.divider}/>
                                     <h3 style={styles.h3Title}>Group Id: {id}</h3>
+                                    <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
                                                   style={styles.gridList}>
@@ -445,12 +450,11 @@ export default class WorkerOverview extends React.Component {
                         } else {
                             return (
                                 <div>
-                                    <Typography variant="headline" className={'app-title'}
-                                                style={styles.h3Title}>{id}</Typography>
+                                    <h3 style={styles.h3Title}>{id}</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
-                                        <GridList className={'node-wrapper'}
-                                                  cols={3} cellHeight='100%' style={styles.gridList}>
+                                        <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
+                                                  style={styles.gridList}>
                                             {workersList[id].map((worker) => {
                                                 return (
                                                     <WorkerThumbnail worker={worker}
@@ -465,15 +469,16 @@ export default class WorkerOverview extends React.Component {
 
                     })}
 
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
+                    <Typography variant="headline" className={'app-title'}
+                                style={{color: '#dedede', marginLeft: '24px', fontWeight: '400', fontSize: '1.25rem'}}>Distributed
                         Deployments</Typography>
 
                     {Object.keys(managerList).map((id, workerList) => {
                         if (id !== "Never Reached" && id !== "Not-Reachable") {
                             return (
                                 <div>
-                                    <Divider inset={true} style={styles.divider}/>
                                     <h3 style={styles.h3Title}>Group Id : {id}</h3>
+                                    <Divider inset={true} style={styles.divider}/>
                                     <h4 style={styles.h3Title}>Managers</h4>
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
@@ -535,7 +540,12 @@ export default class WorkerOverview extends React.Component {
                         if (id !== "Single Node Deployments" && id !== "Never Reached" && id !== " ") {
                             return (
                                 <div>
-                                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
+                                    <Typography variant="headline" className={'app-title'} style={{
+                                        color: '#dedede',
+                                        marginLeft: '24px',
+                                        fontWeight: '400',
+                                        fontSize: '1.25rem'
+                                    }}>HA
                                         Deployments</Typography>
                                     <h3 style={styles.h3Title}>{id}</h3>
                                     <Divider inset={true} style={styles.divider}/>
@@ -592,15 +602,17 @@ export default class WorkerOverview extends React.Component {
                             </Button>
                         </div>
                     </div>
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
+                    <Typography variant="headline" className={'app-title'}
+                                style={{color: '#dedede', marginLeft: '24px', fontWeight: '400', fontSize: '1.25rem'}}>Distributed
                         Deployments</Typography>
 
                     {Object.keys(managerList).map((id, workerList) => {
                         if (id !== "Never Reached" && id !== "Not-Reachable") {
                             return (
                                 <div>
-                                    <Divider inset={true} style={styles.divider}/>
                                     <h3 style={styles.h3Title}>Group Id : {id}</h3>
+                                    <Divider inset={true} style={styles.divider}/>
+
                                     <h4 style={styles.h3Title}>Managers</h4>
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
