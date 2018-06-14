@@ -21,7 +21,9 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 /**
  * Has types of 'attributes/payload' in 'map' of a Siddhi Source/Sink
  */
-public enum MapperAttributeOrPayloadType {
+public enum MapperPayloadOrAttributeType {
     MAP,
-    LIST;
+    LIST,
+    PAYLOAD,
+    ATTRIBUTE;
 }
