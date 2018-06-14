@@ -490,6 +490,11 @@ a.list-group-item, button.list-group-item {
     font-size: 12px;
 }
 
-#form-query-annotation table {
+#form-query-annotation table,
+.define-stream table,
+.define-window table,
+.define-trigger table,
+.define-table table {
     width: 100% !important;
+    max-width: 650px !important;
 }
