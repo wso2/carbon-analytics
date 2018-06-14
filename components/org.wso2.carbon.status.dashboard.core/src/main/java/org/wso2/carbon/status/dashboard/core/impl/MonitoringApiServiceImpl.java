@@ -2083,8 +2083,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     inputStream, new TypeToken<List<ResourceClusterInfo>>() {
                                     }.getType());
                             for (ResourceClusterInfo clusterInfo : clusterInfos) {
-                                String nodeId = clusterInfo.getNodeId();
-                                ResourceClusteredWorkerNode.add(nodeId);
+                                String workerId = generateWorkerKey(clusterInfo.getHttps_host(),clusterInfo.getHttps_port());
+                                ResourceClusteredWorkerNode.add(workerId);
                             }
                         }
                     } catch (feign.RetryableException e) {
@@ -2101,7 +2101,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             if (!registeredWorkers.isEmpty()) {
                 registeredWorkers.parallelStream().forEach(worker -> {
                     ServerHADetails serverHADetails = new ServerHADetails();
-                    if (!ResourceClusteredWorkerNode.contains(getCarbonID(worker.getWorkerId()))) {
+                    if (!ResourceClusteredWorkerNode.contains(worker.getWorkerId())) {
                         try {
                             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
                                     generateURLHostPort(worker.getHost(), String.valueOf(
@@ -2179,8 +2179,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     inputStream, new TypeToken<List<ResourceClusterInfo>>() {
                                     }.getType());
                             for (ResourceClusterInfo clusterInfo : clusterInfos) {
-                                String nodeId = clusterInfo.getNodeId();
-                                ResourceClusteredWorkerNode.add(nodeId);
+                                String workerId = generateWorkerKey(clusterInfo.getHttps_host(),clusterInfo.getHttps_port());
+                                ResourceClusteredWorkerNode.add(workerId);
                             }
                         }
                     } catch (feign.RetryableException e) {
@@ -2198,7 +2198,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             if (!registeredWorkers.isEmpty()) {
                 registeredWorkers.parallelStream().forEach(worker -> {
                     ServerHADetails serverHADetails = new ServerHADetails();
-                    if (!ResourceClusteredWorkerNode.contains(getCarbonID(worker.getWorkerId()))) {
+                    if (!ResourceClusteredWorkerNode.contains(worker.getWorkerId())) {
                         try {
                             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
                                     generateURLHostPort(worker.getHost(), String.valueOf(
