@@ -137,6 +137,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                                 title: 'Parameter',
                                 properties: {
                                     parameterValue: {
+                                        title: "Parameter",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -379,6 +380,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                                 title: 'Parameter',
                                 properties: {
                                     parameterValue: {
+                                        title: "Parameter",
                                         type: "string",
                                         minLength: 1
                                     }
