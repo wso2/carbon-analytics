@@ -30,20 +30,7 @@ define(
              Data storing structure as follows
                 type*: ‘’,
                 options: ['option1', 'option2=value2',...],
-                attributes: {
-                    type*: ‘MAP’
-                    value*: {Key-Value Pair JSON}
-                }
-                << or >>
-                attributes: {
-                    type*: ‘LIST’
-                    value*: ['value1',...]
-                } NOTE: LIST value is applicable to source annotation only.
-                << or  >>
-                attributes: {
-                    type*: 'SINGLE',
-                    value*: ''
-                } // NOTE : SINGLE value is applicable to sink annotation only.
+                attributes: ['attribute1', 'attribute2=value2',...]
             */
             if (options !== undefined) {
                 this.type = options.type;
