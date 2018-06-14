@@ -71,12 +71,16 @@ public class WorkersApiServiceImpl extends WorkersApiService {
 
     public Response getClusteredWorkerNodeDetails() {
         Map<String, ResourceNode> clusteredWorkerList = ServiceDataHolder.getResourcePool().getResourceNodeMap();
-        List<Map<String,String>> resourceNodeDetailMap = new ArrayList<>();
+        List<Map<String, String>> resourceNodeDetailMap = new ArrayList<>();
         for (Map.Entry<String, ResourceNode> resourceNodeEntry : clusteredWorkerList.entrySet()) {
-            Map<String,String> clusteredResourceNode = new HashMap<>();
-            clusteredResourceNode.put(Constants.HTTP_HOST,resourceNodeEntry.getValue().getHttpInterface().getHost());
-            clusteredResourceNode.put(Constants.HTTP_PORT,String.valueOf(resourceNodeEntry.getValue().getHttpInterface().getPort()));
+            Map<String, String> clusteredResourceNode = new HashMap<>();
+            clusteredResourceNode.put(Constants.HTTP_HOST, resourceNodeEntry.getValue().getHttpInterface().getHost());
+            clusteredResourceNode.put(Constants.HTTP_PORT, String.valueOf(resourceNodeEntry.getValue()
+                    .getHttpInterface().getPort()));
             clusteredResourceNode.put(Constants.NODE_ID, resourceNodeEntry.getValue().getId());
+            // TODO: 6/13/18 need to change this to HTTPS port and host
+            clusteredResourceNode.put(Constants.HTTPS_HOST, "localhost");
+            clusteredResourceNode.put(Constants.HTTPS_PORT, "9444");
             resourceNodeDetailMap.add(clusteredResourceNode);
         }
         return Response.ok().entity(resourceNodeDetailMap).build();
