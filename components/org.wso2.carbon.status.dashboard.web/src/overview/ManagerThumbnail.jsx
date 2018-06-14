@@ -48,11 +48,10 @@ const styles = {
     overviewLegend: {fontSize: 10, color: '#fff'},
     legendContainer: {width: '100%', textAlign: 'center', position: 'absolute', bottom: 5},
     root: {
-
         flexWrap: 'wrap',
         justifyContent: 'space-around',
         backgroundColor: '#222222',
-        width: '300%',
+        width: '310%',
         marginLeft: '-8%'
     },
     h3: {color: 'white', marginLeft: '4%', backgroundColor: '#222222'},
@@ -531,7 +530,7 @@ export default class ManagerThumbnail extends React.Component {
                     {"Do you want to delete manager '" + this.state.workerID + "' ?"}
                 </Dialog>
 
-                <GridTile style={{background: 'black'}}>
+                <GridTile style={{background: 'black', marginBottom:'30px'}}>
                     <div style={{
                         display: 'flex', alignItems: 'center', background: titleBg,
                         position: 'absolute', bottom: 0, width: '100%'

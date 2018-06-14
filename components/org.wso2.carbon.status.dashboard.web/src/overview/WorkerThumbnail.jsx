@@ -395,7 +395,7 @@ export default class WorkerThumbnail extends React.Component {
                     {"Do you want to delete worker '" + this.state.workerID + "' ?"}
                 </Dialog>
 
-                <GridTile style={{background: 'black'}}>
+                <GridTile style={{background: 'black',marginBottom:'30px'}}>
                     <div style={{
                         display: 'flex', alignItems: 'center', background: titleBg,
                         position: 'absolute', bottom: 0, width: '100%'
