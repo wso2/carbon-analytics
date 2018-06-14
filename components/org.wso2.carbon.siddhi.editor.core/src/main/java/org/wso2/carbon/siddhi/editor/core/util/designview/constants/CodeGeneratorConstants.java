@@ -52,6 +52,11 @@ public class CodeGeneratorConstants {
     public static final String RANGE = "RANGE";
     public static final String INTERVAL = "INTERVAL";
 
+    public static final String MAP = "MAP";
+    public static final String LIST = "LIST";
+    public static final String PAYLOAD = "PAYLOAD";
+    public static final String ATTRIBUTE = "ATTRIBUTES";
+
     public static final String PRIMARY_KEY_ANNOTATION = "@PRIMARYKEY";
 
     private CodeGeneratorConstants() {

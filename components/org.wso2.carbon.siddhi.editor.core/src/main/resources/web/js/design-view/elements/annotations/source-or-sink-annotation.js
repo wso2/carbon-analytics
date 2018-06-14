@@ -35,14 +35,16 @@ define(
                 options: ['option1', 'option2=value2',...],
                 map: {
                     type*: ‘’,
-                    options: ['option1', 'option2=value2',...],
-                    attributes: {
-                        type*: ‘MAP’
+                    options: {Key-Value Pair JSON},
+                    payloadOrAttribute: {
+                        annotationType: 'PAYLOAD | ATTRIBUTES',
+                        type*: ‘MAP’,
                         value*: {Key-Value Pair JSON}
                     }
                     << or >>
-                    attributes: {
-                        type*: ‘LIST’
+                    payloadOrAttribute: {
+                        annotationType: 'PAYLOAD | ATTRIBUTES',
+                        type*: ‘LIST’,
                         value*: ['value1',...]
                     }
                 }

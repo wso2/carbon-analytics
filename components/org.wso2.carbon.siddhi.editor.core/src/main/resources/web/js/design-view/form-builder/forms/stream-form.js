@@ -49,7 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             formContainer.append(propertyDiv);
 
             // generate the form to define a stream
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-stream')[0], {
                 schema: {
                     type: "object",
                     title: "Stream",
@@ -217,7 +217,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 attributes: attributes
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-stream')[0], {
                 schema: {
                     type: "object",
                     title: "Stream",

@@ -49,7 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
             formContainer.append(propertyDiv);
 
             // generate the form to define a table
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-table')[0], {
                 schema: {
                     type: "object",
                     title: "Table",
@@ -300,7 +300,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                 attributes: attributes
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-table')[0], {
                 schema: {
                     type: "object",
                     title: "Table",

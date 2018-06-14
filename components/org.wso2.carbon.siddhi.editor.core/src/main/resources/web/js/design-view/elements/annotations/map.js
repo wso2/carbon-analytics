@@ -29,21 +29,23 @@ define(
             /*
              Data storing structure as follows
                 type*: ‘’,
-                options: ['option1', 'option2=value2',...],
-                attributes: {
-                    type*: ‘MAP’
+                options: {Key-Value Pair JSON},
+                payloadOrAttribute: {
+                    annotationType: 'PAYLOAD | ATTRIBUTES',
+                    type*: ‘MAP’,
                     value*: {Key-Value Pair JSON}
                 }
                 << or >>
-                attributes: {
-                    type*: ‘LIST’
+                payloadOrAttribute: {
+                    annotationType: 'PAYLOAD | ATTRIBUTES',
+                    type*: ‘LIST’,
                     value*: ['value1',...]
-                } NOTE: LIST will contain only one value in sink mapper.
+                } NOTE: LIST will contain only one value in sink mapper payload.
             */
             if (options !== undefined) {
                 this.type = options.type;
                 this.options = options.options;
-                this.attributes = options.attributes;
+                this.payloadOrAttribute = options.payloadOrAttribute;
             }
         };
 
@@ -55,8 +57,8 @@ define(
             return this.options;
         };
 
-        Map.prototype.getAttributes = function () {
-            return this.attributes;
+        Map.prototype.getPayloadOrAttribute = function () {
+            return this.payloadOrAttribute;
         };
 
         Map.prototype.setType = function (type) {
@@ -67,8 +69,8 @@ define(
             this.options = options;
         };
 
-        Map.prototype.setAttributes = function (attributes) {
-            this.attributes = attributes;
+        Map.prototype.setPayloadOrAttribute = function (payloadOrAttribute) {
+            this.payloadOrAttribute = payloadOrAttribute;
         };
 
         return Map;
