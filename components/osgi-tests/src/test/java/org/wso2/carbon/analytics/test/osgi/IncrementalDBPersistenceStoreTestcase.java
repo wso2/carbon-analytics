@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 
+import javax.inject.Inject;
+import javax.sql.DataSource;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -50,8 +52,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
-import javax.sql.DataSource;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
@@ -60,7 +60,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
-public class DBPersistenceStoreTestcase {
+public class IncrementalDBPersistenceStoreTestcase {
 
     @Inject
     protected BundleContext bundleContext;
@@ -71,7 +71,7 @@ public class DBPersistenceStoreTestcase {
     @Inject
     private DataSourceService dataSourceService;
 
-    private static final Logger log = Logger.getLogger(DBPersistenceStoreTestcase.class);
+    private static final Logger log = Logger.getLogger(IncrementalDBPersistenceStoreTestcase.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String TABLE_NAME = "PERSISTENCE_TABLE";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";
@@ -89,7 +89,7 @@ public class DBPersistenceStoreTestcase {
             basedir = Paths.get(".").toString();
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
-                "conf", "persistence", "db", CARBON_YAML_FILENAME);
+                "conf", "persistence", "incremental-db", CARBON_YAML_FILENAME);
         return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
@@ -109,7 +109,7 @@ public class DBPersistenceStoreTestcase {
     @Configuration
     public Option[] createConfiguration() {
         log.info("Running - " + this.getClass().getName());
-        RDBMSConfig.createDatasource("db");
+        RDBMSConfig.createDatasource("incremental-db");
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -125,7 +125,7 @@ public class DBPersistenceStoreTestcase {
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
                         "com.microsoft.sqlserver", "mssql-jdbc").versionAsInProject()),
                 carbonDistribution(Paths.get("target", "wso2das-" +
-                                System.getProperty("carbon.analytic.version")), "worker")
+                        System.getProperty("carbon.analytic.version")), "worker")
         };
     }
 
@@ -212,7 +212,7 @@ public class DBPersistenceStoreTestcase {
             }
             con.close();
             stmt.close();
-            return count == 2;
+            return count == 3;
         });
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
@@ -258,7 +258,7 @@ public class DBPersistenceStoreTestcase {
                 count++;
                 Assert.assertEquals(resultSet.getString("siddhiAppName"), SIDDHIAPP_NAME);
             }
-            Assert.assertEquals(count, 2);
+            Assert.assertEquals(count, 6);
         } catch (SQLException e) {
             log.error("Error in processing query ", e);
         } catch (DataSourceException e) {
