@@ -35,7 +35,6 @@ import AuthManager from '../auth/utils/AuthManager';
 import Clock from './Clock';
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import WorkerThumbnail from "./WorkerThumbnail";
-import DistributedViewResourceNodeThumbnail from "./DistributedViewResourceNodeThumbnail";
 
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -207,10 +206,8 @@ export default class ManagerThumbnail extends React.Component {
 
 
     renderWorkers(workersList) {
-
         if (ManagerThumbnail.hasNodes(this.state.resourceClustersList)) {
             return (
-
                 Object.keys(workersList).map((id, workerList) => {
                     if (id === 'ResourceCluster') {
                         return (
@@ -220,18 +217,10 @@ export default class ManagerThumbnail extends React.Component {
 
                                     <GridList cols={3} cellHeight='100%' style={styles.overviewGridList}>
                                         {workersList[id].map((worker) => {
-                                            if (worker.statusMessage === "Please add the node manually.") {
-                                                return (
-                                                    <DistributedViewResourceNodeThumbnail worker={worker}
-                                                                                          currentTime={new Date()
-                                                                                              .getTime()}/>
-                                                )
-                                            } else {
                                                 return (
                                                     <WorkerThumbnail worker={worker}
                                                                      currentTime={new Date().getTime()}/>
                                                 )
-                                            }
                                         })}
                                     </GridList>
                                 </div>
