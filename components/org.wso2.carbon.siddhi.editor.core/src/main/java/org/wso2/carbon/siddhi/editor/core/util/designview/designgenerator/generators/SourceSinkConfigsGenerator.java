@@ -20,6 +20,10 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.MapperConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperListPayloadOrAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperMapPayloadOrAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.MapperPayloadOrAttributeType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.core.stream.input.source.Source;
 import org.wso2.siddhi.core.stream.output.sink.Sink;
@@ -136,11 +140,55 @@ public class SourceSinkConfigsGenerator {
         if (type == null) {
             throw new DesignGenerationException("Unable to find 'type' of the mapper");
         }
-        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
-        List<String> attributes =
-                annotationConfigGenerator.generateAnnotationConfigList(mapAnnotation.getAnnotations());
+        MapperPayloadOrAttribute payloadOrAttribute =
+                generateMapperAttributeOrPayload(mapAnnotation.getAnnotations().get(0));
+        return new MapperConfig(type, options, payloadOrAttribute);
+    }
 
-        return new MapperConfig(type, options, attributes);
+    private MapperPayloadOrAttribute generateMapperAttributeOrPayload(Annotation attributeOrPayloadAnnotation) {
+        List<PayloadOrAttributeElement> elements = new ArrayList<>();
+        for (Element element : attributeOrPayloadAnnotation.getElements()) {
+            elements.add(generatePayloadOrAttributeElement(element));
+        }
+        MapperPayloadOrAttributeType mapperPayloadOrAttributeType = getMapperAttributeOrPayloadType(elements);
+        if (mapperPayloadOrAttributeType == MapperPayloadOrAttributeType.MAP) {
+            return generateMapperMapAttribute(attributeOrPayloadAnnotation.getName(), elements);
+        }
+        return generateMapperListAttribute(attributeOrPayloadAnnotation.getName(), elements);
+    }
+
+    private PayloadOrAttributeElement generatePayloadOrAttributeElement(Element element) {
+        PayloadOrAttributeElement payloadOrAttributeElement = new PayloadOrAttributeElement();
+        payloadOrAttributeElement.key = element.getKey();
+        payloadOrAttributeElement.value = element.getValue();
+        return payloadOrAttributeElement;
+    }
+
+    private MapperPayloadOrAttributeType getMapperAttributeOrPayloadType(List<PayloadOrAttributeElement> elements) {
+        for (PayloadOrAttributeElement element : elements) {
+            if (element.key != null) {
+                return MapperPayloadOrAttributeType.MAP;
+            }
+        }
+        return MapperPayloadOrAttributeType.LIST;
+    }
+
+    private MapperListPayloadOrAttribute generateMapperListAttribute(
+            String annotationType, List<PayloadOrAttributeElement> elements) {
+        List<String> values = new ArrayList<>();
+        for (PayloadOrAttributeElement element : elements) {
+            values.add(element.value);
+        }
+        return new MapperListPayloadOrAttribute(annotationType.toUpperCase(), values);
+    }
+
+    private MapperMapPayloadOrAttribute generateMapperMapAttribute(
+            String annotationType, List<PayloadOrAttributeElement> elements) {
+        Map<String, String> values = new HashMap<>();
+        for (PayloadOrAttributeElement element : elements) {
+            values.put(element.key, element.value);
+        }
+        return new MapperMapPayloadOrAttribute(annotationType.toUpperCase(), values);
     }
 
     /**
@@ -177,6 +225,11 @@ public class SourceSinkConfigsGenerator {
             }
         }
         return connectedElements;
+    }
+
+    private class PayloadOrAttributeElement {
+        private String key;
+        private String value;
     }
 
     private enum SourceOrSinkAnnotation {
