@@ -31,13 +31,13 @@ define(
                 type*: ‘’,
                 options: {Key-Value Pair JSON},
                 payloadOrAttribute: {
-                    annotationType: 'PAYLOAD | ATTRIBUTE',
+                    annotationType: 'PAYLOAD | ATTRIBUTES',
                     type*: ‘MAP’,
                     value*: {Key-Value Pair JSON}
                 }
                 << or >>
                 payloadOrAttribute: {
-                    annotationType: 'PAYLOAD | ATTRIBUTE',
+                    annotationType: 'PAYLOAD | ATTRIBUTES',
                     type*: ‘LIST’,
                     value*: ['value1',...]
                 } NOTE: LIST will contain only one value in sink mapper payload.

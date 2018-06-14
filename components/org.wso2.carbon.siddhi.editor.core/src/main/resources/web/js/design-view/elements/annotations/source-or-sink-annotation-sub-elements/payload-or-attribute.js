@@ -28,15 +28,16 @@ define(
         var PayloadOrAttribute = function (options) {
             /*
              Data storing structure as follows
-                annotationType: 'PAYLOAD' | 'ATTRIBUTE',
+                annotationType: 'PAYLOAD' | 'ATTRIBUTES',
                 type*: ‘MAP' | 'LIST’,
                 value*: {Key-Value Pair JSON} | ['value1',...]
 
                 NOTE: LIST will contain only one value in sink mapper payload.
             */
             if (options !== undefined) {
-                this.annotationType = options.annotationType;
-                this.type = options.type;
+                this.annotationType
+                    = (options.annotationType !== undefined) ? (options.annotationType).toUpperCase() : undefined;
+                this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.value = options.value;
             }
         };
@@ -54,11 +55,11 @@ define(
         };
 
         PayloadOrAttribute.prototype.setAnnotationType = function (annotationType) {
-            this.annotationType = annotationType;
+            this.annotationType = annotationType.toUpperCase();
         };
 
         PayloadOrAttribute.prototype.setType = function (type) {
-            this.type = type;
+            this.type = type.toUpperCase();
         };
         PayloadOrAttribute.prototype.setValue = function (value) {
             this.value = value;

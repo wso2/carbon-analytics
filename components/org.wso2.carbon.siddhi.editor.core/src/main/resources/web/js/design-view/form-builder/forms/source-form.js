@@ -259,7 +259,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                             });
 
                             payloadOrAttributeOptions = {};
-                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTE');
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
                             _.set(payloadOrAttributeOptions, 'type', 'MAP');
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValues);
                             payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
@@ -272,7 +272,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                             });
 
                             payloadOrAttributeOptions = {};
-                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTE');
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
                             _.set(payloadOrAttributeOptions, 'type', 'LIST');
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
                             payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
@@ -351,7 +351,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
                 var savedMapperAttributes = map.getPayloadOrAttribute();
                 if (savedMapperAttributes !== undefined && savedMapperAttributes.getAnnotationType() !== undefined
-                    && savedMapperAttributes.getAnnotationType() === 'ATTRIBUTE') {
+                    && savedMapperAttributes.getAnnotationType() === 'ATTRIBUTES') {
                     var attributeValue;
                     if (savedMapperAttributes.getType() === 'MAP') {
                         attributeValue = savedMapperAttributes.getValue();
@@ -597,7 +597,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                             });
 
                             payloadOrAttributeOptions = {};
-                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTE');
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
                             _.set(payloadOrAttributeOptions, 'type', 'MAP');
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValues);
                             payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
@@ -610,7 +610,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                             });
 
                             payloadOrAttributeOptions = {};
-                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTE');
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
                             _.set(payloadOrAttributeOptions, 'type', 'LIST');
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
                             payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
