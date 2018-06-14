@@ -304,7 +304,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                         if (editor.getValue().map.attributeOrPayloadValues.length !== undefined
                             && editor.getValue().map.attributeOrPayloadValues[0].attributeMapKey !== undefined) {
                             var mapperAttributeValues = {};
-                            _.forEach(editor.getValue().map.attributeMapValues, function (attributeValue) {
+                            _.forEach(editor.getValue().map.attributeOrPayloadValues, function (attributeValue) {
                                 mapperAttributeValues[attributeValue.attributeMapKey] = attributeValue.attributeMapValue;
                             });
 
@@ -729,6 +729,16 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                     var mapperOptions = {};
                     _.set(mapperOptions, 'type', config.map.annotationType.name);
 
+                    var mapperAnnotationOptions = [];
+                    if (config.map.annotationOptions !== undefined) {
+                        _.forEach(config.map.annotationOptions, function (option) {
+                            mapperAnnotationOptions.push(option.optionValue);
+                        });
+                        _.set(mapperOptions, 'options', mapperAnnotationOptions);
+                    } else {
+                        _.set(mapperOptions, 'options', undefined);
+                    }
+
                     if (config.map.attributeOrPayloadValues !== undefined) {
                         // if attributeValues[0] or payloadMapValues[0] is defined then mapper annotations values are
                         // saved as a map. If payloadSingleValue is defined then the value is saved as a single value.
@@ -738,7 +748,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                         if (config.map.attributeOrPayloadValues.length !== undefined
                             && config.map.attributeOrPayloadValues[0].attributeMapKey !== undefined) {
                             var mapperAttributeValues = {};
-                            _.forEach(config.map.attributeMapValues, function (attributeValue) {
+                            _.forEach(config.map.attributeOrPayloadValues, function (attributeValue) {
                                 mapperAttributeValues[attributeValue.attributeMapKey]
                                     = attributeValue.attributeMapValue;
                             });
@@ -775,7 +785,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                             _.set(payloadOrAttributeOptions, 'value', mapperPayloadValues);
                             payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
 
-                        } else if (config.map.attributeOrPayloadValues.length !== undefined
+                        } else if (config.map.attributeOrPayloadValues.length === undefined
                             && config.map.attributeOrPayloadValues.singleValue !== undefined) {
                             var mapperPayloadValuesList = [config.map.attributeOrPayloadValues.singleValue];
                             payloadOrAttributeOptions = {};
