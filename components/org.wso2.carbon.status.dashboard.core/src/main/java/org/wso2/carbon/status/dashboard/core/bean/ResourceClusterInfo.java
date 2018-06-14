@@ -24,8 +24,6 @@ package org.wso2.carbon.status.dashboard.core.bean;
  */
 public class ResourceClusterInfo {
     private String nodeId;
-    private String httpHost;
-    private String httpPort;
     private String https_host;
     private String https_port;
 
@@ -35,22 +33,6 @@ public class ResourceClusterInfo {
 
     public void setNodeId(String nodeId) {
         this.nodeId = nodeId;
-    }
-
-    public String getHost() {
-        return httpHost;
-    }
-
-    public void setHost(String httpHost) {
-        this.httpHost = httpHost;
-    }
-
-    public String getPort() {
-        return httpPort;
-    }
-
-    public void setPort(String httpPort) {
-        this.httpPort = httpPort;
     }
 
     public String getHttps_host() {
