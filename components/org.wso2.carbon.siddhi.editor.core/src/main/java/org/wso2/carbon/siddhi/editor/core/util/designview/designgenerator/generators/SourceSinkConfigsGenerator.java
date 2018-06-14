@@ -149,7 +149,7 @@ public class SourceSinkConfigsGenerator {
      * @param sourceOrSinkList                  List of Siddhi Sources/Sinks
      * @param <T>                               Generic Type for Siddhi Source/Sink
      * @return                                  Map of Siddhi Annotations for Source/Sink, and connected element names
-     * @throws DesignGenerationException
+     * @throws DesignGenerationException        Mandatory properties are null
      */
     private <T> Map<Annotation, String> getSourceOrSinkAnnotationStreamIdMap(
             SourceOrSinkAnnotation sourceOrSinkAnnotation, List<T> sourceOrSinkList) throws DesignGenerationException {

@@ -63,13 +63,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -93,18 +93,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     name: {
-                                        title : 'Name',
+                                        title: 'Name',
                                         type: "string",
                                         minLength: 1
                                     },
                                     type: {
-                                        title : 'Type',
+                                        title: 'Type',
                                         type: "string",
                                         enum: [
                                             "string",
@@ -112,7 +112,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                                             "long",
                                             "float",
                                             "double",
-                                            "bool"
+                                            "bool",
+                                            "object"
                                         ],
                                         default: "string"
                                     }
@@ -136,7 +137,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
                 var isStreamNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
@@ -159,7 +160,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 });
                 self.configurationData.getSiddhiAppConfig().addStream(stream);
 
-                var textNode = $('#'+i).find('.streamNameNode');
+                var textNode = $('#' + i).find('.streamNameNode');
                 textNode.html(editor.getValue().name);
 
                 // close the form window
@@ -186,7 +187,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var id = $(element).parent().attr('id');
             // retrieve the stream information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(id);
-            if(!clickedElement) {
+            if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
@@ -208,9 +209,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             });
 
             var fillWith = {
-                annotations : annotations,
-                name : name,
-                attributes : attributes
+                annotations: annotations,
+                name: name,
+                attributes: attributes
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor(formContainer[0], {
@@ -227,13 +228,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -257,7 +258,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 properties: {
                                     name: {
                                         title: "Name",
@@ -273,7 +274,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                                             "long",
                                             "float",
                                             "double",
-                                            "bool"
+                                            "bool",
+                                            "object"
                                         ],
                                         default: "string"
                                     }
@@ -297,7 +299,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
 

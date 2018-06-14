@@ -435,8 +435,8 @@ h3,
 }
 
 .app-annotations-button {
-    position: absolute;
-    top: 3.5%;
+    position: fixed;
+    top: 70px;
     right: 1%;
     font-size: 20px;
     background-color: lightgray;
