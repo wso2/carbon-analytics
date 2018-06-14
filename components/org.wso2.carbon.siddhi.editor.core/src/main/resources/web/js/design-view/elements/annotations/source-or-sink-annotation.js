@@ -36,15 +36,7 @@ define(
                 map: {
                     type*: ‘’,
                     options: ['option1', 'option2=value2',...],
-                    attributes: {
-                        type*: ‘MAP’
-                        value*: {Key-Value Pair JSON}
-                    }
-                    << or >>
-                    attributes: {
-                        type*: ‘LIST’
-                        value*: ['value1',...]
-                    }
+                    attributes: ['attribute1', 'attribute2=value2',...]
                 }
             */
             if (options !== undefined) {
