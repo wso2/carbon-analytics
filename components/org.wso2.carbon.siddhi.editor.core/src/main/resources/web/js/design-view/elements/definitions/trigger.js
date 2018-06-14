@@ -38,7 +38,7 @@ define(['require', 'elementUtils'],
                 this.name = options.name;
                 this.at = options.at;
             }
-            this.annotationList =  [];
+            this.annotationList = [];
         };
 
         Trigger.prototype.addAnnotation = function (annotation) {

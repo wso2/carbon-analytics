@@ -26,19 +26,19 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         var constants = {
             SOURCE: 'sourceDrop',
             SINK: 'sinkDrop',
-            STREAM : 'streamDrop',
-            TABLE : 'tableDrop',
-            WINDOW :'windowDrop',
-            TRIGGER :'triggerDrop',
-            AGGREGATION : 'aggregationDrop',
-            FUNCTION : 'functionDrop',
-            PROJECTION : 'projectionQueryDrop',
-            FILTER : 'filterQueryDrop',
-            JOIN : 'joinQueryDrop',
-            WINDOW_QUERY : 'windowQueryDrop',
-            PATTERN : 'patternQueryDrop',
-            SEQUENCE : 'sequenceQueryDrop',
-            PARTITION :'partitionDrop',
+            STREAM: 'streamDrop',
+            TABLE: 'tableDrop',
+            WINDOW: 'windowDrop',
+            TRIGGER: 'triggerDrop',
+            AGGREGATION: 'aggregationDrop',
+            FUNCTION: 'functionDrop',
+            PROJECTION: 'projectionQueryDrop',
+            FILTER: 'filterQueryDrop',
+            JOIN: 'joinQueryDrop',
+            WINDOW_QUERY: 'windowQueryDrop',
+            PATTERN: 'patternQueryDrop',
+            SEQUENCE: 'sequenceQueryDrop',
+            PARTITION: 'partitionDrop',
             PARTITION_CONNECTION_POINT: 'partition-connector-in-part'
         };
 
@@ -84,10 +84,23 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             this.dropElements = new DropElements(dropElementsOpts);
             this.canvas = $(self.container);
 
+            // configuring the siddhi app level annotations
+            var settingsButtonId = self.currentTabId + '-appSettingsId';
+            var settingsButton = $("<div id='" + settingsButtonId + "' " +
+                "class='btn app-annotations-button tool-container' " +
+                "data-placement='bottom' data-toggle='tooltip' title='App Annotations'>" +
+                "<i class='fw fw-settings'></i></div>");
+            settingsButton.tooltip();
+            self.canvas.append(settingsButton);
+            var settingsIconElement = $('#' + settingsButtonId)[0];
+            settingsIconElement.addEventListener('click', function () {
+                self.dropElements.formBuilder.DefineFormForAppAnnotations(this);
+            });
+
             /**
              * @description jsPlumb function opened
              */
-            self.jsPlumbInstance.ready(function() {
+            self.jsPlumbInstance.ready(function () {
 
                 self.jsPlumbInstance.importDefaults({
                     PaintStyle: {
@@ -131,8 +144,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                      */
 
                     drop: function (e, ui) {
-                        var mouseTop = e.pageY - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                        var mouseLeft = e.pageX - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                        var mouseTop = e.pageY - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                        var mouseLeft = e.pageX - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                         // Clone the element in the toolbox in order to drop the clone on the canvas
                         var droppedElement = ui.helper.clone();
                         // To further manipulate the jsplumb element, remove the jquery UI clone helper as jsPlumb
@@ -203,21 +216,21 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                         // If the dropped Element is a Join Query then->
                         else if ($(droppedElement).hasClass('join-query-drag')) {
-                            self.handleJoinQuery(mouseTop, mouseLeft, false, "Join");
+                            self.handleJoinQuery(mouseTop, mouseLeft, false, "Join Query");
                         }
 
                         // If the dropped Element is a Pattern Query then->
-                        else if($(droppedElement).hasClass('pattern-query-drag')) {
-                            self.handlePatternQuery(mouseTop, mouseLeft, false, "Pattern");
+                        else if ($(droppedElement).hasClass('pattern-query-drag')) {
+                            self.handlePatternQuery(mouseTop, mouseLeft, false, "Pattern Query");
                         }
 
                         // If the dropped Element is a Sequence Query then->
-                        else if($(droppedElement).hasClass('sequence-query-drag')) {
-                            self.handleSequenceQuery(mouseTop, mouseLeft, false, "Sequence");
+                        else if ($(droppedElement).hasClass('sequence-query-drag')) {
+                            self.handleSequenceQuery(mouseTop, mouseLeft, false, "Sequence Query");
                         }
 
                         // If the dropped Element is a Partition then->
-                        else if($(droppedElement).hasClass('partition-drag')) {
+                        else if ($(droppedElement).hasClass('partition-drag')) {
                             self.handlePartition(mouseTop, mouseLeft, false);
                         }
                     }
@@ -287,7 +300,66 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     .errorAlert("Invalid Connection: Stream is already connected to the partition");
                                 return connectionValidity;
                             } else {
-                                return connectionValidity = true;
+
+                                var isStreamDirectlyConnectedToAQuery = false;
+                                _.forEach(partition.getWindowFilterProjectionQueryList(), function (query) {
+                                    if (query.getQueryInput() !== undefined
+                                        && query.getQueryInput().getFrom() !== undefined
+                                        && query.getQueryInput().getFrom() === connectedStreamName) {
+                                        isStreamDirectlyConnectedToAQuery = true;
+                                    }
+                                });
+
+                                _.forEach(partition.getJoinQueryList(), function (query) {
+                                    if (query.getQueryInput() !== undefined) {
+                                        if (query.getQueryInput().getFirstConnectedElement() !== undefined
+                                            && query.getQueryInput().getFirstConnectedElement().type
+                                            === constants.STREAM
+                                            && query.getQueryInput().getFirstConnectedElement().name
+                                            === connectedStreamName) {
+                                            isStreamDirectlyConnectedToAQuery = true;
+
+                                        } else if (query.getQueryInput().getSecondConnectedElement() !== undefined
+                                            && query.getQueryInput().getSecondConnectedElement().type
+                                            === constants.STREAM
+                                            && query.getQueryInput().getSecondConnectedElement().name
+                                            === connectedStreamName) {
+                                            isStreamDirectlyConnectedToAQuery = true;
+                                        }
+                                    }
+                                });
+
+                                _.forEach(partition.getPatternQueryList(), function (query) {
+                                    if (query.getQueryInput() !== undefined) {
+                                        var connectedElementNameList
+                                            = query.getQueryInput().getConnectedElementNameList();
+                                        _.forEach(connectedElementNameList, function (elementName) {
+                                            if (connectedStreamName === elementName) {
+                                                isStreamDirectlyConnectedToAQuery = true;
+                                            }
+                                        });
+                                    }
+                                });
+
+                                _.forEach(partition.getSequenceQueryList(), function (query) {
+                                    if (query.getQueryInput() !== undefined) {
+                                        var connectedElementNameList
+                                            = query.getQueryInput().getConnectedElementNameList();
+                                        _.forEach(connectedElementNameList, function (elementName) {
+                                            if (connectedStreamName === elementName) {
+                                                isStreamDirectlyConnectedToAQuery = true;
+                                            }
+                                        });
+                                    }
+                                });
+
+                                if (isStreamDirectlyConnectedToAQuery) {
+                                    DesignViewUtils.prototype.errorAlert("Invalid Connection: Connected stream is " +
+                                        "already directly connected to a query inside the partition.");
+                                } else {
+                                    connectionValidity = true;
+                                }
+                                return connectionValidity;
                             }
                         }
                     } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
@@ -376,7 +448,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
                     }
                     if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
-                        if(!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
+                        if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection");
                         } else {
                             connectionValidity = true;
@@ -385,7 +457,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     else if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
-                        || sourceElement.hasClass(constants.TRIGGER))) {
+                            || sourceElement.hasClass(constants.TRIGGER))) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection");
                         } else {
                             connectionValidity = true;
@@ -393,7 +465,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     }
                     else if (targetElement.hasClass(constants.JOIN)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
-                        || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.TRIGGER)
+                            || sourceElement.hasClass(constants.AGGREGATION)
+                            || sourceElement.hasClass(constants.TRIGGER)
                             || sourceElement.hasClass(constants.WINDOW))) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection");
                         } else {
@@ -431,8 +504,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     } else {
                                         connectionValidity = false;
                                         DesignViewUtils.prototype
-                                            .errorAlert("At least one connected input element in join query should be a stream " +
-                                            "or a trigger or a window!");
+                                            .errorAlert("At least one connected input element in join query should " +
+                                                "be a stream or a trigger or a window!");
                                     }
                                 } else if (!firstConnectedElement && secondConnectedElement !== undefined) {
                                     var secondElementType = secondConnectedElement.type;
@@ -446,8 +519,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     } else {
                                         connectionValidity = false;
                                         DesignViewUtils.prototype
-                                            .errorAlert("At least one connected input element in join query should be a stream " +
-                                            "or a trigger or a window!");
+                                            .errorAlert("At least one connected input element in join query should " +
+                                                "be a stream or a trigger or a window!");
                                     }
                                 }
                             }
@@ -525,9 +598,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     }
                     // create and add an edge to the edgeList
 
-                    var edgeId = ''+ sourceId + '_' + targetId + '';
+                    var edgeId = '' + sourceId + '_' + targetId + '';
                     var edgeInTheEdgeList = self.configurationData.getEdge(edgeId);
-                    if(!edgeInTheEdgeList) {
+                    if (!edgeInTheEdgeList) {
                         var edgeOptions = {};
                         _.set(edgeOptions, 'id', edgeId);
                         _.set(edgeOptions, 'childId', targetId);
@@ -542,7 +615,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var connectedElementName;
 
                     if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)
-                        && sourceElement.hasClass(constants.STREAM)){
+                        && sourceElement.hasClass(constants.STREAM)) {
                         var partitionId = targetElement.parent()[0].id;
                         var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
                         connectedElementName
@@ -569,22 +642,22 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                         var connectionIn =
                             $('<div class="' + constants.PARTITION_CONNECTION_POINT + '">')
-                            .attr('id', newPartitionConnectorInPartNo);
+                                .attr('id', newPartitionConnectorInPartNo);
                         partitionElement.append(connectionIn);
 
                         self.jsPlumbInstance.makeTarget(connectionIn, {
                             anchor: 'Left',
                             maxConnections: 1,
-                            deleteEndpointsOnDetach : true
+                            deleteEndpointsOnDetach: true
                         });
                         self.jsPlumbInstance.makeSource(connectionIn, {
                             anchor: 'Right',
-                            deleteEndpointsOnDetach : true
+                            deleteEndpointsOnDetach: true
                         });
 
                     } else if (sourceElement.hasClass(constants.SOURCE)
-                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
-                        if(targetElement.hasClass(constants.STREAM)) {
+                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))) {
+                        if (targetElement.hasClass(constants.STREAM)) {
                             connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(targetId)
                                 .getName();
                         } else if (targetElement.hasClass(constants.TRIGGER)) {
@@ -595,8 +668,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             .setConnectedElementName(connectedElementName);
 
                     } else if (targetElement.hasClass(constants.SINK)
-                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))){
-                        if(sourceElement.hasClass(constants.STREAM)) {
+                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
+                        if (sourceElement.hasClass(constants.STREAM)) {
                             connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
                                 .getName();
                         } else if (sourceElement.hasClass(constants.TRIGGER)) {
@@ -622,6 +695,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)
                         || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
+
+                        /*
+                        * Partition connection point represents a stream connection point. so it holds a reference for
+                        * the stream.So that in here we replaces the source element with the actual stream element if a
+                        * connection partition connection pint is found.
+                        * */
                         if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                             var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
                             var sourceConnectionId = sourceConnection[0].sourceId;
@@ -655,7 +734,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         if ((sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                             || sourceElement.hasClass(constants.TRIGGER))
                             && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                            || targetElement.hasClass(constants.WINDOW_QUERY))) {
+                                || targetElement.hasClass(constants.WINDOW_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
                             var type;
@@ -677,9 +756,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             } else {
                                 model.getQueryInput().setFrom(connectedElementName);
                             }
-                        }
-
-                        if (targetElement.hasClass(constants.JOIN)) {
+                        } else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
                             var queryInput = model.getQueryInput();
 
@@ -711,49 +788,44 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     }
                                 }
                             }
-                        }
-                    } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)
-                        || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
-                        if (sourceElement.hasClass(constants.STREAM)) {
-                            connectedElementName =
-                                self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
-                        } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
-                            var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
-                            var sourceConnectionId = sourceConnection[0].sourceId;
-                            var connectedStreamId = sourceConnectionId.substr(0, sourceConnectionId.indexOf('-'));
-                            connectedElementName = self.configurationData.getSiddhiAppConfig()
-                                .getStream(connectedStreamId).getName();
-                        }else {
-                            connectedElementName =
-                                self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
-                        }
-                        if (targetElement.hasClass(constants.PATTERN)) {
-                            model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                            if (!model.getQueryInput()) {
-                                var patternQueryInputOptions = {};
-                                _.set(patternQueryInputOptions, 'type', 'PATTERN');
-                                var patternQueryInputObject =
-                                    new PatternOrSequenceQueryInput(patternQueryInputOptions);
-                                patternQueryInputObject.addConnectedElementName(connectedElementName);
-                                model.setQueryInput(patternQueryInputObject);
+                        } else if (sourceElement.hasClass(constants.STREAM)
+                            || sourceElement.hasClass(constants.TRIGGER)) {
+
+                            if (sourceElement.hasClass(constants.STREAM)) {
+                                connectedElementName =
+                                    self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
                             } else {
-                                model.getQueryInput().addConnectedElementName(connectedElementName);
+                                connectedElementName =
+                                    self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
                             }
-                        } else if (targetElement.hasClass(constants.SEQUENCE)) {
-                            model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                            if (!model.getQueryInput()) {
-                                var sequenceQueryInputOptions = {};
-                                _.set(sequenceQueryInputOptions, 'type', 'SEQUENCE');
-                                var sequenceQueryInputObject =
-                                    new PatternOrSequenceQueryInput(sequenceQueryInputOptions);
-                                sequenceQueryInputObject.addConnectedElementName(connectedElementName);
-                                model.setQueryInput(sequenceQueryInputObject);
-                            } else {
-                                model.getQueryInput().addConnectedElementName(connectedElementName);
+
+                            if (targetElement.hasClass(constants.PATTERN)) {
+                                model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
+                                if (!model.getQueryInput()) {
+                                    var patternQueryInputOptions = {};
+                                    _.set(patternQueryInputOptions, 'type', 'PATTERN');
+                                    var patternQueryInputObject =
+                                        new PatternOrSequenceQueryInput(patternQueryInputOptions);
+                                    patternQueryInputObject.addConnectedElementName(connectedElementName);
+                                    model.setQueryInput(patternQueryInputObject);
+                                } else {
+                                    model.getQueryInput().addConnectedElementName(connectedElementName);
+                                }
+                            } else if (targetElement.hasClass(constants.SEQUENCE)) {
+                                model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
+                                if (!model.getQueryInput()) {
+                                    var sequenceQueryInputOptions = {};
+                                    _.set(sequenceQueryInputOptions, 'type', 'SEQUENCE');
+                                    var sequenceQueryInputObject =
+                                        new PatternOrSequenceQueryInput(sequenceQueryInputOptions);
+                                    sequenceQueryInputObject.addConnectedElementName(connectedElementName);
+                                    model.setQueryInput(sequenceQueryInputObject);
+                                } else {
+                                    model.getQueryInput().addConnectedElementName(connectedElementName);
+                                }
                             }
                         }
                     }
-
                     else if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                         || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
@@ -810,7 +882,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 click: function () {
                                     if (confirm('Are you sure you want to remove the connection?')) {
                                         self.jsPlumbInstance.deleteConnection(connectionObject);
-                                    } else {}
+                                    } else {
+                                    }
                                 }
                             }
                         }
@@ -877,7 +950,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var sourceElement = $('#' + sourceId);
 
                     // removing edge from the edgeList
-                    var edgeId = ''+ sourceId + '_' + targetId + '';
+                    var edgeId = '' + sourceId + '_' + targetId + '';
                     self.configurationData.removeEdge(edgeId);
 
                     if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)
@@ -897,6 +970,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     }
                 });
             }
+
             // Update the model when a connection is detached
             function updateModelOnConnectionDetach() {
                 self.jsPlumbInstance.bind('connectionDetached', function (connection) {
@@ -934,18 +1008,18 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var sourceElement = $('#' + sourceId);
 
                     // removing edge from the edgeList
-                    var edgeId = ''+ sourceId + '_' + targetId + '';
+                    var edgeId = '' + sourceId + '_' + targetId + '';
                     self.configurationData.removeEdge(edgeId);
 
                     var model;
 
                     if (sourceElement.hasClass(constants.SOURCE)
-                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))){
+                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))) {
                         self.configurationData.getSiddhiAppConfig().getSource(sourceId)
                             .setConnectedElementName(undefined);
 
                     } else if (targetElement.hasClass(constants.SINK)
-                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))){
+                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                         self.configurationData.getSiddhiAppConfig().getSink(sourceId)
                             .setConnectedElementName(undefined);
 
@@ -972,13 +1046,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         if ((sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                             || sourceElement.hasClass(constants.TRIGGER))
                             && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                            || targetElement.hasClass(constants.WINDOW_QUERY))) {
+                                || targetElement.hasClass(constants.WINDOW_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
                             model.getQueryInput().setFrom(undefined);
-                            return;
-                        }
-                        if (targetElement.hasClass(constants.JOIN)) {
+
+                        } else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
                             var queryInput = model.getQueryInput();
                             var sourceElementObject =
@@ -999,8 +1072,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 } else if (secondConnectedElement !== undefined
                                     && secondConnectedElement.name === disconnectedElementSourceName) {
                                     queryInput.setSecondConnectedElement(undefined);
-                                }else {
+                                } else {
                                     console.log("Error: Disconnected source name not found in join query!");
+                                    return;
                                 }
 
                                 // if left or sources are created then remove data from those sources
@@ -1012,10 +1086,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     queryInput.setRight(undefined);
                                 }
                             }
-                            return;
-                        }
-                        var disconnectedElementName;
-                        if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER)) {
+
+                        } else if (sourceElement.hasClass(constants.STREAM)
+                            || sourceElement.hasClass(constants.TRIGGER)) {
+
+                            var disconnectedElementName;
                             if (sourceElement.hasClass(constants.STREAM)) {
                                 disconnectedElementName =
                                     self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
@@ -1023,6 +1098,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 disconnectedElementName =
                                     self.configurationData.getSiddhiAppConfig().getTrigger(sourceId).getName();
                             }
+
                             if (targetElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
                                 model.getQueryInput().removeConnectedElementName(disconnectedElementName);
@@ -1031,6 +1107,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 model.getQueryInput().removeConnectedElementName(disconnectedElementName);
                             }
                         }
+
                     } else if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                         || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
@@ -1066,6 +1143,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         return;
                     }
 
+                    var errorMessage = '';
                     var isGroupMemberValid = false;
                     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
                         || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
@@ -1087,45 +1165,67 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             if ($(event.el).hasClass(constants.STREAM)) {
                                 var streamObject = self.configurationData.getSiddhiAppConfig().getStream(elementId);
                                 var streamObjectCopy = _.cloneDeep(streamObject);
-                                self.configurationData.getSiddhiAppConfig().removeStream(elementId);
-                                partition.addStream(streamObjectCopy);
-                                
+
+                                var streamName = streamObjectCopy.getName();
+                                var firstCharacterInStreamName = (streamName).charAt(0);
+                                if (firstCharacterInStreamName !== '#') {
+                                    streamName = '#' + streamName;
+                                }
+                                // check if there is an inner stream with the same name exists. If yes do not add
+                                // the element to the partition
+                                var isStreamNameUsed
+                                    = self.dropElements.formBuilder.formUtils
+                                    .isStreamDefinitionNameUsedInPartition(partitionId, streamName);
+                                if (!isStreamNameUsed) {
+                                    streamObjectCopy.setName(streamName);
+                                    var textNode = $('#' + elementId).parent().find('.streamNameNode');
+                                    textNode.html(streamName);
+                                    self.configurationData.getSiddhiAppConfig().removeStream(elementId);
+                                    partition.addStream(streamObjectCopy);
+                                } else {
+                                    isGroupMemberValid = false;
+                                    errorMessage = ' An inner stream with the same name is already added to the ' +
+                                        'partition.';
+                                }
                             } else if ($(event.el).hasClass(constants.PROJECTION)) {
                                 var projectionQueryObject = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(elementId);
                                 var projectionQueryObjectCopy = _.cloneDeep(projectionQueryObject);
-                                self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                                self.configurationData.getSiddhiAppConfig()
+                                    .removeWindowFilterProjectionQuery(elementId);
                                 partition.addWindowFilterProjectionQuery(projectionQueryObjectCopy);
-                                
+
                             } else if ($(event.el).hasClass(constants.FILTER)) {
                                 var filterQueryObject = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(elementId);
                                 var filterQueryObjectCopy = _.cloneDeep(filterQueryObject);
-                                self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                                self.configurationData.getSiddhiAppConfig()
+                                    .removeWindowFilterProjectionQuery(elementId);
                                 partition.addWindowFilterProjectionQuery(filterQueryObjectCopy);
-                                
+
                             } else if ($(event.el).hasClass(constants.WINDOW_QUERY)) {
                                 var windowQueryObject = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(elementId);
                                 var windowQueryObjectCopy = _.cloneDeep(windowQueryObject);
-                                self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                                self.configurationData.getSiddhiAppConfig()
+                                    .removeWindowFilterProjectionQuery(elementId);
                                 partition.addWindowFilterProjectionQuery(windowQueryObjectCopy);
-                                
+
                             } else if ($(event.el).hasClass(constants.PATTERN)) {
-                                
+
                                 var patternQueryObject = self.configurationData.getSiddhiAppConfig()
                                     .getPatternQuery(elementId);
                                 var patternQueryObjectCopy = _.cloneDeep(patternQueryObject);
                                 self.configurationData.getSiddhiAppConfig().removePatternQuery(elementId);
                                 partition.addPatternQuery(patternQueryObjectCopy);
-                                
+
                             } else if ($(event.el).hasClass(constants.SEQUENCE)) {
                                 var sequenceQueryObject = self.configurationData.getSiddhiAppConfig()
                                     .getSequenceQuery(elementId);
                                 var sequenceQueryObjectCopy = _.cloneDeep(sequenceQueryObject);
                                 self.configurationData.getSiddhiAppConfig().removeSequenceQuery(elementId);
                                 partition.addSequenceQuery(sequenceQueryObjectCopy);
-                                
+
                             } else if ($(event.el).hasClass(constants.JOIN)) {
                                 var joinQueryObject = self.configurationData.getSiddhiAppConfig()
                                     .getJoinQuery(elementId);
@@ -1137,7 +1237,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     }
 
                     if (!isGroupMemberValid) {
-                        DesignViewUtils.prototype.warnAlert('This element cannot be added to partition');
+                        DesignViewUtils.prototype
+                            .warnAlert('This element cannot be added to partition.' + errorMessage);
                         self.jsPlumbInstance.removeFromGroup(event.group, event.el, false);
                         var elementClientX = $(event.el).attr('data-x');
                         var elementClientY = $(event.el).attr('data-y');
@@ -1168,110 +1269,110 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         DesignGrid.prototype.drawGraphFromAppData = function () {
             var self = this;
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getSourceList(), function(source){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getSourceList(), function (source) {
                 var sourceId = source.getId();
                 var sourceName = "Source";
                 var array = sourceId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleSourceAnnotation(mouseTop, mouseLeft, true, sourceName, sourceId);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getSinkList(), function(sink){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getSinkList(), function (sink) {
                 var sinkId = sink.getId();
                 var sinkName = "Sink";
                 var array = sinkId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleSinkAnnotation(mouseTop, mouseLeft, true, sinkName, sinkId);
             });
-            
-            _.forEach(self.configurationData.getSiddhiAppConfig().getStreamList(), function(stream){
+
+            _.forEach(self.configurationData.getSiddhiAppConfig().getStreamList(), function (stream) {
                 var streamId = stream.getId();
                 var streamName = stream.getName();
                 var array = streamId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getTableList(), function(table){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getTableList(), function (table) {
 
                 var tableId = table.getId();
                 var tableName = table.getName();
                 var array = tableId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleTable(mouseTop, mouseLeft, true, tableId, tableName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getWindowList(), function(window){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getWindowList(), function (window) {
 
                 var windowId = window.getId();
                 var windowName = window.getName();
                 var array = windowId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleWindow(mouseTop, mouseLeft, true, windowId, windowName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getTriggerList(), function(trigger){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getTriggerList(), function (trigger) {
 
                 var triggerId = trigger.getId();
                 var triggerName = trigger.getName();
                 var array = triggerId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleTrigger(mouseTop, mouseLeft, true, triggerId, triggerName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getAggregationList(), function(aggregation){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getAggregationList(), function (aggregation) {
 
                 var aggregationId = aggregation.getId();
                 var aggregationName = aggregation.getName();
                 var array = aggregationId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleAggregation(mouseTop, mouseLeft, true, aggregationId, aggregationName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getFunctionList(), function(functionObject){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getFunctionList(), function (functionObject) {
 
                 var functionId = functionObject.getId();
                 var functionName = functionObject.getName();
                 var array = functionId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleFunction(mouseTop, mouseLeft, true, functionId, functionName);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getPatternQueryList(), function(patternQuery){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getPatternQueryList(), function (patternQuery) {
 
                 var patternQueryId = patternQuery.getId();
-                var patternQueryName = "Pattern";
+                var patternQueryName = "Pattern Query";
                 var array = patternQueryId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getSequenceQueryList(), function(sequenceQuery){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getSequenceQueryList(), function (sequenceQuery) {
 
                 var sequenceQueryId = sequenceQuery.getId();
-                var sequenceQueryName = "Sequence";
+                var sequenceQueryName = "Sequence Query";
                 var array = sequenceQueryId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId);
             });
 
@@ -1295,65 +1396,65 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
-            });
+                });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getJoinQueryList(), function(joinQuery){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getJoinQueryList(), function (joinQuery) {
 
                 var joinQueryId = joinQuery.getId();
-                var joinQueryName = "Join";
+                var joinQueryName = "Join Query";
                 var array = joinQueryId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
             });
 
-            _.forEach(self.configurationData.getSiddhiAppConfig().getPartitionList(), function(partition){
+            _.forEach(self.configurationData.getSiddhiAppConfig().getPartitionList(), function (partition) {
 
                 var partitionId = partition.getId();
                 var array = partitionId.split("_");
-                var lastArrayEntry = parseInt(array[array.length -1]);
-                var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                var lastArrayEntry = parseInt(array[array.length - 1]);
+                var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 self.handlePartition(mouseTop, mouseLeft, true, partitionId);
 
                 var jsPlumbPartitionGroup = self.jsPlumbInstance.getGroup(partitionId);
 
-                _.forEach(partition.getStreamList(), function(stream){
+                _.forEach(partition.getStreamList(), function (stream) {
                     var streamId = stream.getId();
                     var streamName = stream.getName();
                     var array = streamId.split("_");
-                    var lastArrayEntry = parseInt(array[array.length -1]);
-                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    var lastArrayEntry = parseInt(array[array.length - 1]);
+                    var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                    var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
 
                     var streamElement = $('#' + streamId)[0];
                     self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, streamElement);
                 });
 
-                _.forEach(partition.getPatternQueryList(), function(patternQuery){
+                _.forEach(partition.getPatternQueryList(), function (patternQuery) {
 
                     var patternQueryId = patternQuery.getId();
-                    var patternQueryName = "Pattern";
+                    var patternQueryName = "Pattern Query";
                     var array = patternQueryId.split("_");
-                    var lastArrayEntry = parseInt(array[array.length -1]);
-                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    var lastArrayEntry = parseInt(array[array.length - 1]);
+                    var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                    var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
 
                     var patternElement = $('#' + patternQueryId)[0];
                     self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, patternElement);
                 });
 
-                _.forEach(partition.getSequenceQueryList(), function(sequenceQuery){
+                _.forEach(partition.getSequenceQueryList(), function (sequenceQuery) {
 
                     var sequenceQueryId = sequenceQuery.getId();
-                    var sequenceQueryName = "Sequence";
+                    var sequenceQueryName = "Sequence Query";
                     var array = sequenceQueryId.split("_");
-                    var lastArrayEntry = parseInt(array[array.length -1]);
-                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    var lastArrayEntry = parseInt(array[array.length - 1]);
+                    var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                    var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId);
 
                     var sequenceElement = $('#' + sequenceQueryId)[0];
@@ -1377,22 +1478,25 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                         var array = queryId.split("_");
                         var lastArrayEntry = parseInt(array[array.length - 1]);
-                        var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
-                        var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                        self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
+                        var mouseTop
+                            = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                        var mouseLeft
+                            = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
+                        self.handleWindowFilterProjectionQuery(
+                            queryType, mouseTop, mouseLeft, true, queryName, queryId);
 
                         var queryElement = $('#' + queryId)[0];
                         self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, queryElement);
                     });
 
-                _.forEach(partition.getJoinQueryList(), function(joinQuery){
+                _.forEach(partition.getJoinQueryList(), function (joinQuery) {
 
                     var joinQueryId = joinQuery.getId();
-                    var joinQueryName = "Join";
+                    var joinQueryName = "Join Query";
                     var array = joinQueryId.split("_");
-                    var lastArrayEntry = parseInt(array[array.length -1]);
-                    var mouseTop = lastArrayEntry*100 - self.canvas.offset().top + self.canvas.scrollTop()- 40;
-                    var mouseLeft = lastArrayEntry*200 - self.canvas.offset().left + self.canvas.scrollLeft()- 60;
+                    var lastArrayEntry = parseInt(array[array.length - 1]);
+                    var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
+                    var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
 
                     var joinElement = $('#' + joinQueryId)[0];
@@ -1400,7 +1504,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 });
             });
 
-            _.forEach(self.configurationData.edgeList, function(edge){
+            _.forEach(self.configurationData.edgeList, function (edge) {
                 var targetId;
                 var sourceId;
 
@@ -1458,9 +1562,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PATTERN));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.SEQUENCE));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PARTITION));
-            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PARTITION_CONNECTION_POINT));
 
-            // Create an empty JSON to store information of the given graph's nodes, egdes and groups.
+            // Create an empty JSON to store information of the given graph's nodes, edges and groups.
             var graphJSON = [];
             graphJSON.nodes = [];
             graphJSON.edges = [];
@@ -1483,28 +1586,55 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             // For every edge in the jsplumb instance
             i = 0;
             var edges = self.jsPlumbInstance.getAllConnections();
+            // Get the edge information and add it too graphJSON.edges[] array
+            // Note - This loop is used to exclude the edges between nodes and partition connections
             edges.forEach(function (edge) {
-                // Get the source and target ID from each edge
-                var source = edge.sourceId;
-                var target = edge.targetId;
-                var sourceId = source.substr(0, source.indexOf('-'));
-                var targetId = target.substr(0, target.indexOf('-'));
-
-                if (!sourceId || sourceId === "") {
-                    sourceId = source;
+                var source;
+                var target;
+                var sourceId;
+                var targetId;
+                // Get the current edge's parent and child Id's
+                var parent = edge.sourceId;
+                var child = edge.targetId;
+                // If the current edge's parent is a partition connection
+                if (parent.includes('_pc')) {
+                    // Loop through the edges again
+                    edges.forEach(function (value) {
+                        // Get the inner loops edge (value) targetId as child
+                        child = value.targetId;
+                        // If child is a partition connection
+                        if (child.includes('_pc')) {
+                            // If the parent partition connection Id is equal to the child partition connection Id
+                            if (parent === child) {
+                                // Link inner edge's (value) sourceId with the outer edge's target Id as a single edge
+                                source = value.sourceId;
+                                target = edge.targetId;
+                                sourceId = source.substr(0, source.indexOf('-'));
+                                targetId = target.substr(0, target.indexOf('-'));
+                            }
+                        }
+                    });
+                } else if (!child.includes('_pc')) {
+                    // If the child of the current edge is *not* a partition connection
+                    source = edge.sourceId;
+                    target = edge.targetId;
+                    sourceId = source.substr(0, source.indexOf('-'));
+                    targetId = target.substr(0, target.indexOf('-'));
                 }
-                if (!targetId || targetId === "") {
-                    targetId = target;
+                // Set the sourceId and targetId to graphJSON if they are not undefined
+                if (sourceId !== undefined && targetId !== undefined) {
+                    graphJSON.edges[i] = {
+                        parent: sourceId,
+                        child: targetId
+                    };
+                    i++;
                 }
 
-                // Set the edge to the dagre graph object
-                graph.setEdge(sourceId, targetId);
-                // Set the edge information to the graphJSON object
-                graphJSON.edges[i] = {
-                    parent: sourceId,
-                    child: targetId
-                };
-                i++;
+            });
+            // Once the needed edge information has been obtained and added to the graphJSON variable
+            // then the edges can be set to the dagre graph variable.
+            graphJSON.edges.forEach(function (edge) {
+                graph.setEdge(edge.parent, edge.child);
             });
 
             // For every group/partition element
@@ -1518,7 +1648,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     children: []
                 };
                 graphJSON.groups[i].id = partition.id;
-
                 // Identify the children in each group/partition element
                 var c = 0;
                 var children = partition.childNodes;
@@ -1612,22 +1741,18 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
                     });
                 });
-
                 // Note that dagre defines the left(x) & top(y) positions from the center of the element
                 // This has to be converted to the actual left and top position of a JQuery element
                 if (isInPartition) {
                     // If the current node is in a partition, then that node must be added relative to the position
                     // of it's parent partition
                     var partitionNode = graph.node(partitionId);
-
                     // Identify the left and top value
                     var partitionNodeLeft = partitionNode.x - (partitionNode.width / 2) + centerLeft;
                     var partitionNodeTop = partitionNode.y - (partitionNode.height / 2) + centerTop;
-
                     // Identify the node's left and top position relative to it's partition's top and left position
                     var left = node.x - (node.width / 2) + centerLeft - partitionNodeLeft;
                     var top = node.y - (node.height / 2) + centerTop - partitionNodeTop;
-
                     // Set the inner node's left and top position
                     $node.css("left", left + "px");
                     $node.css("top", top + "px");
@@ -1661,7 +1786,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(sourceId !== undefined) {
+                if (sourceId !== undefined) {
                     elementId = sourceId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1690,7 +1815,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(sinkId !== undefined) {
+                if (sinkId !== undefined) {
                     elementId = sinkId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1707,7 +1832,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
         };
-        
+
         DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName) {
             var self = this;
             var elementId;
@@ -1718,7 +1843,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(streamId !== undefined) {
+                if (streamId !== undefined) {
                     elementId = streamId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1747,7 +1872,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(tableId !== undefined) {
+                if (tableId !== undefined) {
                     elementId = tableId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1775,7 +1900,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(windowId !== undefined) {
+                if (windowId !== undefined) {
                     elementId = windowId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1804,7 +1929,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(triggerId !== undefined) {
+                if (triggerId !== undefined) {
                     elementId = triggerId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1829,7 +1954,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(aggregationId !== undefined) {
+                if (aggregationId !== undefined) {
                     elementId = aggregationId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1859,7 +1984,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(functionId !== undefined) {
+                if (functionId !== undefined) {
                     elementId = functionId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1885,7 +2010,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(queryId !== undefined) {
+                if (queryId !== undefined) {
                     elementId = queryId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1911,7 +2036,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(joinQueryId !== undefined) {
+                if (joinQueryId !== undefined) {
                     elementId = joinQueryId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1937,7 +2062,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(patternQueryId !== undefined) {
+                if (patternQueryId !== undefined) {
                     elementId = patternQueryId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1957,13 +2082,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleSequenceQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, sequenceQueryName,
-                                                            sequenceQueryId) {
+                                                             sequenceQueryId) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(sequenceQueryId !== undefined) {
+                if (sequenceQueryId !== undefined) {
                     elementId = sequenceQueryId;
                     self.generateNextNewAgentId();
                 } else {
@@ -1988,7 +2113,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if(partitionId !== undefined) {
+                if (partitionId !== undefined) {
                     elementId = partitionId;
                     self.generateNextNewAgentId();
                 } else {
@@ -2007,7 +2132,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.generateNextNewAgentId = function () {
-            var newId = parseInt(this.newAgentId) +1;
+            var newId = parseInt(this.newAgentId) + 1;
             this.newAgentId = "" + newId + "";
             return this.currentTabId + "_element_" + this.newAgentId;
         };
@@ -2021,11 +2146,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var partitionElement = $('#' + partitionId);
             var partitionConnections = partitionElement.find('.' + constants.PARTITION_CONNECTION_POINT);
             var partitionIds = [];
-            _.forEach(partitionConnections, function(connection){
+            _.forEach(partitionConnections, function (connection) {
                 partitionIds.push(parseInt((connection.id).slice(-1)));
             });
 
-            var maxId = partitionIds.reduce(function(a, b) {
+            var maxId = partitionIds.reduce(function (a, b) {
                 return Math.max(a, b);
             });
             return partitionId + '_pc' + (maxId + 1);

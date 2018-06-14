@@ -55,21 +55,12 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.manageConsoles(evt);
             };
 
-            this.listenToViewSwitch = function () {
-                if (!_.isUndefined(app.tabController.getActiveTab())) {
-                    app.tabController.getActiveTab().getSiddhiFileEditor().on("view-switch", function () {
-                        self.updateMenuItems();
-                    });
-                }
-            };
-
             this.createNewTab = function createNewTab(options) {
                 var editorId = app.config.container;
                 $(editorId).css("display", "block");
                 //Showing menu bar
                 app.tabController.newTab(options);
                 app.outputController.makeInactiveActivateButton();
-                self.listenToViewSwitch();
             };
 
             this.saveFileBrowserBased = function saveFile() {

@@ -32,5 +32,7 @@ public enum NodeType {
     QUERY,
     WINDOW_FILTER_PROJECTION_QUERY,
     JOIN_QUERY,
+    PATTERN_QUERY,
+    SEQUENCE_QUERY,
     PARTITION;
 }

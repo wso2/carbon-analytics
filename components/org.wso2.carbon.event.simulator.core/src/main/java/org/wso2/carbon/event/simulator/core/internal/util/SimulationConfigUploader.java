@@ -68,6 +68,7 @@ public class SimulationConfigUploader {
     public void uploadSimulationConfig(String simulationConfig, String destination) throws FileOperationsException,
             InvalidConfigException, FileAlreadyExistsException {
         String simulationName = getSimulationName(simulationConfig);
+        CommonOperations.validatePath(simulationName);
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(destination, (simulationName + "." +
                 EventSimulatorConstants.SIMULATION_FILE_EXTENSION)))) {
             writer.write(simulationConfig);
@@ -122,6 +123,7 @@ public class SimulationConfigUploader {
      */
     public String getSimulationConfig(String simulationName, String destination) throws FileOperationsException {
         try {
+            CommonOperations.validatePath(simulationName);
             return new String(Files.readAllBytes(Paths.get(destination, (simulationName + "." +
                     EventSimulatorConstants.SIMULATION_FILE_EXTENSION))),
                     StandardCharsets.UTF_8);

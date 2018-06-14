@@ -17,7 +17,7 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'designViewUtils'],
-    function (require, log, $, _, Attribute,  Table, StoreAnnotation, DesignViewUtils) {
+    function (require, log, $, _, Attribute, Table, StoreAnnotation, DesignViewUtils) {
 
         /**
          * @class TableForm Creates a forms to collect data from a table
@@ -63,13 +63,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -140,7 +140,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 properties: {
                                     name: {
                                         title: "Name",
@@ -156,7 +156,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                                             "long",
                                             "float",
                                             "double",
-                                            "bool"
+                                            "bool",
+                                            "object"
                                         ],
                                         default: "string"
                                     }
@@ -180,10 +181,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
-                var isTableNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
+                var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
                 if (isTableNameUsed) {
                     DesignViewUtils.prototype
                         .errorAlert("Table name \"" + editor.getValue().name + "\" is already used.");
@@ -211,7 +212,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                 } else {
                     _.set(tableOptions, 'store', undefined);
                 }
-                
+
                 var table = new Table(tableOptions);
                 _.forEach(editor.getValue().attributes, function (attribute) {
                     var attributeObject = new Attribute(attribute);
@@ -222,7 +223,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                 });
                 self.configurationData.getSiddhiAppConfig().addTable(table);
 
-                var textNode = $('#'+i).find('.tableNameNode');
+                var textNode = $('#' + i).find('.tableNameNode');
                 textNode.html(editor.getValue().name);
 
                 // close the form window
@@ -249,7 +250,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
             var id = $(element).parent().attr('id');
             // retrieve the table information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
-            if(!clickedElement) {
+            if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
@@ -288,12 +289,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                     storeOptions: storeOptions
                 };
             }
-            
+
             var fillWith = {
-                annotations : annotations,
+                annotations: annotations,
                 storeAnnotation: storeAnnotation,
-                name : name,
-                attributes : attributes
+                name: name,
+                attributes: attributes
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor(formContainer[0], {
@@ -310,13 +311,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -387,7 +388,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 properties: {
                                     name: {
                                         title: "Name",
@@ -403,7 +404,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
                                             "long",
                                             "float",
                                             "double",
-                                            "bool"
+                                            "bool",
+                                            "object"
                                         ],
                                         default: "string"
                                     }
@@ -427,10 +429,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
-                var isTableNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
+                var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,
                     clickedElement.getId());
                 if (isTableNameUsed) {
                     DesignViewUtils.prototype
@@ -442,8 +444,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
 
                 var config = editor.getValue();
 
-                // update selected table model
-                clickedElement.setName(config.name);
+                var previouslySavedName = clickedElement.getName();
+                // update connection related to the element if the name is changed
+                if (previouslySavedName !== config.name) {
+                    // update selected table model
+                    clickedElement.setName(config.name);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
+
                 // removing all elements from attribute list
                 clickedElement.clearAttributeList();
                 // adding new attributes to the attribute list

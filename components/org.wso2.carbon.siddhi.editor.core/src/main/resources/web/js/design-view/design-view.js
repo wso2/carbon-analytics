@@ -28,7 +28,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          * @param application Application data
          * @param jsPlumbInstance js plumb instance for the design grid
          */
-        var DesignView = function (options, application ,jsPlumbInstance) {
+        var DesignView = function (options, application, jsPlumbInstance) {
             var errorMessage1 = 'unable to find design view container in design-view.js';
             var errorMessage2 = 'unable to find application in design-view.js';
             if (!_.has(options, 'container')) {
@@ -47,7 +47,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             this._$parent_el = container;
             this.options = options;
             this.application = application;
-            this.jsPlumbInstance =jsPlumbInstance;
+            this.jsPlumbInstance = jsPlumbInstance;
         };
 
         /**
@@ -151,27 +151,27 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 result = {
                     status: "success",
                     responseJSON: {
-                        //appName: match[1],
-                        //appDescription: match[2],
-                        "siddhiAppConfig":{
-                            "streamList":[],
-                            "tableList":[],
-                            "windowList":[],
-                            "triggerList":[],
-                            "aggregationList":[],
-                            "functionList":[],
-                            "partitionList":[],
-                            "sourceList":[],
-                            "sinkList":[],
-                            "queryLists":{
-                                "WINDOW_FILTER_PROJECTION":[],
-                                "PATTERN":[],
-                                "SEQUENCE":[],
-                                "JOIN":[]
+                        "siddhiAppConfig": {
+                            "siddhiAppName": match[1],
+                            "appAnnotationList": ['@App:description("' + match[2] + '")'],
+                            "streamList": [],
+                            "tableList": [],
+                            "windowList": [],
+                            "triggerList": [],
+                            "aggregationList": [],
+                            "functionList": [],
+                            "partitionList": [],
+                            "sourceList": [],
+                            "sinkList": [],
+                            "queryLists": {
+                                "WINDOW_FILTER_PROJECTION": [],
+                                "PATTERN": [],
+                                "SEQUENCE": [],
+                                "JOIN": []
                             },
-                            "finalElementCount":0
+                            "finalElementCount": 0
                         },
-                        "edgeList":[]
+                        "edgeList": []
                     }
                 };
             } else {
@@ -185,15 +185,10 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                         result = {status: "success", responseJSON: response};
                     },
                     error: function (error) {
-                        if (error.status === 400) {
-                            result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
-                            //TODO: remove warnings from service call
-                        } else if (error.responseText === "pattern queries are not supported") {
-                            result = {status: "fail", errorMessage: error.responseText};
-                        } else if (error.responseText === "sequence queries are not supported") {
+                        if (error.responseText) {
                             result = {status: "fail", errorMessage: error.responseText};
                         } else {
-                            result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                            result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
                         }
                     }
                 });
@@ -215,11 +210,10 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                     result = {status: "success", responseJSON: window.atob(response)};
                 },
                 error: function (error) {
-                    console.log(error);
-                    if (error.status === 400) {
-                        result = {status: "fail", errorMessage: "Siddhi App Contains Errors"};
+                    if (error.responseText) {
+                        result = {status: "fail", errorMessage: error.responseText};
                     } else {
-                        result = {status: "fail", errorMessage: "Internal Server Error Occurred"};
+                        result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
                     }
                 }
             });

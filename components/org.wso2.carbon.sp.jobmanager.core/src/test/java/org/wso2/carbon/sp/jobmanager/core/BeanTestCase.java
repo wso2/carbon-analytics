@@ -73,7 +73,7 @@ public class BeanTestCase {
         deploymentConfig.setHeartbeatMaxRetry(3);
         deploymentConfig.setMinResourceCount(2);
         deploymentConfig.setType("distributed");
-        deploymentConfig.setHttpInterface(interfaceConfig);
+        deploymentConfig.setHttpsInterface(interfaceConfig);
 
         Assert.assertEquals(deploymentConfig.getBootstrapURLs(), "localhost:9090");
         Assert.assertEquals(deploymentConfig.getDatasource(), "WSO2_DS");
@@ -81,9 +81,9 @@ public class BeanTestCase {
         Assert.assertEquals(deploymentConfig.getHeartbeatMaxRetry(), 3);
         Assert.assertEquals(deploymentConfig.getMinResourceCount(), 2);
         Assert.assertEquals(deploymentConfig.getType(), "distributed");
-        Assert.assertEquals(deploymentConfig.getHttpInterface().getHost(), "localhost");
-        Assert.assertEquals(deploymentConfig.getHttpInterface().getPort(), 9091);
-        Assert.assertEquals(deploymentConfig.getHttpInterface().toString(),
+        Assert.assertEquals(deploymentConfig.getHttpsInterface().getHost(), "localhost");
+        Assert.assertEquals(deploymentConfig.getHttpsInterface().getPort(), 9091);
+        Assert.assertEquals(deploymentConfig.getHttpsInterface().toString(),
                             "Interface { host: localhost, port: 9091 }");
 
         InterfaceConfig similarInterfaceConfig = new InterfaceConfig();
@@ -140,19 +140,19 @@ public class BeanTestCase {
 
         ManagerNode managerNode = new ManagerNode();
         managerNode.setId("manager-1").setHeartbeatInterval(1000).setHeartbeatMaxRetry(3).
-                setHttpInterface(interfaceConfig);
+                setHttpsInterface(interfaceConfig);
         Assert.assertEquals(managerNode.getId(), "manager-1");
         Assert.assertEquals(managerNode.getHeartbeatInterval(), 1000);
         Assert.assertEquals(managerNode.getHeartbeatMaxRetry(), 3);
-        Assert.assertEquals(managerNode.getHttpInterface(), interfaceConfig);
+        Assert.assertEquals(managerNode.getHttpsInterface(), interfaceConfig);
         Assert.assertEquals(managerNode.toString(), "ManagerNode { id: manager-1, host: localhost, port: 9091 }");
 
         ManagerNodeConfig managerNodeConfig = TypeConverter.convert(managerNode);
         Assert.assertEquals(managerNodeConfig.getHeartbeatInterval(), Integer.valueOf(1000));
         Assert.assertEquals(managerNodeConfig.getHeartbeatMaxRetry(), Integer.valueOf(3));
         Assert.assertEquals(managerNodeConfig.getId(), "manager-1");
-        Assert.assertEquals(managerNodeConfig.getHttpInterface().getHost(), interfaceConfig.getHost());
-        Assert.assertEquals(managerNodeConfig.getHttpInterface().getPort(), Integer.valueOf(interfaceConfig.getPort()));
+        Assert.assertEquals(managerNodeConfig.getHttpsInterface().getHost(), interfaceConfig.getHost());
+        Assert.assertEquals(managerNodeConfig.getHttpsInterface().getPort(), Integer.valueOf(interfaceConfig.getPort()));
 
         ManagerNode convertedManagerNode = TypeConverter.convert(managerNodeConfig);
         Assert.assertEquals(convertedManagerNode.getId(), managerNode.getId());
@@ -165,13 +165,13 @@ public class BeanTestCase {
         interfaceConfig.setPort(9091);
 
         ResourceNode resourceNode = new ResourceNode("resource-1");
-        resourceNode.setHttpInterface(interfaceConfig);
+        resourceNode.setHttpsInterface(interfaceConfig);
         resourceNode.setState("NEW");
         Assert.assertEquals(resourceNode.getId(), "resource-1");
         resourceNode.setId("resource-2");
         Assert.assertEquals(resourceNode.getId(), "resource-2");
         Assert.assertEquals(resourceNode.getState(), "NEW");
-        Assert.assertEquals(resourceNode.getHttpInterface(), interfaceConfig);
+        Assert.assertEquals(resourceNode.getHttpsInterface(), interfaceConfig);
         Assert.assertEquals(resourceNode.getFailedPingAttempts(), 0);
         resourceNode.incrementFailedPingAttempts();
         Assert.assertEquals(resourceNode.getFailedPingAttempts(), 1);

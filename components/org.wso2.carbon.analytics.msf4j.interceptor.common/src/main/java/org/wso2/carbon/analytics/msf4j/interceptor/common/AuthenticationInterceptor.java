@@ -96,7 +96,7 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                         if (authHeader.contains(":")) {
                             String userName = authHeader.split(":")[0];
                             String password = authHeader.split(":")[1];
-                            String appName = request.getUri().split("/\\|?")[1];
+                            String appName = getAppContext(request.getUri());
 
                             Map<String, String> loginProperties = new HashMap<>();
                             loginProperties.put(IdPClientConstants.APP_NAME, appName);
@@ -167,6 +167,15 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                 .setMediaType(MediaType.TEXT_PLAIN)
                 .setStatus(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         return false;
+    }
+
+    private String getAppContext(String uri) {
+        int appContextEnd = uri.indexOf("/", 1);
+        if (appContextEnd != -1) {
+            return uri.substring(1, appContextEnd);
+        } else {
+            return uri.substring(1);
+        }
     }
 }
 

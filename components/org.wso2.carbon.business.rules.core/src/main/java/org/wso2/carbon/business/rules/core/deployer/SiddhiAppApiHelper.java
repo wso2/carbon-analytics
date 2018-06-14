@@ -32,7 +32,7 @@ import okhttp3.Response;
  * Consists of methods for additional features for the exposed Siddhi App Api
  */
 public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
-    private static final String SERVICE_ENDPOINT = "http://%s/siddhi-apps/%s/%s";
+    private static final String SERVICE_ENDPOINT = "https://%s/siddhi-apps/%s/%s";
     private ConfigReader configReader;
     private String username;
     private String password;

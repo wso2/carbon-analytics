@@ -47,6 +47,7 @@ public class AttributesSelectionConfigDeSerializer implements JsonDeserializer {
         } else if (attributesSelectionType.equalsIgnoreCase(AttributeSelection.TYPE_ALL)) {
             return jsonDeserializationContext.deserialize(jsonObject, AllSelectionConfig.class);
         }
-        throw new JsonParseException("Unable to parse the AttributesSelectionConfig JSON since its type is unknown");
+        throw new JsonParseException(
+                "Unable to de-serialize the AttributesSelectionConfig JSON since its type is unknown");
     }
 }

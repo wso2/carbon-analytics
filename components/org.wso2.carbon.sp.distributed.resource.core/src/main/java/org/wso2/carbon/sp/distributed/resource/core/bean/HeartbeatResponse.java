@@ -31,7 +31,7 @@ public class HeartbeatResponse {
     /**
      * List of managers that are connected to the leader node's cluster.
      */
-    private List<HTTPInterfaceConfig> connectedManagers;
+    private List<HTTPSInterfaceConfig> connectedManagers;
     /**
      * Current nodes joined state. (whether NEW or EXISTS)
      */
@@ -58,18 +58,18 @@ public class HeartbeatResponse {
     /**
      * Getter for the list of connected managers.
      *
-     * @return {@link List<HTTPInterfaceConfig>} of connected managers.
+     * @return {@link List< HTTPSInterfaceConfig >} of connected managers.
      */
-    public List<HTTPInterfaceConfig> getConnectedManagers() {
+    public List<HTTPSInterfaceConfig> getConnectedManagers() {
         return connectedManagers;
     }
 
     /**
      * Setter for the list of connected managers.
      *
-     * @param connectedManagers {@link List<HTTPInterfaceConfig>} of connected managers.
+     * @param connectedManagers {@link List< HTTPSInterfaceConfig >} of connected managers.
      */
-    public void setConnectedManagers(List<HTTPInterfaceConfig> connectedManagers) {
+    public void setConnectedManagers(List<HTTPSInterfaceConfig> connectedManagers) {
         this.connectedManagers = connectedManagers;
     }
 

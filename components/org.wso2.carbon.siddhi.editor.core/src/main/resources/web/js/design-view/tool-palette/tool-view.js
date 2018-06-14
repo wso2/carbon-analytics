@@ -26,13 +26,12 @@ define(['require', 'jquery', 'backbone', 'lodash'], function (require, $, Backbo
 
         initialize: function (options) {
             _.extend(this, _.pick(options, ["toolPalette"]));
-       },
+        },
 
         render: function (parent) {
             var element = this.toolTemplate(this.model.attributes);
             this.$el.replaceWith(element);
             this.setElement(element);
-            //this.$el =
             this.$el.tooltip();
             parent.append(this.$el);
             var className = '.' + this.model.get("className");

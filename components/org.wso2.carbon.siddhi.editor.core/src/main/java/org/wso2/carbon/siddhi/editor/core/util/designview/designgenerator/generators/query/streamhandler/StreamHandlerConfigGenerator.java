@@ -45,12 +45,27 @@ public class StreamHandlerConfigGenerator {
     }
 
     /**
+     * Generates a list of StreamHandlerConfigs, from the given list of Siddhi StreamHandlers
+     * @param streamHandlers                    List of Siddhi StreamHandler objects
+     * @return                                  List of StreamHandlerConfig objects
+     * @throws DesignGenerationException        Error while generating a StreamHandlerConfig
+     */
+    public List<StreamHandlerConfig> generateStreamHandlerConfigList(List<StreamHandler> streamHandlers)
+            throws DesignGenerationException {
+        List<StreamHandlerConfig> streamHandlerConfigList = new ArrayList<>();
+        for (StreamHandler streamHandler : streamHandlers) {
+            streamHandlerConfigList.add(generateStreamHandlerConfig(streamHandler));
+        }
+        return streamHandlerConfigList;
+    }
+
+    /**
      * Generates StreamHandlerConfig from the given Siddhi StreamHandler
      * @param streamHandler                     Siddhi StreamHandler object
      * @return                                  StreamHandlerConfig object
      * @throws DesignGenerationException        Error while generating config
      */
-    public StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler)
+    private StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler)
             throws DesignGenerationException {
         if (streamHandler instanceof Filter) {
             return generateFilterConfig((Filter) streamHandler);

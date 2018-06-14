@@ -50,7 +50,7 @@ public class DesignGenerator {
 
         EventFlowBuilder eventFlowBuilder =
                 new EventFlowBuilder(siddhiAppString, siddhiApp, siddhiAppRuntime)
-                        .loadAppNameAndDescription()
+                        .loadAppAnnotations()
                         .loadTriggers()
                         .loadStreams()
                         .loadSources()

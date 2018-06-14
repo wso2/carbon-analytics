@@ -19,7 +19,6 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
@@ -27,11 +26,10 @@ import org.wso2.siddhi.query.api.execution.query.input.handler.Window;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generates WindowFilterProjectionConfig with given Siddhi elements
+ * Generates WindowFilterProjection Query Input Config with given Siddhi elements
  */
 public class WindowFilterProjectionConfigGenerator {
     private String siddhiAppString;
@@ -48,16 +46,11 @@ public class WindowFilterProjectionConfigGenerator {
      */
     public WindowFilterProjectionConfig generateWindowFilterProjectionConfig(InputStream queryInputStream)
             throws DesignGenerationException {
-        StreamHandlerConfigGenerator streamHandlerConfigGenerator = new StreamHandlerConfigGenerator(siddhiAppString);
-        List<StreamHandlerConfig> streamHandlerConfigs = new ArrayList<>();
-        for (StreamHandler streamHandler : ((SingleInputStream) queryInputStream).getStreamHandlers()) {
-            streamHandlerConfigs.add(streamHandlerConfigGenerator.generateStreamHandlerConfig(streamHandler));
-        }
-
         return new WindowFilterProjectionConfig(
                 getType(queryInputStream).toString(),
                 queryInputStream.getUniqueStreamIds().get(0),
-                streamHandlerConfigs);
+                new StreamHandlerConfigGenerator(siddhiAppString)
+                        .generateStreamHandlerConfigList(((SingleInputStream) queryInputStream).getStreamHandlers()));
     }
 
     /**

@@ -36,7 +36,7 @@ define(
          */
         ElementUtils.prototype.getElement = function (array, elementId) {
             var foundElement = undefined;
-            array.forEach(function(element){
+            array.forEach(function (element) {
                 if (typeof element.getId === 'function' && element.getId() === elementId) {
                     foundElement = element;
                 }
@@ -52,7 +52,7 @@ define(
          */
         ElementUtils.prototype.removeElement = function (array, elementId) {
             var isElementRemoved = false;
-            array.forEach(function(element){
+            array.forEach(function (element) {
                 if (element.id === elementId) {
                     var index = array.indexOf(element);
                     if (index > -1) {

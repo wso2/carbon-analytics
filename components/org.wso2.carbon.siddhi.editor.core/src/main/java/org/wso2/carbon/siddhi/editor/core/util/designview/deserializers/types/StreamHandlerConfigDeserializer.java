@@ -47,6 +47,7 @@ public class StreamHandlerConfigDeserializer implements JsonDeserializer {
                 streamHandlerType.equalsIgnoreCase(StreamHandlerType.WINDOW.toString())) {
             return jsonDeserializationContext.deserialize(jsonObject, FunctionWindowConfig.class);
         }
-        throw new JsonParseException("Unable to parse the StreamHandlerConfig JSON since its type is unknown");
+        throw new JsonParseException(
+                "Unable to de-serialize the StreamHandlerConfig JSON since its type is unknown");
     }
 }

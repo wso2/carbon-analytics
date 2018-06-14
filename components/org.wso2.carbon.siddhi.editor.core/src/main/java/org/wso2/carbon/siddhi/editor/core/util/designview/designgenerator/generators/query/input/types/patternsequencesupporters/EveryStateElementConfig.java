@@ -16,19 +16,25 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
+package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
-/**
- * Has types of a Siddhi app annotation
- */
-public class SiddhiAnnotationTypes {
-    public static final String NAME = "name";
-    public static final String DESCRIPTION = "description";
-    public static final String INFO = "info";
+public class EveryStateElementConfig implements StateElementConfig {
+    private StateElementConfig stateElement;
+    private String within;
 
-    /**
-     * Avoids instantiation
-     */
-    private SiddhiAnnotationTypes() {
+    public StateElementConfig getStateElement() {
+        return stateElement;
+    }
+
+    public void setStateElement(StateElementConfig stateElement) {
+        this.stateElement = stateElement;
+    }
+
+    public String getWithin() {
+        return within;
+    }
+
+    public void setWithin(String within) {
+        this.within = within;
     }
 }

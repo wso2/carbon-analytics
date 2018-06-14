@@ -63,13 +63,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -93,18 +93,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     name: {
-                                        title : 'Name',
+                                        title: 'Name',
                                         type: "string",
                                         minLength: 1
                                     },
                                     type: {
-                                        title : 'Type',
+                                        title: 'Type',
                                         type: "string",
                                         enum: [
                                             "string",
@@ -112,7 +112,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                                             "long",
                                             "float",
                                             "double",
-                                            "bool"
+                                            "bool",
+                                            "object"
                                         ],
                                         default: "string"
                                     }
@@ -136,10 +137,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
-                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name);
+                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
                 if (isStreamNameUsed) {
                     DesignViewUtils.prototype
                         .errorAlert("Stream name \"" + editor.getValue().name + "\" is already used.");
@@ -159,7 +160,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 });
                 self.configurationData.getSiddhiAppConfig().addStream(stream);
 
-                var textNode = $('#'+i).find('.streamNameNode');
+                var textNode = $('#' + i).find('.streamNameNode');
                 textNode.html(editor.getValue().name);
 
                 // close the form window
@@ -186,7 +187,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var id = $(element).parent().attr('id');
             // retrieve the stream information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(id);
-            if(!clickedElement) {
+            if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
@@ -208,9 +209,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             });
 
             var fillWith = {
-                annotations : annotations,
-                name : name,
-                attributes : attributes
+                annotations: annotations,
+                name: name,
+                attributes: attributes
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor(formContainer[0], {
@@ -227,13 +228,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : "Annotation",
+                                title: "Annotation",
                                 options: {
                                     disable_properties: true
                                 },
                                 properties: {
                                     annotation: {
-                                        title : "Annotation",
+                                        title: "Annotation",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -257,7 +258,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             minItems: 1,
                             items: {
                                 type: "object",
-                                title : 'Attribute',
+                                title: 'Attribute',
                                 properties: {
                                     name: {
                                         title: "Name",
@@ -273,7 +274,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                                             "long",
                                             "float",
                                             "double",
-                                            "bool"
+                                            "bool",
+                                            "object"
                                         ],
                                         default: "string"
                                     }
@@ -297,23 +299,63 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             submitButtonElement.addEventListener('click', function () {
 
                 var errors = editor.validate();
-                if(errors.length) {
+                if (errors.length) {
                     return;
                 }
-                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUnique(editor.getValue().name,
-                    clickedElement.getId());
-                if (isStreamNameUsed) {
-                    DesignViewUtils.prototype
-                        .errorAlert("Stream name \"" + editor.getValue().name + "\" is already used.");
-                    return;
+
+                var config = editor.getValue();
+                var streamName;
+                var firstCharacterInStreamName;
+                var isStreamNameUsed;
+                /*
+                * check whether the stream is inside a partition and if yes check whether it begins with '#'. If not add
+                * '#' to the beginning of the stream name.
+                * */
+                var isStreamSavedInsideAPartition
+                    = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
+                if (!isStreamSavedInsideAPartition) {
+                    firstCharacterInStreamName = (config.name).charAt(0);
+                    if (firstCharacterInStreamName === '#') {
+                        DesignViewUtils.prototype.errorAlert("'#' is used to define inner streams only.");
+                        return;
+                    } else {
+                        streamName = config.name;
+                    }
+                    isStreamNameUsed
+                        = self.formUtils.isDefinitionElementNameUsed(streamName, id);
+                    if (isStreamNameUsed) {
+                        DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" is already defined.");
+                        return;
+                    }
+                } else {
+                    firstCharacterInStreamName = (config.name).charAt(0);
+                    if (firstCharacterInStreamName !== '#') {
+                        streamName = '#' + config.name;
+                    } else {
+                        streamName = config.name;
+                    }
+                    var partitionWhereStreamIsSaved
+                        = self.configurationData.getSiddhiAppConfig().getPartitionWhereStreamIsSaved(id);
+                    var partitionId = partitionWhereStreamIsSaved.getId();
+                    isStreamNameUsed
+                        = self.formUtils.isStreamDefinitionNameUsedInPartition(partitionId, streamName, id);
+                    if (isStreamNameUsed) {
+                        DesignViewUtils.prototype
+                            .errorAlert("Stream name \"" + streamName + "\" is already defined in the partition.");
+                        return;
+                    }
                 }
+
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
-                var config = editor.getValue();
-
-                // update selected stream model
-                clickedElement.setName(config.name);
+                var previouslySavedName = clickedElement.getName();
+                // update connection related to the element if the name is changed
+                if (previouslySavedName !== streamName) {
+                    // update selected stream model
+                    clickedElement.setName(streamName);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
                 // removing all elements from attribute list
                 clickedElement.clearAttributeList();
                 // adding new attributes to the attribute list
@@ -328,7 +370,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 });
 
                 var textNode = $(element).parent().find('.streamNameNode');
-                textNode.html(config.name);
+                textNode.html(streamName);
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);

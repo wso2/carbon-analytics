@@ -45,7 +45,6 @@ public class ResourceManagerApi implements Microservice {
 
     @GET
     @Path("/deployment")
-
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Get the satus.",
             notes = "Returns status of manager nodes cluster and the resourcepool.",

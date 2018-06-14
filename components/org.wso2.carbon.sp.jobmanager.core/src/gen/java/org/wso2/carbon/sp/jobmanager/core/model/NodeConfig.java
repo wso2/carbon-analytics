@@ -37,11 +37,10 @@ public class NodeConfig {
     private String id = null;
     @JsonProperty("state")
     private StateEnum state = null;
-    @JsonProperty("httpInterface")
-    private InterfaceConfig httpInterface = null;
+    @JsonProperty("httpsInterface")
+    private InterfaceConfig httpsInterface = null;
     @JsonProperty("WorkerMetrics")
     private WorkerMetrics workerMetrics = null;
-
     @JsonProperty("isReceiverNode")
     private boolean isReceiverNode;
 
@@ -83,9 +82,23 @@ public class NodeConfig {
         this.state = state;
     }
 
-    public NodeConfig httpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
+    public NodeConfig httpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
         return this;
+    }
+
+    public void setHttpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
+    }
+
+    /**
+     * Get httpsInterface
+     *
+     * @return httpsInterface
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public InterfaceConfig getHttpsInterface() {
+        return httpsInterface;
     }
 
     public NodeConfig workerMetrics(WorkerMetrics workerMetrics) {
@@ -93,23 +106,9 @@ public class NodeConfig {
         return this;
     }
 
-    /**
-     * Get httpInterface
-     *
-     * @return httpInterface
-     **/
-    @ApiModelProperty(required = true, value = "")
-    public InterfaceConfig getHttpInterface() {
-        return httpInterface;
-    }
-
     @ApiModelProperty(required = false, value = "")
     public WorkerMetrics getWorkerMetrics() {
         return workerMetrics;
-    }
-
-    public void setHttpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
     }
 
     public boolean isReceiverNode() {
@@ -132,13 +131,12 @@ public class NodeConfig {
         NodeConfig nodeConfig = (NodeConfig) o;
         return Objects.equals(this.id, nodeConfig.id) &&
                 Objects.equals(this.state, nodeConfig.state) &&
-                Objects.equals(this.httpInterface, nodeConfig.httpInterface) &&
                 Objects.equals(this.workerMetrics, nodeConfig.workerMetrics);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, state, httpInterface, workerMetrics);
+        return Objects.hash(id, state, httpsInterface, workerMetrics);
     }
 
     @Override
@@ -148,7 +146,7 @@ public class NodeConfig {
 
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    state: ").append(toIndentedString(state)).append("\n");
-        sb.append("    httpInterface: ").append(toIndentedString(httpInterface)).append("\n");
+        sb.append("    httpsInterface: ").append(toIndentedString(httpsInterface)).append("\n");
         sb.append("    workerMetrix: ").append(toIndentedString(workerMetrics)).append("\n");
         sb.append("}");
         return sb.toString();

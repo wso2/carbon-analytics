@@ -30,6 +30,9 @@ public class PatternSequenceConditionConfig {
     private String streamName;
     private List<StreamHandlerConfig> streamHandlerList;
 
+    public PatternSequenceConditionConfig() {
+    }
+
     public PatternSequenceConditionConfig(String conditionId, String streamName,
                                           List<StreamHandlerConfig> streamHandlerList) {
         this.conditionId = conditionId;

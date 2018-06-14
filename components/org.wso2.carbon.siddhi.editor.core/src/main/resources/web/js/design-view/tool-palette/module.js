@@ -18,7 +18,7 @@
 define(['require', 'tool_palette/tool', 'tool_palette/tool-view', 'tool_palette/tool-group',
         'tool_palette/tool-group-view', 'tool_palette/tool-palette'],
     function (require, tool, toolView, toolGroup, toolGroupView, toolPalette) {
-        return  {
+        return {
             Models: {
                 Tool: tool,
                 ToolGroup: toolGroup

@@ -159,8 +159,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var outputElementType = undefined;
                 var outputElementAttributesList = [];
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+
                 var inputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(inputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(inputElementName, partitionId);
                 if (inputElement !== undefined) {
                     if (inputElement.type !== undefined
                         && (inputElement.type === 'STREAM' || inputElement.type === 'WINDOW')) {
@@ -177,7 +185,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var outputElement =
-                    self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+                    self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(outputElementName, partitionId);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
@@ -199,7 +208,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         };
                         select.push(attr);
                     }
-                } else if(!clickedElement.getSelect().getValue()) {
+                } else if (!clickedElement.getSelect().getValue()) {
                     for (var i = 0; i < outputElementAttributesList.length; i++) {
                         var attr = {
                             expression: undefined,
@@ -309,7 +318,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var savedQueryInput = {
                     input: {
-                        from : clickedElement.getQueryInput().getFrom()
+                        from: clickedElement.getQueryInput().getFrom()
                     },
                     streamHandlerList: streamHandlerList
                 };
@@ -320,27 +329,27 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 };
                 fillQueryAnnotation = self.formUtils.cleanJSONObject(fillQueryAnnotation);
                 var fillQuerySelectWith = {
-                    select : select,
-                    groupBy : groupBy,
+                    select: select,
+                    groupBy: groupBy,
                     postFilter: {
-                        having : having
+                        having: having
                     }
                 };
                 fillQuerySelectWith = self.formUtils.cleanJSONObject(fillQuerySelectWith);
                 var fillQueryOutputWith = {
-                    orderBy : orderBy,
+                    orderBy: orderBy,
                     limit: {
-                        limit : limit
+                        limit: limit
                     },
                     outputRateLimit: {
-                        outputRateLimit : outputRateLimit
+                        outputRateLimit: outputRateLimit
                     },
                     output: queryOutput
                 };
                 fillQueryOutputWith = self.formUtils.cleanJSONObject(fillQueryOutputWith);
 
                 var inputSchema;
-                if (inputElementType === 'WINDOW'){
+                if (inputElementType === 'WINDOW') {
                     inputSchema = {
                         type: "object",
                         title: "Query Input",
@@ -1068,7 +1077,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var inputErrors = editorInput.validate();
                     var selectErrors = editorSelect.validate();
                     var outputErrors = editorOutput.validate();
-                    if(annotationErrors.length || inputErrors.length || selectErrors.length || outputErrors.length) {
+                    if (annotationErrors.length || inputErrors.length || selectErrors.length || outputErrors.length) {
                         return;
                     }
 
@@ -1226,11 +1235,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                         if (!outputConfig.output.eventType) {
                             outputObject.setEventType(undefined);
-                        } else if(outputConfig.output.eventType === "all events"){
+                        } else if (outputConfig.output.eventType === "all events") {
                             outputObject.setEventType('ALL_EVENTS');
-                        } else if(outputConfig.output.eventType === "current events"){
+                        } else if (outputConfig.output.eventType === "current events") {
                             outputObject.setEventType('CURRENT_EVENTS');
-                        } else if(outputConfig.output.eventType === "expired events"){
+                        } else if (outputConfig.output.eventType === "expired events") {
                             outputObject.setEventType('EXPIRED_EVENTS');
                         }
                         queryOutput.setTarget(outputTarget);
