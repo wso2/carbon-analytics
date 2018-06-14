@@ -258,7 +258,7 @@ public class SourceSinkConfigsGenerator {
     /**
      * Represents a PayloadOrAttribute element
      */
-    private class PayloadOrAttributeElement {
+    private static class PayloadOrAttributeElement {
         private String key;
         private String value;
     }
