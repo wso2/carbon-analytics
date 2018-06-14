@@ -48,7 +48,7 @@ public class RDBMSConfig {
     private static String username;
     private static String password;
 
-    public static void createDatasource() {
+    public static void createDatasource(String folderName) {
         RDBMSType type = RDBMSType.valueOf(System.getenv("DATABASE_TYPE"));
         username = System.getenv("DATABASE_USER");
         password = System.getenv("DATABASE_PASSWORD");
@@ -90,17 +90,17 @@ public class RDBMSConfig {
                 break;
         }
 
-        RDBMSConfig.updateDeploymentYaml();
+        RDBMSConfig.updateDeploymentYaml(folderName);
 
     }
 
-    private static void updateDeploymentYaml() {
+    private static void updateDeploymentYaml(String folderName) {
         try (BufferedReader br = new BufferedReader(new FileReader("src" + File.separator + "test" + File.separator +
-                "resources" + File.separator + "conf" + File.separator + "persistence" + File.separator + "db"
+                "resources" + File.separator + "conf" + File.separator + "persistence" + File.separator + folderName
                 + File.separator + "deployment-structure.yaml"));
-        BufferedWriter bw = new BufferedWriter(new FileWriter("src" + File.separator + "test" + File.separator +
-                "resources" + File.separator + "conf" + File.separator + "persistence" + File.separator + "db"
-                + File.separator + "deployment.yaml"))){
+             BufferedWriter bw = new BufferedWriter(new FileWriter("src" + File.separator + "test" + File.separator +
+                     "resources" + File.separator + "conf" + File.separator + "persistence" + File.separator + folderName
+                     + File.separator + "deployment.yaml"))) {
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -109,10 +109,10 @@ public class RDBMSConfig {
                             " " + url);
                 if (line.contains(YAML_DATASOURCE_CONFIG_USERNAME))
                     line = line.replace(YAML_DATASOURCE_CONFIG_USERNAME, YAML_DATASOURCE_CONFIG_USERNAME +
-                            " " +  username);
+                            " " + username);
                 if (line.contains(YAML_DATASOURCE_CONFIG_PASSWORD))
                     line = line.replace(YAML_DATASOURCE_CONFIG_PASSWORD, YAML_DATASOURCE_CONFIG_PASSWORD +
-                            " " +  password);
+                            " " + password);
                 if (line.contains(YAML_DATASOURCE_CONFIG_JDBC_DRIVER))
                     line = line.replace(YAML_DATASOURCE_CONFIG_JDBC_DRIVER, YAML_DATASOURCE_CONFIG_JDBC_DRIVER +
                             " " + driverClassName);
