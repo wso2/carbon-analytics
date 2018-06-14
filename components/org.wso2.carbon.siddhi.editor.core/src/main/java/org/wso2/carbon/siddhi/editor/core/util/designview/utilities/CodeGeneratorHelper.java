@@ -44,6 +44,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.FunctionWindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.MapperConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperListPayloadOrAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperMapPayloadOrAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
@@ -209,14 +212,13 @@ public class CodeGeneratorHelper {
     /**
      * Generates a Siddhi string representation of a map annotation from a MapperConfig object
      *
-     * @param mapper         The MapperConfig object to be converted
-     * @param annotationType The annotation type the MapperConfig object belongs to (SINK or SOURCE)
+     * @param mapper The MapperConfig object to be converted
      * @return The string representation of the MapperConfig object
      * @throws CodeGenerationException Error while generating code
      */
-    public static String getMapper(MapperConfig mapper, String annotationType) throws CodeGenerationException {
+    public static String getMapper(MapperConfig mapper) throws CodeGenerationException {
         if (mapper.getType() == null || mapper.getType().isEmpty()) {
-            throw new CodeGenerationException("The map type of a given map element is empty");
+            throw new CodeGenerationException("The map type of a given source/sink map element is empty");
         }
 
         StringBuilder mapperStringBuilder = new StringBuilder();
@@ -229,21 +231,80 @@ public class CodeGeneratorHelper {
                     .append(getParameterList(mapper.getOptions()));
         }
 
-        if (mapper.getAttributes() != null && !mapper.getAttributes().isEmpty()) {
+        if (mapper.getPayloadOrAttribute() != null) {
             mapperStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
-            if (annotationType.equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
+            if (mapper.getPayloadOrAttribute().getAnnotationType()
+                    .equalsIgnoreCase(CodeGeneratorConstants.ATTRIBUTE)) {
                 mapperStringBuilder.append(SiddhiStringBuilderConstants.ATTRIBUTES_ANNOTATION);
-            } else if (annotationType.equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
+            } else if (mapper.getPayloadOrAttribute().getAnnotationType()
+                    .equalsIgnoreCase(CodeGeneratorConstants.PAYLOAD)) {
                 mapperStringBuilder.append(SiddhiStringBuilderConstants.PAYLOAD_ANNOTATION);
             }
-
-            mapperStringBuilder.append(getParameterList(mapper.getAttributes()))
+            mapperStringBuilder.append(getMapperPayloadOrAttribute(mapper.getPayloadOrAttribute()))
                     .append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
         }
-
         mapperStringBuilder.append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
 
         return mapperStringBuilder.toString();
+    }
+
+    /**
+     * Generates a Siddhi string representation of a MapperPayloadOrAttribute object
+     *
+     * @param payloadOrAttribute The MapperPayloadOrAttribute object to be converted
+     * @return A Siddhi string representation of the given MapperPayloadOrAttribute object
+     * @throws CodeGenerationException Error while generating code
+     */
+    private static String getMapperPayloadOrAttribute(MapperPayloadOrAttribute payloadOrAttribute)
+            throws CodeGenerationException {
+        if (payloadOrAttribute.getType() == null || payloadOrAttribute.getType().isEmpty()) {
+            throw new CodeGenerationException("The 'type' value of a given source/sink map attribute element is empty");
+        }
+
+        StringBuilder mapperAttributeStringBuilder = new StringBuilder();
+        switch (payloadOrAttribute.getType().toUpperCase()) {
+            case CodeGeneratorConstants.MAP:
+                MapperMapPayloadOrAttribute mapperMapAttribute = (MapperMapPayloadOrAttribute) payloadOrAttribute;
+                if (mapperMapAttribute.getValue() == null || mapperMapAttribute.getValue().isEmpty()) {
+                    throw new CodeGenerationException("The key-value pair values of" +
+                            " a given source/sink map attribute element is empty");
+                }
+                int mapEntriesLeft = mapperMapAttribute.getValue().size();
+                for (Map.Entry<String, String> entry : mapperMapAttribute.getValue().entrySet()) {
+                    mapperAttributeStringBuilder.append(entry.getKey())
+                            .append(SiddhiStringBuilderConstants.EQUAL)
+                            .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
+                            .append(entry.getValue())
+                            .append(SiddhiStringBuilderConstants.SINGLE_QUOTE);
+                    if (mapEntriesLeft != 1) {
+                        mapperAttributeStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
+                    }
+                    mapEntriesLeft--;
+                }
+                break;
+            case CodeGeneratorConstants.LIST:
+                MapperListPayloadOrAttribute mapperListAttribute = (MapperListPayloadOrAttribute) payloadOrAttribute;
+                if (mapperListAttribute.getValue() == null || mapperListAttribute.getValue().isEmpty()) {
+                    throw new CodeGenerationException("The list values of a given sink/source" +
+                            " map attribute element is empty");
+                }
+                int valuesLeft = mapperListAttribute.getValue().size();
+                for (String value : mapperListAttribute.getValue()) {
+                    mapperAttributeStringBuilder.append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
+                            .append(value)
+                            .append(SiddhiStringBuilderConstants.SINGLE_QUOTE);
+                    if (valuesLeft != 1) {
+                        mapperAttributeStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
+                    }
+                    valuesLeft--;
+                }
+                break;
+            default:
+                throw new CodeGenerationException("Unidentified mapper attribute type: "
+                        + payloadOrAttribute.getType());
+        }
+
+        return mapperAttributeStringBuilder.toString();
     }
 
     /**
@@ -522,7 +583,7 @@ public class CodeGeneratorHelper {
         String logic = patternSequence.getLogic();
         for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
             if (logic.contains(condition.getConditionId())) {
-                Pattern pattern = Pattern.compile("\\s+not\\s+" + condition.getConditionId());
+                Pattern pattern = Pattern.compile("not\\s+" + condition.getConditionId());
                 Matcher matcher = pattern.matcher(logic);
                 if (matcher.find()) {
                     logic = logic.replace(condition.getConditionId(),
@@ -1176,9 +1237,9 @@ public class CodeGeneratorHelper {
                     throw new CodeGenerationException("The 'max' value of a given" +
                             " aggregateByTimeRange element is empty");
                 }
-                aggregateByTimePeriodStringBuilder.append(aggregateByTimeRange.getValue().getMin())
+                aggregateByTimePeriodStringBuilder.append(aggregateByTimeRange.getValue().getMin().toLowerCase())
                         .append(SiddhiStringBuilderConstants.THREE_DOTS)
-                        .append(aggregateByTimeRange.getValue().getMax());
+                        .append(aggregateByTimeRange.getValue().getMax().toLowerCase());
                 break;
             case CodeGeneratorConstants.INTERVAL:
                 AggregateByTimeInterval aggregateByTimeInterval = (AggregateByTimeInterval) aggregateByTimePeriod;
@@ -1186,7 +1247,14 @@ public class CodeGeneratorHelper {
                     throw new CodeGenerationException("The 'value' attribute of a given" +
                             " attributeByTimeInterval element is empty");
                 }
-                aggregateByTimePeriodStringBuilder.append(getParameterList(aggregateByTimeInterval.getValue()));
+                int timeIntervalsLeft = aggregateByTimeInterval.getValue().size();
+                for (String timeInterval : aggregateByTimeInterval.getValue()) {
+                    aggregateByTimePeriodStringBuilder.append(timeInterval.toLowerCase());
+                    if (timeIntervalsLeft != 1) {
+                        aggregateByTimePeriodStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
+                    }
+                    timeIntervalsLeft--;
+                }
                 break;
             default:
                 throw new CodeGenerationException("Unidentified aggregateByTimePeriod element type: "
