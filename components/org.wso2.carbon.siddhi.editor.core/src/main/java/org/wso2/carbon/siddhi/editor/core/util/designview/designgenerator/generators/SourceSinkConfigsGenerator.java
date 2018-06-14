@@ -140,8 +140,10 @@ public class SourceSinkConfigsGenerator {
         if (type == null) {
             throw new DesignGenerationException("Unable to find 'type' of the mapper");
         }
-        MapperPayloadOrAttribute payloadOrAttribute =
-                generateMapperPayloadOrAttributes(mapAnnotation.getAnnotations().get(0));
+        MapperPayloadOrAttribute payloadOrAttribute = null;
+        if (mapAnnotation.getAnnotations().size() != 0) {
+            payloadOrAttribute = generateMapperPayloadOrAttributes(mapAnnotation.getAnnotations().get(0));
+        }
         return new MapperConfig(type, options, payloadOrAttribute);
     }
 
