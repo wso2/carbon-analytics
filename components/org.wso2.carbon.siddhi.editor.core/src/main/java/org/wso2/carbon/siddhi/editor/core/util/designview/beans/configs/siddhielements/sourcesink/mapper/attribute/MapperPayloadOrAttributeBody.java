@@ -21,10 +21,10 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 /**
  * Represents @attribute of a Siddhi Source, or @payload of a Siddhi Sink
  */
-public abstract class MapperAttribute {
+public abstract class MapperPayloadOrAttributeBody {
     private String type;
 
-    public MapperAttribute(String type) {
+    public MapperPayloadOrAttributeBody(String type) {
         this.type = type;
     }
 

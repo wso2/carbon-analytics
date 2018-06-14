@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttributeBody;
 
 import java.util.List;
 
@@ -28,15 +28,17 @@ import java.util.List;
 public class MapperConfig {
     private String type;
     private List<String> options;
-    private MapperAttribute attribute;
+    private String payloadOrAttribute;
+    private MapperPayloadOrAttributeBody payloadOrAttributeBody;
 
     public MapperConfig() {
     }
 
-    public MapperConfig(String type, List<String> options, MapperAttribute attribute) {
+    public MapperConfig(String type, String payloadOrAttribute, List<String> options, MapperPayloadOrAttributeBody payloadOrAttributeBody) {
         this.type = type;
+        this.payloadOrAttribute = payloadOrAttribute;
         this.options = options;
-        this.attribute = attribute;
+        this.payloadOrAttributeBody = payloadOrAttributeBody;
     }
 
     public String getType() {
@@ -55,11 +57,19 @@ public class MapperConfig {
         this.options = options;
     }
 
-    public MapperAttribute getAttribute() {
-        return attribute;
+    public String getPayloadOrAttribute() {
+        return payloadOrAttribute;
     }
 
-    public void setAttribute(MapperAttribute attribute) {
-        this.attribute = attribute;
+    public void setPayloadOrAttribute(String payloadOrAttribute) {
+        this.payloadOrAttribute = payloadOrAttribute;
+    }
+
+    public MapperPayloadOrAttributeBody getPayloadOrAttributeBody() {
+        return payloadOrAttributeBody;
+    }
+
+    public void setPayloadOrAttributeBody(MapperPayloadOrAttributeBody payloadOrAttributeBody) {
+        this.payloadOrAttributeBody = payloadOrAttributeBody;
     }
 }
