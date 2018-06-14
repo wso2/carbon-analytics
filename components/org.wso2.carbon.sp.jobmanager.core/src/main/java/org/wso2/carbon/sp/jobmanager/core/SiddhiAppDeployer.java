@@ -23,7 +23,7 @@ import okhttp3.Response;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
-import org.wso2.carbon.sp.jobmanager.core.util.HTTPClientUtil;
+import org.wso2.carbon.sp.jobmanager.core.util.HTTPSClientUtil;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -46,7 +46,7 @@ public class SiddhiAppDeployer {
     public static String deploy(ResourceNode node, SiddhiQuery siddhiQuery) {
         Response response = null;
         try {
-            response = HTTPClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
+            response = HTTPSClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
                     node.getHttpsInterface().getHost(), node.getHttpsInterface().getPort(), ""),
                     siddhiQuery.getApp(), node.getHttpsInterface().getUsername(),
                     node.getHttpsInterface().getPassword());
@@ -56,7 +56,7 @@ public class SiddhiAppDeployer {
                         ? locationHeader.substring(locationHeader.lastIndexOf('/') + 1) : null;
             } else if (response.code() == 409) {
                 response.close();
-                response = HTTPClientUtil.doPutRequest(String.format(SERVICE_ENDPOINT,
+                response = HTTPSClientUtil.doPutRequest(String.format(SERVICE_ENDPOINT,
                         node.getHttpsInterface().getHost(), node.getHttpsInterface().getPort(), ""),
                         siddhiQuery.getApp(), node.getHttpsInterface().getUsername(),
                         node.getHttpsInterface().getPassword());
@@ -90,7 +90,7 @@ public class SiddhiAppDeployer {
     public static boolean unDeploy(ResourceNode node, String siddhiAppName) {
         Response response = null;
         try {
-            response = HTTPClientUtil.doDeleteRequest(String.format(SERVICE_ENDPOINT,
+            response = HTTPSClientUtil.doDeleteRequest(String.format(SERVICE_ENDPOINT,
                     node.getHttpsInterface().getHost(), node.getHttpsInterface().getPort(), "/" + siddhiAppName),
                     node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword()
             );
@@ -117,7 +117,7 @@ public class SiddhiAppDeployer {
         Response response = null;
         String[] apps = new String[0];
         try {
-            response = HTTPClientUtil.doGetRequest(String.format(SERVICE_ENDPOINT,
+            response = HTTPSClientUtil.doGetRequest(String.format(SERVICE_ENDPOINT,
                     node.getHttpsInterface().getHost(), node.getHttpsInterface().getPort(), ""),
                     node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword()
             );

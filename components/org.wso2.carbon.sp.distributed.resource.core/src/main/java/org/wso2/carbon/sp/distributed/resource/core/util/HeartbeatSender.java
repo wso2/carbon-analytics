@@ -171,7 +171,7 @@ public class HeartbeatSender extends TimerTask {
             }
             long startTime = System.currentTimeMillis();
             // Send request to the heartbeat endpoint.
-            response = HTTPClientUtil.doPostRequest(
+            response = HTTPSClientUtil.doPostRequest(
                     String.format(HEARTBEAT_ENDPOINT, config.getHost(), config.getPort()),
                     ServiceDataHolder.getCurrentNodeConfig(), config.getUsername(), config.getPassword()
             );
