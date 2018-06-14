@@ -24,10 +24,10 @@ import org.wso2.carbon.config.annotation.Element;
 import java.io.Serializable;
 
 /**
- * This class represents a HTTP Interface configuration which consists of host and port of the node.
+ * This class represents a HTTPS Interface configuration which consists of host and port of the node.
  */
-@Configuration(description = "HTTP Interface Configuration")
-public class HTTPInterfaceConfig implements Serializable {
+@Configuration(description = "HTTPS Interface Configuration")
+public class HTTPSInterfaceConfig implements Serializable {
 
     private static final long serialVersionUID = -2797775483534299019L;
 
@@ -128,7 +128,7 @@ public class HTTPInterfaceConfig implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("HTTPInterface { host: %s, port: %s }", host, port);
+        return String.format("HTTPSInterface { host: %s, port: %s }", host, port);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class HTTPInterfaceConfig implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        HTTPInterfaceConfig that = (HTTPInterfaceConfig) o;
+        HTTPSInterfaceConfig that = (HTTPSInterfaceConfig) o;
         if (getPort() != that.getPort()) {
             return false;
         }

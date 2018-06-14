@@ -136,9 +136,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     if (childApp.getDeployedNode() != null) {
                         appHolder.setId(childApp.getDeployedNode().getId());
                         appHolder.setState(childApp.getDeployedNode().getState());
-                        appHolder.setHost(childApp.getDeployedNode().getHttpInterface().getHost());
+                        appHolder.setHost(childApp.getDeployedNode().getHttpsInterface().getHost());
                         appHolder.setPort(Integer.toString(childApp.getDeployedNode()
-                                .getHttpInterface().getPort()));
+                                .getHttpsInterface().getPort()));
                         appHolder.setFailedPingAttempts(Integer.toString(childApp.getDeployedNode()
                                 .getFailedPingAttempts()));
                         appHolder.setLastPingTimestamp(Long.toString(childApp.getDeployedNode()
@@ -210,8 +210,8 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 appHolder.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
                 appHolder.setId(siddhiAppHolder.getDeployedNode().getId());
                 appHolder.setState(siddhiAppHolder.getDeployedNode().getState());
-                appHolder.setHost(siddhiAppHolder.getDeployedNode().getHttpInterface().getHost());
-                appHolder.setPort(Integer.toString(siddhiAppHolder.getDeployedNode().getHttpInterface().getPort()));
+                appHolder.setHost(siddhiAppHolder.getDeployedNode().getHttpsInterface().getHost());
+                appHolder.setPort(Integer.toString(siddhiAppHolder.getDeployedNode().getHttpsInterface().getPort()));
                 appHolder.setFailedPingAttempts(
                         Integer.toString(siddhiAppHolder.getDeployedNode().getFailedPingAttempts()));
                 appHolder.setLastPingTimestamp(Long.toString(siddhiAppHolder.getDeployedNode().getLastPingTimestamp()));
@@ -252,9 +252,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 KafkaTransportDetails kafkaTransport = new KafkaTransportDetails();
                 kafkaTransport.setAppName(siddhiAppHolder.getAppName());
                 kafkaTransport.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
-                kafkaTransport.setDeployedHost(siddhiAppHolder.getDeployedNode().getHttpInterface().getHost());
+                kafkaTransport.setDeployedHost(siddhiAppHolder.getDeployedNode().getHttpsInterface().getHost());
                 kafkaTransport.setDeployedPort(Integer.toString(siddhiAppHolder.getDeployedNode()
-                        .getHttpInterface().getPort()));
+                        .getHttpsInterface().getPort()));
                 getSourceSinkDetails(siddhiAppHolder, kafkaTransport, kafkaDetails);
             }));
             return Response.ok().entity(kafkaDetails).build();

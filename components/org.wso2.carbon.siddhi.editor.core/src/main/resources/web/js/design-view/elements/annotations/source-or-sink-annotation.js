@@ -51,7 +51,7 @@ define(
                 this.id = options.id;
                 this.connectedElementName = options.connectedElementName;
                 this.annotationType
-                    = (options.annotationType !== undefined)? (options.annotationType).toUpperCase() : undefined;
+                    = (options.annotationType !== undefined) ? (options.annotationType).toUpperCase() : undefined;
                 this.type = options.type;
                 this.options = options.options;
                 this.map = options.map;

@@ -28,9 +28,9 @@ import okhttp3.Response;
 import java.io.IOException;
 
 /**
- * Utility class to handle HTTP requests.
+ * Utility class to handle HTTPS requests.
  */
-public class HTTPClientUtil {
+public class HTTPSClientUtil {
     /**
      * Instance of {@link Gson} to un/marshall request/response.
      */
