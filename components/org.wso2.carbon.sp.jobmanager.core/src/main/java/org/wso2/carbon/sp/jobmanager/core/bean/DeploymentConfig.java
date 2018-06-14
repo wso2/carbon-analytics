@@ -33,8 +33,6 @@ public class DeploymentConfig implements Serializable {
     private String type;
     @Element(description = "Allocation algorithm", required = true)
     private String allocationAlgorithm = "org.wso2.carbon.sp.jobmanager.core.allocation.RoundRobinAllocationAlgorithm";
-    @Element(description = "HTTP host:port configurations", required = true)
-    private InterfaceConfig httpInterface;
     @Element(description = "HTTPS host:port configurations", required = true)
     private InterfaceConfig httpsInterface;
     private int heartbeatInterval = 10000;
@@ -59,14 +57,6 @@ public class DeploymentConfig implements Serializable {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public InterfaceConfig getHttpInterface() {
-        return httpInterface;
-    }
-
-    public void setHttpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
     }
 
     public InterfaceConfig getHttpsInterface() {

@@ -36,19 +36,14 @@ public class DeploymentConfig implements Serializable {
     @Element(description = "deployment type (distributed/ha)", required = true)
     private String type;
     /**
-     * Advertised HTTP Host:Port configuration of the current node.
-     */
-    @Element(description = "http host:port configurations", required = true)
-    private HTTPInterfaceConfig httpInterface;
-    /**
      * Advertised HTTPS Host:Port configuration of the current node.
      */
     @Element(description = "https host:port configurations", required = true)
-    private HTTPInterfaceConfig httpsInterface;
+    private HTTPSInterfaceConfig httpsInterface;
     /**
-     * List of {@link HTTPInterfaceConfig} for the resource managers.
+     * List of {@link HTTPSInterfaceConfig} for the resource managers.
      */
-    private List<HTTPInterfaceConfig> resourceManagers = null;
+    private List<HTTPSInterfaceConfig> resourceManagers = null;
     /**
      * Interval between two leader node retry attempts.
      */
@@ -78,29 +73,11 @@ public class DeploymentConfig implements Serializable {
     }
 
     /**
-     * Getter for the httpInterface.
-     *
-     * @return httpInterface of the current node.
-     */
-    public HTTPInterfaceConfig getHttpInterface() {
-        return httpInterface;
-    }
-
-    /**
-     * Setter for the httpInterface.
-     *
-     * @param httpInterface of the current node.
-     */
-    public void setHttpInterface(HTTPInterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
-    }
-
-    /**
      * Getter for the httpsInterface.
      *
      * @return httpsInterface of the current node.
      */
-    public HTTPInterfaceConfig getHttpsInterface() {
+    public HTTPSInterfaceConfig getHttpsInterface() {
         return httpsInterface;
     }
 
@@ -109,25 +86,25 @@ public class DeploymentConfig implements Serializable {
      *
      * @param httpsInterface of the current node.
      */
-    public void setHttpsInterface(HTTPInterfaceConfig httpsInterface) {
+    public void setHttpsInterface(HTTPSInterfaceConfig httpsInterface) {
         this.httpsInterface = httpsInterface;
     }
 
     /**
      * Getter for the resourceManagers.
      *
-     * @return list of {@link HTTPInterfaceConfig}
+     * @return list of {@link HTTPSInterfaceConfig}
      */
-    public List<HTTPInterfaceConfig> getResourceManagers() {
+    public List<HTTPSInterfaceConfig> getResourceManagers() {
         return resourceManagers;
     }
 
     /**
      * Setter for the resourceManagers.
      *
-     * @param resourceManagers List of {@link HTTPInterfaceConfig}
+     * @param resourceManagers List of {@link HTTPSInterfaceConfig}
      */
-    public void setResourceManagers(List<HTTPInterfaceConfig> resourceManagers) {
+    public void setResourceManagers(List<HTTPSInterfaceConfig> resourceManagers) {
         this.resourceManagers = resourceManagers;
     }
 
@@ -174,11 +151,6 @@ public class DeploymentConfig implements Serializable {
                 : that.getType() != null) {
             return false;
         }
-        if (getHttpInterface() != null
-                ? !getHttpInterface().equals(that.getHttpInterface())
-                : that.getHttpInterface() != null) {
-            return false;
-        }
         if (getHttpsInterface() != null
                 ? !getHttpsInterface().equals(that.getHttpsInterface())
                 : that.getHttpsInterface() != null) {
@@ -192,7 +164,6 @@ public class DeploymentConfig implements Serializable {
     @Override
     public int hashCode() {
         int result = getType() != null ? getType().hashCode() : 0;
-        result = 31 * result + (getHttpInterface() != null ? getHttpInterface().hashCode() : 0);
         result = 31 * result + (getHttpsInterface() != null ? getHttpsInterface().hashCode() : 0);
         result = 31 * result + (getResourceManagers() != null ? getResourceManagers().hashCode() : 0);
         return result;

@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPInterfaceConfig;
+import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPSInterfaceConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.HeartbeatResponse;
 import org.wso2.carbon.sp.distributed.resource.core.bean.ManagerNodeConfig;
 import org.wso2.carbon.sp.distributed.resource.core.exception.ResourceNodeException;
@@ -105,7 +105,7 @@ public class HeartbeatSender extends TimerTask {
              * Then try to connect to the list of manager nodes available.
              */
             if (!heartbeatSent) {
-                for (HTTPInterfaceConfig i : ServiceDataHolder.getResourceManagers()) {
+                for (HTTPSInterfaceConfig i : ServiceDataHolder.getResourceManagers()) {
                     heartbeatSent = sendHeartbeat(i);
                     if (heartbeatSent) {
                         break;
@@ -131,7 +131,7 @@ public class HeartbeatSender extends TimerTask {
      * @param config host:port configuration of the candidate leader node.
      * @return whether successfully connected to the leader node or not.
      */
-    private boolean sendHeartbeat(HTTPInterfaceConfig config) {
+    private boolean sendHeartbeat(HTTPSInterfaceConfig config) {
         HeartbeatResponse hbRes;
         WorkerMetrics workerMetrics;
         Response response = null;

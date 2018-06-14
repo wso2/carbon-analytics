@@ -41,10 +41,10 @@ public class CoordinatorChangeListener extends MemberEventListener {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
             Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
             String nodeId = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_ID);
-            String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
-            Integer httpInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+            String httpsInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
+            Integer httpsInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
             log.info(String.format("ManagerNode { id: %s, host: %s, port: %s } added to the manager cluster" +
-                    " of the resource pool.", nodeId, httpInterfaceHost, httpInterfacePort));
+                    " of the resource pool.", nodeId, httpsInterfaceHost, httpsInterfacePort));
         }
     }
 
@@ -53,10 +53,10 @@ public class CoordinatorChangeListener extends MemberEventListener {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
             Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
             String nodeId = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_ID);
-            String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
-            Integer httpInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+            String httpsInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
+            Integer httpsInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
             log.info(String.format("ManagerNode { id: %s, host: %s, port: %s } removed from the manager cluster " +
-                    "of the resource pool.", nodeId, httpInterfaceHost, httpInterfacePort));
+                    "of the resource pool.", nodeId, httpsInterfaceHost, httpsInterfacePort));
         }
     }
 
@@ -66,15 +66,15 @@ public class CoordinatorChangeListener extends MemberEventListener {
         String nodeId = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_ID);
         Integer heartbeatInterval = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_INTERVAL);
         Integer heartbeatMaxRetry = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_MAX_RETRY);
-        String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
-        Integer httpInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
-        String httpInterfaceUsername = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_USERNAME);
-        String httpInterfacePassword = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PASSWORD);
+        String httpsInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
+        Integer httpsInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+        String httpsInterfaceUsername = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_USERNAME);
+        String httpsInterfacePassword = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PASSWORD);
         InterfaceConfig interfaceConfig = new InterfaceConfig();
-        interfaceConfig.setHost(httpInterfaceHost);
-        interfaceConfig.setPort(httpInterfacePort);
-        interfaceConfig.setUsername(httpInterfaceUsername);
-        interfaceConfig.setPassword(httpInterfacePassword);
+        interfaceConfig.setHost(httpsInterfaceHost);
+        interfaceConfig.setPort(httpsInterfacePort);
+        interfaceConfig.setUsername(httpsInterfaceUsername);
+        interfaceConfig.setPassword(httpsInterfacePassword);
         ManagerNode leader = new ManagerNode().setId(nodeId)
                 .setHeartbeatInterval(heartbeatInterval)
                 .setHeartbeatMaxRetry(heartbeatMaxRetry)

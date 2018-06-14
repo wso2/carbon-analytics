@@ -34,9 +34,6 @@ public class ManagerNodeConfig {
     @JsonProperty("id")
     private String id = null;
 
-    @JsonProperty("httpInterface")
-    private InterfaceConfig httpInterface = null;
-
     @JsonProperty("httpsInterface")
     private InterfaceConfig httpsInterface = null;
 
@@ -63,25 +60,6 @@ public class ManagerNodeConfig {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public ManagerNodeConfig httpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
-        return this;
-    }
-
-    /**
-     * Get httpInterface
-     *
-     * @return httpInterface
-     **/
-    @ApiModelProperty(required = true, value = "")
-    public InterfaceConfig getHttpInterface() {
-        return httpInterface;
-    }
-
-    public void setHttpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
     }
 
     public ManagerNodeConfig httpsInterface(InterfaceConfig httpsInterface) {
@@ -152,14 +130,13 @@ public class ManagerNodeConfig {
         }
         ManagerNodeConfig managerNodeConfig = (ManagerNodeConfig) o;
         return Objects.equals(this.id, managerNodeConfig.id) &&
-                Objects.equals(this.httpInterface, managerNodeConfig.httpInterface) &&
                 Objects.equals(this.heartbeatInterval, managerNodeConfig.heartbeatInterval) &&
                 Objects.equals(this.heartbeatMaxRetry, managerNodeConfig.heartbeatMaxRetry);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, httpInterface, heartbeatInterval, heartbeatMaxRetry);
+        return Objects.hash(id, httpsInterface, heartbeatInterval, heartbeatMaxRetry);
     }
 
     @Override
@@ -168,7 +145,6 @@ public class ManagerNodeConfig {
         sb.append("class ManagerNodeConfig {\n");
 
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
-        sb.append("    httpInterface: ").append(toIndentedString(httpInterface)).append("\n");
         sb.append("    heartbeatInterval: ").append(toIndentedString(heartbeatInterval)).append("\n");
         sb.append("    heartbeatMaxRetry: ").append(toIndentedString(heartbeatMaxRetry)).append("\n");
         sb.append("}");

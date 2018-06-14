@@ -264,7 +264,7 @@ cluster.config:
   # Deployment Configuration for Distributed Deployment
 deployment.config:
   type: distributed
-  httpInterface:
+  httpsInterface:
     host: localhost
     port: 9190
   heartbeatInterval: 2000
