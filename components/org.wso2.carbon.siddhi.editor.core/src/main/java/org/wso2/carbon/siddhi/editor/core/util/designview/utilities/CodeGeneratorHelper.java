@@ -216,7 +216,7 @@ public class CodeGeneratorHelper {
      */
     public static String getMapper(MapperConfig mapper, String annotationType) throws CodeGenerationException {
         if (mapper.getType() == null || mapper.getType().isEmpty()) {
-            throw new CodeGenerationException("The map type of a given map element is empty");
+            throw new CodeGenerationException("The map type of a given source/sink map element is empty");
         }
 
         StringBuilder mapperStringBuilder = new StringBuilder();
@@ -230,15 +230,8 @@ public class CodeGeneratorHelper {
         }
 
         if (mapper.getAttributes() != null && !mapper.getAttributes().isEmpty()) {
-            mapperStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
-            if (annotationType.equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
-                mapperStringBuilder.append(SiddhiStringBuilderConstants.ATTRIBUTES_ANNOTATION);
-            } else if (annotationType.equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
-                mapperStringBuilder.append(SiddhiStringBuilderConstants.PAYLOAD_ANNOTATION);
-            }
-
-            mapperStringBuilder.append(getParameterList(mapper.getAttributes()))
-                    .append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
+            mapperStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
+                    .append(getParameterList(mapper.getAttributes()));
         }
 
         mapperStringBuilder.append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
@@ -522,7 +515,7 @@ public class CodeGeneratorHelper {
         String logic = patternSequence.getLogic();
         for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
             if (logic.contains(condition.getConditionId())) {
-                Pattern pattern = Pattern.compile("\\s+not\\s+" + condition.getConditionId());
+                Pattern pattern = Pattern.compile("not\\s+" + condition.getConditionId());
                 Matcher matcher = pattern.matcher(logic);
                 if (matcher.find()) {
                     logic = logic.replace(condition.getConditionId(),
@@ -1176,9 +1169,9 @@ public class CodeGeneratorHelper {
                     throw new CodeGenerationException("The 'max' value of a given" +
                             " aggregateByTimeRange element is empty");
                 }
-                aggregateByTimePeriodStringBuilder.append(aggregateByTimeRange.getValue().getMin())
+                aggregateByTimePeriodStringBuilder.append(aggregateByTimeRange.getValue().getMin().toLowerCase())
                         .append(SiddhiStringBuilderConstants.THREE_DOTS)
-                        .append(aggregateByTimeRange.getValue().getMax());
+                        .append(aggregateByTimeRange.getValue().getMax().toLowerCase());
                 break;
             case CodeGeneratorConstants.INTERVAL:
                 AggregateByTimeInterval aggregateByTimeInterval = (AggregateByTimeInterval) aggregateByTimePeriod;
@@ -1186,7 +1179,14 @@ public class CodeGeneratorHelper {
                     throw new CodeGenerationException("The 'value' attribute of a given" +
                             " attributeByTimeInterval element is empty");
                 }
-                aggregateByTimePeriodStringBuilder.append(getParameterList(aggregateByTimeInterval.getValue()));
+                int timeIntervalsLeft = aggregateByTimeInterval.getValue().size();
+                for (String timeInterval : aggregateByTimeInterval.getValue()) {
+                    aggregateByTimePeriodStringBuilder.append(timeInterval.toLowerCase());
+                    if (timeIntervalsLeft != 1) {
+                        aggregateByTimePeriodStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
+                    }
+                    timeIntervalsLeft--;
+                }
                 break;
             default:
                 throw new CodeGenerationException("Unidentified aggregateByTimePeriod element type: "
