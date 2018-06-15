@@ -1177,6 +1177,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
                 } else if (newElement.hasClass('windowQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                } else if (newElement.hasClass('functionQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
                 } else if (newElement.hasClass('patternQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removePatternQuery(elementId);
                 } else if (newElement.hasClass('sequenceQueryDrop')) {

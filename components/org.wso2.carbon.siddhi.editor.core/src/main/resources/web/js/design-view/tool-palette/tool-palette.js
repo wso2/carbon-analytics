@@ -108,6 +108,12 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                         icon: "/editor/images/window-query.svg"
                     },
                     {
+                        id: "function-query",
+                        className: "function-query-drag",
+                        title: "Function Query",
+                        icon: "/editor/images/function-query.svg"
+                    },
+                    {
                         id: "join-query",
                         className: "join-query-drag",
                         title: "Join Query",

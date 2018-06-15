@@ -116,6 +116,10 @@
     background-image: url("../images/window-query.svg");
 }
 
+.functionQueryDrop {
+    background-image: url("../images/function-query.svg");
+}
+
 .joinQueryDrop {
     background-image: url("../images/join-query.svg");
 }
@@ -133,7 +137,8 @@
 */
 
 .streamDrop, .tableDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
-.windowQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop, .sourceDrop, .sinkDrop, .functionDrop {
+.windowQueryDrop, .functionQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop, .sourceDrop, .sinkDrop,
+.functionDrop {
     opacity: 0.8;
     width: 60px;
     height: 60px;
@@ -325,7 +330,7 @@ td {
 .triggerDrop:hover .triggerNameNode, .aggregationDrop:hover .aggregationNameNode, .functionDrop:hover .functionNameNode,
 .projectionQueryDrop:hover .queryNameNode, .filterQueryDrop:hover .queryNameNode, .windowQueryDrop:hover .queryNameNode,
 .joinQueryDrop:hover .joinQueryNameNode, .patternQueryDrop:hover .patternQueryNameNode, .tableDrop:hover .tableNameNode,
-.sourceDrop:hover .sourceNameNode, .sinkDrop:hover .sinkNameNode {
+.sourceDrop:hover .sourceNameNode, .sinkDrop:hover .sinkNameNode, .functionQueryDrop:hover .queryNameNode {
     overflow: initial;
 }
 

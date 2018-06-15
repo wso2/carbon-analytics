@@ -25,7 +25,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         var constants = {
             PROJECTION: 'projectionQueryDrop',
             FILTER: 'filterQueryDrop',
-            WINDOW_QUERY: 'windowQueryDrop'
+            WINDOW_QUERY: 'windowQueryDrop',
+            FUNCTION_QUERY: 'functionQueryDrop'
         };
 
         /**
@@ -82,6 +83,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var streamHandlerList = [];
                 var noOfSavedFilters = 0;
                 var noOfSavedWindows = 0;
+                var noOfSavedFunctions = 0;
                 _.forEach(savedStreamHandlerList, function (streamHandler) {
                     var streamHandlerObject;
                     var parameters = [];
@@ -93,6 +95,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             }
                         };
                     } else if (streamHandler.getType() === "FUNCTION") {
+                        noOfSavedFunctions++;
                         _.forEach(streamHandler.getValue().getParameters(), function (savedParameterValue) {
                             var parameterObject = {
                                 parameter: savedParameterValue
@@ -291,8 +294,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
 
                 /*
-                * Test whether filter and window queries has their unique elements. For an example if a filter is added
-                * the filter field should be activated. If a window is added window fields should be activated.
+                * Test whether filter, function and window queries has their unique elements. For an example if a filter
+                * is added the filter field should be activated. If a window is added window fields should be
+                * activated. If a function query is added function related fields should be activated.
                 * NOTE: this check is only essential when a form is opened for a query for the first time. After that
                 * query type is changed according to the user input. So the required fields are already activated and
                 * filled.
@@ -300,8 +304,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 if ($(element).parent().hasClass(constants.FILTER) && noOfSavedFilters === 0) {
                     var streamHandlerFilterObject = {
                         streamHandler: {
-                            functionName: ' ',
-                            parameters: [{parameter: ' '}]
+                            filter: ' '
                         }
                     };
                     streamHandlerList.push(streamHandlerFilterObject);
@@ -314,6 +317,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                     };
                     streamHandlerList.push(streamHandlerWindowObject);
+                } else if ($(element).parent().hasClass(constants.FUNCTION_QUERY) && noOfSavedFunctions === 0) {
+                    var streamHandlerFunctionObject = {
+                        streamHandler: {
+                            functionName: ' ',
+                            parameters: [{parameter: ' '}]
+                        }
+                    };
+                    streamHandlerList.push(streamHandlerFunctionObject);
+
                 }
 
                 var savedQueryInput = {
@@ -1109,6 +1121,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     var numberOfWindows = 0;
                     var numberOfFilters = 0;
+                    var numberOfFunctions = 0;
                     clickedElement.getQueryInput().clearStreamHandlerList();
 
                     _.forEach(inputConfig.streamHandlerList, function (streamHandler) {
@@ -1127,6 +1140,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             _.set(streamHandlerOptions, 'type', 'WINDOW');
                             _.set(streamHandlerOptions, 'value', queryWindow);
                         } else if (streamHandler.functionName !== undefined) {
+                            numberOfFunctions++;
                             var functionOptions = {};
                             _.set(functionOptions, 'function', streamHandler.functionName);
                             var parameters = [];
@@ -1159,7 +1173,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     var type;
                     // change the query icon depending on the fields filled
-                    if (numberOfWindows === 1) {
+                    if (numberOfFunctions > 0) {
+                        type = "FUNCTION";
+                        $(element).parent().removeClass();
+                        $(element).parent().addClass(constants.FUNCTION_QUERY + ' jtk-draggable');
+                    } else if (numberOfWindows === 1) {
                         type = "WINDOW";
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');
