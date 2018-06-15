@@ -534,6 +534,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                         return;
                     }
 
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     var configAnnotation = editorAnnotation.getValue();
                     var configInput = editorInput.getValue();
                     var configSelect = editorSelect.getValue();

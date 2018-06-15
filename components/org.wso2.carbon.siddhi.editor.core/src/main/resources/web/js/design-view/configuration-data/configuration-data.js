@@ -28,6 +28,7 @@ define(['require', 'elementUtils'],
         var ConfigurationData = function (siddhiAppConfig) {
             this.siddhiAppConfig = siddhiAppConfig;
             this.edgeList = [];
+            this.isDesignViewContentChanged = false;
         };
 
         ConfigurationData.prototype.addEdge = function (edge) {
@@ -50,8 +51,16 @@ define(['require', 'elementUtils'],
             return this.edgeList;
         };
 
+        ConfigurationData.prototype.getIsDesignViewContentChanged = function () {
+            return this.isDesignViewContentChanged;
+        };
+
         ConfigurationData.prototype.setSiddhiAppConfig = function (siddhiAppConfig) {
             this.siddhiAppConfig = siddhiAppConfig;
+        };
+
+        ConfigurationData.prototype.setIsDesignViewContentChanged = function (isDesignViewContentChanged) {
+            this.isDesignViewContentChanged = isDesignViewContentChanged;
         };
 
         return ConfigurationData;

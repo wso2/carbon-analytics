@@ -116,6 +116,10 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                         .errorAlert("Trigger name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 // add the new out trigger to the trigger array
                 var triggerOptions = {};
                 _.set(triggerOptions, 'id', i);
@@ -244,6 +248,9 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 }
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
 
                 var config = editor.getValue();
 

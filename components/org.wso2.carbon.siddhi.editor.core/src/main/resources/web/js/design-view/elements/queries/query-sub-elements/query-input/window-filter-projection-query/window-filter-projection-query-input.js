@@ -28,7 +28,7 @@ define(['require', 'elementUtils'],
         var WindowFilterProjectionQueryInput = function (options) {
             /*
              Data storing structure as follows.
-                type*: 'WINDOW|FILTER|PROJECTION',
+                type*: 'FUNCTION|WINDOW|FILTER|PROJECTION',
                 from*: '',
                 streamHandlerList: [
                     {

@@ -36,6 +36,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             FILTER: 'filterQueryDrop',
             JOIN: 'joinQueryDrop',
             WINDOW_QUERY: 'windowQueryDrop',
+            FUNCTION_QUERY: 'functionQueryDrop',
             PATTERN: 'patternQueryDrop',
             SEQUENCE: 'sequenceQueryDrop',
             PARTITION: 'partitionDrop',
@@ -139,7 +140,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     accept: '.stream-drag, .table-drag, .window-drag, .trigger-drag, .aggregation-drag,' +
                     '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
                     '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag, ' +
-                    '.function-drag',
+                    '.function-drag, .function-query-drag',
                     containment: 'grid-container',
 
                     /**
@@ -221,6 +222,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 "Query");
                         }
 
+                        // If the dropped Element is a Function Query then->
+                        else if ($(droppedElement).hasClass('function-query-drag')) {
+                            self.handleWindowFilterProjectionQuery(constants.FUNCTION_QUERY, mouseTop, mouseLeft, false,
+                                "Query");
+                        }
+
                         // If the dropped Element is a Join Query then->
                         else if ($(droppedElement).hasClass('join-query-drag')) {
                             self.handleJoinQuery(mouseTop, mouseLeft, false, "Join Query");
@@ -240,6 +247,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         else if ($(droppedElement).hasClass('partition-drag')) {
                             self.handlePartition(mouseTop, mouseLeft, false);
                         }
+
+                        // set the isDesignViewContentChanged to true
+                        self.configurationData.setIsDesignViewContentChanged(true);
                     }
                 });
             });
@@ -386,6 +396,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             if (targetElement.hasClass(constants.PROJECTION)
                                 || targetElement.hasClass(constants.FILTER)
                                 || targetElement.hasClass(constants.WINDOW_QUERY)
+                                || targetElement.hasClass(constants.FUNCTION_QUERY)
                                 || targetElement.hasClass(constants.PATTERN)
                                 || targetElement.hasClass(constants.JOIN)
                                 || targetElement.hasClass(constants.SEQUENCE)) {
@@ -436,7 +447,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     // connection point, it cannot connect to the query directly
                     if ((targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY) || targetElement.hasClass(constants.JOIN)
-                        || targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE))
+                        || targetElement.hasClass(constants.FUNCTION_QUERY) || targetElement.hasClass(constants.PATTERN)
+                        || targetElement.hasClass(constants.SEQUENCE))
                         && sourceElement.hasClass(constants.STREAM)) {
                         var querySavedInsideAPartition
                             = self.configurationData.getSiddhiAppConfig().getQueryByIdSavedInsideAPartition(targetId);
@@ -462,7 +474,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
                     }
                     else if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                        || targetElement.hasClass(constants.WINDOW_QUERY)) {
+                        || targetElement.hasClass(constants.WINDOW_QUERY)
+                        || targetElement.hasClass(constants.FUNCTION_QUERY)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                             || sourceElement.hasClass(constants.TRIGGER))) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection");
@@ -535,7 +548,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     }
                     else if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                         || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.PATTERN)
-                        || sourceElement.hasClass(constants.JOIN) || sourceElement.hasClass(constants.SEQUENCE)) {
+                        || sourceElement.hasClass(constants.JOIN) || sourceElement.hasClass(constants.SEQUENCE)
+                        || sourceElement.hasClass(constants.FUNCTION_QUERY)) {
                         if (!(targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                             || targetElement.hasClass(constants.WINDOW))) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection");
@@ -550,6 +564,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             // Update the model when a connection is established and bind events for the connection
             function updateModelOnConnectionAttach() {
                 self.jsPlumbInstance.bind('connection', function (connection) {
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     var targetType;
@@ -741,7 +759,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         if ((sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                             || sourceElement.hasClass(constants.TRIGGER))
                             && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                                || targetElement.hasClass(constants.WINDOW_QUERY))) {
+                                || targetElement.hasClass(constants.WINDOW_QUERY)
+                                || targetElement.hasClass(constants.FUNCTION_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
                             var type;
@@ -751,8 +770,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             else if (targetElement.hasClass(constants.FILTER)) {
                                 type = 'FILTER';
                             }
-                            if (targetElement.hasClass(constants.WINDOW_QUERY)) {
+                            else if (targetElement.hasClass(constants.WINDOW_QUERY)) {
                                 type = 'WINDOW';
+                            }
+                            else if (targetElement.hasClass(constants.FUNCTION_QUERY)) {
+                                type = 'FUNCTION';
                             }
                             if (!model.getQueryInput()) {
                                 var queryInputOptions = {};
@@ -838,6 +860,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                             || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.JOIN)
                             || sourceElement.hasClass(constants.PATTERN)
+                            || sourceElement.hasClass(constants.FUNCTION_QUERY)
                             || sourceElement.hasClass(constants.SEQUENCE)) {
 
                             if (targetElement.hasClass(constants.STREAM)) {
@@ -854,7 +877,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             }
 
                             if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
-                                || sourceElement.hasClass(constants.WINDOW_QUERY)) {
+                                || sourceElement.hasClass(constants.WINDOW_QUERY)
+                                || sourceElement.hasClass(constants.FUNCTION_QUERY)) {
                                 model = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(sourceId);
                             } else if (sourceElement.hasClass(constants.JOIN)) {
@@ -982,6 +1006,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             function updateModelOnConnectionDetach() {
                 self.jsPlumbInstance.bind('connectionDetached', function (connection) {
 
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     /*
@@ -1053,7 +1080,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         if ((sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                             || sourceElement.hasClass(constants.TRIGGER))
                             && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                                || targetElement.hasClass(constants.WINDOW_QUERY))) {
+                                || targetElement.hasClass(constants.WINDOW_QUERY)
+                                || targetElement.hasClass(constants.FUNCTION_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
                             model.getQueryInput().setFrom(undefined);
@@ -1118,12 +1146,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     } else if (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                         || targetElement.hasClass(constants.WINDOW)) {
                         if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
-                            || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.JOIN)
+                            || sourceElement.hasClass(constants.WINDOW_QUERY)
+                            || sourceElement.hasClass(constants.FUNCTION_QUERY)
+                            || sourceElement.hasClass(constants.JOIN)
                             || sourceElement.hasClass(constants.PATTERN)
                             || sourceElement.hasClass(constants.SEQUENCE)) {
 
                             if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
-                                || sourceElement.hasClass(constants.WINDOW_QUERY)) {
+                                || sourceElement.hasClass(constants.WINDOW_QUERY)
+                                || sourceElement.hasClass(constants.FUNCTION_QUERY)) {
                                 model = self.configurationData.getSiddhiAppConfig()
                                     .getWindowFilterProjectionQuery(sourceId);
                             } else if (sourceElement.hasClass(constants.JOIN)) {
@@ -1142,6 +1173,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             function addMemberToPartitionGroup(self) {
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
 
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     var partitionId = $(event.group).attr('id');
                     var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
 
@@ -1153,7 +1187,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var errorMessage = '';
                     var isGroupMemberValid = false;
                     if ($(event.el).hasClass(constants.FILTER) || $(event.el).hasClass(constants.PROJECTION)
-                        || $(event.el).hasClass(constants.WINDOW_QUERY) || $(event.el).hasClass(constants.JOIN)
+                        || $(event.el).hasClass(constants.WINDOW_QUERY)
+                        || $(event.el).hasClass(constants.FUNCTION_QUERY)
+                        || $(event.el).hasClass(constants.JOIN)
                         || $(event.el).hasClass(constants.SEQUENCE) || $(event.el).hasClass(constants.PATTERN)
                         || $(event.el).hasClass(constants.STREAM)) {
 
@@ -1217,6 +1253,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 self.configurationData.getSiddhiAppConfig()
                                     .removeWindowFilterProjectionQuery(elementId);
                                 partition.addWindowFilterProjectionQuery(windowQueryObjectCopy);
+
+                            } else if ($(event.el).hasClass(constants.FUNCTION_QUERY)) {
+                                var functionQueryObject = self.configurationData.getSiddhiAppConfig()
+                                    .getWindowFilterProjectionQuery(elementId);
+                                var functionQueryObjectCopy = _.cloneDeep(functionQueryObject);
+                                self.configurationData.getSiddhiAppConfig()
+                                    .removeWindowFilterProjectionQuery(elementId);
+                                partition.addWindowFilterProjectionQuery(functionQueryObjectCopy);
 
                             } else if ($(event.el).hasClass(constants.PATTERN)) {
 
@@ -1396,6 +1440,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         queryType = constants.FILTER;
                     } else if (querySubType === 'WINDOW') {
                         queryType = constants.WINDOW_QUERY;
+                    } else if (querySubType === 'FUNCTION') {
+                        queryType = constants.FUNCTION_QUERY;
                     }
 
                     var array = queryId.split("_");
@@ -1481,6 +1527,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             queryType = constants.FILTER;
                         } else if (querySubType === 'WINDOW') {
                             queryType = constants.WINDOW_QUERY;
+                        } else if (querySubType === 'FUNCTION') {
+                            queryType = constants.FUNCTION_QUERY;
                         }
 
                         var array = queryId.split("_");
@@ -1534,6 +1582,16 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
             // re-align the elements
             self.autoAlignElements();
+
+            /*
+            * In here we set a timeout because when drawing the graph jsplumb triggers a 'addMember' event (when adding
+            * an element to the partition) an it takes some time to execute. So that we add a timeout and set the
+            * isDesignViewContentChange to false.
+            * */
+            setTimeout(function () {
+                // set the isDesignViewContentChanged to false
+                self.configurationData.setIsDesignViewContentChanged(false);
+            }, 100);
         };
 
         /**
@@ -1565,6 +1623,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PROJECTION));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.FILTER));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.WINDOW_QUERY));
+            Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.FUNCTION_QUERY));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.JOIN));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.PATTERN));
             Array.prototype.push.apply(nodes, currentTabElement.getElementsByClassName(constants.SEQUENCE));
@@ -1664,8 +1723,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var className = child.className;
                     if (className.includes(constants.STREAM) || className.includes(constants.PROJECTION) ||
                         className.includes(constants.FILTER) || className.includes(constants.WINDOW_QUERY) ||
-                        className.includes(constants.JOIN) || className.includes(constants.PATTERN) ||
-                        className.includes(constants.SEQUENCE)) {
+                        className.includes(constants.FUNCTION_QUERY) || className.includes(constants.JOIN) ||
+                        className.includes(constants.PATTERN) || className.includes(constants.SEQUENCE)) {
                         // Set the child to it's respective group in the dagre graph object
                         graph.setParent(child.id, partition.id);
                         // Add the child information of each group to the graphJSON object
