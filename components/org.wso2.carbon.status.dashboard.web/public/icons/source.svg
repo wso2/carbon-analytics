@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
- ~   Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- ~
- *   WSO2 Inc. licenses this file to you under the Apache License,
- *  Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License.
- *  You may obtain a copy of the License at
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an
- *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  KIND, either express or implied.  See the License for the
- *  specific language governing permissions and limitations
- *  under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
 -->
 
 <svg version="1.1" id="source" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 14 14" style="enable-background:new 0 0 14 14;" xml:space="preserve">
-<polygon points="0,6.2500005 0,7.6500006 10.186801,7.6500006 8.8868008,8.9500008 9.7868004,9.8500004 12.5868006,6.9500003 
-	9.7868004,4.1500001 8.8868008,4.9500003 10.1868,6.2500005 "/>
-<rect x="12.5868006" width="1.4" height="14"/>
+<path d="M0,6.3000002v1.4000001h8.1000004L6.8000002,9l0.9000001,0.8999996L10.5,7L7.7000003,4.1999998L6.8000002,5
+	l1.2999992,1.3000002H0z M14,0v0.7000122v0.5v11.5999756v0.6000366V14h-3.9503174v-1.2000122h2.7503052V1.2000122h-2.7503052V0H14z"
+	/>
 </svg>
