@@ -1,4 +1,4 @@
-    /**
+/**
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -64,6 +64,9 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
             this.application.commandManager.registerHandler("open-file", this.openFile, this);
 
             this.application.commandManager.registerHandler("remove-explorer-item", this.removeExplorerItem, this);
+
+            this.application.commandManager.registerCommand("reload-file", {});
+            this.application.commandManager.registerHandler("reload-file", this.reloadFile, this);
         },
 
         openFolder: function(folderPath){
@@ -85,6 +88,15 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                 return;
             }
             this.application.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
+        },
+
+        reloadFile: function(siddhiFileName){
+            var file = this._serviceClient.readFile("workspace" + this.application.getPathSeperator() + siddhiFileName);
+            var activeTab = this.application.tabController.getActiveTab();
+            activeTab.getSiddhiFileEditor().getSourceView().setContent(file.getContent());
+            activeTab.getFile()
+                .setDirty(false)
+                .save();
         },
 
         createExplorerItem: function(folderPath){

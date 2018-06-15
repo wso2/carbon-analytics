@@ -50,7 +50,7 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                         e.stopPropagation();
                         self.application.commandManager.dispatch(_.get(self._options, 'commandRevert.id'));
                     });
-                    
+
                     // register command
                     this.application.commandManager.registerCommand(options.commandRun.id);
                     this.application.commandManager.registerHandler(options.commandRun.id, this.runApp, this);
@@ -59,7 +59,7 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     this.application.commandManager.registerCommand(options.commandStop.id);
                     this.application.commandManager.registerHandler(options.commandStop.id, this.stopApp, this);
                     this.application.commandManager.registerCommand(options.commandRevert.id);
-                    this.application.commandManager.registerHandler(options.commandRevert.id, this.revertApp, this);
+                    this.application.commandManager.registerHandler(options.commandRevert.id, this.revertAppContent, this);
                 },
                 render: function () {
                     ConsoleList.prototype.render.call(this);
@@ -77,8 +77,8 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     var launcher = this.application.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                     launcher.stopApplication(this.application.workspaceManager, false);
                 },
-                revertApp: function(){
-                    //todo
+                revertAppContent: function(){
+                    this.application.workspaceManager.revertAppContent();
                 },
                 disableRunButton: function(){
                     this._runButn.addClass("disabled");
