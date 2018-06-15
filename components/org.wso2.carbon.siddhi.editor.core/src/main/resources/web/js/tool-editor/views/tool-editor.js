@@ -231,7 +231,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             removeUnnecessaryFieldsFromJSON(configurationCopy);
                             var sendingString = JSON.stringify(configurationCopy)
                                 .replace(/'/gm, "\\\'")
-                                .replace(/\\"/gm, "\\\'");
+                                .replace(/\\"/gm, "\\\"");
 
                             var response = self._designView.getCode("'" + sendingString + "'");
                             if (response.status === "success") {
