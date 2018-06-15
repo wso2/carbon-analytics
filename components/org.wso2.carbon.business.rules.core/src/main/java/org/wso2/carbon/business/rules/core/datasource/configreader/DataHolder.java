@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.business.rules.core.datasource.configreader;
 
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.config.provider.ConfigProvider;
 
@@ -28,8 +29,17 @@ public class DataHolder {
     private static DataHolder instance = new DataHolder();
     private  ConfigProvider configProvider;
     private PermissionProvider permissionProvider;
+    private AnalyticsHttpClientBuilderService clientBuilderService;
 
     private DataHolder() {
+    }
+
+    public AnalyticsHttpClientBuilderService getClientBuilderService() {
+        return clientBuilderService;
+    }
+
+    public void setClientBuilderService(AnalyticsHttpClientBuilderService clientBuilderService) {
+        this.clientBuilderService = clientBuilderService;
     }
 
     /**
