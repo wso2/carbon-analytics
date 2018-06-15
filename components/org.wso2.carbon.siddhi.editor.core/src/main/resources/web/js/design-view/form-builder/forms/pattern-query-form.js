@@ -930,6 +930,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         return;
                     }
 
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     var annotationConfig = editorAnnotation.getValue();
                     var inputConfig = editorInput.getValue();
                     var selectConfig = editorSelect.getValue();

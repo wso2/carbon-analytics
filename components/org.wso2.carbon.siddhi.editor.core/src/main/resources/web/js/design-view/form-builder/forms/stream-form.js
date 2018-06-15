@@ -146,6 +146,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         .errorAlert("Stream name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 // add the new out stream to the stream array
                 var streamOptions = {};
                 _.set(streamOptions, 'id', i);
@@ -305,6 +309,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if (errors.length) {
                     return;
                 }
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
 
                 var config = editor.getValue();
                 var streamName;

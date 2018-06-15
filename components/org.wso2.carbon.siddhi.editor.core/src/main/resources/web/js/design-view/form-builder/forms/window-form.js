@@ -181,6 +181,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                         .errorAlert("Window name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 // add the new out window to the window array
                 var windowOptions = {};
                 _.set(windowOptions, 'id', i);
@@ -427,6 +431,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 }
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
 
                 var config = editor.getValue();
 

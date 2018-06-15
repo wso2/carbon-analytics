@@ -121,6 +121,10 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                         .errorAlert("Function name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 // add the new out function to the function array
                 var functionOptions = {};
                 _.set(functionOptions, 'id', i);
@@ -262,6 +266,9 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 }
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
 
                 var config = editor.getValue();
 

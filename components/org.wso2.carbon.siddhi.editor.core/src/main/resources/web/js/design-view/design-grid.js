@@ -240,6 +240,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         else if ($(droppedElement).hasClass('partition-drag')) {
                             self.handlePartition(mouseTop, mouseLeft, false);
                         }
+
+                        // set the isDesignViewContentChanged to true
+                        self.configurationData.setIsDesignViewContentChanged(true);
                     }
                 });
             });
@@ -550,6 +553,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             // Update the model when a connection is established and bind events for the connection
             function updateModelOnConnectionAttach() {
                 self.jsPlumbInstance.bind('connection', function (connection) {
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     var targetType;
@@ -982,6 +989,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             function updateModelOnConnectionDetach() {
                 self.jsPlumbInstance.bind('connectionDetached', function (connection) {
 
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     /*
@@ -1141,6 +1151,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
             function addMemberToPartitionGroup(self) {
                 self.jsPlumbInstance.bind('group:addMember', function (event) {
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
 
                     var partitionId = $(event.group).attr('id');
                     var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
@@ -1534,6 +1547,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
             // re-align the elements
             self.autoAlignElements();
+
+            // set the isDesignViewContentChanged to false
+            self.configurationData.setIsDesignViewContentChanged(false);
         };
 
         /**

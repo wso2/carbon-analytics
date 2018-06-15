@@ -1150,6 +1150,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         || !validateSourceStreamHandlers(inputConfig.right, constants.RIGHT_SOURCE)) {
                         return;
                     }
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     clickedElement.clearAnnotationList();
                     _.forEach(annotationConfig.annotations, function (annotation) {
                         clickedElement.addAnnotation(annotation.annotation);
