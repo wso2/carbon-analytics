@@ -888,7 +888,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var close_icon_overlay = connectionObject.addOverlay([
                         "Custom", {
                             create: function () {
-                                return $('<img src="/editor/images/cancel.png" alt="">');
+                                return $('<span><i class="fw fw-delete"></i></span>');
                             },
                             location: 0.60,
                             id: "close",
