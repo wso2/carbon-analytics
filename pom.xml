@@ -1713,7 +1713,7 @@
         <siddhi.io.tcp.version>2.0.17</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.0.14</siddhi.io.email.version>
         <siddhi.io.kafka.version>4.1.13</siddhi.io.kafka.version>
-        <siddhi.io.http.version>1.0.25</siddhi.io.http.version>
+        <siddhi.io.http.version>1.0.26</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.0.23</siddhi.map.json.version>
         <siddhi.map.binary.version>1.0.11</siddhi.map.binary.version>
