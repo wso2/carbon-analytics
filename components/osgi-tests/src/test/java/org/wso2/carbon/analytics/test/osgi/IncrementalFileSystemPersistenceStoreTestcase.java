@@ -146,7 +146,7 @@ public class IncrementalFileSystemPersistenceStoreTestcase {
         File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
         log.info("Waiting for third time interval for state persistence");
         Thread.sleep(60000); //await() cannot be used because number of persisted revisions do not change
-        Assert.assertEquals(file.exists() && file.isDirectory() && file.list().length == 4, true);
+        Assert.assertEquals(file.exists() && file.isDirectory() && file.list().length == 3, true);
     }
 
 }
