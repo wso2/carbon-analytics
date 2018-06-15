@@ -214,6 +214,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 });
                             }
 
+                            var isDesignViewContentChanged
+                                = designView.getConfigurationData().getIsDesignViewContentChanged();
+
+                            if (!isDesignViewContentChanged) {
+                                designContainer.hide();
+                                designView.emptyDesignViewGridContainer();
+                                sourceContainer.show();
+                                self.trigger("view-switch");
+                                return;
+                            }
+
                             var configurationCopy = _.cloneDeep(designView.getConfigurationData());
                             removeUnnecessaryFieldsFromJSON(configurationCopy);
                             var sendingString = JSON.stringify(configurationCopy)

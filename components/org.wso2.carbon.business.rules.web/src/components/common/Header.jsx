@@ -38,9 +38,21 @@ import '../../index.css';
  * Styles related to this component
  */
 const styles = {
-    headerStyle: {
-        color: 'white',
-        backgroundColor: '#212121',
+    title: {
+        color: '#EEE',
+        fontSize: 16,
+        height: 40,
+        lineHeight: '40px',
+        marginLeft: 15,
+        flex: 1
+    },
+    appBar: {
+        backgroundColor: '#263238',
+        height:40
+    },
+    toolBar: {
+        height: 40,
+        minHeight: '40px'
     },
 };
 
@@ -141,15 +153,12 @@ export default class Header extends Component {
 
     render() {
         return (
-            <AppBar position="static" style={styles.headerStyle}>
-                <Toolbar>
-                    <Link to={`${appContext}/businessRulesManager`} style={{ textDecoration: 'none' }}>
-                        <img height="35" src={Logo} style={{ cursor: 'pointer' }} />
+            <AppBar position="static" style={styles.appBar}>
+                <Toolbar style={styles.toolBar}>
+                    <Link to={`${appContext}/businessRulesManager`} style={{ textDecoration: 'none', height: 17 }}>
+                        <img height="17" src={Logo} style={{ cursor: 'pointer' }} />
                     </Link>
-                    &nbsp;
-                    &nbsp;
-                    &nbsp;
-                    <Typography type="subheading" color="inherit" style={{ flex: 1 }}>
+                    <Typography type="subheading" style={styles.title}>
                         Business Rules Manager
                     </Typography>
                     {this.renderRightLinks()}

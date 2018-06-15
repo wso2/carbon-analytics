@@ -20,6 +20,11 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.AggregateByTimePeriod;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeInterval;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeRange;
@@ -43,6 +48,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.FilterConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.FunctionWindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.MapperConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperListPayloadOrAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperMapPayloadOrAttribute;
@@ -52,10 +58,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGenerato
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -327,6 +336,7 @@ public class CodeGeneratorHelper {
             case CodeGeneratorConstants.WINDOW:
             case CodeGeneratorConstants.FILTER:
             case CodeGeneratorConstants.PROJECTION:
+            case CodeGeneratorConstants.FUNCTION:
                 WindowFilterProjectionConfig windowFilterProjectionQuery = (WindowFilterProjectionConfig) queryInput;
                 queryInputStringBuilder.append(getWindowFilterProjectionQueryInput(windowFilterProjectionQuery));
                 break;
@@ -1093,7 +1103,7 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Obtains a list of queries from a partition and they are reordered in a way that is valid in siddhi.
+     * Obtains a list of queries are reordered in a way that is valid in siddhi.
      * This is done because the query list may come in an invalid order that cannot be compiled by the Siddhi
      * runtime.
      *
@@ -1101,23 +1111,23 @@ public class CodeGeneratorHelper {
      * @return The list of given queries in a valid order
      * @throws CodeGenerationException Error While Reordering Queries
      */
-    public static List<QueryConfig> orderPartitionQueries(List<QueryConfig> queries) throws CodeGenerationException {
+    public static List<QueryConfig> reorderQueries(List<QueryConfig> queries, List<String> definitionNames)
+            throws CodeGenerationException {
         if (queries == null) {
             throw new CodeGenerationException("A given list of queries for a partition is empty");
         }
+        Set<String> existingInputs = new HashSet<>(definitionNames);
         List<QueryConfig> reorderedQueries = new LinkedList<>();
         while (!queries.isEmpty()) {
             Iterator<QueryConfig> queryIterator = queries.iterator();
             while (queryIterator.hasNext()) {
                 QueryConfig query = queryIterator.next();
-                List<String> innerInputStreams = getInnerInputStreams(query);
-                for (QueryConfig reorderedQuery : reorderedQueries) {
-                    String outputStream = reorderedQuery.getQueryOutput().getTarget();
-                    innerInputStreams.remove(outputStream);
-                }
-                if (innerInputStreams.isEmpty()) {
+                List<String> queryInputStreams = getInputStreams(query);
+                queryInputStreams.removeAll(existingInputs);
+                if (queryInputStreams.isEmpty()) {
                     reorderedQueries.add(query);
                     queryIterator.remove();
+                    existingInputs.add(query.getQueryOutput().getTarget());
                 }
             }
         }
@@ -1125,13 +1135,14 @@ public class CodeGeneratorHelper {
     }
 
     /**
-     * Obtains a list of input streams of a given QueryConfig object that are inner streams of a partition
+     * Obtains a list of input streams of a given QueryConfig object
      *
      * @param query The given QueryConfig object
-     * @return The input streams in the given QueryConfig object that are inner input streams
-     * @throws CodeGenerationException Error while trying to get the inner streams
+     * @return The input streams in the given QueryConfig object
+     * @throws CodeGenerationException Error while trying to get the input streams
      */
-    private static List<String> getInnerInputStreams(QueryConfig query) throws CodeGenerationException {
+    private static List<String> getInputStreams(QueryConfig query)
+            throws CodeGenerationException {
         if (query == null) {
             throw new CodeGenerationException("A given query element is empty");
         } else if (query.getQueryInput() == null) {
@@ -1140,21 +1151,19 @@ public class CodeGeneratorHelper {
             throw new CodeGenerationException("The 'type' value of a given query input element is empty");
         }
 
-        List<String> innerInputStreamList = new LinkedList<>();
+        List<String> inputStreamList = new LinkedList<>();
         switch (query.getQueryInput().getType().toUpperCase()) {
             case CodeGeneratorConstants.WINDOW:
             case CodeGeneratorConstants.FILTER:
             case CodeGeneratorConstants.PROJECTION:
+            case CodeGeneratorConstants.FUNCTION:
                 WindowFilterProjectionConfig windowFilterProjection =
                         (WindowFilterProjectionConfig) query.getQueryInput();
                 if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
                     throw new CodeGenerationException("The 'from' value of a given" +
                             " window/filter/projection query input is empty");
                 }
-
-                if (windowFilterProjection.getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
-                    innerInputStreamList.add(windowFilterProjection.getFrom());
-                }
+                inputStreamList.add(windowFilterProjection.getFrom());
                 break;
             case CodeGeneratorConstants.JOIN:
                 JoinConfig join = (JoinConfig) query.getQueryInput();
@@ -1170,12 +1179,8 @@ public class CodeGeneratorHelper {
                             " given join query is empty");
                 }
 
-                if (join.getLeft().getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
-                    innerInputStreamList.add(join.getLeft().getFrom());
-                }
-                if (join.getRight().getFrom().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
-                    innerInputStreamList.add(join.getRight().getFrom());
-                }
+                inputStreamList.add(join.getLeft().getFrom());
+                inputStreamList.add(join.getRight().getFrom());
                 break;
             case CodeGeneratorConstants.PATTERN:
             case CodeGeneratorConstants.SEQUENCE:
@@ -1184,7 +1189,6 @@ public class CodeGeneratorHelper {
                     throw new CodeGenerationException("The condition list of a given " +
                             "pattern/sequence query is empty");
                 }
-
                 for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
                     if (condition == null) {
                         throw new CodeGenerationException("The condition value of a given" +
@@ -1194,16 +1198,14 @@ public class CodeGeneratorHelper {
                                 " pattern/sequence query condition is empty");
                     }
 
-                    if (condition.getStreamName().substring(0, 1).equals(SiddhiStringBuilderConstants.HASH)) {
-                        innerInputStreamList.add(condition.getStreamName());
-                    }
+                    inputStreamList.add(condition.getStreamName());
                 }
                 break;
             default:
                 throw new CodeGenerationException("Unidentified query type: " + query.getQueryInput().getType());
         }
 
-        return innerInputStreamList;
+        return inputStreamList;
     }
 
     /**
@@ -1262,6 +1264,90 @@ public class CodeGeneratorHelper {
         }
 
         return aggregateByTimePeriodStringBuilder.toString();
+    }
+
+    /**
+     * Gets a list of StreamConfig objects and identifies the streams that does not need to be generated,
+     * and outputs the ones that do need to be generated.
+     *
+     * @param streamList The list of streams in the Siddhi app
+     * @param sourceList The list of sources in the Siddhi app
+     * @param sinkList   The list of sinks in the Siddhi app
+     * @param queryList  The list of queries in the Siddhi app
+     * @return The list of streams that are to generated
+     */
+    public static List<StreamConfig> getStreamsToBeDefined(List<StreamConfig> streamList,
+                                                           List<SourceSinkConfig> sourceList,
+                                                           List<SourceSinkConfig> sinkList,
+                                                           List<QueryConfig> queryList) {
+        List<StreamConfig> definedStreams = new ArrayList<>();
+        for (StreamConfig stream : streamList) {
+            // Check For Annotations
+            if (stream.getAnnotationList() != null && !stream.getAnnotationList().isEmpty()) {
+                definedStreams.add(stream);
+                continue;
+            }
+            // Check For Sources/Sinks
+            boolean hasSourceSink = false;
+            List<SourceSinkConfig> sourceSinkList = new ArrayList<>();
+            sourceSinkList.addAll(sourceList);
+            sourceSinkList.addAll(sinkList);
+            for (SourceSinkConfig source : sourceSinkList) {
+                if (stream.getName().equals(source.getConnectedElementName())) {
+                    hasSourceSink = true;
+                    break;
+                }
+            }
+            if (hasSourceSink) {
+                definedStreams.add(stream);
+                continue;
+            }
+            // Check For Query Output
+            boolean isQueryOutput = false;
+            for (QueryConfig query : queryList) {
+                if (query.getQueryOutput().getTarget().equals(stream.getName())) {
+                    isQueryOutput = true;
+                    break;
+                }
+            }
+            if (!isQueryOutput) {
+                definedStreams.add(stream);
+            }
+        }
+
+        return definedStreams;
+    }
+
+    /**
+     * Gets the names of all the definition elements of a Siddhi app.
+     *
+     * @param streams      The list of streams in a Siddhi app
+     * @param tables       The list of tables in a Siddhi app
+     * @param windows      The list of windows in a Siddhi app
+     * @param triggers     The list of triggers in a Siddhi app
+     * @param aggregations The list of aggregations in a Siddhi app
+     * @return The names of all the definitions in a Siddhi app
+     */
+    public static List<String> getDefinitionNames(List<StreamConfig> streams, List<TableConfig> tables,
+                                                  List<WindowConfig> windows, List<TriggerConfig> triggers,
+                                                  List<AggregationConfig> aggregations) {
+        List<String> definitionNames = new LinkedList<>();
+        for (StreamConfig stream : streams) {
+            definitionNames.add(stream.getName());
+        }
+        for (TableConfig table : tables) {
+            definitionNames.add(table.getName());
+        }
+        for (WindowConfig window : windows) {
+            definitionNames.add(window.getName());
+        }
+        for (TriggerConfig trigger : triggers) {
+            definitionNames.add(trigger.getName());
+        }
+        for (AggregationConfig aggregation : aggregations) {
+            definitionNames.add(aggregation.getName());
+        }
+        return definitionNames;
     }
 
     private CodeGeneratorHelper() {

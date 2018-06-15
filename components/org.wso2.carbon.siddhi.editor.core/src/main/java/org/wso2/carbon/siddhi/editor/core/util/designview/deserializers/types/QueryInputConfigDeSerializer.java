@@ -45,7 +45,8 @@ public class QueryInputConfigDeSerializer implements JsonDeserializer {
         String queryInputType = jsonPrimitive.getAsString();
         if (queryInputType.equalsIgnoreCase(QueryInputType.WINDOW.toString()) ||
                 queryInputType.equalsIgnoreCase(QueryInputType.FILTER.toString()) ||
-                queryInputType.equalsIgnoreCase(QueryInputType.PROJECTION.toString())) {
+                queryInputType.equalsIgnoreCase(QueryInputType.PROJECTION.toString()) ||
+                queryInputType.equalsIgnoreCase(QueryInputType.FUNCTION.toString())) {
             return jsonDeserializationContext.deserialize(jsonObject, WindowFilterProjectionConfig.class);
         } else if (queryInputType.equalsIgnoreCase(QueryInputType.JOIN.toString())) {
             return jsonDeserializationContext.deserialize(jsonObject, JoinConfig.class);

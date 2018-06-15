@@ -43,7 +43,7 @@ const styles = {
         border: '1px solid #faebcc',
         color: '#8a6d3b',
         fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif' },
-    cookiePolicyAnchor: { fontWeight: 'bold', color: '#8a6d3b' },
+    cookiePolicyAnchor: { fontWeight: 'bold', color: '#8a6d3b', textDecoration: 'none' },
 };
 
 /**

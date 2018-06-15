@@ -200,20 +200,8 @@ public class IncrementalDBPersistenceStoreTestcase {
     public void testRestoreFromDBSystem() throws InterruptedException, DataSourceException, SQLException {
         DataSource dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
         log.info("Waiting for second time interval for state persistence");
-        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(() -> {
-            Connection con = dataSource.getConnection();
-            PreparedStatement stmt = con.prepareStatement(selectLastQuery);
-            stmt.setString(1, "SiddhiAppPersistence");
-            ResultSet resultSet = stmt.executeQuery();
-            int count = 0;
-            while (resultSet.next()) {
-                count++;
-                Assert.assertEquals(resultSet.getString("siddhiAppName"), SIDDHIAPP_NAME);
-            }
-            con.close();
-            stmt.close();
-            return count == 3;
-        });
+        /* waiting for a minute. Cannot use awaitility as the number of revisions might change over time */
+        Thread.sleep(65000);
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
         log.info("Restarting " + SIDDHIAPP_NAME + " and restoring last saved state");
@@ -236,44 +224,5 @@ public class IncrementalDBPersistenceStoreTestcase {
 
         Assert.assertEquals(SiddhiAppUtil.outputElementsArray, Arrays.asList("500", "500", "500", "500", "500",
                 "300", "300", "280", "280", "280"));
-    }
-
-    @Test(dependsOnMethods = {"testRestoreFromDBSystem"})
-    public void testPeriodicDBSystemPersistence() throws InterruptedException {
-
-        Connection con = null;
-        PreparedStatement stmt = null;
-        try {
-            DataSource dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
-            con = dataSource.getConnection();
-            log.info("Waiting for third time interval for state persistence");
-            Thread.sleep(60000); //await() cannot be used because number of persisted revisions do not change
-
-            stmt = con.prepareStatement(selectLastQuery);
-            SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
-            stmt.setString(1, siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME).getName());
-            ResultSet resultSet = stmt.executeQuery();
-            int count = 0;
-            while (resultSet.next()) {
-                count++;
-                Assert.assertEquals(resultSet.getString("siddhiAppName"), SIDDHIAPP_NAME);
-            }
-            Assert.assertEquals(count, 6);
-        } catch (SQLException e) {
-            log.error("Error in processing query ", e);
-        } catch (DataSourceException e) {
-            log.error("Cannot establish connection to the data source ", e);
-        } finally {
-            try {
-                if (con != null) {
-                    con.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-                log.error("Error in closing connection to test datasource ", e);
-            }
-        }
     }
 }

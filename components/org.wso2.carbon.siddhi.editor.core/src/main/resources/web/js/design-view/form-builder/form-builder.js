@@ -44,6 +44,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             FILTER: 'filterQueryDrop',
             JOIN: 'joinQueryDrop',
             WINDOW_QUERY: 'windowQueryDrop',
+            FUNCTION_QUERY: 'functionQueryDrop',
             PATTERN: 'patternQueryDrop',
             SEQUENCE: 'sequenceQueryDrop',
             PARTITION: 'partitionDrop'
@@ -429,7 +430,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         };
 
         /**
-         * @function generate the form for the simple queries (projection, filter and window)
+         * @function generate the form for the simple queries (projection, filter, window and function)
          * @param element selected element(query)
          */
         FormBuilder.prototype.GeneratePropertiesFormForWindowFilterProjectionQueries = function (element) {

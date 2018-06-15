@@ -1132,6 +1132,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             //register event listener to remove the element when the close icon is clicked
             newElement.on('click', '.element-close-icon', function () {
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 var elementId = newElement[0].id;
 
                 /*
@@ -1173,6 +1177,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
                 } else if (newElement.hasClass('windowQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                } else if (newElement.hasClass('functionQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
                 } else if (newElement.hasClass('patternQueryDrop')) {
                     self.configurationData.getSiddhiAppConfig().removePatternQuery(elementId);
                 } else if (newElement.hasClass('sequenceQueryDrop')) {
@@ -1191,6 +1197,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             //register event listener to remove the element when the close icon is clicked
             newElement.on('click', '.partition-element-close-icon', function () {
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 var elementId = newElement[0].id;
                 var partition = self.configurationData.getSiddhiAppConfig().getPartition(elementId);
                 var noOfElementsInsidePartition = partition.getNoOfElementsInPartition();
