@@ -168,8 +168,9 @@ public class HeartbeatSender extends TimerTask {
             long startTime = System.currentTimeMillis();
             // Send request to the heartbeat endpoint.
             managerResponse = ManagerServiceFactory.getManagerHttpsClient(HTTPSClientUtil.PROTOCOL +
-                            HTTPSClientUtil.generateURLHostPort(config.getHost(), String.valueOf(config.getPort())),
-                    config.getUsername(), config.getPassword()).sendHeartBeat(ServiceDataHolder.getCurrentNodeConfig());
+                    HTTPSClientUtil.generateURLHostPort(config.getHost(),
+                            String.valueOf(config.getPort())), config.getUsername(), config.getPassword())
+                    .sendHeartBeat(gson.toJson(ServiceDataHolder.getCurrentNodeConfig()));
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Time taken to update heartbeat: " + (System.currentTimeMillis() - startTime));
@@ -239,5 +240,4 @@ public class HeartbeatSender extends TimerTask {
         }
         return connected;
     }
-
 }

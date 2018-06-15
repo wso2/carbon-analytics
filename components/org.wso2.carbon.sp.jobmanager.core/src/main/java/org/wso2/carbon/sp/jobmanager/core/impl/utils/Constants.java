@@ -53,8 +53,8 @@ public class Constants {
 
     public static final String PROTOCOL = "https://";
     public static final String URL_HOST_PORT_SEPARATOR = ":";
-    public static final int CLIENT_CONNECTION_TIMEOUT = 2000;
-    public static final int CLIENT_READ_TIMEOUT = 2000;
+    public static final int CLIENT_CONNECTION_TIMEOUT = 5000;
+    public static final int CLIENT_READ_TIMEOUT = 5000;
 
     private Constants() {
         //preventing initialization

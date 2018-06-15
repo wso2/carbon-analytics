@@ -32,5 +32,5 @@ public interface ManagerServiceStub {
     
     @RequestLine("POST /resourceManager/heartbeat")
     @Headers("Content-Type: application/json")
-    Response sendHeartBeat(NodeConfig nodeConfig);
+    Response sendHeartBeat(String nodeConfig);
 }
