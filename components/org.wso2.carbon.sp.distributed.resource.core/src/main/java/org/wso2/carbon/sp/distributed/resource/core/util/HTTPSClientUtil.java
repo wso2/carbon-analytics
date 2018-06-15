@@ -24,9 +24,9 @@ package org.wso2.carbon.sp.distributed.resource.core.util;
 public class HTTPSClientUtil {
 
     public static final String PROTOCOL = "https://";
-    public static final String URL_HOST_PORT_SEPERATOR = ":";
-    public static final int CLIENT_CONNECTION_TIMEOUT = 1000;
-    public static final int CLIENT_READ_TIMEOUT = 1000;
+    public static final String URL_HOST_PORT_SEPARATOR = ":";
+    public static final int CLIENT_CONNECTION_TIMEOUT = 2000;
+    public static final int CLIENT_READ_TIMEOUT = 2000;
 
     /**
      * Generate the worker ker wich is use for rest call.
@@ -36,6 +36,6 @@ public class HTTPSClientUtil {
      * @return returnconcadinating the host:port
      */
     public static String generateURLHostPort(String host, String port) {
-        return host + URL_HOST_PORT_SEPERATOR + port;
+        return host + URL_HOST_PORT_SEPARATOR + port;
     }
 }

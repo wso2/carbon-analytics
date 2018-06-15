@@ -17,20 +17,32 @@
  *
  */
 
-package org.wso2.carbon.sp.distributed.resource.core.api;
+package org.wso2.carbon.sp.jobmanager.core.api;
 
 import feign.Headers;
+import feign.Param;
 import feign.RequestLine;
 import feign.Response;
-import org.wso2.carbon.sp.distributed.resource.core.bean.NodeConfig;
 
 /**
  * feign client for sending the request.
  */
 
-public interface ManagerServiceStub {
-    
-    @RequestLine("POST /resourceManager/heartbeat")
+public interface ResourceServiceStub {
+
+    @RequestLine("POST /siddhi-apps")
+    @Headers({"Content-Type: text/plain; charset=UTF-8", "accept: application/json"})
+    Response postSiddhiApp(String app);
+
+    @RequestLine("PUT /siddhi-apps")
+    @Headers({"Content-Type: text/plain; charset=UTF-8", "accept: application/json"})
+    Response putSiddhiApp(String app);
+
     @Headers("Content-Type: application/json")
-    Response sendHeartBeat(NodeConfig nodeConfig);
+    @RequestLine("DELETE /siddhi-apps/{appName}")
+    Response deleteSiddhiApp(@Param("appName") String appName);
+
+    @Headers("Content-Type: application/json")
+    @RequestLine("GET /siddhi-apps")
+    Response getSiddhiApps();
 }

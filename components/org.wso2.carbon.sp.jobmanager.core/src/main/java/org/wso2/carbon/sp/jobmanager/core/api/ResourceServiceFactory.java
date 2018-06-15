@@ -17,20 +17,18 @@
  *
  */
 
-package org.wso2.carbon.sp.distributed.resource.core.api;
+package org.wso2.carbon.sp.jobmanager.core.api;
 
-import feign.Headers;
-import feign.RequestLine;
-import feign.Response;
-import org.wso2.carbon.sp.distributed.resource.core.bean.NodeConfig;
+import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
+import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 
 /**
- * feign client for sending the request.
+ * Rest API service which is used to access service stub for calling another worker.
  */
-
-public interface ManagerServiceStub {
-    
-    @RequestLine("POST /resourceManager/heartbeat")
-    @Headers("Content-Type: application/json")
-    Response sendHeartBeat(NodeConfig nodeConfig);
+public class ResourceServiceFactory {
+    public static ResourceServiceStub getResourceHttpsClient(String url, String username, String password) {
+        return ServiceDataHolder.getClientBuilderService().build(username, password,
+                Constants.CLIENT_CONNECTION_TIMEOUT, Constants.CLIENT_READ_TIMEOUT,
+                ResourceServiceStub.class, url);
+    }
 }
