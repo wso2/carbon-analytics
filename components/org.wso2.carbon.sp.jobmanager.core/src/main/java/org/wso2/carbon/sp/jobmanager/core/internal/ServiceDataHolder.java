@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.sp.jobmanager.core.internal;
 
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
@@ -53,6 +54,7 @@ public class ServiceDataHolder {
     private static PermissionProvider permissionProvider;
     private static Map<String, String> userDefinedSiddhiApp;
     private static ResourceAllocationAlgorithm allocationAlgorithm;
+    private static AnalyticsHttpClientBuilderService clientBuilderService;
 
     public static ScheduledExecutorService getExecutorService() {
         return EXECUTOR_SERVICE;
@@ -168,5 +170,13 @@ public class ServiceDataHolder {
 
     public static void setAllocationAlgorithm(ResourceAllocationAlgorithm allocationAlgorithm) {
         ServiceDataHolder.allocationAlgorithm = allocationAlgorithm;
+    }
+
+    public static AnalyticsHttpClientBuilderService getClientBuilderService() {
+        return ServiceDataHolder.clientBuilderService;
+    }
+
+    public static void setClientBuilderService(AnalyticsHttpClientBuilderService clientBuilderService) {
+        ServiceDataHolder.clientBuilderService = clientBuilderService;
     }
 }

@@ -18,56 +18,24 @@
 
 package org.wso2.carbon.sp.distributed.resource.core.util;
 
-import com.google.gson.Gson;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
-import java.io.IOException;
-
 /**
  * Utility class to handle HTTPS requests.
  */
 public class HTTPSClientUtil {
-    /**
-     * Instance of {@link Gson} to un/marshall request/response.
-     */
-    public static final Gson GSON = new Gson();
-    /**
-     * Media type to send with the requests.
-     */
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+    public static final String PROTOCOL = "https://";
+    public static final String URL_HOST_PORT_SEPARATOR = ":";
+    public static final int CLIENT_CONNECTION_TIMEOUT = 5000;
+    public static final int CLIENT_READ_TIMEOUT = 5000;
 
     /**
-     * Send a POST request.
+     * Generate the manager URL which is used for rest calls.
      *
-     * @param url     URL of the endpoint.
-     * @param payload payload object.
-     * @return {@link Response} for the request.
-     * @throws IOException when failed to connect.
+     * @param host the Host of the manager node
+     * @param port the Port of the manager node
+     * @return returnconcadinating the host:port
      */
-    public static Response doPostRequest(String url, Object payload, String username, String password)
-            throws IOException {
-        RequestBody body = RequestBody.create(JSON, GSON.toJson(payload));
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        return getAuthenticatedClient(username, password).newCall(request).execute();
-    }
-
-    /**
-     * Generate a authenticated {@link OkHttpClient} client.
-     *
-     * @param username username
-     * @param password password
-     * @return authenticated client
-     */
-    private static OkHttpClient getAuthenticatedClient(final String username, final String password) {
-        return new OkHttpClient.Builder()
-                .addInterceptor(new BasicAuthInterceptor(username, password))
-                .build();
+    public static String generateURLHostPort(String host, String port) {
+        return host + URL_HOST_PORT_SEPARATOR + port;
     }
 }

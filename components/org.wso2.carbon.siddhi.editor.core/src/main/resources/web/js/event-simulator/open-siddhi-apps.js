@@ -1,7 +1,4 @@
-/**
- * Created by ramindu on 8/14/17.
- */
-/**
+/*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,

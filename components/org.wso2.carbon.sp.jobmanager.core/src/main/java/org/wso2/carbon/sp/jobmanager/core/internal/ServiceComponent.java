@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
@@ -281,5 +282,28 @@ public class ServiceComponent {
      */
     protected void unregisterClusterCoordinator(ClusterCoordinator coordinationStrategy) {
         // Do nothing.
+    }
+
+    @Reference(
+            name = "carbon.anaytics.common.clientservice",
+            service = AnalyticsHttpClientBuilderService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterAnalyticsHttpClient"
+    )
+    protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        ServiceDataHolder.setClientBuilderService(service);
+        if (log.isDebugEnabled()) {
+            log.debug("@Reference(bind) AnalyticsHttpClientBuilderService at " +
+                    AnalyticsHttpClientBuilderService.class.getName());
+        }
+    }
+
+    protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        if (log.isDebugEnabled()) {
+            log.debug("@Reference(unbind) AnalyticsHttpClientBuilderService at " +
+                    AnalyticsHttpClientBuilderService.class.getName());
+        }
+        ServiceDataHolder.setClientBuilderService(null);
     }
 }
