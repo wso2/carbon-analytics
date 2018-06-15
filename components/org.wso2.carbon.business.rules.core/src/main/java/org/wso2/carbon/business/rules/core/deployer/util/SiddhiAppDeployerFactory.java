@@ -25,8 +25,8 @@ import org.wso2.carbon.business.rules.core.datasource.configreader.DataHolder;
  * Factory that is used to produce a HTTPS client for calling a Worker
  */
 public class SiddhiAppDeployerFactory {
-    private static final int CLIENT_CONNECTION_TIMEOUT = 1000;
-    private static final int CLIENT_READ_TIMEOUT = 1000;
+    private static final int CLIENT_CONNECTION_TIMEOUT = 5000;
+    private static final int CLIENT_READ_TIMEOUT = 5000;
 
     /**
      * Returns an HTTPS client for deploying Siddhi apps to the Worker
