@@ -222,6 +222,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 designView.emptyDesignViewGridContainer();
                                 sourceContainer.show();
                                 self.trigger("view-switch");
+                                toggleViewButton.html("<i class=\"fw fw-design-view fw-rotate-90\"></i>" +
+                                    "<span class=\"toggle-button-text\">Design View</span>");
                                 return;
                             }
 
@@ -229,7 +231,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             removeUnnecessaryFieldsFromJSON(configurationCopy);
                             var sendingString = JSON.stringify(configurationCopy)
                                 .replace(/'/gm, "\\\'")
-                                .replace(/\\"/gm, "\\\'");
+                                .replace(/\\"/gm, "\\\"");
 
                             var response = self._designView.getCode("'" + sendingString + "'");
                             if (response.status === "success") {
@@ -248,7 +250,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     // NOTE - This trigger should be always handled at the end of setTimeout()
                                     self.trigger("view-switch");
                                 }, 100);
-                                toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
+                                toggleViewButton.html("<i class=\"fw fw-design-view fw-rotate-90\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
                             } else if (response.status === "fail") {
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
