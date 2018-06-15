@@ -21,6 +21,9 @@ package org.wso2.carbon.business.rules.core.deployer.util;
 import feign.Response;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppDeployerServiceStubException;
 
+/**
+ * Contains HTTPS client related methods
+ */
 public class HTTPSClientUtil {
     private static final String PROTOCOL = "https://";
 
@@ -63,11 +66,20 @@ public class HTTPSClientUtil {
      * @return                                              Feign Response object
      * @throws SiddhiAppDeployerServiceStubException        Error occurred within SiddhiAppDeployerServiceStub
      */
-    public static Response doGetRequest(String hostAndPort, String username, String password)
+    /**
+     * Produces a Response after doing a GET request
+     * @param hostAndPort                                   Host and Port of the Worker node in {Host}:{Port} format
+     * @param username                                      Username
+     * @param password                                      Password
+     * @param siddhiAppName                                 Name of the Siddhi app
+     * @return                                              Feign Response object
+     * @throws SiddhiAppDeployerServiceStubException        Error occurred within SiddhiAppDeployerServiceStub
+     */
+    public static Response doGetRequest(String hostAndPort, String username, String password, String siddhiAppName)
             throws SiddhiAppDeployerServiceStubException {
         return SiddhiAppDeployerFactory
                 .getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
-                .doGetRequest();
+                .doGetRequest(siddhiAppName);
     }
 
     /**

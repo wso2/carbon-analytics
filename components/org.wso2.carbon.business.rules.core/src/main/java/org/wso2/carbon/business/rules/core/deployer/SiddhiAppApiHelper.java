@@ -24,19 +24,16 @@ import org.wso2.carbon.business.rules.core.deployer.util.HTTPSClientUtil;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppDeployerServiceStubException;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-
 import feign.Response;
 
 /**
  * Consists of methods for additional features for the exposed Siddhi App Api
  */
 public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
-    private static final String SERVICE_ENDPOINT = "https://%s/siddhi-apps/%s/%s"; // TODO remove
     private ConfigReader configReader;
     private String username;
     private String password;
+
     public SiddhiAppApiHelper() {
         configReader = new ConfigReader();
         username = configReader.getUserName();
@@ -78,14 +75,10 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
 
     @Override
     public String getStatus(String hostAndPort, String siddhiAppName) throws SiddhiAppsApiHelperException {
-        String url;
         Response response = null;
         try {
-            response = HTTPSClientUtil.doGetRequest(hostAndPort, username, password);
+            response = HTTPSClientUtil.doGetRequest(hostAndPort, username, password, siddhiAppName);
             int status = response.status();
-            BufferedReader rd;
-            StringBuffer result;
-            String line;
             JSONObject statusMessage;
             switch (status) {
                 case 200:
@@ -96,8 +89,8 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                             "is not found on the node '" + hostAndPort + "'");
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
-                            "requesting the status of siddhi app '" + siddhiAppName + "' from the node '" + hostAndPort +
-                            "'");
+                            "requesting the status of siddhi app '" + siddhiAppName + "' from the node '" +
+                            hostAndPort + "'");
             }
         } catch (SiddhiAppDeployerServiceStubException e) {
             throw new SiddhiAppsApiHelperException("URI generated for node url '" + hostAndPort + "' is invalid.", e);
@@ -120,7 +113,8 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                             "' is not found on the node '" + hostAndPort + "'");
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
-                            "trying to delete the siddhi app '" + siddhiAppName + "' from the node '" + hostAndPort + "'");
+                            "trying to delete the siddhi app '" + siddhiAppName + "' from the node '" +
+                            hostAndPort + "'");
             }
         } catch (SiddhiAppDeployerServiceStubException e) {
             throw new SiddhiAppsApiHelperException("Failed to delete siddhi app '" + siddhiAppName +
@@ -132,7 +126,6 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
 
     @Override
     public void update(String hostAndPort, String siddhiApp) throws SiddhiAppsApiHelperException {
-        String url;
         Response response = null;
         try {
             response = HTTPSClientUtil.doPutRequest(hostAndPort, username, password, siddhiApp);

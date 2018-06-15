@@ -28,7 +28,6 @@ import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppDeployerServiceSt
 /**
  * Feign client for sending requests
  */
-
 public interface SiddhiAppDeployerServiceStub {
     @RequestLine("POST /siddhi-apps")
     @Headers("Content-Type: text/plain; charset=utf-8")
@@ -39,8 +38,10 @@ public interface SiddhiAppDeployerServiceStub {
     Response doPutRequest(String payload) throws SiddhiAppDeployerServiceStubException;
 
     @RequestLine("DELETE /siddhi-apps/{appName}")
+    @Headers("Content-Type: text/plain; charset=utf-8")
     Response doDeleteRequest(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
 
-    @RequestLine("GET /siddhi-apps")
-    Response doGetRequest() throws SiddhiAppDeployerServiceStubException;
+    @RequestLine("GET /siddhi-apps/{appName}/status")
+    @Headers("Content-Type: text/plain; charset=utf-8")
+    Response doGetRequest(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
 }
