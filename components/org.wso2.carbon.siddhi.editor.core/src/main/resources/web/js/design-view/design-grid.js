@@ -1583,8 +1583,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             // re-align the elements
             self.autoAlignElements();
 
-            // set the isDesignViewContentChanged to false
-            self.configurationData.setIsDesignViewContentChanged(false);
+            /*
+            * In here we set a timeout because when drawing the graph jsplumb triggers a 'addMember' event (when adding
+            * an element to the partition) an it takes some time to execute. So that we add a timeout and set the
+            * isDesignViewContentChange to false.
+            * */
+            setTimeout(function () {
+                // set the isDesignViewContentChanged to false
+                self.configurationData.setIsDesignViewContentChanged(false);
+            }, 100);
         };
 
         /**
