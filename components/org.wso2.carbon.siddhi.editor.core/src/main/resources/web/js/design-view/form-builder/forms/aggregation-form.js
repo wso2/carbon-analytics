@@ -46,6 +46,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
          */
         AggregationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Aggregation Configuration</h3></div>' +
+                '<div class="define-aggregation"></div>');
+            formContainer.append(propertyDiv);
+
             // The design view container is disabled to prevent the user from dropping any elements
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -199,7 +203,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 var editorAnnotation = new JSONEditor($(formContainer).find('#form-aggregation-annotation')[0], {
                     schema: {
                         type: "object",
-                        title: "Aggregation Annotations",
+                        title: "Annotations",
                         properties: {
                             annotations: {
                                 propertyOrder: 1,
@@ -282,7 +286,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 var editorInput = new JSONEditor($(formContainer).find('#form-aggregation-input')[0], {
                     schema: {
                         type: "object",
-                        title: "Aggregation Input",
+                        title: "Input",
                         properties: {
                             name: {
                                 type: "string",
@@ -312,7 +316,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                             disable_properties: false
                         },
                         type: "object",
-                        title: "Aggregation Select",
+                        title: "Select",
                         properties: {
                             select: {
                                 propertyOrder: 1,
@@ -429,7 +433,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                 type: "object",
                                 title: "Range",
                                 options: {
-                                    disable_properties: false
+                                    disable_properties: true
                                 },
                                 properties: {
                                     minValue: {
@@ -450,6 +454,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                                     },
                                     maxValue: {
                                         propertyOrder: 2,
+                                        required: true,
                                         type: "string",
                                         title: "Ending Time Value",
                                         enum: [

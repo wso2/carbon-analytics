@@ -25,8 +25,10 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.AggregateByTimePeriodDeSerializer;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.AttributesSelectionConfigDeSerializer;
+import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.MapperPayloadOrAttributeDeserializer;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.QueryInputConfigDeSerializer;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.QueryOutputConfigDeSerializer;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.StreamHandlerConfigDeserializer;
@@ -54,6 +56,7 @@ public class DeserializersRegisterer {
         gsonBuilder.registerTypeAdapter(AggregateByTimePeriod.class, new AggregateByTimePeriodDeSerializer());
         gsonBuilder.registerTypeAdapter(QueryInputConfig.class, new QueryInputConfigDeSerializer());
         gsonBuilder.registerTypeAdapter(QueryOutputConfig.class, new QueryOutputConfigDeSerializer());
+        gsonBuilder.registerTypeAdapter(MapperPayloadOrAttribute.class, new MapperPayloadOrAttributeDeserializer());
         return gsonBuilder;
     }
 }
