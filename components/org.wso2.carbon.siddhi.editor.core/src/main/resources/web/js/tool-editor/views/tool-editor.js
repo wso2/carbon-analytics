@@ -222,6 +222,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 designView.emptyDesignViewGridContainer();
                                 sourceContainer.show();
                                 self.trigger("view-switch");
+                                toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
+                                    "<span class=\"toggle-button-text\">Design View</span>");
                                 return;
                             }
 
