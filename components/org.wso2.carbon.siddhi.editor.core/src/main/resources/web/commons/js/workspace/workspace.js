@@ -412,6 +412,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                             toolBar.disableRunButton();
                             toolBar.disableDebugButton();
                             toolBar.disableStopButton();
+                            toolBar.enableRevertButton();
                         } else {
                             if(file.getRunStatus() || file.getDebugStatus()){
                                 runMenuItem.disable();
@@ -443,6 +444,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                                 } else{
                                     stopMenuItem.enable();
                                     toolBar.enableStopButton();
+                                    toolBar.disableRevertButton();
                                 }
                             }
                         }
