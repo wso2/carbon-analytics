@@ -284,6 +284,9 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     public String providerConfig() {
         Map<String, String> renderingTypes = new HashMap<>();
         Map<String, String> renderingHints = new HashMap<>();
+        String providerDescription = "RDBMS provider supports retrieve data for widgets using any SQL database table" +
+                ". The Batch provider allows the user to get all the data in the table batch wise and Streaming data" +
+                " provider will allow the user retrieve data in a streaming manner using an incremental data column.";
         renderingTypes.put("publishingInterval", InputFieldTypes.NUMBER);
         renderingHints.put("publishingInterval", "Rate at which data should be sent to the widget");
         renderingTypes.put("purgingInterval", InputFieldTypes.NUMBER);
@@ -304,7 +307,8 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         renderingHints.put("incrementalColumn", "Column of the table that is used to identify the incremental data");
         renderingTypes.put("timeColumns", InputFieldTypes.TEXT_FIELD);
         renderingHints.put("timeColumns", "Columns of the table that contain timestamps");
-        return new Gson().toJson(new Object[]{renderingTypes, new RDBMSDataProviderConf(), renderingHints});
+        return new Gson().toJson(new Object[]{renderingTypes, new RDBMSDataProviderConf(), renderingHints,
+                providerDescription});
     }
 
     @Override
