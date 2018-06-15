@@ -24,6 +24,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.constants.query;
 public enum QueryInputType {
     WINDOW_FILTER_PROJECTION,
     WINDOW,
+    FUNCTION,
     FILTER,
     PROJECTION,
     JOIN,
