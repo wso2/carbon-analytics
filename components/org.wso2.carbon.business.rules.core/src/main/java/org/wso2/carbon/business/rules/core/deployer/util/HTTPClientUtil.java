@@ -28,7 +28,7 @@ import okhttp3.Response;
 /**
  * Utility class to handle HTTP requests.
  */
-public class HTTPClientUtil {
+public class HTTPClientUtil { // TODO REMOVE
     /**
      * Media type to send with the requests.
      */
