@@ -301,6 +301,7 @@
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
+            org.wso2.carbon.analytics.idp.client.*,
             *;resolution:=optional
         </import.package>
         <export.package>

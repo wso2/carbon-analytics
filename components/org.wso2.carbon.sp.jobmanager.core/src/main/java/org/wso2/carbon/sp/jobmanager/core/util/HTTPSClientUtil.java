@@ -26,7 +26,7 @@ import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 public class HTTPSClientUtil {
 
     /**
-     * Generate the worker ker wich is use for rest call.
+     * Generate the worker URL which is used for rest calls.
      *
      * @param host the Host of the worker node
      * @param port the Port of the worker node

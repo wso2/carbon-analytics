@@ -29,10 +29,10 @@ public class HTTPSClientUtil {
     public static final int CLIENT_READ_TIMEOUT = 5000;
 
     /**
-     * Generate the worker ker wich is use for rest call.
+     * Generate the manager URL which is used for rest calls.
      *
-     * @param host the Host of the worker node
-     * @param port the Port of the worker node
+     * @param host the Host of the manager node
+     * @param port the Port of the manager node
      * @return returnconcadinating the host:port
      */
     public static String generateURLHostPort(String host, String port) {

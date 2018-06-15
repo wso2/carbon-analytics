@@ -97,7 +97,7 @@ public class SiddhiAppDeployer {
                     node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword())
                     .deleteSiddhiApp(siddhiAppName);
             return resourceResponse.status() == 200;
-        } catch (feign.RetryableException e) {
+        } catch (feign.FeignException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Error occurred while up-deploying Siddhi app from " + node, e);
             }
@@ -127,7 +127,7 @@ public class SiddhiAppDeployer {
             if (resourceResponse.status() == 200) {
                 apps = new Gson().fromJson(resourceResponse.body().toString(), String[].class);
             }
-        } catch (feign.RetryableException e) {
+        } catch (feign.FeignException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Error occurred while retrieving deployed Siddhi apps from " + node, e);
             }
