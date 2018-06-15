@@ -25,6 +25,7 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     this._runButn = $(_.get(options, 'runIconBtn'));
                     this._debugBtn = $(_.get(options, 'debugIconBtn'));
                     this._stopBtn = $(_.get(options, 'stopIconBtn'));
+                    this._revertBtn = $(_.get(options, 'revertIconBtn'));
                     this.application = _.get(options, 'application');
                     this._$parent_el = $(_.get(options, 'container'));
                     this._options = options;
@@ -44,7 +45,12 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                         e.stopPropagation();
                         self.application.commandManager.dispatch(_.get(self._options, 'commandStop.id'));
                     });
-                    
+                    this._revertBtn.on('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.application.commandManager.dispatch(_.get(self._options, 'commandRevert.id'));
+                    });
+
                     // register command
                     this.application.commandManager.registerCommand(options.commandRun.id);
                     this.application.commandManager.registerHandler(options.commandRun.id, this.runApp, this);
@@ -52,6 +58,8 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     this.application.commandManager.registerHandler(options.commandDebug.id, this.debugApp, this);
                     this.application.commandManager.registerCommand(options.commandStop.id);
                     this.application.commandManager.registerHandler(options.commandStop.id, this.stopApp, this);
+                    this.application.commandManager.registerCommand(options.commandRevert.id);
+                    this.application.commandManager.registerHandler(options.commandRevert.id, this.revertAppContent, this);
                 },
                 render: function () {
                     ConsoleList.prototype.render.call(this);
@@ -69,6 +77,9 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     var launcher = this.application.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                     launcher.stopApplication(this.application.workspaceManager, false);
                 },
+                revertAppContent: function(){
+                    this.application.workspaceManager.revertAppContent();
+                },
                 disableRunButton: function(){
                     this._runButn.addClass("disabled");
                     this._runButn.removeClass("active");
@@ -81,6 +92,10 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     this._stopBtn.addClass("disabled");
                     this._stopBtn.removeClass("active");
                 },
+                disableRevertButton: function(){
+                    this._revertBtn.addClass("disabled");
+                    this._revertBtn.removeClass("active");
+                },
                 enableRunButton: function(){
                     this._runButn.removeClass("disabled");
                     this._runButn.addClass("active");
@@ -92,6 +107,10 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                 enableStopButton: function(){
                     this._stopBtn.removeClass("disabled");
                     this._stopBtn.addClass("active");
+                },
+                enableRevertButton: function(){
+                    this._revertBtn.removeClass("disabled");
+                    this._revertBtn.addClass("active");
                 }
             });
         return ToolBar;
