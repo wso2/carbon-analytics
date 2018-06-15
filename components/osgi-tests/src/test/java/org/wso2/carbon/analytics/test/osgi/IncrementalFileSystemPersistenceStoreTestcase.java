@@ -113,10 +113,8 @@ public class IncrementalFileSystemPersistenceStoreTestcase {
     @Test(dependsOnMethods = {"testFileSystemPersistence"})
     public void testRestoreFromFileSystem() throws InterruptedException {
         log.info("Waiting for second time interval for state persistence");
-        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(() -> {
-            File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
-            return file.exists() && file.isDirectory() && file.list().length >= 3;
-        });
+        /* waiting for a minute. Cannot use awaitility as the number of revisions might change over time */
+        Thread.sleep(65000);
 
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
@@ -140,13 +138,4 @@ public class IncrementalFileSystemPersistenceStoreTestcase {
         Assert.assertEquals(SiddhiAppUtil.outputElementsArray, Arrays.asList("500", "500", "500", "500", "500",
                 "300", "300", "280", "280", "280"));
     }
-
-    @Test(dependsOnMethods = {"testRestoreFromFileSystem"})
-    public void testFileSystemPeriodicPersistence() throws InterruptedException {
-        File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
-        log.info("Waiting for third time interval for state persistence");
-        Thread.sleep(60000); //await() cannot be used because number of persisted revisions do not change
-        Assert.assertEquals(file.exists() && file.isDirectory() && file.list().length == 4, true);
-    }
-
 }
