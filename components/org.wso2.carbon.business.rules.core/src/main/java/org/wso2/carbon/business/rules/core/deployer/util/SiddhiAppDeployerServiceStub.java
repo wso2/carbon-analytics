@@ -23,25 +23,24 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import feign.Response;
-
-import java.io.IOException;
+import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppDeployerServiceStubException;
 
 /**
- * feign client for sending the request.
+ * Feign client for sending requests
  */
 
 public interface SiddhiAppDeployerServiceStub {
     @RequestLine("POST /siddhi-apps")
     @Headers("Content-Type: text/plain; charset=utf-8")
-    Response doPostRequest(String payload) throws IOException;
+    Response doPostRequest(String payload) throws SiddhiAppDeployerServiceStubException;
 
     @RequestLine("PUT /siddhi-apps")
     @Headers("Content-Type: text/plain; charset=utf-8")
-    Response doPutRequest(String payload) throws IOException;
+    Response doPutRequest(String payload) throws SiddhiAppDeployerServiceStubException;
 
     @RequestLine("DELETE /siddhi-apps/{appName}")
-    Response doDeleteRequest(@Param("appName") String appName) throws IOException;
+    Response doDeleteRequest(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
 
     @RequestLine("GET /siddhi-apps")
-    Response doGetRequest() throws IOException;
+    Response doGetRequest() throws SiddhiAppDeployerServiceStubException;
 }

@@ -19,37 +19,86 @@
 package org.wso2.carbon.business.rules.core.deployer.util;
 
 import feign.Response;
-
-import java.io.IOException;
+import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppDeployerServiceStubException;
 
 public class HTTPSClientUtil {
+    private static final String PROTOCOL = "https://";
+
+    /**
+     * Avoids Instantiation
+     */
     private HTTPSClientUtil() {
     }
 
-    public static Response doPostRequest(String url, String username, String password, String payload)
-            throws IOException {
+    /**
+     * Generates an HTTPS URL with the given hostAndPort
+     * @param hostAndPort       Host and Port of the Worker node in {Host}:{Port} format
+     * @return                  HTTPS URL
+     */
+    private static String generateURL(String hostAndPort) {
+        return PROTOCOL + hostAndPort;
+    }
+
+    /**
+     * Produces a Response after doing a POST request
+     * @param hostAndPort                                   Host and Port of the Worker node in {Host}:{Port} format
+     * @param username                                      Username
+     * @param password                                      Password
+     * @param payload                                       Payload
+     * @return                                              Feign Response object
+     * @throws SiddhiAppDeployerServiceStubException        Error occurred within SiddhiAppDeployerServiceStub
+     */
+    public static Response doPostRequest(String hostAndPort, String username, String password, String payload)
+            throws SiddhiAppDeployerServiceStubException {
         return SiddhiAppDeployerFactory
-                .getDeployerHttpsClient(url, username, password)
+                .getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
                 .doPostRequest(payload);
     }
 
-    public static Response doGetRequest(String url, String username, String password) throws IOException {
+    /**
+     * Produces a Response after doing a GET request
+     * @param hostAndPort                                   Host and Port of the Worker node in {Host}:{Port} format
+     * @param username                                      Username
+     * @param password                                      Password
+     * @return                                              Feign Response object
+     * @throws SiddhiAppDeployerServiceStubException        Error occurred within SiddhiAppDeployerServiceStub
+     */
+    public static Response doGetRequest(String hostAndPort, String username, String password)
+            throws SiddhiAppDeployerServiceStubException {
         return SiddhiAppDeployerFactory
-                .getDeployerHttpsClient(url, username, password)
+                .getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
                 .doGetRequest();
     }
 
-    public static Response doPutRequest(String url, String username, String password, String payload)
-            throws IOException {
+    /**
+     * Produces a Response after doing a PUT request
+     * @param hostAndPort                                   Host and Port of the Worker node in {Host}:{Port} format
+     * @param username                                      Username
+     * @param password                                      Password
+     * @param payload                                       Payload
+     * @return                                              Feign Response object
+     * @throws SiddhiAppDeployerServiceStubException        Error occurred within SiddhiAppDeployerServiceStub
+     */
+    public static Response doPutRequest(String hostAndPort, String username, String password, String payload)
+            throws SiddhiAppDeployerServiceStubException {
         return SiddhiAppDeployerFactory
-                .getDeployerHttpsClient(url, username, password)
+                .getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
                 .doPutRequest(payload);
     }
 
-    public static Response doDeleteRequest(String url, String username, String password, String siddhiAppName)
-            throws IOException {
+    /**
+     * Produces a Response after doing a DELETE request
+     * @param hostAndPort                                   Host and Port of the Worker node in {Host}:{Port} format
+     * @param username                                      Username
+     * @param password                                      Password
+     * @param siddhiAppName                                 Name of the Siddhi App
+     * @return                                              Feign Response object
+     * @throws SiddhiAppDeployerServiceStubException        Error occurred within SiddhiAppDeployerServiceStub
+     */
+    public static Response doDeleteRequest(String hostAndPort, String username, String password, String siddhiAppName)
+            throws SiddhiAppDeployerServiceStubException {
         return SiddhiAppDeployerFactory
-                .getDeployerHttpsClient(url, username, password)
+                .getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
                 .doDeleteRequest(siddhiAppName);
     }
 }
