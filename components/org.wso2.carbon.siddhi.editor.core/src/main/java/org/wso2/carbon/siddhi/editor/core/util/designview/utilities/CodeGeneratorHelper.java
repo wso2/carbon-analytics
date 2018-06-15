@@ -327,6 +327,7 @@ public class CodeGeneratorHelper {
             case CodeGeneratorConstants.WINDOW:
             case CodeGeneratorConstants.FILTER:
             case CodeGeneratorConstants.PROJECTION:
+            case CodeGeneratorConstants.FUNCTION:
                 WindowFilterProjectionConfig windowFilterProjectionQuery = (WindowFilterProjectionConfig) queryInput;
                 queryInputStringBuilder.append(getWindowFilterProjectionQueryInput(windowFilterProjectionQuery));
                 break;
@@ -1145,6 +1146,7 @@ public class CodeGeneratorHelper {
             case CodeGeneratorConstants.WINDOW:
             case CodeGeneratorConstants.FILTER:
             case CodeGeneratorConstants.PROJECTION:
+            case CodeGeneratorConstants.FUNCTION:
                 WindowFilterProjectionConfig windowFilterProjection =
                         (WindowFilterProjectionConfig) query.getQueryInput();
                 if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
