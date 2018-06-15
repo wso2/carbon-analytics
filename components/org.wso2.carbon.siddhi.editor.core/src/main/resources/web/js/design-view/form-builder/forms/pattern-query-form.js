@@ -34,9 +34,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 this.application = options.application;
                 this.formUtils = options.formUtils;
                 this.consoleListManager = options.application.outputController;
-                var currentTabId = this.application.tabController.activeTab.cid;
-                this.designViewContainer = $('#design-container-' + currentTabId);
-                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
+                this.currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + this.currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
             }
         };
 
@@ -157,6 +157,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     partitionId = partitionElementWhereQueryIsSaved.getId();
                 }
 
+                // build attribute description for connected  streams and triggers to show as the description for the
+                // query input
+                var descriptionForInputElements = '<br/>';
+
                 _.forEach(inputStreamNames, function (inputStreamName) {
                     var inputElement =
                         self.configurationData.getSiddhiAppConfig()
@@ -164,10 +168,24 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (inputElement !== undefined) {
                         if (inputElement.type === 'TRIGGER') {
                             possibleGroupByAttributes.push(inputStreamName + '.triggered_time');
+
+                            descriptionForInputElements
+                                = descriptionForInputElements + inputStreamName + ' (triggered_time : LONG)<br/>  ';
                         } else {
+                            descriptionForInputElements
+                                = descriptionForInputElements + inputStreamName + ' (';
+
                             _.forEach(inputElement.element.getAttributeList(), function (attribute) {
                                 possibleGroupByAttributes.push(inputStreamName + "." + attribute.getName());
+
+                                descriptionForInputElements
+                                    = descriptionForInputElements + attribute.getName() + ' : ' + attribute.getType() + ', ';
                             });
+
+                            descriptionForInputElements
+                                = descriptionForInputElements.substring(0, descriptionForInputElements.length - 2);
+                            descriptionForInputElements
+                                = descriptionForInputElements + ')<br/>  ';
                         }
                     }
                 });
@@ -410,6 +428,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     schema: {
                         type: 'object',
                         title: 'Input',
+                        description: descriptionForInputElements,
                         properties: {
                             conditions: {
                                 type: 'array',
@@ -543,6 +562,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     disable_array_delete_last_row: true,
                     disable_array_reorder: true
                 });
+
+                /*
+                * set the description for query input manually. Even though we have set that in the 'editorInput' schema
+                * we re do it here because in the json editor generated description field cannot identify the page break
+                * tags.
+                * */
+                $('#' + self.currentTabId + '[data-schemapath="root"] >  p:eq(0)').html(descriptionForInputElements);
 
                 var selectScheme = {
                     schema: {
