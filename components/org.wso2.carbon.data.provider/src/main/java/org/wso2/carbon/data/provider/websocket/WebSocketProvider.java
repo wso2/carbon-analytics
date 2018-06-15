@@ -80,8 +80,10 @@ public class WebSocketProvider implements DataProvider {
     @Override
     public String providerConfig() {
         Map<String, String> renderingTypes = new HashMap<>();
+        String providerDescription = "Websocket provider can be used retrieve data to the widgets using a websocket " +
+                "sink, provider supports mappings of json, xml and text";
         renderingTypes.put("topic", InputFieldTypes.TEXT_FIELD);
         renderingTypes.put("mapType", InputFieldTypes.TEXT_FIELD);
-        return new Gson().toJson(new Object[]{renderingTypes, new WebSocketChannel()});
+        return new Gson().toJson(new Object[]{renderingTypes, new WebSocketChannel(), null, providerDescription});
     }
 }
