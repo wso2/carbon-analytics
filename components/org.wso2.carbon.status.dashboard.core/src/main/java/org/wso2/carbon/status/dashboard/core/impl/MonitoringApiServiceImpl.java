@@ -1128,7 +1128,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
                             getUsername(),
                             getPassword())
-                            .enableAppStatistics(appName, statEnable);
+                            .enableAppStatistics(appName, new Gson().toJson(statEnable));
                     if (workerResponse.status() == 200) {
                         return Response.ok().entity(workerResponse.body().toString()).build();
                     } else if (workerResponse.status() == 401) {
