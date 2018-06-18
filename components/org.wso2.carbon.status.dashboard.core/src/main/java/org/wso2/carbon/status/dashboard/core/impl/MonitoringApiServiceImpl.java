@@ -1439,7 +1439,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 try {
                     feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
                             getUsername(), getPassword()).getWorker();
-                    if (workerResponce != null) {
                         status = workerResponse.status();
                         if (status == 200) {
                             workerResponce.setCode(200);
@@ -1457,10 +1456,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             workerResponce.setMessage("Worker : " + workerId +
                                     " not reachable by unexpected internal server error.");
                         }
-                    } else {
-                        workerResponce.setCode(404);
-                        workerResponce.setMessage("Requested Response is null");
-                    }
                 } catch (feign.RetryableException e) {
                     workerResponce.setCode(404);
                     workerResponce.setMessage("Worker : " + workerId + " is not " +
@@ -1652,6 +1647,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             }
                         }
                     }
+
                 } catch (feign.RetryableException e) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(removeCRLFCharacters(id) + " Unnable to reach manager.", e);
