@@ -50,25 +50,26 @@ public class SiddhiAppDeployer {
                                     String.valueOf(node.getHttpsInterface().getPort())),
                     node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword())
                     .postSiddhiApp(siddhiQuery.getApp());
-            if (resourceResponse.status() == 201) {
-                String locationHeader = resourceResponse.headers().getOrDefault("Location", null).toString();
-                return (locationHeader != null && !locationHeader.isEmpty())
-                        ? locationHeader.substring(locationHeader.lastIndexOf('/') + 1) : null;
-            } else if (resourceResponse.status() == 409) {
-                resourceResponse.close();
-                resourceResponse = ResourceServiceFactory.getResourceHttpsClient(Constants.PROTOCOL +
-                                HTTPSClientUtil.generateURLHostPort(node.getHttpsInterface().getHost(),
-                                        String.valueOf(node.getHttpsInterface().getPort())),
-                        node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword())
-                        .putSiddhiApp(siddhiQuery.getApp());
-                if (resourceResponse.status() == 200) {
-                    return siddhiQuery.getAppName();
-                } else {
-                    return null;
+            if (resourceResponse != null) {
+                if (resourceResponse.status() == 201) {
+                    String locationHeader = resourceResponse.headers().getOrDefault("Location", null).toString();
+                    return (locationHeader != null && !locationHeader.isEmpty())
+                            ? locationHeader.substring(locationHeader.lastIndexOf('/') + 1) : null;
+                } else if (resourceResponse.status() == 409) {
+                    resourceResponse.close();
+                    resourceResponse = ResourceServiceFactory.getResourceHttpsClient(Constants.PROTOCOL +
+                                    HTTPSClientUtil.generateURLHostPort(node.getHttpsInterface().getHost(),
+                                            String.valueOf(node.getHttpsInterface().getPort())),
+                            node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword())
+                            .putSiddhiApp(siddhiQuery.getApp());
+                    if (resourceResponse.status() == 200) {
+                        return siddhiQuery.getAppName();
+                    } else {
+                        return null;
+                    }
                 }
-            } else {
-                return null;
             }
+            return null;
         } catch (feign.FeignException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Error occurred while deploying Siddhi app to " + node, e);
