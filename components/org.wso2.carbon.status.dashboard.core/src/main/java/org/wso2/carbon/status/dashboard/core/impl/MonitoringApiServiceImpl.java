@@ -1457,6 +1457,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             workerResponce.setMessage("Worker : " + workerId +
                                     " not reachable by unexpected internal server error.");
                         }
+                    } else {
+                        workerResponce.setCode(404);
+                        workerResponce.setMessage("Requested Response is null");
                     }
                 } catch (feign.RetryableException e) {
                     workerResponce.setCode(404);
@@ -1634,15 +1637,19 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     feign.Response resourceResponse = WorkerServiceFactory.getWorkerHttpsClient(
                             PROTOCOL + generateURLHostPort(hostPort[0], String.valueOf(hostPort[1])), this
                                     .getUsername(), this.getPassword()).getClusterNodeDetails();
-                    if (resourceResponse != null && resourceResponse.status() == 200) {
-                        Reader inputStream = resourceResponse.body().asReader();
-                        List<ResourceClusterInfo> clusterInfos = gson.fromJson(
-                                inputStream, new TypeToken<List<ResourceClusterInfo>>() {
-                                }.getType());
-                        for (ResourceClusterInfo clusterInfo : clusterInfos) {
-                            String workerId = generateWorkerKey(clusterInfo.getHttps_host(), clusterInfo
-                                    .getHttps_port());
-                            deleteWorker(workerId, username);
+                    if(resourceResponse == null) {
+                        logger.error("Requested response is null");
+                    } else {
+                        if (resourceResponse.status() == 200) {
+                            Reader inputStream = resourceResponse.body().asReader();
+                            List<ResourceClusterInfo> clusterInfos = gson.fromJson(
+                                    inputStream, new TypeToken<List<ResourceClusterInfo>>() {
+                                    }.getType());
+                            for (ResourceClusterInfo clusterInfo : clusterInfos) {
+                                String workerId = generateWorkerKey(clusterInfo.getHttps_host(), clusterInfo
+                                        .getHttps_port());
+                                deleteWorker(workerId, username);
+                            }
                         }
                     }
                 } catch (feign.RetryableException e) {
