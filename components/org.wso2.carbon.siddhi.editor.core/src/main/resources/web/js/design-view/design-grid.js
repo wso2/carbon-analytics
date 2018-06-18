@@ -292,8 +292,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         } else {
                             return connectionValidity = true;
                         }
-                    }
-                    else if (targetElement.hasClass(constants.STREAM)
+
+                    } else if (targetElement.hasClass(constants.STREAM)
                         && self.jsPlumbInstance.getGroupFor(targetId) !== undefined) {
                         if (self.jsPlumbInstance.getGroupFor(targetId) !== self.jsPlumbInstance.getGroupFor(sourceId)) {
                             DesignViewUtils.prototype
@@ -302,6 +302,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         } else {
                             return connectionValidity = true;
                         }
+
                     } else if (targetElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                         if (!sourceElement.hasClass(constants.STREAM)) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect an outer stream");
@@ -373,12 +374,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 if (isStreamDirectlyConnectedToAQuery) {
                                     DesignViewUtils.prototype.errorAlert("Invalid Connection: Connected stream is " +
                                         "already directly connected to a query inside the partition.");
+                                    return connectionValidity;
                                 } else {
-                                    connectionValidity = true;
+                                    return connectionValidity = true;
                                 }
-                                return connectionValidity;
                             }
                         }
+
                     } else if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                         // check whether the partition connection point has a valid connection with a outer stream.
                         // If not display a error message.
@@ -391,7 +393,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         if (self.jsPlumbInstance.getGroupFor(targetId)
                             !== self.jsPlumbInstance.getGroupFor(partitionId)) {
                             DesignViewUtils.prototype
-                                .errorAlert("Invalid Connection: Connect a query inside the partition");
+                                .errorAlert("Invalid Connection: Connect to a query input inside the partition");
+                            return connectionValidity;
                         } else {
                             if (targetElement.hasClass(constants.PROJECTION)
                                 || targetElement.hasClass(constants.FILTER)
@@ -403,28 +406,28 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 return connectionValidity = true;
                             } else {
                                 DesignViewUtils.prototype
-                                    .errorAlert("Invalid Connection: Connect a query inside the partition");
+                                    .errorAlert("Invalid Connection: Connect to a query input inside the partition");
                                 return connectionValidity;
                             }
                         }
-                    }
-                    else if (sourceElement.hasClass(constants.PARTITION)) {
+
+                    } else if (sourceElement.hasClass(constants.PARTITION)) {
                         if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') !== sourceId) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect to a partition query");
                             return connectionValidity;
                         } else {
                             return connectionValidity = true;
                         }
-                    }
-                    else if (sourceElement.hasClass(constants.SOURCE)) {
+
+                    } else if (sourceElement.hasClass(constants.SOURCE)) {
                         if (!targetElement.hasClass(constants.STREAM)) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect to a stream");
                             return connectionValidity;
                         } else {
                             return connectionValidity = true;
                         }
-                    }
-                    else if (targetElement.hasClass(constants.SINK)) {
+
+                    } else if (targetElement.hasClass(constants.SINK)) {
                         if (!sourceElement.hasClass(constants.STREAM)) {
                             DesignViewUtils.prototype
                                 .errorAlert("Invalid Connection: Sink input source should be a stream");
@@ -432,11 +435,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         } else {
                             return connectionValidity = true;
                         }
-                    }
-                    else if (targetElement.hasClass(constants.AGGREGATION)) {
+
+                    } else if (targetElement.hasClass(constants.AGGREGATION)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                             DesignViewUtils.prototype
-                                .errorAlert("Invalid Connection: Aggregation input should be a stream or trigger");
+                                .errorAlert("Invalid Connection: Aggregation input should be a stream or a trigger");
                             return connectionValidity;
                         } else {
                             return connectionValidity = true;
@@ -469,26 +472,29 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     if (targetElement.hasClass(constants.PATTERN) || targetElement.hasClass(constants.SEQUENCE)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
-                    }
-                    else if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
+
+                    } else if (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
                         || targetElement.hasClass(constants.WINDOW_QUERY)
                         || targetElement.hasClass(constants.FUNCTION_QUERY)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                             || sourceElement.hasClass(constants.TRIGGER))) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
-                    }
-                    else if (targetElement.hasClass(constants.JOIN)) {
+
+                    } else if (targetElement.hasClass(constants.JOIN)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                             || sourceElement.hasClass(constants.AGGREGATION)
                             || sourceElement.hasClass(constants.TRIGGER)
                             || sourceElement.hasClass(constants.WINDOW))) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection");
+                            return connectionValidity;
                         } else {
                             var sourceElementObject =
                                 self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId);
@@ -500,62 +506,67 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             var joinQuery = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
                             var queryInput = joinQuery.getQueryInput();
                             if (!queryInput) {
-                                connectionValidity = true;
+                                return connectionValidity = true;
                             } else {
                                 var firstConnectedElement = queryInput.getFirstConnectedElement();
                                 var secondConnectedElement = queryInput.getSecondConnectedElement();
                                 if (!firstConnectedElement && !secondConnectedElement) {
-                                    connectionValidity = true;
+                                    return connectionValidity = true;
                                 } else if (firstConnectedElement !== undefined
                                     && secondConnectedElement !== undefined) {
-                                    connectionValidity = false;
                                     DesignViewUtils.prototype
-                                        .errorAlert("Only two input elements are allowed to connect in join query!");
+                                        .errorAlert("Invalid Connection: Only two input elements are allowed to " +
+                                            "connect in join query!");
+                                    return connectionValidity = false;
                                 } else if (firstConnectedElement !== undefined
                                     && !secondConnectedElement) {
                                     var firstElementType = firstConnectedElement.type;
                                     if (firstElementType === 'STREAM' || firstElementType === 'TRIGGER'
                                         || firstElementType === 'WINDOW') {
-                                        connectionValidity = true;
+                                        return connectionValidity = true;
                                     } else if (connectedElementSourceType === 'STREAM'
                                         || connectedElementSourceType === 'TRIGGER'
                                         || connectedElementSourceType === 'WINDOW') {
-                                        connectionValidity = true;
+                                        return connectionValidity = true;
                                     } else {
-                                        connectionValidity = false;
                                         DesignViewUtils.prototype
-                                            .errorAlert("At least one connected input element in join query should " +
-                                                "be a stream or a trigger or a window!");
+                                            .errorAlert("Invalid Connection: At least one connected input element in " +
+                                                "join query should be a stream or a trigger or a window!");
+                                        return connectionValidity = false;
                                     }
                                 } else if (!firstConnectedElement && secondConnectedElement !== undefined) {
                                     var secondElementType = secondConnectedElement.type;
                                     if (secondElementType === 'STREAM' || secondElementType === 'TRIGGER'
                                         || secondElementType === 'WINDOW') {
-                                        connectionValidity = true;
+                                        return connectionValidity = true;
                                     } else if (connectedElementSourceType === 'STREAM'
                                         || connectedElementSourceType === 'TRIGGER'
                                         || connectedElementSourceType === 'WINDOW') {
-                                        connectionValidity = true;
+                                        return connectionValidity = true;
                                     } else {
-                                        connectionValidity = false;
                                         DesignViewUtils.prototype
-                                            .errorAlert("At least one connected input element in join query should " +
-                                                "be a stream or a trigger or a window!");
+                                            .errorAlert("Invalid Connection: At least one connected input element in " +
+                                                "join query should be a stream or a trigger or a window!");
+                                        return connectionValidity = false;
                                     }
                                 }
                             }
                         }
-                    }
-                    else if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
+
+                    } else if (sourceElement.hasClass(constants.PROJECTION) || sourceElement.hasClass(constants.FILTER)
                         || sourceElement.hasClass(constants.WINDOW_QUERY) || sourceElement.hasClass(constants.PATTERN)
                         || sourceElement.hasClass(constants.JOIN) || sourceElement.hasClass(constants.SEQUENCE)
                         || sourceElement.hasClass(constants.FUNCTION_QUERY)) {
                         if (!(targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TABLE)
                             || targetElement.hasClass(constants.WINDOW))) {
                             DesignViewUtils.prototype.errorAlert("Invalid Connection");
+                            return connectionValidity;
                         } else {
-                            connectionValidity = true;
+                            return connectionValidity = true;
                         }
+                    }
+                    if (!connectionValidity) {
+                        DesignViewUtils.prototype.errorAlert("Invalid Connection");
                     }
                     return connectionValidity;
                 });
