@@ -73,7 +73,6 @@ public class SiddhiMetricsManagement {
         for (String component : registeredComponents) {
             this.metricManagementService.setMetricLevel(component, OFF);
         }
-
     }
 
     public void cleanUpMetrics(String siddhiAppName) {
