@@ -2223,9 +2223,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 }
                             }
                         } catch (feign.RetryableException ex) {
-                            logger.error("Error ocurred while connecting the node " + worker.getWorkerId(), ex);
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach manager.", ex);
+                            }
+                            logger.warn(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach manager.");
                         } catch (IOException e) {
-                            logger.error("error occurred while retrieving response ", e);
+                            logger.error("error occurred while retrieving response ");
                         }
                     }
                 });
@@ -2326,9 +2329,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 }
                             }
                         } catch (feign.RetryableException ex) {
-                            logger.error("Error ocurred while connecting the node " + worker.getWorkerId(), ex);
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach worker.", ex);
+                            }
+                            logger.warn(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach worker.");
                         } catch (IOException e) {
-                            logger.error("error occurred while retrieving response ", e);
+                            logger.error("error occurred while retrieving response ");
                         }
                     }
                 });
