@@ -59,7 +59,7 @@ public interface WorkerServiceStub {
     
     @Headers("Content-Type: application/json")
     @RequestLine("PUT /siddhi-apps/{appName}/statistics")
-    Response enableAppStatistics(@Param("appName") String appName, String statsEnable);
+    Response enableAppStatistics(@Param("appName") String appName, StatsEnable statsEnable);
     
     @Headers("Content-Type: application/json")
     @RequestLine("POST /login")
