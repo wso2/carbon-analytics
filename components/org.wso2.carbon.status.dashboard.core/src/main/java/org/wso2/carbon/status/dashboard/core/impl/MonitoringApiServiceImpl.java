@@ -1605,6 +1605,32 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         if (isAuthorized) {
             try {
                 dashboardStore.deleteManagerConfiguration(id);
+                String[] hostPort = id.split(Constants.WORKER_KEY_GENERATOR);
+                try {
+                    feign.Response resourceResponse = WorkerServiceFactory.getWorkerHttpsClient(
+                            PROTOCOL + generateURLHostPort(hostPort[0], String.valueOf(hostPort[1])), this
+                                    .getUsername(), this.getPassword()).getClusterNodeDetails();
+                    if (resourceResponse.status() == 200) {
+                        Reader inputStream = resourceResponse.body().asReader();
+                        List<ResourceClusterInfo> clusterInfos = gson.fromJson(
+                                inputStream, new TypeToken<List<ResourceClusterInfo>>() {
+                                }.getType());
+                        for (ResourceClusterInfo clusterInfo : clusterInfos) {
+                            String workerId = generateWorkerKey(clusterInfo.getHttps_host(), clusterInfo
+                                    .getHttps_port());
+                            deleteWorker(workerId, username);
+                        }
+                    }
+                } catch (feign.RetryableException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(removeCRLFCharacters(id) + " Unnable to reach manager.", e);
+                    }
+                    logger.warn(removeCRLFCharacters(id) + " Unnable to reach manager.");
+
+                } catch (IOException e) {
+                    logger.warn("Error occured while getting the response " + e.getMessage());
+                }
+
                 return Response.ok().entity(
                         new ApiResponseMessage(ApiResponseMessage.OK, id + " Successfully deleted")).build();
             } catch (RDBMSTableException ex) {
