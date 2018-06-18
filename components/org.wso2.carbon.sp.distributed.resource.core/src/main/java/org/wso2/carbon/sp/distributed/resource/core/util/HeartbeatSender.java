@@ -175,61 +175,63 @@ public class HeartbeatSender extends TimerTask {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Time taken to update heartbeat: " + (System.currentTimeMillis() - startTime));
             }
-            switch (managerResponse.status()) {
-                case 200:
-                    updateLastUpdatedTimestamp();
-                    String hbResponseBody = managerResponse.body().toString();
-                    hbRes = gson.fromJson(hbResponseBody, HeartbeatResponse.class);
-                    ServiceDataHolder.setLeaderNodeConfig(hbRes.getLeader());
-                    /* Response will also contain list of managers which are connected to managers cluster.
-                     * This might contain managers which are not specified in Resource nodes "resourceManagers"
-                     * We'll add those to the resourceManagers list as well, so that managers can later be added
-                     * w/o needing to specify them in the resource node.
-                     */
-                    ServiceDataHolder.getResourceManagers().addAll(hbRes.getConnectedManagers());
-                    if (ResourceConstants.STATE_NEW.equalsIgnoreCase(hbRes.getJoinedState())) {
-                        if (!ResourceConstants.STATE_NEW.equalsIgnoreCase(ServiceDataHolder.getCurrentNodeConfig()
-                                .getState())) {
-                            // If the node joins the resource pool as a new node, then un-deploy any existing apps.
-                            ResourceUtils.cleanSiddhiAppsDirectory();
+            if (managerResponse != null) {
+                switch (managerResponse.status()) {
+                    case 200:
+                        updateLastUpdatedTimestamp();
+                        String hbResponseBody = managerResponse.body().toString();
+                        hbRes = gson.fromJson(hbResponseBody, HeartbeatResponse.class);
+                        ServiceDataHolder.setLeaderNodeConfig(hbRes.getLeader());
+                        /* Response will also contain list of managers which are connected to managers cluster.
+                         * This might contain managers which are not specified in Resource nodes "resourceManagers"
+                         * We'll add those to the resourceManagers list as well, so that managers can later be added
+                         * w/o needing to specify them in the resource node.
+                         */
+                        ServiceDataHolder.getResourceManagers().addAll(hbRes.getConnectedManagers());
+                        if (ResourceConstants.STATE_NEW.equalsIgnoreCase(hbRes.getJoinedState())) {
+                            if (!ResourceConstants.STATE_NEW.equalsIgnoreCase(ServiceDataHolder.getCurrentNodeConfig()
+                                    .getState())) {
+                                // If the node joins the resource pool as a new node, then un-deploy any existing apps.
+                                ResourceUtils.cleanSiddhiAppsDirectory();
+                            }
+                            ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_EXISTS);
+                            LOG.info("Successfully connected to leader node " + hbRes.getLeader() + " as a new resource.");
+                        } else if (ResourceConstants.STATE_EXISTS.equalsIgnoreCase(hbRes.getJoinedState())) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Heartbeat sent to leader node " + hbRes.getLeader());
+                            }
+                            ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_EXISTS);
+                        } else if (ResourceConstants.STATE_REJECTED.equalsIgnoreCase(hbRes.getJoinedState())) {
+                            throw new ResourceNodeException(String.format("Leader@{host:%s, port:%s} rejected "
+                                            + "resource %s from joining the resource pool. Please check node id "
+                                            + "in deployment.yaml", config.getHost(), config.getPort(),
+                                    ServiceDataHolder.getCurrentNodeConfig()));
+                        } else {
+                            throw new ResourceNodeException(String.format("Unknown resource node state(%s) "
+                                            + "returned from the Leader@{host:%s, port:%s} while sending heartbeat.",
+                                    hbRes.getJoinedState(), config.getHost(), config.getPort()));
                         }
-                        ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_EXISTS);
-                        LOG.info("Successfully connected to leader node " + hbRes.getLeader() + " as a new resource.");
-                    } else if (ResourceConstants.STATE_EXISTS.equalsIgnoreCase(hbRes.getJoinedState())) {
+                        /* When to send the next heartbeat, will depend on the current leaders "heartbeatInterval".
+                         * So that, we don't have to worry about different leaders having different heartbeat check
+                         * intervals (in case).
+                         */
+                        timer.schedule(new HeartbeatSender(timer), hbRes.getLeader().getHeartbeatInterval());
+                        connected = true;
+                        cleaned = false;
+                        break;
+                    case 301:
+                        // 301 will redirect to the current leader. Therefore, try that before going into next iteration.
+                        String responseBody = managerResponse.body().toString();
+                        hbRes = gson.fromJson(responseBody, HeartbeatResponse.class);
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Heartbeat sent to leader node " + hbRes.getLeader());
+                            LOG.debug("Redirecting to the current leader node at:" + hbRes.getLeader());
                         }
-                        ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_EXISTS);
-                    } else if (ResourceConstants.STATE_REJECTED.equalsIgnoreCase(hbRes.getJoinedState())) {
-                        throw new ResourceNodeException(String.format("Leader@{host:%s, port:%s} rejected "
-                                        + "resource %s from joining the resource pool. Please check node id "
-                                        + "in deployment.yaml", config.getHost(), config.getPort(),
-                                ServiceDataHolder.getCurrentNodeConfig()));
-                    } else {
-                        throw new ResourceNodeException(String.format("Unknown resource node state(%s) "
-                                        + "returned from the Leader@{host:%s, port:%s} while sending heartbeat.",
-                                hbRes.getJoinedState(), config.getHost(), config.getPort()));
-                    }
-                    /* When to send the next heartbeat, will depend on the current leaders "heartbeatInterval".
-                     * So that, we don't have to worry about different leaders having different heartbeat check
-                     * intervals (in case).
-                     */
-                    timer.schedule(new HeartbeatSender(timer), hbRes.getLeader().getHeartbeatInterval());
-                    connected = true;
-                    cleaned = false;
-                    break;
-                case 301:
-                    // 301 will redirect to the current leader. Therefore, try that before going into next iteration.
-                    String responseBody = managerResponse.body().toString();
-                    hbRes = gson.fromJson(responseBody, HeartbeatResponse.class);
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Redirecting to the current leader node at:" + hbRes.getLeader());
-                    }
-                    connected = sendHeartbeat(hbRes.getLeader().getHttpsInterface());
-                    break;
-                default:
-                    // In case of a 4XX or 5XX, try the next available manager.
-                    break;
+                        connected = sendHeartbeat(hbRes.getLeader().getHttpsInterface());
+                        break;
+                    default:
+                        // In case of a 4XX or 5XX, try the next available manager.
+                        break;
+                }
             }
         } catch (feign.FeignException e) {
             LOG.warn("Error occurred while connecting to ManagerNode@:" + config, e);
