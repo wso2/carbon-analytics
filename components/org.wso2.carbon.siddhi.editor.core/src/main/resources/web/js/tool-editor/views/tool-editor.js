@@ -195,21 +195,27 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                              * */
                             function removeUnnecessaryFieldsFromJSON(object) {
                                 _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function (patternQuery) {
-                                    if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
-                                        delete patternQuery.queryInput['connectedElementNameList'];
+                                    if (patternQuery.queryInput !== undefined) {
+                                        if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
+                                            delete patternQuery.queryInput['connectedElementNameList'];
+                                        }
                                     }
                                 });
                                 _.forEach(object.siddhiAppConfig.queryLists.SEQUENCE, function (sequenceQuery) {
-                                    if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
-                                        delete sequenceQuery.queryInput['connectedElementNameList'];
+                                    if (sequenceQuery.queryInput !== undefined) {
+                                        if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
+                                            delete sequenceQuery.queryInput['connectedElementNameList'];
+                                        }
                                     }
                                 });
                                 _.forEach(object.siddhiAppConfig.queryLists.JOIN, function (joinQuery) {
-                                    if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
-                                        delete joinQuery.queryInput['firstConnectedElement'];
-                                    }
-                                    if (joinQuery.queryInput.hasOwnProperty('secondConnectedElement')) {
-                                        delete joinQuery.queryInput['secondConnectedElement'];
+                                    if (joinQuery.queryInput !== undefined) {
+                                        if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
+                                            delete joinQuery.queryInput['firstConnectedElement'];
+                                        }
+                                        if (joinQuery.queryInput.hasOwnProperty('secondConnectedElement')) {
+                                            delete joinQuery.queryInput['secondConnectedElement'];
+                                        }
                                     }
                                 });
                             }
