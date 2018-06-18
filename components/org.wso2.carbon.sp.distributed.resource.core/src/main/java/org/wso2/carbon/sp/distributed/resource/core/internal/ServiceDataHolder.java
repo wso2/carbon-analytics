@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.sp.distributed.resource.core.internal;
 
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.sp.distributed.resource.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPSInterfaceConfig;
@@ -37,6 +38,7 @@ public class ServiceDataHolder {
     private static NodeConfig currentNodeConfig;
     private static DeploymentMode deploymentMode;
     private static OperatingSystemMetricSet operatingSystemMetricSet;
+    private static AnalyticsHttpClientBuilderService clientBuilderService;
 
     private static Set<HTTPSInterfaceConfig> resourceManagers = Collections.synchronizedSet(new LinkedHashSet<>());
 
@@ -94,5 +96,13 @@ public class ServiceDataHolder {
 
     public static void setOperatingSystemMetricSet(OperatingSystemMetricSet operatingSystemMetricSet) {
         ServiceDataHolder.operatingSystemMetricSet = operatingSystemMetricSet;
+    }
+
+    public static AnalyticsHttpClientBuilderService getClientBuilderService() {
+        return ServiceDataHolder.clientBuilderService;
+    }
+
+    public static void setClientBuilderService(AnalyticsHttpClientBuilderService clientBuilderService) {
+        ServiceDataHolder.clientBuilderService = clientBuilderService;
     }
 }

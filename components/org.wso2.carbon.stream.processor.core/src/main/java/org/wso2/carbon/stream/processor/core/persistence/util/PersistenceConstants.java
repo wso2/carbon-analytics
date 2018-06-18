@@ -27,10 +27,9 @@ public class PersistenceConstants {
     public static final String STATE_PERSISTENCE_REVISIONS_TO_KEEP = "revisionsToKeep";
     public static final String STATE_PERSISTENCE_CONFIGS = "config";
     public static final String DEFAULT_FILE_PERSISTENCE_FOLDER = "siddhi-app-persistence";
-    public static final String REVISION_SEPARATOR = "_";
+    public static final String REVISION_SEPARATOR = "__";
     public static final String DEFAULT_DB_PERSISTENCE_DATASOURCE = "WSO2_CARBON_DB";
     public static final String DEFAULT_DB_PERSISTENCE_TABLE_NAME = "PERSISTENCE_TABLE";
-
     public static final String CREATE_TABLE = "CREATE_TABLE";
     public static final String INSERT_INTO_TABLE = "INSERT_INTO_TABLE";
     public static final String IS_TABLE_EXISTS = "IS_TABLE_EXISTS";

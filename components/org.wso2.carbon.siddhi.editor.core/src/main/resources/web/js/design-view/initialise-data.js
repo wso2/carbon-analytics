@@ -260,7 +260,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
                 if (!windowFilterProjectionQuery.queryInput) {
                     var errMsg
-                        = 'Cannot find query input section for the windowFIlterProjection query:'
+                        = 'Cannot find query input section for the windowFilterProjection query:'
                         + windowFilterProjectionQuery;
                     log.error(errMsg);
                     DesignViewUtils.prototype.errorAlert(errMsg);

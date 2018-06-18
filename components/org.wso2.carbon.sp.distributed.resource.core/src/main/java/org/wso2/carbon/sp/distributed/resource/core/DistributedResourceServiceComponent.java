@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.sp.distributed.resource.core.bean.DeploymentConfig;
@@ -55,7 +56,7 @@ import java.util.Timer;
         immediate = true
 )
 public class DistributedResourceServiceComponent {
-    private static final Logger LOG = LoggerFactory.getLogger(DistributedResourceServiceComponent.class);
+    private static final Logger logger = LoggerFactory.getLogger(DistributedResourceServiceComponent.class);
     /**
      * Service registration for distributed service.
      */
@@ -77,7 +78,7 @@ public class DistributedResourceServiceComponent {
                 && DeploymentMode.DISTRIBUTED == ServiceDataHolder.getDeploymentMode()) {
             // At the server start, cleanup Siddhi apps directory.
             ResourceUtils.cleanSiddhiAppsDirectory();
-            LOG.info("WSO2 Stream Processor starting in distributed mode as a new resource node.");
+            logger.info("WSO2 Stream Processor starting in distributed mode as a new resource node.");
             /* If the node started in worker runtime with distributed mode enabled, Then, join a resource pool and
              * start periodically sending heartbeats.
              */
@@ -155,8 +156,8 @@ public class DistributedResourceServiceComponent {
                     }
                 } else {
                     ServiceDataHolder.setDeploymentMode(DeploymentMode.OTHER);
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(ResourceConstants.DEPLOYMENT_CONFIG_NS + " is not defined in deployment.yaml. " +
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(ResourceConstants.DEPLOYMENT_CONFIG_NS + " is not defined in deployment.yaml. " +
                                 "Hence, disabling distributed mode.");
                     }
                 }
@@ -166,7 +167,6 @@ public class DistributedResourceServiceComponent {
             }
         }
     }
-
     /**
      * Unregister ConfigProvider and unset node config and deployment config.
      *
@@ -176,6 +176,29 @@ public class DistributedResourceServiceComponent {
         ServiceDataHolder.setConfigProvider(null);
         ServiceDataHolder.setDeploymentConfig(null);
         ServiceDataHolder.setCurrentNodeConfig(null);
+    }
+
+    @Reference(
+            name = "carbon.anaytics.common.clientservice",
+            service = AnalyticsHttpClientBuilderService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterAnalyticsHttpClient"
+    )
+    protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        ServiceDataHolder.setClientBuilderService(service);
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) AnalyticsHttpClientBuilderService at " +
+                    AnalyticsHttpClientBuilderService.class.getName());
+        }
+    }
+
+    protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) AnalyticsHttpClientBuilderService at " +
+                    AnalyticsHttpClientBuilderService.class.getName());
+        }
+        ServiceDataHolder.setClientBuilderService(null);
     }
 
     @Reference(

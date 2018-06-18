@@ -122,6 +122,9 @@ define(['require', 'log', 'jquery', 'lodash'],
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 var config = editor.getValue();
 
                 siddhiAppConfig.setSiddhiAppName(config.siddhiApp.name);
