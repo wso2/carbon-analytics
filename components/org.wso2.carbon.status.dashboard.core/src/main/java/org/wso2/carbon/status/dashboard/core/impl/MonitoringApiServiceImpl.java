@@ -2223,8 +2223,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             logger.error("Error ocurred while connecting the node " + worker.getWorkerId(), ex);
                         } catch (IOException e) {
                             logger.error("error occurred while retrieving response ", e);
-                        } catch (NullPointerException ex) {
-                            logger.error("Requested Response is null" + ex.getMessage());
                         }
                     }
                 });
