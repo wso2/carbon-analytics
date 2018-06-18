@@ -192,6 +192,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
                     } catch (IOException e) {
                         logger.warn("Error occured while getting the response " + e.getMessage());
+                    } catch (NullPointerException ex) {
+                        logger.error("Requested Response is null" + ex.getMessage());
                     }
                 });
             }
@@ -808,6 +810,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 } catch (feign.RetryableException e) {
                     String jsonString = new Gson().toJson(siddhiAppsData);
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
                 }
             }
             logger.error("Inproper format of worker ID:" + workerId);
@@ -925,6 +929,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
                                     e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
                 }
             }
             logger.error("Inproper format of worker ID:" + id);
@@ -1144,6 +1150,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
                                     e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
+                    String jsonString = "Requested Response is null" + ex.getMessage();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                 }
             } else {
                 logger.error("Inproper format of worker ID:" + workerId);
@@ -1183,6 +1193,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
                                     e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
                 }
             } else {
                 logger.error("Inproper format of worker ID:" + workerId);
@@ -1629,6 +1641,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
                 } catch (IOException e) {
                     logger.warn("Error occured while getting the response " + e.getMessage());
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
                 }
 
                 return Response.ok().entity(
@@ -1823,6 +1837,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             .toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
                                     e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
+                    String jsonString = "Requested Response is null" + ex.getMessage();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                 }
             } else {
                 logger.error("Inproper format of manager ID" + managerId);
@@ -1872,6 +1890,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             .SERVER_CONNECTION_ERROR,
                             ex.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null" + ex.getMessage()).build();
                 }
             } else {
                 logger.error("Inproper format of manager ID" + managerId);
@@ -1915,6 +1936,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 } catch (feign.RetryableException e) {
                     String jsonString = new Gson().toJson(Constants.NOT_REACHABLE_ID);
                     return Response.ok().entity(jsonString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
                 }
             }
             logger.error("Inproper format of worker ID:" + managerId);
@@ -2020,6 +2043,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     String jsonString = new Gson().toJson(new ApiResponseMessageWithCode(
                             ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR, e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null" + ex.getMessage()).build();
                 }
             } else {
                 logger.error("Improper format of manager ID" + managerId);
@@ -2069,6 +2095,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     String errString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
                             .SERVER_CONNECTION_ERROR, ex.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null" + ex.getMessage()).build();
                 }
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
@@ -2122,6 +2151,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
                     } catch (IOException e) {
                         logger.warn("Error occured while getting the response " + e.getMessage());
+                    } catch (NullPointerException ex) {
+                        logger.error("Requested Response is null" + ex.getMessage());
                     }
                 });
             }
@@ -2165,6 +2196,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             logger.error("Error ocurred while connecting the node " + worker.getWorkerId(), ex);
                         } catch (IOException e) {
                             logger.error("error occurred while retrieving response ", e);
+                        } catch (NullPointerException ex) {
+                            logger.error("Requested Response is null" + ex.getMessage());
                         }
                     }
                 });
@@ -2219,6 +2252,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
                     } catch (IOException e) {
                         logger.warn("Error occured while getting the response " + e.getMessage());
+                    } catch (NullPointerException ex) {
+                        logger.error("Requested Response is null" + ex.getMessage());
                     }
                 });
             }
@@ -2264,6 +2299,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             logger.error("Error ocurred while connecting the node " + worker.getWorkerId(), ex);
                         } catch (IOException e) {
                             logger.error("error occurred while retrieving response ", e);
+                        } catch (NullPointerException ex) {
+                            logger.error("Requested Response is null" + ex.getMessage());
                         }
                     }
                 });
@@ -2323,6 +2360,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         logger.error("error occured while retrieving response", e);
                     } catch (NotFoundException e) {
                         logger.error("Requested response is not found ", e);
+                    } catch (NullPointerException ex) {
+                        logger.error("Requested Response is null" + ex.getMessage());
                     }
                 });
             }
@@ -2360,6 +2399,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     String errString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
                             .SERVER_CONNECTION_ERROR, ex.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested response is null" + ex.getMessage());
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested response is null" + ex.getMessage()).build();
                 }
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
@@ -2463,6 +2505,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             .SERVER_CONNECTION_ERROR, e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
 
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
+                    String errString = "Requested Response is null" + ex.getMessage();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
                 }
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
@@ -2580,6 +2626,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     String errString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode
                             .SERVER_CONNECTION_ERROR, e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
+                } catch (NullPointerException ex) {
+                    logger.error("Requested Response is null" + ex.getMessage());
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null" + ex.getMessage()).build();
                 }
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
