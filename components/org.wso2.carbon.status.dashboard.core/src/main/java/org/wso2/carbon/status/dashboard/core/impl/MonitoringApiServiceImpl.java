@@ -1892,7 +1892,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                 } catch (NullPointerException ex) {
                     logger.error("Requested Response is null" + ex.getMessage());
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null" + ex.getMessage()).build();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null"
+                            + ex.getMessage()).build();
                 }
             } else {
                 logger.error("Inproper format of manager ID" + managerId);
@@ -2045,7 +2046,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                 } catch (NullPointerException ex) {
                     logger.error("Requested Response is null" + ex.getMessage());
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null" + ex.getMessage()).build();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null"
+                            + ex.getMessage()).build();
                 }
             } else {
                 logger.error("Improper format of manager ID" + managerId);
@@ -2097,7 +2099,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
                 } catch (NullPointerException ex) {
                     logger.error("Requested Response is null" + ex.getMessage());
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null" + ex.getMessage()).build();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null"
+                            + ex.getMessage()).build();
                 }
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
@@ -2401,7 +2404,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
                 } catch (NullPointerException ex) {
                     logger.error("Requested response is null" + ex.getMessage());
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested response is null" + ex.getMessage()).build();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested response is null"
+                            + ex.getMessage()).build();
                 }
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
@@ -2628,7 +2632,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errString).build();
                 } catch (NullPointerException ex) {
                     logger.error("Requested Response is null" + ex.getMessage());
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null" + ex.getMessage()).build();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Requested Response is null"
+                            + ex.getMessage()).build();
                 }
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("In proper format of managerId "
