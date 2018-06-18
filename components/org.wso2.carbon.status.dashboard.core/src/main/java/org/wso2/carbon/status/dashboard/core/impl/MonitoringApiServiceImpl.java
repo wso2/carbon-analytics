@@ -1439,23 +1439,23 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 try {
                     feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
                             getUsername(), getPassword()).getWorker();
-                        status = workerResponse.status();
-                        if (status == 200) {
-                            workerResponce.setCode(200);
-                            workerResponce.setMessage("Sucessfully reached the worker : " + workerId);
-                        } else if (status == 404) {
-                            workerResponce.setCode(404);
-                            workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId + " is not " +
-                                    "reachable");
-                        } else if (status == 401) {
-                            workerResponce.setCode(401);
-                            workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId +
-                                    " has wrong credentials.");
-                        } else {
-                            workerResponce.setCode(500);
-                            workerResponce.setMessage("Worker : " + workerId +
-                                    " not reachable by unexpected internal server error.");
-                        }
+                    status = workerResponse.status();
+                    if (status == 200) {
+                        workerResponce.setCode(200);
+                        workerResponce.setMessage("Sucessfully reached the worker : " + workerId);
+                    } else if (status == 404) {
+                        workerResponce.setCode(404);
+                        workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId + " is not " +
+                                "reachable");
+                    } else if (status == 401) {
+                        workerResponce.setCode(401);
+                        workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId +
+                                " has wrong credentials.");
+                    } else {
+                        workerResponce.setCode(500);
+                        workerResponce.setMessage("Worker : " + workerId +
+                                " not reachable by unexpected internal server error.");
+                    }
                 } catch (feign.RetryableException e) {
                     workerResponce.setCode(404);
                     workerResponce.setMessage("Worker : " + workerId + " is not " +
@@ -1632,7 +1632,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     feign.Response resourceResponse = WorkerServiceFactory.getWorkerHttpsClient(
                             PROTOCOL + generateURLHostPort(hostPort[0], String.valueOf(hostPort[1])), this
                                     .getUsername(), this.getPassword()).getClusterNodeDetails();
-                    if(resourceResponse == null) {
+                    if (resourceResponse == null) {
                         logger.error("Requested response is null");
                     } else {
                         if (resourceResponse.status() == 200) {
@@ -2224,7 +2224,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             }
                         } catch (feign.RetryableException ex) {
                             if (logger.isDebugEnabled()) {
-                                logger.debug(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach manager.", ex);
+                                logger.debug(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach manager" +
+                                        ".", ex);
                             }
                             logger.warn(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach manager.");
                         } catch (IOException e) {
@@ -2330,7 +2331,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             }
                         } catch (feign.RetryableException ex) {
                             if (logger.isDebugEnabled()) {
-                                logger.debug(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach worker.", ex);
+                                logger.debug(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach worker" +
+                                        ".", ex);
                             }
                             logger.warn(removeCRLFCharacters(worker.getWorkerId()) + " Unnable to reach worker.");
                         } catch (IOException e) {
