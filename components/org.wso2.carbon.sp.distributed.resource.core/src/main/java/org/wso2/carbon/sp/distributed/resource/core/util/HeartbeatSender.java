@@ -195,7 +195,8 @@ public class HeartbeatSender extends TimerTask {
                                 ResourceUtils.cleanSiddhiAppsDirectory();
                             }
                             ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_EXISTS);
-                            LOG.info("Successfully connected to leader node " + hbRes.getLeader() + " as a new resource.");
+                            LOG.info("Successfully connected to leader node " + hbRes.getLeader() + " as a new " +
+                                    "resource.");
                         } else if (ResourceConstants.STATE_EXISTS.equalsIgnoreCase(hbRes.getJoinedState())) {
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug("Heartbeat sent to leader node " + hbRes.getLeader());
@@ -220,7 +221,8 @@ public class HeartbeatSender extends TimerTask {
                         cleaned = false;
                         break;
                     case 301:
-                        // 301 will redirect to the current leader. Therefore, try that before going into next iteration.
+                        // 301 will redirect to the current leader. Therefore, try that before going into next
+                        // iteration.
                         String responseBody = managerResponse.body().toString();
                         hbRes = gson.fromJson(responseBody, HeartbeatResponse.class);
                         if (LOG.isDebugEnabled()) {
@@ -234,7 +236,10 @@ public class HeartbeatSender extends TimerTask {
                 }
             }
         } catch (feign.FeignException e) {
-            LOG.warn("Error occurred while connecting to ManagerNode@:" + config, e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error occurred while connecting to ManagerNode@:" + config, e);
+            }
+            LOG.warn("Error occurred while connecting to ManagerNode@:" + config);
         } finally {
             if (managerResponse != null) {
                 managerResponse.close();
