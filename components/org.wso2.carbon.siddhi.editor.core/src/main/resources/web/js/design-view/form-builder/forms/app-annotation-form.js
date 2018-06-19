@@ -44,6 +44,8 @@ define(['require', 'log', 'jquery', 'lodash'],
          */
         AppAnnotationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var div = $('<div />').attr({id: 'define-appconfig', class: 'define-appconfig'});
+            formContainer.append(div);
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -63,7 +65,7 @@ define(['require', 'log', 'jquery', 'lodash'],
                 annotations: annotations
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor(div[0], {
                 schema: {
                     type: "object",
                     title: "Siddhi App Configurations",

@@ -49,7 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             formContainer.append(propertyDiv);
 
             // generate the form to define a source
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor(formContainer.find('.define-source')[0], {
                 schema: {
                     type: "object",
                     title: "Source",
@@ -393,7 +393,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             fillWith = self.formUtils.cleanJSONObject(fillWith);
 
             // generate the form to define a source
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor(formContainer.find('.define-source')[0], {
                 schema: {
                     type: "object",
                     title: "Source",
