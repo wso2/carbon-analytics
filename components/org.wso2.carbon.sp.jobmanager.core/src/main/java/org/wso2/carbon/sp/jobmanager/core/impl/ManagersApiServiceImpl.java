@@ -105,50 +105,55 @@ public class ManagersApiServiceImpl extends ManagersApiService {
      */
 
     public Response getSiddhiAppDetails() {
-        Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
-                .getSiddhiAppHoldersMap();
-        Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
-                .getAppsWaitingForDeploy();
+        if(ServiceDataHolder.getResourcePool() != null) {
+            Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
+                    .getSiddhiAppHoldersMap();
+            Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
+                    .getAppsWaitingForDeploy();
 
-        if (deployedSiddhiAppHolder.isEmpty() && waitingToDeploy.isEmpty()) {
-            logger.info("There is no siddhi apps");
-            return Response.ok().entity("There is no siddhi app  in the manager node").build();
-        } else {
-            List<SiddhiAppDetails> appList = new ArrayList<>();
-            for (Map.Entry<String, List<SiddhiAppHolder>> en : waitingToDeploy.entrySet()) {
-                for (SiddhiAppHolder childApp : en.getValue()) {
-                    SiddhiAppDetails appHolder = new SiddhiAppDetails();
-                    appHolder.setParentAppName(childApp.getParentAppName());
-                    appHolder.setAppName(childApp.getAppName());
-                    appHolder.setGroupName(childApp.getGroupName());
-                    appHolder.setSiddhiApp(childApp.getSiddhiApp());
-                    appList.add(appHolder);
-                }
-            }
-            for (Map.Entry<String, List<SiddhiAppHolder>> en : deployedSiddhiAppHolder.entrySet()) {
-                for (SiddhiAppHolder childApp : en.getValue()) {
-                    SiddhiAppDetails appHolder = new SiddhiAppDetails();
-                    appHolder.setParentAppName(childApp.getParentAppName());
-                    appHolder.setAppName(childApp.getAppName());
-                    appHolder.setGroupName(childApp.getGroupName());
-                    appHolder.setSiddhiApp(childApp.getSiddhiApp());
-
-                    if (childApp.getDeployedNode() != null) {
-                        appHolder.setId(childApp.getDeployedNode().getId());
-                        appHolder.setState(childApp.getDeployedNode().getState());
-                        appHolder.setHost(childApp.getDeployedNode().getHttpsInterface().getHost());
-                        appHolder.setPort(Integer.toString(childApp.getDeployedNode()
-                                .getHttpsInterface().getPort()));
-                        appHolder.setFailedPingAttempts(Integer.toString(childApp.getDeployedNode()
-                                .getFailedPingAttempts()));
-                        appHolder.setLastPingTimestamp(Long.toString(childApp.getDeployedNode()
-                                .getLastPingTimestamp()));
+            if (deployedSiddhiAppHolder.isEmpty() && waitingToDeploy.isEmpty()) {
+                logger.info("There is no siddhi apps");
+                return Response.ok().entity("There is no siddhi app  in the manager node").build();
+            } else {
+                List<SiddhiAppDetails> appList = new ArrayList<>();
+                for (Map.Entry<String, List<SiddhiAppHolder>> en : waitingToDeploy.entrySet()) {
+                    for (SiddhiAppHolder childApp : en.getValue()) {
+                        SiddhiAppDetails appHolder = new SiddhiAppDetails();
+                        appHolder.setParentAppName(childApp.getParentAppName());
+                        appHolder.setAppName(childApp.getAppName());
+                        appHolder.setGroupName(childApp.getGroupName());
+                        appHolder.setSiddhiApp(childApp.getSiddhiApp());
+                        appList.add(appHolder);
                     }
-                    appList.add(appHolder);
                 }
-            }
+                for (Map.Entry<String, List<SiddhiAppHolder>> en : deployedSiddhiAppHolder.entrySet()) {
+                    for (SiddhiAppHolder childApp : en.getValue()) {
+                        SiddhiAppDetails appHolder = new SiddhiAppDetails();
+                        appHolder.setParentAppName(childApp.getParentAppName());
+                        appHolder.setAppName(childApp.getAppName());
+                        appHolder.setGroupName(childApp.getGroupName());
+                        appHolder.setSiddhiApp(childApp.getSiddhiApp());
 
-            return Response.ok().entity(appList).build();
+                        if (childApp.getDeployedNode() != null) {
+                            appHolder.setId(childApp.getDeployedNode().getId());
+                            appHolder.setState(childApp.getDeployedNode().getState());
+                            appHolder.setHost(childApp.getDeployedNode().getHttpsInterface().getHost());
+                            appHolder.setPort(Integer.toString(childApp.getDeployedNode()
+                                    .getHttpsInterface().getPort()));
+                            appHolder.setFailedPingAttempts(Integer.toString(childApp.getDeployedNode()
+                                    .getFailedPingAttempts()));
+                            appHolder.setLastPingTimestamp(Long.toString(childApp.getDeployedNode()
+                                    .getLastPingTimestamp()));
+                        }
+                        appList.add(appHolder);
+                    }
+                }
+                return Response.ok().entity(appList).build();
+            }
+        } else {
+            return Response.status(Response.Status.NO_CONTENT).entity(
+                    new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no siddhi apps found in the "
+                            + "node")).build();
         }
     }
 
