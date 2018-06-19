@@ -17,8 +17,8 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'designViewGrid', 'appData',
-        'initialiseData'],
-    function (require, log, _, $, ToolPalette, DesignViewGrid, AppData, InitialiseData) {
+        'initialiseData', 'jsonValidator'],
+    function (require, log, _, $, ToolPalette, DesignViewGrid, AppData, InitialiseData, JSONValidator) {
 
         /**
          * @class DesignView
@@ -135,6 +135,16 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             }
         };
 
+        /**
+         * @function Renders design view in the design container
+         * @param configurationJSON JSON which needs to be validated
+         * @return {boolean} return whether the json is valid or not
+         */
+        DesignView.prototype.validateJSONBeforeSendingToBackend = function (configurationJSON) {
+            var jsonValidator = new JSONValidator();
+            return jsonValidator.validate(configurationJSON);
+        };
+
         DesignView.prototype.getDesign = function (code) {
             var self = this;
             var result = {};
@@ -147,32 +157,31 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
 
             // check whether Siddhi app is in initial mode(initial Siddhi app template) and if yes then go to the
             // design view with the no content
-            var defaultResponse = {
-                "siddhiAppConfig": {
-                    "siddhiAppName": match[1],
-                    "appAnnotationList": ['@App:description("' + match[2] + '")'],
-                    "streamList": [],
-                    "tableList": [],
-                    "windowList": [],
-                    "triggerList": [],
-                    "aggregationList": [],
-                    "functionList": [],
-                    "partitionList": [],
-                    "sourceList": [],
-                    "sinkList": [],
-                    "queryLists": {
-                        "WINDOW_FILTER_PROJECTION": [],
-                        "PATTERN": [],
-                        "SEQUENCE": [],
-                        "JOIN": []
-                    },
-                    "finalElementCount": 0
-                },
-                "edgeList": []
-            };
-
-            var defaultString = JSON.stringify(defaultResponse);
             if (match !== null) {
+                var defaultResponse = {
+                    "siddhiAppConfig": {
+                        "siddhiAppName": match[1],
+                        "appAnnotationList": ['@App:description("' + match[2] + '")'],
+                        "streamList": [],
+                        "tableList": [],
+                        "windowList": [],
+                        "triggerList": [],
+                        "aggregationList": [],
+                        "functionList": [],
+                        "partitionList": [],
+                        "sourceList": [],
+                        "sinkList": [],
+                        "queryLists": {
+                            "WINDOW_FILTER_PROJECTION": [],
+                            "PATTERN": [],
+                            "SEQUENCE": [],
+                            "JOIN": []
+                        },
+                        "finalElementCount": 0
+                    },
+                    "edgeList": []
+                };
+                var defaultString = JSON.stringify(defaultResponse);
                 result = {
                     status: "success",
                     responseString: defaultString

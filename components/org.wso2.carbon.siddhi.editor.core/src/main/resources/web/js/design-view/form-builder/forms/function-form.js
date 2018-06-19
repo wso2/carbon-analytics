@@ -49,7 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             formContainer.append(propertyDiv);
 
             // generate the form to define a function
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-function')[0], {
                 schema: {
                     type: "object",
                     title: "Function",
@@ -191,7 +191,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 body: body
             };
 
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-function')[0], {
                 schema: {
                     type: "object",
                     title: "Function",
