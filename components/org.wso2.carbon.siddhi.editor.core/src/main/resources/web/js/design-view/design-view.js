@@ -182,7 +182,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                     data: window.btoa(code),
                     async: false,
                     success: function (response) {
-                        result = {status: "success", responseJSON: response};
+                        result = {status: "success", responseString: window.atob(response)};
                     },
                     error: function (error) {
                         if (error.responseText) {
@@ -203,11 +203,10 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             $.ajax({
                 type: "POST",
                 url: self.designToCodeURL,
-                contentType: "application/json",
-                data: designViewJSON,
+                data: window.btoa(designViewJSON),
                 async: false,
                 success: function (response) {
-                    result = {status: "success", responseJSON: window.atob(response)};
+                    result = {status: "success", responseString: window.atob(response)};
                 },
                 error: function (error) {
                     if (error.responseText) {

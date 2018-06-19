@@ -169,7 +169,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             }
                             var response = self._designView.getDesign(self.getContent());
                             if (response.status === "success") {
-                                self.JSONObject = response.responseJSON;
+                                self.JSONObject = JSON.parse(response.responseString);
                                 sourceContainer.hide();
                                 loadingScreen.show();
                                 // The following code has been added to the setTimeout() method because
@@ -229,18 +229,16 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                             var configurationCopy = _.cloneDeep(designView.getConfigurationData());
                             removeUnnecessaryFieldsFromJSON(configurationCopy);
-                            var sendingString = JSON.stringify(configurationCopy)
-                                .replace(/'/gm, "\\\'")
-                                .replace(/\\"/gm, "\\\"");
+                            var sendingString = JSON.stringify(configurationCopy);
 
-                            var response = self._designView.getCode("'" + sendingString + "'");
+                            var response = self._designView.getCode(sendingString);
                             if (response.status === "success") {
                                 designContainer.hide();
                                 loadingScreen.show();
                                 // The following code has been added to the setTimeout() method because
                                 // the code needs to run asynchronously for the loading screen
                                 setTimeout(function () {
-                                    self.setContent(response.responseJSON);
+                                    self.setContent(response.responseString);
                                     self.trigger('content-modified');
                                     designView.emptyDesignViewGridContainer();
                                     sourceContainer.show();
