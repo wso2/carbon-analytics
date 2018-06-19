@@ -163,6 +163,7 @@ public class CSVEventGenerator implements EventGenerator {
     @Override
     public void stop() {
         csvReader.closeParser(csvConfiguration.getFileName(), csvConfiguration.getIsOrdered());
+        startTimestamp = -1;
         if (log.isDebugEnabled()) {
             log.debug("Stop CSV generator for file '" + csvConfiguration.getFileName() + "' for stream '"
                               + csvConfiguration.getStreamName() + "'.");

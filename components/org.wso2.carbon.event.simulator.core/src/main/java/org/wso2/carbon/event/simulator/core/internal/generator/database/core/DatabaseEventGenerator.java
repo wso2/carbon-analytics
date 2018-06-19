@@ -170,6 +170,7 @@ public class DatabaseEventGenerator implements EventGenerator {
      */
     @Override
     public void stop() {
+        startTimestamp = -1;
         if (databaseConnection != null) {
             databaseConnection.closeConnection();
         }
