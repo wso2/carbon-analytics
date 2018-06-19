@@ -29,6 +29,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.elements.ExecutionElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
@@ -59,11 +60,16 @@ public class CodeGenerator {
         for (List<QueryConfig> queryList : siddhiApp.getQueryLists().values()) {
             queries.addAll(queryList);
         }
+        for (PartitionConfig partition : siddhiApp.getPartitionList()) {
+            for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
+                queries.addAll(queryList);
+            }
+        }
         List<StreamConfig> definedStreams = CodeGeneratorHelper.getStreamsToBeDefined(siddhiApp.getStreamList(),
                 siddhiApp.getSourceList(), siddhiApp.getSinkList(), queries);
-        List<String> definitionNames = CodeGeneratorHelper.getDefinitionNames(definedStreams,
+        List<String> definitionNames = CodeGeneratorHelper.getDefinitionNames(siddhiApp.getStreamList(),
                 siddhiApp.getTableList(), siddhiApp.getWindowList(),
-                siddhiApp.getTriggerList(), siddhiApp.getAggregationList());
+                siddhiApp.getTriggerList(), siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
 
         return generateAppName(siddhiApp.getSiddhiAppName()) +
                 CodeGeneratorHelper.getAnnotations(siddhiApp.getAppAnnotationList()) +
@@ -73,8 +79,39 @@ public class CodeGenerator {
                 generateTriggers(siddhiApp.getTriggerList()) +
                 generateAggregations(siddhiApp.getAggregationList()) +
                 generateFunctions(siddhiApp.getFunctionList()) +
-                generateQueries(siddhiApp.getQueryLists(), definitionNames) +
-                generatePartitions(siddhiApp.getPartitionList(), definitionNames);
+                generateExecutionElements(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(), definitionNames);
+//                generateQueries(siddhiApp.getQueryLists(), definitionNames) +
+//                generatePartitions(siddhiApp.getPartitionList(), definitionNames);
+    }
+
+    private String generateExecutionElements(Map<QueryListType, List<QueryConfig>> queryLists,
+                                             List<PartitionConfig> partitions, List<String> definitionNames)
+            throws CodeGenerationException {
+        StringBuilder executionElementStringBuilder = new StringBuilder();
+        executionElementStringBuilder.append("-- Queries & Partitions")
+                .append(SiddhiStringBuilderConstants.NEW_LINE);
+        List<QueryConfig> queries = new LinkedList<>();
+        for (List<QueryConfig> queryList : queryLists.values()) {
+            queries.addAll(queryList);
+        }
+
+        List<ExecutionElementConfig> executionElements =
+                CodeGeneratorHelper.convertToExecutionElements(queries, partitions);
+        for (ExecutionElementConfig executionElement :
+                CodeGeneratorHelper.reorderExecutionElements(executionElements, definitionNames)) {
+            if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.QUERY)) {
+                QueryConfig query = (QueryConfig) executionElement.getValue();
+                executionElementStringBuilder.append(generateQueryString(query));
+            } else if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.PARTITION)) {
+                PartitionConfig partition = (PartitionConfig) executionElement.getValue();
+                executionElementStringBuilder.append(generatePartitionString(partition, definitionNames));
+            } else {
+                throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
+            }
+            executionElementStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+        }
+
+        return executionElementStringBuilder.toString();
     }
 
     /**
@@ -279,30 +316,30 @@ public class CodeGenerator {
      * @return The Siddhi string representation of the given QueryConfig list
      * @throws CodeGenerationException Error while generating code
      */
-    private String generateQueries(Map<QueryListType, List<QueryConfig>> queryLists, List<String> definitionNames)
-            throws CodeGenerationException {
-        if (queryLists == null || queryLists.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
-        }
-
-        List<QueryConfig> queries = new LinkedList<>();
-        for (List<QueryConfig> queryList : queryLists.values()) {
-            queries.addAll(queryList);
-        }
-
-        StringBuilder queryListStringBuilder = new StringBuilder();
-        if (!queries.isEmpty()) {
-            queryListStringBuilder.append(SiddhiStringBuilderConstants.QUERIES_COMMENT)
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
-            for (QueryConfig query : CodeGeneratorHelper.reorderQueries(queries, definitionNames)) {
-                queryListStringBuilder.append(generateQueryString(query))
-                        .append(SiddhiStringBuilderConstants.NEW_LINE);
-            }
-        }
-        queryListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
-
-        return queryListStringBuilder.toString();
-    }
+//    private String generateQueries(Map<QueryListType, List<QueryConfig>> queryLists, List<String> definitionNames)
+//            throws CodeGenerationException {
+//        if (queryLists == null || queryLists.isEmpty()) {
+//            return SiddhiStringBuilderConstants.EMPTY_STRING;
+//        }
+//
+//        List<QueryConfig> queries = new LinkedList<>();
+//        for (List<QueryConfig> queryList : queryLists.values()) {
+//            queries.addAll(queryList);
+//        }
+//
+//        StringBuilder queryListStringBuilder = new StringBuilder();
+//        if (!queries.isEmpty()) {
+//            queryListStringBuilder.append(SiddhiStringBuilderConstants.QUERIES_COMMENT)
+//                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+//            for (QueryConfig query : CodeGeneratorHelper.reorderQueries(queries, definitionNames)) {
+//                queryListStringBuilder.append(generateQueryString(query))
+//                        .append(SiddhiStringBuilderConstants.NEW_LINE);
+//            }
+//        }
+//        queryListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+//
+//        return queryListStringBuilder.toString();
+//    }
 
     /**
      * Generates a string representation of all the partitions in a Siddhi app
@@ -311,24 +348,24 @@ public class CodeGenerator {
      * @return The Siddhi string representation of the given PartitionConfig list
      * @throws CodeGenerationException Error while generating code
      */
-    private String generatePartitions(List<PartitionConfig> partitionList, List<String> definitionNames)
-            throws CodeGenerationException {
-        if (partitionList == null || partitionList.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
-        }
-
-        StringBuilder partitionListStringBuilder = new StringBuilder();
-        partitionListStringBuilder.append(SiddhiStringBuilderConstants.PARTITIONS_COMMENT)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
-        for (PartitionConfig partition : partitionList) {
-            partitionListStringBuilder.append(generatePartitionString(partition, definitionNames))
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
-        }
-
-        partitionListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
-
-        return partitionListStringBuilder.toString();
-    }
+//    private String generatePartitions(List<PartitionConfig> partitionList, List<String> definitionNames)
+//            throws CodeGenerationException {
+//        if (partitionList == null || partitionList.isEmpty()) {
+//            return SiddhiStringBuilderConstants.EMPTY_STRING;
+//        }
+//
+//        StringBuilder partitionListStringBuilder = new StringBuilder();
+//        partitionListStringBuilder.append(SiddhiStringBuilderConstants.PARTITIONS_COMMENT)
+//                .append(SiddhiStringBuilderConstants.NEW_LINE);
+//        for (PartitionConfig partition : partitionList) {
+//            partitionListStringBuilder.append(generatePartitionString(partition, definitionNames))
+//                    .append(SiddhiStringBuilderConstants.NEW_LINE);
+//        }
+//
+//        partitionListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+//
+//        return partitionListStringBuilder.toString();
+//    }
 
     /**
      * Generates a stream definition string from a StreamConfig object
@@ -635,9 +672,13 @@ public class CodeGenerator {
         }
 
         if (!queries.isEmpty()) {
+            int queriesLeft = queries.size();
             for (QueryConfig query : CodeGeneratorHelper.reorderQueries(queries, definitionNames)) {
-                partitionStringBuilder.append(generateQueryString(query))
-                        .append(SiddhiStringBuilderConstants.NEW_LINE);
+                partitionStringBuilder.append(generateQueryString(query));
+                if (queriesLeft != 1) {
+                    partitionStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+                }
+                queriesLeft--;
             }
         }
 

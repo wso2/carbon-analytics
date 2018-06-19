@@ -31,6 +31,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionWithElement;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
@@ -53,6 +54,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperListPayloadOrAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperMapPayloadOrAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.elements.ExecutionElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
@@ -1330,7 +1332,7 @@ public class CodeGeneratorHelper {
      */
     public static List<String> getDefinitionNames(List<StreamConfig> streams, List<TableConfig> tables,
                                                   List<WindowConfig> windows, List<TriggerConfig> triggers,
-                                                  List<AggregationConfig> aggregations) {
+                                                  List<AggregationConfig> aggregations, List<PartitionConfig> partitions) {
         List<String> definitionNames = new LinkedList<>();
         for (StreamConfig stream : streams) {
             definitionNames.add(stream.getName());
@@ -1347,7 +1349,48 @@ public class CodeGeneratorHelper {
         for (AggregationConfig aggregation : aggregations) {
             definitionNames.add(aggregation.getName());
         }
+        for (PartitionConfig partition: partitions) {
+            for (StreamConfig stream: partition.getStreamList()) {
+                definitionNames.add(stream.getName());
+            }
+        }
         return definitionNames;
+    }
+
+    public static List<ExecutionElementConfig> convertToExecutionElements(List<QueryConfig> queries,
+                                                                          List<PartitionConfig> partitions)
+            throws CodeGenerationException {
+        List<ExecutionElementConfig> executionElements = new LinkedList<>();
+        for (QueryConfig query : queries) {
+            executionElements.add(new ExecutionElementConfig(query));
+        }
+        for (PartitionConfig partition : partitions) {
+            executionElements.add(new ExecutionElementConfig(partition));
+        }
+        return executionElements;
+    }
+
+    public static List<ExecutionElementConfig> reorderExecutionElements(List<ExecutionElementConfig> executionElements, List<String> definitionNames)
+            throws CodeGenerationException {
+        if (executionElements == null) {
+            throw new CodeGenerationException("The given list of execution elements is empty");
+        }
+        Set<String> existingInputs = new HashSet<>(definitionNames);
+        List<ExecutionElementConfig> reorderedExecutionElements = new LinkedList<>();
+        while (!executionElements.isEmpty()) {
+            Iterator<ExecutionElementConfig> executionElementIterator = executionElements.iterator();
+            while (executionElementIterator.hasNext()) {
+                ExecutionElementConfig executionElement = executionElementIterator.next();
+                List<String> executionElementInputStreams = executionElement.getInputStreams();
+                executionElementInputStreams.removeAll(existingInputs);
+                if (executionElementInputStreams.isEmpty()) {
+                    reorderedExecutionElements.add(executionElement);
+                    executionElementIterator.remove();
+                    existingInputs.addAll(executionElement.getOutputStreams());
+                }
+            }
+        }
+        return reorderedExecutionElements;
     }
 
     private CodeGeneratorHelper() {

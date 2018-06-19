@@ -57,6 +57,9 @@ public class CodeGeneratorConstants {
     public static final String PAYLOAD = "PAYLOAD";
     public static final String ATTRIBUTE = "ATTRIBUTES";
 
+    public static final String QUERY = "QUERY";
+    public static final String PARTITION = "PARTITION";
+
     public static final String PRIMARY_KEY_ANNOTATION = "@PRIMARYKEY";
 
     private CodeGeneratorConstants() {

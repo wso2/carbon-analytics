@@ -20,5 +20,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="wso2sp-test-suite">
-
+    <test name="siddhi-editor-core-tests" parallel="false">
+        <classes>
+            <class name="org.wso2.carbon.siddhi.editor.core.CodeGeneratorTest"/>
+        </classes>
+    </test>
 </suite>
