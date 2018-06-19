@@ -73,6 +73,7 @@ public class EdgesGenerator {
                 generatePatternSequenceQueryEdges(
                         getCompleteQueryTypeList(QueryListType.SEQUENCE)));
         edges.addAll(generateAggregationEdges(siddhiAppConfig.getAggregationList()));
+        edges.addAll(generatePartitionEdges(siddhiAppConfig.getPartitionList()));
         return edges;
     }
 
@@ -283,6 +284,27 @@ public class EdgesGenerator {
                     generateEdge(
                             getElementWithStreamName(aggregation.getFrom(), null),
                             aggregation));
+        }
+        return edges;
+    }
+
+    /**
+     * Generates Edges related to Partitions
+     * @param partitionConfigList               List of PartitionConfigs
+     * @return                                  Set of Edges
+     * @throws DesignGenerationException        Error while generating Edges
+     */
+    private Set<Edge> generatePartitionEdges(List<PartitionConfig> partitionConfigList)
+            throws DesignGenerationException {
+        Set<Edge> edges = new HashSet<>();
+        for (PartitionConfig partitionConfig : partitionConfigList) {
+            for (Map.Entry<String, String> connectorsAndStreamsEntry :
+                    partitionConfig.getConnectorsAndStreams().entrySet()) {
+                edges.add(
+                        generateEdgeToPartitionConnector(
+                                getElementWithStreamName(connectorsAndStreamsEntry.getValue(), null),
+                                connectorsAndStreamsEntry.getKey()));
+            }
         }
         return edges;
     }
