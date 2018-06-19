@@ -57,11 +57,11 @@ public class FileConfigManager implements ConfigManager {
                     }
                 }
             } catch (ConfigurationException e) {
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
             }
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Couldn't find a matching configuration for name: " +
+            LOGGER.debug("Could not find a matching configuration for name: " +
                     name + "and namespace: " + namespace + "!");
         }
         return new FileConfigReader(new HashMap<>());
@@ -87,11 +87,11 @@ public class FileConfigManager implements ConfigManager {
                     }
                 }
             } catch (ConfigurationException e) {
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
             }
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Couldn't find a matching configuration for ref, name: " + name + "!");
+            LOGGER.debug("Could not find a matching configuration for ref, name: " + name + "!");
         }
         return new HashMap<>();
     }
