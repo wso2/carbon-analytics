@@ -45,8 +45,8 @@ public class FileConfigManager implements ConfigManager {
         if (configProvider != null) {
             try {
                 RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
-                if (null != rootConfiguration && null != rootConfiguration.extensions) {
-                    for (Extension extension : rootConfiguration.extensions) {
+                if (null != rootConfiguration && null != rootConfiguration.getExtensions()) {
+                    for (Extension extension : rootConfiguration.getExtensions()) {
                         ExtensionChildConfiguration childConfiguration = extension.getExtension();
                         if (null != childConfiguration && null != childConfiguration.getName() && childConfiguration
                                 .getName().equals(name) && null != childConfiguration.getNamespace() &&
@@ -72,8 +72,8 @@ public class FileConfigManager implements ConfigManager {
         if (configProvider != null) {
             try {
                 RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
-                if (null != rootConfiguration && null != rootConfiguration.refs) {
-                    for (Reference ref : rootConfiguration.refs) {
+                if (null != rootConfiguration && null != rootConfiguration.getRefs()) {
+                    for (Reference ref : rootConfiguration.getRefs()) {
                         ReferenceChildConfiguration childConfiguration = ref.getReference();
                         if (null != childConfiguration && null != childConfiguration.getName()
                                 && childConfiguration.getName().equals(name)) {
