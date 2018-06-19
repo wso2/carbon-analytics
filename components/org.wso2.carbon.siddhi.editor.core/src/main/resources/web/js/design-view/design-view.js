@@ -150,21 +150,21 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             var defaultResponse = {
                 "siddhiAppConfig": {
                     "siddhiAppName": match[1],
-                        "appAnnotationList": ['@App:description("' + match[2] + '")'],
-                        "streamList": [],
-                        "tableList": [],
-                        "windowList": [],
-                        "triggerList": [],
-                        "aggregationList": [],
-                        "functionList": [],
-                        "partitionList": [],
-                        "sourceList": [],
-                        "sinkList": [],
-                        "queryLists": {
+                    "appAnnotationList": ['@App:description("' + match[2] + '")'],
+                    "streamList": [],
+                    "tableList": [],
+                    "windowList": [],
+                    "triggerList": [],
+                    "aggregationList": [],
+                    "functionList": [],
+                    "partitionList": [],
+                    "sourceList": [],
+                    "sinkList": [],
+                    "queryLists": {
                         "WINDOW_FILTER_PROJECTION": [],
-                            "PATTERN": [],
-                            "SEQUENCE": [],
-                            "JOIN": []
+                        "PATTERN": [],
+                        "SEQUENCE": [],
+                        "JOIN": []
                     },
                     "finalElementCount": 0
                 },
