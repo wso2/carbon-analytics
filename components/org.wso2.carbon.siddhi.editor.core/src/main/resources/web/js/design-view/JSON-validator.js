@@ -146,20 +146,22 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
         function validateWindowFilterProjectionQuery(query) {
             var isValid;
             if (!query.queryInput) {
-                DesignViewUtils.prototype.errorAlert('Connect an input for Function/Window/Filter/Projection query');
+                DesignViewUtils.prototype.errorAlert('A Function/Window/Filter/Projection query does not contain a ' +
+                    'connected input');
                 return false;
 
             } else if (!query.queryInput.from) {
-                DesignViewUtils.prototype.errorAlert('Connect an input for Function/Window/Filter/Projection query');
+                DesignViewUtils.prototype.errorAlert('A Function/Window/Filter/Projection query does not contain a ' +
+                    'connected input');
                 return false;
             }
 
-            isValid = validateQuerySelectSection(query.select, 'Function/Window/Filter/Projection');
+            isValid = validateQueryOutputSection(query.queryOutput, 'Function/Window/Filter/Projection');
             if (!isValid) {
                 return isValid;
             }
 
-            isValid = validateQueryOutputSection(query.queryOutput, 'Function/Window/Filter/Projection');
+            isValid = validateQuerySelectSection(query.select, 'Function/Window/Filter/Projection');
             if (!isValid) {
                 return isValid;
             }
@@ -170,28 +172,33 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
         function validateJoinQuery(query) {
             var isValid;
             if (!query.queryInput) {
-                DesignViewUtils.prototype.errorAlert('Connect two inputs for Join query');
+                DesignViewUtils.prototype.errorAlert('A join query doe not have two connected inputs');
+                return false;
+            } else if (!query.queryInput.firstConnectedElement && !query.queryInput.secondConnectedElement) {
+                DesignViewUtils.prototype.errorAlert('A join query doe not have two connected inputs');
                 return false;
             } else if (!query.queryInput.firstConnectedElement || !query.queryInput.secondConnectedElement) {
-                DesignViewUtils.prototype.errorAlert('Only one element is connected to the join query');
-                return false;
-            } else if (!query.queryInput.left) {
-                DesignViewUtils.prototype.errorAlert('Left source of the Join query is not defined');
-                return false;
-            } else if (!query.queryInput.right) {
-                DesignViewUtils.prototype.errorAlert('Right source of the Join query is not defined');
-                return false;
-            } else if (!query.queryInput.joinWith || !query.queryInput.joinType) {
-                DesignViewUtils.prototype.errorAlert('Fill the Join query form');
+                DesignViewUtils.prototype.errorAlert('Only one element is connected to a Join query');
                 return false;
             }
 
-            isValid = validateQuerySelectSection(query.select, 'Join');
+            isValid = validateQueryOutputSection(query.queryOutput, 'Join');
             if (!isValid) {
                 return isValid;
             }
 
-            isValid = validateQueryOutputSection(query.queryOutput, 'Join');
+            if (!query.queryInput.left) {
+                DesignViewUtils.prototype.errorAlert('Left source of a Join query is not defined');
+                return false;
+            } else if (!query.queryInput.right) {
+                DesignViewUtils.prototype.errorAlert('Right source of a Join query is not defined');
+                return false;
+            } else if (!query.queryInput.joinWith || !query.queryInput.joinType) {
+                DesignViewUtils.prototype.errorAlert('A Join query form is not filled');
+                return false;
+            }
+
+            isValid = validateQuerySelectSection(query.select, 'Join');
             if (!isValid) {
                 return isValid;
             }
@@ -202,30 +209,32 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
         function validatePatternOrSequenceQuery(query, type) {
             var isValid;
             if (!query.queryInput) {
-                DesignViewUtils.prototype.errorAlert('Connect an input for ' + type + ' query');
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' query does not contain a input');
                 return false;
 
-            } else if (query.queryInput.connectedElementList !== undefined
-                && query.queryInput.connectedElementList.length === 0) {
-                DesignViewUtils.prototype.errorAlert('Connect an input for ' + type + ' query');
+            } else if (query.queryInput.connectedElementNameList !== undefined
+                && query.queryInput.connectedElementNameList.length === 0) {
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' query does not contain a input');
                 return false;
 
-            } else if (!query.queryInput.logic) {
-                DesignViewUtils.prototype
-                    .errorAlert('Logic section in query input of the ' + type + ' query form cannot be blank');
-                return false;
-            } else if (query.queryInput.conditionList.length === 0){
-                DesignViewUtils.prototype
-                    .errorAlert('Condition list in query input of the ' + type + ' query form cannot be blank');
-                return false;
             }
 
-            isValid = validateQuerySelectSection(query.select, type);
+            isValid = validateQueryOutputSection(query.queryOutput, type);
             if (!isValid) {
                 return isValid;
             }
 
-            isValid = validateQueryOutputSection(query.queryOutput, type);
+            if (!query.queryInput.logic) {
+                DesignViewUtils.prototype
+                    .errorAlert('Logic section in query input of a ' + type + ' query form cannot be blank');
+                return false;
+            } else if (query.queryInput.conditionList.length === 0){
+                DesignViewUtils.prototype
+                    .errorAlert('Condition list in query input of a ' + type + ' query form cannot be blank');
+                return false;
+            }
+
+            isValid = validateQuerySelectSection(query.select, type);
             if (!isValid) {
                 return isValid;
             }
@@ -237,7 +246,7 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
             var isValid = true;
             if (!select) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('Select section of the ' + type + ' query form cannot be blank');
+                DesignViewUtils.prototype.errorAlert('Select section of a ' + type + ' query form cannot be blank');
             } else if(select.type === 'USER_DEFINED') {
                 _.forEach(select.value, function (value) {
                     if (!value.expression || value.expression === '') {
@@ -254,13 +263,13 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
             var isValid = true;
             if (!output) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('Connect an output to the ' + type + ' query');
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' query does not contain a connected output element');
             } else if (!output.target) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('Connect an output for ' + type + ' query');
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' query does not contain a connected output element');
             } else if(!output.type || !output.output) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('Output section of the ' + type + ' query form cannot be blank');
+                DesignViewUtils.prototype.errorAlert('Output section of a ' + type + ' query form is not filled');
             }
             return isValid;
         }
