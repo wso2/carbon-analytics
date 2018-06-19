@@ -116,11 +116,16 @@ public class QueryOutputConfigGenerator {
      */
     private QueryOutputConfig generateUpdateOrInsertIntoOutputConfig(UpdateOrInsertStream updateOrInsertStream)
             throws DesignGenerationException {
+        List<SetAttributeConfig> setAttributeConfigList = null;
+        if (updateOrInsertStream.getUpdateSet() != null) {
+            setAttributeConfigList =
+                    generateSetAttributeConfigsList(updateOrInsertStream.getUpdateSet().getSetAttributeList());
+        }
         return new QueryOutputConfig(
                 QueryOutputType.UPDATE_OR_INSERT_INTO.toString(),
                 new UpdateInsertIntoOutputConfig(
                         updateOrInsertStream.getOutputEventType().name(),
-                        generateSetAttributeConfigsList(updateOrInsertStream.getUpdateSet().getSetAttributeList()),
+                        setAttributeConfigList,
                         ConfigBuildingUtilities.getDefinition(
                                 updateOrInsertStream.getOnUpdateExpression(), siddhiAppString)),
                 updateOrInsertStream.getId());
