@@ -234,6 +234,12 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             }
 
                             var configurationCopy = _.cloneDeep(designView.getConfigurationData());
+
+                            // validate json before sending to backend to get the code view
+                            if (!designView.validateJSONBeforeSendingToBackend(configurationCopy.getSiddhiAppConfig())) {
+                                return;
+                            }
+
                             removeUnnecessaryFieldsFromJSON(configurationCopy);
                             var sendingString = JSON.stringify(configurationCopy);
 
