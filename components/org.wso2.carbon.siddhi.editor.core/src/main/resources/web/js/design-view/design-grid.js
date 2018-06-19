@@ -1148,9 +1148,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             if (targetElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
                                 model.getQueryInput().removeConnectedElementName(disconnectedElementName);
+                                model.getQueryInput().removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
                             } else if (targetElement.hasClass(constants.SEQUENCE)) {
                                 model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
                                 model.getQueryInput().removeConnectedElementName(disconnectedElementName);
+                                model.getQueryInput().removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
                             }
                         }
 
