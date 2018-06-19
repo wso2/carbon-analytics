@@ -172,7 +172,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 }
                 fillAggregate = self.formUtils.cleanJSONObject(fillAggregate);
 
-                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                formContainer.find('.define-aggregation')
+                    .append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
                     '<div class="row"><div id="form-aggregation-annotation" class="col-md-12 section-seperator frm-agr"></div></div>' +
                     '<div class="row"><div id="form-aggregation-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-aggregation-select" class="col-md-4 frm-agr"></div>' +
