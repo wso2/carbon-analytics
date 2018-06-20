@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.CommentCodeSegment;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.ElementCodeSegment;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.query.api.SiddhiElement;
 
@@ -42,7 +44,21 @@ public class ConfigBuildingUtilities {
             throws DesignGenerationException {
         int[] startIndex = siddhiElement.getQueryContextStartIndex();
         int[] endIndex = siddhiElement.getQueryContextEndIndex();
+        return getStringWithQueryContextIndexes(startIndex, endIndex, siddhiAppString);
 
+    }
+
+    // TODO comment
+    public static String getComment(CommentCodeSegment commentCodeSegment, String siddhiAppString)
+            throws DesignGenerationException {
+        return getStringWithQueryContextIndexes(
+                commentCodeSegment.getQueryContextStartIndex(),
+                commentCodeSegment.getQueryContextEndIndex(),
+                siddhiAppString);
+    }
+
+    public static String getStringWithQueryContextIndexes(int[] startIndex, int[] endIndex, String siddhiAppString)
+            throws DesignGenerationException {
         if (startIndex == null || endIndex == null) {
             throw new DesignGenerationException("Unable to get the definition of the SiddhiElement");
         }
