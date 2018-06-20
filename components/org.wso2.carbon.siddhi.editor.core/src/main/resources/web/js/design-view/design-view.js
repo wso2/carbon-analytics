@@ -81,7 +81,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          */
         DesignView.prototype.renderDesignGrid = function (configurationJSON) {
             var self = this;
-            var initialiseData = new InitialiseData(self._$parent_el);
+            var initialiseData = new InitialiseData(self._$parent_el, self.application);
             this.configurationData = initialiseData.initialiseSiddhiAppData(configurationJSON);
             var designViewGridOpts = {};
             _.set(designViewGridOpts, 'container', this.designViewGridContainer);

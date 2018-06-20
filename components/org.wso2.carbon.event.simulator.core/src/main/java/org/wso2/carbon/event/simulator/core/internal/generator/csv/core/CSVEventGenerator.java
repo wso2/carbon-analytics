@@ -170,6 +170,20 @@ public class CSVEventGenerator implements EventGenerator {
         }
     }
 
+    /**
+     * resume() method
+     */
+    @Override
+    public void resume() {
+        if ("-1".equals(csvConfiguration.getTimestampAttribute())) {
+            startTimestamp = System.currentTimeMillis();
+            nextEvent.setTimestamp(startTimestamp);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Stop random generator for stream '" + csvConfiguration.getStreamName() + "'");
+        }
+    }
+
 
     /**
      * poll() returns nextEvent of the generator and assign the event with next least timestamp as the nextEvent
@@ -232,6 +246,7 @@ public class CSVEventGenerator implements EventGenerator {
          * if the CSV file is ordered by timestamp, create next event and assign it as the nextEvent of generator
          * else, assign the next event with current timestamp as nextEvent of generator
          */
+        startTimestamp += csvConfiguration.getTimestampInterval();
         if (csvConfiguration.getIsOrdered()) {
             nextEvent = csvReader.getNextEvent(csvConfiguration, streamAttributes, startTimestamp,
                     endTimestamp);

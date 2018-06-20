@@ -34,6 +34,46 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
          */
         JSONValidator.prototype.validate = function (JSON) {
             var isValid = true;
+
+            _.forEach(JSON.sourceList, function (source) {
+                isValid = validateSourceOrSinkAnnotation(source, 'Source');
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            // exit from the validate method
+            if(!isValid) {
+                return isValid;
+            }
+
+            _.forEach(JSON.sinkList, function (sink) {
+                isValid = validateSourceOrSinkAnnotation(sink, 'Sink');
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            // exit from the validate method
+            if(!isValid) {
+                return isValid;
+            }
+
+            _.forEach(JSON.aggregationList, function (aggregation) {
+                isValid = validateAggregation(aggregation);
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            // exit from the validate method
+            if(!isValid) {
+                return isValid;
+            }
+
             _.forEach(JSON.queryLists.WINDOW_FILTER_PROJECTION, function (query) {
                 isValid = validateWindowFilterProjectionQuery(query);
                 if (!isValid) {
@@ -61,7 +101,7 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.queryLists.PATTERN, function (query) {
-                isValid = validatePatternOrSequenceQuery(query, 'Pattern');
+                isValid = validatePatternOrSequenceQuery(query, 'Pattern Query');
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -74,7 +114,7 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.queryLists.SEQUENCE, function (query) {
-                isValid = validatePatternOrSequenceQuery(query, 'Sequence');
+                isValid = validatePatternOrSequenceQuery(query, 'Sequence Query');
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -114,7 +154,7 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
                 }
 
                 _.forEach(partition.queryLists.PATTERN, function (query) {
-                    isValid = validatePatternOrSequenceQuery(query, 'Pattern');
+                    isValid = validatePatternOrSequenceQuery(query, 'Pattern Query');
                     if (!isValid) {
                         // break the for each loop
                         return false;
@@ -127,7 +167,7 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
                 }
 
                 _.forEach(partition.queryLists.SEQUENCE, function (query) {
-                    isValid = validatePatternOrSequenceQuery(query, 'Sequence');
+                    isValid = validatePatternOrSequenceQuery(query, 'Sequence Query');
                     if (!isValid) {
                         // break the for each loop
                         return false;
@@ -143,6 +183,34 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
             return isValid;
         };
 
+        function validateSourceOrSinkAnnotation(annotation, type) {
+            if (!annotation.connectedElementName) {
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' annotation does not contain a connected stream');
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        function validateAggregation(aggregation) {
+            var isValid;
+            if (!aggregation.from) {
+                DesignViewUtils.prototype.errorAlert('An Aggregation element does not contain a connected input');
+                return false;
+
+            } else if (!aggregation.name) {
+                DesignViewUtils.prototype.errorAlert('Name field of an Aggregation form cannot be blank');
+                return false;
+            }
+
+            isValid = validateQuerySelectSection(aggregation.select, 'Aggregation');
+            if (!isValid) {
+                return isValid;
+            }
+
+            return isValid;
+        }
+
         function validateWindowFilterProjectionQuery(query) {
             var isValid;
             if (!query.queryInput) {
@@ -156,12 +224,12 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = validateQueryOutputSection(query.queryOutput, 'Function/Window/Filter/Projection');
+            isValid = validateQueryOutputSection(query.queryOutput, 'Function/Window/Filter/Projection query');
             if (!isValid) {
                 return isValid;
             }
 
-            isValid = validateQuerySelectSection(query.select, 'Function/Window/Filter/Projection');
+            isValid = validateQuerySelectSection(query.select, 'Function/Window/Filter/Projection query');
             if (!isValid) {
                 return isValid;
             }
@@ -172,17 +240,17 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
         function validateJoinQuery(query) {
             var isValid;
             if (!query.queryInput) {
-                DesignViewUtils.prototype.errorAlert('A join query doe not have two connected inputs');
+                DesignViewUtils.prototype.errorAlert('A Join query does not contain two connected inputs');
                 return false;
             } else if (!query.queryInput.firstConnectedElement && !query.queryInput.secondConnectedElement) {
-                DesignViewUtils.prototype.errorAlert('A join query doe not have two connected inputs');
+                DesignViewUtils.prototype.errorAlert('A Join query does not contain two connected inputs');
                 return false;
             } else if (!query.queryInput.firstConnectedElement || !query.queryInput.secondConnectedElement) {
                 DesignViewUtils.prototype.errorAlert('Only one element is connected to a Join query');
                 return false;
             }
 
-            isValid = validateQueryOutputSection(query.queryOutput, 'Join');
+            isValid = validateQueryOutputSection(query.queryOutput, 'Join query');
             if (!isValid) {
                 return isValid;
             }
@@ -198,7 +266,7 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = validateQuerySelectSection(query.select, 'Join');
+            isValid = validateQuerySelectSection(query.select, 'Join query');
             if (!isValid) {
                 return isValid;
             }
@@ -209,12 +277,12 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
         function validatePatternOrSequenceQuery(query, type) {
             var isValid;
             if (!query.queryInput) {
-                DesignViewUtils.prototype.errorAlert('A ' + type + ' query does not contain a input');
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' does not contain a input');
                 return false;
 
             } else if (query.queryInput.connectedElementNameList !== undefined
                 && query.queryInput.connectedElementNameList.length === 0) {
-                DesignViewUtils.prototype.errorAlert('A ' + type + ' query does not contain a input');
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' does not contain a input');
                 return false;
 
             }
@@ -226,11 +294,11 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
 
             if (!query.queryInput.logic) {
                 DesignViewUtils.prototype
-                    .errorAlert('Logic section in query input of a ' + type + ' query form cannot be blank');
+                    .errorAlert('Logic section in query input of a ' + type + ' form cannot be blank');
                 return false;
             } else if (query.queryInput.conditionList.length === 0){
                 DesignViewUtils.prototype
-                    .errorAlert('Condition list in query input of a ' + type + ' query form cannot be blank');
+                    .errorAlert('Condition list in query input of a ' + type + ' form cannot be blank');
                 return false;
             }
 
@@ -246,7 +314,7 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
             var isValid = true;
             if (!select) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('Select section of a ' + type + ' query form cannot be blank');
+                DesignViewUtils.prototype.errorAlert('Select section of a ' + type + ' form cannot be blank');
             } else if(select.type === 'USER_DEFINED') {
                 _.forEach(select.value, function (value) {
                     if (!value.expression || value.expression === '') {
@@ -263,13 +331,13 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
             var isValid = true;
             if (!output) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('A ' + type + ' query does not contain a connected output element');
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' does not contain a connected output element');
             } else if (!output.target) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('A ' + type + ' query does not contain a connected output element');
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' does not contain a connected output element');
             } else if(!output.type || !output.output) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('Output section of a ' + type + ' query form is not filled');
+                DesignViewUtils.prototype.errorAlert('Output section of a ' + type + ' form is not filled');
             }
             return isValid;
         }
