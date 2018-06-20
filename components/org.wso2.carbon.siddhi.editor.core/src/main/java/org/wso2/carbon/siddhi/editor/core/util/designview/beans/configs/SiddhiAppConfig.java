@@ -55,6 +55,10 @@ public class SiddhiAppConfig {
     private Map<QueryListType, List<QueryConfig>> queryLists = new EnumMap<>(QueryListType.class);
     private List<PartitionConfig> partitionList = new ArrayList<>();
 
+    // TODO under testing
+    List<ElementCodeSegment> elementCodeSegments = new ArrayList<>();
+    List<CommentCodeSegment> commentCodeSegments = new ArrayList<>();
+
     public SiddhiAppConfig() {
         queryLists.put(QueryListType.WINDOW_FILTER_PROJECTION, new ArrayList<>());
         queryLists.put(QueryListType.JOIN, new ArrayList<>());

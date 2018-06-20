@@ -18,11 +18,16 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.CommentCodeSegment;
+
 /**
  * Represents a Siddhi Element
  */
 public abstract class SiddhiElementConfig {
     private String id;
+    private int[] queryContextStartIndex;
+    private int[] queryContextEndIndex;
+    private CommentCodeSegment previousCommentSegment;
 
     public SiddhiElementConfig() {
     }
@@ -37,5 +42,29 @@ public abstract class SiddhiElementConfig {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public int[] getQueryContextStartIndex() {
+        return queryContextStartIndex;
+    }
+
+    public void setQueryContextStartIndex(int[] queryContextStartIndex) {
+        this.queryContextStartIndex = queryContextStartIndex;
+    }
+
+    public int[] getQueryContextEndIndex() {
+        return queryContextEndIndex;
+    }
+
+    public void setQueryContextEndIndex(int[] queryContextEndIndex) {
+        this.queryContextEndIndex = queryContextEndIndex;
+    }
+
+    public CommentCodeSegment getPreviousCommentSegment() {
+        return previousCommentSegment;
+    }
+
+    public void setPreviousCommentSegment(CommentCodeSegment previousCommentSegment) {
+        this.previousCommentSegment = previousCommentSegment;
     }
 }
