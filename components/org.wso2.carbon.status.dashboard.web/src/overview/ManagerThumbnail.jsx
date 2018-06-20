@@ -35,7 +35,6 @@ import AuthManager from '../auth/utils/AuthManager';
 import Clock from './Clock';
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import WorkerThumbnail from "./WorkerThumbnail";
-import DistributedViewResourceNodeThumbnail from "./DistributedViewResourceNodeThumbnail";
 
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -44,19 +43,19 @@ const constants = {memory: "memory", cpu: "cpu", load: "load", down: "down", up:
 
 const styles = {
     gridList: {width: '100%', height: 150, margin: 0},
-    overviewGridList: {width: '90%', padding: 40},
+    overviewGridList: {width: '96%', padding: 40},
     smallIcon: {width: 20, height: 20, zIndex: 1, padding: 5},
     overviewLegend: {fontSize: 10, color: '#fff'},
     legendContainer: {width: '100%', textAlign: 'center', position: 'absolute', bottom: 5},
     root: {
-
         flexWrap: 'wrap',
         justifyContent: 'space-around',
         backgroundColor: '#222222',
-        width: '300%'
+        width: '310%',
+        marginLeft: '-8%'
     },
     h3: {color: 'white', marginLeft: '4%', backgroundColor: '#222222'},
-    h3Title: {color: '#C0C0C0', marginLeft: '4%', backgroundColor: '#222222'},
+    h3Title: {color: '#dedede', fontWeight: '400'},
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
@@ -207,31 +206,21 @@ export default class ManagerThumbnail extends React.Component {
 
 
     renderWorkers(workersList) {
-
         if (ManagerThumbnail.hasNodes(this.state.resourceClustersList)) {
             return (
-
                 Object.keys(workersList).map((id, workerList) => {
                     if (id === 'ResourceCluster') {
                         return (
-                            <div style={{marginLeft: '-8%'}}>
+                            <div>
                                 <h4 style={styles.h3Title}>Workers</h4>
                                 <div style={styles.root}>
 
                                     <GridList cols={3} cellHeight='100%' style={styles.overviewGridList}>
                                         {workersList[id].map((worker) => {
-                                            if (worker.statusMessage === "Please add the node manually.") {
-                                                return (
-                                                    <DistributedViewResourceNodeThumbnail worker={worker}
-                                                                                          currentTime={new Date()
-                                                                                              .getTime()}/>
-                                                )
-                                            } else {
                                                 return (
                                                     <WorkerThumbnail worker={worker}
                                                                      currentTime={new Date().getTime()}/>
                                                 )
-                                            }
                                         })}
                                     </GridList>
                                 </div>
@@ -541,7 +530,7 @@ export default class ManagerThumbnail extends React.Component {
                     {"Do you want to delete manager '" + this.state.workerID + "' ?"}
                 </Dialog>
 
-                <GridTile style={{background: 'black'}}>
+                <GridTile style={{background: 'black', marginBottom:'30px'}}>
                     <div style={{
                         display: 'flex', alignItems: 'center', background: titleBg,
                         position: 'absolute', bottom: 0, width: '100%'

@@ -108,6 +108,7 @@ public class RandomEventGenerator implements EventGenerator {
      */
     @Override
     public void stop() {
+        currentTimestamp = -1;
         if (log.isDebugEnabled()) {
             log.debug("Stop random generator for stream '" + randomSimulationConfig.getStreamName() + "'");
         }

@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.wso2.siddhi.query.api.execution.query.input.handler.StreamFunction;
 import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Window;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
@@ -64,6 +65,11 @@ public class WindowFilterProjectionConfigGenerator {
             return WindowFilterProjectionQueryType.PROJECTION;
         } else {
             for (StreamHandler streamHandler : streamHandlers) {
+                if (streamHandler instanceof StreamFunction) {
+                    return WindowFilterProjectionQueryType.FUNCTION;
+                }
+            }
+            for (StreamHandler streamHandler : streamHandlers) {
                 if (streamHandler instanceof Window) {
                     return WindowFilterProjectionQueryType.WINDOW;
                 }
@@ -78,6 +84,7 @@ public class WindowFilterProjectionConfigGenerator {
     private enum WindowFilterProjectionQueryType {
         PROJECTION,
         FILTER,
+        FUNCTION,
         WINDOW
     }
 }

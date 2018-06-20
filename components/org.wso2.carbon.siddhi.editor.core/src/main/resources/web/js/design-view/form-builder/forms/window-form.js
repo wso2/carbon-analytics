@@ -44,12 +44,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
          */
         WindowForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Window </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div>' +
                 '<div id="define-window" class="define-window"></div>');
             formContainer.append(propertyDiv);
 
             // generate the form to define a window
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
                 schema: {
                     type: "object",
                     title: "Window",
@@ -119,7 +119,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                         },
                         functionName: {
                             type: "string",
-                            title: "Function Name",
+                            title: "Window Function Name",
                             minLength: 1,
                             required: true,
                             propertyOrder: 4
@@ -137,6 +137,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                                 title: 'Parameter',
                                 properties: {
                                     parameterValue: {
+                                        title: "Parameter",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -180,6 +181,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                         .errorAlert("Window name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 // add the new out window to the window array
                 var windowOptions = {};
                 _.set(windowOptions, 'id', i);
@@ -231,6 +236,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
          */
         WindowForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div>' +
+                '<div id="define-window" class="define-window"></div>');
+            formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
@@ -288,7 +296,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 outputEventType: outputEventType
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
                 schema: {
                     type: "object",
                     title: "Window",
@@ -358,7 +366,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                         },
                         functionName: {
                             type: "string",
-                            title: "Function Name",
+                            title: "Window Function Name",
                             minLength: 1,
                             required: true,
                             propertyOrder: 4
@@ -376,6 +384,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                                 title: 'Parameter',
                                 properties: {
                                     parameterValue: {
+                                        title: "Parameter",
                                         type: "string",
                                         minLength: 1
                                     }
@@ -422,6 +431,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 }
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
 
                 var config = editor.getValue();
 

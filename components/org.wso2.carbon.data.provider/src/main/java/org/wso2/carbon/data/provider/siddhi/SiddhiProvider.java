@@ -101,10 +101,16 @@ public class SiddhiProvider extends AbstractDataProvider {
     @Override
     public String providerConfig() {
         Map<String, String> renderingTypes = new HashMap();
+        Map<String, String> renderingHints = new HashMap();
+        String providerDescription = "Siddhi app provider will allow the user to retrieve data from siddhi by " +
+                "writing using a siddhi app";
         renderingTypes.put(SIDDHI_APP, InputFieldTypes.SIDDHI_CODE);
+        renderingHints.put(SIDDHI_APP, "Siddhi app which is used to retrieve the data");
         renderingTypes.put(STORE_QUERY, InputFieldTypes.DYNAMIC_SIDDHI_CODE);
         renderingTypes.put(PULISHING_INTERVAL, InputFieldTypes.NUMBER);
-        return new Gson().toJson(new Object[]{renderingTypes, new SiddhiDataProviderConfig()});
+        renderingHints.put(PULISHING_INTERVAL, "Rate at which data should be sent to the widget");
+        return new Gson().toJson(new Object[]{renderingTypes, new SiddhiDataProviderConfig(), renderingHints,
+                providerDescription});
     }
 
     @Override

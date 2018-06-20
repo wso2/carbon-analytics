@@ -44,6 +44,10 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
          */
         PartitionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Partition Configuration</h3></div>' +
+                '<div id="define-partition" class="define-partition"></div>');
+            formContainer.append(propertyDiv);
+
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -82,7 +86,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     partitionKeys: partitionKeys
                 };
                 fillWith = self.formUtils.cleanJSONObject(fillWith);
-                var editor = new JSONEditor(formContainer[0], {
+                var editor = new JSONEditor($(formContainer).find('#define-partition')[0], {
                     schema: {
                         type: "object",
                         title: "Partition",
@@ -117,7 +121,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                                 propertyOrder: 2,
                                 type: "array",
                                 format: "table",
-                                title: "Partition Keys",
+                                title: "Partition By",
                                 options: {
                                     disable_array_add: true,
                                     disable_array_delete: true
@@ -167,6 +171,9 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                 // 'Submit' button action
                 var submitButtonElement = $(formContainer).find('#btn-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
 
                     var config = editor.getValue();
 

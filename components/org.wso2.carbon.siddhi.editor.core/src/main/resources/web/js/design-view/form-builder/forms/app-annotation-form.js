@@ -30,9 +30,9 @@ define(['require', 'log', 'jquery', 'lodash'],
                 this.application = options.application;
                 this.consoleListManager = options.application.outputController;
                 this.formUtils = options.formUtils;
-                var currentTabId = this.application.tabController.activeTab.cid;
-                this.designViewContainer = $('#design-container-' + currentTabId);
-                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
+                this.currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + this.currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
             }
         };
 
@@ -44,6 +44,8 @@ define(['require', 'log', 'jquery', 'lodash'],
          */
         AppAnnotationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var div = $('<div />').attr({id: 'define-appconfig', class: 'define-appconfig'});
+            formContainer.append(div);
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -63,7 +65,7 @@ define(['require', 'log', 'jquery', 'lodash'],
                 annotations: annotations
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor(div[0], {
                 schema: {
                     type: "object",
                     title: "Siddhi App Configurations",
@@ -122,6 +124,9 @@ define(['require', 'log', 'jquery', 'lodash'],
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 var config = editor.getValue();
 
                 siddhiAppConfig.setSiddhiAppName(config.siddhiApp.name);
@@ -129,6 +134,10 @@ define(['require', 'log', 'jquery', 'lodash'],
                 _.forEach(config.annotations, function (annotation) {
                     siddhiAppConfig.addAppAnnotation(annotation.annotation);
                 });
+
+                // update the siddhi app name displayed on the canvas
+                var siddhiAppNameNode = $('#' + self.currentTabId + '-siddhiAppNameId');
+                siddhiAppNameNode.html(config.siddhiApp.name);
 
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');

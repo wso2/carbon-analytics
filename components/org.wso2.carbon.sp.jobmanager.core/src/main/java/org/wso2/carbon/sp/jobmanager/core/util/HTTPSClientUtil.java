@@ -18,98 +18,21 @@
 
 package org.wso2.carbon.sp.jobmanager.core.util;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
-import java.io.IOException;
+import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 
 /**
  * Utility class to handle HTTPS requests.
  */
 public class HTTPSClientUtil {
-    /**
-     * Media type to send with the requests.
-     */
-    private static final MediaType MEDIA_TYPE_PLAINTEXT = MediaType.parse("text/plain; charset=utf-8");
 
     /**
-     * Send a GET request.
+     * Generate the worker URL which is used for rest calls.
      *
-     * @param url URL of the endpoint.
-     * @return {@link Response} for the request.
-     * @throws IOException when failed to connect.
+     * @param host the Host of the worker node
+     * @param port the Port of the worker node
+     * @return returnconcadinating the host:port
      */
-    public static Response doGetRequest(String url, String username, String password) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        return getAuthenticatedClient(username, password).newCall(request).execute();
-    }
-
-    /**
-     * Send a POST request.
-     *
-     * @param url     URL of the endpoint.
-     * @param payload payload string.
-     * @return {@link Response} for the request.
-     * @throws IOException when failed to connect.
-     */
-    public static Response doPostRequest(String url, String payload, String username, String password)
-            throws IOException {
-        RequestBody body = RequestBody.create(MEDIA_TYPE_PLAINTEXT, payload);
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        return getAuthenticatedClient(username, password).newCall(request).execute();
-    }
-
-    /**
-     * Send a PUT request.
-     *
-     * @param url     URL of the endpoint.
-     * @param payload payload string.
-     * @return {@link Response} for the request.
-     * @throws IOException when failed to connect.
-     */
-    public static Response doPutRequest(String url, String payload, String username, String password)
-            throws IOException {
-        RequestBody body = RequestBody.create(MEDIA_TYPE_PLAINTEXT, payload);
-        Request request = new Request.Builder()
-                .url(url)
-                .put(body)
-                .build();
-        return getAuthenticatedClient(username, password).newCall(request).execute();
-    }
-
-    /**
-     * Send a DELETE request.
-     *
-     * @param url URL of the endpoint.
-     * @return {@link Response} for the request.
-     * @throws IOException when failed to connect.
-     */
-    public static Response doDeleteRequest(String url, String username, String password) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .delete()
-                .build();
-        return getAuthenticatedClient(username, password).newCall(request).execute();
-    }
-
-    /**
-     * Generate a authenticated {@link OkHttpClient} client.
-     *
-     * @param username username
-     * @param password password
-     * @return authenticated client
-     */
-    private static OkHttpClient getAuthenticatedClient(final String username, final String password) {
-        return new OkHttpClient.Builder()
-                .addInterceptor(new BasicAuthInterceptor(username, password))
-                .build();
+    public static String generateURLHostPort(String host, String port) {
+        return host + Constants.URL_HOST_PORT_SEPARATOR + port;
     }
 }

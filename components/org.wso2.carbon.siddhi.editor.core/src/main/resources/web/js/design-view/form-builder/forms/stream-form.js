@@ -44,12 +44,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
          */
         StreamForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Stream </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
                 '<div id="define-stream" class="define-stream"></div>');
             formContainer.append(propertyDiv);
 
             // generate the form to define a stream
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-stream')[0], {
                 schema: {
                     type: "object",
                     title: "Stream",
@@ -146,6 +146,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         .errorAlert("Stream name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 // add the new out stream to the stream array
                 var streamOptions = {};
                 _.set(streamOptions, 'id', i);
@@ -181,6 +185,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
          */
         StreamForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
+                '<div id="define-stream" class="define-stream"></div>');
+            formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
@@ -214,7 +221,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 attributes: attributes
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-stream')[0], {
                 schema: {
                     type: "object",
                     title: "Stream",
@@ -302,6 +309,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if (errors.length) {
                     return;
                 }
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
 
                 var config = editor.getValue();
                 var streamName;

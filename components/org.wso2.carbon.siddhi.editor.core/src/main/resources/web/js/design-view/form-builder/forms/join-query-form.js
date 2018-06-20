@@ -18,7 +18,7 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'joinQuerySource', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils'],
+        'joinQuerySource', 'streamHandler', 'designViewUtils'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
               DesignViewUtils) {
@@ -53,9 +53,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          */
         JoinQueryForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Join Query </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Join Query Configuration</h3></div>' +
                 '<div class="define-join-query"></div>');
             formContainer.append(propertyDiv);
+
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
@@ -143,19 +144,19 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var outputElementType = undefined;
                 var outputElementAttributesList = [];
 
-                var partitionId;
+                self.partitionId = undefined;
                 var partitionElementWhereQueryIsSaved
                     = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
                 if (partitionElementWhereQueryIsSaved !== undefined) {
-                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                    self.partitionId = partitionElementWhereQueryIsSaved.getId();
                 }
 
                 var firstInputElement =
                     self.configurationData.getSiddhiAppConfig()
-                        .getDefinitionElementByName(firstInputElementName, partitionId);
+                        .getDefinitionElementByName(firstInputElementName, self.partitionId);
                 var secondInputElement =
                     self.configurationData.getSiddhiAppConfig()
-                        .getDefinitionElementByName(secondInputElementName, partitionId);
+                        .getDefinitionElementByName(secondInputElementName, self.partitionId);
                 if (firstInputElement !== undefined && secondInputElement !== undefined) {
 
                     if (firstInputElement.type !== undefined && firstInputElement.type === 'TRIGGER') {
@@ -199,7 +200,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var outputElement =
                     self.configurationData.getSiddhiAppConfig()
-                        .getDefinitionElementByName(outputElementName, partitionId);
+                        .getDefinitionElementByName(outputElementName, self.partitionId);
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
@@ -349,7 +350,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var inputSchema = {
                     type: "object",
-                    title: "Query Input",
+                    title: "Input",
                     required: true,
                     options: {
                         disable_properties: false
@@ -576,7 +577,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var editorAnnotation = new JSONEditor($(formContainer).find('#form-query-annotation')[0], {
                     schema: {
                         type: "object",
-                        title: "Query Annotations",
+                        title: "Annotations",
                         properties: {
                             annotations: {
                                 propertyOrder: 1,
@@ -719,7 +720,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             disable_properties: false
                         },
                         type: "object",
-                        title: "Query Select",
+                        title: "Select",
                         properties: {
                             select: {
                                 propertyOrder: 1,
@@ -853,7 +854,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     schema: {
                         required: true,
                         type: "object",
-                        title: "Query Output",
+                        title: "Output",
                         options: {
                             disable_properties: false
                         },
@@ -1149,6 +1150,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         || !validateSourceStreamHandlers(inputConfig.right, constants.RIGHT_SOURCE)) {
                         return;
                     }
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     clickedElement.clearAnnotationList();
                     _.forEach(annotationConfig.annotations, function (annotation) {
                         clickedElement.addAnnotation(annotation.annotation);
@@ -1408,6 +1413,52 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 console.log("Unknown source side received!");
             }
 
+            var inputElementAttributeList;
+            var descriptionForSourceElement = 'Attributes { ';
+            var inputElement
+                = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(sourceName, self.partitionId);
+            if (sourceType === 'STREAM' || sourceType === 'WINDOW' || sourceType === 'TABLE') {
+                inputElementAttributeList = (inputElement.element).getAttributeList();
+                _.forEach(inputElementAttributeList, function (attribute) {
+                    descriptionForSourceElement
+                        = descriptionForSourceElement + attribute.getName() + ' : ' + attribute.getType() + ', ';
+                });
+                descriptionForSourceElement
+                    = descriptionForSourceElement.substring(0, descriptionForSourceElement.length - 2);
+                descriptionForSourceElement = descriptionForSourceElement + ' }';
+            } else if (sourceType === 'TRIGGER') {
+                descriptionForSourceElement = descriptionForSourceElement + 'triggered_time : long }';
+            } else if (sourceType === 'AGGREGATION') {
+                var aggregationSelect = (inputElement.element).getSelect();
+                var aggregationSelectType = aggregationSelect.getType();
+                if (aggregationSelectType === 'USER_DEFINED') {
+                    _.forEach(aggregationSelect.getValue(), function (value) {
+                        descriptionForSourceElement
+                            = descriptionForSourceElement + value.as + ', ';
+                    });
+                    descriptionForSourceElement
+                        = descriptionForSourceElement.substring(0, descriptionForSourceElement.length - 2);
+                    descriptionForSourceElement = descriptionForSourceElement + ' }';
+                } else if (aggregationSelectType === 'ALL') {
+                    var connectedStreamOrTriggerName = (inputElement.element).getFrom();
+                    inputElement
+                        = self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(connectedStreamOrTriggerName, self.partitionId);
+                    if (inputElement.type === 'STREAM') {
+                        inputElementAttributeList = (inputElement.element).getAttributeList();
+                        _.forEach(inputElementAttributeList, function (attribute) {
+                            descriptionForSourceElement
+                                = descriptionForSourceElement + attribute.getName() + ' : ' + attribute.getType() + ', ';
+                        });
+                        descriptionForSourceElement
+                            = descriptionForSourceElement.substring(0, descriptionForSourceElement.length - 2);
+                        descriptionForSourceElement = descriptionForSourceElement + ' }';
+                    } else if (inputElement.type === 'TRIGGER') {
+                        descriptionForSourceElement = descriptionForSourceElement + 'triggered_time : long }';
+                    }
+                }
+            }
+
             var commonJoinSourceSchema = {
                 type: "object",
                 propertyOrder: sourcePropertyOrder,
@@ -1428,7 +1479,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 title: "From",
                                 type: "string",
                                 enum: [sourceName, secondarySourceName],
-                                default: sourceName
+                                default: sourceName,
+                                description: descriptionForSourceElement
                             }
                         }
                     },

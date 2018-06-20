@@ -44,12 +44,12 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
          */
         FunctionForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Function </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Function Configuration</h3></div>' +
                 '<div id="define-function" class="define-function"></div>');
             formContainer.append(propertyDiv);
 
             // generate the form to define a function
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-function')[0], {
                 schema: {
                     type: "object",
                     title: "Function",
@@ -121,6 +121,10 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                         .errorAlert("Function name \"" + editor.getValue().name + "\" is already used.");
                     return;
                 }
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
+
                 // add the new out function to the function array
                 var functionOptions = {};
                 _.set(functionOptions, 'id', i);
@@ -151,6 +155,10 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
          */
         FunctionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Function Configuration</h3></div>' +
+                '<div id="define-function" class="define-function"></div>');
+            formContainer.append(propertyDiv);
+
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
@@ -183,7 +191,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 body: body
             };
 
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor($(formContainer).find('#define-function')[0], {
                 schema: {
                     type: "object",
                     title: "Function",
@@ -258,6 +266,9 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 }
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
+
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
 
                 var config = editor.getValue();
 

@@ -21,13 +21,14 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
         'queryWindowOrFunction', 'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert',
         'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput',
         'joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation',
-        'mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation', 'partitionWith', 'designViewUtils'],
+        'mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation', 'partitionWith', 'designViewUtils',
+        'payloadOrAttribute'],
     function (require, log, _, $, ConfigurationData, AppData, Partition, Query, Stream, Table, Window, Trigger,
               Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
               QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource, PatternOrSequenceQueryInput,
               PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation, FunctionDefinition, StreamHandler,
-              StoreAnnotation, PartitionWith, DesignViewUtils) {
+              StoreAnnotation, PartitionWith, DesignViewUtils, PayloadOrAttribute) {
 
         /**
          * @class InitialiseDataStructure
@@ -117,7 +118,21 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 if (_.isEmpty(source.map)) {
                     sourceObject.setMap(undefined);
                 } else {
-                    var mapperObject = new MapAnnotation(source.map);
+                    var mapperOptions = {};
+                    _.set(mapperOptions, 'type', source.map.type);
+                    _.set(mapperOptions, 'options', source.map.options);
+
+                    if (_.isEmpty(source.map.payloadOrAttribute)) {
+                        _.set(mapperOptions, 'payloadOrAttribute', undefined);
+                    } else {
+                        var payloadOrAttributeOptions = {};
+                        _.set(payloadOrAttributeOptions, 'annotationType', source.map.payloadOrAttribute.annotationType);
+                        _.set(payloadOrAttributeOptions, 'type', source.map.payloadOrAttribute.type);
+                        _.set(payloadOrAttributeOptions, 'value', source.map.payloadOrAttribute.value);
+                        var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                        _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
+                    }
+                    var mapperObject = new MapAnnotation(mapperOptions);
                     sourceObject.setMap(mapperObject);
                 }
                 mainObject.addSource(sourceObject);
@@ -131,7 +146,21 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 if (_.isEmpty(sink.map)) {
                     sinkObject.setMap(undefined);
                 } else {
-                    var mapperObject = new MapAnnotation(sink.map);
+                    var mapperOptions = {};
+                    _.set(mapperOptions, 'type', sink.map.type);
+                    _.set(mapperOptions, 'options', sink.map.options);
+
+                    if (_.isEmpty(sink.map.payloadOrAttribute)) {
+                        _.set(mapperOptions, 'payloadOrAttribute', undefined);
+                    } else {
+                        var payloadOrAttributeOptions = {};
+                        _.set(payloadOrAttributeOptions, 'annotationType', sink.map.payloadOrAttribute.annotationType);
+                        _.set(payloadOrAttributeOptions, 'type', sink.map.payloadOrAttribute.type);
+                        _.set(payloadOrAttributeOptions, 'value', sink.map.payloadOrAttribute.value);
+                        var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                        _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
+                    }
+                    var mapperObject = new MapAnnotation(mapperOptions);
                     sinkObject.setMap(mapperObject);
                 }
                 mainObject.addSink(sinkObject);
@@ -231,7 +260,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
                 if (!windowFilterProjectionQuery.queryInput) {
                     var errMsg
-                        = 'Cannot find query input section for the windowFIlterProjection query:'
+                        = 'Cannot find query input section for the windowFilterProjection query:'
                         + windowFilterProjectionQuery;
                     log.error(errMsg);
                     DesignViewUtils.prototype.errorAlert(errMsg);

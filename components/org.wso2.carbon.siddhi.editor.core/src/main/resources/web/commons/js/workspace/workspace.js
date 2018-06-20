@@ -412,7 +412,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                             toolBar.disableRunButton();
                             toolBar.disableDebugButton();
                             toolBar.disableStopButton();
+                            toolBar.enableRevertButton();
                         } else {
+                            toolBar.disableRevertButton();
                             if(file.getRunStatus() || file.getDebugStatus()){
                                 runMenuItem.disable();
                                 debugMenuItem.disable();
@@ -449,10 +451,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     } else {
                         runMenuItem.disable();
                         debugMenuItem.disable();
-                        stopMenuItem.disable();
                         toolBar.disableRunButton();
                         toolBar.disableDebugButton();
-                        toolBar.disableStopButton();
+                        if (file.getRunStatus() || file.getDebugStatus()) {
+                            stopMenuItem.enable();
+                            toolBar.enableStopButton();
+                        } else {
+                            stopMenuItem.disable();
+                            toolBar.disableStopButton();
+                        }
                     }
                 } else {
                     runMenuItem.disable();
@@ -629,6 +636,17 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             this.closeTab = function closeTab(options){
                 var tab = app.tabController.getActiveTab();
                 app.tabController.removeTab(tab)
+            };
+
+            this.revertAppContent = function revertAppContent(){
+                var tab = app.tabController.getActiveTab();
+                var file = tab.getFile();
+                if(file !== undefined && file.isDirty()){
+                    var toolBar = app.toolBar;
+                    app.commandManager.dispatch("reload-file", tab.getTitle());
+                    toolBar.disableRevertButton();
+                    self.updateRunMenuItem();
+                }
             };
 
             function checkEndsWithSiddhi(string) {

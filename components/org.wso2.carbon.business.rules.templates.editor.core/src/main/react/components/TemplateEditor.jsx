@@ -147,7 +147,7 @@ class TemplateEditor extends React.Component {
             codeViewError: '',
             editorSettings: {
                 theme: 'tomorrow_night_eighties',
-                fontSize: 18,
+                fontSize: 12,
                 wrapEnabled: true,
             },
             showSettingsDialog: false,

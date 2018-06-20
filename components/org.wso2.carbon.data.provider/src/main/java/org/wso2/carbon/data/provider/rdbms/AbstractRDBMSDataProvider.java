@@ -283,17 +283,32 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     @Override
     public String providerConfig() {
         Map<String, String> renderingTypes = new HashMap<>();
+        Map<String, String> renderingHints = new HashMap<>();
+        String providerDescription = "RDBMS provider supports retrieve data for widgets using any SQL database table" +
+                ". The Batch provider allows the user to get all the data in the table batch wise and Streaming data" +
+                " provider will allow the user retrieve data in a streaming manner using an incremental data column.";
         renderingTypes.put("publishingInterval", InputFieldTypes.NUMBER);
+        renderingHints.put("publishingInterval", "Rate at which data should be sent to the widget");
         renderingTypes.put("purgingInterval", InputFieldTypes.NUMBER);
+        renderingHints.put("purgingInterval", "Rate at which data deletion queries should run against the table");
         renderingTypes.put("isPurgingEnable", InputFieldTypes.SWITCH);
+        renderingHints.put("isPurgingEnable", "Enable execution of data deletion queries against the table at regular " +
+                "intervals");
         renderingTypes.put("publishingLimit", InputFieldTypes.NUMBER);
+        renderingHints.put("publishingLimit", "Limit of records that should be sent at a time");
         renderingTypes.put("purgingLimit", InputFieldTypes.NUMBER);
+        renderingHints.put("purgingLimit", "Limit of data entries that should be deleted at a time");
         renderingTypes.put("datasourceName", InputFieldTypes.TEXT_FIELD);
+        renderingHints.put("datasourceName", "Name of the datasource defined in the deployment.yaml");
         renderingTypes.put("queryData", InputFieldTypes.DYNAMIC_SQL_CODE);
         renderingTypes.put("tableName", InputFieldTypes.TEXT_FIELD);
+        renderingHints.put("tableName", "Name of the table where data is retrieved from");
         renderingTypes.put("incrementalColumn", InputFieldTypes.TEXT_FIELD);
+        renderingHints.put("incrementalColumn", "Column of the table that is used to identify the incremental data");
         renderingTypes.put("timeColumns", InputFieldTypes.TEXT_FIELD);
-        return new Gson().toJson(new Object[]{renderingTypes, new RDBMSDataProviderConf()});
+        renderingHints.put("timeColumns", "Columns of the table that contain timestamps");
+        return new Gson().toJson(new Object[]{renderingTypes, new RDBMSDataProviderConf(), renderingHints,
+                providerDescription});
     }
 
     @Override

@@ -78,6 +78,9 @@
             <a href="#" data-placement="bottom" data-toggle="tooltip" title="Stop" class="stop_btn">
                 <i class="fw fw-stop"></i>
             </a>
+            <a href="#" data-placement="bottom" data-toggle="tooltip" title="Revert Changes" class="revert_btn">
+                <i class="fw fw-undo"></i>
+            </a>
         </div>
     </div>
     <!-- End: header - logo, title & menu-bar -->
@@ -256,7 +259,7 @@
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
             <div class="btn toggle-view-button">
-                <i class="fw fw-design-view"></i>
+                <i class="fw fw-design-view fw-rotate-90"></i>
                 <span class="toggle-button-text">Design View</span>
             </div>
         </div>
@@ -1152,6 +1155,7 @@
             debugger_console: "js/debugger/debugger",
             design_view: "js/design-view/design-view",
             initialiseData: "js/design-view/initialise-data",
+            jsonValidator: "js/design-view/JSON-validator",
             designViewGrid: "js/design-view/design-grid",
             designViewUtils: "js/design-view/util/design-view-utils",
             dropElements: "js/design-view/drop-elements",
@@ -1179,6 +1183,7 @@
             sourceOrSinkAnnotation: "js/design-view/elements/annotations/source-or-sink-annotation",
             mapAnnotation: "js/design-view/elements/annotations/map",
             storeAnnotation: "js/design-view/elements/annotations/store-annotation",
+            payloadOrAttribute: "js/design-view/elements/annotations/source-or-sink-annotation-sub-elements/payload-or-attribute",
             // definitions
             stream: "js/design-view/elements/definitions/stream",
             table: "js/design-view/elements/definitions/table",
@@ -1317,6 +1322,7 @@
                 runIconBtn: '.run_btn',
                 debugIconBtn: '.debug_btn',
                 stopIconBtn: '.stop_btn',
+                revertIconBtn: '.revert_btn',
                 commandRun: {
                     id: "run_icon-siddhi-app"
                 },
@@ -1325,6 +1331,9 @@
                 },
                 commandStop: {
                     id: "stop_icon-siddhi-app"
+                },
+                commandRevert: {
+                    id: "revert_icon-siddhi-app"
                 }
             },
             event_simulator : {

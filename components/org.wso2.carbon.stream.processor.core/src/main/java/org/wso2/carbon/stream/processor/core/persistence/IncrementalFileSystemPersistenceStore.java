@@ -40,9 +40,9 @@ public class IncrementalFileSystemPersistenceStore implements IncrementalPersist
     private static final Logger log = Logger.getLogger(IncrementalFileSystemPersistenceStore.class);
     private String folder;
 
-    public IncrementalFileSystemPersistenceStore(){
+    public IncrementalFileSystemPersistenceStore() {
     }
-    
+
     public IncrementalFileSystemPersistenceStore(String storageFilePath) {
         folder = storageFilePath;
     }
@@ -63,9 +63,7 @@ public class IncrementalFileSystemPersistenceStore implements IncrementalPersist
         try {
             Files.createParentDirs(file);
             Files.write(compressedSnapshot, file);
-            if (snapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.BASE) {
-                cleanOldRevisions(snapshotInfo);
-            }
+            cleanOldRevisions(snapshotInfo);
             if (log.isDebugEnabled()) {
                 log.debug("Incremental persistence of '" + snapshotInfo.getSiddhiAppId() +
                         "' with revision '" + snapshotInfo.getRevision() + "' persisted successfully.");
@@ -125,7 +123,7 @@ public class IncrementalFileSystemPersistenceStore implements IncrementalPersist
     }
 
     @Override
-    public List<IncrementalSnapshotInfo> getListOfRevisionsToLoad (long restoreTime, String siddhiAppName) {
+    public List<IncrementalSnapshotInfo> getListOfRevisionsToLoad(long restoreTime, String siddhiAppName) {
 
         File dir = new File(folder + File.separator + siddhiAppName);
         File[] files = dir.listFiles();
@@ -182,7 +180,7 @@ public class IncrementalFileSystemPersistenceStore implements IncrementalPersist
     }
 
     private void cleanOldRevisions(IncrementalSnapshotInfo incrementalSnapshotInfo) {
-        if (incrementalSnapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.BASE) {
+        if (incrementalSnapshotInfo.getType() != IncrementalSnapshotInfo.SnapshotType.INCREMENT) {
             File dir = new File(folder + File.separator + incrementalSnapshotInfo.getSiddhiAppId());
             File[] files = dir.listFiles();
             if (files != null) {
@@ -194,10 +192,21 @@ public class IncrementalFileSystemPersistenceStore implements IncrementalPersist
                             incrementalSnapshotInfo.getSiddhiAppId().equals(snapshotInfo.getSiddhiAppId()) &&
                             incrementalSnapshotInfo.getQueryName().equals(snapshotInfo.getQueryName()) &&
                             incrementalSnapshotInfo.getElementId().equals(snapshotInfo.getElementId())) {
-                        if (file.exists()) {
-                            Boolean isDeleted = file.delete();
-                            if (!isDeleted) {
-                                log.error("Error deleting old revision " + fileName);
+                        if (incrementalSnapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.BASE &&
+                                snapshotInfo.getType() != IncrementalSnapshotInfo.SnapshotType.PERIODIC) {
+                            if (file.exists()) {
+                                Boolean isDeleted = file.delete();
+                                if (!isDeleted) {
+                                    log.error("Error deleting old revision " + fileName);
+                                }
+                            }
+                        } else if (incrementalSnapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.PERIODIC &&
+                                snapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.PERIODIC) {
+                            if (file.exists()) {
+                                Boolean isDeleted = file.delete();
+                                if (!isDeleted) {
+                                    log.error("Error deleting old revision " + fileName);
+                                }
                             }
                         }
                     }

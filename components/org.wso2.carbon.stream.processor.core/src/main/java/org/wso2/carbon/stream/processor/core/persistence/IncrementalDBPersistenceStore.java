@@ -313,7 +313,7 @@ public class IncrementalDBPersistenceStore implements IncrementalPersistenceStor
     }
 
     private void cleanOldRevisions(IncrementalSnapshotInfo incrementalSnapshotInfo) {
-        if (incrementalSnapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.BASE) {
+        if (incrementalSnapshotInfo.getType() != IncrementalSnapshotInfo.SnapshotType.INCREMENT) {
             List<String> allRevisions = getListOfRevisionsFromDB(incrementalSnapshotInfo.getSiddhiAppId());
             if (allRevisions != null) {
                 String revisionsToClean = getRevisionsToClean(incrementalSnapshotInfo, allRevisions);
@@ -366,7 +366,13 @@ public class IncrementalDBPersistenceStore implements IncrementalPersistenceStor
                     incrementalSnapshotInfo.getSiddhiAppId().equals(snapshotInfo.getSiddhiAppId()) &&
                     incrementalSnapshotInfo.getQueryName().equals(snapshotInfo.getQueryName()) &&
                     incrementalSnapshotInfo.getElementId().equals(snapshotInfo.getElementId())) {
-                revisionsToClean.append(",").append(revision);
+                if (incrementalSnapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.BASE &&
+                        snapshotInfo.getType() != IncrementalSnapshotInfo.SnapshotType.PERIODIC) {
+                    revisionsToClean.append(",").append(revision);
+                } else if (incrementalSnapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.PERIODIC &&
+                        snapshotInfo.getType() == IncrementalSnapshotInfo.SnapshotType.PERIODIC) {
+                    revisionsToClean.append(",").append(revision);
+                }
             }
         }
         if (revisionsToClean.length() != 0) {

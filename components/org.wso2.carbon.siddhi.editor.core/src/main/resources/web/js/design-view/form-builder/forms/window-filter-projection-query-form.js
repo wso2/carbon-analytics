@@ -25,7 +25,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         var constants = {
             PROJECTION: 'projectionQueryDrop',
             FILTER: 'filterQueryDrop',
-            WINDOW_QUERY: 'windowQueryDrop'
+            WINDOW_QUERY: 'windowQueryDrop',
+            FUNCTION_QUERY: 'functionQueryDrop'
         };
 
         /**
@@ -54,7 +55,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         WindowFilterProjectionQueryForm.prototype.generatePropertiesForm = function (element, formConsole,
                                                                                      formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Window/Filter/Projection Query </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Query Configuration</h3></div>' +
                 '<div class="define-windowFilterProjection-query"></div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
@@ -82,6 +83,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var streamHandlerList = [];
                 var noOfSavedFilters = 0;
                 var noOfSavedWindows = 0;
+                var noOfSavedFunctions = 0;
                 _.forEach(savedStreamHandlerList, function (streamHandler) {
                     var streamHandlerObject;
                     var parameters = [];
@@ -93,6 +95,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             }
                         };
                     } else if (streamHandler.getType() === "FUNCTION") {
+                        noOfSavedFunctions++;
                         _.forEach(streamHandler.getValue().getParameters(), function (savedParameterValue) {
                             var parameterObject = {
                                 parameter: savedParameterValue
@@ -291,8 +294,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
 
                 /*
-                * Test whether filter and window queries has their unique elements. For an example if a filter is added
-                * the filter field should be activated. If a window is added window fields should be activated.
+                * Test whether filter, function and window queries has their unique elements. For an example if a filter
+                * is added the filter field should be activated. If a window is added window fields should be
+                * activated. If a function query is added function related fields should be activated.
                 * NOTE: this check is only essential when a form is opened for a query for the first time. After that
                 * query type is changed according to the user input. So the required fields are already activated and
                 * filled.
@@ -300,8 +304,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 if ($(element).parent().hasClass(constants.FILTER) && noOfSavedFilters === 0) {
                     var streamHandlerFilterObject = {
                         streamHandler: {
-                            functionName: ' ',
-                            parameters: [{parameter: ' '}]
+                            filter: ' '
                         }
                     };
                     streamHandlerList.push(streamHandlerFilterObject);
@@ -314,6 +317,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                     };
                     streamHandlerList.push(streamHandlerWindowObject);
+                } else if ($(element).parent().hasClass(constants.FUNCTION_QUERY) && noOfSavedFunctions === 0) {
+                    var streamHandlerFunctionObject = {
+                        streamHandler: {
+                            functionName: ' ',
+                            parameters: [{parameter: ' '}]
+                        }
+                    };
+                    streamHandlerList.push(streamHandlerFunctionObject);
+
                 }
 
                 var savedQueryInput = {
@@ -322,6 +334,22 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     },
                     streamHandlerList: streamHandlerList
                 };
+
+                var inputElementAttributeList;
+                var descriptionForFromElement = 'Attributes { ';
+                if (inputElementType === 'STREAM' || inputElementType === 'WINDOW') {
+                    inputElementAttributeList = (inputElement.element).getAttributeList();
+                    _.forEach(inputElementAttributeList, function (attribute) {
+                        descriptionForFromElement
+                            = descriptionForFromElement + attribute.getName() + ' : ' + attribute.getType() + ', ';
+                    });
+                    descriptionForFromElement
+                        = descriptionForFromElement.substring(0, descriptionForFromElement.length - 2);
+                    descriptionForFromElement = descriptionForFromElement + ' }';
+                } else if (inputElementType === 'TRIGGER') {
+                    descriptionForFromElement = descriptionForFromElement + 'triggered_time : long }';
+                }
+
                 var fillQueryInputWith = self.formUtils.cleanJSONObject(savedQueryInput);
 
                 var fillQueryAnnotation = {
@@ -352,7 +380,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 if (inputElementType === 'WINDOW') {
                     inputSchema = {
                         type: "object",
-                        title: "Query Input",
+                        title: "Input",
                         required: true,
                         options: {
                             disable_properties: false
@@ -369,7 +397,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         title: "Window",
                                         type: "string",
                                         template: inputElementName,
-                                        minLength: 1
+                                        minLength: 1,
+                                        description: descriptionForFromElement
                                     }
                                 }
                             },
@@ -452,7 +481,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 } else {
                     inputSchema = {
                         type: "object",
-                        title: "Query Input",
+                        title: "Input",
                         required: true,
                         options: {
                             disable_properties: false
@@ -469,7 +498,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         title: "Stream/Trigger",
                                         type: "string",
                                         template: inputElementName,
-                                        minLength: 1
+                                        minLength: 1,
+                                        description: descriptionForFromElement
                                     }
                                 }
                             },
@@ -641,7 +671,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                formContainer.find('.define-windowFilterProjection-query')
+                    .append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
                     '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
                     '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
@@ -650,7 +681,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var editorAnnotation = new JSONEditor($(formContainer).find('#form-query-annotation')[0], {
                     schema: {
                         type: "object",
-                        title: "Query Annotations",
+                        title: "Annotations",
                         properties: {
                             annotations: {
                                 propertyOrder: 1,
@@ -702,7 +733,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             disable_properties: false
                         },
                         type: "object",
-                        title: "Query Select",
+                        title: "Select",
                         properties: {
                             select: {
                                 propertyOrder: 1,
@@ -836,7 +867,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     schema: {
                         required: true,
                         type: "object",
-                        title: "Query Output",
+                        title: "Output",
                         options: {
                             disable_properties: false
                         },
@@ -1081,6 +1112,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         return;
                     }
 
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
                     var annotationConfig = editorAnnotation.getValue();
                     var inputConfig = editorInput.getValue();
                     var selectConfig = editorSelect.getValue();
@@ -1088,6 +1122,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     var numberOfWindows = 0;
                     var numberOfFilters = 0;
+                    var numberOfFunctions = 0;
                     clickedElement.getQueryInput().clearStreamHandlerList();
 
                     _.forEach(inputConfig.streamHandlerList, function (streamHandler) {
@@ -1106,6 +1141,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             _.set(streamHandlerOptions, 'type', 'WINDOW');
                             _.set(streamHandlerOptions, 'value', queryWindow);
                         } else if (streamHandler.functionName !== undefined) {
+                            numberOfFunctions++;
                             var functionOptions = {};
                             _.set(functionOptions, 'function', streamHandler.functionName);
                             var parameters = [];
@@ -1138,7 +1174,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     var type;
                     // change the query icon depending on the fields filled
-                    if (numberOfWindows === 1) {
+                    if (numberOfFunctions > 0) {
+                        type = "FUNCTION";
+                        $(element).parent().removeClass();
+                        $(element).parent().addClass(constants.FUNCTION_QUERY + ' jtk-draggable');
+                    } else if (numberOfWindows === 1) {
                         type = "WINDOW";
                         $(element).parent().removeClass();
                         $(element).parent().addClass(constants.WINDOW_QUERY + ' jtk-draggable');

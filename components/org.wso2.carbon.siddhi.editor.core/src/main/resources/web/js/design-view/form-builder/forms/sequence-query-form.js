@@ -34,9 +34,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 this.application = options.application;
                 this.formUtils = options.formUtils;
                 this.consoleListManager = options.application.outputController;
-                var currentTabId = this.application.tabController.activeTab.cid;
-                this.designViewContainer = $('#design-container-' + currentTabId);
-                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
+                this.currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + this.currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
             }
         };
 
@@ -48,7 +48,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          */
         SequenceQueryForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Define Sequence Query </h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Sequence Query Configuration</h3></div>' +
                 '<div class="define-sequence-query"></div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
@@ -154,6 +154,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     partitionId = partitionElementWhereQueryIsSaved.getId();
                 }
 
+                // build attribute description for connected  streams and triggers to show as the description for the
+                // query input
+                var descriptionForInputElements = '<br/>';
+
                 _.forEach(inputStreamNames, function (inputStreamName) {
                     var inputElement =
                         self.configurationData.getSiddhiAppConfig()
@@ -161,10 +165,24 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (inputElement !== undefined) {
                         if (inputElement.type === 'TRIGGER') {
                             possibleGroupByAttributes.push(inputStreamName + '.triggered_time');
+
+                            descriptionForInputElements
+                                = descriptionForInputElements + inputStreamName + ' (triggered_time : LONG)<br/>  ';
                         } else {
+                            descriptionForInputElements
+                                = descriptionForInputElements + inputStreamName + ' (';
+
                             _.forEach(inputElement.element.getAttributeList(), function (attribute) {
                                 possibleGroupByAttributes.push(inputStreamName + "." + attribute.getName());
+
+                                descriptionForInputElements
+                                    = descriptionForInputElements + attribute.getName() + ' : ' + attribute.getType() + ', ';
                             });
+
+                            descriptionForInputElements
+                                = descriptionForInputElements.substring(0, descriptionForInputElements.length - 2);
+                            descriptionForInputElements
+                                = descriptionForInputElements + ')<br/>  ';
                         }
                     }
                 });
@@ -360,7 +378,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     };
                 }
 
-                formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                formContainer.find('.define-sequence-query')
+                    .append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
                     '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
                     '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
@@ -369,7 +388,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var editorAnnotation = new JSONEditor($(formContainer).find('#form-query-annotation')[0], {
                     schema: {
                         type: "object",
-                        title: "Query Annotations",
+                        title: "Annotations",
                         properties: {
                             annotations: {
                                 propertyOrder: 1,
@@ -406,7 +425,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var editorInput = new JSONEditor($(formContainer).find('#form-query-input')[0], {
                     schema: {
                         type: 'object',
-                        title: 'Query Input',
+                        title: 'Input',
+                        description: descriptionForInputElements,
                         properties: {
                             conditions: {
                                 type: 'array',
@@ -422,7 +442,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         disable_properties: false
                                     },
                                     title: 'condition',
-                                    headerTemplate: "Condition" + "{{i1}}",
+                                    headerTemplate: "c" + "{{i1}}",
                                     properties: {
                                         conditionId: {
                                             type: 'string',
@@ -541,6 +561,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     disable_array_reorder: true
                 });
 
+                $('#' + self.currentTabId + '[data-schemapath="root"] >  p:eq(0)').html(descriptionForInputElements);
+
                 var selectScheme = {
                     schema: {
                         required: true,
@@ -548,7 +570,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             disable_properties: false
                         },
                         type: "object",
-                        title: "Query Select",
+                        title: "Select",
                         properties: {
                             select: {
                                 propertyOrder: 1,
@@ -682,7 +704,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     schema: {
                         required: true,
                         type: "object",
-                        title: "Query Output",
+                        title: "Output",
                         options: {
                             disable_properties: false
                         },
@@ -926,6 +948,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (annotationErrors.length || inputErrors.length || selectErrors.length || outputErrors.length) {
                         return;
                     }
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
 
                     var annotationConfig = editorAnnotation.getValue();
                     var inputConfig = editorInput.getValue();
