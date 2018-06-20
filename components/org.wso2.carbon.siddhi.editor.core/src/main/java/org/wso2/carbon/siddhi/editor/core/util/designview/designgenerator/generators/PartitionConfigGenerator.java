@@ -79,6 +79,8 @@ public class PartitionConfigGenerator {
         partitionConfig.setPartitionWith(generatePartitionWith(partition.getPartitionTypeMap()));
         partitionConfig.setAnnotationList(generateAnnotations(partition.getAnnotations()));
         partitionConfig.setConnectorsAndStreams(connectorsAndStreams);
+        partitionConfig.setQueryContextStartIndex(partition.getQueryContextStartIndex());
+        partitionConfig.setQueryContextEndIndex(partition.getQueryContextEndIndex());
         return partitionConfig;
     }
 

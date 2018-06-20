@@ -90,6 +90,8 @@ public class AggregationConfigGenerator {
         }
         aggregationConfig.setStore(storeConfig);
         aggregationConfig.setAnnotationList(annotationList);
+        aggregationConfig.setQueryContextStartIndex(aggregationDefinition.getQueryContextStartIndex());
+        aggregationConfig.setQueryContextEndIndex(aggregationDefinition.getQueryContextEndIndex());
 
         return aggregationConfig;
     }

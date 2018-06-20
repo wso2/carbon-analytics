@@ -50,11 +50,15 @@ public class TableConfigGenerator {
             }
         }
 
-        return new TableConfig(
+        TableConfig tableConfig = new TableConfig(
                 tableDefinition.getId(),
                 tableDefinition.getId(),
                 new AttributeConfigListGenerator().generateAttributeConfigList(tableDefinition.getAttributeList()),
                 storeConfig,
                 annotationList);
+        tableConfig.setQueryContextStartIndex(tableDefinition.getQueryContextStartIndex());
+        tableConfig.setQueryContextEndIndex(tableDefinition.getQueryContextEndIndex());
+
+        return tableConfig;
     }
 }

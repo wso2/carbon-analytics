@@ -118,7 +118,15 @@ public class SourceSinkConfigsGenerator {
                 options.add(annotationConfigGenerator.generateAnnotationConfig(sourceOrSinkAnnotation));
             }
         }
-        return new SourceSinkConfig(annotationType.toString(), connectedElementName, type, options, map);
+
+        SourceSinkConfig sourceSinkConfig =
+                new SourceSinkConfig(annotationType.toString(), connectedElementName, type, options, map);
+        sourceSinkConfig.setQueryContextStartIndex(
+                sourceOrSinkAndConnectedElement.getKey().getQueryContextStartIndex());
+        sourceSinkConfig.setQueryContextEndIndex(
+                sourceOrSinkAndConnectedElement.getKey().getQueryContextEndIndex());
+
+        return sourceSinkConfig;
     }
 
     /**

@@ -82,6 +82,9 @@ public class QueryConfigGenerator {
         queryConfig.setAnnotationList(
                 new AnnotationConfigGenerator().generateAnnotationConfigList(query.getAnnotations()));
 
+        queryConfig.setQueryContextStartIndex(query.getQueryContextStartIndex());
+        queryConfig.setQueryContextEndIndex(query.getQueryContextEndIndex());
+
         return queryConfig;
     }
 

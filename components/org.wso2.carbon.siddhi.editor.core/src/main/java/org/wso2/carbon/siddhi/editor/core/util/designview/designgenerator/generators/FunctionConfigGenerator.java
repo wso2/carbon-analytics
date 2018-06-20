@@ -31,10 +31,13 @@ public class FunctionConfigGenerator {
      * @return                          FunctionConfig object
      */
     public FunctionConfig generateFunctionConfig(FunctionDefinition functionDefinition) {
-        return new FunctionConfig(
+        FunctionConfig functionConfig = new FunctionConfig(
                 functionDefinition.getId(),
                 functionDefinition.getLanguage(),
                 functionDefinition.getReturnType().toString(),
                 functionDefinition.getBody());
+        functionConfig.setQueryContextStartIndex(functionDefinition.getQueryContextStartIndex());
+        functionConfig.setQueryContextEndIndex(functionDefinition.getQueryContextEndIndex());
+        return functionConfig;
     }
 }

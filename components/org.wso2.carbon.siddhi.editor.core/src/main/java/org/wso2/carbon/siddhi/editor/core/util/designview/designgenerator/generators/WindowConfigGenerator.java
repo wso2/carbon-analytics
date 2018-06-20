@@ -49,13 +49,20 @@ public class WindowConfigGenerator {
             parameters.add(ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));
         }
 
-        return new WindowConfig(
-                windowDefinition.getId(),
-                windowDefinition.getId(),
-                new AttributeConfigListGenerator().generateAttributeConfigList(windowDefinition.getAttributeList()),
-                windowDefinition.getWindow().getName(),
-                parameters,
-                windowDefinition.getOutputEventType().name(),
-                new AnnotationConfigGenerator().generateAnnotationConfigList(windowDefinition.getAnnotations()));
+        WindowConfig windowConfig =
+                new WindowConfig(
+                        windowDefinition.getId(),
+                        windowDefinition.getId(),
+                        new AttributeConfigListGenerator().generateAttributeConfigList(
+                                windowDefinition.getAttributeList()),
+                        windowDefinition.getWindow().getName(),
+                        parameters,
+                        windowDefinition.getOutputEventType().name(),
+                        new AnnotationConfigGenerator().generateAnnotationConfigList(
+                                windowDefinition.getAnnotations()));
+        windowConfig.setQueryContextStartIndex(windowDefinition.getQueryContextStartIndex());
+        windowConfig.setQueryContextEndIndex(windowDefinition.getQueryContextEndIndex());
+
+        return windowConfig;
     }
 }

@@ -45,9 +45,14 @@ public class StreamDefinitionConfigGenerator {
                 annotationConfigs.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
             }
         }
-        return new StreamConfig(streamDefinition.getId(),
+
+        StreamConfig streamConfig = new StreamConfig(streamDefinition.getId(),
                 streamDefinition.getId(),
                 new AttributeConfigListGenerator().generateAttributeConfigList(streamDefinition.getAttributeList()),
                 annotationConfigs);
+        streamConfig.setQueryContextStartIndex(streamDefinition.getQueryContextStartIndex()); // TODO testing
+        streamConfig.setQueryContextEndIndex(streamDefinition.getQueryContextEndIndex()); // TODO testing
+
+        return streamConfig;
     }
 }
