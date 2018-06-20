@@ -34,10 +34,12 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
          * @class InitialiseDataStructure
          * @constructor
          * @class InitialiseDataStructure  Initialise the data structure with the json sent from the backend
+         * @param application Application data
          * @param parentElement parent element of the view
          */
-        var InitialiseDataStructure = function (parentElement) {
+        var InitialiseDataStructure = function (parentElement, application) {
             this._$parent_el = parentElement;
+            this.application = application;
         };
 
         /**
@@ -49,7 +51,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             var currentTabId = self._$parent_el.attr('id');
             self.newIdBeginningPhrase = currentTabId + "_element_";
             self.appData = new AppData();
-            self.configurationData = new ConfigurationData(self.appData);
+            self.configurationData = new ConfigurationData(self.appData, self.application);
 
             // set the app name
             self.appData.setSiddhiAppName(configurationJSON.siddhiAppConfig.siddhiAppName);

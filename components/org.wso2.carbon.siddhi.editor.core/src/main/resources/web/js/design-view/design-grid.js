@@ -1333,6 +1333,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         DesignGrid.prototype.drawGraphFromAppData = function () {
             var self = this;
 
+            // set isStillDrawingGraph to true since the graph drawing has begun
+            self.configurationData.setIsStillDrawingGraph(true);
+
             _.forEach(self.configurationData.getSiddhiAppConfig().getSourceList(), function (source) {
                 var sourceId = source.getId();
                 var sourceName = "Source";
@@ -1604,6 +1607,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             setTimeout(function () {
                 // set the isDesignViewContentChanged to false
                 self.configurationData.setIsDesignViewContentChanged(false);
+
+                // set isStillDrawingGraph to false since the graph drawing is done
+                self.configurationData.setIsStillDrawingGraph(false);
             }, 100);
         };
 
