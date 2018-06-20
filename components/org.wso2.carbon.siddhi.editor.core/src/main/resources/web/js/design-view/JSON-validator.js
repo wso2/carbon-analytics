@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'designViewUtils'],
-    function (require, log, _, DesignViewUtils) {
+define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
+    function (require, log, $, _, DesignViewUtils) {
 
         /**
          * @class JSONValidator
@@ -340,6 +340,10 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
                 DesignViewUtils.prototype.errorAlert('Output section of a ' + type + ' form is not filled');
             }
             return isValid;
+        }
+
+        function highlightErrorElement(errorElementId) {
+            $('#' + errorElementId).addClass('error-element');
         }
 
         return JSONValidator;
