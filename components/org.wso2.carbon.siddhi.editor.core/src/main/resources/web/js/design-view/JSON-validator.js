@@ -34,6 +34,46 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
          */
         JSONValidator.prototype.validate = function (JSON) {
             var isValid = true;
+
+            _.forEach(JSON.sourceList, function (source) {
+                isValid = validateSourceOrSinkAnnotation(source, 'Source');
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            // exit from the validate method
+            if(!isValid) {
+                return isValid;
+            }
+
+            _.forEach(JSON.sinkList, function (sink) {
+                isValid = validateSourceOrSinkAnnotation(sink, 'Sink');
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            // exit from the validate method
+            if(!isValid) {
+                return isValid;
+            }
+
+            _.forEach(JSON.aggregationList, function (aggregation) {
+                isValid = validateAggregation(aggregation);
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            // exit from the validate method
+            if(!isValid) {
+                return isValid;
+            }
+
             _.forEach(JSON.queryLists.WINDOW_FILTER_PROJECTION, function (query) {
                 isValid = validateWindowFilterProjectionQuery(query);
                 if (!isValid) {
@@ -142,6 +182,34 @@ define(['require', 'log', 'lodash', 'designViewUtils'],
 
             return isValid;
         };
+
+        function validateSourceOrSinkAnnotation(annotation, type) {
+            if (!annotation.connectedElementName) {
+                DesignViewUtils.prototype.errorAlert('A ' + type + ' annotation does not contain a connected stream');
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        function validateAggregation(aggregation) {
+            var isValid;
+            if (!aggregation.from) {
+                DesignViewUtils.prototype.errorAlert('An Aggregation element does not contain a connected input');
+                return false;
+
+            } else if (!aggregation.name) {
+                DesignViewUtils.prototype.errorAlert('Name field of an Aggregation form cannot be blank');
+                return false;
+            }
+
+            isValid = validateQuerySelectSection(aggregation.select, 'Aggregation');
+            if (!isValid) {
+                return isValid;
+            }
+
+            return isValid;
+        }
 
         function validateWindowFilterProjectionQuery(query) {
             var isValid;
