@@ -92,7 +92,19 @@ public class SiddhiAppConfig {
      */
     private <T> void addElement(List<T> elementList, T elementConfig) {
         ((SiddhiElementConfig) elementConfig).setId(generateNextElementId());
+        addElementCodeSegment((SiddhiElementConfig) elementConfig);
         elementList.add(elementConfig);
+    }
+
+    // TODO
+    private void addElementCodeSegment(SiddhiElementConfig siddhiElementConfig) {
+        ElementCodeSegment elementCodeSegment =
+                new ElementCodeSegment(
+                        siddhiElementConfig.getQueryContextStartIndex(),
+                        siddhiElementConfig.getQueryContextEndIndex());
+        if (elementCodeSegment.isValid()) {
+            elementCodeSegments.add(elementCodeSegment);
+        }
     }
 
     /**
@@ -102,6 +114,7 @@ public class SiddhiAppConfig {
      */
     public void addQuery(QueryListType queryListType, QueryConfig queryConfig) {
         queryConfig.setId(generateNextElementId());
+        addElementCodeSegment(queryConfig);
         queryLists.get(queryListType).add(queryConfig);
     }
 
@@ -134,6 +147,7 @@ public class SiddhiAppConfig {
             streamConfig.setPartitionId(partitionConfig.getId());
             streamConfig.setConnectorsAndStreams(connectorsAndStreams);
         }
+        addElementCodeSegment(partitionConfig);
         partitionList.add(partitionConfig);
     }
 
@@ -227,6 +241,22 @@ public class SiddhiAppConfig {
 
     public List<PartitionConfig> getPartitionList() {
         return partitionList;
+    }
+
+    public List<ElementCodeSegment> getElementCodeSegments() {
+        return elementCodeSegments;
+    }
+
+    public void setElementCodeSegments(List<ElementCodeSegment> elementCodeSegments) {
+        this.elementCodeSegments = elementCodeSegments;
+    }
+
+    public List<CommentCodeSegment> getCommentCodeSegments() {
+        return commentCodeSegments;
+    }
+
+    public void setCommentCodeSegments(List<CommentCodeSegment> commentCodeSegments) {
+        this.commentCodeSegments = commentCodeSegments;
     }
 
     public int getFinalElementCount() {

@@ -19,12 +19,22 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.builders;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.CommentCodeSegment;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.ElementCodeSegment;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AggregationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.CommentsPreserver;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.FunctionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.PartitionConfigGenerator;
@@ -35,6 +45,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.genera
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.WindowConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.stream.input.source.Source;
 import org.wso2.siddhi.core.stream.output.sink.Sink;
@@ -52,6 +63,7 @@ import org.wso2.siddhi.query.api.execution.partition.Partition;
 import org.wso2.siddhi.query.api.execution.query.Query;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +79,10 @@ public class EventFlowBuilder {
 
     private SiddhiAppConfig siddhiAppConfig;
     private Set<Edge> edges;
+
+    // TODO under testing
+    List<ElementCodeSegment> elementCodeSegments = new ArrayList<>();
+    List<CommentCodeSegment> commentCodeSegments = new ArrayList<>();
 
     public EventFlowBuilder(String siddhiAppString, SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime) {
         this.siddhiAppString = siddhiAppString;
@@ -134,7 +150,7 @@ public class EventFlowBuilder {
      * Loads Streams from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadStreams() {
+    public EventFlowBuilder loadStreams() { // TODO only adding comments for this for now
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
         Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
         for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitionMap.entrySet()) {
@@ -151,7 +167,7 @@ public class EventFlowBuilder {
      * Loads Sources from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadSources() throws DesignGenerationException {
+    public EventFlowBuilder loadSources() throws DesignGenerationException { // TODO query indexes
         SourceSinkConfigsGenerator sourceConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Source> sourceList : siddhiAppRuntime.getSources()) {
             for (SourceSinkConfig sourceConfig : sourceConfigsGenerator.generateSourceConfigs(sourceList)) {
@@ -165,7 +181,7 @@ public class EventFlowBuilder {
      * Loads Sinks from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadSinks() throws DesignGenerationException {
+    public EventFlowBuilder loadSinks() throws DesignGenerationException { // TODO query indexes
         SourceSinkConfigsGenerator sinkConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Sink> sinkList : siddhiAppRuntime.getSinks()) {
             for (SourceSinkConfig sinkConfig : sinkConfigsGenerator.generateSinkConfigs(sinkList)) {
@@ -265,6 +281,16 @@ public class EventFlowBuilder {
     public EventFlowBuilder loadEdges() throws DesignGenerationException {
         EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
         edges = edgesGenerator.generateEdges();
+        return this;
+    }
+
+    // TODO under testing
+    public EventFlowBuilder loadComments() throws DesignGenerationException {
+        CommentsPreserver commentsPreserver =
+                new CommentsPreserver(siddhiAppString, siddhiAppConfig.getElementCodeSegments());
+        siddhiAppConfig.setCommentCodeSegments(commentsPreserver.generateCommentCodeSegments());
+        siddhiAppConfig =
+                commentsPreserver.bindCommentsToElements(siddhiAppConfig.getCommentCodeSegments(), siddhiAppConfig);
         return this;
     }
 }
