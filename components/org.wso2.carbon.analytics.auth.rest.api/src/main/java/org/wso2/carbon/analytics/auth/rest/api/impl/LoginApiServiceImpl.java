@@ -135,14 +135,14 @@ public class LoginApiServiceImpl extends LoginApiService {
                     String refreshToken = loginResponse.get(IdPClientConstants.REFRESH_TOKEN);
                     // The access token is stored as two cookies in client side. One is a normal cookie and other
                     // is a http only cookie. Hence we need to split the access token
-                    String part1 = accessToken.substring(0, accessToken.length() / 2);
-                    String part2 = accessToken.substring(accessToken.length() / 2);
-                    userDTO.setpID(part1);
+                    String accessTokenFirstHalf = accessToken.substring(0, accessToken.length() / 2);
+                    String accessTokenSecondHalf = accessToken.substring(accessToken.length() / 2);
+                    userDTO.setpID(accessTokenFirstHalf);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
-                            .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
+                            .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, accessTokenSecondHalf, appContext, true, true,
                                     -1);
                     NewCookie logoutContextAccessToken = AuthUtil
-                            .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, part2,
+                            .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
                                     AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true,
                                     -1);
                     if (refreshToken != null) {
@@ -248,14 +248,14 @@ public class LoginApiServiceImpl extends LoginApiService {
                     String accessToken = authCodeloginResponse.get(IdPClientConstants.ACCESS_TOKEN);
                     String refreshToken = authCodeloginResponse.get(IdPClientConstants.REFRESH_TOKEN);
 
-                    String part1 = accessToken.substring(0, accessToken.length() / 2);
-                    String part2 = accessToken.substring(accessToken.length() / 2);
-                    userDTO.setpID(part1);
+                    String accessTokenFirstHalf = accessToken.substring(0, accessToken.length() / 2);
+                    String accessTokenSecondHalf = accessToken.substring(accessToken.length() / 2);
+                    userDTO.setpID(accessTokenFirstHalf);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
-                            .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
+                            .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, accessTokenSecondHalf, appContext, true, true,
                                     -1);
                     NewCookie logoutContextAccessToken = AuthUtil
-                            .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, part2,
+                            .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
                                     AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
 
                     if (refreshToken != null) {
