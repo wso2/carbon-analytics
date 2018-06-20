@@ -194,6 +194,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                              * Removed attributes are used only for front end use only.
                              * */
                             function removeUnnecessaryFieldsFromJSON(object) {
+                                if (object.hasOwnProperty('application')) {
+                                    delete object['application'];
+                                }
+                                if (object.hasOwnProperty('isStillDrawingGraph')) {
+                                    delete object['isStillDrawingGraph'];
+                                }
+                                if (object.hasOwnProperty('isDesignViewContentChanged')) {
+                                    delete object['isDesignViewContentChanged'];
+                                }
                                 _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function (patternQuery) {
                                     if (patternQuery.queryInput !== undefined) {
                                         if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
