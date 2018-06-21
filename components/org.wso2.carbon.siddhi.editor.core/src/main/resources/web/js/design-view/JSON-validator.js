@@ -139,8 +139,11 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         };
 
         JSONValidator.prototype.validateSourceOrSinkAnnotation = function (annotation, type) {
+            var errorMessage;
             if (!annotation.connectedElementName) {
-                DesignViewUtils.prototype.errorAlert('A ' + type + ' annotation does not contain a connected stream');
+                errorMessage = 'A ' + type + ' annotation does not contain a connected stream';
+                highlightErrorElement(annotation.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             } else {
                 return true;
@@ -148,17 +151,23 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         };
 
         JSONValidator.prototype.validateAggregation = function (aggregation) {
+            var self = this;
+            var errorMessage;
             var isValid;
             if (!aggregation.from) {
-                DesignViewUtils.prototype.errorAlert('An Aggregation element does not contain a connected input');
+                errorMessage = 'An Aggregation element does not contain a connected input';
+                highlightErrorElement(aggregation.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
 
             } else if (!aggregation.name) {
-                DesignViewUtils.prototype.errorAlert('Name field of an Aggregation form cannot be blank');
+                errorMessage = 'Name field of an Aggregation form cannot be blank';
+                highlightErrorElement(aggregation.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             }
 
-            isValid = self.validateQuerySelectSection(aggregation.select, 'Aggregation');
+            isValid = self.validateQuerySelectSection(aggregation.select, 'Aggregation', aggregation.id);
             if (!isValid) {
                 return isValid;
             }
@@ -167,24 +176,30 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         };
 
         JSONValidator.prototype.validateWindowFilterProjectionQuery = function (query) {
+            var self = this;
             var isValid;
+            var errorMessage;
             if (!query.queryInput) {
-                DesignViewUtils.prototype.errorAlert('A Function/Window/Filter/Projection query does not contain a ' +
-                    'connected input');
+                errorMessage = 'A Function/Window/Filter/Projection query does not contain a connected input';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
 
             } else if (!query.queryInput.from) {
-                DesignViewUtils.prototype.errorAlert('A Function/Window/Filter/Projection query does not contain a ' +
-                    'connected input');
+                errorMessage = 'A Function/Window/Filter/Projection query does not contain a connected input';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             }
 
-            isValid = self.validateQueryOutputSection(query.queryOutput, 'Function/Window/Filter/Projection query');
+            isValid = self.validateQueryOutputSection(query.queryOutput, 'Function/Window/Filter/Projection query',
+                query.id);
             if (!isValid) {
                 return isValid;
             }
 
-            isValid = self.validateQuerySelectSection(query.select, 'Function/Window/Filter/Projection query');
+            isValid = self.validateQuerySelectSection(query.select, 'Function/Window/Filter/Projection query',
+                query.id);
             if (!isValid) {
                 return isValid;
             }
@@ -193,35 +208,49 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         };
 
         JSONValidator.prototype.validateJoinQuery = function (query) {
+            var self = this;
             var isValid;
+            var errorMessage;
             if (!query.queryInput) {
-                DesignViewUtils.prototype.errorAlert('A Join query does not contain two connected inputs');
+                errorMessage = 'A Join query does not contain two connected inputs';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             } else if (!query.queryInput.firstConnectedElement && !query.queryInput.secondConnectedElement) {
-                DesignViewUtils.prototype.errorAlert('A Join query does not contain two connected inputs');
+                errorMessage = 'A Join query does not contain two connected inputs';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             } else if (!query.queryInput.firstConnectedElement || !query.queryInput.secondConnectedElement) {
-                DesignViewUtils.prototype.errorAlert('Only one element is connected to a Join query');
+                errorMessage = 'Only one element is connected to a Join query';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             }
 
-            isValid = self.validateQueryOutputSection(query.queryOutput, 'Join query');
+            isValid = self.validateQueryOutputSection(query.queryOutput, 'Join query', query.id);
             if (!isValid) {
                 return isValid;
             }
 
             if (!query.queryInput.left) {
-                DesignViewUtils.prototype.errorAlert('Left source of a Join query is not defined');
+                errorMessage = 'Left source of a Join query is not defined';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             } else if (!query.queryInput.right) {
-                DesignViewUtils.prototype.errorAlert('Right source of a Join query is not defined');
+                errorMessage = 'Right source of a Join query is not defined';
+                highlightErrorElement(query.i, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             } else if (!query.queryInput.joinWith || !query.queryInput.joinType) {
-                DesignViewUtils.prototype.errorAlert('A Join query form is not filled');
+                errorMessage = 'A Join query form is not filled';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             }
 
-            isValid = self.validateQuerySelectSection(query.select, 'Join query');
+            isValid = self.validateQuerySelectSection(query.select, 'Join query', query.id);
             if (!isValid) {
                 return isValid;
             }
@@ -230,34 +259,42 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         };
 
         JSONValidator.prototype.validatePatternOrSequenceQuery = function (query, type) {
+            var self = this;
             var isValid;
+            var errorMessage;
             if (!query.queryInput) {
-                DesignViewUtils.prototype.errorAlert('A ' + type + ' does not contain a input');
+                errorMessage = 'A ' + type + ' does not contain a input';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
 
             } else if (query.queryInput.connectedElementNameList !== undefined
                 && query.queryInput.connectedElementNameList.length === 0) {
-                DesignViewUtils.prototype.errorAlert('A ' + type + ' does not contain a input');
+                errorMessage = 'A ' + type + ' does not contain a input';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
 
             }
 
-            isValid = self.validateQueryOutputSection(query.queryOutput, type);
+            isValid = self.validateQueryOutputSection(query.queryOutput, type, query.id);
             if (!isValid) {
                 return isValid;
             }
 
             if (!query.queryInput.logic) {
-                DesignViewUtils.prototype
-                    .errorAlert('Logic section in query input of a ' + type + ' form cannot be blank');
+                errorMessage = 'Logic section in query input of a ' + type + ' form cannot be blank';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             } else if (query.queryInput.conditionList.length === 0){
-                DesignViewUtils.prototype
-                    .errorAlert('Condition list in query input of a ' + type + ' form cannot be blank');
+                errorMessage = 'Condition list in query input of a ' + type + ' form cannot be blank';
+                highlightErrorElement(query.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             }
 
-            isValid = self.validateQuerySelectSection(query.select, type);
+            isValid = self.validateQuerySelectSection(query.select, type, query.id);
             if (!isValid) {
                 return isValid;
             }
@@ -265,16 +302,21 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             return isValid;
         };
 
-        JSONValidator.prototype.validateQuerySelectSection = function (select, type) {
+        JSONValidator.prototype.validateQuerySelectSection = function (select, type, elementId) {
             var isValid = true;
+            var errorMessage;
             if (!select) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('Select section of a ' + type + ' form cannot be blank');
+                errorMessage = 'Select section of a ' + type + ' form cannot be blank';
+                highlightErrorElement(elementId, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
             } else if(select.type === 'USER_DEFINED') {
                 _.forEach(select.value, function (value) {
                     if (!value.expression || value.expression === '') {
                         isValid = false;
-                        DesignViewUtils.prototype.errorAlert('Select section of a ' + type + ' form cannot be blank');
+                        errorMessage = 'Select section of a ' + type + ' form cannot be blank';
+                        highlightErrorElement(elementId, errorMessage);
+                        DesignViewUtils.prototype.errorAlert(errorMessage);
                         // break the for each loop
                         return false;
                     }
@@ -283,32 +325,44 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             return isValid;
         };
 
-        JSONValidator.prototype.validateQueryOutputSection = function (output, type) {
+        JSONValidator.prototype.validateQueryOutputSection = function (output, type, elementId) {
             var isValid = true;
+            var errorMessage;
             if (!output) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('A ' + type + ' does not contain a connected output element');
+                errorMessage = 'A ' + type + ' does not contain a connected output element';
+                highlightErrorElement(elementId, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
             } else if (!output.target) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('A ' + type + ' does not contain a connected output element');
+                errorMessage = 'A ' + type + ' does not contain a connected output element';
+                highlightErrorElement(elementId, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
             } else if(!output.type || !output.output) {
                 isValid = false;
-                DesignViewUtils.prototype.errorAlert('Output section of a ' + type + ' form is not filled');
+                errorMessage = 'Output section of a ' + type + ' form is not filled';
+                highlightErrorElement(elementId, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
             }
             return isValid;
         };
 
         JSONValidator.prototype.validatePartition = function (partition) {
+            var self = this;
             var isValid = true;
-
+            var errorMessage;
             if (partition.partitionWith.length === 0) {
-                DesignViewUtils.prototype.errorAlert('A partition does not contain a connected outer stream');
+                errorMessage = 'A partition does not contain a connected outer stream';
+                highlightErrorElement(partition.id, errorMessage);
+                DesignViewUtils.prototype.errorAlert(errorMessage);
                 return false;
             } else {
                 _.forEach(partition.partitionWith, function (partitionWithAttribute) {
                     if (!partitionWithAttribute.expression || partitionWithAttribute.expression === ''
                         || !partitionWithAttribute.streamName) {
-                        DesignViewUtils.prototype.errorAlert('Partition by section of a partition form is not filled');
+                        errorMessage = 'Partition by section of a partition form is not filled';
+                        highlightErrorElement(partition.id, errorMessage);
+                        DesignViewUtils.prototype.errorAlert(errorMessage);
                         isValid = false;
                         // break the for each loop
                         return false;
@@ -367,8 +421,10 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             return isValid;
         };
 
-        function highlightErrorElement(errorElementId) {
-            $('#' + errorElementId).addClass('error-element');
+        function highlightErrorElement(errorElementId, errorMessage) {
+            var element = $('#' + errorElementId);
+            element.addClass('error-element');
+            element.prop('title', errorMessage);
         }
 
         return JSONValidator;
