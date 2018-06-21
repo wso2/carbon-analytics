@@ -33,10 +33,11 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * @param JSON provided JSON
          */
         JSONValidator.prototype.validate = function (JSON) {
+            var self = this;
             var isValid = true;
 
             _.forEach(JSON.sourceList, function (source) {
-                isValid = validateSourceOrSinkAnnotation(source, 'Source');
+                isValid = self.validateSourceOrSinkAnnotation(source, 'Source');
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -49,7 +50,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.sinkList, function (sink) {
-                isValid = validateSourceOrSinkAnnotation(sink, 'Sink');
+                isValid = self.validateSourceOrSinkAnnotation(sink, 'Sink');
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -62,7 +63,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.aggregationList, function (aggregation) {
-                isValid = validateAggregation(aggregation);
+                isValid = self.validateAggregation(aggregation);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -75,7 +76,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.queryLists.WINDOW_FILTER_PROJECTION, function (query) {
-                isValid = validateWindowFilterProjectionQuery(query);
+                isValid = self.validateWindowFilterProjectionQuery(query);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -88,7 +89,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.queryLists.JOIN, function (query) {
-                isValid = validateJoinQuery(query);
+                isValid = self.validateJoinQuery(query);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -101,7 +102,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.queryLists.PATTERN, function (query) {
-                isValid = validatePatternOrSequenceQuery(query, 'Pattern Query');
+                isValid = self.validatePatternOrSequenceQuery(query, 'Pattern Query');
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -114,7 +115,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.queryLists.SEQUENCE, function (query) {
-                isValid = validatePatternOrSequenceQuery(query, 'Sequence Query');
+                isValid = self.validatePatternOrSequenceQuery(query, 'Sequence Query');
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -127,55 +128,9 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.partitionList, function (partition) {
-                _.forEach(partition.queryLists.WINDOW_FILTER_PROJECTION, function (query) {
-                    isValid = validateWindowFilterProjectionQuery(query);
-                    if (!isValid) {
-                        // break the for each loop
-                        return false;
-                    }
-                });
-
+                isValid = self.validatePartition(partition);
                 if (!isValid) {
-                    // break the partition for each loop
-                    return false;
-                }
-
-                _.forEach(partition.queryLists.JOIN, function (query) {
-                    isValid = validateJoinQuery(query);
-                    if (!isValid) {
-                        // break the for each loop
-                        return false;
-                    }
-                });
-
-                if (!isValid) {
-                    // break the partition for each loop
-                    return false;
-                }
-
-                _.forEach(partition.queryLists.PATTERN, function (query) {
-                    isValid = validatePatternOrSequenceQuery(query, 'Pattern Query');
-                    if (!isValid) {
-                        // break the for each loop
-                        return false;
-                    }
-                });
-
-                if (!isValid) {
-                    // break the partition for each loop
-                    return false;
-                }
-
-                _.forEach(partition.queryLists.SEQUENCE, function (query) {
-                    isValid = validatePatternOrSequenceQuery(query, 'Sequence Query');
-                    if (!isValid) {
-                        // break the for each loop
-                        return false;
-                    }
-                });
-
-                if (!isValid) {
-                    // break the partition for each loop
+                    // break the for each loop
                     return false;
                 }
             });
@@ -183,16 +138,16 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             return isValid;
         };
 
-        function validateSourceOrSinkAnnotation(annotation, type) {
+        JSONValidator.prototype.validateSourceOrSinkAnnotation = function (annotation, type) {
             if (!annotation.connectedElementName) {
                 DesignViewUtils.prototype.errorAlert('A ' + type + ' annotation does not contain a connected stream');
                 return false;
             } else {
                 return true;
             }
-        }
+        };
 
-        function validateAggregation(aggregation) {
+        JSONValidator.prototype.validateAggregation = function (aggregation) {
             var isValid;
             if (!aggregation.from) {
                 DesignViewUtils.prototype.errorAlert('An Aggregation element does not contain a connected input');
@@ -203,15 +158,15 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = validateQuerySelectSection(aggregation.select, 'Aggregation');
+            isValid = self.validateQuerySelectSection(aggregation.select, 'Aggregation');
             if (!isValid) {
                 return isValid;
             }
 
             return isValid;
-        }
+        };
 
-        function validateWindowFilterProjectionQuery(query) {
+        JSONValidator.prototype.validateWindowFilterProjectionQuery = function (query) {
             var isValid;
             if (!query.queryInput) {
                 DesignViewUtils.prototype.errorAlert('A Function/Window/Filter/Projection query does not contain a ' +
@@ -224,20 +179,20 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = validateQueryOutputSection(query.queryOutput, 'Function/Window/Filter/Projection query');
+            isValid = self.validateQueryOutputSection(query.queryOutput, 'Function/Window/Filter/Projection query');
             if (!isValid) {
                 return isValid;
             }
 
-            isValid = validateQuerySelectSection(query.select, 'Function/Window/Filter/Projection query');
+            isValid = self.validateQuerySelectSection(query.select, 'Function/Window/Filter/Projection query');
             if (!isValid) {
                 return isValid;
             }
 
             return isValid;
-        }
+        };
 
-        function validateJoinQuery(query) {
+        JSONValidator.prototype.validateJoinQuery = function (query) {
             var isValid;
             if (!query.queryInput) {
                 DesignViewUtils.prototype.errorAlert('A Join query does not contain two connected inputs');
@@ -250,7 +205,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = validateQueryOutputSection(query.queryOutput, 'Join query');
+            isValid = self.validateQueryOutputSection(query.queryOutput, 'Join query');
             if (!isValid) {
                 return isValid;
             }
@@ -266,15 +221,15 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = validateQuerySelectSection(query.select, 'Join query');
+            isValid = self.validateQuerySelectSection(query.select, 'Join query');
             if (!isValid) {
                 return isValid;
             }
 
             return isValid;
-        }
+        };
 
-        function validatePatternOrSequenceQuery(query, type) {
+        JSONValidator.prototype.validatePatternOrSequenceQuery = function (query, type) {
             var isValid;
             if (!query.queryInput) {
                 DesignViewUtils.prototype.errorAlert('A ' + type + ' does not contain a input');
@@ -287,7 +242,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
 
             }
 
-            isValid = validateQueryOutputSection(query.queryOutput, type);
+            isValid = self.validateQueryOutputSection(query.queryOutput, type);
             if (!isValid) {
                 return isValid;
             }
@@ -302,15 +257,15 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = validateQuerySelectSection(query.select, type);
+            isValid = self.validateQuerySelectSection(query.select, type);
             if (!isValid) {
                 return isValid;
             }
 
             return isValid;
-        }
+        };
 
-        function validateQuerySelectSection(select, type) {
+        JSONValidator.prototype.validateQuerySelectSection = function (select, type) {
             var isValid = true;
             if (!select) {
                 isValid = false;
@@ -319,15 +274,16 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 _.forEach(select.value, function (value) {
                     if (!value.expression || value.expression === '') {
                         isValid = false;
+                        DesignViewUtils.prototype.errorAlert('Select section of a ' + type + ' form cannot be blank');
                         // break the for each loop
                         return false;
                     }
                 });
             }
             return isValid;
-        }
+        };
 
-        function validateQueryOutputSection(output, type) {
+        JSONValidator.prototype.validateQueryOutputSection = function (output, type) {
             var isValid = true;
             if (!output) {
                 isValid = false;
@@ -340,7 +296,76 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 DesignViewUtils.prototype.errorAlert('Output section of a ' + type + ' form is not filled');
             }
             return isValid;
-        }
+        };
+
+        JSONValidator.prototype.validatePartition = function (partition) {
+            var isValid = true;
+
+            if (partition.partitionWith.length === 0) {
+                DesignViewUtils.prototype.errorAlert('A partition does not contain a connected outer stream');
+                return false;
+            } else {
+                _.forEach(partition.partitionWith, function (partitionWithAttribute) {
+                    if (!partitionWithAttribute.expression || partitionWithAttribute.expression === ''
+                        || !partitionWithAttribute.streamName) {
+                        DesignViewUtils.prototype.errorAlert('Partition by section of a partition form is not filled');
+                        isValid = false;
+                        // break the for each loop
+                        return false;
+                    }
+                });
+            }
+
+            if (!isValid) {
+                return false;
+            }
+
+            _.forEach(partition.queryLists.WINDOW_FILTER_PROJECTION, function (query) {
+                isValid = self.validateWindowFilterProjectionQuery(query);
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            if (!isValid) {
+                return false;
+            }
+
+            _.forEach(partition.queryLists.JOIN, function (query) {
+                isValid = self.validateJoinQuery(query);
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            if (!isValid) {
+                return false;
+            }
+
+            _.forEach(partition.queryLists.PATTERN, function (query) {
+                isValid = self.validatePatternOrSequenceQuery(query, 'Pattern Query');
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            if (!isValid) {
+                return false;
+            }
+
+            _.forEach(partition.queryLists.SEQUENCE, function (query) {
+                isValid = self.validatePatternOrSequenceQuery(query, 'Sequence Query');
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            return isValid;
+        };
 
         function highlightErrorElement(errorElementId) {
             $('#' + errorElementId).addClass('error-element');
