@@ -1338,7 +1338,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getSourceList(), function (source) {
                 var sourceId = source.getId();
-                var sourceName = "Source";
+                var sourceName = source.getType();
                 var array = sourceId.split("_");
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
@@ -1348,7 +1348,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getSinkList(), function (sink) {
                 var sinkId = sink.getId();
-                var sinkName = "Sink";
+                var sinkName = sink.getType();
                 var array = sinkId.split("_");
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;

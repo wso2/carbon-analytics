@@ -64,14 +64,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
 
             var self = this;
-            if (!isCodeToDesignMode) {
-                self.formBuilder.DefineSource(i);
+            var name;
+            if (isCodeToDesignMode) {
+                name = sourceName;
+            } else {
+                name = self.formBuilder.DefineSource(i);
             }
-            var node = $('<div>' + sourceName + '</div>');
+            var node = $('<div>' + name + '</div>');
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sourceNameNode");
-
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Source Element will
@@ -130,10 +132,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         DropElements.prototype.dropSink = function (newAgent, i, top, left, isCodeToDesignMode, sinkName) {
 
             var self = this;
-            if (!isCodeToDesignMode) {
-                self.formBuilder.DefineSink(i);
+            var name;
+            if (isCodeToDesignMode) {
+                name = sinkName;
+            } else {
+                name = self.formBuilder.DefineSink(i);
             }
-            var node = $('<div>' + sinkName + '</div>');
+            var node = $('<div>' + name + '</div>');
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sinkNameNode");
