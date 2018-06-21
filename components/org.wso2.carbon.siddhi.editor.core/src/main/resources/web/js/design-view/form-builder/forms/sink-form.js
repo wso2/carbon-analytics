@@ -369,6 +369,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 var sink = new SourceOrSinkAnnotation(sinkOptions);
                 self.configurationData.getSiddhiAppConfig().addSink(sink);
 
+                var textNode = $('#' + i).find('.sinkNameNode');
+                textNode.html(editor.getValue().annotationType.name);
+
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
 
@@ -376,6 +379,8 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 self.toggleViewButton.removeClass('disableContainer');
 
             });
+
+            return editor.getValue().annotationType.name;
         };
 
         /**
@@ -812,6 +817,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 } else {
                     clickedElement.setMap(undefined);
                 }
+
+                var textNode = $('#' + id).find('.sinkNameNode');
+                textNode.html(config.annotationType.name);
 
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
