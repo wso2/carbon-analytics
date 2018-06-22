@@ -953,9 +953,6 @@ public class CodeGeneratorHelper {
                                           String target) throws CodeGenerationException {
         if (updateInsertIntoOutput == null) {
             throw new CodeGenerationException("A given update/insert query output element is empty");
-        } else if (updateInsertIntoOutput.getSet() == null || updateInsertIntoOutput.getSet().isEmpty()) {
-            throw new CodeGenerationException("The 'set attribute' list of a given update/insert" +
-                    " query output element is empty");
         } else if (updateInsertIntoOutput.getOn() == null || updateInsertIntoOutput.getOn().isEmpty()) {
             throw new CodeGenerationException("The 'on' value of a given update/insert query" +
                     " element is empty");
@@ -974,22 +971,24 @@ public class CodeGeneratorHelper {
         updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
                 .append(target)
                 .append(getForEventType(updateInsertIntoOutput.getEventType()))
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.SET)
                 .append(SiddhiStringBuilderConstants.SPACE);
 
-        int setAttributesLeft = updateInsertIntoOutput.getSet().size();
-        for (SetAttributeConfig setAttribute : updateInsertIntoOutput.getSet()) {
-            updateInsertIntoOutputStringBuilder.append(getSetAttribute(setAttribute));
+        if (updateInsertIntoOutput.getSet() != null && !updateInsertIntoOutput.getSet().isEmpty()) {
+            updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.SET)
+                    .append(SiddhiStringBuilderConstants.SPACE);
+            int setAttributesLeft = updateInsertIntoOutput.getSet().size();
+            for (SetAttributeConfig setAttribute : updateInsertIntoOutput.getSet()) {
+                updateInsertIntoOutputStringBuilder.append(getSetAttribute(setAttribute));
 
-            if (setAttributesLeft != 1) {
-                updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
+                if (setAttributesLeft != 1) {
+                    updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.COMMA);
+                }
+                setAttributesLeft--;
             }
-            setAttributesLeft--;
+            updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.SPACE);
         }
 
-        updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.ON)
+        updateInsertIntoOutputStringBuilder.append(SiddhiStringBuilderConstants.ON)
                 .append(SiddhiStringBuilderConstants.SPACE)
                 .append(updateInsertIntoOutput.getOn())
                 .append(SiddhiStringBuilderConstants.SEMI_COLON);

@@ -499,12 +499,94 @@ a.list-group-item, button.list-group-item {
     font-size: 12px;
 }
 
-#form-query-annotation table,
-.define-stream table,
-.define-window table,
-.define-trigger table,
-.define-table table,
-.define-partition table {
-    width: 100% !important;
-    max-width: 650px !important;
+/* JSONEditor overrides */
+/* Set widths */
+.define-appconfig [data-schemapath="root.annotations"] table,
+.define-source [data-schemapath="root.annotationOptions"] table,
+.define-source [data-schemapath="root.map.annotationOptions"] table,
+.define-source [data-schemapath="root.map.attributeValues"] table,
+.define-sink [data-schemapath="root.annotationOptions"] table,
+.define-sink [data-schemapath="root.map.annotationOptions"] table,
+.define-source [data-schemapath="root.map.attributeValues"] table,
+.define-stream [data-schemapath="root.annotations"] table,
+.define-stream [data-schemapath="root.attributes"] table,
+.define-table [data-schemapath="root.annotations"] table,
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table,
+.define-table [data-schemapath="root.attributes"] table,
+.define-window [data-schemapath="root.annotations"] table,
+.define-window [data-schemapath="root.attributes"] table,
+.define-window [data-schemapath="root.parameters"] table,
+.define-trigger [data-schemapath="root.annotations"] table,
+.define-partition [data-schemapath="root.annotations"] table,
+.define-partition [data-schemapath="root.partitionKeys"] table
+{
+    width: 650px;
+}
+
+/* 1 column */
+.define-appconfig [data-schemapath="root.annotations"] table tr td:first-child,
+.define-source [data-schemapath="root.annotationOptions"] table tr td:first-child,
+.define-source [data-schemapath="root.map.annotationOptions"] table tr td:first-child,
+.define-sink [data-schemapath="root.annotationOptions"] table tr td:first-child,
+.define-sink [data-schemapath="root.map.annotationOptions"] table tr td:first-child,
+.define-stream [data-schemapath="root.annotations"] table tr td:first-child,
+.define-table [data-schemapath="root.annotations"] table tr td:first-child,
+.define-window [data-schemapath="root.annotations"] table tr td:first-child,
+.define-window [data-schemapath="root.parameters"] table tr td:first-child,
+.define-trigger [data-schemapath="root.annotations"] table tr td:first-child,
+.define-partition [data-schemapath="root.annotations"] table tr td:first-child
+{
+    width: 508px;
+}
+
+/* 2 column */
+.define-source [data-schemapath="root.map.attributeValues"] table tr td:nth-child(1),
+.define-source [data-schemapath="root.map.attributeValues"] table tr td:nth-child(2),
+.define-sink [data-schemapath="root.map.attributeOrPayloadValues"] table tr td:nth-child(1),
+.define-sink [data-schemapath="root.map.attributeOrPayloadValues"] table tr td:nth-child(2),
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table tr td:nth-child(1),
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table tr td:nth-child(2),
+.define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(1),
+.define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(2),
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(1),
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(2)
+{
+    width: 254px;
+}
+
+/* 2 column with type field */
+.define-stream [data-schemapath="root.attributes"] table tr td:nth-child(1),
+.define-table [data-schemapath="root.attributes"] table tr td:nth-child(1),
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(1)
+{
+    width: 428px;
+}
+
+.define-stream [data-schemapath="root.attributes"] table tr td:nth-child(2),
+.define-table [data-schemapath="root.attributes"] table tr td:nth-child(2),
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(2)
+{
+    width: 80px;
+}
+
+/* Hide duplicate labels */
+.define-appconfig [data-schemapath="root.annotations"] table thead,
+.define-source [data-schemapath="root.annotationOptions"] table thead,
+.define-source [data-schemapath="root.map.annotationOptions"] table thead,
+.define-sink [data-schemapath="root.annotationOptions"] table thead,
+.define-sink [data-schemapath="root.map.annotationOptions"] table thead,
+.define-stream [data-schemapath="root.annotations"] table thead,
+.define-table [data-schemapath="root.annotations"] table thead,
+.define-window [data-schemapath="root.annotations"] table thead,
+.define-window [data-schemapath="root.parameters"] table thead,
+.define-trigger [data-schemapath="root.annotations"] table thead,
+.define-partition [data-schemapath="root.annotations"] table thead,
+.define-windowFilterProjection-query [data-schemapath="root.annotations"] table thead,
+.define-windowFilterProjection-query [data-schemapath="root.streamHandlerList.0.streamHandler.parameters"] table thead,
+.define-aggregation [data-schemapath="root.annotations"] table thead,
+.define-aggregation [data-schemapath="root.aggregateByTimePeriod"] table thead,
+.define-pattern-query [data-schemapath="root.annotations"] table thead,
+.define-sequence-query [data-schemapath="root.annotations"] table thead
+{
+    display: none;
 }

@@ -451,10 +451,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     } else {
                         runMenuItem.disable();
                         debugMenuItem.disable();
-                        stopMenuItem.disable();
                         toolBar.disableRunButton();
                         toolBar.disableDebugButton();
-                        toolBar.disableStopButton();
+                        if (file.getRunStatus() || file.getDebugStatus()) {
+                            stopMenuItem.enable();
+                            toolBar.enableStopButton();
+                        } else {
+                            stopMenuItem.disable();
+                            toolBar.disableStopButton();
+                        }
                     }
                 } else {
                     runMenuItem.disable();

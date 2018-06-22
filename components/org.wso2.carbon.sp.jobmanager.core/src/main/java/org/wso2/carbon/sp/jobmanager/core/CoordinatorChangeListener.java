@@ -38,7 +38,8 @@ public class CoordinatorChangeListener extends MemberEventListener {
 
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
-        if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
+        if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null
+                && nodeDetail.getPropertiesMap() != null){
             Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
             String nodeId = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_ID);
             String httpsInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);

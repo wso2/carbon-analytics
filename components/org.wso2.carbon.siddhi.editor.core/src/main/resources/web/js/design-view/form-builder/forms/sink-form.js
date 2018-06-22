@@ -49,7 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             formContainer.append(propertyDiv);
 
             // generate the form to define a sink
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor(formContainer.find('.define-sink')[0], {
                 schema: {
                     type: "object",
                     title: "Sink",
@@ -500,7 +500,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
             fillWith = self.formUtils.cleanJSONObject(fillWith);
 
             // generate the form to define a sink
-            var editor = new JSONEditor(formContainer[0], {
+            var editor = new JSONEditor(formContainer.find('.define-sink')[0], {
                 schema: {
                     type: "object",
                     title: "Sink",

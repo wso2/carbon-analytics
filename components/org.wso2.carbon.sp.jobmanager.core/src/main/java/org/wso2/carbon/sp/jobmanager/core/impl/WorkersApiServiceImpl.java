@@ -70,17 +70,24 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     }
 
     public Response getClusteredWorkerNodeDetails() {
-        Map<String, ResourceNode> clusteredWorkerList = ServiceDataHolder.getResourcePool().getResourceNodeMap();
-        List<Map<String,String>> resourceNodeDetailMap = new ArrayList<>();
-        for (Map.Entry<String, ResourceNode> resourceNodeEntry : clusteredWorkerList.entrySet()) {
-            Map<String,String> clusteredResourceNode = new HashMap<>();
-            clusteredResourceNode.put(Constants.HTTPS_HOST,resourceNodeEntry.getValue().getHttpsInterface().getHost());
-            clusteredResourceNode.put(Constants.HTTPS_PORT,String.valueOf(resourceNodeEntry.getValue()
-                    .getHttpsInterface().getPort()));
-            clusteredResourceNode.put(Constants.NODE_ID, resourceNodeEntry.getValue().getId());
-            resourceNodeDetailMap.add(clusteredResourceNode);
+        ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
+        if (resourcePool != null) {
+            Map<String, ResourceNode> clusteredWorkerList = resourcePool.getResourceNodeMap();
+            List<Map<String, String>> resourceNodeDetailMap = new ArrayList<>();
+            for (Map.Entry<String, ResourceNode> resourceNodeEntry : clusteredWorkerList.entrySet()) {
+                Map<String, String> clusteredResourceNode = new HashMap<>();
+                clusteredResourceNode.put(Constants.HTTPS_HOST, resourceNodeEntry.getValue().getHttpsInterface()
+                        .getHost());
+                clusteredResourceNode.put(Constants.HTTPS_PORT, String.valueOf(resourceNodeEntry.getValue()
+                        .getHttpsInterface().getPort()));
+                clusteredResourceNode.put(Constants.NODE_ID, resourceNodeEntry.getValue().getId());
+                resourceNodeDetailMap.add(clusteredResourceNode);
+            }
+            return Response.ok().entity(resourceNodeDetailMap).build();
+        } else {
+            return Response.status(Response.Status.NO_CONTENT).entity("Requested response is null").build();
         }
-        return Response.ok().entity(resourceNodeDetailMap).build();
+
     }
 
     /**

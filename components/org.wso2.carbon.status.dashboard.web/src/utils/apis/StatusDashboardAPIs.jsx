@@ -30,7 +30,7 @@ export default class StatusDashboardAPIS {
     static getHTTPClient() {
         let httpClient = Axios.create({
             baseURL: window.location.origin + "/" + window.contextPath.substr(1) + '/apis/workers',
-            timeout: 6000,
+            timeout: 12000,
             headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID}
         });
         httpClient.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;
