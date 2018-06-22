@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'joinQuerySource', 'streamHandler', 'designViewUtils'],
+        'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
-              DesignViewUtils) {
+              DesignViewUtils, JSONValidator) {
 
         var constants = {
             LEFT_SOURCE: 'Left Source',
@@ -1361,6 +1361,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setType(outputType);
                     }
+
+                    // perform JSON validation
+                    $(element).removeClass('error-element');
+                    JSONValidator.prototype.validateWindowFilterProjectionQuery(clickedElement);
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');

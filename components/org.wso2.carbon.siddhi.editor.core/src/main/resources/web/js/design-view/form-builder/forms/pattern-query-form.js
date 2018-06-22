@@ -18,10 +18,11 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
-        'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils'],
+        'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils',
+        'jsonValidator'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
-              QueryWindowOrFunction, DesignViewUtils) {
+              QueryWindowOrFunction, DesignViewUtils, JSONValidator) {
 
         /**
          * @class PatternQueryForm Creates a forms to collect data from a pattern query
@@ -1105,6 +1106,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setType(outputType);
                     }
+
+                    // perform JSON validation
+                    JSONValidator.prototype.validatePatternOrSequenceQuery(clickedElement, 'Pattern Query');
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');

@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation'],
-    function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation) {
+define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
+        'jsonValidator'],
+    function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator) {
 
         /**
          * @class DesignView
@@ -601,6 +602,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(aggregationOptions, 'name', i);
                 var aggregation = new Aggregation(aggregationOptions);
                 self.configurationData.getSiddhiAppConfig().addAggregation(aggregation);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateAggregation(aggregation);
             }
 
             var node = $('<div>' + name + '</div>');
@@ -748,6 +752,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(queryOptions, 'id', i);
                 var query = new Query(queryOptions);
                 self.configurationData.getSiddhiAppConfig().addWindowFilterProjectionQuery(query);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateWindowFilterProjectionQuery(query);
             }
             var settingsIconId = "" + i + "-dropQuerySettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
@@ -824,6 +831,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(patternQueryOptions, 'id', i);
                 var patternQuery = new Query(patternQueryOptions);
                 self.configurationData.getSiddhiAppConfig().addPatternQuery(patternQuery);
+
+                // perform JSON validation
+                JSONValidator.prototype.validatePatternOrSequenceQuery(patternQuery, 'Pattern Query');
             }
 
             /*
@@ -907,6 +917,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(sequenceQueryOptions, 'id', i);
                 var sequenceQuery = new Query(sequenceQueryOptions);
                 self.configurationData.getSiddhiAppConfig().addSequenceQuery(sequenceQuery);
+
+                // perform JSON validation
+                JSONValidator.prototype
+                    .validatePatternOrSequenceQuery(sequenceQuery,'Sequence Query');
             }
 
             /*
@@ -989,6 +1003,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(queryOptions, 'id', i);
                 var query = new Query(queryOptions);
                 self.configurationData.getSiddhiAppConfig().addJoinQuery(query);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateJoinQuery(query);
             }
             var settingsIconId = "" + i + "-dropJoinQuerySettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
@@ -1084,6 +1101,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var newPartition = new Partition(partitionOptions);
                 newPartition.setId(i);
                 self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
+
+                // perform JSON validation
+                JSONValidator.prototype.validatePartition(newPartition);
             }
 
             // There will be always added a connection point by default

@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute'],
-    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute) {
+define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
+        'jsonValidator'],
+    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator) {
 
         /**
          * @class SourceForm Creates a forms to collect data from a source
@@ -298,6 +299,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
                 var textNode = $('#' + i).find('.sourceNameNode');
                 textNode.html(editor.getValue().annotationType.name);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateSourceOrSinkAnnotation(source, 'Source');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -640,6 +644,10 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
                 var textNode = $('#' + id).find('.sourceNameNode');
                 textNode.html(config.annotationType.name);
+
+                // perform JSON validation
+                $(element).removeClass('error-element');
+                JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Source');
 
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');

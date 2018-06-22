@@ -17,11 +17,11 @@
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
-        'partitionWith'],
+        'partitionWith', 'jsonValidator'],
 
     function (require, log, $, Backbone, _, DesignViewUtils, DropElements, dagre, Edge,
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
-              PartitionWith) {
+              PartitionWith, JSONValidator) {
 
         var constants = {
             SOURCE: 'sourceDrop',
@@ -899,6 +899,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
                     }
 
+                    // validate source and target elements
+                    checkJSONValidityOfElement(self, sourceId);
+                    checkJSONValidityOfElement(self, targetId);
+
                     var connectionObject = connection.connection;
                     // add a overlay of a close icon for connection. connection can be detached by clicking on it
                     var close_icon_overlay = connectionObject.addOverlay([
@@ -1165,6 +1169,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             model.getQueryOutput().setTarget(undefined);
                         }
                     }
+
+                    // validate source and target elements
+                    checkJSONValidityOfElement(self, sourceId);
+                    checkJSONValidityOfElement(self, targetId);
                 });
             }
 
@@ -1300,6 +1308,30 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         self.jsPlumbInstance.repaintEverything();
                     }
                 });
+            }
+
+            function checkJSONValidityOfElement(self, elementId) {
+                var element = self.configurationData.getSiddhiAppConfig()
+                    .getDefinitionElementById(elementId, true, true);
+                if (element !== undefined) {
+                    var type = element.type;
+                    var elementObject = element.element;
+                    if (type === 'WINDOW_FILTER_PROJECTION_QUERY') {
+                        JSONValidator.prototype.validateWindowFilterProjectionQuery(elementObject);
+                    } else if (type === 'PATTERN_QUERY') {
+                        JSONValidator.prototype.validatePatternOrSequenceQuery(elementObject, 'Pattern Query');
+                    } else if (type === 'SEQUENCE_QUERY') {
+                        JSONValidator.prototype.validatePatternOrSequenceQuery(elementObject, 'Sequence Query');
+                    } else if (type === 'JOIN_QUERY') {
+                        JSONValidator.prototype.validateJoinQuery(elementObject);
+                    } else if (type === 'SOURCE') {
+                        JSONValidator.prototype.validateSourceOrSinkAnnotation(elementObject, 'Source');
+                    } else if (type === 'SINK') {
+                        JSONValidator.prototype.validateSourceOrSinkAnnotation(elementObject, 'Sink');
+                    } else if (type === 'AGGREGATION') {
+                        JSONValidator.prototype.validateAggregation(elementObject);
+                    }
+                }
             }
 
             checkConnectionValidityBeforeElementDrop();
