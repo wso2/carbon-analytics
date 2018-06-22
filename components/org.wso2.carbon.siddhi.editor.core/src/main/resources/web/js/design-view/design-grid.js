@@ -691,27 +691,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             deleteEndpointsOnDetach: true
                         });
 
-                    } else if (sourceElement.hasClass(constants.SOURCE)
-                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))) {
-                        if (targetElement.hasClass(constants.STREAM)) {
-                            connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(targetId)
-                                .getName();
-                        } else if (targetElement.hasClass(constants.TRIGGER)) {
-                            connectedElementName = self.configurationData.getSiddhiAppConfig().getTrigger(targetId)
-                                .getName();
-                        }
+                    } else if (sourceElement.hasClass(constants.SOURCE) && targetElement.hasClass(constants.STREAM)) {
+                        connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(targetId)
+                            .getName();
                         self.configurationData.getSiddhiAppConfig().getSource(sourceId)
                             .setConnectedElementName(connectedElementName);
 
-                    } else if (targetElement.hasClass(constants.SINK)
-                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
-                        if (sourceElement.hasClass(constants.STREAM)) {
-                            connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
+                    } else if (targetElement.hasClass(constants.SINK) && sourceElement.hasClass(constants.STREAM)) {
+                        connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
                                 .getName();
-                        } else if (sourceElement.hasClass(constants.TRIGGER)) {
-                            connectedElementName = self.configurationData.getSiddhiAppConfig().getTrigger(sourceId)
-                                .getName();
-                        }
                         self.configurationData.getSiddhiAppConfig().getSink(targetId)
                             .setConnectedElementName(connectedElementName);
 
@@ -931,7 +919,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
                     ]);
 
-                    //TODO: check the mouse enter and leave events when in a partition
                     if (isConnectionMadeInsideAPartition) {
                         close_icon_overlay.setVisible(false);
                         // show the close icon when mouse is over the connection
@@ -1058,14 +1045,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                     var model;
 
-                    if (sourceElement.hasClass(constants.SOURCE)
-                        && (targetElement.hasClass(constants.STREAM) || targetElement.hasClass(constants.TRIGGER))) {
+                    if (sourceElement.hasClass(constants.SOURCE) && targetElement.hasClass(constants.STREAM)) {
                         self.configurationData.getSiddhiAppConfig().getSource(sourceId)
                             .setConnectedElementName(undefined);
 
-                    } else if (targetElement.hasClass(constants.SINK)
-                        && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
-                        self.configurationData.getSiddhiAppConfig().getSink(sourceId)
+                    } else if (targetElement.hasClass(constants.SINK) && sourceElement.hasClass(constants.STREAM)) {
+                        self.configurationData.getSiddhiAppConfig().getSink(targetId)
                             .setConnectedElementName(undefined);
 
                     } else if (targetElement.hasClass(constants.AGGREGATION)
