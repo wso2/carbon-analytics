@@ -1,11 +1,10 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 
 public class FunctionCodeGenerator {
-
     /**
      * Generates a function definition string from a FunctionConfig object
      *
@@ -13,7 +12,7 @@ public class FunctionCodeGenerator {
      * @return The converted function definition string
      * @throws CodeGenerationException Error while generating code
      */
-    public String generateFunctionCode(FunctionConfig function) throws CodeGenerationException {
+    public String generateFunction(FunctionConfig function) throws CodeGenerationException {
         if (function == null) {
             throw new CodeGenerationException("A given function element is empty");
         } else if (function.getName() == null || function.getName().isEmpty()) {
@@ -26,21 +25,21 @@ public class FunctionCodeGenerator {
             throw new CodeGenerationException("The 'body' value of " + function.getName() + " is empty");
         }
 
-        return SiddhiStringBuilderConstants.DEFINE_FUNCTION +
-                SiddhiStringBuilderConstants.SPACE +
+        return SiddhiCodeBuilderConstants.DEFINE_FUNCTION +
+                SiddhiCodeBuilderConstants.SPACE +
                 function.getName() +
-                SiddhiStringBuilderConstants.OPEN_SQUARE_BRACKET +
+                SiddhiCodeBuilderConstants.OPEN_SQUARE_BRACKET +
                 function.getScriptType() +
-                SiddhiStringBuilderConstants.CLOSE_SQUARE_BRACKET +
-                SiddhiStringBuilderConstants.SPACE +
-                SiddhiStringBuilderConstants.RETURN +
-                SiddhiStringBuilderConstants.SPACE +
+                SiddhiCodeBuilderConstants.CLOSE_SQUARE_BRACKET +
+                SiddhiCodeBuilderConstants.SPACE +
+                SiddhiCodeBuilderConstants.RETURN +
+                SiddhiCodeBuilderConstants.SPACE +
                 function.getReturnType().toLowerCase() +
-                SiddhiStringBuilderConstants.SPACE +
-                SiddhiStringBuilderConstants.OPEN_CURLY_BRACKET +
+                SiddhiCodeBuilderConstants.SPACE +
+                SiddhiCodeBuilderConstants.OPEN_CURLY_BRACKET +
                 function.getBody().trim() +
-                SiddhiStringBuilderConstants.CLOSE_CURLY_BRACKET +
-                SiddhiStringBuilderConstants.SEMI_COLON;
+                SiddhiCodeBuilderConstants.CLOSE_CURLY_BRACKET +
+                SiddhiCodeBuilderConstants.SEMI_COLON;
     }
 
 }

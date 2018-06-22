@@ -1,23 +1,20 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.AggregateByTimePeriod;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeInterval;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeRange;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.subelements.QuerySelectCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.subelements.QuerySubElementCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
-import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorHelper;
 
 import java.util.List;
 
 public class AggregationCodeGenerator {
 
-    /**
-     * Generates a aggregation definition string from a AggregationConfig object
-     *
-     * @param aggregation The AggregationConfig object to be converted
-     * @return The converted aggregation definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generateAggregationCode(AggregationConfig aggregation) throws CodeGenerationException {
+    public String generateAggregation(AggregationConfig aggregation) throws CodeGenerationException {
         if (aggregation == null) {
             throw new CodeGenerationException("A given aggregation element is empty");
         } else if (aggregation.getName() == null || aggregation.getName().isEmpty()) {
@@ -34,34 +31,34 @@ public class AggregationCodeGenerator {
         }
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
-        aggregationStringBuilder.append(CodeGeneratorHelper.getStore(aggregation.getStore()))
-                .append(getAggregationAnnotations(aggregation.getAnnotationList()))
-                .append(SiddhiStringBuilderConstants.DEFINE_AGGREGATION)
-                .append(SiddhiStringBuilderConstants.SPACE)
+        aggregationStringBuilder.append(SubElementCodeGenerator.generateStore(aggregation.getStore()))
+                .append(generateAggregationAnnotations(aggregation.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.DEFINE_AGGREGATION)
+                .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(aggregation.getName())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.FROM)
-                .append(SiddhiStringBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.FROM)
+                .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(aggregation.getFrom())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(CodeGeneratorHelper.getQuerySelect(aggregation.getSelect()))
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(CodeGeneratorHelper.getQueryGroupBy(aggregation.getGroupBy()))
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.AGGREGATE);
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(QuerySelectCodeGenerator.generateQuerySelect(aggregation.getSelect()))
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(QuerySubElementCodeGenerator.generateQueryGroupBy(aggregation.getGroupBy()))
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.AGGREGATE);
 
         if (aggregation.getAggregateByAttribute() != null && !aggregation.getAggregateByAttribute().isEmpty()) {
-            aggregationStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(SiddhiStringBuilderConstants.BY)
-                    .append(SiddhiStringBuilderConstants.SPACE)
+            aggregationStringBuilder.append(SiddhiCodeBuilderConstants.SPACE)
+                    .append(SiddhiCodeBuilderConstants.BY)
+                    .append(SiddhiCodeBuilderConstants.SPACE)
                     .append(aggregation.getAggregateByAttribute());
         }
 
-        aggregationStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.EVERY)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(CodeGeneratorHelper.getAggregateByTimePeriod(aggregation.getAggregateByTimePeriod()))
-                .append(SiddhiStringBuilderConstants.SEMI_COLON);
+        aggregationStringBuilder.append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.EVERY)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(generateAggregateByTimePeriod(aggregation.getAggregateByTimePeriod()))
+                .append(SiddhiCodeBuilderConstants.SEMI_COLON);
 
         return aggregationStringBuilder.toString();
     }
@@ -72,9 +69,9 @@ public class AggregationCodeGenerator {
      * @param annotations The list of annotations to be converted
      * @return The string representation of the annotations for an aggregation defintion
      */
-    private String getAggregationAnnotations(List<String> annotations) {
+    private String generateAggregationAnnotations(List<String> annotations) {
         if (annotations == null || annotations.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder annotationsStringBuilder = new StringBuilder();
@@ -90,4 +87,63 @@ public class AggregationCodeGenerator {
 
         return annotationsStringBuilder.toString();
     }
+
+    /**
+     * Generate's a Siddhi string representation of a aggregation's AggregateByTimePeriod object
+     *
+     * @param aggregateByTimePeriod The AggregateByTimePeriod object to be converted
+     * @return The Siddhi string representation of the given AggregateByTimePeriod object
+     * @throws CodeGenerationException Error while generating the code
+     */
+    private String generateAggregateByTimePeriod(AggregateByTimePeriod aggregateByTimePeriod)
+            throws CodeGenerationException {
+        if (aggregateByTimePeriod == null) {
+            throw new CodeGenerationException("A given aggregateByTimePeriod element is empty");
+        } else if (aggregateByTimePeriod.getType() == null || aggregateByTimePeriod.getType().isEmpty()) {
+            throw new CodeGenerationException("The 'type' value of a given aggregateByTimePeriod element is empty");
+        }
+
+        StringBuilder aggregateByTimePeriodStringBuilder = new StringBuilder();
+        switch (aggregateByTimePeriod.getType().toUpperCase()) {
+            case CodeGeneratorConstants.RANGE:
+                AggregateByTimeRange aggregateByTimeRange = (AggregateByTimeRange) aggregateByTimePeriod;
+                if (aggregateByTimeRange.getValue() == null) {
+                    throw new CodeGenerationException("The 'value' attribute of a given aggregateByTimeRange" +
+                            " element is empty");
+                } else if (aggregateByTimeRange.getValue().getMin() == null ||
+                        aggregateByTimeRange.getValue().getMin().isEmpty()) {
+                    throw new CodeGenerationException("The 'min' value of a given" +
+                            " aggregateByTimeRange element is empty");
+                } else if (aggregateByTimeRange.getValue().getMax() == null ||
+                        aggregateByTimeRange.getValue().getMax().isEmpty()) {
+                    throw new CodeGenerationException("The 'max' value of a given" +
+                            " aggregateByTimeRange element is empty");
+                }
+                aggregateByTimePeriodStringBuilder.append(aggregateByTimeRange.getValue().getMin().toLowerCase())
+                        .append(SiddhiCodeBuilderConstants.THREE_DOTS)
+                        .append(aggregateByTimeRange.getValue().getMax().toLowerCase());
+                break;
+            case CodeGeneratorConstants.INTERVAL:
+                AggregateByTimeInterval aggregateByTimeInterval = (AggregateByTimeInterval) aggregateByTimePeriod;
+                if (aggregateByTimeInterval.getValue() == null || aggregateByTimeInterval.getValue().isEmpty()) {
+                    throw new CodeGenerationException("The 'value' attribute of a given" +
+                            " attributeByTimeInterval element is empty");
+                }
+                int timeIntervalsLeft = aggregateByTimeInterval.getValue().size();
+                for (String timeInterval : aggregateByTimeInterval.getValue()) {
+                    aggregateByTimePeriodStringBuilder.append(timeInterval.toLowerCase());
+                    if (timeIntervalsLeft != 1) {
+                        aggregateByTimePeriodStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+                    }
+                    timeIntervalsLeft--;
+                }
+                break;
+            default:
+                throw new CodeGenerationException("Unidentified aggregateByTimePeriod element type: "
+                        + aggregateByTimePeriod.getType());
+        }
+
+        return aggregateByTimePeriodStringBuilder.toString();
+    }
+
 }

@@ -1,12 +1,10 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
-import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorHelper;
 
 public class TriggerCodeGenerator {
-
     /**
      * Generates a trigger definition string from a TriggerConfig object
      *
@@ -14,7 +12,7 @@ public class TriggerCodeGenerator {
      * @return The converted trigger definition string
      * @throws CodeGenerationException Error while generating code
      */
-    private String generateTriggerCode(TriggerConfig trigger) throws CodeGenerationException {
+    public String generateTrigger(TriggerConfig trigger) throws CodeGenerationException {
         if (trigger == null) {
             throw new CodeGenerationException("A given trigger element is empty");
         } else if (trigger.getName() == null || trigger.getName().isEmpty()) {
@@ -23,15 +21,14 @@ public class TriggerCodeGenerator {
             throw new CodeGenerationException("The 'at' value of " + trigger.getName() + " is empty");
         }
 
-        return CodeGeneratorHelper.getAnnotations(trigger.getAnnotationList()) +
-                SiddhiStringBuilderConstants.DEFINE_TRIGGER +
-                SiddhiStringBuilderConstants.SPACE +
+        return SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()) +
+                SiddhiCodeBuilderConstants.DEFINE_TRIGGER +
+                SiddhiCodeBuilderConstants.SPACE +
                 trigger.getName() +
-                SiddhiStringBuilderConstants.SPACE +
-                SiddhiStringBuilderConstants.AT +
-                SiddhiStringBuilderConstants.SPACE +
+                SiddhiCodeBuilderConstants.SPACE +
+                SiddhiCodeBuilderConstants.AT +
+                SiddhiCodeBuilderConstants.SPACE +
                 trigger.getAt() +
-                SiddhiStringBuilderConstants.SEMI_COLON;
+                SiddhiCodeBuilderConstants.SEMI_COLON;
     }
-
 }

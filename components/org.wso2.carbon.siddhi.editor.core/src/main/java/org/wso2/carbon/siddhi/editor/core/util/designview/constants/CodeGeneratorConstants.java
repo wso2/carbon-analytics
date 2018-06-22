@@ -20,7 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
  * Contains generic String constants that are used by the
- * CodeGenerator & CodeGeneratorHelper class
+ * CodeGenerator & CodeGeneratorUtils class
  */
 public class CodeGeneratorConstants {
 
