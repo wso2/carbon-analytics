@@ -30,13 +30,21 @@ import java.util.List;
 public class RootConfiguration {
 
     @Element(description = "Extension list", required = true)
-    public List<Extension> extensions;
+    private List<Extension> extensions;
 
     @Element(description = "References list", required = false)
-    public List<Reference> refs;
+    private List<Reference> refs;
 
     public RootConfiguration() {
         extensions = new ArrayList<>();
         refs = new ArrayList<>();
+    }
+
+    public List<Extension> getExtensions() {
+        return extensions;
+    }
+
+    public List<Reference> getRefs() {
+        return refs;
     }
 }

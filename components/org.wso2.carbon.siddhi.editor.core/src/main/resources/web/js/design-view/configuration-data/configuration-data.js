@@ -24,11 +24,16 @@ define(['require', 'elementUtils'],
          * @constructor
          * @class ConfigurationData  Holds the configuration data for a given Siddhi app
          * @param {Object} siddhiAppConfig Siddhi App Data
+         * @param {object} application Current Application data
          */
-        var ConfigurationData = function (siddhiAppConfig) {
+        var ConfigurationData = function (siddhiAppConfig, application) {
             this.siddhiAppConfig = siddhiAppConfig;
             this.edgeList = [];
+            // checks whether still the graph is drawing from the JSON sent from backend when switching from code
+            // to design
+            this.isStillDrawingGraph = false;
             this.isDesignViewContentChanged = false;
+            this.application = application;
         };
 
         ConfigurationData.prototype.addEdge = function (edge) {
@@ -51,6 +56,10 @@ define(['require', 'elementUtils'],
             return this.edgeList;
         };
 
+        ConfigurationData.prototype.getIsStillDrawingGraph = function () {
+            return this.isStillDrawingGraph;
+        };
+
         ConfigurationData.prototype.getIsDesignViewContentChanged = function () {
             return this.isDesignViewContentChanged;
         };
@@ -59,8 +68,22 @@ define(['require', 'elementUtils'],
             this.siddhiAppConfig = siddhiAppConfig;
         };
 
+        ConfigurationData.prototype.setIsStillDrawingGraph= function (isStillDrawingGraph) {
+            this.isStillDrawingGraph = isStillDrawingGraph;
+        };
+
         ConfigurationData.prototype.setIsDesignViewContentChanged = function (isDesignViewContentChanged) {
-            this.isDesignViewContentChanged = isDesignViewContentChanged;
+            var self = this;
+            self.isDesignViewContentChanged = isDesignViewContentChanged;
+            var activeTab = self.application.tabController.getActiveTab();
+            var file = activeTab.getFile();
+            // If the graph is not drawing from the JSON sent from the backend when switching from code to design, then
+            // if a change is done in the design then app is stop if it is still running or debugging.
+            if(!self.isStillDrawingGraph && isDesignViewContentChanged
+                && (file.getRunStatus() || file.getDebugStatus())){
+                var launcher = activeTab.getSiddhiFileEditor().getLauncher();
+                launcher.stopApplication(self.application.workspaceManager, false);
+            }
         };
 
         return ConfigurationData;

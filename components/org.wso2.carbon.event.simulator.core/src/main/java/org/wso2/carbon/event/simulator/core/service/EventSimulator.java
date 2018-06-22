@@ -496,6 +496,7 @@ public class EventSimulator implements Runnable {
      */
     public void resume() {
         if (status.equals(Status.PAUSE)) {
+            generators.forEach(EventGenerator::resume);
             lock.release();
             status = Status.RUN;
             if (log.isDebugEnabled()) {

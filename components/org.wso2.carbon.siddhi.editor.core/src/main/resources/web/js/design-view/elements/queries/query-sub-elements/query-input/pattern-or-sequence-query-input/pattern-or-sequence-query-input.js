@@ -66,6 +66,16 @@ define(['require', 'elementUtils'],
             }
         };
 
+        PatternOrSequenceQueryInput.prototype.removeConditionsWhereStreamNameIsUsed = function (elementName) {
+            var self = this;
+            var i;
+            for (i = self.conditionList.length - 1; i >= 0; --i) {
+                if (self.conditionList[i].getStreamName() === elementName) {
+                    self.conditionList.splice(i, 1);
+                }
+            }
+        };
+
         PatternOrSequenceQueryInput.prototype.clearConditionList = function () {
             ElementUtils.prototype.removeAllElements(this.conditionList);
         };

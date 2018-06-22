@@ -1148,9 +1148,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             if (targetElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
                                 model.getQueryInput().removeConnectedElementName(disconnectedElementName);
+                                model.getQueryInput().removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
                             } else if (targetElement.hasClass(constants.SEQUENCE)) {
                                 model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
                                 model.getQueryInput().removeConnectedElementName(disconnectedElementName);
+                                model.getQueryInput().removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
                             }
                         }
 
@@ -1330,6 +1332,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
         DesignGrid.prototype.drawGraphFromAppData = function () {
             var self = this;
+
+            // set isStillDrawingGraph to true since the graph drawing has begun
+            self.configurationData.setIsStillDrawingGraph(true);
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getSourceList(), function (source) {
                 var sourceId = source.getId();
@@ -1602,6 +1607,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             setTimeout(function () {
                 // set the isDesignViewContentChanged to false
                 self.configurationData.setIsDesignViewContentChanged(false);
+
+                // set isStillDrawingGraph to false since the graph drawing is done
+                self.configurationData.setIsStillDrawingGraph(false);
             }, 100);
         };
 

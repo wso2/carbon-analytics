@@ -857,17 +857,21 @@ public class EditorMicroservice implements Microservice {
     @POST
     @Path("/design-view")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getDesignView(String siddhiAppBase64) {
         try {
             String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
             DesignGenerator designGenerator = new DesignGenerator();
             EventFlow eventFlow = designGenerator.getEventFlow(siddhiAppString);
-
             Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+            String eventFlowJson = gson.toJson(eventFlow);
+
+            String encodedEventFlowJson =
+                    new String(Base64.getEncoder().encode(eventFlowJson.getBytes(StandardCharsets.UTF_8)),
+                            StandardCharsets.UTF_8);
             return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(gson.toJson(eventFlow).replace("\\\"", "\\\\\\\""))
+                    .entity(encodedEventFlowJson)
                     .build();
         } catch (SiddhiAppCreationException e) {
             log.error("Unable to generate design view", e);
@@ -886,12 +890,14 @@ public class EditorMicroservice implements Microservice {
 
     @POST
     @Path("/code-view")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response getCodeView(String siddhiAppEventFlowJSON) {
+    public Response getCodeView(String encodedEventFlowJson) {
         try {
+            String eventFlowJson =
+                    new String(Base64.getDecoder().decode(encodedEventFlowJson), StandardCharsets.UTF_8);
             Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
-            EventFlow eventFlow = gson.fromJson(siddhiAppEventFlowJSON, EventFlow.class);
+            EventFlow eventFlow = gson.fromJson(eventFlowJson, EventFlow.class);
             CodeGenerator codeGenerator = new CodeGenerator();
             String siddhiAppCode = codeGenerator.generateSiddhiAppCode(eventFlow);
 
