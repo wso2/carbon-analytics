@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
-        'elementUtils', 'storeAnnotation', 'designViewUtils'],
+        'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator'],
     function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils,
-              StoreAnnotation, DesignViewUtils) {
+              StoreAnnotation, DesignViewUtils, JSONValidator) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -635,6 +635,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
 
                     var textNode = $(element).parent().find('.aggregationNameNode');
                     textNode.html(configInput.name);
+
+                    // perform JSON validation
+                    $(element).removeClass('error-element');
+                    JSONValidator.prototype.validateAggregation(clickedElement);
 
                     // design view container and toggle view button are enabled
                     self.designViewContainer.removeClass('disableContainer');

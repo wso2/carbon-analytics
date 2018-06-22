@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute'],
-    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute) {
+define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
+        'jsonValidator'],
+    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator) {
 
         /**
          * @class SinkForm Creates a forms to collect data from a sink
@@ -371,6 +372,9 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
                 var textNode = $('#' + i).find('.sinkNameNode');
                 textNode.html(editor.getValue().annotationType.name);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateSourceOrSinkAnnotation(sink, 'Sink');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -820,6 +824,10 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
                 var textNode = $('#' + id).find('.sinkNameNode');
                 textNode.html(config.annotationType.name);
+
+                // perform JSON validation
+                $(element).removeClass('error-element');
+                JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Sink');
 
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
