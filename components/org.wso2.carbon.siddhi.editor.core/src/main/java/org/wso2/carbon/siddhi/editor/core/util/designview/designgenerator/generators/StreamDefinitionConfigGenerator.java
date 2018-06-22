@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Generator to create Stream definition config
  */
-public class StreamDefinitionConfigGenerator {
+public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
     /**
      * Generates StreamConfig object, with given Siddhi StreamDefinition
      * @param streamDefinition  Siddhi StreamDefinition object
@@ -45,13 +45,13 @@ public class StreamDefinitionConfigGenerator {
                 annotationConfigs.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
             }
         }
-
+        AttributeConfigListGenerator attributeConfigListGenerator = new AttributeConfigListGenerator();
         StreamConfig streamConfig = new StreamConfig(streamDefinition.getId(),
                 streamDefinition.getId(),
-                new AttributeConfigListGenerator().generateAttributeConfigList(streamDefinition.getAttributeList()),
+                attributeConfigListGenerator.generateAttributeConfigList(streamDefinition.getAttributeList()),
                 annotationConfigs);
-        streamConfig.setQueryContextStartIndex(streamDefinition.getQueryContextStartIndex()); // TODO testing
-        streamConfig.setQueryContextEndIndex(streamDefinition.getQueryContextEndIndex()); // TODO testing
+        preserveCodeSegmentsOf(annotationConfigGenerator, attributeConfigListGenerator);
+        preserveAndBindCodeSegment(streamDefinition, streamConfig);
 
         return streamConfig;
     }

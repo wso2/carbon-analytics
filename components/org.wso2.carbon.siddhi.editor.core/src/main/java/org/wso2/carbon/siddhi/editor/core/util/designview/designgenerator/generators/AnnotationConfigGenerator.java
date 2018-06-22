@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Generator to create AnnotationConfig
  */
-public class AnnotationConfigGenerator {
+public class AnnotationConfigGenerator extends CodeSegmentsPreserver {
     /**
      * Generates AnnotationConfig String for the given Siddhi Annotation
      * @param annotation    Siddhi Annotation
@@ -46,9 +46,10 @@ public class AnnotationConfigGenerator {
         for (Annotation innerAnnotation : annotation.getAnnotations()) {
             annotationMembers.add(generateAnnotationConfig(innerAnnotation));
         }
-
         annotationConfig.append(String.join(", ", annotationMembers));
         annotationConfig.append(")");
+
+        preserveCodeSegment(annotation);
         return annotationConfig.toString();
     }
 

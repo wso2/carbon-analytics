@@ -24,7 +24,7 @@ import org.wso2.siddhi.query.api.definition.FunctionDefinition;
 /**
  * Generator to create FunctionConfig
  */
-public class FunctionConfigGenerator {
+public class FunctionConfigGenerator extends CodeSegmentsPreserver {
     /**
      * Generates FunctionConfig from the given Siddhi FunctionDefinition
      * @param functionDefinition        Siddhi FunctionDefinition
@@ -36,8 +36,7 @@ public class FunctionConfigGenerator {
                 functionDefinition.getLanguage(),
                 functionDefinition.getReturnType().toString(),
                 functionDefinition.getBody());
-        functionConfig.setQueryContextStartIndex(functionDefinition.getQueryContextStartIndex());
-        functionConfig.setQueryContextEndIndex(functionDefinition.getQueryContextEndIndex());
+        preserveAndBindCodeSegment(functionDefinition, functionConfig);
         return functionConfig;
     }
 }

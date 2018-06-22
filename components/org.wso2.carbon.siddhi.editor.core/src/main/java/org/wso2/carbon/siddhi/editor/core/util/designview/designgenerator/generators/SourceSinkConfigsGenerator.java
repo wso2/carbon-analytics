@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * Generator to create Source or Sink config
  */
-public class SourceSinkConfigsGenerator {
+public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     private static final String TYPE = "TYPE";
     private static final String MAP = "MAP";
 
@@ -118,14 +118,10 @@ public class SourceSinkConfigsGenerator {
                 options.add(annotationConfigGenerator.generateAnnotationConfig(sourceOrSinkAnnotation));
             }
         }
-
         SourceSinkConfig sourceSinkConfig =
                 new SourceSinkConfig(annotationType.toString(), connectedElementName, type, options, map);
-        sourceSinkConfig.setQueryContextStartIndex(
-                sourceOrSinkAndConnectedElement.getKey().getQueryContextStartIndex());
-        sourceSinkConfig.setQueryContextEndIndex(
-                sourceOrSinkAndConnectedElement.getKey().getQueryContextEndIndex());
-
+        preserveCodeSegmentsOf(annotationConfigGenerator);
+        preserveAndBindCodeSegment(sourceOrSinkAndConnectedElement.getKey(), sourceSinkConfig);
         return sourceSinkConfig;
     }
 
@@ -152,7 +148,9 @@ public class SourceSinkConfigsGenerator {
         if (mapAnnotation.getAnnotations().size() != 0) {
             payloadOrAttribute = generateMapperPayloadOrAttributes(mapAnnotation.getAnnotations().get(0));
         }
-        return new MapperConfig(type, options, payloadOrAttribute);
+        MapperConfig mapperConfig = new MapperConfig(type, options, payloadOrAttribute);
+        preserveAndBindCodeSegment(mapAnnotation, mapperConfig);
+        return mapperConfig;
     }
 
     /**

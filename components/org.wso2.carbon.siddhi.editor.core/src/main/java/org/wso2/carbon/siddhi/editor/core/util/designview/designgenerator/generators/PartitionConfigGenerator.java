@@ -47,7 +47,7 @@ import java.util.Map;
 /**
  * Generator to create PartitionConfig
  */
-public class PartitionConfigGenerator {
+public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
     private Map<String, Map<String, AbstractDefinition>> partitionedInnerStreamDefinitions;
@@ -79,8 +79,7 @@ public class PartitionConfigGenerator {
         partitionConfig.setPartitionWith(generatePartitionWith(partition.getPartitionTypeMap()));
         partitionConfig.setAnnotationList(generateAnnotations(partition.getAnnotations()));
         partitionConfig.setConnectorsAndStreams(connectorsAndStreams);
-        partitionConfig.setQueryContextStartIndex(partition.getQueryContextStartIndex());
-        partitionConfig.setQueryContextEndIndex(partition.getQueryContextEndIndex());
+        preserveAndBindCodeSegment(partition, partitionConfig);
         return partitionConfig;
     }
 
@@ -99,6 +98,7 @@ public class PartitionConfigGenerator {
             QueryListType queryListType = QueryConfigGenerator.getQueryListType(queryConfig);
             queryLists.get(queryListType).add(queryConfig);
         }
+        preserveCodeSegmentsOf(queryConfigGenerator);
         return queryLists;
     }
 
@@ -129,6 +129,7 @@ public class PartitionConfigGenerator {
                         streamDefinitionConfigGenerator.generateStreamConfig((StreamDefinition) innerStreamDefinition));
             }
         }
+        preserveCodeSegmentsOf(streamDefinitionConfigGenerator);
         return innerStreams;
     }
 
@@ -213,6 +214,8 @@ public class PartitionConfigGenerator {
      */
     private List<String> generateAnnotations(List<Annotation> annotations) {
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
-        return annotationConfigGenerator.generateAnnotationConfigList(annotations);
+        List<String> annotationConfigs = annotationConfigGenerator.generateAnnotationConfigList(annotations);
+        preserveCodeSegmentsOf(annotationConfigGenerator);
+        return annotationConfigs;
     }
 }
