@@ -33,6 +33,7 @@ public class SiddhiCodeBuilderConstants {
     public static final char SINGLE_QUOTE = '\'';
     public static final char DOUBLE_QUOTE = '\"';
     public static final char SPACE = ' ';
+    public static final char HASH = '#';
     // Brackets
     public static final char OPEN_BRACKET = '(';
     public static final char CLOSE_BRACKET = ')';
@@ -43,7 +44,6 @@ public class SiddhiCodeBuilderConstants {
     // General Strings
     public static final String EMPTY_STRING = "";
     public static final String THREE_DOTS = "...";
-    public static final String HASH = "#";
     // Definition Strings
     public static final String DEFINE_STREAM = "define stream";
     public static final String DEFINE_TABLE = "define table";

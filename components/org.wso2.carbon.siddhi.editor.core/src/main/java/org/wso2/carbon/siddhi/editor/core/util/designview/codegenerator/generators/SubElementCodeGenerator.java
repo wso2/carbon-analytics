@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
@@ -12,17 +30,12 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Generate's the code for a sub-element of a Siddhi element
+ */
 public class SubElementCodeGenerator {
 
-    /**
-     * Generates a string representation of a list of attributes for a definition
-     * Attributes Example - (name string, age int, ...)
-     *
-     * @param attributes The list of AttributeConfig objects to be converted
-     * @return The converted attributes as a string
-     * @throws CodeGenerationException Error while generating code
-     */
-    public static String generateAttributes(List<AttributeConfig> attributes) throws CodeGenerationException {
+    static String generateAttributes(List<AttributeConfig> attributes) throws CodeGenerationException {
         if (attributes == null || attributes.isEmpty()) {
             throw new CodeGenerationException("A given attribute list is empty");
         }
@@ -48,12 +61,6 @@ public class SubElementCodeGenerator {
         return stringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of the annotations of a Siddhi element
-     *
-     * @param annotations The list of AnnotationConfig objects to be converted
-     * @return The string representation of all the annotations
-     */
     public static String generateAnnotations(List<String> annotations) {
         if (annotations == null || annotations.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -67,14 +74,7 @@ public class SubElementCodeGenerator {
         return annotationsStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of a Siddhi store annotation
-     *
-     * @param store The StoreConfig instance to be converted
-     * @return The string representation of a store annotation
-     * @throws CodeGenerationException Error while generating code
-     */
-    public static String generateStore(StoreConfig store) throws CodeGenerationException {
+    static String generateStore(StoreConfig store) throws CodeGenerationException {
         if (store == null) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         } else if (store.getType() == null || store.getType().isEmpty()) {
@@ -107,13 +107,6 @@ public class SubElementCodeGenerator {
         return storeStringBuilder.toString();
     }
 
-    /**
-     * Generate a string of parameters for a specific window/function
-     * Example of parameter: (10 min, 4, 'regex', ...)
-     *
-     * @param parameters The list of parameters to be converted
-     * @return The string of the parameters separated by a comma(,)
-     */
     public static String generateParameterList(List<String> parameters) {
         if (parameters == null || parameters.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -132,13 +125,6 @@ public class SubElementCodeGenerator {
         return parametersStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation of a list of StreamHandlerConfig objects
-     *
-     * @param streamHandlerList The list of StreamHandlerConfig objects to be converted
-     * @return The result string representation of the list of StreamHandlerConfig objects
-     * @throws CodeGenerationException Error while generating code
-     */
     public static String generateStreamHandlerList(List<StreamHandlerConfig> streamHandlerList)
             throws CodeGenerationException {
         if (streamHandlerList == null || streamHandlerList.isEmpty()) {
@@ -154,14 +140,7 @@ public class SubElementCodeGenerator {
         return streamhandlerListStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation of a given StreamHandlerConfig object
-     *
-     * @param streamHandler The StreamHandlerConfig object to be converted
-     * @return The string representation of the given StreamHandlerConfig object
-     * @throws CodeGenerationException Error while generating code
-     */
-    public static String generateStreamHandler(StreamHandlerConfig streamHandler) throws CodeGenerationException {
+    private static String generateStreamHandler(StreamHandlerConfig streamHandler) throws CodeGenerationException {
         if (streamHandler == null) {
             throw new CodeGenerationException("A given stream handler element is empty");
         } else if (streamHandler.getType() == null || streamHandler.getType().isEmpty()) {
@@ -202,14 +181,6 @@ public class SubElementCodeGenerator {
         return streamHandlerStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation for a 'for <eventType>' output,
-     * where the <eventType> can be 'CURRENT_EVENTS', 'EXPIRED_EVENTS' or 'ALL_EVENTS'
-     *
-     * @param eventType The event type that is used
-     * @return The string representation for the event type in Siddhi
-     * @throws CodeGenerationException Error while generating code
-     */
     public static String generateForEventType(String eventType) throws CodeGenerationException {
         if (eventType == null || eventType.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;

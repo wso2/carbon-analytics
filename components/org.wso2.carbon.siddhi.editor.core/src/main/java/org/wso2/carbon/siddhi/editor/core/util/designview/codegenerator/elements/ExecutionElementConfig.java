@@ -30,6 +30,10 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Store's information of an execution element bean class,
+ * which is either of type QueryConfig or PartitionConfig.
+ */
 public class ExecutionElementConfig {
 
     private String type;
@@ -103,7 +107,7 @@ public class ExecutionElementConfig {
         return outputStreamList;
     }
 
-    private List<String> extractOutputStreams(PartitionConfig partition) throws CodeGenerationException {
+    private List<String> extractOutputStreams(PartitionConfig partition) {
         List<String> outputStreamList = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
             for (QueryConfig query : queryList) {

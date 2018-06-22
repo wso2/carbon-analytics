@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
@@ -11,15 +29,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 
 import java.util.Map;
 
+/**
+ * Generate's the code for a Siddhi source/sink element
+ */
 public class SourceSinkCodeGenerator {
 
-    /**
-     * Generates a source/sink definition string from a SourceSinkConfig object
-     *
-     * @param sourceSink The SourceSinkConfig object to be converted
-     * @return The converted source/sink definition string
-     * @throws CodeGenerationException Error while generating code
-     */
     public String generateSourceSink(SourceSinkConfig sourceSink) throws CodeGenerationException {
         if (sourceSink == null) {
             throw new CodeGenerationException("A given source/sink element is empty");
@@ -56,13 +70,6 @@ public class SourceSinkCodeGenerator {
         return sourceSinkStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation of a map annotation from a MapperConfig object
-     *
-     * @param mapper The MapperConfig object to be converted
-     * @return The string representation of the MapperConfig object
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generateMapper(MapperConfig mapper) throws CodeGenerationException {
         if (mapper.getType() == null || mapper.getType().isEmpty()) {
             throw new CodeGenerationException("The map type of a given source/sink map element is empty");
@@ -95,13 +102,6 @@ public class SourceSinkCodeGenerator {
         return mapperStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation of a MapperPayloadOrAttribute object
-     *
-     * @param payloadOrAttribute The MapperPayloadOrAttribute object to be converted
-     * @return A Siddhi string representation of the given MapperPayloadOrAttribute object
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generateMapperPayloadOrAttribute(MapperPayloadOrAttribute payloadOrAttribute)
             throws CodeGenerationException {
         if (payloadOrAttribute.getType() == null || payloadOrAttribute.getType().isEmpty()) {
@@ -111,40 +111,12 @@ public class SourceSinkCodeGenerator {
         StringBuilder mapperAttributeStringBuilder = new StringBuilder();
         switch (payloadOrAttribute.getType().toUpperCase()) {
             case CodeGeneratorConstants.MAP:
-                MapperMapPayloadOrAttribute mapperMapAttribute = (MapperMapPayloadOrAttribute) payloadOrAttribute;
-                if (mapperMapAttribute.getValue() == null || mapperMapAttribute.getValue().isEmpty()) {
-                    throw new CodeGenerationException("The key-value pair values of" +
-                            " a given source/sink map attribute element is empty");
-                }
-                int mapEntriesLeft = mapperMapAttribute.getValue().size();
-                for (Map.Entry<String, String> entry : mapperMapAttribute.getValue().entrySet()) {
-                    mapperAttributeStringBuilder.append(entry.getKey())
-                            .append(SiddhiCodeBuilderConstants.EQUAL)
-                            .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
-                            .append(entry.getValue())
-                            .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
-                    if (mapEntriesLeft != 1) {
-                        mapperAttributeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
-                    }
-                    mapEntriesLeft--;
-                }
+                mapperAttributeStringBuilder.append(
+                        generateMapPayloadOrAttribute((MapperMapPayloadOrAttribute) payloadOrAttribute));
                 break;
             case CodeGeneratorConstants.LIST:
-                MapperListPayloadOrAttribute mapperListAttribute = (MapperListPayloadOrAttribute) payloadOrAttribute;
-                if (mapperListAttribute.getValue() == null || mapperListAttribute.getValue().isEmpty()) {
-                    throw new CodeGenerationException("The list values of a given sink/source" +
-                            " map attribute element is empty");
-                }
-                int valuesLeft = mapperListAttribute.getValue().size();
-                for (String value : mapperListAttribute.getValue()) {
-                    mapperAttributeStringBuilder.append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE)
-                            .append(value)
-                            .append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE);
-                    if (valuesLeft != 1) {
-                        mapperAttributeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
-                    }
-                    valuesLeft--;
-                }
+                mapperAttributeStringBuilder.append(
+                        generateListPayloadOrAttribute((MapperListPayloadOrAttribute) payloadOrAttribute));
                 break;
             default:
                 throw new CodeGenerationException("Unidentified mapper attribute type: "
@@ -152,6 +124,46 @@ public class SourceSinkCodeGenerator {
         }
 
         return mapperAttributeStringBuilder.toString();
+    }
+
+    private String generateListPayloadOrAttribute(MapperListPayloadOrAttribute mapperListAttribute) throws CodeGenerationException {
+        StringBuilder mapperListAttributeStringBuilder = new StringBuilder();
+        if (mapperListAttribute.getValue() == null || mapperListAttribute.getValue().isEmpty()) {
+            throw new CodeGenerationException("The list values of a given sink/source" +
+                    " map attribute element is empty");
+        }
+        int valuesLeft = mapperListAttribute.getValue().size();
+        for (String value : mapperListAttribute.getValue()) {
+            mapperListAttributeStringBuilder.append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE)
+                    .append(value)
+                    .append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE);
+            if (valuesLeft != 1) {
+                mapperListAttributeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+            }
+            valuesLeft--;
+        }
+        return mapperListAttributeStringBuilder.toString();
+    }
+
+    private String generateMapPayloadOrAttribute(MapperMapPayloadOrAttribute mapperMapAttribute) throws CodeGenerationException {
+        StringBuilder mapperMapAttributeStringBuilder = new StringBuilder();
+        if (mapperMapAttribute.getValue() == null || mapperMapAttribute.getValue().isEmpty()) {
+            throw new CodeGenerationException("The key-value pair values of" +
+                    " a given source/sink map attribute element is empty");
+        }
+        int mapEntriesLeft = mapperMapAttribute.getValue().size();
+        for (Map.Entry<String, String> entry : mapperMapAttribute.getValue().entrySet()) {
+            mapperMapAttributeStringBuilder.append(entry.getKey())
+                    .append(SiddhiCodeBuilderConstants.EQUAL)
+                    .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
+                    .append(entry.getValue())
+                    .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
+            if (mapEntriesLeft != 1) {
+                mapperMapAttributeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+            }
+            mapEntriesLeft--;
+        }
+        return mapperMapAttributeStringBuilder.toString();
     }
 
 }

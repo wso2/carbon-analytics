@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.subelements;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
@@ -7,16 +25,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 
+/**
+ * Generate's the code for a select element of a Siddhi query
+ */
 public class QuerySelectCodeGenerator {
 
-    /**
-     * Generates a Siddhi string representation of an AttributesSelectionConfig object
-     * Example For Query Select - select * ...
-     *
-     * @param attributesSelection The AttributesSelectionConfig object to be converted
-     * @return The converted Siddhi string representation of the given AttributesSelectionConfig object
-     * @throws CodeGenerationException Error while generating code
-     */
     public static String generateQuerySelect(AttributesSelectionConfig attributesSelection) throws CodeGenerationException {
         if (attributesSelection == null) {
             throw new CodeGenerationException("A given attribute selection element is empty");
@@ -47,14 +60,6 @@ public class QuerySelectCodeGenerator {
         return attributesSelectionStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation of a UserDefinedSelectionConfig object
-     * Example of the UserDefinedSelectionConfig - select name, avg(age) as avgAge, ...
-     *
-     * @param userDefinedSelection The UserDefinedSelectionConfig object to be converted
-     * @return The Siddhi string representation of the given UserDefinedSelectionConfig
-     * @throws CodeGenerationException Error while generating code
-     */
     private static String generateUserDefinedSelection(UserDefinedSelectionConfig userDefinedSelection)
             throws CodeGenerationException {
         if (userDefinedSelection == null || userDefinedSelection.getValue() == null ||
@@ -85,6 +90,9 @@ public class QuerySelectCodeGenerator {
         }
 
         return userDefinedSelectionStringBuilder.toString();
+    }
+
+    private QuerySelectCodeGenerator() {
     }
 
 }

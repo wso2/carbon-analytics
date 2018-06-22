@@ -33,13 +33,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.elements
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.AggregationCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.FunctionCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.PartitionCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.QueryCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.SourceSinkCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.StreamCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.SubElementCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.TableCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.TriggerCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.WindowCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.QueryCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
@@ -52,17 +52,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Used to convert an EventFlow object to a Siddhi app string
+ * Generate's the code for a Siddhi application
  */
 public class CodeGenerator {
 
-    /**
-     * Converts a given EventFlow object to it's Siddhi app string representation
-     *
-     * @param eventFlow The EventFlow object to be converted
-     * @return The Siddhi app as a string
-     * @throws CodeGenerationException Error while generating code
-     */
     public String generateSiddhiAppCode(EventFlow eventFlow) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
 
@@ -124,12 +117,6 @@ public class CodeGenerator {
         return executionElementStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of the siddhi app name annotation
-     *
-     * @param appName The app name
-     * @return The string representation of the siddhi app name annotation
-     */
     private String generateAppName(String appName) {
         StringBuilder appNameStringBuilder = new StringBuilder();
 
@@ -145,15 +132,6 @@ public class CodeGenerator {
         return appNameStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of all the streams in a Siddhi app
-     *
-     * @param streamList A list of StreamConfig objects from the SiddhiAppConfig object
-     * @param sourceList A list of StreamConfig objects from the SiddhiAppConfig object
-     * @param sinkList   A list of StreamConfig objects from the SiddhiAppConfig object
-     * @return The string representation of the stream definitions
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList,
                                    List<SourceSinkConfig> sinkList) throws CodeGenerationException {
         if (streamList == null || streamList.isEmpty()) {
@@ -197,13 +175,6 @@ public class CodeGenerator {
         return streamListStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of all the tables in a Siddhi app
-     *
-     * @param tableList A list of TableConfig objects from the SiddhiAppConfig object
-     * @return The Siddhi string representation of the table definitions
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generateTables(List<TableConfig> tableList) throws CodeGenerationException {
         if (tableList == null || tableList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -223,13 +194,6 @@ public class CodeGenerator {
         return tableListStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of all the window definitions in a Siddhi app
-     *
-     * @param windowList A list of WindowConfig objects to be converted
-     * @return The Siddhi string representaiotn of all the window definitions
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generateWindows(List<WindowConfig> windowList) throws CodeGenerationException {
         if (windowList == null || windowList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -249,13 +213,6 @@ public class CodeGenerator {
         return windowListStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of all the trigger definitions in a Siddhi app
-     *
-     * @param triggerList A list of all the TriggerConfig objects to be converted
-     * @return The Siddhi string representation of all the trigger definitions
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generateTriggers(List<TriggerConfig> triggerList) throws CodeGenerationException {
         if (triggerList == null || triggerList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -274,13 +231,6 @@ public class CodeGenerator {
         return triggerListStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of all the aggregation definitions in a Siddhi app
-     *
-     * @param aggregationList A list of AggregationConfig objects to be converted
-     * @return The Siddhi string representation of all the aggregation definitions
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generateAggregations(List<AggregationConfig> aggregationList) throws CodeGenerationException {
         if (aggregationList == null || aggregationList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -299,13 +249,6 @@ public class CodeGenerator {
         return aggregationListStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of all the function definitions in a Siddhi app
-     *
-     * @param functionList A list of FunctionConfig objects to be converted
-     * @return The Siddhi string representation of all the function definitions
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generateFunctions(List<FunctionConfig> functionList) throws CodeGenerationException {
         if (functionList == null || functionList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;

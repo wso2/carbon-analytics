@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
@@ -12,6 +30,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 
 import java.util.List;
 
+/**
+ * Generate's the code for a Siddhi aggregation element
+ */
 public class AggregationCodeGenerator {
 
     public String generateAggregation(AggregationConfig aggregation) throws CodeGenerationException {
@@ -63,12 +84,6 @@ public class AggregationCodeGenerator {
         return aggregationStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of a list of annotations for an aggregation definition
-     *
-     * @param annotations The list of annotations to be converted
-     * @return The string representation of the annotations for an aggregation defintion
-     */
     private String generateAggregationAnnotations(List<String> annotations) {
         if (annotations == null || annotations.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -88,13 +103,6 @@ public class AggregationCodeGenerator {
         return annotationsStringBuilder.toString();
     }
 
-    /**
-     * Generate's a Siddhi string representation of a aggregation's AggregateByTimePeriod object
-     *
-     * @param aggregateByTimePeriod The AggregateByTimePeriod object to be converted
-     * @return The Siddhi string representation of the given AggregateByTimePeriod object
-     * @throws CodeGenerationException Error while generating the code
-     */
     private String generateAggregateByTimePeriod(AggregateByTimePeriod aggregateByTimePeriod)
             throws CodeGenerationException {
         if (aggregateByTimePeriod == null) {
@@ -106,37 +114,12 @@ public class AggregationCodeGenerator {
         StringBuilder aggregateByTimePeriodStringBuilder = new StringBuilder();
         switch (aggregateByTimePeriod.getType().toUpperCase()) {
             case CodeGeneratorConstants.RANGE:
-                AggregateByTimeRange aggregateByTimeRange = (AggregateByTimeRange) aggregateByTimePeriod;
-                if (aggregateByTimeRange.getValue() == null) {
-                    throw new CodeGenerationException("The 'value' attribute of a given aggregateByTimeRange" +
-                            " element is empty");
-                } else if (aggregateByTimeRange.getValue().getMin() == null ||
-                        aggregateByTimeRange.getValue().getMin().isEmpty()) {
-                    throw new CodeGenerationException("The 'min' value of a given" +
-                            " aggregateByTimeRange element is empty");
-                } else if (aggregateByTimeRange.getValue().getMax() == null ||
-                        aggregateByTimeRange.getValue().getMax().isEmpty()) {
-                    throw new CodeGenerationException("The 'max' value of a given" +
-                            " aggregateByTimeRange element is empty");
-                }
-                aggregateByTimePeriodStringBuilder.append(aggregateByTimeRange.getValue().getMin().toLowerCase())
-                        .append(SiddhiCodeBuilderConstants.THREE_DOTS)
-                        .append(aggregateByTimeRange.getValue().getMax().toLowerCase());
+                aggregateByTimePeriodStringBuilder.append(
+                        generateAggregateByTimeRange((AggregateByTimeRange) aggregateByTimePeriod));
                 break;
             case CodeGeneratorConstants.INTERVAL:
-                AggregateByTimeInterval aggregateByTimeInterval = (AggregateByTimeInterval) aggregateByTimePeriod;
-                if (aggregateByTimeInterval.getValue() == null || aggregateByTimeInterval.getValue().isEmpty()) {
-                    throw new CodeGenerationException("The 'value' attribute of a given" +
-                            " attributeByTimeInterval element is empty");
-                }
-                int timeIntervalsLeft = aggregateByTimeInterval.getValue().size();
-                for (String timeInterval : aggregateByTimeInterval.getValue()) {
-                    aggregateByTimePeriodStringBuilder.append(timeInterval.toLowerCase());
-                    if (timeIntervalsLeft != 1) {
-                        aggregateByTimePeriodStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
-                    }
-                    timeIntervalsLeft--;
-                }
+                aggregateByTimePeriodStringBuilder.append(
+                        generateAggregateByTimeInterval((AggregateByTimeInterval) aggregateByTimePeriod));
                 break;
             default:
                 throw new CodeGenerationException("Unidentified aggregateByTimePeriod element type: "
@@ -144,6 +127,43 @@ public class AggregationCodeGenerator {
         }
 
         return aggregateByTimePeriodStringBuilder.toString();
+    }
+
+    private String generateAggregateByTimeInterval(AggregateByTimeInterval aggregateByTimeInterval) throws CodeGenerationException {
+        StringBuilder aggregateByTimeIntervalStringBuilder = new StringBuilder();
+        if (aggregateByTimeInterval.getValue() == null || aggregateByTimeInterval.getValue().isEmpty()) {
+            throw new CodeGenerationException("The 'value' attribute of a given" +
+                    " attributeByTimeInterval element is empty");
+        }
+        int timeIntervalsLeft = aggregateByTimeInterval.getValue().size();
+        for (String timeInterval : aggregateByTimeInterval.getValue()) {
+            aggregateByTimeIntervalStringBuilder.append(timeInterval.toLowerCase());
+            if (timeIntervalsLeft != 1) {
+                aggregateByTimeIntervalStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+            }
+            timeIntervalsLeft--;
+        }
+        return aggregateByTimeIntervalStringBuilder.toString();
+    }
+
+    private String generateAggregateByTimeRange(AggregateByTimeRange aggregateByTimeRange) throws CodeGenerationException {
+        StringBuilder aggregateByTimeRangeStringBuilder = new StringBuilder();
+        if (aggregateByTimeRange.getValue() == null) {
+            throw new CodeGenerationException("The 'value' attribute of a given aggregateByTimeRange" +
+                    " element is empty");
+        } else if (aggregateByTimeRange.getValue().getMin() == null ||
+                aggregateByTimeRange.getValue().getMin().isEmpty()) {
+            throw new CodeGenerationException("The 'min' value of a given" +
+                    " aggregateByTimeRange element is empty");
+        } else if (aggregateByTimeRange.getValue().getMax() == null ||
+                aggregateByTimeRange.getValue().getMax().isEmpty()) {
+            throw new CodeGenerationException("The 'max' value of a given" +
+                    " aggregateByTimeRange element is empty");
+        }
+        aggregateByTimeRangeStringBuilder.append(aggregateByTimeRange.getValue().getMin().toLowerCase())
+                .append(SiddhiCodeBuilderConstants.THREE_DOTS)
+                .append(aggregateByTimeRange.getValue().getMax().toLowerCase());
+        return aggregateByTimeRangeStringBuilder.toString();
     }
 
 }

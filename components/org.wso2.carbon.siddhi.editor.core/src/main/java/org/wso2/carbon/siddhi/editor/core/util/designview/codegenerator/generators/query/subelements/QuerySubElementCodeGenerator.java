@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.subelements;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
@@ -7,14 +25,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 
 import java.util.List;
 
+/**
+ * Generate's the code for sub-elements of a Siddhi query
+ */
 public class QuerySubElementCodeGenerator {
 
-    /**
-     * Generates a Siddhi string representation of a group by list of a query
-     *
-     * @param groupByList The list of group by attributes to be converted
-     * @return The Siddhi string representation of the given group by list
-     */
     public static String generateQueryGroupBy(List<String> groupByList) {
         if (groupByList == null || groupByList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -27,13 +42,6 @@ public class QuerySubElementCodeGenerator {
                 SubElementCodeGenerator.generateParameterList(groupByList);
     }
 
-    /**
-     * Generates a Siddhi string representation of a order by list of a query
-     *
-     * @param orderByList The order by list to be converted
-     * @return The Siddhi string representation of the given order by config list
-     * @throws CodeGenerationException Error while generating code
-     */
     public static String generateQueryOrderBy(List<QueryOrderByConfig> orderByList) throws CodeGenerationException {
         if (orderByList == null || orderByList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -68,12 +76,6 @@ public class QuerySubElementCodeGenerator {
         return orderByListStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation of the given limit value
-     *
-     * @param limit The limit value to be converted
-     * @return The Siddhi representation of the given query limit
-     */
     public static String generateQueryLimit(long limit) {
         if (limit != 0) {
             return SiddhiCodeBuilderConstants.LIMIT +
@@ -83,12 +85,6 @@ public class QuerySubElementCodeGenerator {
         return SiddhiCodeBuilderConstants.EMPTY_STRING;
     }
 
-    /**
-     * Generates a Siddhi string representation of the given having value
-     *
-     * @param having The having value given
-     * @return The Siddhi string representation of the query 'having' value
-     */
     public static String generateQueryHaving(String having) {
         if (having == null || having.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -99,12 +95,6 @@ public class QuerySubElementCodeGenerator {
                 having;
     }
 
-    /**
-     * Generates a Siddhi string representation of a given query output rate limit
-     *
-     * @param outputRateLimit The output rate limit value given
-     * @return The Siddhi representation of the given output rate limit value
-     */
     public static String generateQueryOutputRateLimit(String outputRateLimit) {
         if (outputRateLimit == null || outputRateLimit.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -115,4 +105,6 @@ public class QuerySubElementCodeGenerator {
                 outputRateLimit;
     }
 
+    private QuerySubElementCodeGenerator() {
+    }
 }

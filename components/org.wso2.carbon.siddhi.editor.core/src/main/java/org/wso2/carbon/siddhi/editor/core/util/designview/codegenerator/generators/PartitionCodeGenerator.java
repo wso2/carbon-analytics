@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
@@ -11,14 +29,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Generate's the code for a Siddhi partition element
+ */
 public class PartitionCodeGenerator {
-    /**
-     * Generates a partition definition string from a PartitionConfig object
-     *
-     * @param partition The PartitionConfig object to be converted
-     * @return The converted partition definition string
-     * @throws CodeGenerationException Error while generating code
-     */
+
     public String generatePartition(PartitionConfig partition, List<String> definitionNames)
             throws CodeGenerationException {
         if (partition == null) {
@@ -64,13 +79,6 @@ public class PartitionCodeGenerator {
         return partitionStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of a list of PartitionWithElement objects for a particular partition
-     *
-     * @param partitionWith The List of partitionWithElement objects to be converted
-     * @return The Siddhi string representation of the PartitionWithElement list given
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generatePartitionWith(List<PartitionWithElement> partitionWith) throws CodeGenerationException {
         if (partitionWith == null || partitionWith.isEmpty()) {
             throw new CodeGenerationException("A given 'partitionWith' list is empty");
@@ -89,13 +97,6 @@ public class PartitionCodeGenerator {
         return partitionWithStringBuilder.toString();
     }
 
-    /**
-     * Generates a string representation of a single PartitionWithElement object
-     *
-     * @param partitionWithElement The PartitionWithElement object to be converted
-     * @return The Siddhi string representation of the given PartitionWithElement object
-     * @throws CodeGenerationException Error while generating code
-     */
     private String generatePartitionWithElement(PartitionWithElement partitionWithElement)
             throws CodeGenerationException {
         if (partitionWithElement == null) {

@@ -42,21 +42,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Helper that contains generic reusable utility methods
- * for the CodeGenerator class to build a Siddhi app string,
- * mainly to generate strings for sub-elements of a SiddhiAppConfig object
+ * Utility methods for the CodeGenerator class
  */
 public class CodeGeneratorUtils {
 
-    /**
-     * Obtains a list of queries are reordered in a way that is valid in siddhi.
-     * This is done because the query list may come in an invalid order that cannot be compiled by the Siddhi
-     * runtime.
-     *
-     * @param queries The queries to be ordered
-     * @return The list of given queries in a valid order
-     * @throws CodeGenerationException Error While Reordering Queries
-     */
     public static List<QueryConfig> reorderQueries(List<QueryConfig> queries, List<String> definitionNames)
             throws CodeGenerationException {
         if (queries == null) {
@@ -80,13 +69,6 @@ public class CodeGeneratorUtils {
         return reorderedQueries;
     }
 
-    /**
-     * Obtains a list of input streams of a given QueryConfig object
-     *
-     * @param query The given QueryConfig object
-     * @return The input streams in the given QueryConfig object
-     * @throws CodeGenerationException Error while trying to get the input streams
-     */
     private static List<String> getInputStreams(QueryConfig query)
             throws CodeGenerationException {
         if (query == null) {
@@ -154,16 +136,6 @@ public class CodeGeneratorUtils {
         return inputStreamList;
     }
 
-    /**
-     * Gets a list of StreamConfig objects and identifies the streams that does not need to be generated,
-     * and outputs the ones that do need to be generated.
-     *
-     * @param streamList The list of streams in the Siddhi app
-     * @param sourceList The list of sources in the Siddhi app
-     * @param sinkList   The list of sinks in the Siddhi app
-     * @param queryList  The list of queries in the Siddhi app
-     * @return The list of streams that are to generated
-     */
     public static List<StreamConfig> getStreamsToBeGenerated(List<StreamConfig> streamList,
                                                              List<SourceSinkConfig> sourceList,
                                                              List<SourceSinkConfig> sinkList,
@@ -206,16 +178,6 @@ public class CodeGeneratorUtils {
         return definedStreams;
     }
 
-    /**
-     * Gets the names of all the definition elements of a Siddhi app.
-     *
-     * @param streams      The list of streams in a Siddhi app
-     * @param tables       The list of tables in a Siddhi app
-     * @param windows      The list of windows in a Siddhi app
-     * @param triggers     The list of triggers in a Siddhi app
-     * @param aggregations The list of aggregations in a Siddhi app
-     * @return The names of all the definitions in a Siddhi app
-     */
     public static List<String> getDefinitionNames(List<StreamConfig> streams, List<TableConfig> tables,
                                                   List<WindowConfig> windows, List<TriggerConfig> triggers,
                                                   List<AggregationConfig> aggregations, List<PartitionConfig> partitions) {

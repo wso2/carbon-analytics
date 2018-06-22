@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.subelements;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
@@ -10,15 +28,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGenerato
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 
+/**
+ * Generate's the code for a output element of a Siddhi query
+ */
 public class QueryOutputCodeGenerator {
 
-    /**
-     * Generates a Siddhi string representation of a QueryOutputConfig object
-     *
-     * @param queryOutput The QueryOutputConfig object to be converted
-     * @return The converted string representation of the given QueryOutputConfig object
-     * @throws CodeGenerationException Error while generating code
-     */
     public static String generateQueryOutput(QueryOutputConfig queryOutput) throws CodeGenerationException {
         if (queryOutput == null) {
             throw new CodeGenerationException("A given query output element is empty");
@@ -51,14 +65,6 @@ public class QueryOutputCodeGenerator {
         return queryOutputStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation of a InsertOutputConfig object
-     *
-     * @param insertOutput The InsertOutputConfig object to be converted
-     * @param target       The name of the target output definition
-     * @return The Siddhi string representation of the InsertOutputConfig to respective target
-     * @throws CodeGenerationException Error while generating code
-     */
     private static String generateInsertOutput(InsertOutputConfig insertOutput, String target)
             throws CodeGenerationException {
         if (insertOutput == null) {
@@ -100,14 +106,6 @@ public class QueryOutputCodeGenerator {
         return insertOutputStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation of a DeleteOutputConfig object
-     *
-     * @param deleteOutput The DeleteOutputConfig object to be converted
-     * @param target       The name of the target output definition
-     * @return The Siddhi string representation of the DeleteOutputConfig object to the respective target
-     * @throws CodeGenerationException Error while generating code
-     */
     private static String generateDeleteOutput(DeleteOutputConfig deleteOutput, String target)
             throws CodeGenerationException {
         if (deleteOutput == null) {
@@ -130,15 +128,6 @@ public class QueryOutputCodeGenerator {
                 SiddhiCodeBuilderConstants.SEMI_COLON;
     }
 
-    /**
-     * Generates a Siddhi string representation of a UpdateInsertIntoOutputConfig object
-     *
-     * @param type                   The type of output object the one is (i.e. Either update|update or insert into)
-     * @param updateInsertIntoOutput The UpdateInsertIntoConfig object to be converted
-     * @param target                 The name of the target output definition
-     * @return The Siddhi string representation of the UpdateInsertIntoOutputConfig object to the respective target
-     * @throws CodeGenerationException Error while generating code
-     */
     private static String generateUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput,
                                                String target) throws CodeGenerationException {
         if (updateInsertIntoOutput == null) {
@@ -186,13 +175,6 @@ public class QueryOutputCodeGenerator {
         return updateInsertIntoOutputStringBuilder.toString();
     }
 
-    /**
-     * Generates a Siddhi string representation of a SetAttributeConfig object
-     *
-     * @param setAttribute The given SetAttributeConfig object to be converted
-     * @return The converted Siddhi string representation of the SetAttributeConfig object
-     * @throws CodeGenerationException Error while generating code
-     */
     private static String generateSetAttribute(SetAttributeConfig setAttribute) throws CodeGenerationException {
         if (setAttribute == null) {
             throw new CodeGenerationException("A given set attribute element given is empty");
@@ -209,4 +191,6 @@ public class QueryOutputCodeGenerator {
                 setAttribute.getValue();
     }
 
+    private QueryOutputCodeGenerator() {
+    }
 }
