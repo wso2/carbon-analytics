@@ -33,8 +33,10 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryL
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Contains elements of a Siddhi app
@@ -55,9 +57,8 @@ public class SiddhiAppConfig {
     private Map<QueryListType, List<QueryConfig>> queryLists = new EnumMap<>(QueryListType.class);
     private List<PartitionConfig> partitionList = new ArrayList<>();
 
-    // TODO under testing
-    List<ElementCodeSegment> elementCodeSegments = new ArrayList<>();
-    List<CommentCodeSegment> commentCodeSegments = new ArrayList<>();
+    private Set<ElementCodeSegment> elementCodeSegments = new HashSet<>();
+    private Set<CommentCodeSegment> commentCodeSegments = new HashSet<>();
 
     public SiddhiAppConfig() {
         queryLists.put(QueryListType.WINDOW_FILTER_PROJECTION, new ArrayList<>());
@@ -96,7 +97,19 @@ public class SiddhiAppConfig {
         elementList.add(elementConfig);
     }
 
-    // TODO
+    /**
+     * Adds the given list of ElementCodeSegment objects representing code segments of Siddhi elements,
+     * to the existing list
+     * @param elementCodeSegments       List of ElementCodeSegment objects
+     */
+    public void addElementCodeSegments(Set<ElementCodeSegment> elementCodeSegments) {
+        this.elementCodeSegments.addAll(elementCodeSegments);
+    }
+
+    /**
+     * Adds the code segment of the given SiddhiElementConfig object, to the existing list of code segments
+     * @param siddhiElementConfig       SiddhiElementConfig object
+     */
     private void addElementCodeSegment(SiddhiElementConfig siddhiElementConfig) {
         ElementCodeSegment elementCodeSegment =
                 new ElementCodeSegment(
@@ -243,20 +256,16 @@ public class SiddhiAppConfig {
         return partitionList;
     }
 
-    public List<ElementCodeSegment> getElementCodeSegments() {
+    public Set<ElementCodeSegment> getElementCodeSegments() {
         return elementCodeSegments;
     }
 
-    public void setElementCodeSegments(List<ElementCodeSegment> elementCodeSegments) {
-        this.elementCodeSegments = elementCodeSegments;
-    }
-
-    public List<CommentCodeSegment> getCommentCodeSegments() {
+    public Set<CommentCodeSegment> getCommentCodeSegments() {
         return commentCodeSegments;
     }
 
-    public void setCommentCodeSegments(List<CommentCodeSegment> commentCodeSegments) {
-        this.commentCodeSegments = commentCodeSegments;
+    public void assignCommentCodeSegments(List<CommentCodeSegment> commentCodeSegments) {
+        this.commentCodeSegments.addAll(commentCodeSegments);
     }
 
     public int getFinalElementCount() {
