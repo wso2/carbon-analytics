@@ -409,8 +409,8 @@ define(['require', 'elementUtils', 'lodash'],
                 });
             });
 
-            // check the element in the partitionList
-            if (!requestedElement) {
+            // check the element in queries inside the partitions
+            if (includeQueryTypes !== undefined && includeQueryTypes && !requestedElement) {
                 requestedElement = self.getQueryByIdSavedInsideAPartition(elementId);
             }
             // search in the inner streams in partitions
