@@ -115,12 +115,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 log.error(errMsg);
                 throw errMsg;
             }
-            // remove any child nodes from designViewGridContainer if exists
-            this.designViewGridContainer.empty();
+
             // reset the jsPlumb common instance
             if (this.jsPlumbInstance !== undefined) {
+                this.jsPlumbInstance.clear();
                 this.jsPlumbInstance.reset();
             }
+            // remove any child nodes from designViewGridContainer if exists
+            this.designViewGridContainer.empty();
         };
 
         DesignView.prototype.showToolPalette = function () {
