@@ -914,10 +914,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             id: "close",
                             events: {
                                 click: function () {
-                                    if (confirm('Are you sure you want to remove the connection?')) {
-                                        self.jsPlumbInstance.deleteConnection(connectionObject);
-                                    } else {
-                                    }
+                                    self.jsPlumbInstance.deleteConnection(connectionObject);
                                 }
                             }
                         }
