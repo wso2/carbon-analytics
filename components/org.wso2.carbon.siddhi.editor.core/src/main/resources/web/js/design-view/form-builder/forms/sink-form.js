@@ -826,7 +826,6 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 textNode.html(config.annotationType.name);
 
                 // perform JSON validation
-                $(element).removeClass('error-element');
                 JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Sink');
 
                 self.designViewContainer.removeClass('disableContainer');

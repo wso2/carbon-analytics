@@ -1100,7 +1100,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     // perform JSON validation
-                    $(element).removeClass('error-element');
                     JSONValidator.prototype.validatePatternOrSequenceQuery(clickedElement, 'Sequence Query');
 
                     self.designViewContainer.removeClass('disableContainer');

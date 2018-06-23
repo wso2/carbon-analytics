@@ -899,9 +899,17 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
                     }
 
-                    // validate source and target elements
-                    checkJSONValidityOfElement(self, sourceId);
-                    checkJSONValidityOfElement(self, targetId);
+                    // do not check for json validity if the design is still generating from the data sent from backend
+                    if (!self.configurationData.getIsStillDrawingGraph()) {
+                        if (sourceType === 'PARTITION') {
+                            sourceId = sourceElement.parent().attr('id');
+                        } else if (targetType === 'PARTITION') {
+                            targetId = targetElement.parent().attr('id');
+                        }
+                        // validate source and target elements
+                        checkJSONValidityOfElement(self, sourceId);
+                        checkJSONValidityOfElement(self, targetId);
+                    }
 
                     var connectionObject = connection.connection;
                     // add a overlay of a close icon for connection. connection can be detached by clicking on it
@@ -997,6 +1005,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             self.jsPlumbInstance.deleteConnection(connection);
                         });
                         targetElement.detach();
+
+                        // validate the partition
+                        checkJSONValidityOfElement(self, partitionId);
                     }
                 });
             }
@@ -1309,7 +1320,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
             function checkJSONValidityOfElement(self, elementId) {
                 var element = self.configurationData.getSiddhiAppConfig()
-                    .getDefinitionElementById(elementId, true, true);
+                    .getDefinitionElementById(elementId, true, true, true);
                 if (element !== undefined) {
                     var type = element.type;
                     var elementObject = element.element;
@@ -1327,6 +1338,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         JSONValidator.prototype.validateSourceOrSinkAnnotation(elementObject, 'Sink');
                     } else if (type === 'AGGREGATION') {
                         JSONValidator.prototype.validateAggregation(elementObject);
+                    } else if (type === 'PARTITION') {
+                        JSONValidator.prototype.validatePartition(elementObject);
                     }
                 }
             }

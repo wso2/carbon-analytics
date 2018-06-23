@@ -189,7 +189,6 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     });
 
                     // perform JSON validation
-                    $(element).removeClass('error-element');
                     JSONValidator.prototype.validatePartition(partitionElement);
 
                     // design view container and toggle view button are enabled

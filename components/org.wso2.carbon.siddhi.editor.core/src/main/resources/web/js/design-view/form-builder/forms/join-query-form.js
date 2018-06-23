@@ -1363,7 +1363,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     // perform JSON validation
-                    $(element).removeClass('error-element');
                     JSONValidator.prototype.validateWindowFilterProjectionQuery(clickedElement);
 
                     self.designViewContainer.removeClass('disableContainer');

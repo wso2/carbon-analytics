@@ -637,7 +637,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     textNode.html(configInput.name);
 
                     // perform JSON validation
-                    $(element).removeClass('error-element');
                     JSONValidator.prototype.validateAggregation(clickedElement);
 
                     // design view container and toggle view button are enabled
