@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
-// TODO class comment
+/**
+ * Represents Code segment of a Comment in a Siddhi app
+ */
 public class CommentCodeSegment extends ElementCodeSegment {
     private String content;
 
@@ -33,5 +35,15 @@ public class CommentCodeSegment extends ElementCodeSegment {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

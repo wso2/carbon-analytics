@@ -45,19 +45,19 @@ public abstract class SiddhiElementConfig {
     }
 
     public int[] getQueryContextStartIndex() {
-        return queryContextStartIndex;
+        return new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
     }
 
     public void setQueryContextStartIndex(int[] queryContextStartIndex) {
-        this.queryContextStartIndex = queryContextStartIndex;
+        this.queryContextStartIndex = new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
     }
 
     public int[] getQueryContextEndIndex() {
-        return queryContextEndIndex;
+        return new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public void setQueryContextEndIndex(int[] queryContextEndIndex) {
-        this.queryContextEndIndex = queryContextEndIndex;
+        this.queryContextEndIndex = new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public CommentCodeSegment getPreviousCommentSegment() {

@@ -20,30 +20,32 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
 import java.util.Arrays;
 
-// TODO class comment
+/**
+ * Represents Code segment of a Siddhi element in a Siddhi app, which is generated as a config
+ */
 public class ElementCodeSegment implements Comparable {
     private int[] queryContextStartIndex;
     private int[] queryContextEndIndex;
 
     public ElementCodeSegment(int[] queryContextStartIndex, int[] queryContextEndIndex) {
-        this.queryContextStartIndex = queryContextStartIndex;
-        this.queryContextEndIndex = queryContextEndIndex;
+        this.queryContextStartIndex = new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
+        this.queryContextEndIndex = new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public int[] getQueryContextStartIndex() {
-        return queryContextStartIndex;
+        return new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
     }
 
     public void setQueryContextStartIndex(int[] queryContextStartIndex) {
-        this.queryContextStartIndex = queryContextStartIndex;
+        this.queryContextStartIndex = new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
     }
 
     public int[] getQueryContextEndIndex() {
-        return queryContextEndIndex;
+        return new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public void setQueryContextEndIndex(int[] queryContextEndIndex) {
-        this.queryContextEndIndex = queryContextEndIndex;
+        this.queryContextEndIndex = new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public int getStartLine() {
@@ -62,10 +64,6 @@ public class ElementCodeSegment implements Comparable {
         return queryContextEndIndex[1];
     }
 
-    public boolean isOverlappingWith(ElementCodeSegment majorSegment) {
-        return majorSegment.getStartLine() <= getStartLine() && getStartLine() <= majorSegment.getEndLine();
-    }
-
     public boolean isValid() {
         if (getStartLine() == getEndLine()) {
             return (getEndColumn() - getStartColumn() > 0);
@@ -75,17 +73,11 @@ public class ElementCodeSegment implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        ElementCodeSegment seg2 = (ElementCodeSegment) o;
-        if (queryContextStartIndex[0] > seg2.queryContextStartIndex[0]) {
+        ElementCodeSegment otherSegment = (ElementCodeSegment) o;
+        if (getStartLine() > otherSegment.getStartLine()) {
             return 1;
-        } else if (queryContextStartIndex[0] == seg2.queryContextStartIndex[0]) {
-            if (queryContextStartIndex[1] > seg2.queryContextStartIndex[1]) {
-                return 1;
-            } else if (queryContextStartIndex[1] == seg2.queryContextStartIndex[1]) {
-                return 0;
-            } else {
-                return -1;
-            }
+        } else if (getStartLine() == otherSegment.getStartLine()) {
+            return Integer.compare(getStartColumn(), otherSegment.getStartColumn());
         } else {
             return -1;
         }
