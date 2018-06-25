@@ -1363,7 +1363,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     // perform JSON validation
-                    JSONValidator.prototype.validateWindowFilterProjectionQuery(clickedElement);
+                    JSONValidator.prototype.validateJoinQuery(clickedElement);
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
