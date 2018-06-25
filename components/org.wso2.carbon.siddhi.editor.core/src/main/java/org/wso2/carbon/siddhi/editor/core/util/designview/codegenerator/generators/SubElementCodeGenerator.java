@@ -26,6 +26,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -77,11 +78,8 @@ public class SubElementCodeGenerator {
     static String generateStore(StoreConfig store) throws CodeGenerationException {
         if (store == null) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
-        } else if (store.getType() == null || store.getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of a given store element is empty");
-        } else if (store.getOptions() == null || store.getOptions().isEmpty()) {
-            throw new CodeGenerationException("The options map of a given store element is empty");
         }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(store);
 
         StringBuilder storeStringBuilder = new StringBuilder();
 
@@ -141,11 +139,7 @@ public class SubElementCodeGenerator {
     }
 
     private static String generateStreamHandler(StreamHandlerConfig streamHandler) throws CodeGenerationException {
-        if (streamHandler == null) {
-            throw new CodeGenerationException("A given stream handler element is empty");
-        } else if (streamHandler.getType() == null || streamHandler.getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of a given stream handler element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(streamHandler);
 
         StringBuilder streamHandlerStringBuilder = new StringBuilder();
 

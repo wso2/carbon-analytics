@@ -26,6 +26,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.Map;
 
@@ -35,13 +36,7 @@ import java.util.Map;
 public class SourceSinkCodeGenerator {
 
     public String generateSourceSink(SourceSinkConfig sourceSink) throws CodeGenerationException {
-        if (sourceSink == null) {
-            throw new CodeGenerationException("A given source/sink element is empty");
-        } else if (sourceSink.getAnnotationType() == null || sourceSink.getAnnotationType().isEmpty()) {
-            throw new CodeGenerationException("The annotation type for a given source/sink element is empty");
-        } else if (sourceSink.getType() == null || sourceSink.getType().isEmpty()) {
-            throw new CodeGenerationException("The type attribute for a given source/sink element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(sourceSink);
 
         StringBuilder sourceSinkStringBuilder = new StringBuilder();
         if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
@@ -127,11 +122,11 @@ public class SourceSinkCodeGenerator {
     }
 
     private String generateListPayloadOrAttribute(MapperListPayloadOrAttribute mapperListAttribute) throws CodeGenerationException {
-        StringBuilder mapperListAttributeStringBuilder = new StringBuilder();
         if (mapperListAttribute.getValue() == null || mapperListAttribute.getValue().isEmpty()) {
             throw new CodeGenerationException("The list values of a given sink/source" +
                     " map attribute element is empty");
         }
+        StringBuilder mapperListAttributeStringBuilder = new StringBuilder();
         int valuesLeft = mapperListAttribute.getValue().size();
         for (String value : mapperListAttribute.getValue()) {
             mapperListAttributeStringBuilder.append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE)
@@ -146,11 +141,11 @@ public class SourceSinkCodeGenerator {
     }
 
     private String generateMapPayloadOrAttribute(MapperMapPayloadOrAttribute mapperMapAttribute) throws CodeGenerationException {
-        StringBuilder mapperMapAttributeStringBuilder = new StringBuilder();
         if (mapperMapAttribute.getValue() == null || mapperMapAttribute.getValue().isEmpty()) {
             throw new CodeGenerationException("The key-value pair values of" +
                     " a given source/sink map attribute element is empty");
         }
+        StringBuilder mapperMapAttributeStringBuilder = new StringBuilder();
         int mapEntriesLeft = mapperMapAttribute.getValue().size();
         for (Map.Entry<String, String> entry : mapperMapAttribute.getValue().entrySet()) {
             mapperMapAttributeStringBuilder.append(entry.getKey())

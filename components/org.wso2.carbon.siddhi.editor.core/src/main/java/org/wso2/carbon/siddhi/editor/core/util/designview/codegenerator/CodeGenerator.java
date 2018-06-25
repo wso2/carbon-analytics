@@ -89,7 +89,7 @@ public class CodeGenerator {
                                              List<PartitionConfig> partitions, List<String> definitionNames)
             throws CodeGenerationException {
         StringBuilder executionElementStringBuilder = new StringBuilder();
-        executionElementStringBuilder.append("-- Queries & Partitions")
+        executionElementStringBuilder.append(SiddhiCodeBuilderConstants.QUERIES_PARTITIONS_COMMENT)
                 .append(SiddhiCodeBuilderConstants.NEW_LINE);
         List<QueryConfig> queries = new LinkedList<>();
         for (List<QueryConfig> queryList : queryLists.values()) {
@@ -146,24 +146,18 @@ public class CodeGenerator {
 
         SourceSinkCodeGenerator sourceSinkCodeGenerator = new SourceSinkCodeGenerator();
         StreamCodeGenerator streamCodeGenerator = new StreamCodeGenerator();
+        List<SourceSinkConfig> sourcesAndSinks = new LinkedList<>();
+        sourcesAndSinks.addAll(sourceList);
+        sourcesAndSinks.addAll(sinkList);
         for (StreamConfig stream : streamList) {
-            if (stream == null) {
-                throw new CodeGenerationException("A given stream element is empty");
-            } else if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
+            CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
+            if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
                 continue;
-            } else if (stream.getName() == null || stream.getName().isEmpty()) {
-                throw new CodeGenerationException("The name of a given stream element is empty");
             }
 
-            for (SourceSinkConfig source : sourceList) {
-                if (stream.getName().equals(source.getConnectedElementName())) {
-                    streamListStringBuilder.append(sourceSinkCodeGenerator.generateSourceSink(source));
-                }
-            }
-
-            for (SourceSinkConfig sink : sinkList) {
-                if (stream.getName().equals(sink.getConnectedElementName())) {
-                    streamListStringBuilder.append(sourceSinkCodeGenerator.generateSourceSink(sink));
+            for (SourceSinkConfig sourceSink : sourcesAndSinks) {
+                if (stream.getName().equals(sourceSink.getConnectedElementName())) {
+                    streamListStringBuilder.append(sourceSinkCodeGenerator.generateSourceSink(sourceSink));
                 }
             }
 

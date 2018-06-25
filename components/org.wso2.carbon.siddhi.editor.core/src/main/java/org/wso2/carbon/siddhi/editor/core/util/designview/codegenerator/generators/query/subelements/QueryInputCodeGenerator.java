@@ -28,6 +28,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generato
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,11 +39,7 @@ import java.util.regex.Pattern;
 public class QueryInputCodeGenerator {
 
     public static String generateQueryInput(QueryInputConfig queryInput) throws CodeGenerationException {
-        if (queryInput == null) {
-            throw new CodeGenerationException("A given query input element is empty");
-        } else if (queryInput.getType() == null || queryInput.getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of a given query input element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(queryInput);
 
         StringBuilder queryInputStringBuilder = new StringBuilder();
 
@@ -72,11 +69,7 @@ public class QueryInputCodeGenerator {
 
     private static String generateWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection)
             throws CodeGenerationException {
-        if (windowFilterProjection == null) {
-            throw new CodeGenerationException("A given window/filter/project element is empty");
-        } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
-            throw new CodeGenerationException("The 'from' value of a given window/filter/project element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(windowFilterProjection);
 
         return SiddhiCodeBuilderConstants.FROM +
                 SiddhiCodeBuilderConstants.SPACE +
@@ -85,7 +78,7 @@ public class QueryInputCodeGenerator {
     }
 
     private static String generateJoinQueryInput(JoinConfig join) throws CodeGenerationException {
-        nullCheck(join);
+        CodeGeneratorUtils.NullValidator.validateConfigObject(join);
 
         StringBuilder joinStringBuilder = new StringBuilder();
         joinStringBuilder.append(SiddhiCodeBuilderConstants.FROM)
@@ -125,26 +118,8 @@ public class QueryInputCodeGenerator {
         return joinStringBuilder.toString();
     }
 
-    private static void nullCheck(JoinConfig join) throws CodeGenerationException {
-        if (join == null) {
-            throw new CodeGenerationException("A given join query is empty");
-        } else if (join.getJoinWith() == null || join.getJoinType().isEmpty()) {
-            throw new CodeGenerationException("The 'joinWith' value of a given join query is empty");
-        } else if (join.getJoinType() == null || join.getJoinType().isEmpty()) {
-            throw new CodeGenerationException("The 'joinType' value of a given join query is empty");
-        } else if (join.getLeft() == null || join.getRight() == null) {
-            throw new CodeGenerationException("The left/right join element for a given join query is empty");
-        } else if (join.getLeft().getType() == null || join.getLeft().getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of the left join element" +
-                    " of a given join query is empty");
-        } else if (join.getRight().getType() == null || join.getRight().getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of the right join element" +
-                    " of a given join query is empty");
-        }
-    }
-
     private static String generateJoinElement(JoinElementConfig joinElement) throws CodeGenerationException {
-        nullCheck(joinElement);
+        CodeGeneratorUtils.NullValidator.validateConfigObject(joinElement);
 
         StringBuilder joinElementStringBuilder = new StringBuilder();
 
@@ -164,14 +139,6 @@ public class QueryInputCodeGenerator {
         }
 
         return joinElementStringBuilder.toString();
-    }
-
-    private static void nullCheck(JoinElementConfig joinElement) throws CodeGenerationException {
-        if (joinElement == null) {
-            throw new CodeGenerationException("A given join element is empty");
-        } else if (joinElement.getFrom() == null || joinElement.getFrom().isEmpty()) {
-            throw new CodeGenerationException("The 'from' value of a given join element is empty");
-        }
     }
 
     private static String generateJoinType(String joinType) throws CodeGenerationException {
@@ -195,7 +162,7 @@ public class QueryInputCodeGenerator {
 
     private static String generatePatternSequenceInput(PatternSequenceConfig patternSequence)
             throws CodeGenerationException {
-        nullCheck(patternSequence);
+        CodeGeneratorUtils.NullValidator.validateConfigObject(patternSequence);
 
         StringBuilder patternSequenceInputStringBuilder = new StringBuilder();
         patternSequenceInputStringBuilder.append(SiddhiCodeBuilderConstants.FROM)
@@ -220,23 +187,9 @@ public class QueryInputCodeGenerator {
         return patternSequenceInputStringBuilder.toString();
     }
 
-    private static void nullCheck(PatternSequenceConfig patternSequence) throws CodeGenerationException {
-        if (patternSequence == null) {
-            throw new CodeGenerationException("A given pattern/sequence query is empty");
-        } else if (patternSequence.getLogic() == null || patternSequence.getLogic().isEmpty()) {
-            throw new CodeGenerationException("The 'logic' value for a given pattern/sequence query is empty");
-        } else if (patternSequence.getConditionList() == null || patternSequence.getConditionList().isEmpty()) {
-            throw new CodeGenerationException("The condition list for a given pattern/sequence query is empty");
-        }
-    }
-
     private static String generatePatternSequenceConditionLogic(PatternSequenceConditionConfig condition, boolean hasNot)
             throws CodeGenerationException {
-        if (condition == null) {
-            throw new CodeGenerationException("A given pattern/sequence query condition is empty");
-        } else if (condition.getStreamName() == null || condition.getStreamName().isEmpty()) {
-            throw new CodeGenerationException("The stream name of a given pattern/sequence query condition is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(condition);
 
         StringBuilder patternSequenceConditionStringBuilder = new StringBuilder();
 

@@ -36,13 +36,7 @@ public class PartitionCodeGenerator {
 
     public String generatePartition(PartitionConfig partition, List<String> definitionNames)
             throws CodeGenerationException {
-        if (partition == null) {
-            throw new CodeGenerationException("A given partition object is empty");
-        } else if (partition.getPartitionWith() == null || partition.getPartitionWith().isEmpty()) {
-            throw new CodeGenerationException("The 'partitionWith' value of a given partition element is empty");
-        } else if (partition.getQueryLists() == null || partition.getQueryLists().isEmpty()) {
-            throw new CodeGenerationException("The query lists of a given partition element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
 
         StringBuilder partitionStringBuilder = new StringBuilder();
 
@@ -99,13 +93,7 @@ public class PartitionCodeGenerator {
 
     private String generatePartitionWithElement(PartitionWithElement partitionWithElement)
             throws CodeGenerationException {
-        if (partitionWithElement == null) {
-            throw new CodeGenerationException("A given 'partition with' element is empty");
-        } else if (partitionWithElement.getExpression() == null || partitionWithElement.getExpression().isEmpty()) {
-            throw new CodeGenerationException("The 'expression' value of a given 'partition with' element is empty");
-        } else if (partitionWithElement.getStreamName() == null || partitionWithElement.getStreamName().isEmpty()) {
-            throw new CodeGenerationException("The stream name of a given 'partition with' element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(partitionWithElement);
 
         return partitionWithElement.getExpression() +
                 SiddhiCodeBuilderConstants.SPACE +

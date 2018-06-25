@@ -107,4 +107,5 @@ public class QuerySubElementCodeGenerator {
 
     private QuerySubElementCodeGenerator() {
     }
+
 }

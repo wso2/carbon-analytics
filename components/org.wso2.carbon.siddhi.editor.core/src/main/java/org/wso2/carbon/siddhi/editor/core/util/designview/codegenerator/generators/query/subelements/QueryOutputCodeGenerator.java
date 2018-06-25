@@ -27,6 +27,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generato
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
  * Generate's the code for a output element of a Siddhi query
@@ -34,11 +35,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 public class QueryOutputCodeGenerator {
 
     public static String generateQueryOutput(QueryOutputConfig queryOutput) throws CodeGenerationException {
-        if (queryOutput == null) {
-            throw new CodeGenerationException("A given query output element is empty");
-        } else if (queryOutput.getType() == null || queryOutput.getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of a given query output element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(queryOutput);
 
         StringBuilder queryOutputStringBuilder = new StringBuilder();
 
@@ -108,12 +105,8 @@ public class QueryOutputCodeGenerator {
 
     private static String generateDeleteOutput(DeleteOutputConfig deleteOutput, String target)
             throws CodeGenerationException {
-        if (deleteOutput == null) {
-            throw new CodeGenerationException("A given delete query output element is empty");
-        } else if (deleteOutput.getOn() == null || deleteOutput.getOn().isEmpty()) {
-            throw new CodeGenerationException("The 'on' statement of a given delete query" +
-                    " output element is null/empty");
-        } else if (target == null || target.isEmpty()) {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(deleteOutput);
+        if (target == null || target.isEmpty()) {
             throw new CodeGenerationException("The 'target' value of a given delete query output is empty");
         }
 
@@ -130,12 +123,8 @@ public class QueryOutputCodeGenerator {
 
     private static String generateUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput,
                                                String target) throws CodeGenerationException {
-        if (updateInsertIntoOutput == null) {
-            throw new CodeGenerationException("A given update/insert query output element is empty");
-        } else if (updateInsertIntoOutput.getOn() == null || updateInsertIntoOutput.getOn().isEmpty()) {
-            throw new CodeGenerationException("The 'on' value of a given update/insert query" +
-                    " element is empty");
-        } else if (target == null || target.isEmpty()) {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(updateInsertIntoOutput);
+        if (target == null || target.isEmpty()) {
             throw new CodeGenerationException("The 'target' value of a given update/insert" +
                     " query output element is empty");
         }
@@ -176,13 +165,7 @@ public class QueryOutputCodeGenerator {
     }
 
     private static String generateSetAttribute(SetAttributeConfig setAttribute) throws CodeGenerationException {
-        if (setAttribute == null) {
-            throw new CodeGenerationException("A given set attribute element given is empty");
-        } else if (setAttribute.getAttribute() == null || setAttribute.getAttribute().isEmpty()) {
-            throw new CodeGenerationException("The 'attribute' value of a given set attribute element is empty");
-        } else if (setAttribute.getValue() == null || setAttribute.getValue().isEmpty()) {
-            throw new CodeGenerationException("The 'value' attribute of a given set attribute element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(setAttribute);
 
         return setAttribute.getAttribute() +
                 SiddhiCodeBuilderConstants.SPACE +
@@ -193,4 +176,5 @@ public class QueryOutputCodeGenerator {
 
     private QueryOutputCodeGenerator() {
     }
+
 }

@@ -22,6 +22,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
  * Generate's the code for a Siddhi window element
@@ -29,13 +30,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 public class WindowCodeGenerator {
 
     public String generateWindow(WindowConfig window) throws CodeGenerationException {
-        if (window == null) {
-            throw new CodeGenerationException("A given window element is empty");
-        } else if (window.getName() == null || window.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given window element is empty");
-        } else if (window.getFunction() == null || window.getFunction().isEmpty()) {
-            throw new CodeGenerationException("The function name of the window " + window.getName() + " is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(window);
 
         StringBuilder windowStringBuilder = new StringBuilder();
         windowStringBuilder.append(SubElementCodeGenerator.generateAnnotations(window.getAnnotationList()))

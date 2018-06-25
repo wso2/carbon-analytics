@@ -27,6 +27,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generato
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.List;
 
@@ -36,20 +37,7 @@ import java.util.List;
 public class AggregationCodeGenerator {
 
     public String generateAggregation(AggregationConfig aggregation) throws CodeGenerationException {
-        if (aggregation == null) {
-            throw new CodeGenerationException("A given aggregation element is empty");
-        } else if (aggregation.getName() == null || aggregation.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given aggregation element is empty");
-        } else if (aggregation.getFrom() == null || aggregation.getFrom().isEmpty()) {
-            throw new CodeGenerationException("The 'from' value of " + aggregation.getName() + " is empty");
-        } else if (aggregation.getAggregateByTimePeriod() == null) {
-            throw new CodeGenerationException("The 'aggregateByTimePeriod' value of " + aggregation.getName()
-                    + " is empty");
-        } else if (aggregation.getAggregateByTimePeriod().getType() == null
-                || aggregation.getAggregateByTimePeriod().getType().isEmpty()) {
-            throw new CodeGenerationException("The aggregateByTimePeriod 'type' value of "
-                    + aggregation.getName() + " is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(aggregation);
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
         aggregationStringBuilder.append(SubElementCodeGenerator.generateStore(aggregation.getStore()))
@@ -105,11 +93,7 @@ public class AggregationCodeGenerator {
 
     private String generateAggregateByTimePeriod(AggregateByTimePeriod aggregateByTimePeriod)
             throws CodeGenerationException {
-        if (aggregateByTimePeriod == null) {
-            throw new CodeGenerationException("A given aggregateByTimePeriod element is empty");
-        } else if (aggregateByTimePeriod.getType() == null || aggregateByTimePeriod.getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of a given aggregateByTimePeriod element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimePeriod);
 
         StringBuilder aggregateByTimePeriodStringBuilder = new StringBuilder();
         switch (aggregateByTimePeriod.getType().toUpperCase()) {
@@ -130,11 +114,11 @@ public class AggregationCodeGenerator {
     }
 
     private String generateAggregateByTimeInterval(AggregateByTimeInterval aggregateByTimeInterval) throws CodeGenerationException {
-        StringBuilder aggregateByTimeIntervalStringBuilder = new StringBuilder();
         if (aggregateByTimeInterval.getValue() == null || aggregateByTimeInterval.getValue().isEmpty()) {
             throw new CodeGenerationException("The 'value' attribute of a given" +
                     " attributeByTimeInterval element is empty");
         }
+        StringBuilder aggregateByTimeIntervalStringBuilder = new StringBuilder();
         int timeIntervalsLeft = aggregateByTimeInterval.getValue().size();
         for (String timeInterval : aggregateByTimeInterval.getValue()) {
             aggregateByTimeIntervalStringBuilder.append(timeInterval.toLowerCase());
@@ -147,19 +131,8 @@ public class AggregationCodeGenerator {
     }
 
     private String generateAggregateByTimeRange(AggregateByTimeRange aggregateByTimeRange) throws CodeGenerationException {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimeRange);
         StringBuilder aggregateByTimeRangeStringBuilder = new StringBuilder();
-        if (aggregateByTimeRange.getValue() == null) {
-            throw new CodeGenerationException("The 'value' attribute of a given aggregateByTimeRange" +
-                    " element is empty");
-        } else if (aggregateByTimeRange.getValue().getMin() == null ||
-                aggregateByTimeRange.getValue().getMin().isEmpty()) {
-            throw new CodeGenerationException("The 'min' value of a given" +
-                    " aggregateByTimeRange element is empty");
-        } else if (aggregateByTimeRange.getValue().getMax() == null ||
-                aggregateByTimeRange.getValue().getMax().isEmpty()) {
-            throw new CodeGenerationException("The 'max' value of a given" +
-                    " aggregateByTimeRange element is empty");
-        }
         aggregateByTimeRangeStringBuilder.append(aggregateByTimeRange.getValue().getMin().toLowerCase())
                 .append(SiddhiCodeBuilderConstants.THREE_DOTS)
                 .append(aggregateByTimeRange.getValue().getMax().toLowerCase());

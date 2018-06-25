@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generat
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
  * Generate's the code for a Siddhi table element
@@ -28,11 +29,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 public class TableCodeGenerator {
 
     public String generateTable(TableConfig table) throws CodeGenerationException {
-        if (table == null) {
-            throw new CodeGenerationException("A given table element is empty");
-        } else if (table.getName() == null || table.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given table element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(table);
 
         return SubElementCodeGenerator.generateStore(table.getStore()) +
                 SubElementCodeGenerator.generateAnnotations(table.getAnnotationList()) +

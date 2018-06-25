@@ -84,6 +84,7 @@ public class SiddhiCodeBuilderConstants {
     public static final String FUNCTIONS_COMMENT = "-- Functions";
     public static final String QUERIES_COMMENT = "-- Queries";
     public static final String PARTITIONS_COMMENT = "-- Partitions";
+    public static final String QUERIES_PARTITIONS_COMMENT = "-- Queries & Partitions";
     // Other Strings
     public static final String FROM = "from";
     public static final String SELECT = "select";

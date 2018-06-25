@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generat
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
  * Generate's the code for a Siddhi function element
@@ -28,17 +29,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 public class FunctionCodeGenerator {
 
     public String generateFunction(FunctionConfig function) throws CodeGenerationException {
-        if (function == null) {
-            throw new CodeGenerationException("A given function element is empty");
-        } else if (function.getName() == null || function.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given function element is empty");
-        } else if (function.getScriptType() == null || function.getScriptType().isEmpty()) {
-            throw new CodeGenerationException("The 'script type' of " + function.getName() + " is empty");
-        } else if (function.getReturnType() == null || function.getReturnType().isEmpty()) {
-            throw new CodeGenerationException("The return type of " + function.getName() + " is empty");
-        } else if (function.getBody() == null || function.getBody().isEmpty()) {
-            throw new CodeGenerationException("The 'body' value of " + function.getName() + " is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(function);
 
         return SiddhiCodeBuilderConstants.DEFINE_FUNCTION +
                 SiddhiCodeBuilderConstants.SPACE +

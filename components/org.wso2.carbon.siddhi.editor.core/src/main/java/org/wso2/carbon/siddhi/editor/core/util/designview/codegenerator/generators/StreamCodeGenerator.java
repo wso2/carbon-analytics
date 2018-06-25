@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generat
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
  * Generate's the code for a Siddhi stream element
@@ -28,11 +29,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 public class StreamCodeGenerator {
 
     public String generateStream(StreamConfig stream) throws CodeGenerationException {
-        if (stream == null) {
-            throw new CodeGenerationException("A given stream element is empty");
-        } else if (stream.getName() == null || stream.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given stream element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
 
         return SubElementCodeGenerator.generateAnnotations(stream.getAnnotationList()) +
                 SiddhiCodeBuilderConstants.DEFINE_STREAM +

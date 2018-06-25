@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generat
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TriggerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
  * Generate's the code for a Siddhi trigger element
@@ -28,13 +29,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 public class TriggerCodeGenerator {
 
     public String generateTrigger(TriggerConfig trigger) throws CodeGenerationException {
-        if (trigger == null) {
-            throw new CodeGenerationException("A given trigger element is empty");
-        } else if (trigger.getName() == null || trigger.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given trigger element is empty");
-        } else if (trigger.getAt() == null || trigger.getAt().isEmpty()) {
-            throw new CodeGenerationException("The 'at' value of " + trigger.getName() + " is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(trigger);
 
         return SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()) +
                 SiddhiCodeBuilderConstants.DEFINE_TRIGGER +
