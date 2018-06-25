@@ -77,7 +77,15 @@ public class ElementCodeSegment implements Comparable {
         if (getStartLine() > otherSegment.getStartLine()) {
             return 1;
         } else if (getStartLine() == otherSegment.getStartLine()) {
-            return Integer.compare(getStartColumn(), otherSegment.getStartColumn());
+            if (getEndLine() == otherSegment.getEndLine()) {
+                if (getStartColumn() == otherSegment.getStartColumn()) {
+                    return Integer.compare(getEndColumn(), otherSegment.getEndColumn());
+                } else {
+                    return Integer.compare(getStartColumn(), otherSegment.getStartColumn());
+                }
+            } else {
+                return Integer.compare(getEndLine(), otherSegment.getEndLine());
+            }
         } else {
             return -1;
         }
