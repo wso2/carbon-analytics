@@ -64,9 +64,8 @@ public class QueryOutputCodeGenerator {
 
     private static String generateInsertOutput(InsertOutputConfig insertOutput, String target)
             throws CodeGenerationException {
-        if (insertOutput == null) {
-            throw new CodeGenerationException("A given insert query output element is empty");
-        } else if (target == null || target.isEmpty()) {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(insertOutput);
+        if (target == null || target.isEmpty()) {
             throw new CodeGenerationException("The 'target' value of a given query output element is empty");
         }
 

@@ -27,6 +27,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.AggregateByTimePeriod;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeRange;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionWithElement;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
@@ -38,6 +40,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.DeleteOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.InsertOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.UpdateInsertIntoOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute.SetAttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
@@ -488,6 +491,23 @@ public class CodeGeneratorUtils {
                 throw new CodeGenerationException("The function name of the window " + window.getName() + " is empty");
             }
         }
+
+        public static void validateConfigObject(InsertOutputConfig insertOutput) throws CodeGenerationException {
+            if (insertOutput == null) {
+                throw new CodeGenerationException("A given insert query output element is empty");
+            }
+        }
+
+        public static void validateConfigObject(AttributesSelectionConfig attributesSelection) throws CodeGenerationException {
+            if (attributesSelection == null) {
+                throw new CodeGenerationException("A given attribute selection element is empty");
+            } else if (attributesSelection.getType() == null || attributesSelection.getType().isEmpty()) {
+                throw new CodeGenerationException("The 'type' value of a given attribute selection element is empty");
+            }
+        }
+
+
+
 
         private NullValidator() {
         }

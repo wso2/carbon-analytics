@@ -24,6 +24,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSelection;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
  * Generate's the code for a select element of a Siddhi query
@@ -31,19 +32,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 public class QuerySelectCodeGenerator {
 
     public static String generateQuerySelect(AttributesSelectionConfig attributesSelection) throws CodeGenerationException {
-        if (attributesSelection == null) {
-            throw new CodeGenerationException("A given attribute selection element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(attributesSelection);
 
         StringBuilder attributesSelectionStringBuilder = new StringBuilder();
-
         attributesSelectionStringBuilder.append(SiddhiCodeBuilderConstants.SELECT)
                 .append(SiddhiCodeBuilderConstants.SPACE);
-
-        if (attributesSelection.getType() == null || attributesSelection.getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of a given attribute selection element is empty");
-        }
-
         switch (attributesSelection.getType().toUpperCase()) {
             case AttributeSelection.TYPE_USER_DEFINED:
                 UserDefinedSelectionConfig userDefinedSelection = (UserDefinedSelectionConfig) attributesSelection;
