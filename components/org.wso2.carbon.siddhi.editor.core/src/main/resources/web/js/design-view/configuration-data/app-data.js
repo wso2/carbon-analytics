@@ -29,6 +29,10 @@ define(['require', 'elementUtils', 'lodash'],
             // initiates the collections
             if (options !== undefined) {
                 this.siddhiAppName = options.siddhiAppName;
+                // Following lists hold references for comments in the code view. These lists are passed to the backend
+                // when generating the code from design. Front end does not use them.
+                this.elementCodeSegments = options.elementCodeSegments;
+                this.commentCodeSegments = options.commentCodeSegments;
             }
             this.appAnnotationList = [];
             this.streamList = [];

@@ -30,6 +30,7 @@ define(['require', 'elementUtils'],
              Data storing structure as follows.
 
                 id*: '',
+                previousCommentSegment:'',
                 queryInput*: {Query Input JSON},
                 select*: {Query Select JSON},
                 groupBy: ['value1',...],
@@ -48,6 +49,7 @@ define(['require', 'elementUtils'],
             */
             if (options !== undefined) {
                 this.id = options.id;
+                this.previousCommentSegment = options.previousCommentSegment;
                 this.queryInput = options.queryInput;
                 this.select = options.select;
                 this.groupBy = options.groupBy;
