@@ -29,7 +29,7 @@ define(
             /*
              Data storing structure as follows.
                 function*: '',
-                parameters*: ['value1',...]'
+                parameters: ['value1',...]'
             */
             if (options !== undefined) {
                 this.function = options.function;

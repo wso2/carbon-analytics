@@ -522,6 +522,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 title: "Function",
                                 type: "object",
                                 required: true,
+                                options: {
+                                    disable_properties: false
+                                },
                                 properties: {
                                     functionName: {
                                         required: true,
@@ -530,7 +533,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         minLength: 1
                                     },
                                     parameters: {
-                                        required: true,
                                         type: "array",
                                         format: "table",
                                         title: "Parameters",
