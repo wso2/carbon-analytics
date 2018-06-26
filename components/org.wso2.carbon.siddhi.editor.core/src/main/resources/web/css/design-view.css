@@ -592,5 +592,5 @@ a.list-group-item, button.list-group-item {
 }
 
 .error-element {
-    background-color: #ff0000;
+    border: 3px solid #FF0000;
 }
