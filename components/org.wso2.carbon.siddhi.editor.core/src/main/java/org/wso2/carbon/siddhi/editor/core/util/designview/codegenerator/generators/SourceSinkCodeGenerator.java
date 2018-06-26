@@ -39,7 +39,8 @@ public class SourceSinkCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(sourceSink);
 
         StringBuilder sourceSinkStringBuilder = new StringBuilder();
-        sourceSinkStringBuilder.append(SubElementCodeGenerator.generateComment(sourceSink.getPreviousCommentSegment()));
+        sourceSinkStringBuilder.append(
+                SubElementCodeGenerator.generateComment(sourceSink.getPreviousCommentSegment()));
         if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
             sourceSinkStringBuilder.append(SiddhiCodeBuilderConstants.SOURCE_ANNOTATION);
         } else if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
@@ -67,9 +68,7 @@ public class SourceSinkCodeGenerator {
     }
 
     private String generateMapper(MapperConfig mapper) throws CodeGenerationException {
-        if (mapper.getType() == null || mapper.getType().isEmpty()) {
-            throw new CodeGenerationException("The map type of a given source/sink map element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(mapper);
 
         StringBuilder mapperStringBuilder = new StringBuilder();
         mapperStringBuilder.append(SiddhiCodeBuilderConstants.MAP_ANNOTATION)
@@ -100,9 +99,7 @@ public class SourceSinkCodeGenerator {
 
     private String generateMapperPayloadOrAttribute(MapperPayloadOrAttribute payloadOrAttribute)
             throws CodeGenerationException {
-        if (payloadOrAttribute.getType() == null || payloadOrAttribute.getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of a given source/sink map attribute element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(payloadOrAttribute);
 
         StringBuilder mapperAttributeStringBuilder = new StringBuilder();
         switch (payloadOrAttribute.getType().toUpperCase()) {
@@ -122,11 +119,10 @@ public class SourceSinkCodeGenerator {
         return mapperAttributeStringBuilder.toString();
     }
 
-    private String generateListPayloadOrAttribute(MapperListPayloadOrAttribute mapperListAttribute) throws CodeGenerationException {
-        if (mapperListAttribute.getValue() == null || mapperListAttribute.getValue().isEmpty()) {
-            throw new CodeGenerationException("The list values of a given sink/source" +
-                    " map attribute element is empty");
-        }
+    private String generateListPayloadOrAttribute(MapperListPayloadOrAttribute mapperListAttribute)
+            throws CodeGenerationException {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(mapperListAttribute);
+
         StringBuilder mapperListAttributeStringBuilder = new StringBuilder();
         int valuesLeft = mapperListAttribute.getValue().size();
         for (String value : mapperListAttribute.getValue()) {
@@ -138,14 +134,14 @@ public class SourceSinkCodeGenerator {
             }
             valuesLeft--;
         }
+
         return mapperListAttributeStringBuilder.toString();
     }
 
-    private String generateMapPayloadOrAttribute(MapperMapPayloadOrAttribute mapperMapAttribute) throws CodeGenerationException {
-        if (mapperMapAttribute.getValue() == null || mapperMapAttribute.getValue().isEmpty()) {
-            throw new CodeGenerationException("The key-value pair values of" +
-                    " a given source/sink map attribute element is empty");
-        }
+    private String generateMapPayloadOrAttribute(MapperMapPayloadOrAttribute mapperMapAttribute)
+            throws CodeGenerationException {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(mapperMapAttribute);
+
         StringBuilder mapperMapAttributeStringBuilder = new StringBuilder();
         int mapEntriesLeft = mapperMapAttribute.getValue().size();
         for (Map.Entry<String, String> entry : mapperMapAttribute.getValue().entrySet()) {
@@ -159,6 +155,7 @@ public class SourceSinkCodeGenerator {
             }
             mapEntriesLeft--;
         }
+
         return mapperMapAttributeStringBuilder.toString();
     }
 

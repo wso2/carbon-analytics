@@ -62,7 +62,8 @@ public class ExecutionElementConfig {
             case CodeGeneratorConstants.FILTER:
             case CodeGeneratorConstants.PROJECTION:
             case CodeGeneratorConstants.FUNCTION:
-                WindowFilterProjectionConfig windowFilterProjection = (WindowFilterProjectionConfig) query.getQueryInput();
+                WindowFilterProjectionConfig windowFilterProjection =
+                        (WindowFilterProjectionConfig) query.getQueryInput();
                 inputStreamList.add(windowFilterProjection.getFrom());
                 break;
             case CodeGeneratorConstants.JOIN:
@@ -92,7 +93,8 @@ public class ExecutionElementConfig {
             for (QueryConfig query : queryList) {
                 List<String> queryInputStreams = extractInputStreams(query);
                 for (String inputStreamName : queryInputStreams) {
-                    if (!inputStreamList.contains(inputStreamName)) {
+                    if (!inputStreamList.contains(inputStreamName) &&
+                            !inputStreamName.substring(0, 1).equals("#")) {
                         inputStreamList.add(inputStreamName);
                     }
                 }
@@ -111,7 +113,8 @@ public class ExecutionElementConfig {
         List<String> outputStreamList = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
             for (QueryConfig query : queryList) {
-                if (!outputStreamList.contains(extractOutputStreams(query).get(0))) {
+                String outputStream = extractOutputStreams(query).get(0);
+                if (!outputStreamList.contains(outputStream) && !outputStream.substring(0, 1).equals("#")) {
                     outputStreamList.add(extractOutputStreams(query).get(0));
                 }
             }

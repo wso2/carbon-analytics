@@ -42,7 +42,6 @@ public class QueryInputCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(queryInput);
 
         StringBuilder queryInputStringBuilder = new StringBuilder();
-
         switch (queryInput.getType().toUpperCase()) {
             case CodeGeneratorConstants.WINDOW:
             case CodeGeneratorConstants.FILTER:
@@ -187,7 +186,8 @@ public class QueryInputCodeGenerator {
         return patternSequenceInputStringBuilder.toString();
     }
 
-    private static String generatePatternSequenceConditionLogic(PatternSequenceConditionConfig condition, boolean hasNot)
+    private static String generatePatternSequenceConditionLogic(PatternSequenceConditionConfig condition,
+                                                                boolean hasNot)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(condition);
 

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
@@ -26,11 +27,14 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.AggregationConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.AggregateByTimePeriod;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeInterval;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeRange;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionWithElement;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryOrderByConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.join.JoinElementConfig;
@@ -44,6 +48,10 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute.SetAttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.MapperConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperListPayloadOrAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperMapPayloadOrAttribute;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.elements.ExecutionElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
@@ -80,18 +88,14 @@ public class CodeGeneratorUtils {
                 }
             }
         }
+
         return reorderedQueries;
     }
 
     private static List<String> getInputStreams(QueryConfig query)
             throws CodeGenerationException {
-        if (query == null) {
-            throw new CodeGenerationException("A given query element is empty");
-        } else if (query.getQueryInput() == null) {
-            throw new CodeGenerationException("The query input of a given query element is empty");
-        } else if (query.getQueryInput().getType() == null || query.getQueryInput().getType().isEmpty()) {
-            throw new CodeGenerationException("The 'type' value of a given query input element is empty");
-        }
+        NullValidator.validateConfigObject(query);
+        NullValidator.validateConfigObject(query.getQueryInput());
 
         List<String> inputStreamList = new LinkedList<>();
         switch (query.getQueryInput().getType().toUpperCase()) {
@@ -101,45 +105,21 @@ public class CodeGeneratorUtils {
             case CodeGeneratorConstants.FUNCTION:
                 WindowFilterProjectionConfig windowFilterProjection =
                         (WindowFilterProjectionConfig) query.getQueryInput();
-                if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
-                    throw new CodeGenerationException("The 'from' value of a given" +
-                            " window/filter/projection query input is empty");
-                }
+                NullValidator.validateConfigObject(windowFilterProjection);
                 inputStreamList.add(windowFilterProjection.getFrom());
                 break;
             case CodeGeneratorConstants.JOIN:
                 JoinConfig join = (JoinConfig) query.getQueryInput();
-                if (join.getLeft() == null) {
-                    throw new CodeGenerationException("The join left element of a given join query is empty");
-                } else if (join.getRight() == null) {
-                    throw new CodeGenerationException("The join right element of a given join query is empty");
-                } else if (join.getLeft().getFrom() == null || join.getLeft().getFrom().isEmpty()) {
-                    throw new CodeGenerationException("The left element 'from' value of a given" +
-                            " join query is empty");
-                } else if (join.getRight().getFrom() == null || join.getRight().getFrom().isEmpty()) {
-                    throw new CodeGenerationException("The right element 'from' value of a" +
-                            " given join query is empty");
-                }
-
+                NullValidator.validateConfigObject(join);
                 inputStreamList.add(join.getLeft().getFrom());
                 inputStreamList.add(join.getRight().getFrom());
                 break;
             case CodeGeneratorConstants.PATTERN:
             case CodeGeneratorConstants.SEQUENCE:
                 PatternSequenceConfig patternSequence = (PatternSequenceConfig) query.getQueryInput();
-                if (patternSequence.getConditionList() == null || patternSequence.getConditionList().isEmpty()) {
-                    throw new CodeGenerationException("The condition list of a given " +
-                            "pattern/sequence query is empty");
-                }
+                NullValidator.validateConfigObject(patternSequence);
                 for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
-                    if (condition == null) {
-                        throw new CodeGenerationException("The condition value of a given" +
-                                " pattern/sequence condition list is empty");
-                    } else if (condition.getStreamName() == null || condition.getStreamName().isEmpty()) {
-                        throw new CodeGenerationException("The condition stream name of the given" +
-                                " pattern/sequence query condition is empty");
-                    }
-
+                    NullValidator.validateConfigObject(condition);
                     inputStreamList.add(condition.getStreamName());
                 }
                 break;
@@ -157,12 +137,11 @@ public class CodeGeneratorUtils {
         List<StreamConfig> definedStreams = new ArrayList<>();
         for (StreamConfig stream : streamList) {
             // Check For Stream Comments
-            if (stream.getPreviousCommentSegment() != null) {
-                if (stream.getPreviousCommentSegment().getContent() != null &&
-                        !stream.getPreviousCommentSegment().getContent().isEmpty()) {
-                    definedStreams.add(stream);
-                    continue;
-                }
+            if (stream.getPreviousCommentSegment() != null &&
+                    stream.getPreviousCommentSegment().getContent() != null &&
+                    !stream.getPreviousCommentSegment().getContent().isEmpty()) {
+                definedStreams.add(stream);
+                continue;
             }
             // Check For Annotations
             if (stream.getAnnotationList() != null && !stream.getAnnotationList().isEmpty()) {
@@ -225,6 +204,7 @@ public class CodeGeneratorUtils {
                 definitionNames.add(stream.getName());
             }
         }
+
         return definitionNames;
     }
 
@@ -238,6 +218,7 @@ public class CodeGeneratorUtils {
         for (PartitionConfig partition : partitions) {
             executionElements.add(new ExecutionElementConfig(partition));
         }
+
         return executionElements;
     }
 
@@ -262,6 +243,7 @@ public class CodeGeneratorUtils {
                 }
             }
         }
+
         return reorderedExecutionElements;
     }
 
@@ -513,6 +495,75 @@ public class CodeGeneratorUtils {
             }
         }
 
+        public static void validateConfigObject(SelectedAttribute attribute) throws CodeGenerationException {
+            if (attribute.getExpression() == null || attribute.getExpression().isEmpty()) {
+                throw new CodeGenerationException("The 'expression' value of a given select" +
+                        " attribute element is empty");
+            }
+        }
+
+        public static void validateConfigObject(QueryOrderByConfig orderByAttribute) throws CodeGenerationException {
+            if (orderByAttribute == null) {
+                throw new CodeGenerationException("A given query 'order by' value is empty");
+            } else if (orderByAttribute.getValue() == null || orderByAttribute.getValue().isEmpty()) {
+                throw new CodeGenerationException("The 'value' attribute for a given query order by element is empty");
+            }
+        }
+
+        public static void validateConfigObject(QueryConfig query) throws CodeGenerationException {
+            if (query == null) {
+                throw new CodeGenerationException("A given query element is empty");
+            }
+        }
+
+        public static void validateConfigObject(AggregateByTimeInterval aggregateByTimeInterval) throws CodeGenerationException {
+            if (aggregateByTimeInterval.getValue() == null || aggregateByTimeInterval.getValue().isEmpty()) {
+                throw new CodeGenerationException("The 'value' attribute of a given" +
+                        " attributeByTimeInterval element is empty");
+            }
+        }
+
+        public static void validateConfigObject(List<PartitionWithElement> partitionWith) throws CodeGenerationException {
+            if (partitionWith == null || partitionWith.isEmpty()) {
+                throw new CodeGenerationException("A given 'partitionWith' list is empty");
+            }
+        }
+
+        public static void validateConfigObject(MapperConfig mapper) throws CodeGenerationException {
+            if (mapper.getType() == null || mapper.getType().isEmpty()) {
+                throw new CodeGenerationException("The map type of a given source/sink map element is empty");
+            }
+        }
+
+        public static void validateConfigObject(MapperPayloadOrAttribute payloadOrAttribute) throws CodeGenerationException {
+            if (payloadOrAttribute.getType() == null || payloadOrAttribute.getType().isEmpty()) {
+                throw new CodeGenerationException("The 'type' value of a given source/sink map attribute element is empty");
+            }
+        }
+
+        public static void validateConfigObject(MapperListPayloadOrAttribute mapperListAttribute) throws CodeGenerationException {
+            if (mapperListAttribute.getValue() == null || mapperListAttribute.getValue().isEmpty()) {
+                throw new CodeGenerationException("The list values of a given sink/source" +
+                        " map attribute element is empty");
+            }
+        }
+
+        public static void validateConfigObject(MapperMapPayloadOrAttribute mapperMapAttribute) throws CodeGenerationException {
+            if (mapperMapAttribute.getValue() == null || mapperMapAttribute.getValue().isEmpty()) {
+                throw new CodeGenerationException("The key-value pair values of" +
+                        " a given source/sink map attribute element is empty");
+            }
+        }
+
+        public static void validateConfigObject(AttributeConfig attribute) throws CodeGenerationException {
+            if (attribute == null) {
+                throw new CodeGenerationException("A given attribute element is empty");
+            } else if (attribute.getName() == null || attribute.getName().isEmpty()) {
+                throw new CodeGenerationException("The 'name' of a given attribute element is empty");
+            } else if (attribute.getType() == null || attribute.getType().isEmpty()) {
+                throw new CodeGenerationException("The 'type' value of a given attribute element is empty");
+            }
+        }
 
         private NullValidator() {
         }

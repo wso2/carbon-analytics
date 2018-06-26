@@ -26,6 +26,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generato
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.subelements.QuerySubElementCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
  * Generate's the code for a Siddhi query element
@@ -33,9 +34,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 public class QueryCodeGenerator {
 
     public String generateQuery(QueryConfig query) throws CodeGenerationException {
-        if (query == null) {
-            throw new CodeGenerationException("A given query element is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(query);
 
         StringBuilder queryStringBuilder = new StringBuilder();
         queryStringBuilder.append(SubElementCodeGenerator.generateComment(query.getPreviousCommentSegment()))

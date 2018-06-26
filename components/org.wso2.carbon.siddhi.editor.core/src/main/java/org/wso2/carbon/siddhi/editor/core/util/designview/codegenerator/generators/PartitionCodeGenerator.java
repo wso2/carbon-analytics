@@ -75,9 +75,7 @@ public class PartitionCodeGenerator {
     }
 
     private String generatePartitionWith(List<PartitionWithElement> partitionWith) throws CodeGenerationException {
-        if (partitionWith == null || partitionWith.isEmpty()) {
-            throw new CodeGenerationException("A given 'partitionWith' list is empty");
-        }
+        CodeGeneratorUtils.NullValidator.validateConfigObject(partitionWith);
 
         StringBuilder partitionWithStringBuilder = new StringBuilder();
         int partitionWithElementsLeft = partitionWith.size();

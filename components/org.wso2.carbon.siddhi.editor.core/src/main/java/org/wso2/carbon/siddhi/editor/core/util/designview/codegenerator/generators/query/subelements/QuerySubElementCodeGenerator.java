@@ -22,6 +22,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.SubElementCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.List;
 
@@ -55,11 +56,7 @@ public class QuerySubElementCodeGenerator {
 
         int orderByAttributesLeft = orderByList.size();
         for (QueryOrderByConfig orderByAttribute : orderByList) {
-            if (orderByAttribute == null) {
-                throw new CodeGenerationException("A given query 'order by' value is empty");
-            } else if (orderByAttribute.getValue() == null || orderByAttribute.getValue().isEmpty()) {
-                throw new CodeGenerationException("The 'value' attribute for a given query order by element is empty");
-            }
+            CodeGeneratorUtils.NullValidator.validateConfigObject(orderByAttribute);
 
             orderByListStringBuilder.append(orderByAttribute.getValue());
             if (orderByAttribute.getOrder() != null && !orderByAttribute.getOrder().isEmpty()) {

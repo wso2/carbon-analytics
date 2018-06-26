@@ -54,13 +54,8 @@ public class SubElementCodeGenerator {
         StringBuilder stringBuilder = new StringBuilder();
         int attributesLeft = attributes.size();
         for (AttributeConfig attribute : attributes) {
-            if (attribute == null) {
-                throw new CodeGenerationException("A given attribute element is empty");
-            } else if (attribute.getName() == null || attribute.getName().isEmpty()) {
-                throw new CodeGenerationException("The 'name' of a given attribute element is empty");
-            } else if (attribute.getType() == null || attribute.getType().isEmpty()) {
-                throw new CodeGenerationException("The 'type' value of a given attribute element is empty");
-            }
+            CodeGeneratorUtils.NullValidator.validateConfigObject(attribute);
+
             stringBuilder.append(attribute.getName())
                     .append(SiddhiCodeBuilderConstants.SPACE)
                     .append(attribute.getType().toLowerCase());
@@ -139,13 +134,12 @@ public class SubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        StringBuilder streamhandlerListStringBuilder = new StringBuilder();
-
+        StringBuilder streamHandlerListStringBuilder = new StringBuilder();
         for (StreamHandlerConfig streamHandler : streamHandlerList) {
-            streamhandlerListStringBuilder.append(generateStreamHandler(streamHandler));
+            streamHandlerListStringBuilder.append(generateStreamHandler(streamHandler));
         }
 
-        return streamhandlerListStringBuilder.toString();
+        return streamHandlerListStringBuilder.toString();
     }
 
     private static String generateStreamHandler(StreamHandlerConfig streamHandler) throws CodeGenerationException {

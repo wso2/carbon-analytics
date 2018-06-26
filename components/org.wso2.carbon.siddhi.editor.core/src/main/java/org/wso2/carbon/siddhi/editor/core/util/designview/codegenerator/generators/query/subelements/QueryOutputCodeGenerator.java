@@ -38,7 +38,6 @@ public class QueryOutputCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(queryOutput);
 
         StringBuilder queryOutputStringBuilder = new StringBuilder();
-
         switch (queryOutput.getType().toUpperCase()) {
             case CodeGeneratorConstants.INSERT:
                 InsertOutputConfig insertOutputConfig = (InsertOutputConfig) queryOutput.getOutput();

@@ -115,11 +115,10 @@ public class AggregationCodeGenerator {
         return aggregateByTimePeriodStringBuilder.toString();
     }
 
-    private String generateAggregateByTimeInterval(AggregateByTimeInterval aggregateByTimeInterval) throws CodeGenerationException {
-        if (aggregateByTimeInterval.getValue() == null || aggregateByTimeInterval.getValue().isEmpty()) {
-            throw new CodeGenerationException("The 'value' attribute of a given" +
-                    " attributeByTimeInterval element is empty");
-        }
+    private String generateAggregateByTimeInterval(AggregateByTimeInterval aggregateByTimeInterval)
+            throws CodeGenerationException {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimeInterval);
+
         StringBuilder aggregateByTimeIntervalStringBuilder = new StringBuilder();
         int timeIntervalsLeft = aggregateByTimeInterval.getValue().size();
         for (String timeInterval : aggregateByTimeInterval.getValue()) {
@@ -132,13 +131,13 @@ public class AggregationCodeGenerator {
         return aggregateByTimeIntervalStringBuilder.toString();
     }
 
-    private String generateAggregateByTimeRange(AggregateByTimeRange aggregateByTimeRange) throws CodeGenerationException {
+    private String generateAggregateByTimeRange(AggregateByTimeRange aggregateByTimeRange)
+            throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimeRange);
-        StringBuilder aggregateByTimeRangeStringBuilder = new StringBuilder();
-        aggregateByTimeRangeStringBuilder.append(aggregateByTimeRange.getValue().getMin().toLowerCase())
-                .append(SiddhiCodeBuilderConstants.THREE_DOTS)
-                .append(aggregateByTimeRange.getValue().getMax().toLowerCase());
-        return aggregateByTimeRangeStringBuilder.toString();
+
+        return aggregateByTimeRange.getValue().getMin().toLowerCase() +
+                SiddhiCodeBuilderConstants.THREE_DOTS +
+                aggregateByTimeRange.getValue().getMax().toLowerCase();
     }
 
 }

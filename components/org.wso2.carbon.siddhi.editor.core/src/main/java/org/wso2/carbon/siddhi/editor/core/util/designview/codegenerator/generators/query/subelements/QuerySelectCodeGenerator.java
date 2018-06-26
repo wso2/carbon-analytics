@@ -31,7 +31,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
  */
 public class QuerySelectCodeGenerator {
 
-    public static String generateQuerySelect(AttributesSelectionConfig attributesSelection) throws CodeGenerationException {
+    public static String generateQuerySelect(AttributesSelectionConfig attributesSelection)
+            throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(attributesSelection);
 
         StringBuilder attributesSelectionStringBuilder = new StringBuilder();
@@ -64,10 +65,8 @@ public class QuerySelectCodeGenerator {
 
         int attributesLeft = userDefinedSelection.getValue().size();
         for (SelectedAttribute attribute : userDefinedSelection.getValue()) {
-            if (attribute.getExpression() == null || attribute.getExpression().isEmpty()) {
-                throw new CodeGenerationException("The 'expression' value of a given select" +
-                        " attribute element is empty");
-            }
+            CodeGeneratorUtils.NullValidator.validateConfigObject(attribute);
+
             userDefinedSelectionStringBuilder.append(attribute.getExpression());
             if (attribute.getAs() != null && !attribute.getAs().isEmpty() &&
                     !attribute.getAs().equals(attribute.getExpression())) {
