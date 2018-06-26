@@ -31,7 +31,8 @@ public class TriggerCodeGenerator {
     public String generateTrigger(TriggerConfig trigger) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(trigger);
 
-        return SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()) +
+        return SubElementCodeGenerator.generateComment(trigger.getPreviousCommentSegment()) +
+                SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()) +
                 SiddhiCodeBuilderConstants.DEFINE_TRIGGER +
                 SiddhiCodeBuilderConstants.SPACE +
                 trigger.getName() +

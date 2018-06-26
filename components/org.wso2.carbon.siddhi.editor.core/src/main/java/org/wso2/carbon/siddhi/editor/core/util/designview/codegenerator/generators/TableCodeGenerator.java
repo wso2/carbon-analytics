@@ -31,7 +31,8 @@ public class TableCodeGenerator {
     public String generateTable(TableConfig table) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(table);
 
-        return SubElementCodeGenerator.generateStore(table.getStore()) +
+        return SubElementCodeGenerator.generateComment(table.getPreviousCommentSegment()) +
+                SubElementCodeGenerator.generateStore(table.getStore()) +
                 SubElementCodeGenerator.generateAnnotations(table.getAnnotationList()) +
                 SiddhiCodeBuilderConstants.DEFINE_TABLE +
                 SiddhiCodeBuilderConstants.SPACE +

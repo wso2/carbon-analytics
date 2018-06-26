@@ -31,7 +31,8 @@ public class StreamCodeGenerator {
     public String generateStream(StreamConfig stream) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
 
-        return SubElementCodeGenerator.generateAnnotations(stream.getAnnotationList()) +
+        return SubElementCodeGenerator.generateComment(stream.getPreviousCommentSegment()) +
+                SubElementCodeGenerator.generateAnnotations(stream.getAnnotationList()) +
                 SiddhiCodeBuilderConstants.DEFINE_STREAM +
                 SiddhiCodeBuilderConstants.SPACE +
                 stream.getName() +

@@ -89,8 +89,7 @@ public class CodeGenerator {
                                              List<PartitionConfig> partitions, List<String> definitionNames)
             throws CodeGenerationException {
         StringBuilder executionElementStringBuilder = new StringBuilder();
-        executionElementStringBuilder.append(SiddhiCodeBuilderConstants.QUERIES_PARTITIONS_COMMENT)
-                .append(SiddhiCodeBuilderConstants.NEW_LINE);
+        executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         List<QueryConfig> queries = new LinkedList<>();
         for (List<QueryConfig> queryList : queryLists.values()) {
             queries.addAll(queryList);
@@ -140,8 +139,6 @@ public class CodeGenerator {
 
         StringBuilder streamListStringBuilder = new StringBuilder();
         streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
-                .append(SiddhiCodeBuilderConstants.NEW_LINE)
-                .append(SiddhiCodeBuilderConstants.STREAMS_COMMENT)
                 .append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         SourceSinkCodeGenerator sourceSinkCodeGenerator = new SourceSinkCodeGenerator();
@@ -175,8 +172,7 @@ public class CodeGenerator {
         }
 
         StringBuilder tableListStringBuilder = new StringBuilder();
-        tableListStringBuilder.append(SiddhiCodeBuilderConstants.TABLES_COMMENT)
-                .append(SiddhiCodeBuilderConstants.NEW_LINE);
+        tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         TableCodeGenerator tableCodeGenerator = new TableCodeGenerator();
         for (TableConfig table : tableList) {
@@ -194,8 +190,7 @@ public class CodeGenerator {
         }
 
         StringBuilder windowListStringBuilder = new StringBuilder();
-        windowListStringBuilder.append(SiddhiCodeBuilderConstants.WINDOWS_COMMENT)
-                .append(SiddhiCodeBuilderConstants.NEW_LINE);
+        windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         WindowCodeGenerator windowCodeGenerator = new WindowCodeGenerator();
         for (WindowConfig window : windowList) {
@@ -213,8 +208,7 @@ public class CodeGenerator {
         }
 
         StringBuilder triggerListStringBuilder = new StringBuilder();
-        triggerListStringBuilder.append(SiddhiCodeBuilderConstants.TRIGGERS_COMMENT)
-                .append(SiddhiCodeBuilderConstants.NEW_LINE);
+        triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         TriggerCodeGenerator triggerCodeGenerator = new TriggerCodeGenerator();
         for (TriggerConfig trigger : triggerList) {
             triggerListStringBuilder.append(triggerCodeGenerator.generateTrigger(trigger));
@@ -231,8 +225,7 @@ public class CodeGenerator {
         }
 
         StringBuilder aggregationListStringBuilder = new StringBuilder();
-        aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.AGGREGATIONS_COMMENT)
-                .append(SiddhiCodeBuilderConstants.NEW_LINE);
+        aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         AggregationCodeGenerator aggregationCodeGenerator = new AggregationCodeGenerator();
         for (AggregationConfig aggregation : aggregationList) {
             aggregationListStringBuilder.append(aggregationCodeGenerator.generateAggregation(aggregation));
@@ -249,8 +242,7 @@ public class CodeGenerator {
         }
 
         StringBuilder functionListStringBuilder = new StringBuilder();
-        functionListStringBuilder.append(SiddhiCodeBuilderConstants.FUNCTIONS_COMMENT)
-                .append(SiddhiCodeBuilderConstants.NEW_LINE);
+        functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         FunctionCodeGenerator functionCodeGenerator = new FunctionCodeGenerator();
         for (FunctionConfig function : functionList) {
             functionListStringBuilder.append(functionCodeGenerator.generateFunction(function));

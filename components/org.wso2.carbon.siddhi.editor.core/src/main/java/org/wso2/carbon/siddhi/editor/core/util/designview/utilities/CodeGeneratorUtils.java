@@ -28,7 +28,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.AggregateByTimePeriod;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregateByTimeRange;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionWithElement;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
@@ -157,6 +156,14 @@ public class CodeGeneratorUtils {
                                                              List<QueryConfig> queryList) {
         List<StreamConfig> definedStreams = new ArrayList<>();
         for (StreamConfig stream : streamList) {
+            // Check For Stream Comments
+            if (stream.getPreviousCommentSegment() != null) {
+                if (stream.getPreviousCommentSegment().getContent() != null &&
+                        !stream.getPreviousCommentSegment().getContent().isEmpty()) {
+                    definedStreams.add(stream);
+                    continue;
+                }
+            }
             // Check For Annotations
             if (stream.getAnnotationList() != null && !stream.getAnnotationList().isEmpty()) {
                 definedStreams.add(stream);
@@ -505,8 +512,6 @@ public class CodeGeneratorUtils {
                 throw new CodeGenerationException("The 'type' value of a given attribute selection element is empty");
             }
         }
-
-
 
 
         private NullValidator() {

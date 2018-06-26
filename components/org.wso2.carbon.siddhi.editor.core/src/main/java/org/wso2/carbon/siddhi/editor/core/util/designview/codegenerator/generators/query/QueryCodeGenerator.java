@@ -38,7 +38,8 @@ public class QueryCodeGenerator {
         }
 
         StringBuilder queryStringBuilder = new StringBuilder();
-        queryStringBuilder.append(SubElementCodeGenerator.generateAnnotations(query.getAnnotationList()))
+        queryStringBuilder.append(SubElementCodeGenerator.generateComment(query.getPreviousCommentSegment()))
+                .append(SubElementCodeGenerator.generateAnnotations(query.getAnnotationList()))
                 .append(QueryInputCodeGenerator.generateQueryInput(query.getQueryInput()))
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(QuerySelectCodeGenerator.generateQuerySelect(query.getSelect()));

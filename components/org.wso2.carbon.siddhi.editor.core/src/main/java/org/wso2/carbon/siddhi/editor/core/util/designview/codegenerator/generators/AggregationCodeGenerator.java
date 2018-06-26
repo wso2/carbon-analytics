@@ -40,7 +40,9 @@ public class AggregationCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregation);
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
-        aggregationStringBuilder.append(SubElementCodeGenerator.generateStore(aggregation.getStore()))
+        aggregationStringBuilder
+                .append(SubElementCodeGenerator.generateComment(aggregation.getPreviousCommentSegment()))
+                .append(SubElementCodeGenerator.generateStore(aggregation.getStore()))
                 .append(generateAggregationAnnotations(aggregation.getAnnotationList()))
                 .append(SiddhiCodeBuilderConstants.DEFINE_AGGREGATION)
                 .append(SiddhiCodeBuilderConstants.SPACE)

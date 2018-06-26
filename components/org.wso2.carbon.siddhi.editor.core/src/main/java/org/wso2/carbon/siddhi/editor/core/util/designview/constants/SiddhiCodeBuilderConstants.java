@@ -75,16 +75,6 @@ public class SiddhiCodeBuilderConstants {
     public static final String DELETE = "delete";
     public static final String UPDATE = "update";
     public static final String UPDATE_OR_INSERT_INTO = "update or insert into";
-    // Siddhi Comments
-    public static final String STREAMS_COMMENT = "-- Streams";
-    public static final String TABLES_COMMENT = "-- Tables";
-    public static final String WINDOWS_COMMENT = "-- Windows";
-    public static final String TRIGGERS_COMMENT = "-- Triggers";
-    public static final String AGGREGATIONS_COMMENT = "-- Aggregations";
-    public static final String FUNCTIONS_COMMENT = "-- Functions";
-    public static final String QUERIES_COMMENT = "-- Queries";
-    public static final String PARTITIONS_COMMENT = "-- Partitions";
-    public static final String QUERIES_PARTITIONS_COMMENT = "-- Queries & Partitions";
     // Other Strings
     public static final String FROM = "from";
     public static final String SELECT = "select";

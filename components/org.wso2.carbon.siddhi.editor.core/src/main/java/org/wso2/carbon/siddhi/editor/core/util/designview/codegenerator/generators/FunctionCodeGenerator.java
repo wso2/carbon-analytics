@@ -31,7 +31,8 @@ public class FunctionCodeGenerator {
     public String generateFunction(FunctionConfig function) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(function);
 
-        return SiddhiCodeBuilderConstants.DEFINE_FUNCTION +
+        return SubElementCodeGenerator.generateComment(function.getPreviousCommentSegment()) +
+                SiddhiCodeBuilderConstants.DEFINE_FUNCTION +
                 SiddhiCodeBuilderConstants.SPACE +
                 function.getName() +
                 SiddhiCodeBuilderConstants.OPEN_SQUARE_BRACKET +

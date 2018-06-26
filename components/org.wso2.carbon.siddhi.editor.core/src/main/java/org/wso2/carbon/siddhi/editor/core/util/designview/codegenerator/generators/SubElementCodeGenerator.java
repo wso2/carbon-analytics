@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.CommentCodeSegment;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.FilterConfig;
@@ -35,6 +36,15 @@ import java.util.Map;
  * Generate's the code for a sub-element of a Siddhi element
  */
 public class SubElementCodeGenerator {
+
+    public static String generateComment(CommentCodeSegment comment) throws CodeGenerationException {
+        if (comment == null) {
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
+        } else if (comment.getContent() == null || comment.getContent().isEmpty()) {
+            throw new CodeGenerationException("The content of a given comment object is empty");
+        }
+        return comment.getContent();
+    }
 
     static String generateAttributes(List<AttributeConfig> attributes) throws CodeGenerationException {
         if (attributes == null || attributes.isEmpty()) {

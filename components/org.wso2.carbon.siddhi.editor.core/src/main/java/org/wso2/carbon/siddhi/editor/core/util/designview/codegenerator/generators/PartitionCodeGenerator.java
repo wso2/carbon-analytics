@@ -40,7 +40,8 @@ public class PartitionCodeGenerator {
 
         StringBuilder partitionStringBuilder = new StringBuilder();
 
-        partitionStringBuilder.append(SubElementCodeGenerator.generateAnnotations(partition.getAnnotationList()))
+        partitionStringBuilder.append(SubElementCodeGenerator.generateComment(partition.getPreviousCommentSegment()))
+                .append(SubElementCodeGenerator.generateAnnotations(partition.getAnnotationList()))
                 .append(SiddhiCodeBuilderConstants.PARTITION_WITH)
                 .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
                 .append(generatePartitionWith(partition.getPartitionWith()))

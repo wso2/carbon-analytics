@@ -33,7 +33,8 @@ public class WindowCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(window);
 
         StringBuilder windowStringBuilder = new StringBuilder();
-        windowStringBuilder.append(SubElementCodeGenerator.generateAnnotations(window.getAnnotationList()))
+        windowStringBuilder.append(SubElementCodeGenerator.generateComment(window.getPreviousCommentSegment()))
+                .append(SubElementCodeGenerator.generateAnnotations(window.getAnnotationList()))
                 .append(SiddhiCodeBuilderConstants.DEFINE_WINDOW)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(window.getName())

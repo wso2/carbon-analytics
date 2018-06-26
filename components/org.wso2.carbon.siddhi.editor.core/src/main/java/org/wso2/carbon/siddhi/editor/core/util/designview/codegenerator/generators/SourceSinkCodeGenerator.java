@@ -39,6 +39,7 @@ public class SourceSinkCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(sourceSink);
 
         StringBuilder sourceSinkStringBuilder = new StringBuilder();
+        sourceSinkStringBuilder.append(SubElementCodeGenerator.generateComment(sourceSink.getPreviousCommentSegment()));
         if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
             sourceSinkStringBuilder.append(SiddhiCodeBuilderConstants.SOURCE_ANNOTATION);
         } else if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
