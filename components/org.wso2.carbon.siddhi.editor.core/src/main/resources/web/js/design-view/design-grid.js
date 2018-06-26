@@ -907,8 +907,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             targetId = targetElement.parent().attr('id');
                         }
                         // validate source and target elements
-                        checkJSONValidityOfElement(self, sourceId);
-                        checkJSONValidityOfElement(self, targetId);
+                        checkJSONValidityOfElement(self, sourceId, true);
+                        checkJSONValidityOfElement(self, targetId, true);
                     }
 
                     var connectionObject = connection.connection;
@@ -1007,7 +1007,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         targetElement.detach();
 
                         // validate the partition
-                        checkJSONValidityOfElement(self, partitionId);
+                        checkJSONValidityOfElement(self, partitionId, true);
                     }
                 });
             }
@@ -1179,8 +1179,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     }
 
                     // validate source and target elements
-                    checkJSONValidityOfElement(self, sourceId);
-                    checkJSONValidityOfElement(self, targetId);
+                    checkJSONValidityOfElement(self, sourceId, true);
+                    checkJSONValidityOfElement(self, targetId, true);
                 });
             }
 
@@ -1318,28 +1318,33 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 });
             }
 
-            function checkJSONValidityOfElement(self, elementId) {
+            function checkJSONValidityOfElement(self, elementId, doNotShowErrorMessages) {
                 var element = self.configurationData.getSiddhiAppConfig()
                     .getDefinitionElementById(elementId, true, true, true);
                 if (element !== undefined) {
                     var type = element.type;
                     var elementObject = element.element;
                     if (type === 'WINDOW_FILTER_PROJECTION_QUERY') {
-                        JSONValidator.prototype.validateWindowFilterProjectionQuery(elementObject);
+                        JSONValidator.prototype.validateWindowFilterProjectionQuery(elementObject,
+                            doNotShowErrorMessages);
                     } else if (type === 'PATTERN_QUERY') {
-                        JSONValidator.prototype.validatePatternOrSequenceQuery(elementObject, 'Pattern Query');
+                        JSONValidator.prototype.validatePatternOrSequenceQuery(elementObject, 'Pattern Query',
+                            doNotShowErrorMessages);
                     } else if (type === 'SEQUENCE_QUERY') {
-                        JSONValidator.prototype.validatePatternOrSequenceQuery(elementObject, 'Sequence Query');
+                        JSONValidator.prototype.validatePatternOrSequenceQuery(elementObject, 'Sequence Query',
+                            doNotShowErrorMessages);
                     } else if (type === 'JOIN_QUERY') {
-                        JSONValidator.prototype.validateJoinQuery(elementObject);
+                        JSONValidator.prototype.validateJoinQuery(elementObject, doNotShowErrorMessages);
                     } else if (type === 'SOURCE') {
-                        JSONValidator.prototype.validateSourceOrSinkAnnotation(elementObject, 'Source');
+                        JSONValidator.prototype.validateSourceOrSinkAnnotation(elementObject, 'Source',
+                            doNotShowErrorMessages);
                     } else if (type === 'SINK') {
-                        JSONValidator.prototype.validateSourceOrSinkAnnotation(elementObject, 'Sink');
+                        JSONValidator.prototype.validateSourceOrSinkAnnotation(elementObject, 'Sink',
+                            doNotShowErrorMessages);
                     } else if (type === 'AGGREGATION') {
-                        JSONValidator.prototype.validateAggregation(elementObject);
+                        JSONValidator.prototype.validateAggregation(elementObject, doNotShowErrorMessages);
                     } else if (type === 'PARTITION') {
-                        JSONValidator.prototype.validatePartition(elementObject);
+                        JSONValidator.prototype.validatePartition(elementObject, doNotShowErrorMessages);
                     }
                 }
             }
