@@ -88,7 +88,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                                 + "'"))
                         .build();
             }
-        } catch (InvalidConfigException | InsufficientAttributesException | FileOperationsException |
+        } catch (ResourceNotFoundException | FileOperationsException |
                 FileAlreadyExistsException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
@@ -280,7 +280,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                           EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString())) {
             try {
                 EventSimulator.validateSimulationConfig(simulationConfigDetails, false);
-            } catch (ResourceNotFoundException | InvalidConfigException | InsufficientAttributesException e) {
+            } catch (ResourceNotFoundException e) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .header("Access-Control-Allow-Origin", "*")
                         .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage()))

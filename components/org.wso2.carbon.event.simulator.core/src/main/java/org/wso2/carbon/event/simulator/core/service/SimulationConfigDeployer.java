@@ -70,6 +70,7 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
         if (!file.getName().startsWith(".")) {
             if (FilenameUtils.isExtension(file.getName(), EventSimulatorConstants.SIMULATION_FILE_EXTENSION)) {
                 String simulationName = FilenameUtils.getBaseName(file.getName());
+                EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
                 try {
                     String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
                             (simulationName, (Paths.get(Utils.getRuntimePath().toString(),
@@ -82,7 +83,6 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
                         log.info("Deployed active simulation '" + simulationName + "'.");
                     }
                 } catch (ResourceNotFoundException e) {
-                    EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
                     ResourceDependencyData resourceDependencyData =
                             eventSimulatorMap.getInActiveSimulatorMap().get(simulationName);
                     ResourceDependencyData newResourceDependency =

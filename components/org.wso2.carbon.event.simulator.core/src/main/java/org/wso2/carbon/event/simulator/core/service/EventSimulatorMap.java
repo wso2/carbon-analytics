@@ -97,7 +97,7 @@ public class EventSimulatorMap {
                     inActiveSimulatorMap.put(simulationName, newDependency);
 //                    log.error(e.getMessage(), e);
                 }
-            } catch (FileOperationsException | InvalidConfigException | InsufficientAttributesException e) {
+            } catch (FileOperationsException e) {
                 inActiveSimulatorMap.remove(simulationName);
                 log.error(e.getMessage(), e);
             }
@@ -119,11 +119,6 @@ public class EventSimulatorMap {
                         e.getResourceName(), e.getMessage()));
                 log.error(e.getMessage(), e);
                 log.info("Changed status of simulation '" + simulationName + "' from active to inactive.");
-            } catch (InvalidConfigException | InsufficientAttributesException e) {
-                simulatorData.getEventSimulator().stop();
-                activeSimulatorMap.remove(simulationName);
-                log.info("Simulation configuration of active simulation '" + simulationName + "' is no longer valid. "
-                        , e);
             }
         });
     }

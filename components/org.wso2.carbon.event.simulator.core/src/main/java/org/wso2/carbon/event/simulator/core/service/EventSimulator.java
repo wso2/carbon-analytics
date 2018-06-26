@@ -97,8 +97,9 @@ public class EventSimulator implements Runnable {
             }
         } else {
             log.error("Simulation '" + simulationName + "' does not have a configuration specified.");
-            throw new InvalidConfigException("Simulation '" + simulationName + "' does not have a configuration" +
-                                                     " specified.");
+            throw new InvalidConfigException(
+                            ResourceNotFoundException.ResourceType.SIMULATION,
+                            "content", "Simulation '" + simulationName + "' does not have a configuration specified.");
         }
     }
 
@@ -138,22 +139,27 @@ public class EventSimulator implements Runnable {
                     }
                 } else {
                     throw new InvalidConfigException(
-                            "Source configuration is required for event simulation '"
-                                    + simulationName + "'. Invalid simulation configuration provided : "
-                                    + simulationConfig.toString());
+                                    ResourceNotFoundException.ResourceType.SIMULATION,
+                                    EventSimulatorConstants.JSON_CONFIGURATION_RESOURCE_NAME,
+                                    "Source configuration is required for event simulation '" + simulationName + "'. " +
+                                    "Invalid simulation configuration provided : " + simulationConfig.toString());
                 }
             } else {
-                throw new InvalidConfigException("Simulation properties are required for '" + simulationName
-                                                         + "'event simulation. Invalid simulation configuration "
-                                                         + "provided : " + simulationConfig.toString());
+                throw new InvalidConfigException(
+                                ResourceNotFoundException.ResourceType.SIMULATION,
+                                EventSimulatorConstants.PROPERTIES_RESOURCE_NAME,
+                                "Simulation properties are required for '" + simulationName + "'event simulation. " +
+                                "Invalid simulation configuration provided : " + simulationConfig.toString());
             }
         } catch (JSONException e) {
             log.error("Error occurred when accessing simulation configuration of " +
                     "simulation. Invalid JSON simulation properties configuration provided : " +
                     LogEncoder.removeCRLFCharacters(simulationConfiguration), e);
-            throw new InvalidConfigException("Error occurred when accessing simulation configuration. "
-                                                     + "Invalid JSON simulation properties configuration provided : "
-                                                     + simulationConfiguration, e);
+            throw new InvalidConfigException(
+                            ResourceNotFoundException.ResourceType.SIMULATION,
+                            EventSimulatorConstants.JSON_CONFIGURATION_RESOURCE_NAME,
+                            "Error occurred when accessing simulation configuration. Invalid JSON simulation " +
+                            "properties configuration provided : " + simulationConfiguration, e);
         }
     }
 
@@ -173,9 +179,11 @@ public class EventSimulator implements Runnable {
          * */
         try {
             if (!checkAvailability(simulationPropertiesConfig, EventSimulatorConstants.EVENT_SIMULATION_NAME)) {
-                throw new InvalidConfigException("Simulation name is required for event simulation. "
-                                                         + "Invalid simulation properties configuration provided : "
-                                                         + simulationPropertiesConfig.toString());
+                throw new InvalidConfigException(
+                                ResourceNotFoundException.ResourceType.SIMULATION,
+                                EventSimulatorConstants.EVENT_SIMULATION_NAME,
+                                "Simulation name is required for event simulation. Invalid simulation properties " +
+                                "configuration provided : " + simulationPropertiesConfig.toString());
             }
             long startTimestamp = System.currentTimeMillis();
             if (simulationPropertiesConfig.has(EventSimulatorConstants.START_TIMESTAMP)) {
@@ -184,11 +192,13 @@ public class EventSimulator implements Runnable {
                         startTimestamp = simulationPropertiesConfig.getLong(EventSimulatorConstants.START_TIMESTAMP);
                         if (startTimestamp < 0) {
                             throw new InvalidConfigException(
-                                    "StartTimestamp must be a positive value for simulation '"
-                                            + simulationPropertiesConfig.getString(
-                                            EventSimulatorConstants.EVENT_SIMULATION_NAME)
-                                            + "'. Invalid simulation properties configuration provided : "
-                                            + simulationPropertiesConfig.toString());
+                                            ResourceNotFoundException.ResourceType.SIMULATION,
+                                            EventSimulatorConstants.START_TIMESTAMP,
+                                            "StartTimestamp must be a positive value for simulation '" +
+                                            simulationPropertiesConfig.
+                                                    getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) + "'. " +
+                                            "Invalid simulation properties configuration provided : " +
+                                            simulationPropertiesConfig.toString());
                         }
                     }
                 }
@@ -200,23 +210,26 @@ public class EventSimulator implements Runnable {
                         endTimestamp = simulationPropertiesConfig.getLong(EventSimulatorConstants.END_TIMESTAMP);
                         if (endTimestamp < 0) {
                             throw new InvalidConfigException(
-                                    "EndTimestamp must be a positive value for simulation '"
-                                            + simulationPropertiesConfig.getString(
-                                            EventSimulatorConstants.EVENT_SIMULATION_NAME)
-                                            + "'. Invalid simulation properties configuration provided : "
-                                            + simulationPropertiesConfig.toString());
+                                            ResourceNotFoundException.ResourceType.SIMULATION,
+                                            EventSimulatorConstants.END_TIMESTAMP,
+                                            "EndTimestamp must be a positive value for simulation '" +
+                                            simulationPropertiesConfig.
+                                                    getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) + "'. " +
+                                            "Invalid simulation properties configuration provided : " +
+                                            simulationPropertiesConfig.toString());
                         }
                     }
                 }
             }
             if (endTimestamp != -1 && endTimestamp < startTimestamp) {
                 throw new InvalidConfigException(
-                        "Simulation '"
-                                + simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME)
-                                + "' has incompatible startTimestamp and endTimestamp values. EndTimestamp must be "
-                                + "either greater than the startTimestamp or must be set to null. "
-                                + "Invalid simulation properties configuration provided : "
-                                + simulationPropertiesConfig.toString());
+                                ResourceNotFoundException.ResourceType.SIMULATION,
+                                "timestamps",
+                                "Simulation '" +
+                                simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) +
+                                "' has incompatible startTimestamp and endTimestamp values. EndTimestamp must be " +
+                                "either greater than the startTimestamp or must be set to null. Invalid simulation " +
+                                "properties configuration provided : " + simulationPropertiesConfig.toString());
             }
             if (simulationPropertiesConfig.has(EventSimulatorConstants.NUMBER_OF_EVENTS_REQUIRED)) {
                 if (!simulationPropertiesConfig.isNull(EventSimulatorConstants.NUMBER_OF_EVENTS_REQUIRED)) {
@@ -224,25 +237,29 @@ public class EventSimulator implements Runnable {
                             .isEmpty()) {
                         if (simulationPropertiesConfig.getInt(EventSimulatorConstants.NUMBER_OF_EVENTS_REQUIRED) < 0) {
                             throw new InvalidConfigException(
-                                    "Number of event to be generated for simulation '"
-                                            + simulationPropertiesConfig.getString(
-                                            EventSimulatorConstants.EVENT_SIMULATION_NAME)
-                                            + "' must be a positive value. Invalid simulation  configuration provided: "
-                                            + simulationPropertiesConfig.toString());
+                                            ResourceNotFoundException.ResourceType.SIMULATION,
+                                            EventSimulatorConstants.NUMBER_OF_EVENTS_REQUIRED,
+                                            "Number of event to be generated for simulation '" +
+                                            simulationPropertiesConfig.
+                                                    getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) +
+                                            "' must be a positive value. Invalid simulation  configuration provided: " +
+                                            simulationPropertiesConfig.toString());
                         }
                     }
                 }
             }
         } catch (JSONException e) {
-            log.error("Error occurred when accessing simulation configuration of simulation '"
-                              + simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME)
-                              + "'. Invalid simulation properties configuration provided : "
-                              +  simulationPropertiesConfig.toString(), e);
+            log.error("Error occurred when accessing simulation configuration of simulation '" +
+                        simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) +
+                        "'. Invalid simulation properties configuration provided : " +
+                        simulationPropertiesConfig.toString(), e);
             throw new InvalidConfigException(
-                    "Error occurred when accessing simulation configuration of simulation '"
-                            + simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME)
-                            + "'. Invalid simulation properties configuration provided : "
-                            + simulationPropertiesConfig.toString(), e);
+                            ResourceNotFoundException.ResourceType.SIMULATION,
+                            EventSimulatorConstants.NUMBER_OF_EVENTS_REQUIRED,
+                            "Error occurred when accessing simulation configuration of simulation '" +
+                            simulationPropertiesConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) +
+                            "'. Invalid simulation properties configuration provided : " +
+                            simulationPropertiesConfig.toString(), e);
         }
     }
 
