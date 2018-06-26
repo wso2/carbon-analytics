@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 /**
  * Represents a Siddhi Attribute
  */
-public class AttributeConfig {
+public class AttributeConfig extends SiddhiElementConfig {
     private String name;
     private String type;
 

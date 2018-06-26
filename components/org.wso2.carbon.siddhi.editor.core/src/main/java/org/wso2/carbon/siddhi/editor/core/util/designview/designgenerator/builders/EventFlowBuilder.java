@@ -25,6 +25,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AggregationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.CommentSegmentsPreserver;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.FunctionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.PartitionConfigGenerator;
@@ -95,6 +96,7 @@ public class EventFlowBuilder {
         for (Annotation annotation : siddhiApp.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase("NAME")) {
                 siddhiAppName = annotation.getElements().get(0).getValue();
+                annotationConfigGenerator.preserveCodeSegment(annotation);
             } else {
                 appAnnotations.add(
                         "@App:" + annotationConfigGenerator.generateAnnotationConfig(annotation).split("@")[1]);
@@ -102,6 +104,7 @@ public class EventFlowBuilder {
         }
         siddhiAppConfig.setSiddhiAppName(siddhiAppName);
         siddhiAppConfig.setAppAnnotationList(appAnnotations);
+        siddhiAppConfig.addElementCodeSegments(annotationConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -116,6 +119,7 @@ public class EventFlowBuilder {
         for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
             siddhiAppConfig.add(triggerConfigGenerator.generateTriggerConfig(triggerDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(triggerConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -134,7 +138,7 @@ public class EventFlowBuilder {
      * Loads Streams from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadStreams() {
+    public EventFlowBuilder loadStreams() { // TODO only adding comments for this for now
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
         Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
         for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitionMap.entrySet()) {
@@ -144,6 +148,7 @@ public class EventFlowBuilder {
                                 .generateStreamConfig(streamDefinitionEntry.getValue()));
             }
         }
+        siddhiAppConfig.addElementCodeSegments(streamDefinitionConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -151,13 +156,14 @@ public class EventFlowBuilder {
      * Loads Sources from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadSources() throws DesignGenerationException {
+    public EventFlowBuilder loadSources() throws DesignGenerationException { // TODO query indexes
         SourceSinkConfigsGenerator sourceConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Source> sourceList : siddhiAppRuntime.getSources()) {
             for (SourceSinkConfig sourceConfig : sourceConfigsGenerator.generateSourceConfigs(sourceList)) {
                 siddhiAppConfig.addSource(sourceConfig);
             }
         }
+        siddhiAppConfig.addElementCodeSegments(sourceConfigsGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -165,13 +171,14 @@ public class EventFlowBuilder {
      * Loads Sinks from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadSinks() throws DesignGenerationException {
+    public EventFlowBuilder loadSinks() throws DesignGenerationException { // TODO query indexes
         SourceSinkConfigsGenerator sinkConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Sink> sinkList : siddhiAppRuntime.getSinks()) {
             for (SourceSinkConfig sinkConfig : sinkConfigsGenerator.generateSinkConfigs(sinkList)) {
                 siddhiAppConfig.addSink(sinkConfig);
             }
         }
+        siddhiAppConfig.addElementCodeSegments(sinkConfigsGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -185,6 +192,7 @@ public class EventFlowBuilder {
         for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
             siddhiAppConfig.add(tableConfigGenerator.generateTableConfig(tableDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(tableConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -198,6 +206,7 @@ public class EventFlowBuilder {
         for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
             siddhiAppConfig.add(windowConfigGenerator.generateWindowConfig(windowDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(windowConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -211,6 +220,7 @@ public class EventFlowBuilder {
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
             siddhiAppConfig.add(aggregationConfigGenerator.generateAggregationConfig(aggregationDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(aggregationConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -223,6 +233,7 @@ public class EventFlowBuilder {
         for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
             siddhiAppConfig.add(functionConfigGenerator.generateFunctionConfig(functionDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(functionConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -254,6 +265,8 @@ public class EventFlowBuilder {
                 throw new DesignGenerationException("Unable create config for execution element of type unknown");
             }
         }
+        siddhiAppConfig.addElementCodeSegments(queryConfigGenerator.getPreservedCodeSegments());
+        siddhiAppConfig.addElementCodeSegments(partitionConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -265,6 +278,22 @@ public class EventFlowBuilder {
     public EventFlowBuilder loadEdges() throws DesignGenerationException {
         EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
         edges = edgesGenerator.generateEdges();
+        return this;
+    }
+
+    /**
+     * Loads Comments, that were preserved by each Siddhi Element Config generator
+     * @return                                  A reference to this object
+     * @throws DesignGenerationException        Error while generating Comment Code Segments
+     */
+    public EventFlowBuilder loadComments() throws DesignGenerationException {
+        CommentSegmentsPreserver commentSegmentsPreserver =
+                new CommentSegmentsPreserver(siddhiAppString, siddhiAppConfig.getElementCodeSegments());
+        siddhiAppConfig.assignCommentCodeSegments(commentSegmentsPreserver.generateCommentCodeSegments());
+        siddhiAppConfig =
+                commentSegmentsPreserver.bindCommentsToElements(
+                        siddhiAppConfig.getCommentCodeSegments(),
+                        siddhiAppConfig);
         return this;
     }
 }

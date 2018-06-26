@@ -18,10 +18,12 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
+
 /**
  * Represents a selected Siddhi Attribute
  */
-public class SelectedAttribute {
+public class SelectedAttribute extends SiddhiElementConfig {
     private String expression;
     private String as;
 

@@ -60,7 +60,8 @@ public class DesignGenerator {
                         .loadAggregations()
                         .loadExecutionElements()
                         .loadFunctions()
-                        .loadEdges();
+                        .loadEdges()
+                        .loadComments();
 
         return eventFlowBuilder.create();
     }

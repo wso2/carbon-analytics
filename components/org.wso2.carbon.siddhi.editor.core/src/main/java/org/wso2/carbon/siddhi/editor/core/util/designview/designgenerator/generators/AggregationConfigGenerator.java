@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Generator to create AggregationConfig
  */
-public class AggregationConfigGenerator {
+public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;
 
     public AggregationConfigGenerator(String siddhiAppString) {
@@ -59,11 +59,12 @@ public class AggregationConfigGenerator {
         aggregationConfig.setFrom(aggregationDefinition.getBasicSingleInputStream().getStreamId());
 
         // 'select' and 'groupBy'
+        AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
+                new AttributesSelectionConfigGenerator(siddhiAppString);
         if (aggregationDefinition.getSelector() instanceof BasicSelector) {
+            preserveCodeSegment(aggregationDefinition.getSelector());
             BasicSelector selector = (BasicSelector) aggregationDefinition.getSelector();
-            aggregationConfig.setSelect(
-                    new AttributesSelectionConfigGenerator(siddhiAppString)
-                            .generateAttributesSelectionConfig(selector));
+            aggregationConfig.setSelect(attributesSelectionConfigGenerator.generateAttributesSelectionConfig(selector));
             aggregationConfig.setGroupBy(generateGroupBy(selector.getGroupByList()));
         } else {
             throw new DesignGenerationException("Selector of AggregationDefinition is not of class BasicSelector");
@@ -78,8 +79,8 @@ public class AggregationConfigGenerator {
 
         // 'store' and annotations
         StoreConfigGenerator storeConfigGenerator = new StoreConfigGenerator();
-        StoreConfig storeConfig = null;
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
+        StoreConfig storeConfig = null;
         List<String> annotationList = new ArrayList<>();
         for (Annotation annotation : aggregationDefinition.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase("STORE")) {
@@ -91,6 +92,8 @@ public class AggregationConfigGenerator {
         aggregationConfig.setStore(storeConfig);
         aggregationConfig.setAnnotationList(annotationList);
 
+        preserveCodeSegmentsOf(annotationConfigGenerator, storeConfigGenerator, attributesSelectionConfigGenerator);
+        preserveAndBindCodeSegment(aggregationDefinition, aggregationConfig);
         return aggregationConfig;
     }
 
@@ -103,6 +106,7 @@ public class AggregationConfigGenerator {
     private List<String> generateGroupBy(List<Variable> groupByVariables) throws DesignGenerationException {
         List<String> groupByList = new ArrayList<>();
         for (Variable variable : groupByVariables) {
+            preserveCodeSegment(variable);
             groupByList.add(ConfigBuildingUtilities.getDefinition(variable, siddhiAppString));
         }
         return groupByList;
@@ -115,6 +119,7 @@ public class AggregationConfigGenerator {
      * @throws DesignGenerationException        Unknown type of TimePeriod operator
      */
     private AggregateByTimePeriod generateAggregateByTime(TimePeriod timePeriod) throws DesignGenerationException {
+        preserveCodeSegment(timePeriod);
         if (("INTERVAL").equalsIgnoreCase(timePeriod.getOperator().toString())) {
             return generateAggregateByTimeInterval(timePeriod.getDurations());
         } else if (("RANGE").equalsIgnoreCase(timePeriod.getOperator().toString())) {
@@ -155,6 +160,7 @@ public class AggregationConfigGenerator {
      */
     private String generateAggregateByAttribute(Variable aggregateAttribute) {
         if (aggregateAttribute != null) {
+            preserveCodeSegment(aggregateAttribute);
             return aggregateAttribute.getAttributeName();
         }
         return "";
