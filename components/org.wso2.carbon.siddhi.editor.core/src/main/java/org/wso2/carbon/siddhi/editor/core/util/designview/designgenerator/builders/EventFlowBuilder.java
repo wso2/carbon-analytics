@@ -25,7 +25,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AggregationConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.CommentSegmentsPreserver;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.EdgesGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.FunctionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.PartitionConfigGenerator;
@@ -34,6 +33,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.genera
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.TableConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.TriggerConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.WindowConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.commentspreserver.OuterScopeCommentsPreserver;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -287,13 +287,14 @@ public class EventFlowBuilder {
      * @throws DesignGenerationException        Error while generating Comment Code Segments
      */
     public EventFlowBuilder loadComments() throws DesignGenerationException {
-        CommentSegmentsPreserver commentSegmentsPreserver =
-                new CommentSegmentsPreserver(siddhiAppString, siddhiAppConfig.getElementCodeSegments());
-        siddhiAppConfig.assignCommentCodeSegments(commentSegmentsPreserver.generateCommentCodeSegments());
+        OuterScopeCommentsPreserver outerScopeCommentsPreserver =
+                new OuterScopeCommentsPreserver(siddhiAppString, siddhiAppConfig.getElementCodeSegments());
+        siddhiAppConfig.assignCommentCodeSegments(outerScopeCommentsPreserver.generateCommentCodeSegments());
         siddhiAppConfig =
-                commentSegmentsPreserver.bindCommentsToElements(
+                outerScopeCommentsPreserver.bindCommentsToElements(
                         siddhiAppConfig.getCommentCodeSegments(),
-                        siddhiAppConfig);
+                        siddhiAppConfig
+                );
         return this;
     }
 }
