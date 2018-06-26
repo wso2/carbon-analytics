@@ -19,6 +19,114 @@
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designViewUtils'],
     function (require, log, $, _, Attribute, Window, DesignViewUtils) {
 
+        var windowSchema = {
+            type: "object",
+            title: "Window",
+            properties: {
+                annotations: {
+                    propertyOrder: 1,
+                    type: "array",
+                    format: "table",
+                    title: "Annotations",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: "Annotation",
+                        options: {
+                            disable_properties: true
+                        },
+                        properties: {
+                            annotation: {
+                                title: "Annotation",
+                                type: "string",
+                                minLength: 1
+                            }
+                        }
+                    }
+                },
+                name: {
+                    type: "string",
+                    title: "Name",
+                    minLength: 1,
+                    required: true,
+                    propertyOrder: 2
+                },
+                attributes: {
+                    required: true,
+                    propertyOrder: 3,
+                    type: "array",
+                    format: "table",
+                    title: "Attributes",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Attribute',
+                        properties: {
+                            name: {
+                                title: "Name",
+                                type: "string",
+                                minLength: 1
+                            },
+                            type: {
+                                title: "Type",
+                                type: "string",
+                                enum: [
+                                    "string",
+                                    "int",
+                                    "long",
+                                    "float",
+                                    "double",
+                                    "bool",
+                                    "object"
+                                ],
+                                default: "string"
+                            }
+                        }
+                    }
+                },
+                functionName: {
+                    type: "string",
+                    title: "Window Function Name",
+                    minLength: 1,
+                    required: true,
+                    propertyOrder: 4
+                },
+                parameters: {
+                    required: true,
+                    propertyOrder: 5,
+                    type: "array",
+                    format: "table",
+                    title: "Parameters",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Parameter',
+                        properties: {
+                            parameterValue: {
+                                title: "Parameter",
+                                type: "string",
+                                minLength: 1
+                            }
+                        }
+                    }
+                },
+                outputEventType: {
+                    type: "string",
+                    title: "Output Event Type",
+                    propertyOrder: 6,
+                    enum: [
+                        "current events",
+                        "expired events",
+                        "all events"
+                    ],
+                    default: "current events"
+                }
+            }
+        };
+
         /**
          * @class WindowForm Creates a forms to collect data from a window
          * @constructor
@@ -50,113 +158,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
 
             // generate the form to define a window
             var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
-                schema: {
-                    type: "object",
-                    title: "Window",
-                    properties: {
-                        annotations: {
-                            propertyOrder: 1,
-                            type: "array",
-                            format: "table",
-                            title: "Annotations",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: "Annotation",
-                                options: {
-                                    disable_properties: true
-                                },
-                                properties: {
-                                    annotation: {
-                                        title: "Annotation",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 2
-                        },
-                        attributes: {
-                            required: true,
-                            propertyOrder: 3,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    name: {
-                                        title: "Name",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    type: {
-                                        title: "Type",
-                                        type: "string",
-                                        enum: [
-                                            "string",
-                                            "int",
-                                            "long",
-                                            "float",
-                                            "double",
-                                            "bool",
-                                            "object"
-                                        ],
-                                        default: "string"
-                                    }
-                                }
-                            }
-                        },
-                        functionName: {
-                            type: "string",
-                            title: "Window Function Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 4
-                        },
-                        parameters: {
-                            required: true,
-                            propertyOrder: 5,
-                            type: "array",
-                            format: "table",
-                            title: "Parameters",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Parameter',
-                                properties: {
-                                    parameterValue: {
-                                        title: "Parameter",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        outputEventType: {
-                            type: "string",
-                            title: "Output Event Type",
-                            propertyOrder: 6,
-                            enum: [
-                                "current events",
-                                "expired events",
-                                "all events"
-                            ],
-                            default: "current events"
-                        }
-                    }
-                },
+                schema: windowSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
@@ -297,113 +299,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
-                schema: {
-                    type: "object",
-                    title: "Window",
-                    properties: {
-                        annotations: {
-                            propertyOrder: 1,
-                            type: "array",
-                            format: "table",
-                            title: "Annotations",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: "Annotation",
-                                options: {
-                                    disable_properties: true
-                                },
-                                properties: {
-                                    annotation: {
-                                        title: "Annotation",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 2
-                        },
-                        attributes: {
-                            required: true,
-                            propertyOrder: 3,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    name: {
-                                        title: "Name",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    type: {
-                                        title: "Type",
-                                        type: "string",
-                                        enum: [
-                                            "string",
-                                            "int",
-                                            "long",
-                                            "float",
-                                            "double",
-                                            "bool",
-                                            "object"
-                                        ],
-                                        default: "string"
-                                    }
-                                }
-                            }
-                        },
-                        functionName: {
-                            type: "string",
-                            title: "Window Function Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 4
-                        },
-                        parameters: {
-                            required: true,
-                            propertyOrder: 5,
-                            type: "array",
-                            format: "table",
-                            title: "Parameters",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Parameter',
-                                properties: {
-                                    parameterValue: {
-                                        title: "Parameter",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        outputEventType: {
-                            type: "string",
-                            title: "Output Event Type",
-                            propertyOrder: 6,
-                            enum: [
-                                "current events",
-                                "expired events",
-                                "all events"
-                            ],
-                            default: "current events"
-                        }
-                    }
-                },
+                schema: windowSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,

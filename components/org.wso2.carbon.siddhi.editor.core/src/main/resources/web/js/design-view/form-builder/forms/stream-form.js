@@ -19,6 +19,79 @@
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designViewUtils'],
     function (require, log, $, _, Attribute, Stream, DesignViewUtils) {
 
+        var streamSchema = {
+            type: "object",
+            title: "Stream",
+            properties: {
+                annotations: {
+                    propertyOrder: 1,
+                    type: "array",
+                    format: "table",
+                    title: "Annotations",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: "Annotation",
+                        options: {
+                            disable_properties: true
+                        },
+                        properties: {
+                            annotation: {
+                                title: "Annotation",
+                                type: "string",
+                                minLength: 1
+                            }
+                        }
+                    }
+                },
+                name: {
+                    type: "string",
+                    title: "Name",
+                    minLength: 1,
+                    required: true,
+                    propertyOrder: 2
+                },
+                attributes: {
+                    required: true,
+                    propertyOrder: 3,
+                    type: "array",
+                    format: "table",
+                    title: "Attributes",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Attribute',
+                        options: {
+                            disable_properties: true
+                        },
+                        properties: {
+                            name: {
+                                title: 'Name',
+                                type: "string",
+                                minLength: 1
+                            },
+                            type: {
+                                title: 'Type',
+                                type: "string",
+                                enum: [
+                                    "string",
+                                    "int",
+                                    "long",
+                                    "float",
+                                    "double",
+                                    "bool",
+                                    "object"
+                                ],
+                                default: "string"
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
         /**
          * @class StreamForm Creates a forms to collect data from a stream
          * @constructor
@@ -50,78 +123,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
             // generate the form to define a stream
             var editor = new JSONEditor($(formContainer).find('#define-stream')[0], {
-                schema: {
-                    type: "object",
-                    title: "Stream",
-                    properties: {
-                        annotations: {
-                            propertyOrder: 1,
-                            type: "array",
-                            format: "table",
-                            title: "Annotations",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: "Annotation",
-                                options: {
-                                    disable_properties: true
-                                },
-                                properties: {
-                                    annotation: {
-                                        title: "Annotation",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 2
-                        },
-                        attributes: {
-                            required: true,
-                            propertyOrder: 3,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                options: {
-                                    disable_properties: true
-                                },
-                                properties: {
-                                    name: {
-                                        title: 'Name',
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    type: {
-                                        title: 'Type',
-                                        type: "string",
-                                        enum: [
-                                            "string",
-                                            "int",
-                                            "long",
-                                            "float",
-                                            "double",
-                                            "bool",
-                                            "object"
-                                        ],
-                                        default: "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
+                schema: streamSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
@@ -222,75 +224,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor($(formContainer).find('#define-stream')[0], {
-                schema: {
-                    type: "object",
-                    title: "Stream",
-                    properties: {
-                        annotations: {
-                            propertyOrder: 1,
-                            type: "array",
-                            format: "table",
-                            title: "Annotations",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: "Annotation",
-                                options: {
-                                    disable_properties: true
-                                },
-                                properties: {
-                                    annotation: {
-                                        title: "Annotation",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 2
-                        },
-                        attributes: {
-                            required: true,
-                            propertyOrder: 3,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    name: {
-                                        title: "Name",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    type: {
-                                        title: "Type",
-                                        type: "string",
-                                        enum: [
-                                            "string",
-                                            "int",
-                                            "long",
-                                            "float",
-                                            "double",
-                                            "bool",
-                                            "object"
-                                        ],
-                                        default: "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
+                schema: streamSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
