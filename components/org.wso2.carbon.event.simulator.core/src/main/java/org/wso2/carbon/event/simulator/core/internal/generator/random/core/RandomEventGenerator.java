@@ -108,10 +108,30 @@ public class RandomEventGenerator implements EventGenerator {
      */
     @Override
     public void stop() {
+        currentTimestamp = -1;
         if (log.isDebugEnabled()) {
             log.debug("Stop random generator for stream '" + randomSimulationConfig.getStreamName() + "'");
         }
 //        do nothing
+    }
+
+    /**
+     * resume() method
+     */
+    @Override
+    public void resume() {
+        /*
+         * The system timestamp is set to current timestamp to enable the event to have the latest timestamp.
+         * This timestamp is used to create the notify timer event in the WindowProcessor
+         * If we use the timestamp at the time of pausing the simulator, it will cause issues when generating the timer
+         * event because the system timestamp is continously increasing
+         */
+        currentTimestamp = System.currentTimeMillis();
+        nextEvent.setTimestamp(currentTimestamp);
+        currentTimestamp += randomSimulationConfig.getTimestampInterval();
+        if (log.isDebugEnabled()) {
+            log.debug("Stop random generator for stream '" + randomSimulationConfig.getStreamName() + "'");
+        }
     }
 
 

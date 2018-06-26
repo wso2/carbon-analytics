@@ -113,6 +113,7 @@ public class DatabaseEventGenerator implements EventGenerator {
                                                  dbSimulationConfig.getDataSourceLocation(),
                                                  dbSimulationConfig.getUsername(),
                                                  dbSimulationConfig.getPassword());
+            databaseConnection.closeConnection();
         } catch (PoolInitializationException e) {
             throw new ResourceNotFoundException("Error occurred when creating connection to database ' "
                                                         + dbSimulationConfig.getDataSourceLocation()
@@ -129,6 +130,19 @@ public class DatabaseEventGenerator implements EventGenerator {
      */
     @Override
     public void start() {
+        try {
+            databaseConnection.connectToDatabase(dbSimulationConfig.getDriver(),
+                    dbSimulationConfig.getDataSourceLocation(),
+                    dbSimulationConfig.getUsername(),
+                    dbSimulationConfig.getPassword());
+        } catch (PoolInitializationException e) {
+            throw new EventGenerationException("Error occurred when creating connection to database ' "
+                    + dbSimulationConfig.getDataSourceLocation()
+                    + "' to simulate to simulate stream '"
+                    + dbSimulationConfig.getStreamName()
+                    + "'. Please check connection and config settings. ", e);
+        }
+
         if (startTimestamp == -1 && "-1".equals(dbSimulationConfig.getTimestampAttribute())) {
             startTimestamp = System.currentTimeMillis();
         }
@@ -170,11 +184,27 @@ public class DatabaseEventGenerator implements EventGenerator {
      */
     @Override
     public void stop() {
+        currentTimestamp = -1;
         if (databaseConnection != null) {
             databaseConnection.closeConnection();
         }
         if (log.isDebugEnabled()) {
             log.debug("Stop database generator for stream '" + dbSimulationConfig.getStreamName() + "'");
+        }
+    }
+
+    /**
+     * resume() method
+     */
+    @Override
+    public void resume() {
+        if (null == dbSimulationConfig.getTimestampAttribute()) {
+            currentTimestamp = System.currentTimeMillis();
+            nextEvent.setTimestamp(currentTimestamp);
+            currentTimestamp += dbSimulationConfig.getTimestampInterval();
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Stop random generator for stream '" + dbSimulationConfig.getStreamName() + "'");
         }
     }
 

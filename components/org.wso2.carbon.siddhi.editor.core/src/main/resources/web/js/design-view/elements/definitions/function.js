@@ -29,6 +29,7 @@ define(
             /*
              Data storing structure as follows
                 id*: '',
+                previousCommentSegment:'',
                 name*: '',
                 scriptType*: 'JAVASCRIPT | R | SCALA',
                 returnType*: 'INT | LONG | DOUBLE | FLOAT | STRING | BOOL | OBJECT',
@@ -36,6 +37,7 @@ define(
             */
             if (options !== undefined) {
                 this.id = options.id;
+                this.previousCommentSegment = options.previousCommentSegment;
                 this.name = options.name;
                 this.scriptType = (options.scriptType !== undefined) ? (options.scriptType).toUpperCase() : undefined;
                 this.returnType = (options.returnType !== undefined) ? (options.returnType).toUpperCase() : undefined;

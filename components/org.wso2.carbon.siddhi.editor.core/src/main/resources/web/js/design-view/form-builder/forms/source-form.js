@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute'],
-    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute) {
+define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
+        'jsonValidator'],
+    function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator) {
 
         /**
          * @class SourceForm Creates a forms to collect data from a source
@@ -296,6 +297,12 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 var source = new SourceOrSinkAnnotation(sourceOptions);
                 self.configurationData.getSiddhiAppConfig().addSource(source);
 
+                var textNode = $('#' + i).find('.sourceNameNode');
+                textNode.html(editor.getValue().annotationType.name);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateSourceOrSinkAnnotation(source, 'Source');
+
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
 
@@ -303,6 +310,8 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 self.toggleViewButton.removeClass('disableContainer');
 
             });
+
+            return editor.getValue().annotationType.name;
         };
 
         /**
@@ -632,6 +641,12 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                 } else {
                     clickedElement.setMap(undefined);
                 }
+
+                var textNode = $('#' + id).find('.sourceNameNode');
+                textNode.html(config.annotationType.name);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Source');
 
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');

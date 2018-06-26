@@ -18,9 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'streamHandler', 'designViewUtils'],
+        'streamHandler', 'designViewUtils', 'jsonValidator'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
+              JSONValidator) {
 
         var constants = {
             PROJECTION: 'projectionQueryDrop',
@@ -1286,6 +1287,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setType(outputType);
                     }
+
+                    // perform JSON validation
+                    JSONValidator.prototype.validateWindowFilterProjectionQuery(clickedElement);
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');

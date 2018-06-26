@@ -126,7 +126,7 @@ public class CSVReader {
                          * if timestamp attribute is not specified, take startTimestamp as the first event
                          * timestamp and the successive timestamps will be lastTimetstamp + timeInterval
                          * */
-                        timestamp = startTimestamp + eventNumber * csvConfig.getTimestampInterval();
+                        timestamp = startTimestamp;
                         if (endTimestamp != -1 && timestamp > endTimestamp) {
                             break;
                         }

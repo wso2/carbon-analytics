@@ -29,6 +29,10 @@ define(['require', 'elementUtils', 'lodash'],
             // initiates the collections
             if (options !== undefined) {
                 this.siddhiAppName = options.siddhiAppName;
+                // Following lists hold references for comments in the code view. These lists are passed to the backend
+                // when generating the code from design. Front end does not use them.
+                this.elementCodeSegments = options.elementCodeSegments;
+                this.commentCodeSegments = options.commentCodeSegments;
             }
             this.appAnnotationList = [];
             this.streamList = [];
@@ -341,9 +345,11 @@ define(['require', 'elementUtils', 'lodash'],
          * @param elementId id of the definition element
          * @param includeQueryTypes if true search in the queries as well
          * @param includeSourceAndSink if true search in the sinks and sources as well
+         * @param includePartitions if true search in the partition list as well
          * @return requestedElement returns undefined if the requested element is not found
          */
-        AppData.prototype.getDefinitionElementById = function (elementId, includeQueryTypes, includeSourceAndSink) {
+        AppData.prototype.getDefinitionElementById = function (elementId, includeQueryTypes, includeSourceAndSink,
+                                                               includePartitions) {
             var self = this;
             var requestedElement;
             var streamList = self.streamList;
@@ -358,6 +364,7 @@ define(['require', 'elementUtils', 'lodash'],
             var joinQueryList = self.queryLists.JOIN;
             var sourceList = self.sourceList;
             var sinkList = self.sinkList;
+            var partitionList = self.partitionList;
 
             var lists = [streamList, tableList, windowList, aggregationList, functionList, triggerList];
 
@@ -370,6 +377,9 @@ define(['require', 'elementUtils', 'lodash'],
             if (includeSourceAndSink !== undefined && includeSourceAndSink) {
                 lists.push(sourceList);
                 lists.push(sinkList);
+            }
+            if (includePartitions !== undefined && includePartitions) {
+                lists.push(partitionList);
             }
 
             _.forEach(lists, function (list) {
@@ -400,6 +410,8 @@ define(['require', 'elementUtils', 'lodash'],
                             type = 'SOURCE';
                         } else if (list === sinkList) {
                             type = 'SINK';
+                        } else if (list === partitionList) {
+                            type = 'PARTITION';
                         }
                         requestedElement = {
                             type: type,
@@ -409,8 +421,8 @@ define(['require', 'elementUtils', 'lodash'],
                 });
             });
 
-            // check the element in the partitionList
-            if (!requestedElement) {
+            // check the element in queries inside the partitions
+            if (includeQueryTypes !== undefined && includeQueryTypes && !requestedElement) {
                 requestedElement = self.getQueryByIdSavedInsideAPartition(elementId);
             }
             // search in the inner streams in partitions

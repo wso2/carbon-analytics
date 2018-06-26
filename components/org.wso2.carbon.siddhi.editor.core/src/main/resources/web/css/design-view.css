@@ -590,3 +590,7 @@ a.list-group-item, button.list-group-item {
 {
     display: none;
 }
+
+.error-element {
+    background-color: #ff0000;
+}

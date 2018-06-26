@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'],
-    function (require, log, $, _, PartitionWith, DesignViewUtils) {
+define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils', 'jsonValidator'],
+    function (require, log, $, _, PartitionWith, DesignViewUtils, JSONValidator) {
 
         /**
          * @class PartitionForm Creates a forms to collect data from a partition
@@ -187,6 +187,9 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     _.forEach(config.annotations, function (annotation) {
                         partitionElement.addAnnotation(annotation.annotation);
                     });
+
+                    // perform JSON validation
+                    JSONValidator.prototype.validatePartition(partitionElement);
 
                     // design view container and toggle view button are enabled
                     self.designViewContainer.removeClass('disableContainer');
