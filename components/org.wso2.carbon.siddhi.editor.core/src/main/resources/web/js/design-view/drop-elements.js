@@ -1172,17 +1172,20 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
                 var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
 
-                _.forEach(outConnections, function (connection) {
-                    self.jsPlumbInstance.deleteConnection(connection);
-                });
-                _.forEach(inConnections, function (connection) {
-                    self.jsPlumbInstance.deleteConnection(connection);
-                });
+                // remove connections and remove element from canvas
+                setTimeout(function () {
+                    _.forEach(outConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
+                    });
+                    _.forEach(inConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
+                    });
 
-                self.jsPlumbInstance.remove(newElement, true);
-                if (self.jsPlumbInstance.getGroupFor(newElement)) {
-                    self.jsPlumbInstance.removeFromGroup(newElement);
-                }
+                    self.jsPlumbInstance.remove(newElement, true);
+                    if (self.jsPlumbInstance.getGroupFor(newElement)) {
+                        self.jsPlumbInstance.removeFromGroup(newElement);
+                    }
+                }, 100);
 
                 if (newElement.hasClass('streamDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeStream(elementId);
