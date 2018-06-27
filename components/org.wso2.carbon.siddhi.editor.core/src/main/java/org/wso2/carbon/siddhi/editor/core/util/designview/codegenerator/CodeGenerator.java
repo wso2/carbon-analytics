@@ -70,7 +70,10 @@ public class CodeGenerator {
         }
         List<StreamConfig> definedStreams = CodeGeneratorUtils.getStreamsToBeGenerated(siddhiApp.getStreamList(),
                 siddhiApp.getSourceList(), siddhiApp.getSinkList(), queries);
-        List<String> definitionNames = CodeGeneratorUtils.getDefinitionNames(siddhiApp.getStreamList(),
+        List<String> definitionNames = CodeGeneratorUtils.getDefinitionNames(definedStreams,
+                siddhiApp.getTableList(), siddhiApp.getWindowList(),
+                siddhiApp.getTriggerList(), siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
+        List<String> allDefinitions = CodeGeneratorUtils.getDefinitionNames(siddhiApp.getStreamList(),
                 siddhiApp.getTableList(), siddhiApp.getWindowList(),
                 siddhiApp.getTriggerList(), siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
 
@@ -82,11 +85,11 @@ public class CodeGenerator {
                 generateTriggers(siddhiApp.getTriggerList()) +
                 generateAggregations(siddhiApp.getAggregationList()) +
                 generateFunctions(siddhiApp.getFunctionList()) +
-                generateExecutionElements(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(), definitionNames);
+                generateExecutionElements(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(), definitionNames, allDefinitions);
     }
 
     private String generateExecutionElements(Map<QueryListType, List<QueryConfig>> queryLists,
-                                             List<PartitionConfig> partitions, List<String> definitionNames)
+                                             List<PartitionConfig> partitions, List<String> definitionNames, List<String> allDefinitions)
             throws CodeGenerationException {
         StringBuilder executionElementStringBuilder = new StringBuilder();
         executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
@@ -106,7 +109,7 @@ public class CodeGenerator {
                 executionElementStringBuilder.append(queryCodeGenerator.generateQuery(query));
             } else if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.PARTITION)) {
                 PartitionConfig partition = (PartitionConfig) executionElement.getValue();
-                executionElementStringBuilder.append(partitionCodeGenerator.generatePartition(partition, definitionNames));
+                executionElementStringBuilder.append(partitionCodeGenerator.generatePartition(partition, allDefinitions));
             } else {
                 throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
             }
