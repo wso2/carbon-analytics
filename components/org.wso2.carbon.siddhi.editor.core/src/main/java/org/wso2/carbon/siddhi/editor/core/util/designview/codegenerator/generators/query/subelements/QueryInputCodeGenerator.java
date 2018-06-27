@@ -38,6 +38,13 @@ import java.util.regex.Pattern;
  */
 public class QueryInputCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a QueryInputConfig object
+     *
+     * @param queryInput The QueryInputConfig object
+     * @return The Siddhi code representation of the given QueryInputConfig object
+     * @throws CodeGenerationException Error when generating code
+     */
     public static String generateQueryInput(QueryInputConfig queryInput) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(queryInput);
 
@@ -66,6 +73,13 @@ public class QueryInputCodeGenerator {
         return queryInputStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a WindowFilterProjectionConfig object
+     *
+     * @param windowFilterProjection The WindowFilterProjectionConfig object
+     * @return The Siddhi code representation of the given WindowFilterProjectionConfig object
+     * @throws CodeGenerationException Error when generating code
+     */
     private static String generateWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(windowFilterProjection);
@@ -76,6 +90,13 @@ public class QueryInputCodeGenerator {
                 SubElementCodeGenerator.generateStreamHandlerList(windowFilterProjection.getStreamHandlerList());
     }
 
+    /**
+     * Generate's the Siddhi code representation of a JoinConfig object
+     *
+     * @param join The JoinConfig object
+     * @return The Siddhi code representation of the given JoinConfig object
+     * @throws CodeGenerationException Error when generating code
+     */
     private static String generateJoinQueryInput(JoinConfig join) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(join);
 
@@ -117,6 +138,13 @@ public class QueryInputCodeGenerator {
         return joinStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a JoinElementConfig object
+     *
+     * @param joinElement The JoinElementConfig object
+     * @return The Siddhi code representation of the given JoinElementConfig object
+     * @throws CodeGenerationException Error when generating code
+     */
     private static String generateJoinElement(JoinElementConfig joinElement) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(joinElement);
 
@@ -140,6 +168,13 @@ public class QueryInputCodeGenerator {
         return joinElementStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a join type
+     *
+     * @param joinType The join type
+     * @return The Siddhi code representation of the given join type
+     * @throws CodeGenerationException Error when generating code
+     */
     private static String generateJoinType(String joinType) throws CodeGenerationException {
         if (joinType == null || joinType.isEmpty()) {
             throw new CodeGenerationException("The 'joinType' value of a given join query is empty");
@@ -159,6 +194,13 @@ public class QueryInputCodeGenerator {
         }
     }
 
+    /**
+     * Generate's the Siddhi code representation of a PatternSequenceConfig object
+     *
+     * @param patternSequence The PatternSequenceConfig object
+     * @return The Siddhi code representation of the given PatternSequenceConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private static String generatePatternSequenceInput(PatternSequenceConfig patternSequence)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(patternSequence);
@@ -186,6 +228,14 @@ public class QueryInputCodeGenerator {
         return patternSequenceInputStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a PatternSequenceConditionConfig object
+     *
+     * @param condition The PatternSequenceConditionConfig objecy
+     * @param hasNot    Flag to show whether the given PatternSequenceConditionConfig has a 'not' keyword
+     * @return The Siddhi code representation of the given PatternSequenceConditionConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private static String generatePatternSequenceConditionLogic(PatternSequenceConditionConfig condition,
                                                                 boolean hasNot)
             throws CodeGenerationException {

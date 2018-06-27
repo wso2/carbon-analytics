@@ -28,6 +28,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
  */
 public class FunctionCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a FunctionConfig object
+     *
+     * @param function The FunctionConfig object
+     * @return The Siddhi code representation of the given FunctionConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public String generateFunction(FunctionConfig function) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(function);
 

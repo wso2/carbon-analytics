@@ -36,6 +36,13 @@ import java.util.List;
  */
 public class AggregationCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a AggregationConfig object
+     *
+     * @param aggregation The AggregationConfig object
+     * @return The Siddhi code representation of the given AggregationConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public String generateAggregation(AggregationConfig aggregation) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregation);
 
@@ -74,6 +81,12 @@ public class AggregationCodeGenerator {
         return aggregationStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a aggregation definition's annotations
+     *
+     * @param annotations The list of annotations of an aggregation definition
+     * @return The Siddhi code representation of the given annotation list
+     */
     private String generateAggregationAnnotations(List<String> annotations) {
         if (annotations == null || annotations.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -93,6 +106,13 @@ public class AggregationCodeGenerator {
         return annotationsStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a AggregateByTimePeriod object
+     *
+     * @param aggregateByTimePeriod The AggregateByTimePeriod object
+     * @return The Siddhi code representation of the given AggregateByTimePeriod object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private String generateAggregateByTimePeriod(AggregateByTimePeriod aggregateByTimePeriod)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimePeriod);
@@ -115,6 +135,13 @@ public class AggregationCodeGenerator {
         return aggregateByTimePeriodStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a AggregateByTimeInterval object
+     *
+     * @param aggregateByTimeInterval The AggregateByTimeInterval object
+     * @return The Siddhi code representation of the given AggregateByTimeInterval object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private String generateAggregateByTimeInterval(AggregateByTimeInterval aggregateByTimeInterval)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimeInterval);
@@ -131,6 +158,13 @@ public class AggregationCodeGenerator {
         return aggregateByTimeIntervalStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a AggregateByTimeRange object
+     *
+     * @param aggregateByTimeRange The AggregateByTimeRange object
+     * @return The Siddhi code representation of the given AggregateByTimeRange object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private String generateAggregateByTimeRange(AggregateByTimeRange aggregateByTimeRange)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimeRange);

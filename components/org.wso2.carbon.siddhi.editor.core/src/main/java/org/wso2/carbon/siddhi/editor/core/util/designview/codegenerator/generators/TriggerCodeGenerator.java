@@ -28,6 +28,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
  */
 public class TriggerCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a TriggerConfig object
+     *
+     * @param trigger The TriggerConfig object
+     * @return The Siddhi code representation of the given TriggerConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public String generateTrigger(TriggerConfig trigger) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(trigger);
 

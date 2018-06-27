@@ -33,6 +33,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
  */
 public class QueryCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a QueryConfig object
+     *
+     * @param query The QueryConfig objecy
+     * @return The Siddhi code representation of the given QueryConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public String generateQuery(QueryConfig query) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(query);
 

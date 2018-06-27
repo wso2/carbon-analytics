@@ -31,6 +31,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
  */
 public class QuerySelectCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a AttributesSelectionConfig object
+     *
+     * @param attributesSelection The AttributesSelectionConfig object
+     * @return The Siddhi code representation of the given AttributesSelectionConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public static String generateQuerySelect(AttributesSelectionConfig attributesSelection)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(attributesSelection);
@@ -54,6 +61,13 @@ public class QuerySelectCodeGenerator {
         return attributesSelectionStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a UserDefinedSelectionConfig object
+     *
+     * @param userDefinedSelection The UserDefinedSelectionConfig object
+     * @return The Siddhi code representation of the given UserDefinedSelectionConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private static String generateUserDefinedSelection(UserDefinedSelectionConfig userDefinedSelection)
             throws CodeGenerationException {
         if (userDefinedSelection == null || userDefinedSelection.getValue() == null ||

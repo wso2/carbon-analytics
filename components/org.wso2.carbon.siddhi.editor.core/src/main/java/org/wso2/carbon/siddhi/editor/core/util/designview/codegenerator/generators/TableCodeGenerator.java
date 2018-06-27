@@ -28,6 +28,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
  */
 public class TableCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a TableConfig object
+     *
+     * @param table The TableConfig object
+     * @return The Siddhi code representation of the given TableConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public String generateTable(TableConfig table) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(table);
 

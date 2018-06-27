@@ -28,6 +28,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
  */
 public class StreamCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a StreamConfig object
+     *
+     * @param stream The StreamConfig object
+     * @return The Siddhi code representation of the given StreamConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public String generateStream(StreamConfig stream) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
 

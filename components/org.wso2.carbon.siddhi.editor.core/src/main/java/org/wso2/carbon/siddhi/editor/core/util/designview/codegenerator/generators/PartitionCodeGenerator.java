@@ -34,6 +34,14 @@ import java.util.List;
  */
 public class PartitionCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a PartitionConfig object
+     *
+     * @param partition       The PartitionConfig object
+     * @param definitionNames The names of all the Siddhi definition objects (including inner streams)
+     * @return The Siddhi code representation of the given PartitionConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public String generatePartition(PartitionConfig partition, List<String> definitionNames)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
@@ -74,6 +82,13 @@ public class PartitionCodeGenerator {
         return partitionStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a partition's PartitionWithElement list
+     *
+     * @param partitionWith The PartitionWithElement list
+     * @return The Siddhi code representation of the given PartitionWithElement list
+     * @throws CodeGenerationException Error when generating the code
+     */
     private String generatePartitionWith(List<PartitionWithElement> partitionWith) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(partitionWith);
 
@@ -90,6 +105,13 @@ public class PartitionCodeGenerator {
         return partitionWithStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a PartitionWithElement object
+     *
+     * @param partitionWithElement The PartitionWithElement object
+     * @return The Siddhi code representation of the given PartitionWithElement object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private String generatePartitionWithElement(PartitionWithElement partitionWithElement)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(partitionWithElement);

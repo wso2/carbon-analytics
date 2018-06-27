@@ -56,6 +56,13 @@ import java.util.Map;
  */
 public class CodeGenerator {
 
+    /**
+     * Generate's the Siddhi app code as a string of a given EventFlow object
+     *
+     * @param eventFlow The EventFlow object
+     * @return The Siddhi application code as a string of the given EventFlow object
+     * @throws CodeGenerationException Error while generating the code
+     */
     public String generateSiddhiAppCode(EventFlow eventFlow) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
 
@@ -88,6 +95,16 @@ public class CodeGenerator {
                 generateExecutionElements(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(), definitionNames, allDefinitions);
     }
 
+    /**
+     * Generate's the Siddhi code representation of a Siddhi app's execution elements (queries and partitions)
+     *
+     * @param queryLists      The list of queries in a Siddhi app
+     * @param partitions      The list of partitions in a Siddhi app
+     * @param definitionNames The names of all the definition elements that are to be defined in the app
+     * @param allDefinitions  The names of all the definition elements in the Siddhi app
+     * @return The Siddhi code representation of all the queries and partitions of a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
+     */
     private String generateExecutionElements(Map<QueryListType, List<QueryConfig>> queryLists,
                                              List<PartitionConfig> partitions, List<String> definitionNames, List<String> allDefinitions)
             throws CodeGenerationException {
@@ -119,6 +136,12 @@ public class CodeGenerator {
         return executionElementStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a Siddhi app's app name
+     *
+     * @param appName The Siddhi app's app name
+     * @return The Siddhi code representation of a Siddhi app name annotation
+     */
     private String generateAppName(String appName) {
         StringBuilder appNameStringBuilder = new StringBuilder();
 
@@ -134,6 +157,15 @@ public class CodeGenerator {
         return appNameStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a Siddhi app's stream definitions
+     *
+     * @param streamList The list of streams to be defined in a Siddhi app
+     * @param sourceList The list of source annotations in a Siddhi app
+     * @param sinkList   The list of sink annotations in a Siddhi app
+     * @return The Siddhi code representation of all the streams in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
+     */
     private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList,
                                    List<SourceSinkConfig> sinkList) throws CodeGenerationException {
         if (streamList == null || streamList.isEmpty()) {
@@ -169,6 +201,13 @@ public class CodeGenerator {
         return streamListStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a Siddhi app's table definitions
+     *
+     * @param tableList The list of tables to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the tables in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
+     */
     private String generateTables(List<TableConfig> tableList) throws CodeGenerationException {
         if (tableList == null || tableList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -187,6 +226,13 @@ public class CodeGenerator {
         return tableListStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a Siddhi app's window definitions
+     *
+     * @param windowList The list of windows to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the windows in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
+     */
     private String generateWindows(List<WindowConfig> windowList) throws CodeGenerationException {
         if (windowList == null || windowList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -205,6 +251,13 @@ public class CodeGenerator {
         return windowListStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a Siddhi app's trigger definitions
+     *
+     * @param triggerList The list of triggers to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the triggers in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
+     */
     private String generateTriggers(List<TriggerConfig> triggerList) throws CodeGenerationException {
         if (triggerList == null || triggerList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -222,6 +275,13 @@ public class CodeGenerator {
         return triggerListStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a Siddhi app's aggregation definitions
+     *
+     * @param aggregationList The list of aggregations to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the aggregations in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
+     */
     private String generateAggregations(List<AggregationConfig> aggregationList) throws CodeGenerationException {
         if (aggregationList == null || aggregationList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
@@ -239,6 +299,13 @@ public class CodeGenerator {
         return aggregationListStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a Siddhi app's function definitions
+     *
+     * @param functionList The list of functions to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the functions in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
+     */
     private String generateFunctions(List<FunctionConfig> functionList) throws CodeGenerationException {
         if (functionList == null || functionList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;

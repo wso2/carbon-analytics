@@ -68,6 +68,15 @@ import java.util.Set;
  */
 public class CodeGeneratorUtils {
 
+    /**
+     * Reorders a list of QueryConfig objects to the right order that it should be in displayed in
+     * when converting to a Siddhi app partition
+     *
+     * @param queries         The list of queries to be ordered
+     * @param definitionNames The names of all the definition elements (streams, tables, windows etc) of the Siddhi app
+     * @return The queries reordered to the way it should be represented in a Siddhi app partition
+     * @throws CodeGenerationException Error when trying to reorder the queries
+     */
     public static List<QueryConfig> reorderQueries(List<QueryConfig> queries, List<String> definitionNames)
             throws CodeGenerationException {
         if (queries == null) {
@@ -92,6 +101,13 @@ public class CodeGeneratorUtils {
         return reorderedQueries;
     }
 
+    /**
+     * Identifies the names of the input streams of a given QueryConfig object
+     *
+     * @param query The QueryConfig object
+     * @return The list of names of the input streams of the given QueryConfig object
+     * @throws CodeGenerationException Error while trying to identify the input streams
+     */
     private static List<String> getInputStreams(QueryConfig query)
             throws CodeGenerationException {
         NullValidator.validateConfigObject(query);
@@ -130,6 +146,15 @@ public class CodeGeneratorUtils {
         return inputStreamList;
     }
 
+    /**
+     * Identifies that streams that need to be generated and displayed when generating the Siddhi app code
+     *
+     * @param streamList The list of streams in a Siddhi app
+     * @param sourceList The list of source annotations in a Siddhi app
+     * @param sinkList   The list of sink annotations in a Siddhi app
+     * @param queryList  The list of queries in a Siddhi app (including partition queries)
+     * @return The list of streams that need to be generated in a Siddhi app
+     */
     public static List<StreamConfig> getStreamsToBeGenerated(List<StreamConfig> streamList,
                                                              List<SourceSinkConfig> sourceList,
                                                              List<SourceSinkConfig> sinkList,
@@ -179,6 +204,17 @@ public class CodeGeneratorUtils {
         return definedStreams;
     }
 
+    /**
+     * Identifies the names of all the definition elements in a Siddhi application
+     *
+     * @param streams      The list of streams in a Siddhi app
+     * @param tables       The list of tables in a Siddhi app
+     * @param windows      The list of windows in a Siddhi app
+     * @param triggers     The list of triggers in a Siddhi app
+     * @param aggregations The list of aggregations in a Siddhi app
+     * @param partitions   The list of partitions in a Siddhi app
+     * @return The list of all the definition elements names in a Siddhi app
+     */
     public static List<String> getDefinitionNames(List<StreamConfig> streams, List<TableConfig> tables,
                                                   List<WindowConfig> windows, List<TriggerConfig> triggers,
                                                   List<AggregationConfig> aggregations,
@@ -208,6 +244,14 @@ public class CodeGeneratorUtils {
         return definitionNames;
     }
 
+    /**
+     * Converts a list of queries and partitions to ExecutionElementConfig objects
+     *
+     * @param queries    The list of queries in a Siddhi app
+     * @param partitions The list of partitions in a Siddhi app
+     * @return The list of ExecutionElementConfig objects of a Siddhi app
+     * @throws CodeGenerationException Error when trying to convert a query/partition to an ExecutionElementConfig object
+     */
     public static List<ExecutionElementConfig> convertToExecutionElements(List<QueryConfig> queries,
                                                                           List<PartitionConfig> partitions)
             throws CodeGenerationException {
@@ -222,6 +266,15 @@ public class CodeGeneratorUtils {
         return executionElements;
     }
 
+    /**
+     * Reorders a list of ExecutionElementConfig objects to the right order that it should
+     * be in displayed in when converting to a Siddhi app partition
+     *
+     * @param executionElements The ExecutionElements (queries and partitions) of a Siddhi app
+     * @param definitionNames   The names of all the definition elements in a Siddhi app (excluding inner streams and undefined streams)
+     * @return The execution elements reordered to the way it should be represented in a Siddhi application
+     * @throws CodeGenerationException Error when trying to reorder the ExecutionElementConfig list
+     */
     public static List<ExecutionElementConfig> reorderExecutionElements(
             List<ExecutionElementConfig> executionElements, List<String> definitionNames)
             throws CodeGenerationException {
@@ -247,6 +300,9 @@ public class CodeGeneratorUtils {
         return reorderedExecutionElements;
     }
 
+    /**
+     * Static inner class that is used to validate any incoming *Config objects for null pointers
+     */
     public static class NullValidator {
 
         public static void validateConfigObject(StreamConfig stream) throws CodeGenerationException {

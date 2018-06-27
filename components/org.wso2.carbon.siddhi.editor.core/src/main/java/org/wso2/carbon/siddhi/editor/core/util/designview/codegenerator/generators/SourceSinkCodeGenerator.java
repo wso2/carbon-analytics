@@ -35,6 +35,13 @@ import java.util.Map;
  */
 public class SourceSinkCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a SourceSinkConfig object
+     *
+     * @param sourceSink The SourceSinkConfig object
+     * @return The Siddhi code representation of the given SourceSinkConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public String generateSourceSink(SourceSinkConfig sourceSink) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(sourceSink);
 
@@ -67,6 +74,13 @@ public class SourceSinkCodeGenerator {
         return sourceSinkStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a MapperConfig object
+     *
+     * @param mapper The MapperConfig object
+     * @return The Siddhi code representation of the given MapperConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private String generateMapper(MapperConfig mapper) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(mapper);
 
@@ -97,6 +111,13 @@ public class SourceSinkCodeGenerator {
         return mapperStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a MapperPayloadOrAttribute object
+     *
+     * @param payloadOrAttribute The MapperPayloadOrAttribute object
+     * @return The Siddhi code representation of the given MapperConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private String generateMapperPayloadOrAttribute(MapperPayloadOrAttribute payloadOrAttribute)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(payloadOrAttribute);
@@ -119,6 +140,13 @@ public class SourceSinkCodeGenerator {
         return mapperAttributeStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a MapperListPayloadOrAttribute object
+     *
+     * @param mapperListAttribute The MapperListPayloadOrAttribute object
+     * @return The Siddhi code representation of the given MapperListPayloadOrAttribute object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private String generateListPayloadOrAttribute(MapperListPayloadOrAttribute mapperListAttribute)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(mapperListAttribute);
@@ -138,6 +166,13 @@ public class SourceSinkCodeGenerator {
         return mapperListAttributeStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a MapperMapPayloadOrAttribute object
+     *
+     * @param mapperMapAttribute The MapperMapPayloadOrAttribute object
+     * @return The Siddhi code representation of the given MapperMapPayloadOrAttribute object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private String generateMapPayloadOrAttribute(MapperMapPayloadOrAttribute mapperMapAttribute)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(mapperMapAttribute);

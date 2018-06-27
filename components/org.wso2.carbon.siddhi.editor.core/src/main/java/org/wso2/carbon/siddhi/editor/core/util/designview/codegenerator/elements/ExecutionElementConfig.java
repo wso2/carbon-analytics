@@ -26,6 +26,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +43,7 @@ public class ExecutionElementConfig {
     private List<String> outputStreams;
 
     public ExecutionElementConfig(QueryConfig query) throws CodeGenerationException {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(query);
         this.type = CodeGeneratorConstants.QUERY;
         this.value = query;
         this.inputStreams = extractInputStreams(query);
@@ -49,12 +51,20 @@ public class ExecutionElementConfig {
     }
 
     public ExecutionElementConfig(PartitionConfig partition) throws CodeGenerationException {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
         this.type = CodeGeneratorConstants.PARTITION;
         this.value = partition;
         this.inputStreams = extractInputStreams(partition);
         this.outputStreams = extractOutputStreams(partition);
     }
 
+    /**
+     * Identifies the names of the input streams of a query
+     *
+     * @param query The query object to be used
+     * @return The list of names of the given query's input streams
+     * @throws CodeGenerationException Error when identifying input streams
+     */
     private List<String> extractInputStreams(QueryConfig query) throws CodeGenerationException {
         List<String> inputStreamList = new LinkedList<>();
         switch (query.getQueryInput().getType().toUpperCase()) {
@@ -64,16 +74,19 @@ public class ExecutionElementConfig {
             case CodeGeneratorConstants.FUNCTION:
                 WindowFilterProjectionConfig windowFilterProjection =
                         (WindowFilterProjectionConfig) query.getQueryInput();
+                CodeGeneratorUtils.NullValidator.validateConfigObject(windowFilterProjection);
                 inputStreamList.add(windowFilterProjection.getFrom());
                 break;
             case CodeGeneratorConstants.JOIN:
                 JoinConfig join = (JoinConfig) query.getQueryInput();
+                CodeGeneratorUtils.NullValidator.validateConfigObject(join);
                 inputStreamList.add(join.getLeft().getFrom());
                 inputStreamList.add(join.getRight().getFrom());
                 break;
             case CodeGeneratorConstants.PATTERN:
             case CodeGeneratorConstants.SEQUENCE:
                 PatternSequenceConfig patternSequence = (PatternSequenceConfig) query.getQueryInput();
+                CodeGeneratorUtils.NullValidator.validateConfigObject(patternSequence);
                 for (PatternSequenceConditionConfig condition : patternSequence.getConditionList()) {
                     if (!inputStreamList.contains(condition.getStreamName())) {
                         inputStreamList.add(condition.getStreamName());
@@ -87,6 +100,13 @@ public class ExecutionElementConfig {
         return inputStreamList;
     }
 
+    /**
+     * Identifies the names of the input streams of a partition
+     *
+     * @param partition The partition object to be used
+     * @return The list of names of the given partition's input streams
+     * @throws CodeGenerationException Error when identifying input streams
+     */
     private List<String> extractInputStreams(PartitionConfig partition) throws CodeGenerationException {
         List<String> inputStreamList = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
@@ -103,13 +123,28 @@ public class ExecutionElementConfig {
         return inputStreamList;
     }
 
-    private List<String> extractOutputStreams(QueryConfig query) {
+    /**
+     * Identifies the name of the output stream of a query
+     *
+     * @param query The query object to be used
+     * @return The name of the given query's output stream
+     * @throws CodeGenerationException Error when identifying the output stream
+     */
+    private List<String> extractOutputStreams(QueryConfig query) throws CodeGenerationException {
+        CodeGeneratorUtils.NullValidator.validateConfigObject(query.getQueryOutput());
         List<String> outputStreamList = new LinkedList<>();
         outputStreamList.add(query.getQueryOutput().getTarget());
         return outputStreamList;
     }
 
-    private List<String> extractOutputStreams(PartitionConfig partition) {
+    /**
+     * Identifies the names of the output streams of a partition
+     *
+     * @param partition The partition object to be used
+     * @return The list of names of the given partition's output streams
+     * @throws CodeGenerationException Error when identifying the output streams
+     */
+    private List<String> extractOutputStreams(PartitionConfig partition) throws CodeGenerationException {
         List<String> outputStreamList = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
             for (QueryConfig query : queryList) {

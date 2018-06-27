@@ -29,6 +29,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
  */
 public class WindowCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a WindowConfig object
+     *
+     * @param window The WindowConfig object
+     * @return The Siddhi code representation of the given WindowConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public String generateWindow(WindowConfig window) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(window);
 

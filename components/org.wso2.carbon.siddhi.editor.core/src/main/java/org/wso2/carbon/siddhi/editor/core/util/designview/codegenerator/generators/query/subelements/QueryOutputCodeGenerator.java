@@ -34,6 +34,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
  */
 public class QueryOutputCodeGenerator {
 
+    /**
+     * Generate's the Siddhi code representation of a QueryOutputConfig object
+     *
+     * @param queryOutput The QueryOutputConfig object
+     * @return The Siddhi code representation of the given QueryOutputConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     public static String generateQueryOutput(QueryOutputConfig queryOutput) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(queryOutput);
 
@@ -61,6 +68,14 @@ public class QueryOutputCodeGenerator {
         return queryOutputStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a InsertOutputConfig object
+     *
+     * @param insertOutput The InsertOutputConfig object
+     * @param target       The name of the output stream
+     * @return The Siddhi code representation of the given InsertOutputConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private static String generateInsertOutput(InsertOutputConfig insertOutput, String target)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(insertOutput);
@@ -101,6 +116,14 @@ public class QueryOutputCodeGenerator {
         return insertOutputStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a DeleteOutputConfig object
+     *
+     * @param deleteOutput The DeleteOutputConfig object
+     * @param target       The name of the output stream
+     * @return The Siddhi code representation of the given DeleteOutputConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private static String generateDeleteOutput(DeleteOutputConfig deleteOutput, String target)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(deleteOutput);
@@ -119,6 +142,15 @@ public class QueryOutputCodeGenerator {
                 SiddhiCodeBuilderConstants.SEMI_COLON;
     }
 
+    /**
+     * Generate's the Siddhi code representation of a UpdateInsertIntoOutputConfig object
+     *
+     * @param type                   The type of output (i.e Either 'update' or 'update-or-insert-into')
+     * @param updateInsertIntoOutput The UpdateInsertIntoOutputConfig object
+     * @param target                 The name of the output stream
+     * @return The Siddhi code representation of the given UpdateInsertIntoOutputConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private static String generateUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput,
                                                String target) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(updateInsertIntoOutput);
@@ -162,6 +194,13 @@ public class QueryOutputCodeGenerator {
         return updateInsertIntoOutputStringBuilder.toString();
     }
 
+    /**
+     * Generate's the Siddhi code representation of a SetAttributeConfig object
+     *
+     * @param setAttribute The SetAttributeConfig object
+     * @return The Siddhi code representation of the given SetAttributeConfig object
+     * @throws CodeGenerationException Error when generating the code
+     */
     private static String generateSetAttribute(SetAttributeConfig setAttribute) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(setAttribute);
 
