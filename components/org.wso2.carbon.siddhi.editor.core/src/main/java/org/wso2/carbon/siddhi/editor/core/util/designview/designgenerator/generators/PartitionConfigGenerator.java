@@ -161,9 +161,12 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      */
     private PartitionWithElement generatePartitionWithElement(Map.Entry<String, PartitionType> partitionWithEntry)
             throws DesignGenerationException {
-        return new PartitionWithElement(
-                generatePartitionElementExpression(partitionWithEntry.getValue()),
-                partitionWithEntry.getKey());
+        PartitionWithElement partitionWithElement =
+                new PartitionWithElement(
+                        generatePartitionElementExpression(partitionWithEntry.getValue()),
+                        partitionWithEntry.getKey());
+        preserveAndBindCodeSegment(partitionWithEntry.getValue(), partitionWithElement);
+        return partitionWithElement;
     }
 
     /**
