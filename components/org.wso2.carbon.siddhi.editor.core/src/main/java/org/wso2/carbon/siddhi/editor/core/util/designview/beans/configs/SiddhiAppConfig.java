@@ -268,6 +268,13 @@ public class SiddhiAppConfig {
         this.commentCodeSegments.addAll(commentCodeSegments);
     }
 
+    /**
+     * Removes unnecessarily remaining comments
+     */
+    public void clearCommentCodeSegments() {
+        commentCodeSegments = new HashSet<>();
+    }
+
     public int getFinalElementCount() {
         return finalElementCount;
     }

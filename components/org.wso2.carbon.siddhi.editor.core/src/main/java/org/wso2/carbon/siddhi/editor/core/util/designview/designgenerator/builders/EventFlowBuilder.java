@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.build
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AggregationConfigGenerator;
@@ -34,6 +35,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.genera
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.TriggerConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.WindowConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.commentspreserver.OuterScopeCommentsPreserver;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.commentspreserver.PartitionScopeCommentsPreserver;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -293,8 +295,19 @@ public class EventFlowBuilder {
         siddhiAppConfig =
                 outerScopeCommentsPreserver.bindCommentsToElements(
                         siddhiAppConfig.getCommentCodeSegments(),
-                        siddhiAppConfig
-                );
+                        siddhiAppConfig);
+        // Preserve Comments of Partitions
+        for (PartitionConfig partitionConfig : siddhiAppConfig.getPartitionList()) {
+            PartitionScopeCommentsPreserver partitionScopeCommentsPreserver =
+                    new PartitionScopeCommentsPreserver(
+                            siddhiAppString, partitionConfig, siddhiAppConfig.getElementCodeSegments());
+            siddhiAppConfig.clearCommentCodeSegments();
+            siddhiAppConfig.assignCommentCodeSegments(partitionScopeCommentsPreserver.generateCommentCodeSegments());
+            siddhiAppConfig =
+                    partitionScopeCommentsPreserver.bindCommentsToElements(
+                            siddhiAppConfig.getCommentCodeSegments(),
+                            siddhiAppConfig);
+        }
         return this;
     }
 }
