@@ -23,10 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
-import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
-import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
-import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
+import org.wso2.carbon.event.simulator.core.exception.*;
 import org.wso2.carbon.event.simulator.core.internal.bean.SimulationPropertiesDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventGeneratorFactoryImpl;
@@ -74,7 +71,7 @@ public class EventSimulator implements Runnable {
      * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     public EventSimulator(String simulationName, String simulationConfiguration, boolean isTriggeredFromDeploy)
-            throws InsufficientAttributesException, InvalidConfigException, ResourceNotFoundException {
+            throws SimulationValidationException {
         if (!simulationConfiguration.isEmpty()) {
             //validate simulation configuration
             validateSimulationConfig(simulationConfiguration, isTriggeredFromDeploy);
@@ -112,7 +109,7 @@ public class EventSimulator implements Runnable {
      * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     public static void validateSimulationConfig(String simulationConfiguration, boolean isTriggeredFromDeploy)
-            throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException {
+            throws SimulationValidationException {
         try {
             JSONObject simulationConfig = new JSONObject(simulationConfiguration);
             String simulationName = simulationConfig.getJSONObject(

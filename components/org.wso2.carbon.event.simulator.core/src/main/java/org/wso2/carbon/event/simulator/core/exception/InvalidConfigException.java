@@ -24,7 +24,7 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 /**
  * customized exception class for parsing simulation and stream configurations
  */
-public class InvalidConfigException extends ResourceNotFoundException {
+public class InvalidConfigException extends SimulationValidationException {
 
     /**
      * Throws customizes exception when parsing simulation and stream configurations

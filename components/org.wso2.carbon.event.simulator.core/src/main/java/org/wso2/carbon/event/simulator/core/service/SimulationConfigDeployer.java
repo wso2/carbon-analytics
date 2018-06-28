@@ -32,6 +32,7 @@ import org.wso2.carbon.deployment.engine.Artifact;
 import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
+import org.wso2.carbon.event.simulator.core.exception.SimulationValidationException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.event.simulator.core.service.bean.ActiveSimulatorData;
@@ -82,7 +83,7 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
                                 new ActiveSimulatorData(eventSimulator, simulationConfig));
                         log.info("Deployed active simulation '" + simulationName + "'.");
                     }
-                } catch (ResourceNotFoundException e) {
+                } catch (SimulationValidationException e) {
                     ResourceDependencyData resourceDependencyData =
                             eventSimulatorMap.getInActiveSimulatorMap().get(simulationName);
                     ResourceDependencyData newResourceDependency =

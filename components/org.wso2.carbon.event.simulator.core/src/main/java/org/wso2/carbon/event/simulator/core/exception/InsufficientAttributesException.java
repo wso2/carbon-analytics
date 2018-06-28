@@ -24,7 +24,7 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
  * customized exception class for validation whethere the number of attributes generated is equal to the number of
  * attributes in stream
  */
-public class InsufficientAttributesException extends ResourceNotFoundException {
+public class InsufficientAttributesException extends SimulationValidationException {
 
     /**
      * Throws customizes validating the number of attributes generated

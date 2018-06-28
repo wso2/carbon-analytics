@@ -24,10 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
-import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
-import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
-import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
+import org.wso2.carbon.event.simulator.core.exception.*;
 import org.wso2.carbon.event.simulator.core.internal.bean.DBSimulationDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.database.util.DatabaseConnector;
@@ -79,7 +76,7 @@ public class DatabaseEventGenerator implements EventGenerator {
      */
     @Override
     public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, String simulationName)
-            throws InvalidConfigException, ResourceNotFoundException {
+            throws SimulationValidationException {
         //retrieve stream attributes
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
@@ -115,13 +112,13 @@ public class DatabaseEventGenerator implements EventGenerator {
                                                  dbSimulationConfig.getPassword());
             databaseConnection.closeConnection();
         } catch (PoolInitializationException e) {
-            throw new ResourceNotFoundException("Error occurred when creating connection to database ' "
-                                                        + dbSimulationConfig.getDataSourceLocation()
-                                                        + "' to simulate to simulate stream '"
-                                                        + dbSimulationConfig.getStreamName()
-                                                        + "'. Please check connection and config settings. ",
-                                                ResourceNotFoundException.ResourceType.DATABASE,
-                                                dbSimulationConfig.getDataSourceLocation(), e);
+            throw new SimulationValidationException(
+                            dbSimulationConfig.getDataSourceLocation(),
+                            ResourceNotFoundException.ResourceType.DATABASE,
+                            "Error occurred when creating connection to database ' " +
+                            dbSimulationConfig.getDataSourceLocation() +
+                            "' to simulate to simulate stream '" + dbSimulationConfig.getStreamName() +
+                            "'. Please check connection and config settings. ", e);
         }
     }
 
@@ -350,7 +347,7 @@ public class DatabaseEventGenerator implements EventGenerator {
      */
     @Override
     public void validateSourceConfiguration(JSONObject sourceConfig, String simulationName)
-            throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException {
+            throws SimulationValidationException {
         /*
          * Perform the following checks prior to setting the properties.
          * 1. has
@@ -383,7 +380,7 @@ public class DatabaseEventGenerator implements EventGenerator {
                         .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
                                              sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             } catch (ResourceNotFoundException e) {
-                throw new ResourceNotFoundException(
+                throw new SimulationValidationException(
                                 e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for database " +
                                 "simulation does not exist. Invalid source configuration in '" +
                                 simulationName + "' simulation.\n" +
@@ -446,7 +443,7 @@ public class DatabaseEventGenerator implements EventGenerator {
                 dbConnection.close();
                 dataSource.close();
             } catch (PoolInitializationException | SQLException e) {
-                throw new ResourceNotFoundException(
+                throw new SimulationValidationException(
                                 "Error occurred when creating connection to database ' " +
                                 sourceConfig.getString(EventSimulatorConstants.DATA_SOURCE_LOCATION) +
                                 "' to simulate to simulate stream '" +
@@ -456,7 +453,7 @@ public class DatabaseEventGenerator implements EventGenerator {
                                 ResourceNotFoundException.ResourceType.DATABASE,
                                 sourceConfig.getString(EventSimulatorConstants.DATA_SOURCE_LOCATION), e);
             } catch (Exception e) {
-                throw new ResourceNotFoundException(
+                throw new SimulationValidationException(
                                 e.getCause().getCause() +" when creating connection to database ' " +
                                 sourceConfig.getString(EventSimulatorConstants.DATA_SOURCE_LOCATION) + "' to " +
                                 "simulate to simulate stream '" +

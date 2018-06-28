@@ -1,6 +1,7 @@
 package org.wso2.carbon.event.simulator.core.impl;
 
 import org.wso2.carbon.event.simulator.core.api.SingleApiService;
+import org.wso2.carbon.event.simulator.core.exception.SimulationValidationException;
 import org.wso2.carbon.event.simulator.core.internal.generator.SingleEventGenerator;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
@@ -17,7 +18,7 @@ public class SingleApiServiceImpl extends SingleApiService {
             return Response.ok().header("Access-Control-Allow-Origin", "*")
                     .entity(new ResponseMapper(Response.Status.OK, "Single Event simulation started successfully"))
                     .build();
-        } catch (ResourceNotFoundException e) {
+        } catch (SimulationValidationException | ResourceNotFoundException e) {
             return Response.serverError().header("Access-Control-Allow-Origin", "*")
                     .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage())).build();
         }

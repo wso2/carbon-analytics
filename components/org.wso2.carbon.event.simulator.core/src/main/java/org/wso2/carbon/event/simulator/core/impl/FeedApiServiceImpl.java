@@ -24,10 +24,7 @@ import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.event.simulator.core.api.FeedApiService;
 import org.wso2.carbon.event.simulator.core.api.NotFoundException;
-import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
-import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
-import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
-import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.carbon.event.simulator.core.exception.*;
 import org.wso2.carbon.event.simulator.core.internal.util.CommonOperations;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
@@ -63,7 +60,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                     simulationConfigUploader.getSimulationName(simulationConfiguration))) {
                 try {
                     EventSimulator.validateSimulationConfig(simulationConfiguration, false);
-                } catch (ResourceNotFoundException e) {
+                } catch (SimulationValidationException e) {
                     //do nothing
                 }
                 simulationConfigUploader.uploadSimulationConfig(simulationConfiguration,
@@ -88,7 +85,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                                 + "'"))
                         .build();
             }
-        } catch (ResourceNotFoundException | FileOperationsException |
+        } catch (SimulationValidationException | FileOperationsException |
                 FileAlreadyExistsException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
@@ -280,7 +277,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                           EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString())) {
             try {
                 EventSimulator.validateSimulationConfig(simulationConfigDetails, false);
-            } catch (ResourceNotFoundException e) {
+            } catch (SimulationValidationException e) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .header("Access-Control-Allow-Origin", "*")
                         .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage()))

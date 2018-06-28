@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.carbon.event.simulator.core.exception.SimulationValidationException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.event.simulator.core.service.bean.ActiveSimulatorData;
@@ -85,7 +86,7 @@ public class EventSimulatorMap {
                     activeSimulatorMap.put(simulationName, new ActiveSimulatorData(eventSimulator, simulationConfig));
                     log.info("Changed status of simulation '" + simulationName + "' from inactive to active.");
                 }
-            } catch (ResourceNotFoundException e) {
+            } catch (SimulationValidationException e) {
                 /*
                  * check whether the resource missing is the same as previous. if not, update the entry in
                  * inactiveSimulation map.
@@ -95,7 +96,6 @@ public class EventSimulatorMap {
                         new ResourceDependencyData(e.getResourceType(), e.getResourceName(), e.getMessage());
                 if (!resourceData.equals(newDependency)) {
                     inActiveSimulatorMap.put(simulationName, newDependency);
-//                    log.error(e.getMessage(), e);
                 }
             } catch (FileOperationsException e) {
                 inActiveSimulatorMap.remove(simulationName);
@@ -112,7 +112,7 @@ public class EventSimulatorMap {
         activeSimulatorMap.forEach((simulationName, simulatorData) -> {
             try {
                 EventSimulator.validateSimulationConfig(simulatorData.getSimulationConfig(), isTriggeredFromDeploy);
-            } catch (ResourceNotFoundException e) {
+            } catch (SimulationValidationException e) {
                 simulatorData.getEventSimulator().stop();
                 activeSimulatorMap.remove(simulationName);
                 inActiveSimulatorMap.put(simulationName, new ResourceDependencyData(e.getResourceType(),

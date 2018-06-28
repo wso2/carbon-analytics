@@ -21,6 +21,7 @@ package org.wso2.carbon.event.simulator.core.internal.util;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.carbon.event.simulator.core.exception.SimulationValidationException;
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.core.CSVEventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.database.core.DatabaseEventGenerator;
@@ -48,7 +49,7 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
     @Override
     public EventGenerator createEventGenerator(JSONObject sourceConfig, long startTimestamp, long endTimestamp,
                                                String simulationName)
-            throws InvalidConfigException, ResourceNotFoundException {
+            throws SimulationValidationException {
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
             try {
@@ -106,8 +107,7 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
      */
     @Override
     public void validateGeneratorConfiguration(JSONObject sourceConfig, String simulationName)
-            throws InvalidConfigException,
-            InsufficientAttributesException, ResourceNotFoundException {
+            throws SimulationValidationException {
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
             try {
