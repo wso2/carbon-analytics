@@ -23,7 +23,7 @@ import java.util.Arrays;
 /**
  * Represents Code segment of a Siddhi element in a Siddhi app, which is generated as a config
  */
-public class ElementCodeSegment implements Comparable {
+public class ElementCodeSegment implements Comparable<ElementCodeSegment> {
     private int[] queryContextStartIndex;
     private int[] queryContextEndIndex;
 
@@ -72,26 +72,6 @@ public class ElementCodeSegment implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        ElementCodeSegment otherSegment = (ElementCodeSegment) o;
-        if (getStartLine() > otherSegment.getStartLine()) {
-            return 1;
-        } else if (getStartLine() == otherSegment.getStartLine()) {
-            if (getEndLine() == otherSegment.getEndLine()) {
-                if (getStartColumn() == otherSegment.getStartColumn()) {
-                    return Integer.compare(getEndColumn(), otherSegment.getEndColumn());
-                } else {
-                    return Integer.compare(getStartColumn(), otherSegment.getStartColumn());
-                }
-            } else {
-                return Integer.compare(getEndLine(), otherSegment.getEndLine());
-            }
-        } else {
-            return -1;
-        }
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) {
@@ -107,5 +87,24 @@ public class ElementCodeSegment implements Comparable {
         int result = Arrays.hashCode(getQueryContextStartIndex());
         result = 31 * result + Arrays.hashCode(getQueryContextEndIndex());
         return result;
+    }
+
+    @Override
+    public int compareTo(ElementCodeSegment elementCodeSegment) {
+        if (getStartLine() > elementCodeSegment.getStartLine()) {
+            return 1;
+        } else if (getStartLine() == elementCodeSegment.getStartLine()) {
+            if (getEndLine() == elementCodeSegment.getEndLine()) {
+                if (getStartColumn() == elementCodeSegment.getStartColumn()) {
+                    return Integer.compare(getEndColumn(), elementCodeSegment.getEndColumn());
+                } else {
+                    return Integer.compare(getStartColumn(), elementCodeSegment.getStartColumn());
+                }
+            } else {
+                return Integer.compare(getEndLine(), elementCodeSegment.getEndLine());
+            }
+        } else {
+            return -1;
+        }
     }
 }
