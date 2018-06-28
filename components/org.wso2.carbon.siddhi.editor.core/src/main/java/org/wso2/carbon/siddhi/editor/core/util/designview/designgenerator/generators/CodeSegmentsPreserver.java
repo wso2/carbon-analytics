@@ -26,7 +26,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Preserver which can preserve code segments of Siddhi elements
+ * Contains methods to preserve code segments of Siddhi elements through their Config Generators,
+ * in order to help preserving comments
  */
 public abstract class CodeSegmentsPreserver {
     private Set<ElementCodeSegment> preservedCodeSegments = new HashSet<>();

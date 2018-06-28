@@ -30,14 +30,15 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Contains methods for preserving Comment segments from a Siddhi app
+ * Contains methods for preserving Comment segments from a Siddhi app, within preferred scopes.
+ * Scopes are defined by classes that extend this abstract class
  */
-public abstract class CommentsPreserver {
+public abstract class ScopedCommentsPreserver {
     protected String siddhiAppString;
     protected List<ElementCodeSegment> elementCodeSegments;
     protected List<CommentCodeSegment> commentCodeSegments = new ArrayList<>();
 
-    public CommentsPreserver(String siddhiAppString, List<ElementCodeSegment> elementCodeSegments) {
+    public ScopedCommentsPreserver(String siddhiAppString, List<ElementCodeSegment> elementCodeSegments) {
         this.siddhiAppString = siddhiAppString;
         this.elementCodeSegments = elementCodeSegments;
     }
@@ -59,17 +60,25 @@ public abstract class CommentsPreserver {
     public abstract SiddhiAppConfig bindCommentsToElements(Collection<CommentCodeSegment> commentCodeSegments,
                                                            SiddhiAppConfig siddhiAppConfigReference);
 
-    protected void detectCommentCodeSegments(List<ElementCodeSegment> elementCodeSegments)
+    /**
+     * Returns detected Comment segments in between the given list of ElementCodeSegment objects
+     * @param elementCodeSegments               List of ElementCodeSegment objects, each representing a Code segment
+     * @return                                  List of detected CommentCodeSegment objects
+     * @throws DesignGenerationException        Error while getting a code segment in between
+     */
+    protected List<CommentCodeSegment> detectCommentCodeSegments(List<ElementCodeSegment> elementCodeSegments)
             throws DesignGenerationException {
+        List<CommentCodeSegment> detectedCommentCodeSegments = new ArrayList<>();
         for (int i = 1; i < elementCodeSegments.size(); i++) {
             if (hasCodeSegmentInBetween(elementCodeSegments.get(i - 1), elementCodeSegments.get(i))) {
                 CommentCodeSegment codeSegmentInBetween =
                         getCodeSegmentInBetween(elementCodeSegments.get(i - 1), elementCodeSegments.get(i));
                 if (isCommentValid(codeSegmentInBetween)) {
-                    commentCodeSegments.add(codeSegmentInBetween);
+                    detectedCommentCodeSegments.add(codeSegmentInBetween);
                 }
             }
         }
+        return detectedCommentCodeSegments;
     }
 
     /**
@@ -131,16 +140,11 @@ public abstract class CommentsPreserver {
         if (commentCodeSegment == null) {
             return false;
         }
-        if (commentCodeSegment.getQueryContextEndIndex()[0] < commentCodeSegment.getQueryContextStartIndex()[0]) {
+        if (commentCodeSegment.getEndLine() < commentCodeSegment.getStartLine()) {
             return false;
-        } else if (commentCodeSegment.getQueryContextEndIndex()[0] ==
-                commentCodeSegment.getQueryContextStartIndex()[0]) {
-            if (commentCodeSegment.getQueryContextEndIndex()[1] < commentCodeSegment.getQueryContextStartIndex()[1]) {
-                return false;
-            } else if (commentCodeSegment.getQueryContextEndIndex()[1] ==
-                    commentCodeSegment.getQueryContextStartIndex()[1]) {
-                return false;
-            }
+        } else if (commentCodeSegment.getEndLine() == commentCodeSegment.getStartLine()) {
+            return commentCodeSegment.getEndColumn() >= commentCodeSegment.getStartColumn() &&
+                    commentCodeSegment.getEndColumn() != commentCodeSegment.getStartColumn();
         }
         return true;
     }
@@ -200,11 +204,10 @@ public abstract class CommentsPreserver {
                                             List<ElementCodeSegment> elementCodeSegments) {
         boolean isContainedInAnySegment = false;
         for (ElementCodeSegment comparedSegment : elementCodeSegments) {
-            if (!elementCodeSegment.equals(comparedSegment)) {
-                if (isSegmentContainedIn(elementCodeSegment, comparedSegment)) {
-                    isContainedInAnySegment = true;
-                    break;
-                }
+            if (!elementCodeSegment.equals(comparedSegment) &&
+                    isSegmentContainedIn(elementCodeSegment, comparedSegment)) {
+                isContainedInAnySegment = true;
+                break;
             }
         }
         return isContainedInAnySegment;

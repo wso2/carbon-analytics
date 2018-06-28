@@ -140,7 +140,7 @@ public class EventFlowBuilder {
      * Loads Streams from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadStreams() { // TODO only adding comments for this for now
+    public EventFlowBuilder loadStreams() {
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
         Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
         for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitionMap.entrySet()) {
@@ -158,7 +158,7 @@ public class EventFlowBuilder {
      * Loads Sources from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadSources() throws DesignGenerationException { // TODO query indexes
+    public EventFlowBuilder loadSources() throws DesignGenerationException {
         SourceSinkConfigsGenerator sourceConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Source> sourceList : siddhiAppRuntime.getSources()) {
             for (SourceSinkConfig sourceConfig : sourceConfigsGenerator.generateSourceConfigs(sourceList)) {
@@ -173,7 +173,7 @@ public class EventFlowBuilder {
      * Loads Sinks from the SiddhiAppRuntime
      * @return      A reference to this object
      */
-    public EventFlowBuilder loadSinks() throws DesignGenerationException { // TODO query indexes
+    public EventFlowBuilder loadSinks() throws DesignGenerationException {
         SourceSinkConfigsGenerator sinkConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Sink> sinkList : siddhiAppRuntime.getSinks()) {
             for (SourceSinkConfig sinkConfig : sinkConfigsGenerator.generateSinkConfigs(sinkList)) {

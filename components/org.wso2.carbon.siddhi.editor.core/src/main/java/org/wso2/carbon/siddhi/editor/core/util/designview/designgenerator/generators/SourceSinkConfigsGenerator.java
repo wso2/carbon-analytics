@@ -145,7 +145,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
             throw new DesignGenerationException("Unable to find 'type' of the mapper");
         }
         MapperPayloadOrAttribute payloadOrAttribute = null;
-        if (mapAnnotation.getAnnotations().size() != 0) {
+        if (!mapAnnotation.getAnnotations().isEmpty()) {
             payloadOrAttribute = generateMapperPayloadOrAttributes(mapAnnotation.getAnnotations().get(0));
         }
         MapperConfig mapperConfig = new MapperConfig(type, options, payloadOrAttribute);

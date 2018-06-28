@@ -36,7 +36,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PartitionScopeCommentsPreserver extends CommentsPreserver {
+/**
+ * Preserves Comments of major elements, that reside in a Partition scope
+ */
+public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
     private PartitionConfig partitionConfig;
     private ElementCodeSegment partitionCodeSegment;
 
@@ -56,15 +59,41 @@ public class PartitionScopeCommentsPreserver extends CommentsPreserver {
         Collections.sort(elementCodeSegments);
         elementCodeSegments = filterCurrentPartitionContainedCodeSegments(elementCodeSegments);
         elementCodeSegments = filterMajorElementCodeSegments(elementCodeSegments);
-        detectCommentCodeSegments(elementCodeSegments);
+        commentCodeSegments = detectCommentCodeSegments(elementCodeSegments);
         commentCodeSegments = filterCommentsAfterPartitionWithKeyword(commentCodeSegments);
         return commentCodeSegments;
     }
 
+    /**
+     * Returns the filtered list of Code segments that only belong to the current Partition,
+     * from the given list of ElementCodeSegments
+     * @param elementCodeSegments       Unfiltered list of ElementCodeSegment objects
+     * @return                          Filtered list of ElementCodeSegment objects
+     */
+    private List<ElementCodeSegment> filterCurrentPartitionContainedCodeSegments(
+            List<ElementCodeSegment> elementCodeSegments) {
+        List<ElementCodeSegment> filteredElementCodeSegments = new ArrayList<>();
+        ElementCodeSegment partitionElementCodeSegment =
+                new ElementCodeSegment(
+                        partitionConfig.getQueryContextStartIndex(), partitionConfig.getQueryContextEndIndex());
+        for (ElementCodeSegment elementCodeSegment : elementCodeSegments) {
+            if (!elementCodeSegment.equals(partitionElementCodeSegment) &&
+                    doesSegmentBelongToCurrentPartition(elementCodeSegment)) {
+                filteredElementCodeSegments.add(elementCodeSegment);
+            }
+        }
+        return filteredElementCodeSegments;
+    }
+
+    /**
+     * Returns only the Comment segments, existing after 'partition with' elements
+     * @param commentCodeSegments       List of CommentCodeSegment objects
+     * @return                          List of filtered CommentCodeSegment objects
+     */
     private List<CommentCodeSegment> filterCommentsAfterPartitionWithKeyword(
             List<CommentCodeSegment> commentCodeSegments) {
         List<CommentCodeSegment> filteredCommentCodeSegments = new ArrayList<>();
-        int[] partitionWithLastIndex = getLastPartitionWithElementIndex(partitionConfig.getPartitionWith());
+        int[] partitionWithLastIndex = getLastPartitionWithElementEndIndex(partitionConfig.getPartitionWith());
         for (CommentCodeSegment commentCodeSegment : commentCodeSegments) {
             if (commentCodeSegment.getStartLine() > partitionWithLastIndex[0] ||
                     (commentCodeSegment.getStartLine() == partitionWithLastIndex[0] &&
@@ -95,7 +124,12 @@ public class PartitionScopeCommentsPreserver extends CommentsPreserver {
         return siddhiAppConfigReference;
     }
 
-    private int[] getLastPartitionWithElementIndex(List<PartitionWithElement> partitionWithElements) {
+    /**
+     * Gets the ending index of the very last 'partition with' element
+     * @param partitionWithElements     List of 'partition with' elements
+     * @return                          Query context end index of the very last 'partition with' element
+     */
+    private int[] getLastPartitionWithElementEndIndex(List<PartitionWithElement> partitionWithElements) {
         List<ElementCodeSegment> partitionWithCodeSegments = new ArrayList<>();
         for (PartitionWithElement partitionWithElement : partitionWithElements) {
             partitionWithCodeSegments.add(
@@ -107,6 +141,13 @@ public class PartitionScopeCommentsPreserver extends CommentsPreserver {
         return partitionWithCodeSegments.get(partitionWithCodeSegments.size() - 1).getQueryContextEndIndex();
     }
 
+    /**
+     * Returns the first comment within the partition, after trimming the 'begin' keyword.
+     * Since the 'begin' keyword is not parsed, it will be detected as a comment that is immediately after the
+     * last ever 'partition with' element.
+     * @param firstCommentCodeSegment       First comment segment, that contains the 'begin' keyword
+     * @return                              Comment segment trimmed out of the 'begin' keyword
+     */
     private CommentCodeSegment getTrimmedFirstInnerPartitionCommentSegment(CommentCodeSegment firstCommentCodeSegment) {
         final String BEGIN = "begin";
         String[] splitArray = firstCommentCodeSegment.getContent().split(BEGIN);
@@ -128,6 +169,13 @@ public class PartitionScopeCommentsPreserver extends CommentsPreserver {
                 new int[]{line, column}, firstCommentCodeSegment.getQueryContextEndIndex(), newContent);
     }
 
+    /**
+     * Finds and returns the reference of the PartitionConfig object,
+     * for the Partition whose comments are about to be preserved with this Preserver,
+     * from the given SiddhiAppConfig reference
+     * @param siddhiAppConfigReference          SiddhiAppConfig object reference
+     * @return                                  PartitionConfig object reference
+     */
     private PartitionConfig getCurrentPartitionConfigReference(SiddhiAppConfig siddhiAppConfigReference) {
         for (PartitionConfig partitionConfigReference : siddhiAppConfigReference.getPartitionList()) {
             ElementCodeSegment codeSegment =
@@ -141,21 +189,11 @@ public class PartitionScopeCommentsPreserver extends CommentsPreserver {
         return null;
     }
 
-    private List<ElementCodeSegment> filterCurrentPartitionContainedCodeSegments(
-            List<ElementCodeSegment> elementCodeSegments) {
-        List<ElementCodeSegment> filteredElementCodeSegments = new ArrayList<>();
-        ElementCodeSegment partitionCodeSegment =
-                new ElementCodeSegment(
-                        partitionConfig.getQueryContextStartIndex(), partitionConfig.getQueryContextEndIndex());
-        for (ElementCodeSegment elementCodeSegment : elementCodeSegments) {
-            if (!elementCodeSegment.equals(partitionCodeSegment) &&
-                    doesSegmentBelongToCurrentPartition(elementCodeSegment)) {
-                filteredElementCodeSegments.add(elementCodeSegment);
-            }
-        }
-        return filteredElementCodeSegments;
-    }
-
+    /**
+     * Returns whether the given code segment belongs to the current Partition or not
+     * @param elementCodeSegment        ElementCodeSegment object
+     * @return                          Whether the code segment belongs to the current Partition or not
+     */
     private boolean doesSegmentBelongToCurrentPartition(ElementCodeSegment elementCodeSegment) {
         ElementCodeSegment partitionElementCodeSegment =
                 new ElementCodeSegment(

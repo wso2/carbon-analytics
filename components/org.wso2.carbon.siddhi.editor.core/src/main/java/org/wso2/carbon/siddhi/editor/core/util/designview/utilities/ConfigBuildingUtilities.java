@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.CommentCodeSegment;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.ElementCodeSegment;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.query.api.SiddhiElement;
 
