@@ -138,6 +138,9 @@ public class StreamHandlerConfigGenerator {
      */
     private List<String> generateParameters(Expression[] parameters) throws DesignGenerationException {
         List<String> parameterStrings = new ArrayList<>();
+        if (parameters == null) {
+            return null;
+        }
         for (Expression parameter : parameters) {
             parameterStrings.add(ConfigBuildingUtilities.getDefinition(parameter, siddhiAppString));
         }

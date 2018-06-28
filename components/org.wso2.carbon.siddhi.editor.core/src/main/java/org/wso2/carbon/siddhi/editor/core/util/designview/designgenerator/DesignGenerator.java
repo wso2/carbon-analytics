@@ -31,6 +31,12 @@ import org.wso2.siddhi.query.compiler.SiddhiCompiler;
  * Generator to create Config objects from Siddhi Code
  */
 public class DesignGenerator {
+    private SiddhiManager siddhiManager;
+
+    public void setSiddhiManager(SiddhiManager siddhiManager) {
+        this.siddhiManager = siddhiManager;
+    }
+
     /**
      * Gets EventFlow configuration for a given Siddhi app code string
      * @param siddhiAppString                   Code representation of the Siddhi app
@@ -42,7 +48,7 @@ public class DesignGenerator {
         SiddhiAppRuntime siddhiAppRuntime;
         try {
             siddhiApp = SiddhiCompiler.parse(siddhiAppString);
-            siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
+            siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiApp);
         } catch (Exception e) {
             // Runtime exception occurred. Eg: Missing a library for a particular source
             throw new SiddhiAppCreationException(e.getMessage());
@@ -60,7 +66,8 @@ public class DesignGenerator {
                         .loadAggregations()
                         .loadExecutionElements()
                         .loadFunctions()
-                        .loadEdges();
+                        .loadEdges()
+                        .loadComments();
 
         return eventFlowBuilder.create();
     }

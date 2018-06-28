@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'joinQuerySource', 'streamHandler', 'designViewUtils'],
+        'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
-              DesignViewUtils) {
+              DesignViewUtils, JSONValidator) {
 
         var constants = {
             LEFT_SOURCE: 'Left Source',
@@ -405,6 +405,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             title: "Window",
                             type: "object",
                             required: true,
+                            options: {
+                                disable_properties: false
+                            },
                             properties: {
                                 windowName: {
                                     required: true,
@@ -413,7 +416,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                     minLength: 1
                                 },
                                 parameters: {
-                                    required: true,
                                     type: "array",
                                     format: "table",
                                     title: "Parameters",
@@ -437,6 +439,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             title: "Function",
                             type: "object",
                             required: true,
+                            options: {
+                                disable_properties: false
+                            },
                             properties: {
                                 functionName: {
                                     required: true,
@@ -445,7 +450,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                     minLength: 1
                                 },
                                 parameters: {
-                                    required: true,
                                     type: "array",
                                     format: "table",
                                     title: "Parameters",
@@ -1361,6 +1365,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setType(outputType);
                     }
+
+                    // perform JSON validation
+                    JSONValidator.prototype.validateJoinQuery(clickedElement);
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');

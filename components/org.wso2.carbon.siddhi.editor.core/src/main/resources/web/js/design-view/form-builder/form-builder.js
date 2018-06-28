@@ -251,6 +251,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var streamForm = new StreamForm(formOptions);
             return streamForm.generateDefineForm(i, formConsole, formContainer);
         };
@@ -268,6 +269,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var streamForm = new StreamForm(formOptions);
             streamForm.generatePropertiesForm(element, formConsole, formContainer);
         };
@@ -510,6 +512,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var partitionForm = new PartitionForm(formOptions);
             partitionForm.generatePropertiesForm(element, formConsole, formContainer);
         };

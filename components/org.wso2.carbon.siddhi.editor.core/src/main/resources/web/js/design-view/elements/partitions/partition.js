@@ -29,6 +29,7 @@ define(['require', 'elementUtils', 'lodash'],
             /*
              Data storing structure as follows.
                 id*: ‘’,
+                previousCommentSegment:'',
                 streamList = [];
                 queryLists: [
                     {
@@ -47,6 +48,7 @@ define(['require', 'elementUtils', 'lodash'],
             */
             if (options !== undefined) {
                 this.id = options.id;
+                this.previousCommentSegment = options.previousCommentSegment;
             }
             this.streamList = [];
             this.queryLists = {

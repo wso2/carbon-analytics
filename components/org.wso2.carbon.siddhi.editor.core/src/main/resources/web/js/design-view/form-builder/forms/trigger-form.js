@@ -19,6 +19,49 @@
 define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
     function (require, log, $, _, Trigger, DesignViewUtils) {
 
+        var triggerSchema = {
+            type: "object",
+            title: "Trigger",
+            properties: {
+                annotations: {
+                    propertyOrder: 1,
+                    type: "array",
+                    format: "table",
+                    title: "Annotations",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: "Annotation",
+                        options: {
+                            disable_properties: true
+                        },
+                        properties: {
+                            annotation: {
+                                title: "Annotation",
+                                type: "string",
+                                minLength: 1
+                            }
+                        }
+                    }
+                },
+                name: {
+                    type: "string",
+                    title: "Name",
+                    minLength: 1,
+                    required: true,
+                    propertyOrder: 2
+                },
+                at: {
+                    type: "string",
+                    title: "At",
+                    minLength: 1,
+                    required: true,
+                    propertyOrder: 3
+                }
+            }
+        };
+
         /**
          * @class TriggerForm Creates a forms to collect data from a trigger
          * @constructor
@@ -50,48 +93,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
 
             // generate the form to define a trigger
             var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
-                schema: {
-                    type: "object",
-                    title: "Trigger",
-                    properties: {
-                        annotations: {
-                            propertyOrder: 1,
-                            type: "array",
-                            format: "table",
-                            title: "Annotations",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: "Annotation",
-                                options: {
-                                    disable_properties: true
-                                },
-                                properties: {
-                                    annotation: {
-                                        title: "Annotation",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 2
-                        },
-                        at: {
-                            type: "string",
-                            title: "At",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 3
-                        }
-                    }
-                },
+                schema: triggerSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
@@ -179,48 +181,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
-                schema: {
-                    type: "object",
-                    title: "Trigger",
-                    properties: {
-                        annotations: {
-                            propertyOrder: 1,
-                            type: "array",
-                            format: "table",
-                            title: "Annotations",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: "Annotation",
-                                options: {
-                                    disable_properties: true
-                                },
-                                properties: {
-                                    annotation: {
-                                        title: "Annotation",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 2
-                        },
-                        at: {
-                            type: "string",
-                            title: "At",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 3
-                        }
-                    }
-                },
+                schema: triggerSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
