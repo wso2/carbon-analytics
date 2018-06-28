@@ -19,6 +19,123 @@
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'designViewUtils'],
     function (require, log, $, _, Attribute, Table, StoreAnnotation, DesignViewUtils) {
 
+        var tableSchema = {
+            type: "object",
+            title: "Table",
+            properties: {
+                annotations: {
+                    propertyOrder: 1,
+                    type: "array",
+                    format: "table",
+                    title: "Annotations",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: "Annotation",
+                        options: {
+                            disable_properties: true
+                        },
+                        properties: {
+                            annotation: {
+                                title: "Annotation",
+                                type: "string",
+                                minLength: 1
+                            }
+                        }
+                    }
+                },
+                storeAnnotation: {
+                    propertyOrder: 2,
+                    title: "Store Annotation",
+                    type: "object",
+                    options: {
+                        disable_properties: true
+                    },
+                    properties: {
+                        annotationType: {
+                            propertyOrder: 1,
+                            required: true,
+                            title: "Type",
+                            type: "string",
+                            minLength: 1
+                        },
+                        storeOptions: {
+                            propertyOrder: 2,
+                            required: true,
+                            type: "array",
+                            format: "table",
+                            title: "Options",
+                            uniqueItems: true,
+                            minItems: 1,
+                            items: {
+                                type: "object",
+                                title: "Option",
+                                options: {
+                                    disable_properties: true
+                                },
+                                properties: {
+                                    key: {
+                                        required: true,
+                                        title: "Key",
+                                        type: "string",
+                                        minLength: 1
+                                    },
+                                    value: {
+                                        required: true,
+                                        title: "value",
+                                        type: "string",
+                                        minLength: 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                name: {
+                    type: "string",
+                    title: "Name",
+                    minLength: 1,
+                    required: true,
+                    propertyOrder: 3
+                },
+                attributes: {
+                    required: true,
+                    propertyOrder: 4,
+                    type: "array",
+                    format: "table",
+                    title: "Attributes",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Attribute',
+                        properties: {
+                            name: {
+                                title: "Name",
+                                type: "string",
+                                minLength: 1
+                            },
+                            type: {
+                                title: "Type",
+                                type: "string",
+                                enum: [
+                                    "string",
+                                    "int",
+                                    "long",
+                                    "float",
+                                    "double",
+                                    "bool",
+                                    "object"
+                                ],
+                                default: "string"
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
         /**
          * @class TableForm Creates a forms to collect data from a table
          * @constructor
@@ -50,122 +167,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
 
             // generate the form to define a table
             var editor = new JSONEditor($(formContainer).find('#define-table')[0], {
-                schema: {
-                    type: "object",
-                    title: "Table",
-                    properties: {
-                        annotations: {
-                            propertyOrder: 1,
-                            type: "array",
-                            format: "table",
-                            title: "Annotations",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: "Annotation",
-                                options: {
-                                    disable_properties: true
-                                },
-                                properties: {
-                                    annotation: {
-                                        title: "Annotation",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        storeAnnotation: {
-                            propertyOrder: 2,
-                            title: "Store Annotation",
-                            type: "object",
-                            options: {
-                                disable_properties: true
-                            },
-                            properties: {
-                                annotationType: {
-                                    propertyOrder: 1,
-                                    required: true,
-                                    title: "Type",
-                                    type: "string",
-                                    minLength: 1
-                                },
-                                storeOptions: {
-                                    propertyOrder: 2,
-                                    required: true,
-                                    type: "array",
-                                    format: "table",
-                                    title: "Options",
-                                    uniqueItems: true,
-                                    minItems: 1,
-                                    items: {
-                                        type: "object",
-                                        title: "Option",
-                                        options: {
-                                            disable_properties: true
-                                        },
-                                        properties: {
-                                            key: {
-                                                required: true,
-                                                title: "Key",
-                                                type: "string",
-                                                minLength: 1
-                                            },
-                                            value: {
-                                                required: true,
-                                                title: "value",
-                                                type: "string",
-                                                minLength: 1
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 3
-                        },
-                        attributes: {
-                            required: true,
-                            propertyOrder: 4,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    name: {
-                                        title: "Name",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    type: {
-                                        title: "Type",
-                                        type: "string",
-                                        enum: [
-                                            "string",
-                                            "int",
-                                            "long",
-                                            "float",
-                                            "double",
-                                            "bool",
-                                            "object"
-                                        ],
-                                        default: "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
+                schema: tableSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
@@ -305,122 +307,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnota
             };
             fillWith = self.formUtils.cleanJSONObject(fillWith);
             var editor = new JSONEditor($(formContainer).find('#define-table')[0], {
-                schema: {
-                    type: "object",
-                    title: "Table",
-                    properties: {
-                        annotations: {
-                            propertyOrder: 1,
-                            type: "array",
-                            format: "table",
-                            title: "Annotations",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: "Annotation",
-                                options: {
-                                    disable_properties: true
-                                },
-                                properties: {
-                                    annotation: {
-                                        title: "Annotation",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        storeAnnotation: {
-                            propertyOrder: 2,
-                            title: "Store Annotation",
-                            type: "object",
-                            options: {
-                                disable_properties: true
-                            },
-                            properties: {
-                                annotationType: {
-                                    propertyOrder: 1,
-                                    required: true,
-                                    title: "Type",
-                                    type: "string",
-                                    minLength: 1
-                                },
-                                storeOptions: {
-                                    propertyOrder: 2,
-                                    required: true,
-                                    type: "array",
-                                    format: "table",
-                                    title: "Options",
-                                    uniqueItems: true,
-                                    minItems: 1,
-                                    items: {
-                                        type: "object",
-                                        title: "Option",
-                                        options: {
-                                            disable_properties: true
-                                        },
-                                        properties: {
-                                            key: {
-                                                required: true,
-                                                title: "Key",
-                                                type: "string",
-                                                minLength: 1
-                                            },
-                                            value: {
-                                                required: true,
-                                                title: "value",
-                                                type: "string",
-                                                minLength: 1
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 3
-                        },
-                        attributes: {
-                            required: true,
-                            propertyOrder: 4,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    name: {
-                                        title: "Name",
-                                        type: "string",
-                                        minLength: 1
-                                    },
-                                    type: {
-                                        title: "Type",
-                                        type: "string",
-                                        enum: [
-                                            "string",
-                                            "int",
-                                            "long",
-                                            "float",
-                                            "double",
-                                            "bool",
-                                            "object"
-                                        ],
-                                        default: "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
+                schema: tableSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,

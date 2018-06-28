@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttribute;
 
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.List;
 /**
  * Represents Siddhi Source/Sink Mapper
  */
-public class MapperConfig {
+public class MapperConfig extends SiddhiElementConfig {
     private String type;
     private List<String> options;
     private MapperPayloadOrAttribute payloadOrAttribute;

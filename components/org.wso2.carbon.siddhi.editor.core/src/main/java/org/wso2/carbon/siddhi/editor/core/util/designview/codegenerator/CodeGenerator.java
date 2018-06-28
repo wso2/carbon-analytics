@@ -29,11 +29,22 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.elements.ExecutionElementConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.AggregationCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.FunctionCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.PartitionCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.SourceSinkCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.StreamCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.SubElementCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.TableCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.TriggerCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.WindowCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.QueryCodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiStringBuilderConstants;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
-import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorHelper;
+import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -41,16 +52,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Used to convert an EventFlow object to a Siddhi app string
+ * Generate's the code for a Siddhi application
  */
 public class CodeGenerator {
 
     /**
-     * Converts a given EventFlow object to it's Siddhi app string representation
+     * Generate's the Siddhi app code as a string of a given EventFlow object
      *
-     * @param eventFlow The EventFlow object to be converted
-     * @return The Siddhi app as a string
-     * @throws CodeGenerationException Error while generating code
+     * @param eventFlow The EventFlow object
+     * @return The Siddhi application code as a string of the given EventFlow object
+     * @throws CodeGenerationException Error while generating the code
      */
     public String generateSiddhiAppCode(EventFlow eventFlow) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
@@ -59,636 +70,262 @@ public class CodeGenerator {
         for (List<QueryConfig> queryList : siddhiApp.getQueryLists().values()) {
             queries.addAll(queryList);
         }
-        List<StreamConfig> definedStreams = CodeGeneratorHelper.getStreamsToBeDefined(siddhiApp.getStreamList(),
+        for (PartitionConfig partition : siddhiApp.getPartitionList()) {
+            for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
+                queries.addAll(queryList);
+            }
+        }
+        List<StreamConfig> streamsToBeGenerated = CodeGeneratorUtils.getStreamsToBeGenerated(siddhiApp.getStreamList(),
                 siddhiApp.getSourceList(), siddhiApp.getSinkList(), queries);
-        List<String> definitionNames = CodeGeneratorHelper.getDefinitionNames(definedStreams,
+        List<String> definitionsToBeGenerated = CodeGeneratorUtils.getDefinitionNames(streamsToBeGenerated,
                 siddhiApp.getTableList(), siddhiApp.getWindowList(),
-                siddhiApp.getTriggerList(), siddhiApp.getAggregationList());
+                siddhiApp.getTriggerList(), siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
+        List<String> allDefinitions = CodeGeneratorUtils.getDefinitionNames(siddhiApp.getStreamList(),
+                siddhiApp.getTableList(), siddhiApp.getWindowList(),
+                siddhiApp.getTriggerList(), siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
 
         return generateAppName(siddhiApp.getSiddhiAppName()) +
-                CodeGeneratorHelper.getAnnotations(siddhiApp.getAppAnnotationList()) +
-                generateStreams(definedStreams, siddhiApp.getSourceList(), siddhiApp.getSinkList()) +
+                SubElementCodeGenerator.generateAnnotations(siddhiApp.getAppAnnotationList()) +
+                generateStreams(streamsToBeGenerated, siddhiApp.getSourceList(), siddhiApp.getSinkList()) +
                 generateTables(siddhiApp.getTableList()) +
                 generateWindows(siddhiApp.getWindowList()) +
                 generateTriggers(siddhiApp.getTriggerList()) +
                 generateAggregations(siddhiApp.getAggregationList()) +
                 generateFunctions(siddhiApp.getFunctionList()) +
-                generateQueries(siddhiApp.getQueryLists(), definitionNames) +
-                generatePartitions(siddhiApp.getPartitionList(), definitionNames);
+                generateExecutionElements(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(),
+                        definitionsToBeGenerated, allDefinitions);
     }
 
     /**
-     * Generates a string representation of the siddhi app name annotation
+     * Generate's the Siddhi code representation of a Siddhi app's app name
      *
-     * @param appName The app name
-     * @return The string representation of the siddhi app name annotation
+     * @param appName The Siddhi app's app name
+     * @return The Siddhi code representation of a Siddhi app name annotation
      */
     private String generateAppName(String appName) {
         StringBuilder appNameStringBuilder = new StringBuilder();
 
         if (appName != null && !appName.isEmpty()) {
-            appNameStringBuilder.append(SiddhiStringBuilderConstants.APP_NAME_ANNOTATION)
+            appNameStringBuilder.append(SiddhiCodeBuilderConstants.APP_NAME_ANNOTATION)
                     .append(appName)
-                    .append(SiddhiStringBuilderConstants.SINGLE_QUOTE)
-                    .append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
+                    .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
+                    .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
         } else {
-            appNameStringBuilder.append(SiddhiStringBuilderConstants.DEFAULT_APP_NAME_ANNOTATION);
+            appNameStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_APP_NAME_ANNOTATION);
         }
 
         return appNameStringBuilder.toString();
     }
 
     /**
-     * Generates a string representation of all the streams in a Siddhi app
+     * Generate's the Siddhi code representation of a Siddhi app's stream definitions
      *
-     * @param streamList A list of StreamConfig objects from the SiddhiAppConfig object
-     * @param sourceList A list of StreamConfig objects from the SiddhiAppConfig object
-     * @param sinkList   A list of StreamConfig objects from the SiddhiAppConfig object
-     * @return The string representation of the stream definitions
-     * @throws CodeGenerationException Error while generating code
+     * @param streamList The list of streams to be defined in a Siddhi app
+     * @param sourceList The list of source annotations in a Siddhi app
+     * @param sinkList   The list of sink annotations in a Siddhi app
+     * @return The Siddhi code representation of all the streams in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
      */
     private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList,
                                    List<SourceSinkConfig> sinkList) throws CodeGenerationException {
         if (streamList == null || streamList.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
+
+        List<SourceSinkConfig> sourcesAndSinks = new LinkedList<>();
+        sourcesAndSinks.addAll(sourceList);
+        sourcesAndSinks.addAll(sinkList);
 
         StringBuilder streamListStringBuilder = new StringBuilder();
-        streamListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.NEW_LINE)
-                .append(SiddhiStringBuilderConstants.STREAMS_COMMENT)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
+        streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
+        SourceSinkCodeGenerator sourceSinkCodeGenerator = new SourceSinkCodeGenerator();
+        StreamCodeGenerator streamCodeGenerator = new StreamCodeGenerator();
         for (StreamConfig stream : streamList) {
-            if (stream == null) {
-                throw new CodeGenerationException("A given stream element is empty");
-            } else if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
+            CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
+            if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
                 continue;
-            } else if (stream.getName() == null || stream.getName().isEmpty()) {
-                throw new CodeGenerationException("The name of a given stream element is empty");
             }
 
-            for (SourceSinkConfig source : sourceList) {
-                if (stream.getName().equals(source.getConnectedElementName())) {
-                    streamListStringBuilder.append(generateSourceSinkString(source));
+            for (SourceSinkConfig sourceSink : sourcesAndSinks) {
+                if (stream.getName().equals(sourceSink.getConnectedElementName())) {
+                    streamListStringBuilder.append(sourceSinkCodeGenerator.generateSourceSink(sourceSink));
                 }
             }
 
-            for (SourceSinkConfig sink : sinkList) {
-                if (stream.getName().equals(sink.getConnectedElementName())) {
-                    streamListStringBuilder.append(generateSourceSinkString(sink));
-                }
-            }
-
-            streamListStringBuilder.append(generateStreamString(stream));
+            streamListStringBuilder.append(streamCodeGenerator.generateStream(stream));
         }
 
-        streamListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+        streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         return streamListStringBuilder.toString();
     }
 
     /**
-     * Generates a string representation of all the tables in a Siddhi app
+     * Generate's the Siddhi code representation of a Siddhi app's table definitions
      *
-     * @param tableList A list of TableConfig objects from the SiddhiAppConfig object
-     * @return The Siddhi string representation of the table definitions
-     * @throws CodeGenerationException Error while generating code
+     * @param tableList The list of tables to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the tables in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
      */
     private String generateTables(List<TableConfig> tableList) throws CodeGenerationException {
         if (tableList == null || tableList.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder tableListStringBuilder = new StringBuilder();
-        tableListStringBuilder.append(SiddhiStringBuilderConstants.TABLES_COMMENT)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
+        tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
+        TableCodeGenerator tableCodeGenerator = new TableCodeGenerator();
         for (TableConfig table : tableList) {
-            tableListStringBuilder.append(generateTableString(table));
+            tableListStringBuilder.append(tableCodeGenerator.generateTable(table));
         }
 
-        tableListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+        tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         return tableListStringBuilder.toString();
     }
 
     /**
-     * Generates a string representation of all the window definitions in a Siddhi app
+     * Generate's the Siddhi code representation of a Siddhi app's window definitions
      *
-     * @param windowList A list of WindowConfig objects to be converted
-     * @return The Siddhi string representaiotn of all the window definitions
-     * @throws CodeGenerationException Error while generating code
+     * @param windowList The list of windows to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the windows in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
      */
     private String generateWindows(List<WindowConfig> windowList) throws CodeGenerationException {
         if (windowList == null || windowList.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder windowListStringBuilder = new StringBuilder();
-        windowListStringBuilder.append(SiddhiStringBuilderConstants.WINDOWS_COMMENT)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
+        windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
+        WindowCodeGenerator windowCodeGenerator = new WindowCodeGenerator();
         for (WindowConfig window : windowList) {
-            windowListStringBuilder.append(generateWindowString(window));
+            windowListStringBuilder.append(windowCodeGenerator.generateWindow(window));
         }
 
-        windowListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+        windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         return windowListStringBuilder.toString();
     }
 
     /**
-     * Generates a string representation of all the trigger definitions in a Siddhi app
+     * Generate's the Siddhi code representation of a Siddhi app's trigger definitions
      *
-     * @param triggerList A list of all the TriggerConfig objects to be converted
-     * @return The Siddhi string representation of all the trigger definitions
-     * @throws CodeGenerationException Error while generating code
+     * @param triggerList The list of triggers to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the triggers in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
      */
     private String generateTriggers(List<TriggerConfig> triggerList) throws CodeGenerationException {
         if (triggerList == null || triggerList.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder triggerListStringBuilder = new StringBuilder();
-        triggerListStringBuilder.append(SiddhiStringBuilderConstants.TRIGGERS_COMMENT)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
+        triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+
+        TriggerCodeGenerator triggerCodeGenerator = new TriggerCodeGenerator();
         for (TriggerConfig trigger : triggerList) {
-            triggerListStringBuilder.append(generateTriggerString(trigger));
+            triggerListStringBuilder.append(triggerCodeGenerator.generateTrigger(trigger));
         }
 
-        triggerListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+        triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         return triggerListStringBuilder.toString();
     }
 
     /**
-     * Generates a string representation of all the aggregation definitions in a Siddhi app
+     * Generate's the Siddhi code representation of a Siddhi app's aggregation definitions
      *
-     * @param aggregationList A list of AggregationConfig objects to be converted
-     * @return The Siddhi string representation of all the aggregation definitions
-     * @throws CodeGenerationException Error while generating code
+     * @param aggregationList The list of aggregations to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the aggregations in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
      */
     private String generateAggregations(List<AggregationConfig> aggregationList) throws CodeGenerationException {
         if (aggregationList == null || aggregationList.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder aggregationListStringBuilder = new StringBuilder();
-        aggregationListStringBuilder.append(SiddhiStringBuilderConstants.AGGREGATIONS_COMMENT)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
+        aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
+        AggregationCodeGenerator aggregationCodeGenerator = new AggregationCodeGenerator();
         for (AggregationConfig aggregation : aggregationList) {
-            aggregationListStringBuilder.append(generateAggregationString(aggregation));
+            aggregationListStringBuilder.append(aggregationCodeGenerator.generateAggregation(aggregation));
         }
 
-        aggregationListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+        aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         return aggregationListStringBuilder.toString();
     }
 
     /**
-     * Generates a string representation of all the function definitions in a Siddhi app
+     * Generate's the Siddhi code representation of a Siddhi app's function definitions
      *
-     * @param functionList A list of FunctionConfig objects to be converted
-     * @return The Siddhi string representation of all the function definitions
-     * @throws CodeGenerationException Error while generating code
+     * @param functionList The list of functions to be defined in a Siddhi app
+     * @return The Siddhi code representation of all the functions in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
      */
     private String generateFunctions(List<FunctionConfig> functionList) throws CodeGenerationException {
         if (functionList == null || functionList.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
         StringBuilder functionListStringBuilder = new StringBuilder();
-        functionListStringBuilder.append(SiddhiStringBuilderConstants.FUNCTIONS_COMMENT)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
+        functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
+        FunctionCodeGenerator functionCodeGenerator = new FunctionCodeGenerator();
         for (FunctionConfig function : functionList) {
-            functionListStringBuilder.append(generateFunctionString(function));
+            functionListStringBuilder.append(functionCodeGenerator.generateFunction(function));
         }
 
-        functionListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
+        functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         return functionListStringBuilder.toString();
     }
 
     /**
-     * Generates a string representation of all the queries in a Siddhi app
+     * Generate's the Siddhi code representation of a Siddhi app's execution elements (queries and partitions)
      *
-     * @param queryLists A list of QueryConfig objects to be converted
-     * @return The Siddhi string representation of the given QueryConfig list
-     * @throws CodeGenerationException Error while generating code
+     * @param queryLists               The list of queries in a Siddhi app
+     * @param partitions               The list of partitions in a Siddhi app
+     * @param definitionsToBeGenerated The names of all the definition elements that are to be defined in the app
+     * @param allDefinitions           The names of all the definition elements in the Siddhi app
+     * @return The Siddhi code representation of all the queries and partitions of a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
      */
-    private String generateQueries(Map<QueryListType, List<QueryConfig>> queryLists, List<String> definitionNames)
+    private String generateExecutionElements(Map<QueryListType, List<QueryConfig>> queryLists,
+                                             List<PartitionConfig> partitions, List<String> definitionsToBeGenerated,
+                                             List<String> allDefinitions)
             throws CodeGenerationException {
-        if (queryLists == null || queryLists.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
-        }
-
+        StringBuilder executionElementStringBuilder = new StringBuilder();
+        executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         List<QueryConfig> queries = new LinkedList<>();
         for (List<QueryConfig> queryList : queryLists.values()) {
             queries.addAll(queryList);
         }
 
-        StringBuilder queryListStringBuilder = new StringBuilder();
-        if (!queries.isEmpty()) {
-            queryListStringBuilder.append(SiddhiStringBuilderConstants.QUERIES_COMMENT)
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
-            for (QueryConfig query : CodeGeneratorHelper.reorderQueries(queries, definitionNames)) {
-                queryListStringBuilder.append(generateQueryString(query))
-                        .append(SiddhiStringBuilderConstants.NEW_LINE);
+        List<ExecutionElementConfig> executionElements =
+                CodeGeneratorUtils.convertToExecutionElements(queries, partitions);
+        QueryCodeGenerator queryCodeGenerator = new QueryCodeGenerator();
+        PartitionCodeGenerator partitionCodeGenerator = new PartitionCodeGenerator();
+        for (ExecutionElementConfig executionElement :
+                CodeGeneratorUtils.reorderExecutionElements(executionElements, definitionsToBeGenerated)) {
+            if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.QUERY)) {
+                QueryConfig query = (QueryConfig) executionElement.getValue();
+                executionElementStringBuilder.append(queryCodeGenerator.generateQuery(query));
+            } else if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.PARTITION)) {
+                PartitionConfig partition = (PartitionConfig) executionElement.getValue();
+                executionElementStringBuilder.append(partitionCodeGenerator.generatePartition(partition, allDefinitions));
+            } else {
+                throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
             }
-        }
-        queryListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
-
-        return queryListStringBuilder.toString();
-    }
-
-    /**
-     * Generates a string representation of all the partitions in a Siddhi app
-     *
-     * @param partitionList The list of PartitionConfig objects to be converted
-     * @return The Siddhi string representation of the given PartitionConfig list
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generatePartitions(List<PartitionConfig> partitionList, List<String> definitionNames)
-            throws CodeGenerationException {
-        if (partitionList == null || partitionList.isEmpty()) {
-            return SiddhiStringBuilderConstants.EMPTY_STRING;
+            executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
 
-        StringBuilder partitionListStringBuilder = new StringBuilder();
-        partitionListStringBuilder.append(SiddhiStringBuilderConstants.PARTITIONS_COMMENT)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
-        for (PartitionConfig partition : partitionList) {
-            partitionListStringBuilder.append(generatePartitionString(partition, definitionNames))
-                    .append(SiddhiStringBuilderConstants.NEW_LINE);
-        }
-
-        partitionListStringBuilder.append(SiddhiStringBuilderConstants.NEW_LINE);
-
-        return partitionListStringBuilder.toString();
-    }
-
-    /**
-     * Generates a stream definition string from a StreamConfig object
-     *
-     * @param stream The StreamConfig object to be converted
-     * @return The converted stream definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generateStreamString(StreamConfig stream) throws CodeGenerationException {
-        if (stream == null) {
-            throw new CodeGenerationException("A given stream element is empty");
-        } else if (stream.getName() == null || stream.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given stream element is empty");
-        }
-
-        return CodeGeneratorHelper.getAnnotations(stream.getAnnotationList()) +
-                SiddhiStringBuilderConstants.DEFINE_STREAM +
-                SiddhiStringBuilderConstants.SPACE +
-                stream.getName() +
-                SiddhiStringBuilderConstants.SPACE +
-                SiddhiStringBuilderConstants.OPEN_BRACKET +
-                CodeGeneratorHelper.getAttributes(stream.getAttributeList()) +
-                SiddhiStringBuilderConstants.CLOSE_BRACKET +
-                SiddhiStringBuilderConstants.SEMI_COLON;
-    }
-
-    /**
-     * Generates a table definition string from a TableConfig object
-     *
-     * @param table The TableConfig object to be converted
-     * @return The converted table definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generateTableString(TableConfig table) throws CodeGenerationException {
-        if (table == null) {
-            throw new CodeGenerationException("A given table element is empty");
-        } else if (table.getName() == null || table.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given table element is empty");
-        }
-
-        return CodeGeneratorHelper.getStore(table.getStore()) +
-                CodeGeneratorHelper.getAnnotations(table.getAnnotationList()) +
-                SiddhiStringBuilderConstants.DEFINE_TABLE +
-                SiddhiStringBuilderConstants.SPACE +
-                table.getName() +
-                SiddhiStringBuilderConstants.SPACE +
-                SiddhiStringBuilderConstants.OPEN_BRACKET +
-                CodeGeneratorHelper.getAttributes(table.getAttributeList()) +
-                SiddhiStringBuilderConstants.CLOSE_BRACKET +
-                SiddhiStringBuilderConstants.SEMI_COLON;
-    }
-
-    /**
-     * Generates a window definition string from a WindowConfig object
-     *
-     * @param window The WindowConfig object to be converted
-     * @return The converted window definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generateWindowString(WindowConfig window) throws CodeGenerationException {
-        if (window == null) {
-            throw new CodeGenerationException("A given window element is empty");
-        } else if (window.getName() == null || window.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given window element is empty");
-        } else if (window.getFunction() == null || window.getFunction().isEmpty()) {
-            throw new CodeGenerationException("The function name of the window " + window.getName() + " is empty");
-        }
-
-        StringBuilder windowStringBuilder = new StringBuilder();
-        windowStringBuilder.append(CodeGeneratorHelper.getAnnotations(window.getAnnotationList()))
-                .append(SiddhiStringBuilderConstants.DEFINE_WINDOW)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(window.getName())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.OPEN_BRACKET)
-                .append(CodeGeneratorHelper.getAttributes(window.getAttributeList()))
-                .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(window.getFunction())
-                .append(SiddhiStringBuilderConstants.OPEN_BRACKET)
-                .append(CodeGeneratorHelper.getParameterList(window.getParameters()))
-                .append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
-
-        if (window.getOutputEventType() != null && !window.getOutputEventType().isEmpty()) {
-            windowStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(SiddhiStringBuilderConstants.OUTPUT)
-                    .append(SiddhiStringBuilderConstants.SPACE);
-            switch (window.getOutputEventType().toUpperCase()) {
-                case CodeGeneratorConstants.CURRENT_EVENTS:
-                    windowStringBuilder.append(SiddhiStringBuilderConstants.CURRENT_EVENTS);
-                    break;
-                case CodeGeneratorConstants.EXPIRED_EVENTS:
-                    windowStringBuilder.append(SiddhiStringBuilderConstants.EXPIRED_EVENTS);
-                    break;
-                case CodeGeneratorConstants.ALL_EVENTS:
-                    windowStringBuilder.append(SiddhiStringBuilderConstants.ALL_EVENTS);
-                    break;
-                default:
-                    throw new CodeGenerationException("Unidentified window output event type: "
-                            + window.getOutputEventType());
-            }
-        }
-        windowStringBuilder.append(SiddhiStringBuilderConstants.SEMI_COLON);
-
-        return windowStringBuilder.toString();
-    }
-
-    /**
-     * Generates a trigger definition string from a TriggerConfig object
-     *
-     * @param trigger The TriggerConfig object to be converted
-     * @return The converted trigger definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generateTriggerString(TriggerConfig trigger) throws CodeGenerationException {
-        if (trigger == null) {
-            throw new CodeGenerationException("A given trigger element is empty");
-        } else if (trigger.getName() == null || trigger.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given trigger element is empty");
-        } else if (trigger.getAt() == null || trigger.getAt().isEmpty()) {
-            throw new CodeGenerationException("The 'at' value of " + trigger.getName() + " is empty");
-        }
-
-        return CodeGeneratorHelper.getAnnotations(trigger.getAnnotationList()) +
-                SiddhiStringBuilderConstants.DEFINE_TRIGGER +
-                SiddhiStringBuilderConstants.SPACE +
-                trigger.getName() +
-                SiddhiStringBuilderConstants.SPACE +
-                SiddhiStringBuilderConstants.AT +
-                SiddhiStringBuilderConstants.SPACE +
-                trigger.getAt() +
-                SiddhiStringBuilderConstants.SEMI_COLON;
-    }
-
-    /**
-     * Generates a aggregation definition string from a AggregationConfig object
-     *
-     * @param aggregation The AggregationConfig object to be converted
-     * @return The converted aggregation definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generateAggregationString(AggregationConfig aggregation) throws CodeGenerationException {
-        if (aggregation == null) {
-            throw new CodeGenerationException("A given aggregation element is empty");
-        } else if (aggregation.getName() == null || aggregation.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given aggregation element is empty");
-        } else if (aggregation.getFrom() == null || aggregation.getFrom().isEmpty()) {
-            throw new CodeGenerationException("The 'from' value of " + aggregation.getName() + " is empty");
-        } else if (aggregation.getAggregateByTimePeriod() == null) {
-            throw new CodeGenerationException("The 'aggregateByTimePeriod' value of " + aggregation.getName()
-                    + " is empty");
-        } else if (aggregation.getAggregateByTimePeriod().getType() == null
-                || aggregation.getAggregateByTimePeriod().getType().isEmpty()) {
-            throw new CodeGenerationException("The aggregateByTimePeriod 'type' value of "
-                    + aggregation.getName() + " is empty");
-        }
-
-        StringBuilder aggregationStringBuilder = new StringBuilder();
-        aggregationStringBuilder.append(CodeGeneratorHelper.getStore(aggregation.getStore()))
-                .append(CodeGeneratorHelper.getAggregationAnnotations(aggregation.getAnnotationList()))
-                .append(SiddhiStringBuilderConstants.DEFINE_AGGREGATION)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(aggregation.getName())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.FROM)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(aggregation.getFrom())
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(CodeGeneratorHelper.getQuerySelect(aggregation.getSelect()))
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(CodeGeneratorHelper.getQueryGroupBy(aggregation.getGroupBy()))
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.AGGREGATE);
-
-        if (aggregation.getAggregateByAttribute() != null && !aggregation.getAggregateByAttribute().isEmpty()) {
-            aggregationStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(SiddhiStringBuilderConstants.BY)
-                    .append(SiddhiStringBuilderConstants.SPACE)
-                    .append(aggregation.getAggregateByAttribute());
-        }
-
-        aggregationStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.EVERY)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(CodeGeneratorHelper.getAggregateByTimePeriod(aggregation.getAggregateByTimePeriod()))
-                .append(SiddhiStringBuilderConstants.SEMI_COLON);
-
-        return aggregationStringBuilder.toString();
-    }
-
-    /**
-     * Generates a function definition string from a FunctionConfig object
-     *
-     * @param function The FunctionConfig object to be converted
-     * @return The converted function definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generateFunctionString(FunctionConfig function) throws CodeGenerationException {
-        if (function == null) {
-            throw new CodeGenerationException("A given function element is empty");
-        } else if (function.getName() == null || function.getName().isEmpty()) {
-            throw new CodeGenerationException("The name of a given function element is empty");
-        } else if (function.getScriptType() == null || function.getScriptType().isEmpty()) {
-            throw new CodeGenerationException("The 'script type' of " + function.getName() + " is empty");
-        } else if (function.getReturnType() == null || function.getReturnType().isEmpty()) {
-            throw new CodeGenerationException("The return type of " + function.getName() + " is empty");
-        } else if (function.getBody() == null || function.getBody().isEmpty()) {
-            throw new CodeGenerationException("The 'body' value of " + function.getName() + " is empty");
-        }
-
-        return SiddhiStringBuilderConstants.DEFINE_FUNCTION +
-                SiddhiStringBuilderConstants.SPACE +
-                function.getName() +
-                SiddhiStringBuilderConstants.OPEN_SQUARE_BRACKET +
-                function.getScriptType() +
-                SiddhiStringBuilderConstants.CLOSE_SQUARE_BRACKET +
-                SiddhiStringBuilderConstants.SPACE +
-                SiddhiStringBuilderConstants.RETURN +
-                SiddhiStringBuilderConstants.SPACE +
-                function.getReturnType().toLowerCase() +
-                SiddhiStringBuilderConstants.SPACE +
-                SiddhiStringBuilderConstants.OPEN_CURLY_BRACKET +
-                function.getBody().trim() +
-                SiddhiStringBuilderConstants.CLOSE_CURLY_BRACKET +
-                SiddhiStringBuilderConstants.SEMI_COLON;
-    }
-
-    /**
-     * Generates a query definition string from a QueryConfig object
-     *
-     * @param query The QueryConfig object to be converted
-     * @return The converted query definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generateQueryString(QueryConfig query) throws CodeGenerationException {
-        if (query == null) {
-            throw new CodeGenerationException("A given query element is empty");
-        }
-
-        StringBuilder queryStringBuilder = new StringBuilder();
-        queryStringBuilder.append(CodeGeneratorHelper.getAnnotations(query.getAnnotationList()))
-                .append(CodeGeneratorHelper.getQueryInput(query.getQueryInput()))
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(CodeGeneratorHelper.getQuerySelect(query.getSelect()));
-
-        if (query.getGroupBy() != null && !query.getGroupBy().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(CodeGeneratorHelper.getQueryGroupBy(query.getGroupBy()));
-        }
-        if (query.getHaving() != null && !query.getHaving().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(CodeGeneratorHelper.getQueryHaving(query.getHaving()));
-        }
-        if (query.getOrderBy() != null && !query.getOrderBy().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(CodeGeneratorHelper.getQueryOrderBy(query.getOrderBy()));
-        }
-        if (query.getLimit() != 0) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(CodeGeneratorHelper.getQueryLimit(query.getLimit()));
-        }
-        if (query.getOutputRateLimit() != null && !query.getOutputRateLimit().isEmpty()) {
-            queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                    .append(CodeGeneratorHelper.getQueryOutputRateLimit(query.getOutputRateLimit()));
-        }
-
-        queryStringBuilder.append(SiddhiStringBuilderConstants.SPACE)
-                .append(CodeGeneratorHelper.getQueryOutput(query.getQueryOutput()));
-
-        return queryStringBuilder.toString();
-    }
-
-    /**
-     * Generates a partition definition string from a PartitionConfig object
-     *
-     * @param partition The PartitionConfig object to be converted
-     * @return The converted partition definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generatePartitionString(PartitionConfig partition, List<String> definitionNames)
-            throws CodeGenerationException {
-        if (partition == null) {
-            throw new CodeGenerationException("A given partition object is empty");
-        } else if (partition.getPartitionWith() == null || partition.getPartitionWith().isEmpty()) {
-            throw new CodeGenerationException("The 'partitionWith' value of a given partition element is empty");
-        } else if (partition.getQueryLists() == null || partition.getQueryLists().isEmpty()) {
-            throw new CodeGenerationException("The query lists of a given partition element is empty");
-        }
-
-        StringBuilder partitionStringBuilder = new StringBuilder();
-
-        partitionStringBuilder.append(CodeGeneratorHelper.getAnnotations(partition.getAnnotationList()))
-                .append(SiddhiStringBuilderConstants.PARTITION_WITH)
-                .append(SiddhiStringBuilderConstants.OPEN_BRACKET)
-                .append(CodeGeneratorHelper.getPartitionWith(partition.getPartitionWith()))
-                .append(SiddhiStringBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiStringBuilderConstants.SPACE)
-                .append(SiddhiStringBuilderConstants.BEGIN)
-                .append(SiddhiStringBuilderConstants.SPACE);
-
-        List<QueryConfig> queries = new LinkedList<>();
-        for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
-            queries.addAll(queryList);
-        }
-
-        if (!queries.isEmpty()) {
-            for (QueryConfig query : CodeGeneratorHelper.reorderQueries(queries, definitionNames)) {
-                partitionStringBuilder.append(generateQueryString(query))
-                        .append(SiddhiStringBuilderConstants.NEW_LINE);
-            }
-        }
-
-        partitionStringBuilder.append(SiddhiStringBuilderConstants.END)
-                .append(SiddhiStringBuilderConstants.SEMI_COLON)
-                .append(SiddhiStringBuilderConstants.NEW_LINE);
-
-        return partitionStringBuilder.toString();
-    }
-
-    /**
-     * Generates a source/sink definition string from a SourceSinkConfig object
-     *
-     * @param sourceSink The SourceSinkConfig object to be converted
-     * @return The converted source/sink definition string
-     * @throws CodeGenerationException Error while generating code
-     */
-    private String generateSourceSinkString(SourceSinkConfig sourceSink) throws CodeGenerationException {
-        if (sourceSink == null) {
-            throw new CodeGenerationException("A given source/sink element is empty");
-        } else if (sourceSink.getAnnotationType() == null || sourceSink.getAnnotationType().isEmpty()) {
-            throw new CodeGenerationException("The annotation type for a given source/sink element is empty");
-        } else if (sourceSink.getType() == null || sourceSink.getType().isEmpty()) {
-            throw new CodeGenerationException("The type attribute for a given source/sink element is empty");
-        }
-
-        StringBuilder sourceSinkStringBuilder = new StringBuilder();
-        if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
-            sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.SOURCE_ANNOTATION);
-        } else if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
-            sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.SINK_ANNOTATION);
-        } else {
-            throw new CodeGenerationException("Unidentified source/sink type: " + sourceSink.getType());
-        }
-
-        sourceSinkStringBuilder.append(sourceSink.getType())
-                .append(SiddhiStringBuilderConstants.SINGLE_QUOTE);
-
-        if (sourceSink.getOptions() != null && !sourceSink.getOptions().isEmpty()) {
-            sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                    .append(CodeGeneratorHelper.getParameterList(sourceSink.getOptions()));
-        }
-
-        if (sourceSink.getMap() != null) {
-            sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.COMMA)
-                    .append(CodeGeneratorHelper.getMapper(sourceSink.getMap()));
-        }
-
-        sourceSinkStringBuilder.append(SiddhiStringBuilderConstants.CLOSE_BRACKET);
-
-        return sourceSinkStringBuilder.toString();
+        return executionElementStringBuilder.toString();
     }
 
 }

@@ -29,6 +29,7 @@ define(
             /*
              Data storing structure as follows
                 id*: ‘’,
+                previousCommentSegment:'',
                 connectedElementName*: '',
                 annotationType*: 'SOURCE | SINK',
                 type*: ‘’,
@@ -51,6 +52,7 @@ define(
             */
             if (options !== undefined) {
                 this.id = options.id;
+                this.previousCommentSegment = options.previousCommentSegment;
                 this.connectedElementName = options.connectedElementName;
                 this.annotationType
                     = (options.annotationType !== undefined) ? (options.annotationType).toUpperCase() : undefined;

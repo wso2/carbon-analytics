@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.build
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition.PartitionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AggregationConfigGenerator;
@@ -33,6 +34,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.genera
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.TableConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.TriggerConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.WindowConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.commentspreserver.OuterScopeCommentsPreserver;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.commentspreserver.PartitionScopeCommentsPreserver;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -95,6 +98,7 @@ public class EventFlowBuilder {
         for (Annotation annotation : siddhiApp.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase("NAME")) {
                 siddhiAppName = annotation.getElements().get(0).getValue();
+                annotationConfigGenerator.preserveCodeSegment(annotation);
             } else {
                 appAnnotations.add(
                         "@App:" + annotationConfigGenerator.generateAnnotationConfig(annotation).split("@")[1]);
@@ -102,6 +106,7 @@ public class EventFlowBuilder {
         }
         siddhiAppConfig.setSiddhiAppName(siddhiAppName);
         siddhiAppConfig.setAppAnnotationList(appAnnotations);
+        siddhiAppConfig.addElementCodeSegments(annotationConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -116,6 +121,7 @@ public class EventFlowBuilder {
         for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
             siddhiAppConfig.add(triggerConfigGenerator.generateTriggerConfig(triggerDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(triggerConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -144,6 +150,7 @@ public class EventFlowBuilder {
                                 .generateStreamConfig(streamDefinitionEntry.getValue()));
             }
         }
+        siddhiAppConfig.addElementCodeSegments(streamDefinitionConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -158,6 +165,7 @@ public class EventFlowBuilder {
                 siddhiAppConfig.addSource(sourceConfig);
             }
         }
+        siddhiAppConfig.addElementCodeSegments(sourceConfigsGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -172,6 +180,7 @@ public class EventFlowBuilder {
                 siddhiAppConfig.addSink(sinkConfig);
             }
         }
+        siddhiAppConfig.addElementCodeSegments(sinkConfigsGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -185,6 +194,7 @@ public class EventFlowBuilder {
         for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
             siddhiAppConfig.add(tableConfigGenerator.generateTableConfig(tableDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(tableConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -198,6 +208,7 @@ public class EventFlowBuilder {
         for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
             siddhiAppConfig.add(windowConfigGenerator.generateWindowConfig(windowDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(windowConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -211,6 +222,7 @@ public class EventFlowBuilder {
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
             siddhiAppConfig.add(aggregationConfigGenerator.generateAggregationConfig(aggregationDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(aggregationConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -223,6 +235,7 @@ public class EventFlowBuilder {
         for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
             siddhiAppConfig.add(functionConfigGenerator.generateFunctionConfig(functionDefinition));
         }
+        siddhiAppConfig.addElementCodeSegments(functionConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -254,6 +267,8 @@ public class EventFlowBuilder {
                 throw new DesignGenerationException("Unable create config for execution element of type unknown");
             }
         }
+        siddhiAppConfig.addElementCodeSegments(queryConfigGenerator.getPreservedCodeSegments());
+        siddhiAppConfig.addElementCodeSegments(partitionConfigGenerator.getPreservedCodeSegments());
         return this;
     }
 
@@ -265,6 +280,34 @@ public class EventFlowBuilder {
     public EventFlowBuilder loadEdges() throws DesignGenerationException {
         EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
         edges = edgesGenerator.generateEdges();
+        return this;
+    }
+
+    /**
+     * Loads Comments, that were preserved by each Siddhi Element Config generator
+     * @return                                  A reference to this object
+     * @throws DesignGenerationException        Error while generating Comment Code Segments
+     */
+    public EventFlowBuilder loadComments() throws DesignGenerationException {
+        OuterScopeCommentsPreserver outerScopeCommentsPreserver =
+                new OuterScopeCommentsPreserver(siddhiAppString, siddhiAppConfig.getElementCodeSegments());
+        siddhiAppConfig.assignCommentCodeSegments(outerScopeCommentsPreserver.generateCommentCodeSegments());
+        siddhiAppConfig =
+                outerScopeCommentsPreserver.bindCommentsToElements(
+                        siddhiAppConfig.getCommentCodeSegments(),
+                        siddhiAppConfig);
+        // Preserve Comments of Partitions
+        for (PartitionConfig partitionConfig : siddhiAppConfig.getPartitionList()) {
+            PartitionScopeCommentsPreserver partitionScopeCommentsPreserver =
+                    new PartitionScopeCommentsPreserver(
+                            siddhiAppString, partitionConfig, siddhiAppConfig.getElementCodeSegments());
+            siddhiAppConfig.clearCommentCodeSegments();
+            siddhiAppConfig.assignCommentCodeSegments(partitionScopeCommentsPreserver.generateCommentCodeSegments());
+            siddhiAppConfig =
+                    partitionScopeCommentsPreserver.bindCommentsToElements(
+                            siddhiAppConfig.getCommentCodeSegments(),
+                            siddhiAppConfig);
+        }
         return this;
     }
 }

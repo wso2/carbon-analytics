@@ -45,8 +45,8 @@ public class FileConfigManager implements ConfigManager {
         if (configProvider != null) {
             try {
                 RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
-                if (null != rootConfiguration && null != rootConfiguration.extensions) {
-                    for (Extension extension : rootConfiguration.extensions) {
+                if (null != rootConfiguration && null != rootConfiguration.getExtensions()) {
+                    for (Extension extension : rootConfiguration.getExtensions()) {
                         ExtensionChildConfiguration childConfiguration = extension.getExtension();
                         if (null != childConfiguration && null != childConfiguration.getName() && childConfiguration
                                 .getName().equals(name) && null != childConfiguration.getNamespace() &&
@@ -57,11 +57,11 @@ public class FileConfigManager implements ConfigManager {
                     }
                 }
             } catch (ConfigurationException e) {
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
             }
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Couldn't find a matching configuration for name: " +
+            LOGGER.debug("Could not find a matching configuration for name: " +
                     name + "and namespace: " + namespace + "!");
         }
         return new FileConfigReader(new HashMap<>());
@@ -72,8 +72,8 @@ public class FileConfigManager implements ConfigManager {
         if (configProvider != null) {
             try {
                 RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
-                if (null != rootConfiguration && null != rootConfiguration.refs) {
-                    for (Reference ref : rootConfiguration.refs) {
+                if (null != rootConfiguration && null != rootConfiguration.getRefs()) {
+                    for (Reference ref : rootConfiguration.getRefs()) {
                         ReferenceChildConfiguration childConfiguration = ref.getReference();
                         if (null != childConfiguration && null != childConfiguration.getName()
                                 && childConfiguration.getName().equals(name)) {
@@ -87,11 +87,11 @@ public class FileConfigManager implements ConfigManager {
                     }
                 }
             } catch (ConfigurationException e) {
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
             }
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Couldn't find a matching configuration for ref, name: " + name + "!");
+            LOGGER.debug("Could not find a matching configuration for ref, name: " + name + "!");
         }
         return new HashMap<>();
     }

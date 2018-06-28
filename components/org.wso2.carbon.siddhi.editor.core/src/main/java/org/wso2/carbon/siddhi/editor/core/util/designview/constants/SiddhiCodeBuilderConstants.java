@@ -22,7 +22,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
  * Contains all the generic String/char values that are needed by
  * the CodeGenerator class to build the entire Siddhi app string
  */
-public class SiddhiStringBuilderConstants {
+public class SiddhiCodeBuilderConstants {
     // General chars
     public static final char ALL = '*';
     public static final char FULL_STOP = '.';
@@ -33,6 +33,7 @@ public class SiddhiStringBuilderConstants {
     public static final char SINGLE_QUOTE = '\'';
     public static final char DOUBLE_QUOTE = '\"';
     public static final char SPACE = ' ';
+    public static final char HASH = '#';
     // Brackets
     public static final char OPEN_BRACKET = '(';
     public static final char CLOSE_BRACKET = ')';
@@ -43,7 +44,6 @@ public class SiddhiStringBuilderConstants {
     // General Strings
     public static final String EMPTY_STRING = "";
     public static final String THREE_DOTS = "...";
-    public static final String HASH = "#";
     // Definition Strings
     public static final String DEFINE_STREAM = "define stream";
     public static final String DEFINE_TABLE = "define table";
@@ -75,15 +75,6 @@ public class SiddhiStringBuilderConstants {
     public static final String DELETE = "delete";
     public static final String UPDATE = "update";
     public static final String UPDATE_OR_INSERT_INTO = "update or insert into";
-    // Siddhi Comments
-    public static final String STREAMS_COMMENT = "-- Streams";
-    public static final String TABLES_COMMENT = "-- Tables";
-    public static final String WINDOWS_COMMENT = "-- Windows";
-    public static final String TRIGGERS_COMMENT = "-- Triggers";
-    public static final String AGGREGATIONS_COMMENT = "-- Aggregations";
-    public static final String FUNCTIONS_COMMENT = "-- Functions";
-    public static final String QUERIES_COMMENT = "-- Queries";
-    public static final String PARTITIONS_COMMENT = "-- Partitions";
     // Other Strings
     public static final String FROM = "from";
     public static final String SELECT = "select";
@@ -111,7 +102,7 @@ public class SiddhiStringBuilderConstants {
     public static final String BEGIN = "begin";
     public static final String END = "end";
 
-    private SiddhiStringBuilderConstants() {
+    private SiddhiCodeBuilderConstants() {
     }
 
 }

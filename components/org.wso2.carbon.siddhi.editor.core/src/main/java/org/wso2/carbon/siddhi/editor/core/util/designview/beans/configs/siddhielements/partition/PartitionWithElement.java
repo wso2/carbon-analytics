@@ -18,10 +18,12 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition;
 
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
+
 /**
  * Represents Siddhi Partition with element
  */
-public class PartitionWithElement {
+public class PartitionWithElement extends SiddhiElementConfig {
     private String expression;
     private String streamName;
 

@@ -29,6 +29,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributesSelectionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.CodeSegmentsPreserver;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.QueryInputConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.output.QueryOutputConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
@@ -50,7 +51,7 @@ import java.util.List;
 /**
  * Generator to create QueryConfig from Siddhi elements
  */
-public class QueryConfigGenerator {
+public class QueryConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
 
@@ -79,9 +80,11 @@ public class QueryConfigGenerator {
 
         queryConfig.setQueryOutput(generateOutput(query.getOutputStream()));
         queryConfig.setOutputRateLimit(generateOutputRateLimit(query.getOutputRate()));
-        queryConfig.setAnnotationList(
-                new AnnotationConfigGenerator().generateAnnotationConfigList(query.getAnnotations()));
+        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
+        queryConfig.setAnnotationList(annotationConfigGenerator.generateAnnotationConfigList(query.getAnnotations()));
 
+        preserveCodeSegmentsOf(annotationConfigGenerator);
+        preserveAndBindCodeSegment(query, queryConfig);
         return queryConfig;
     }
 
@@ -101,7 +104,10 @@ public class QueryConfigGenerator {
      * @return              AttributesSelectionConfig
      */
     private AttributesSelectionConfig generateSelect(Selector selector) {
-        return new AttributesSelectionConfigGenerator(siddhiAppString).generateAttributesSelectionConfig(selector);
+        AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
+                new AttributesSelectionConfigGenerator(siddhiAppString);
+        preserveCodeSegmentsOf(attributesSelectionConfigGenerator);
+        return attributesSelectionConfigGenerator.generateAttributesSelectionConfig(selector);
     }
 
     /**

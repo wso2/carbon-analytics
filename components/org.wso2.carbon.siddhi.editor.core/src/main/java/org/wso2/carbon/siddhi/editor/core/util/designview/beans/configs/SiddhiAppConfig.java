@@ -33,8 +33,10 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryL
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Contains elements of a Siddhi app
@@ -54,6 +56,9 @@ public class SiddhiAppConfig {
     private List<FunctionConfig> functionList = new ArrayList<>();
     private Map<QueryListType, List<QueryConfig>> queryLists = new EnumMap<>(QueryListType.class);
     private List<PartitionConfig> partitionList = new ArrayList<>();
+
+    private Set<ElementCodeSegment> elementCodeSegments = new HashSet<>();
+    private Set<CommentCodeSegment> commentCodeSegments = new HashSet<>();
 
     public SiddhiAppConfig() {
         queryLists.put(QueryListType.WINDOW_FILTER_PROJECTION, new ArrayList<>());
@@ -88,7 +93,31 @@ public class SiddhiAppConfig {
      */
     private <T> void addElement(List<T> elementList, T elementConfig) {
         ((SiddhiElementConfig) elementConfig).setId(generateNextElementId());
+        addElementCodeSegment((SiddhiElementConfig) elementConfig);
         elementList.add(elementConfig);
+    }
+
+    /**
+     * Adds the given list of ElementCodeSegment objects representing code segments of Siddhi elements,
+     * to the existing list
+     * @param elementCodeSegments       List of ElementCodeSegment objects
+     */
+    public void addElementCodeSegments(Set<ElementCodeSegment> elementCodeSegments) {
+        this.elementCodeSegments.addAll(elementCodeSegments);
+    }
+
+    /**
+     * Adds the code segment of the given SiddhiElementConfig object, to the existing list of code segments
+     * @param siddhiElementConfig       SiddhiElementConfig object
+     */
+    private void addElementCodeSegment(SiddhiElementConfig siddhiElementConfig) {
+        ElementCodeSegment elementCodeSegment =
+                new ElementCodeSegment(
+                        siddhiElementConfig.getQueryContextStartIndex(),
+                        siddhiElementConfig.getQueryContextEndIndex());
+        if (elementCodeSegment.isValid()) {
+            elementCodeSegments.add(elementCodeSegment);
+        }
     }
 
     /**
@@ -98,6 +127,7 @@ public class SiddhiAppConfig {
      */
     public void addQuery(QueryListType queryListType, QueryConfig queryConfig) {
         queryConfig.setId(generateNextElementId());
+        addElementCodeSegment(queryConfig);
         queryLists.get(queryListType).add(queryConfig);
     }
 
@@ -130,6 +160,7 @@ public class SiddhiAppConfig {
             streamConfig.setPartitionId(partitionConfig.getId());
             streamConfig.setConnectorsAndStreams(connectorsAndStreams);
         }
+        addElementCodeSegment(partitionConfig);
         partitionList.add(partitionConfig);
     }
 
@@ -223,6 +254,25 @@ public class SiddhiAppConfig {
 
     public List<PartitionConfig> getPartitionList() {
         return partitionList;
+    }
+
+    public Set<ElementCodeSegment> getElementCodeSegments() {
+        return elementCodeSegments;
+    }
+
+    public Set<CommentCodeSegment> getCommentCodeSegments() {
+        return commentCodeSegments;
+    }
+
+    public void assignCommentCodeSegments(List<CommentCodeSegment> commentCodeSegments) {
+        this.commentCodeSegments.addAll(commentCodeSegments);
+    }
+
+    /**
+     * Removes unnecessarily remaining comments
+     */
+    public void clearCommentCodeSegments() {
+        commentCodeSegments = new HashSet<>();
     }
 
     public int getFinalElementCount() {

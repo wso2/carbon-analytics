@@ -163,9 +163,24 @@ public class CSVEventGenerator implements EventGenerator {
     @Override
     public void stop() {
         csvReader.closeParser(csvConfiguration.getFileName(), csvConfiguration.getIsOrdered());
+        startTimestamp = -1;
         if (log.isDebugEnabled()) {
             log.debug("Stop CSV generator for file '" + csvConfiguration.getFileName() + "' for stream '"
                               + csvConfiguration.getStreamName() + "'.");
+        }
+    }
+
+    /**
+     * resume() method
+     */
+    @Override
+    public void resume() {
+        if ("-1".equals(csvConfiguration.getTimestampAttribute())) {
+            startTimestamp = System.currentTimeMillis();
+            nextEvent.setTimestamp(startTimestamp);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Stop random generator for stream '" + csvConfiguration.getStreamName() + "'");
         }
     }
 
@@ -231,6 +246,7 @@ public class CSVEventGenerator implements EventGenerator {
          * if the CSV file is ordered by timestamp, create next event and assign it as the nextEvent of generator
          * else, assign the next event with current timestamp as nextEvent of generator
          */
+        startTimestamp += csvConfiguration.getTimestampInterval();
         if (csvConfiguration.getIsOrdered()) {
             nextEvent = csvReader.getNextEvent(csvConfiguration, streamAttributes, startTimestamp,
                     endTimestamp);

@@ -36,6 +36,8 @@ public interface EventGenerator {
 
     void stop();
 
+    void resume();
+
     Event poll();
 
     Event peek();

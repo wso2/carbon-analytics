@@ -115,12 +115,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 log.error(errMsg);
                 throw errMsg;
             }
-            // remove any child nodes from designViewGridContainer if exists
-            this.designViewGridContainer.empty();
+
             // reset the jsPlumb common instance
             if (this.jsPlumbInstance !== undefined) {
+                this.jsPlumbInstance.clear();
                 this.jsPlumbInstance.reset();
             }
+            // remove any child nodes from designViewGridContainer if exists
+            this.designViewGridContainer.empty();
         };
 
         DesignView.prototype.showToolPalette = function () {
@@ -141,8 +143,9 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          * @return {boolean} return whether the json is valid or not
          */
         DesignView.prototype.validateJSONBeforeSendingToBackend = function (configurationJSON) {
+            var self = this;
             var jsonValidator = new JSONValidator();
-            return jsonValidator.validate(configurationJSON);
+            return jsonValidator.validate(configurationJSON, self.jsPlumbInstance);
         };
 
         DesignView.prototype.getDesign = function (code) {
