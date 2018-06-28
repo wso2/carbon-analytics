@@ -230,7 +230,8 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQuerySelectSection(aggregation.select, 'Aggregation', aggregation.id);
+            isValid = self.validateQuerySelectSection(aggregation.select, 'Aggregation', aggregation.id,
+                doNotShowErrorMessages);
             if (isValid) {
                 removeErrorHighlighter(aggregation.id);
             }
@@ -267,12 +268,12 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQueryOutputSection(query.queryOutput, 'Query', query.id);
+            isValid = self.validateQueryOutputSection(query.queryOutput, 'Query', query.id, doNotShowErrorMessages);
             if (!isValid) {
                 return isValid;
             }
 
-            isValid = self.validateQuerySelectSection(query.select, 'Query', query.id);
+            isValid = self.validateQuerySelectSection(query.select, 'Query', query.id, doNotShowErrorMessages);
 
             if (isValid) {
                 removeErrorHighlighter(query.id);
@@ -316,7 +317,8 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQueryOutputSection(query.queryOutput, 'Join query', query.id);
+            isValid = self.validateQueryOutputSection(query.queryOutput, 'Join query', query.id,
+                doNotShowErrorMessages);
             if (!isValid) {
                 return isValid;
             }
@@ -344,7 +346,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQuerySelectSection(query.select, 'Join query', query.id);
+            isValid = self.validateQuerySelectSection(query.select, 'Join query', query.id, doNotShowErrorMessages);
             if (isValid) {
                 removeErrorHighlighter(query.id);
             }
@@ -384,7 +386,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
 
             }
 
-            isValid = self.validateQueryOutputSection(query.queryOutput, type, query.id);
+            isValid = self.validateQueryOutputSection(query.queryOutput, type, query.id, doNotShowErrorMessages);
             if (!isValid) {
                 return isValid;
             }
@@ -405,7 +407,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQuerySelectSection(query.select, type, query.id);
+            isValid = self.validateQuerySelectSection(query.select, type, query.id, doNotShowErrorMessages);
             if (isValid) {
                 removeErrorHighlighter(query.id);
             }
@@ -545,7 +547,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(partition.queryLists.WINDOW_FILTER_PROJECTION, function (query) {
-                isValid = self.validateWindowFilterProjectionQuery(query);
+                isValid = self.validateWindowFilterProjectionQuery(query, doNotShowErrorMessages);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -557,7 +559,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(partition.queryLists.JOIN, function (query) {
-                isValid = self.validateJoinQuery(query);
+                isValid = self.validateJoinQuery(query, doNotShowErrorMessages);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -569,7 +571,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(partition.queryLists.PATTERN, function (query) {
-                isValid = self.validatePatternOrSequenceQuery(query, 'Pattern Query');
+                isValid = self.validatePatternOrSequenceQuery(query, 'Pattern Query', doNotShowErrorMessages);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -581,7 +583,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(partition.queryLists.SEQUENCE, function (query) {
-                isValid = self.validatePatternOrSequenceQuery(query, 'Sequence Query');
+                isValid = self.validatePatternOrSequenceQuery(query, 'Sequence Query', doNotShowErrorMessages);
                 if (!isValid) {
                     // break the for each loop
                     return false;
