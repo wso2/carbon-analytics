@@ -204,11 +204,10 @@ public abstract class ScopedCommentsPreserver {
                                             List<ElementCodeSegment> elementCodeSegments) {
         boolean isContainedInAnySegment = false;
         for (ElementCodeSegment comparedSegment : elementCodeSegments) {
-            if (!elementCodeSegment.equals(comparedSegment)) {
-                if (isSegmentContainedIn(elementCodeSegment, comparedSegment)) {
-                    isContainedInAnySegment = true;
-                    break;
-                }
+            if (!elementCodeSegment.equals(comparedSegment) &&
+                    isSegmentContainedIn(elementCodeSegment, comparedSegment)) {
+                isContainedInAnySegment = true;
+                break;
             }
         }
         return isContainedInAnySegment;
