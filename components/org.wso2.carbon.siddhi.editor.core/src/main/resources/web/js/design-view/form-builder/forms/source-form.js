@@ -20,40 +20,51 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
         'jsonValidator'],
     function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator) {
 
-        /**
-         * @class SourceForm Creates a forms to collect data from a source
-         * @constructor
-         * @param {Object} options Rendering options for the view
-         */
-        var SourceForm = function (options) {
-            if (options !== undefined) {
-                this.configurationData = options.configurationData;
-                this.application = options.application;
-                this.formUtils = options.formUtils;
-                this.consoleListManager = options.application.outputController;
-                var currentTabId = this.application.tabController.activeTab.cid;
-                this.designViewContainer = $('#design-container-' + currentTabId);
-                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
-            }
-        };
-
-        /**
-         * @function generate form when defining a form
-         * @param i id for the element
-         * @param formConsole Console which holds the form
-         * @param formContainer Container which holds the form
-         */
-        SourceForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
-            var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Source Configuration</h3></div>' +
-                '<div id="define-source" class="define-source"></div>');
-            formContainer.append(propertyDiv);
-
-            // generate the form to define a source
-            var editor = new JSONEditor(formContainer.find('.define-source')[0], {
-                schema: {
+        var sourceSchema = {
+            type: "object",
+            title: "Source",
+            properties: {
+                annotationType: {
+                    required: true,
+                    propertyOrder: 1,
                     type: "object",
-                    title: "Source",
+                    title: "Type",
+                    options: {
+                        disable_properties: true
+                    },
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            required: true,
+                            minLength: 1
+                        }
+                    }
+                },
+                annotationOptions: {
+                    propertyOrder: 2,
+                    type: "array",
+                    format: "table",
+                    title: "Options",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Option',
+                        properties: {
+                            optionValue: {
+                                title: 'Value',
+                                type: "string",
+                                required: true,
+                                minLength: 1
+                            }
+                        }
+                    }
+                },
+                map: {
+                    propertyOrder: 3,
+                    title: "Map",
+                    type: "object",
                     properties: {
                         annotationType: {
                             required: true,
@@ -92,114 +103,105 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                                 }
                             }
                         },
-                        map: {
+                        attributeValues: {
                             propertyOrder: 3,
-                            title: "Map",
-                            type: "object",
-                            properties: {
-                                annotationType: {
-                                    required: true,
-                                    propertyOrder: 1,
-                                    type: "object",
-                                    title: "Type",
-                                    options: {
-                                        disable_properties: true
-                                    },
-                                    properties: {
-                                        name: {
-                                            type: "string",
-                                            title: "Name",
-                                            required: true,
-                                            minLength: 1
-                                        }
-                                    }
+                            title: "Attributes Mapping",
+                            oneOf: [
+                                {
+                                    $ref: "#/definitions/mapValues",
+                                    title: "Enter attributes as key/value pairs"
                                 },
-                                annotationOptions: {
-                                    propertyOrder: 2,
-                                    type: "array",
-                                    format: "table",
-                                    title: "Options",
-                                    uniqueItems: true,
-                                    minItems: 1,
-                                    items: {
-                                        type: "object",
-                                        title: 'Option',
-                                        properties: {
-                                            optionValue: {
-                                                title: 'Value',
-                                                type: "string",
-                                                required: true,
-                                                minLength: 1
-                                            }
-                                        }
-                                    }
-                                },
-                                attributeValues: {
-                                    propertyOrder: 3,
-                                    title: "Attributes Mapping",
-                                    oneOf: [
-                                        {
-                                            $ref: "#/definitions/mapValues",
-                                            title: "Enter attributes as key/value pairs"
-                                        },
-                                        {
-                                            $ref: "#/definitions/listValues",
-                                            title: "Enter attributes as a list"
-                                        }
-                                    ]
+                                {
+                                    $ref: "#/definitions/listValues",
+                                    title: "Enter attributes as a list"
                                 }
-                            }
+                            ]
                         }
-                    },
-                    definitions: {
-                        mapValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    key: {
-                                        title: 'Key',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    },
-                                    value: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        listValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    value: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
+                    }
+                }
+            },
+            definitions: {
+                mapValues: {
+                    required: true,
+                    type: "array",
+                    format: "table",
+                    title: "Attributes",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Attribute',
+                        properties: {
+                            key: {
+                                title: 'Key',
+                                type: "string",
+                                required: true,
+                                minLength: 1
+                            },
+                            value: {
+                                title: 'Value',
+                                type: "string",
+                                required: true,
+                                minLength: 1
                             }
                         }
                     }
                 },
+                listValues: {
+                    required: true,
+                    type: "array",
+                    format: "table",
+                    title: "Attributes",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Attribute',
+                        properties: {
+                            value: {
+                                title: 'Value',
+                                type: "string",
+                                required: true,
+                                minLength: 1
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        /**
+         * @class SourceForm Creates a forms to collect data from a source
+         * @constructor
+         * @param {Object} options Rendering options for the view
+         */
+        var SourceForm = function (options) {
+            if (options !== undefined) {
+                this.configurationData = options.configurationData;
+                this.application = options.application;
+                this.formUtils = options.formUtils;
+                this.consoleListManager = options.application.outputController;
+                var currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
+            }
+        };
+
+        /**
+         * @function generate form when defining a form
+         * @param i id for the element
+         * @param formConsole Console which holds the form
+         * @param formContainer Container which holds the form
+         */
+        SourceForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
+            var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Source Configuration</h3></div>' +
+                '<div id="define-source" class="define-source"></div>');
+            formContainer.append(propertyDiv);
+
+            // generate the form to define a source
+            var editor = new JSONEditor(formContainer.find('.define-source')[0], {
+                schema: sourceSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
@@ -403,155 +405,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
             // generate the form to define a source
             var editor = new JSONEditor(formContainer.find('.define-source')[0], {
-                schema: {
-                    type: "object",
-                    title: "Source",
-                    properties: {
-                        annotationType: {
-                            required: true,
-                            propertyOrder: 1,
-                            type: "object",
-                            title: "Type",
-                            options: {
-                                disable_properties: true
-                            },
-                            properties: {
-                                name: {
-                                    type: "string",
-                                    title: "Name",
-                                    required: true,
-                                    minLength: 1
-                                }
-                            }
-                        },
-                        annotationOptions: {
-                            propertyOrder: 2,
-                            type: "array",
-                            format: "table",
-                            title: "Options",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Option',
-                                properties: {
-                                    optionValue: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        map: {
-                            propertyOrder: 3,
-                            title: "Map",
-                            type: "object",
-                            properties: {
-                                annotationType: {
-                                    required: true,
-                                    propertyOrder: 1,
-                                    type: "object",
-                                    title: "Type",
-                                    options: {
-                                        disable_properties: true
-                                    },
-                                    properties: {
-                                        name: {
-                                            type: "string",
-                                            title: "Name",
-                                            required: true,
-                                            minLength: 1
-                                        }
-                                    }
-                                },
-                                annotationOptions: {
-                                    propertyOrder: 2,
-                                    type: "array",
-                                    format: "table",
-                                    title: "Options",
-                                    uniqueItems: true,
-                                    minItems: 1,
-                                    items: {
-                                        type: "object",
-                                        title: 'Option',
-                                        properties: {
-                                            optionValue: {
-                                                title: 'Value',
-                                                type: "string",
-                                                required: true,
-                                                minLength: 1
-                                            }
-                                        }
-                                    }
-                                },
-                                attributeValues: {
-                                    propertyOrder: 3,
-                                    title: "Attributes Mapping",
-                                    oneOf: [
-                                        {
-                                            $ref: "#/definitions/mapValues",
-                                            title: "Enter attributes as key/value pairs"
-                                        },
-                                        {
-                                            $ref: "#/definitions/listValues",
-                                            title: "Enter attributes as a list"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    definitions: {
-                        mapValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    key: {
-                                        title: 'Key',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    },
-                                    value: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        listValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    value: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
+                schema: sourceSchema,
                 startval: fillWith,
                 show_errors: "always",
                 disable_properties: false,

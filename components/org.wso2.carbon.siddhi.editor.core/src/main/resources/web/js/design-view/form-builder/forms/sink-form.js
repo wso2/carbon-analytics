@@ -20,40 +20,51 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
         'jsonValidator'],
     function (require, log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator) {
 
-        /**
-         * @class SinkForm Creates a forms to collect data from a sink
-         * @constructor
-         * @param {Object} options Rendering options for the view
-         */
-        var SinkForm = function (options) {
-            if (options !== undefined) {
-                this.configurationData = options.configurationData;
-                this.application = options.application;
-                this.formUtils = options.formUtils;
-                this.consoleListManager = options.application.outputController;
-                var currentTabId = this.application.tabController.activeTab.cid;
-                this.designViewContainer = $('#design-container-' + currentTabId);
-                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
-            }
-        };
-
-        /**
-         * @function generate form when defining a form
-         * @param i id for the element
-         * @param formConsole Console which holds the form
-         * @param formContainer Container which holds the form
-         */
-        SinkForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
-            var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Sink Configuration</h3></div>' +
-                '<div id="define-sink" class="define-sink"></div>');
-            formContainer.append(propertyDiv);
-
-            // generate the form to define a sink
-            var editor = new JSONEditor(formContainer.find('.define-sink')[0], {
-                schema: {
+        var sinkSchema = {
+            type: "object",
+            title: "Sink",
+            properties: {
+                annotationType: {
+                    required: true,
+                    propertyOrder: 1,
                     type: "object",
-                    title: "Sink",
+                    title: "Type",
+                    options: {
+                        disable_properties: true
+                    },
+                    properties: {
+                        name: {
+                            type: "string",
+                            title: "Name",
+                            required: true,
+                            minLength: 1
+                        }
+                    }
+                },
+                annotationOptions: {
+                    propertyOrder: 2,
+                    type: "array",
+                    format: "table",
+                    title: "Options",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Option',
+                        properties: {
+                            optionValue: {
+                                title: 'Value',
+                                type: "string",
+                                required: true,
+                                minLength: 1
+                            }
+                        }
+                    }
+                },
+                map: {
+                    propertyOrder: 3,
+                    title: "Map",
+                    type: "object",
                     properties: {
                         annotationType: {
                             required: true,
@@ -92,161 +103,152 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
                                 }
                             }
                         },
-                        map: {
+                        attributeOrPayloadValues: {
                             propertyOrder: 3,
-                            title: "Map",
-                            type: "object",
-                            properties: {
-                                annotationType: {
-                                    required: true,
-                                    propertyOrder: 1,
-                                    type: "object",
-                                    title: "Type",
-                                    options: {
-                                        disable_properties: true
-                                    },
-                                    properties: {
-                                        name: {
-                                            type: "string",
-                                            title: "Name",
-                                            required: true,
-                                            minLength: 1
-                                        }
-                                    }
+                            title: "Payload or attribute Mapping",
+                            oneOf: [
+                                {
+                                    $ref: "#/definitions/payloadMapValues",
+                                    title: "Enter payload as key/value pairs"
                                 },
-                                annotationOptions: {
-                                    propertyOrder: 2,
-                                    type: "array",
-                                    format: "table",
-                                    title: "Options",
-                                    uniqueItems: true,
-                                    minItems: 1,
-                                    items: {
-                                        type: "object",
-                                        title: 'Option',
-                                        properties: {
-                                            optionValue: {
-                                                title: 'Value',
-                                                type: "string",
-                                                required: true,
-                                                minLength: 1
-                                            }
-                                        }
-                                    }
+                                {
+                                    $ref: "#/definitions/payloadSingleValue",
+                                    title: "Enter a single payload attribute"
                                 },
-                                attributeOrPayloadValues: {
-                                    propertyOrder: 3,
-                                    title: "Payload or attribute Mapping",
-                                    oneOf: [
-                                        {
-                                            $ref: "#/definitions/payloadMapValues",
-                                            title: "Enter payload as key/value pairs"
-                                        },
-                                        {
-                                            $ref: "#/definitions/payloadSingleValue",
-                                            title: "Enter a single payload attribute"
-                                        },
-                                        {
-                                            $ref: "#/definitions/attributeMapValues",
-                                            title: "Enter attributes as key/value pairs"
-                                        },
-                                        {
-                                            $ref: "#/definitions/attributeListValues",
-                                            title: "Enter attributes as a list"
-                                        }
-                                    ]
+                                {
+                                    $ref: "#/definitions/attributeMapValues",
+                                    title: "Enter attributes as key/value pairs"
+                                },
+                                {
+                                    $ref: "#/definitions/attributeListValues",
+                                    title: "Enter attributes as a list"
                                 }
-                            }
+                            ]
                         }
-                    },
-                    definitions: {
-                        payloadMapValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Payload Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    payloadMapKey: {
-                                        title: 'Key',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    },
-                                    payloadMapValue: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        payloadSingleValue: {
-                            required: true,
-                            type: "object",
-                            title: " Payload Attribute",
-                            properties: {
-                                singleValue: {
-                                    title: 'Value',
-                                    type: "string",
-                                    required: true,
-                                    minLength: 1
-                                }
-                            }
-                        },
-                        attributeMapValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    attributeMapKey: {
-                                        title: 'Key',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    },
-                                    attributeMapValue: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        attributeListValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    attributeListValue: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
+                    }
+                }
+            },
+            definitions: {
+                payloadMapValues: {
+                    required: true,
+                    type: "array",
+                    format: "table",
+                    title: "Payload Attributes",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Attribute',
+                        properties: {
+                            payloadMapKey: {
+                                title: 'Key',
+                                type: "string",
+                                required: true,
+                                minLength: 1
+                            },
+                            payloadMapValue: {
+                                title: 'Value',
+                                type: "string",
+                                required: true,
+                                minLength: 1
                             }
                         }
                     }
                 },
+                payloadSingleValue: {
+                    required: true,
+                    type: "object",
+                    title: " Payload Attribute",
+                    properties: {
+                        singleValue: {
+                            title: 'Value',
+                            type: "string",
+                            required: true,
+                            minLength: 1
+                        }
+                    }
+                },
+                attributeMapValues: {
+                    required: true,
+                    type: "array",
+                    format: "table",
+                    title: "Attributes",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Attribute',
+                        properties: {
+                            attributeMapKey: {
+                                title: 'Key',
+                                type: "string",
+                                required: true,
+                                minLength: 1
+                            },
+                            attributeMapValue: {
+                                title: 'Value',
+                                type: "string",
+                                required: true,
+                                minLength: 1
+                            }
+                        }
+                    }
+                },
+                attributeListValues: {
+                    required: true,
+                    type: "array",
+                    format: "table",
+                    title: "Attributes",
+                    uniqueItems: true,
+                    minItems: 1,
+                    items: {
+                        type: "object",
+                        title: 'Attribute',
+                        properties: {
+                            attributeListValue: {
+                                title: 'Value',
+                                type: "string",
+                                required: true,
+                                minLength: 1
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        /**
+         * @class SinkForm Creates a forms to collect data from a sink
+         * @constructor
+         * @param {Object} options Rendering options for the view
+         */
+        var SinkForm = function (options) {
+            if (options !== undefined) {
+                this.configurationData = options.configurationData;
+                this.application = options.application;
+                this.formUtils = options.formUtils;
+                this.consoleListManager = options.application.outputController;
+                var currentTabId = this.application.tabController.activeTab.cid;
+                this.designViewContainer = $('#design-container-' + currentTabId);
+                this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
+            }
+        };
+
+        /**
+         * @function generate form when defining a form
+         * @param i id for the element
+         * @param formConsole Console which holds the form
+         * @param formContainer Container which holds the form
+         */
+        SinkForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
+            var self = this;
+            var propertyDiv = $('<div id="property-header"><h3>Sink Configuration</h3></div>' +
+                '<div id="define-sink" class="define-sink"></div>');
+            formContainer.append(propertyDiv);
+
+            // generate the form to define a sink
+            var editor = new JSONEditor(formContainer.find('.define-sink')[0], {
+                schema: sinkSchema,
                 show_errors: "always",
                 disable_properties: false,
                 disable_array_delete_all_rows: true,
@@ -510,202 +512,7 @@ define(['require', 'log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnno
 
             // generate the form to define a sink
             var editor = new JSONEditor(formContainer.find('.define-sink')[0], {
-                schema: {
-                    type: "object",
-                    title: "Sink",
-                    properties: {
-                        annotationType: {
-                            required: true,
-                            propertyOrder: 1,
-                            type: "object",
-                            title: "Type",
-                            options: {
-                                disable_properties: true
-                            },
-                            properties: {
-                                name: {
-                                    type: "string",
-                                    title: "Name",
-                                    required: true,
-                                    minLength: 1
-                                }
-                            }
-                        },
-                        annotationOptions: {
-                            propertyOrder: 2,
-                            type: "array",
-                            format: "table",
-                            title: "Options",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Option',
-                                properties: {
-                                    optionValue: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        map: {
-                            propertyOrder: 3,
-                            title: "Map",
-                            type: "object",
-                            properties: {
-                                annotationType: {
-                                    required: true,
-                                    propertyOrder: 1,
-                                    type: "object",
-                                    title: "Type",
-                                    options: {
-                                        disable_properties: true
-                                    },
-                                    properties: {
-                                        name: {
-                                            type: "string",
-                                            title: "Name",
-                                            required: true,
-                                            minLength: 1
-                                        }
-                                    }
-                                },
-                                annotationOptions: {
-                                    propertyOrder: 2,
-                                    type: "array",
-                                    format: "table",
-                                    title: "Options",
-                                    uniqueItems: true,
-                                    minItems: 1,
-                                    items: {
-                                        type: "object",
-                                        title: 'Option',
-                                        properties: {
-                                            optionValue: {
-                                                title: 'Value',
-                                                type: "string",
-                                                required: true,
-                                                minLength: 1
-                                            }
-                                        }
-                                    }
-                                },
-                                attributeOrPayloadValues: {
-                                    propertyOrder: 3,
-                                    title: "Payload or attribute Mapping",
-                                    oneOf: [
-                                        {
-                                            $ref: "#/definitions/payloadMapValues",
-                                            title: "Enter payload as key/value pairs"
-                                        },
-                                        {
-                                            $ref: "#/definitions/payloadSingleValue",
-                                            title: "Enter a single payload attribute"
-                                        },
-                                        {
-                                            $ref: "#/definitions/attributeMapValues",
-                                            title: "Enter attributes as key/value pairs"
-                                        },
-                                        {
-                                            $ref: "#/definitions/attributeListValues",
-                                            title: "Enter attributes as a list"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    definitions: {
-                        payloadMapValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Payload Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    payloadMapKey: {
-                                        title: 'Key',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    },
-                                    payloadMapValue: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        payloadSingleValue: {
-                            required: true,
-                            type: "object",
-                            title: " Payload Attribute",
-                            properties: {
-                                singleValue: {
-                                    title: 'Value',
-                                    type: "string",
-                                    required: true,
-                                    minLength: 1
-                                }
-                            }
-                        },
-                        attributeMapValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    attributeMapKey: {
-                                        title: 'Key',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    },
-                                    attributeMapValue: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        },
-                        attributeListValues: {
-                            required: true,
-                            type: "array",
-                            format: "table",
-                            title: "Attributes",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: 'Attribute',
-                                properties: {
-                                    attributeListValue: {
-                                        title: 'Value',
-                                        type: "string",
-                                        required: true,
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
+                schema: sinkSchema,
                 startval: fillWith,
                 show_errors: "always",
                 disable_properties: false,

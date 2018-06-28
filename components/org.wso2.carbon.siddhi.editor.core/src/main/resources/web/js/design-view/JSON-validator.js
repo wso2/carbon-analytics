@@ -471,6 +471,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             var self = this;
             var isValid = true;
             var errorMessage;
+            removeTooltipErrorMessage(partition.id);
             if (partition.partitionWith.length === 0) {
                 errorMessage = 'Partition does not contain a connected outer stream';
                 highlightErrorElement(partition.id, errorMessage);
@@ -496,6 +497,10 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
 
             if (!isValid) {
                 return false;
+            } else {
+                // At this moment fields related to partition form is valid. So if the partition is highlighted in
+                // red(error element) then we remove it
+                removeErrorHighlighter(partition.id);
             }
 
             _.forEach(partition.queryLists.WINDOW_FILTER_PROJECTION, function (query) {
@@ -542,9 +547,6 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 }
             });
 
-            if (isValid) {
-                removeErrorHighlighter(partition.id);
-            }
             return isValid;
         };
 
