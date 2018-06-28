@@ -1169,15 +1169,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 * update the other elements data connected to current element. ex: when a stream is deleted from a
                 * query, from clause in the query will be updated as undefined.
                 * */
-                var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
-                var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
+                setTimeout(function () {
+                    var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
+                    var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
 
-                _.forEach(outConnections, function (connection) {
-                    self.jsPlumbInstance.deleteConnection(connection);
-                });
-                _.forEach(inConnections, function (connection) {
-                    self.jsPlumbInstance.deleteConnection(connection);
-                });
+                    _.forEach(outConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
+                    });
+                    _.forEach(inConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
+                    });
+                }, 100);
 
                 self.jsPlumbInstance.remove(newElement, true);
                 if (self.jsPlumbInstance.getGroupFor(newElement)) {
