@@ -43,7 +43,7 @@ import java.util.Set;
 /**
  * Preserves Comments of major elements, that reside in the outer scope of Siddhi app
  */
-public class OuterScopeCommentsPreserver extends CommentsPreserver {
+public class OuterScopeCommentsPreserver extends ScopedCommentsPreserver {
 
     public OuterScopeCommentsPreserver(String siddhiAppString, Set<ElementCodeSegment> elementCodeSegments) {
         super(siddhiAppString, new ArrayList<>(elementCodeSegments));
@@ -53,7 +53,7 @@ public class OuterScopeCommentsPreserver extends CommentsPreserver {
     public List<CommentCodeSegment> generateCommentCodeSegments() throws DesignGenerationException {
         Collections.sort(elementCodeSegments);
         elementCodeSegments = filterMajorElementCodeSegments(elementCodeSegments);
-        detectCommentCodeSegments(elementCodeSegments);
+        commentCodeSegments = detectCommentCodeSegments(elementCodeSegments);
         return commentCodeSegments;
     }
 
