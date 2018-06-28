@@ -195,21 +195,27 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                              * */
                             function removeUnnecessaryFieldsFromJSON(object) {
                                 _.forEach(object.siddhiAppConfig.queryLists.PATTERN, function (patternQuery) {
-                                    if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
-                                        delete patternQuery.queryInput['connectedElementNameList'];
+                                    if (patternQuery.queryInput !== undefined) {
+                                        if (patternQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
+                                            delete patternQuery.queryInput['connectedElementNameList'];
+                                        }
                                     }
                                 });
                                 _.forEach(object.siddhiAppConfig.queryLists.SEQUENCE, function (sequenceQuery) {
-                                    if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
-                                        delete sequenceQuery.queryInput['connectedElementNameList'];
+                                    if (sequenceQuery.queryInput !== undefined) {
+                                        if (sequenceQuery.queryInput.hasOwnProperty('connectedElementNameList')) {
+                                            delete sequenceQuery.queryInput['connectedElementNameList'];
+                                        }
                                     }
                                 });
                                 _.forEach(object.siddhiAppConfig.queryLists.JOIN, function (joinQuery) {
-                                    if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
-                                        delete joinQuery.queryInput['firstConnectedElement'];
-                                    }
-                                    if (joinQuery.queryInput.hasOwnProperty('secondConnectedElement')) {
-                                        delete joinQuery.queryInput['secondConnectedElement'];
+                                    if (joinQuery.queryInput !== undefined) {
+                                        if (joinQuery.queryInput.hasOwnProperty('firstConnectedElement')) {
+                                            delete joinQuery.queryInput['firstConnectedElement'];
+                                        }
+                                        if (joinQuery.queryInput.hasOwnProperty('secondConnectedElement')) {
+                                            delete joinQuery.queryInput['secondConnectedElement'];
+                                        }
                                     }
                                 });
                             }
@@ -222,6 +228,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 designView.emptyDesignViewGridContainer();
                                 sourceContainer.show();
                                 self.trigger("view-switch");
+                                toggleViewButton.html("<i class=\"fw fw-design-view fw-rotate-90\"></i>" +
+                                    "<span class=\"toggle-button-text\">Design View</span>");
                                 return;
                             }
 
@@ -229,7 +237,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             removeUnnecessaryFieldsFromJSON(configurationCopy);
                             var sendingString = JSON.stringify(configurationCopy)
                                 .replace(/'/gm, "\\\'")
-                                .replace(/\\"/gm, "\\\'");
+                                .replace(/\\"/gm, "\\\"");
 
                             var response = self._designView.getCode("'" + sendingString + "'");
                             if (response.status === "success") {
@@ -248,7 +256,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     // NOTE - This trigger should be always handled at the end of setTimeout()
                                     self.trigger("view-switch");
                                 }, 100);
-                                toggleViewButton.html("<i class=\"fw fw-design-view\"></i>" +
+                                toggleViewButton.html("<i class=\"fw fw-design-view fw-rotate-90\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
                             } else if (response.status === "fail") {
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);

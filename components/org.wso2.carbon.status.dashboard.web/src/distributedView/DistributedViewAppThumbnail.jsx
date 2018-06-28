@@ -20,13 +20,19 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 //Material UI
+import {Typography} from 'material-ui-next';
 import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar} from 'material-ui';
 import ToolTip from 'react-tooltip';
 import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
 
-const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex: 1}};
+const styles = {
+    gridList: {width: '100%', height: 150, margin: 0},
+    smallIcon: {width: 20, height: 20, zIndex: 1},
+    overviewLegend: {fontSize: 10, color: '#fff'},
+    legendContainer: {width: '100%', textAlign: 'center', position: 'absolute', bottom: 5}
+};
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
@@ -86,40 +92,57 @@ export default class DistributedViewAppThumbnail extends React.Component {
             <div>
                 <Link style={{textDecoration: 'none'}}
                       to={window.contextPath + "/" + this.props.distributedApp.managerId + '/siddhi-apps/' + this.props.distributedApp.parentAppName}>
-                    <GridList cols={3} cellHeight={180}  style={styles.gridList}>
-
-                        <GridTile title="Groups" titlePosition="bottom" titleStyle={{fontSize: 10}} style={{marginLeft: '30%'}} data-tip
+                    <GridList cols={3} cellHeight={98} style={styles.gridList}>
+                        <GridTile data-tip
                                   data-for='groups'>
-                            <div className="grid-tile-h1" style={{marginTop: '50%',marginLeft:-50}}>
+                            <div className="grid-tile-h1" style={{marginTop: 30}}>
                                 <h1 className="deployed-apps-details">{this.props.distributedApp.numberOfGroups}</h1>
+                            </div>
+                            <div style={styles.legendContainer}>
+                                <Typography style={styles.overviewLegend} align={'center'}>
+                                    Groups
+                                </Typography>
                             </div>
                             <ToolTip id='groups' aria-haspopup='true' role='example'>
                                 <p>Indicates number of groups in the parent siddhi application</p>
                             </ToolTip>
 
                         </GridTile>
-                        <GridTile title="Child Apps" titlePosition="bottom" titleStyle={{fontSize: 10}} style={{marginLeft: '30%'}}>
-                            <div className="grid-tile-h1" style={{marginTop: '50%'}}><h1
-                                className="active-apps" data-tip data-for='deployedChildApps'>{this.props.distributedApp.deployedChildApps}</h1>
+                        <GridTile>
+                            <div className="grid-tile-h1" style={{marginTop: 30}}><h1
+                                className="active-apps" data-tip
+                                data-for='deployedChildApps'>{this.props.distributedApp.deployedChildApps}</h1>
                                 <h1 style={{display: 'inline'}}> | </h1>
                                 <h1 className="inactive-apps" data-tip data-for='notDeployedChildApps'>
                                     {this.props.distributedApp.notDeployedChildApps}
                                 </h1>
                             </div>
+                            <div style={styles.legendContainer}>
+                                <Typography style={styles.overviewLegend} align={'center'}>
+                                    Child Apps
+                                </Typography>
+                            </div>
                             <ToolTip id='deployedChildApps' aria-haspopup='true' role='example'>
-                            <p>Indicates number of deployed child apps</p>
+                                <p>Indicates number of deployed child apps</p>
                             </ToolTip>
                             <ToolTip id='notDeployedChildApps' aria-haspopup='true' role='example'>
                                 <p>Indicates number of un-deployed child apps</p>
                             </ToolTip>
                         </GridTile>
-                        <GridTile title="Worker Nodes" titlePosition="bottom" titleStyle={{fontSize: 10}} style={{marginLeft: '30%'}}>
-                            <div className="grid-tile-h1" style={{marginTop: '50%'}}><h1
-                                className="active-apps" data-tip data-for='usedWorkerNodes'>{this.props.distributedApp.usedWorkerNodes}</h1>
+                        <GridTile>
+                            <div className="grid-tile-h1" style={{marginTop: 30}}><h1
+                                className="active-apps" data-tip
+                                data-for='usedWorkerNodes'>{this.props.distributedApp.usedWorkerNodes}</h1>
                                 <h1 style={{display: 'inline'}}> | </h1>
-                                <h1 className="inactive-apps" style={{color:'orange'}} data-tip data-for='totalWorkerNodes'>
+                                <h1 className="inactive-apps" style={{color: 'orange'}} data-tip
+                                    data-for='totalWorkerNodes'>
                                     {this.props.distributedApp.totalWorkerNodes}
                                 </h1>
+                            </div>
+                            <div style={styles.legendContainer}>
+                                <Typography style={styles.overviewLegend} align={'center'}>
+                                    Worker Nodes
+                                </Typography>
                             </div>
                             <ToolTip id='usedWorkerNodes' aria-haspopup='true' role='example'>
                                 <p>Indicates number of worker nodes used in the <br/> particular parent siddhi
@@ -151,10 +174,10 @@ export default class DistributedViewAppThumbnail extends React.Component {
             <div>
                 <GridTile
                     title={this.props.distributedApp.parentAppName}
-                    actionIcon={<IconButton ><CircleBorder
+                    actionIcon={<IconButton><CircleBorder
                         color={items[1]}/></IconButton>}
                     actionPosition="left"
-                    style={{background: 'black'}}
+                    style={{background: 'black', marginBottom: '30px'}}
                     titleBackground={'#424242'}
                 >
                     <CardActions style={{boxSizing: 'border-box', float: 'right', display: 'inline', height: 20}}>
