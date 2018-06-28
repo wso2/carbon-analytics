@@ -30,6 +30,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                 this.application = options.application;
                 this.consoleListManager = options.application.outputController;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
@@ -189,7 +190,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     });
 
                     // perform JSON validation
-                    JSONValidator.prototype.validatePartition(partitionElement);
+                    JSONValidator.prototype.validatePartition(partitionElement, self.jsPlumbInstance, true);
 
                     // design view container and toggle view button are enabled
                     self.designViewContainer.removeClass('disableContainer');

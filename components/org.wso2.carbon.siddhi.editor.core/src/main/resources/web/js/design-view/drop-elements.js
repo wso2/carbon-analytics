@@ -1103,7 +1103,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
 
                 // perform JSON validation
-                JSONValidator.prototype.validatePartition(newPartition);
+                JSONValidator.prototype.validatePartition(newPartition, self.jsPlumbInstance, true);
             }
 
             // There will be always added a connection point by default

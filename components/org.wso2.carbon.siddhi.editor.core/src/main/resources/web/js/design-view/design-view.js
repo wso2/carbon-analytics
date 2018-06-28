@@ -143,8 +143,9 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
          * @return {boolean} return whether the json is valid or not
          */
         DesignView.prototype.validateJSONBeforeSendingToBackend = function (configurationJSON) {
+            var self = this;
             var jsonValidator = new JSONValidator();
-            return jsonValidator.validate(configurationJSON);
+            return jsonValidator.validate(configurationJSON, self.jsPlumbInstance);
         };
 
         DesignView.prototype.getDesign = function (code) {

@@ -1239,6 +1239,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     textNode.html(streamName);
                                     self.configurationData.getSiddhiAppConfig().removeStream(elementId);
                                     partition.addStream(streamObjectCopy);
+
+                                    JSONValidator.prototype
+                                        .validateInnerStream(streamObjectCopy, self.jsPlumbInstance, true);
                                 } else {
                                     isGroupMemberValid = false;
                                     errorMessage = ' An inner stream with the same name is already added to the ' +
@@ -1324,7 +1327,16 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 if (element !== undefined) {
                     var type = element.type;
                     var elementObject = element.element;
-                    if (type === 'WINDOW_FILTER_PROJECTION_QUERY') {
+                    if (type === 'STREAM') {
+                        // If this is an inner stream perform validation
+                        var streamSavedInsideAPartition
+                            = self.configurationData.getSiddhiAppConfig()
+                            .getStreamSavedInsideAPartition(elementObject.getId());
+                        // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
+                        if (streamSavedInsideAPartition !== undefined) {
+                            JSONValidator.prototype.validateInnerStream(elementObject, self.jsPlumbInstance, true);
+                        }
+                    } else if (type === 'WINDOW_FILTER_PROJECTION_QUERY') {
                         JSONValidator.prototype.validateWindowFilterProjectionQuery(elementObject,
                             doNotShowErrorMessages);
                     } else if (type === 'PATTERN_QUERY') {
@@ -1344,7 +1356,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     } else if (type === 'AGGREGATION') {
                         JSONValidator.prototype.validateAggregation(elementObject, doNotShowErrorMessages);
                     } else if (type === 'PARTITION') {
-                        JSONValidator.prototype.validatePartition(elementObject, doNotShowErrorMessages);
+                        JSONValidator.prototype.validatePartition(elementObject, self.jsPlumbInstance,
+                            doNotShowErrorMessages);
                     }
                 }
             }

@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designViewUtils'],
-    function (require, log, $, _, Attribute, Stream, DesignViewUtils) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designViewUtils', 'jsonValidator'],
+    function (require, log, $, _, Attribute, Stream, DesignViewUtils, JSONValidator) {
 
         var streamSchema = {
             type: "object",
@@ -102,6 +102,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -168,6 +169,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
                 var textNode = $('#' + i).find('.streamNameNode');
                 textNode.html(editor.getValue().name);
+
+                // If this is an inner stream perform validation
+                var streamSavedInsideAPartition
+                    = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(i);
+                // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
+                if (streamSavedInsideAPartition !== undefined) {
+                    JSONValidator.prototype.validateInnerStream(stream, self.jsPlumbInstance, true);
+                }
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -315,6 +324,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
                 var textNode = $(element).parent().find('.streamNameNode');
                 textNode.html(streamName);
+
+                // If this is an inner stream perform validation
+                var streamSavedInsideAPartition
+                    = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
+                // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
+                if (streamSavedInsideAPartition !== undefined) {
+                    JSONValidator.prototype.validateInnerStream(clickedElement, self.jsPlumbInstance, true);
+                }
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
