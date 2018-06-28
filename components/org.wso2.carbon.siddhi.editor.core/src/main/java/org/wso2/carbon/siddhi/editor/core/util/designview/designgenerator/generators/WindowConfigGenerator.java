@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Generator to create WindowConfig
  */
-public class WindowConfigGenerator {
+public class WindowConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;
 
     public WindowConfigGenerator(String siddhiAppString) {
@@ -48,14 +48,20 @@ public class WindowConfigGenerator {
         for (Expression expression : windowDefinition.getWindow().getParameters()) {
             parameters.add(ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));
         }
+        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
+        AttributeConfigListGenerator attributeConfigListGenerator = new AttributeConfigListGenerator();
+        WindowConfig windowConfig =
+                new WindowConfig(
+                        windowDefinition.getId(),
+                        windowDefinition.getId(),
+                        attributeConfigListGenerator.generateAttributeConfigList(windowDefinition.getAttributeList()),
+                        windowDefinition.getWindow().getName(),
+                        parameters,
+                        windowDefinition.getOutputEventType().name(),
+                        annotationConfigGenerator.generateAnnotationConfigList(windowDefinition.getAnnotations()));
+        preserveCodeSegmentsOf(annotationConfigGenerator, attributeConfigListGenerator);
+        preserveAndBindCodeSegment(windowDefinition, windowConfig);
 
-        return new WindowConfig(
-                windowDefinition.getId(),
-                windowDefinition.getId(),
-                new AttributeConfigListGenerator().generateAttributeConfigList(windowDefinition.getAttributeList()),
-                windowDefinition.getWindow().getName(),
-                parameters,
-                windowDefinition.getOutputEventType().name(),
-                new AnnotationConfigGenerator().generateAnnotationConfigList(windowDefinition.getAnnotations()));
+        return windowConfig;
     }
 }

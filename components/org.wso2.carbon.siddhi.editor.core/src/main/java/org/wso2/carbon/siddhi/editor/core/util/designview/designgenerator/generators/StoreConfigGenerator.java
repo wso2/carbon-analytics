@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * Generator to create Store config
  */
-public class StoreConfigGenerator {
+public class StoreConfigGenerator extends CodeSegmentsPreserver {
     public StoreConfig generateStoreConfig(Annotation storeAnnotation) throws DesignGenerationException {
         String type = null;
         Map<String, String> options = new HashMap<>();
@@ -40,13 +40,12 @@ public class StoreConfigGenerator {
                 options.put(element.getKey(), element.getValue());
             }
         }
-
         if (type == null) {
             throw new DesignGenerationException("Can not find type for the Store");
         }
+        StoreConfig storeConfig = new StoreConfig(type, options);
+        preserveAndBindCodeSegment(storeAnnotation, storeConfig);
 
-        return new StoreConfig(
-                type,
-                options);
+        return storeConfig;
     }
 }
