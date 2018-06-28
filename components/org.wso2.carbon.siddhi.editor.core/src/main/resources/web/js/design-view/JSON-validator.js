@@ -31,8 +31,9 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         /**
          * @function Validates a given JSON
          * @param JSON provided JSON
+         * @param jsPlumbInstance jsPlumb instance for the current tab
          */
-        JSONValidator.prototype.validate = function (JSON) {
+        JSONValidator.prototype.validate = function (JSON, jsPlumbInstance) {
             var self = this;
             var isValid = true;
             var commonErrorMessage = 'Siddhi app design contains errors';
@@ -135,7 +136,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(JSON.partitionList, function (partition) {
-                isValid = self.validatePartition(partition, true);
+                isValid = self.validatePartition(partition, jsPlumbInstance, true);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -147,6 +148,33 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             return isValid;
+        };
+
+        /**
+         * @function Validates a given stream by checking if it is an inner stream inside a partition, then checks
+         * whether it has a connection in
+         * @param innerStream inner stream json
+         * @param jsPlumbInstance jsPlumb instance for the current tab
+         * @param doNotShowErrorMessages If true error messages will not be shown as alerts. Only the validity will be
+         * returned
+         * @returns {boolean} validity of the json
+         */
+        JSONValidator.prototype.validateInnerStream = function (innerStream, jsPlumbInstance, doNotShowErrorMessages) {
+            var errorMessage;
+            removeTooltipErrorMessage(innerStream.id);
+            // check whether it has a connection in because there cannot be a inner stream without a 'connection-in'
+            var inConnections = jsPlumbInstance.getConnections({target: innerStream.id + '-in'});
+            if (inConnections.length === 0) {
+                errorMessage = 'Inner stream does not contain a connection input from an inner query';
+                highlightErrorElement(innerStream.id, errorMessage);
+                if (!doNotShowErrorMessages) {
+                    DesignViewUtils.prototype.errorAlert(errorMessage);
+                }
+                return false;
+            } else {
+                removeErrorHighlighter(innerStream.id);
+                return true;
+            }
         };
 
         /**
@@ -202,7 +230,8 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQuerySelectSection(aggregation.select, 'Aggregation', aggregation.id);
+            isValid = self.validateQuerySelectSection(aggregation.select, 'Aggregation', aggregation.id,
+                doNotShowErrorMessages);
             if (isValid) {
                 removeErrorHighlighter(aggregation.id);
             }
@@ -239,12 +268,12 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQueryOutputSection(query.queryOutput, 'Query', query.id);
+            isValid = self.validateQueryOutputSection(query.queryOutput, 'Query', query.id, doNotShowErrorMessages);
             if (!isValid) {
                 return isValid;
             }
 
-            isValid = self.validateQuerySelectSection(query.select, 'Query', query.id);
+            isValid = self.validateQuerySelectSection(query.select, 'Query', query.id, doNotShowErrorMessages);
 
             if (isValid) {
                 removeErrorHighlighter(query.id);
@@ -288,7 +317,8 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQueryOutputSection(query.queryOutput, 'Join query', query.id);
+            isValid = self.validateQueryOutputSection(query.queryOutput, 'Join query', query.id,
+                doNotShowErrorMessages);
             if (!isValid) {
                 return isValid;
             }
@@ -316,7 +346,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQuerySelectSection(query.select, 'Join query', query.id);
+            isValid = self.validateQuerySelectSection(query.select, 'Join query', query.id, doNotShowErrorMessages);
             if (isValid) {
                 removeErrorHighlighter(query.id);
             }
@@ -356,7 +386,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
 
             }
 
-            isValid = self.validateQueryOutputSection(query.queryOutput, type, query.id);
+            isValid = self.validateQueryOutputSection(query.queryOutput, type, query.id, doNotShowErrorMessages);
             if (!isValid) {
                 return isValid;
             }
@@ -377,7 +407,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             }
 
-            isValid = self.validateQuerySelectSection(query.select, type, query.id);
+            isValid = self.validateQuerySelectSection(query.select, type, query.id, doNotShowErrorMessages);
             if (isValid) {
                 removeErrorHighlighter(query.id);
             }
@@ -463,11 +493,12 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         /**
          * @function Validates a given partition json
          * @param partition partition json
+         * @param jsPlumbInstance jsPlumb instance for the current tab
          * @param doNotShowErrorMessages If true error messages will not be shown as alerts. Only the validity will be
          * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validatePartition = function (partition, doNotShowErrorMessages) {
+        JSONValidator.prototype.validatePartition = function (partition, jsPlumbInstance, doNotShowErrorMessages) {
             var self = this;
             var isValid = true;
             var errorMessage;
@@ -503,8 +534,20 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 removeErrorHighlighter(partition.id);
             }
 
+            _.forEach(partition.streamList, function (stream) {
+                isValid = self.validateInnerStream(stream, jsPlumbInstance, doNotShowErrorMessages);
+                if (!isValid) {
+                    // break the for each loop
+                    return false;
+                }
+            });
+
+            if (!isValid) {
+                return false;
+            }
+
             _.forEach(partition.queryLists.WINDOW_FILTER_PROJECTION, function (query) {
-                isValid = self.validateWindowFilterProjectionQuery(query);
+                isValid = self.validateWindowFilterProjectionQuery(query, doNotShowErrorMessages);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -516,7 +559,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(partition.queryLists.JOIN, function (query) {
-                isValid = self.validateJoinQuery(query);
+                isValid = self.validateJoinQuery(query, doNotShowErrorMessages);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -528,7 +571,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(partition.queryLists.PATTERN, function (query) {
-                isValid = self.validatePatternOrSequenceQuery(query, 'Pattern Query');
+                isValid = self.validatePatternOrSequenceQuery(query, 'Pattern Query', doNotShowErrorMessages);
                 if (!isValid) {
                     // break the for each loop
                     return false;
@@ -540,7 +583,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
 
             _.forEach(partition.queryLists.SEQUENCE, function (query) {
-                isValid = self.validatePatternOrSequenceQuery(query, 'Sequence Query');
+                isValid = self.validatePatternOrSequenceQuery(query, 'Sequence Query', doNotShowErrorMessages);
                 if (!isValid) {
                     // break the for each loop
                     return false;

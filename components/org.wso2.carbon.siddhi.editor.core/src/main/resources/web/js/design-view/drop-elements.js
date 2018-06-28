@@ -754,7 +754,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.getSiddhiAppConfig().addWindowFilterProjectionQuery(query);
 
                 // perform JSON validation
-                JSONValidator.prototype.validateWindowFilterProjectionQuery(query);
+                JSONValidator.prototype.validateWindowFilterProjectionQuery(query, true);
             }
             var settingsIconId = "" + i + "-dropQuerySettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
@@ -833,7 +833,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.getSiddhiAppConfig().addPatternQuery(patternQuery);
 
                 // perform JSON validation
-                JSONValidator.prototype.validatePatternOrSequenceQuery(patternQuery, 'Pattern Query');
+                JSONValidator.prototype.validatePatternOrSequenceQuery(patternQuery, 'Pattern Query', true);
             }
 
             /*
@@ -920,7 +920,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
                 // perform JSON validation
                 JSONValidator.prototype
-                    .validatePatternOrSequenceQuery(sequenceQuery,'Sequence Query');
+                    .validatePatternOrSequenceQuery(sequenceQuery,'Sequence Query', true);
             }
 
             /*
@@ -1005,7 +1005,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.getSiddhiAppConfig().addJoinQuery(query);
 
                 // perform JSON validation
-                JSONValidator.prototype.validateJoinQuery(query);
+                JSONValidator.prototype.validateJoinQuery(query, true);
             }
             var settingsIconId = "" + i + "-dropJoinQuerySettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
@@ -1103,7 +1103,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
 
                 // perform JSON validation
-                JSONValidator.prototype.validatePartition(newPartition);
+                JSONValidator.prototype.validatePartition(newPartition, self.jsPlumbInstance, true);
             }
 
             // There will be always added a connection point by default
