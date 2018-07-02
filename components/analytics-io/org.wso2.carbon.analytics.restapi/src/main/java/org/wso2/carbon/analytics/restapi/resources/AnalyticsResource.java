@@ -493,6 +493,7 @@ public class AnalyticsResource extends AbstractResource {
                 }
                 recordWriter.write(STR_JSON_ARRAY_CLOSING_SQUARE_BRACKET);
                 recordWriter.flush();
+                recordWriter.close();
             }
         };
 	}
