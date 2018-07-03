@@ -65,7 +65,6 @@ body {
 }
 
 .navigation-bar {
-    width: 100%;
     background-color: #424242;
 }
 
@@ -390,11 +389,12 @@ p.node-last-update {
     color: #fff;
     font-size: 14px;
     text-align: left;
-    float: right;
     width: 100%;
     max-width: 440px;
     padding: 10px;
     background: #333;
+    position: absolute;
+    right: 40px;
 }
 
 .legend-key {

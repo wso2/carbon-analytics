@@ -20,7 +20,7 @@
 import React from 'react';
 import {Link, Redirect} from 'react-router-dom';
 //Material UI
-import {FlatButton, GridList, GridTile, RaisedButton} from 'material-ui';
+import {Button, Typography} from 'material-ui-next';
 import HomeButton from 'material-ui/svg-icons/action/home';
 //App Components
 import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
@@ -37,7 +37,13 @@ import JVMOsLoad from './JVMOsLoad';
 import JVMLoad from './JVMLoad';
 import JVMOTotalMemory from './JVMTotalMemory';
 
-const cardStyle = {padding: 30, width: '90%'};
+const styles = {
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
+};
 /**
  * class to manage worker history details.
  */
@@ -173,32 +179,32 @@ export default class WorkerHistoryMore extends React.Component {
             );
         } else {
             return (
-                <div>
-                    <div style={cardStyle}>
+                <div style={{padding: '20px 24px'}}>
+                    <div>
                         <JVMLoading
                             data={[this.state.jvmClassLoadingLoadedTotal,
                                 this.state.jvmClassLoadingLoadedCurrent,
                                 this.state.jvmClassLoadingUnloadedTotal]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMOsLoad data={[
                             this.state.jvmOsCpuLoadProcess,
                             this.state.jvmOsCpuLoadSystem
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMLoad data={[
                             this.state.jvmOsSystemLoadAverage
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMOsPhysicalMemory
                             data={[
                                 this.state.jvmOsPhysicalMemoryFreeSize,
                                 this.state.jvmOsPhysicalMemoryTotalSize,
                                 this.state.jvmOsVirtualMemoryCommittedSize]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMOTotalMemory
                             data={[
                                 this.state.jvmMemoryTotalCommitted,
@@ -206,13 +212,13 @@ export default class WorkerHistoryMore extends React.Component {
                                 this.state.jvmMemoryTotalMax,
                                 this.state.jvmMemoryTotalUsed]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMSwap
                             data={[
                                 this.state.jvmOsSwapSpaceFreeSize,
                                 this.state.jvmOsSwapSpaceTotalSize]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMThread data={[
                             this.state.jvmThreadsCount,
                             this.state.jvmThreadsDaemonCount,
@@ -226,7 +232,7 @@ export default class WorkerHistoryMore extends React.Component {
                         ]}
                         />
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <HeapMemory data={[
                             this.state.jvmMemoryHeapInit,
                             this.state.jvmMemoryHeapUsed,
@@ -235,7 +241,7 @@ export default class WorkerHistoryMore extends React.Component {
                             this.state.jvmMemoryHeapUsage
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <NonHeapMemory data={[
                             this.state.jvmMemoryNonHeapInit,
                             this.state.jvmMemoryNonHeapUsed,
@@ -245,7 +251,7 @@ export default class WorkerHistoryMore extends React.Component {
 
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMGarbageCOllector data={[
                             this.state.jvmGcPsMarksweepCount,
                             this.state.jvmGcPsMarksweepTime,
@@ -253,7 +259,7 @@ export default class WorkerHistoryMore extends React.Component {
                             this.state.jvmGcPsScavengeTime
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <FileDescriptor data={[
                             this.state.jvmOsFileDescriptorOpenCount,
                             this.state.jvmOsFileDescriptorMaxCount]}
@@ -272,20 +278,31 @@ export default class WorkerHistoryMore extends React.Component {
         }
         return (
             <div>
-                <div className="navigation-bar">
-                    <Header/>
-                    <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                              icon={<HomeButton color="black"/>}/></Link>
-                    <Link to={window.contextPath + '/worker/' + this.props.match.params.id}>
-                        <FlatButton label={this.state.workerID + " >"}/></Link>
-                    <Link to={window.contextPath + '/worker/history/' + this.props.match.params.id}><FlatButton
-                        label="Metrics >"/></Link>
-                    <RaisedButton label="More" disabled disabledLabelColor='white'
-                                  disabledBackgroundColor='#f17b31'/>
+                <Header/>
+                <div style={styles.navBar} className="navigation-bar">
+                    <Link  style={{textDecoration: 'none'}} to={window.contextPath}>
+                        <Button style={styles.navBtn}>
+                            <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                            Overview >
+                        </Button>
+                    </Link>
+                    <Link  style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
+                        this.props.match.params.id}>
+                        <Button style={styles.navBtn}>
+                            {this.state.workerID} >
+                        </Button>
+                    </Link>
+                    <Link  style={{textDecoration: 'none'}} to={window.contextPath + '/worker/history/' +
+                        this.props.match.params.id}>
+                        <Button style={styles.navBtn}>
+                            Metrics >
+                        </Button>
+                    </Link>
+                    <Typography style={styles.navBtnActive}>More</Typography>
                 </div>
-                <div className="worker-h1">
-                    <h2 style={{marginLeft: 40}}> {this.state.workerID} Metrics </h2>
-                </div>
+                <Typography variant="title" style={styles.titleStyle}>
+                    {this.state.workerID} Metrics
+                </Typography>
 
                 {this.renderCharts()}
             </div>

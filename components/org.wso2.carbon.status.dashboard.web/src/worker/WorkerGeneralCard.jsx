@@ -27,7 +27,7 @@ import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI
 
 const styles = {
     borderBottom: {borderBottomColor: 'rgba(215,215,215,0.05)'},
-    rowColor: {color: 'rgba(255,255,255,0.87)'}, length: {width: 200}
+    rowColor: {color: 'rgba(255,255,255,0.87)'}, length: {width: 150}
 };
 
 /**
@@ -123,7 +123,7 @@ export default class WorkerGeneralCard extends React.Component {
     render() {
         if (!this.state.isApiCalled) {
             return (
-                <div style={{paddingLeft: 20, width: '30%', float: 'left', boxSizing: 'border-box'}}>
+                <div style={{paddingLeft: 24, width: '30%', float: 'left', boxSizing: 'border-box'}}>
                     <Card style={{height: 660}}>
                         <CardTitle title="Server General Details"/>
                         <Divider/>
@@ -140,13 +140,13 @@ export default class WorkerGeneralCard extends React.Component {
             );
         }
         return (
-            <div style={{paddingLeft: 20, width: '30%', float: 'left', boxSizing: 'border-box'}}>
+            <div style={{paddingLeft: 24, width: '30%', float: 'left', boxSizing: 'border-box'}}>
                 <Card style={{height: 660}}>
-                    <CardTitle title="Server General Details"/>
-                    <Divider/>
-                    <CardText style={{textAlign: 'left'}}>
+                    <CardTitle titleStyle={{fontSize: 16, lineHeight: '48px', color: '#fff'}}
+                               style={{padding: '0 16px'}} title="Server General Details"/>
+                    <CardText style={{textAlign: 'left', padding: 0}}>
                         <Table
-                            height={560}
+                            height={612}
                             fixedHeader={false}
                             fixedFooter={false}
                             selectable={false}

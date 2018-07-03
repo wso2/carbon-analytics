@@ -44,11 +44,12 @@ const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '100%', padding: '40px 24px', margin: 0},
     h3Title: {color: '#dedede', marginLeft: '24px', fontWeight: '400'},
-    titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
     divider: {backgroundColor: '#9E9E9E', width: 'calc(100% - 48px)', margin: '-16px 24px 0 24px'},
-    navBtn: {color: '#BDBDBD', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
     alignCenter: {display: 'flex', alignItems: 'center'},
     addBtn: {
         backgroundColor: '#f17b31',
@@ -675,22 +676,16 @@ export default class WorkerOverview extends React.Component {
             return (
                 <div>
                     <Header/>
-                    <div className="navigation-bar">
+                    <div style={styles.navBar} className="navigation-bar">
                         <Button style={styles.navBtn}>
                             <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
                             Overview
                         </Button>
                     </div>
-                    <Typography variant="display2" className={'node-title'} style={{
-                        marginTop: '20px',
-                        color: '#dedede',
-                        marginLeft: '24px',
-                        backgroundColor: '#222222',
-                        fontSize: '1.6rem'
-                    }}>
+                    <Typography variant="title" style={styles.titleStyle}>
                         Node Overview
                     </Typography>
-                    <div style={{marginTop: '-23px', marginRight: '24px', fontSize: '0.875rem'}}>
+                    <div style={{marginTop: '-26px', marginRight: '24px', fontSize: '0.875rem'}}>
                         <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right', paddingLeft: 10}}
                               to={window.contextPath}>Node View</Link>
 

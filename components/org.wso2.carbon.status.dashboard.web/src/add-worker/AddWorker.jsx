@@ -27,7 +27,7 @@ import '../../public/css/dashboard.css';
 // Material UI
 import HomeButton from 'material-ui/svg-icons/action/home';
 import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from 'material-ui';
-import {Button} from 'material-ui-next';
+import {Button, Typography} from 'material-ui-next';
 // CSS
 import '../../public/css/dashboard.css';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
@@ -53,8 +53,10 @@ const styles = {
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
     divider: {backgroundColor: '#9E9E9E', width: 'calc(100% - 48px)', margin: '-22px 24px 0 24px'},
-    navBtn: {color: '#BDBDBD', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize'},
-    navBtnActive: {color: '#FF5722', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    navBar: {padding: '0 15px'},
 };
 
 /**
@@ -435,15 +437,14 @@ export default class AddWorker extends React.Component {
                     </Dialog>
 
                     <Header/>
-                    <div className="navigation-bar">
+                    <div style={styles.navBar} className="navigation-bar">
                         <Link style={{textDecoration: 'none'}} to={window.contextPath}>
                             <Button style={styles.navBtn}>
                                 <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
                                 Overview >
                             </Button>
                         </Link>
-                        <RaisedButton label="Add New" disabled disabledLabelColor='white'
-                                      disabledBackgroundColor='#f17b31'/>
+                        <Typography style={styles.navBtnActive}>Add New</Typography>
                     </div>
                     <MuiThemeProvider muiTheme={muiTheme}>
                         <div className="addWorker-container">

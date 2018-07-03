@@ -99,15 +99,16 @@ export default class JVMThread extends React.Component {
         if (this.state.count.length === 0 && this.state.daemonCount.length === 0 &&
             this.state.jvmThreadsBlockedCount.length === 0) {
             return (
-                <div style={{paddingLeft: 10}}>
+                <div>
                     <Card>
                         <CardHeader
                             title="Threads"
                         />
                         <Divider/>
                         <CardMedia>
-                            <div style={{backgroundColor: '#131313'}}>
-                                <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+                                color: '#9c9898'}}>
+                                No Data Available
                             </div>
                         </CardMedia>
                     </Card>
@@ -131,7 +132,7 @@ export default class JVMThread extends React.Component {
         let data = DashboardUtils.getCombinedChartList(data7, this.state.jvmThreadsWaitingCount);
         let y = DashboardUtils.getCombinedYDomain(this.state.jvmThreadsWaitingCount, y7);
         return (
-            <div style={{paddingLeft: 10}}>
+            <div>
                 <ChartCard data={data} yDomain={y}
                            metadata={threadMetadata} config={threadLineChartConfig} title="Threads"/>
             </div>

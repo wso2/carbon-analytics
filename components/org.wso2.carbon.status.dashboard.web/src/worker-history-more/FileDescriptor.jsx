@@ -72,15 +72,16 @@ export default class FileDescriptor extends React.Component {
         if (this.state.jvmOsFileDescriptorOpenCount.length === 0 &&
             this.state.jvmOsFileDescriptorMaxCount.length === 0) {
             return (
-                <div style={{paddingLeft: 10}}>
+                <div>
                     <Card>
                         <CardHeader
                             title="File Descriptor"
                         />
                         <Divider/>
                         <CardMedia>
-                            <div style={{backgroundColor: '#131313'}}>
-                                <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+                                color: '#9c9898'}}>
+                                No Data Available
                             </div>
                         </CardMedia>
                     </Card>
@@ -90,7 +91,7 @@ export default class FileDescriptor extends React.Component {
         let intY = DashboardUtils
             .initCombinedYDomain(this.state.jvmOsFileDescriptorOpenCount, this.state.jvmOsFileDescriptorMaxCount);
         return (
-            <div style={{paddingLeft: 10}}>
+            <div>
                 <ChartCard data={DashboardUtils.getCombinedChartList(this.state.jvmOsFileDescriptorOpenCount,
                     this.state.jvmOsFileDescriptorMaxCount)}
                            metadata={metadata} config={chartConfig} title="File Descriptor" yDomain={intY}/>
