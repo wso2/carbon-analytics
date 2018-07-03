@@ -21,7 +21,7 @@ import React from 'react';
 import DashboardUtils from '../utils/DashboardUtils';
 import ChartCard from '../common/ChartCard';
 //Material UI
-import {Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui';
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
 
 const swapMetadata = {names: ['Time', 'free swap size', 'total swap size'], types: ['time', 'linear', 'linear']};
 
@@ -71,7 +71,7 @@ export default class JVMSwap extends React.Component {
         };
         if (this.state.freeSize.length === 0 && this.state.totalSize.length === 0) {
             return (
-                <div style={{paddingLeft: 10}}>
+                <div>
                     <Card>
                         <CardHeader
                             title="JVM Swap Space"
@@ -88,7 +88,7 @@ export default class JVMSwap extends React.Component {
         }
         let y = DashboardUtils.initCombinedYDomain(this.state.freeSize, this.state.totalSize);
         return (
-            <div style={{paddingLeft: 10}}>
+            <div>
                 <ChartCard data={DashboardUtils.getCombinedChartList(this.state.freeSize, this.state.totalSize)}
                            yDomain={y} metadata={swapMetadata} config={swapLineChartConfig} title="JVM Swap Space"/>
             </div>

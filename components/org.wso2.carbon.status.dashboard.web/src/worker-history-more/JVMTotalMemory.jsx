@@ -84,15 +84,16 @@ export default class JVMOTotalMemory extends React.Component {
             && this.state.virtualMemory.length === 0 && this.state.jvmMemoryPoolsSize.length === 0 &&
             this.jvmMemoryTotalUsed.length === 0) {
             return (
-                <div style={{paddingLeft: 10}}>
+                <div>
                     <Card>
                         <CardHeader
                             title="JVM Total Memory (bytes)"
                         />
                         <Divider/>
                         <CardMedia>
-                            <div style={{backgroundColor: '#131313'}}>
-                                <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+                                color: '#9c9898'}}>
+                                No Data Available
                             </div>
                         </CardMedia>
                     </Card>
@@ -109,7 +110,7 @@ export default class JVMOTotalMemory extends React.Component {
         let data = DashboardUtils.getCombinedChartList(data4, this.state.jvmMemoryTotalUsed);
         let y = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryTotalUsed, y4);
         return (
-            <div style={{paddingLeft: 10}}>
+            <div>
                 <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig} yDomain={y}
                            title="JVM Total Memory (bytes)"/>
             </div>

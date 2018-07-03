@@ -86,15 +86,16 @@ export default class HeapMemory extends React.Component {
             && this.state.jvmMemoryHeapCommitted.length === 0 && this.state.jvmMemoryHeapMax.length === 0 &&
             this.state.jvmMemoryHeapUsage.length === 0) {
             return (
-                <div style={{paddingLeft: 10}}>
+                <div>
                     <Card>
                         <CardHeader
                             title="JVM Heap Memory (bytes)"
                         />
                         <Divider/>
                         <CardMedia>
-                            <div style={{backgroundColor: '#131313'}}>
-                                <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+                                color: '#9c9898'}}>
+                                No Data Available
                             </div>
                         </CardMedia>
                     </Card>
@@ -110,7 +111,7 @@ export default class HeapMemory extends React.Component {
         let data = DashboardUtils.getCombinedChartList(data3, this.state.jvmMemoryHeapUsage);
         let y = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryHeapUsage, y3);
         return (
-            <div style={{paddingLeft: 10}}>
+            <div>
                 <ChartCard data={data} yDomain={y}
                            metadata={metadata} config={chartConfig} title="JVM Heap Memory"/>
             </div>

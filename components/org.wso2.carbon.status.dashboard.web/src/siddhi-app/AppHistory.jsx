@@ -25,7 +25,8 @@ import ChartCard from '../common/ChartCard';
 import Header from '../common/Header';
 //Material UI
 import HomeButton from 'material-ui/svg-icons/action/home';
-import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from 'material-ui';
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
+import {Button, Typography} from 'material-ui-next';
 import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
@@ -33,15 +34,21 @@ import AuthManager from '../auth/utils/AuthManager';
 import Error403 from '../error-pages/Error403';
 
 const styles = {
-    button: {margin: 12, backgroundColor: '#f17b31', fontSize: 10}
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
+    button: {margin: 0, fontSize: 10, borderLeft: '1px solid #4c4c4c', borderRadius: 0}
 };
+
 const memoryMetadata = {names: ['Time', 'Memory(bytes)'], types: ['time', 'linear']};
 
 const latencyMetadata = {names: ['Time', 'Latency(milliseconds)'], types: ['time', 'linear']};
 
 const tpMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
 
-const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
+const toolBar = {position: 'absolute', top: 85, right: 15, padding: 0, backgroundColor: 'transparent'};
 
 /**
  * class which manages Siddhi App history details.
@@ -281,16 +288,10 @@ export default class AppSpecific extends React.Component {
             );
         } else {
             return (
-                <div style={{width: '90%', marginLeft: '10px'}}>
-                    <div style={{padding: 30}}>
-                        {this.renderLatencyChart()}
-                    </div>
-                    <div style={{padding: 30}}>
-                        {this.renderMemoryChart()}
-                    </div>
-                    <div style={{padding: 30}}>
-                        {this.renderThroughputChart()}
-                    </div>
+                <div style={{padding: '30px 24px'}}>
+                    {this.renderLatencyChart()}
+                    {this.renderMemoryChart()}
+                    {this.renderThroughputChart()}
                 </div>
             );
         }
@@ -310,21 +311,31 @@ export default class AppSpecific extends React.Component {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     <Header/>
-                    <div className="navigation-bar">
-                        <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/></Link>
-                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id}>
-                            <FlatButton label={this.state.workerID + " >"}/></Link>
-                        <Link
-                            to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
-                            this.props.match.params.appName + '/' + this.state.statsEnable}>
-                            <FlatButton label={this.props.match.params.appName + " >"}/></Link>
-                        <RaisedButton label="Metrics" disabled disabledLabelColor='white'
-                                      disabledBackgroundColor='#f17b31'/>
+                    <div style={styles.navBar} className="navigation-bar">
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath}>
+                            <Button style={styles.navBtn}>
+                                <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                                Overview >
+                            </Button>
+                        </Link>
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
+                        this.props.match.params.id}>
+                            <Button style={styles.navBtn}>
+                                {this.state.workerID} >
+                            </Button>
+                        </Link>
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
+                        this.props.match.params.id + '/siddhi-apps/' + this.props.match.params.appName + '/' +
+                        this.state.statsEnable}>
+                            <Button style={styles.navBtn}>
+                                {this.props.match.params.appName} >
+                            </Button>
+                        </Link>
+                        <Typography style={styles.navBtnActive}>Metrics</Typography>
                     </div>
-                    <div className="worker-h1">
-                        <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
-                    </div>
+                    <Typography variant="title" style={styles.titleStyle}>
+                        {this.state.workerID} : {this.state.appName} Metrics
+                    </Typography>
                     <Toolbar style={toolBar}>
                         <ToolbarGroup firstChild={true}>
                             <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}

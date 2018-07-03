@@ -30,12 +30,20 @@ import Header from '../common/Header';
 import RaisedButton from 'material-ui/RaisedButton';
 import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 import HomeButton from 'material-ui/svg-icons/action/home';
-import {Card, CardHeader, CardMedia, Divider, FlatButton} from 'material-ui';
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
+import {Button, Typography} from 'material-ui-next';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import Error403 from '../error-pages/Error403';
 import AuthManager from '../auth/utils/AuthManager';
 
-const styles = {button: {margin: 12, backgroundColor: '#f17b31', fontSize: 10}};
+const styles = {
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
+    button: {margin: 0, fontSize: 10, borderLeft: '1px solid #4c4c4c', borderRadius: 0}
+};
 const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const memoryMetadata = {
     names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
@@ -43,7 +51,12 @@ const memoryMetadata = {
 };
 const loadAvgMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
 const throughputMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
-
+const noData = [
+    <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+        color: '#9c9898'}}>
+        No Data Available
+    </div>
+];
 
 /**
  * class which manages worker history details.
@@ -188,9 +201,7 @@ export default class WorkerHistory extends React.Component {
             return (
                 <Card><CardHeader title="CPU Usage"/><Divider/>
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
-                        </div>
+                        {noData}
                     </CardMedia>
                 </Card>
             );
@@ -230,9 +241,7 @@ export default class WorkerHistory extends React.Component {
             return (
                 <Card><CardHeader title="Memory Usage"/><Divider/>
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
-                        </div>
+                        {noData}
                     </CardMedia>
                 </Card>
             );
@@ -270,9 +279,7 @@ export default class WorkerHistory extends React.Component {
             return (
                 <Card><CardHeader title="Load Average"/><Divider/>
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
-                        </div>
+                        {noData}
                     </CardMedia>
                 </Card>
             );
@@ -307,9 +314,7 @@ export default class WorkerHistory extends React.Component {
             return (
                 <Card><CardHeader title="Throughput"/><Divider/>
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
-                        </div>
+                        {noData}
                     </CardMedia>
                 </Card>
             );
@@ -337,29 +342,16 @@ export default class WorkerHistory extends React.Component {
             );
         } else {
             return (
-                <div style={{width: '90%', marginLeft: '10px'}}>
-                    <div style={{padding: 30}}>
-                        {this.renderCpuChart()}
-                    </div>
-
-                    <div style={{padding: 30}}>
-                        {this.renderMemoryChart()}
-                    </div>
-
-                    <div style={{padding: 30}}>
-                        {this.renderLoadAverageChart()}
-                    </div>
-
-                    <div style={{padding: 30}}>
-                        {this.renderThroughputChart()}
-                    </div>
-
-                    <div style={{marginLeft: '89%'}}>
-                        <Link to={window.contextPath + '/worker/history/' + this.props.match.params.id + '/more'}>
-                            <RaisedButton label="More Details" style={styles.button}
-                                          backgroundColor='#f17b31'/>
-                        </Link>
-                    </div>
+                <div style={{padding: '30px 24px'}}>
+                    {this.renderCpuChart()}
+                    {this.renderMemoryChart()}
+                    {this.renderLoadAverageChart()}
+                    {this.renderThroughputChart()}
+                    <Link style={{float: 'right', margin: '20px 0'}} to={window.contextPath + '/worker/history/' +
+                        this.props.match.params.id + '/more'}>
+                        <RaisedButton label="More Details" style={styles.button}
+                                      backgroundColor='#f17b31'/>
+                    </Link>
                 </div>
             );
         }
@@ -375,19 +367,26 @@ export default class WorkerHistory extends React.Component {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     <Header/>
-                    <div className="navigation-bar">
-                        <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/>
+                    <div style={styles.navBar} className="navigation-bar">
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath}>
+                            <Button style={styles.navBtn}>
+                                <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                                Overview >
+                            </Button>
                         </Link>
-                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id}>
-                            <FlatButton label={this.state.workerID + " >"}/></Link>
-                        <RaisedButton label="Metrics" disabled disabledLabelColor='white'
-                                      disabledBackgroundColor='#f17b31'/>
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
+                            this.props.match.params.id}>
+                            <Button style={styles.navBtn}>
+                                {this.state.workerID} >
+                            </Button>
+                        </Link>
+                        <Typography style={styles.navBtnActive}>Metrics</Typography>
                     </div>
-                    <div className="worker-h1">
-                        <h2 style={{marginLeft: 40}}> {this.state.workerID} Metrics </h2>
-                    </div>
-                    <Toolbar style={{width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'}}>
+                    <Typography variant="title" style={styles.titleStyle}>
+                        {this.state.workerID} Metrics
+                    </Typography>
+                    <Toolbar style={{position: 'absolute', top: 85, right: 15, padding: 0,
+                        backgroundColor: 'transparent'}}>
                         <ToolbarGroup firstChild={true}>
                             <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
                                           onClick={() => this.handleChange('5min')}

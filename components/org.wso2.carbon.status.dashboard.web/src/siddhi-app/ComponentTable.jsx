@@ -27,7 +27,7 @@ import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow,
 import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
 
 const styles = {
-    header: {color: '#dedede'},
+    header: {color: '#dedede', fontSize: 14, fontWeight: 500},
     tableRow: {
         borderLeft: '1px solid rgb(120, 120, 120)'
     },
@@ -96,11 +96,11 @@ export default class ComponentTable extends React.Component {
                 <TableHeader displaySelectAll={false}
                              adjustForCheckbox={false}>
                     <TableRow>
-                        <TableHeaderColumn style={{color: '#dedede', width: '25%'}}>Type</TableHeaderColumn>
-                        <TableHeaderColumn style={{color: '#dedede', width: '25%'}}>Name</TableHeaderColumn>
-                        <TableHeaderColumn style={{color: '#dedede', width: '11.4%'}}>Total Events(events)</TableHeaderColumn>
-                        <TableHeaderColumn style={{color: '#dedede', width: '19.25%'}}>Metric Type</TableHeaderColumn>
-                        <TableHeaderColumn style={{color: '#dedede'}}>Value</TableHeaderColumn>
+                        <TableHeaderColumn width={'25%'} style={styles.header}>Type</TableHeaderColumn>
+                        <TableHeaderColumn width={'25%'} style={styles.header}>Name</TableHeaderColumn>
+                        <TableHeaderColumn width={'11.4%'} style={styles.header}>Total Events(events)</TableHeaderColumn>
+                        <TableHeaderColumn width={'19.25%'} style={styles.header}>Metric Type</TableHeaderColumn>
+                        <TableHeaderColumn style={styles.header}>Value</TableHeaderColumn>
                     </TableRow>
                 </TableHeader>
                 <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
@@ -110,7 +110,7 @@ export default class ComponentTable extends React.Component {
                                 borderBottom: '2px solid rgb(200, 200, 200)',
                             }}>
                                 <TableRowColumn
-                                    style={{fontSize: '20px', width: '25%'}}>{component.type}</TableRowColumn>
+                                    style={{width: '25%'}}>{component.type}</TableRowColumn>
                                 <TableRowColumn style={{paddingLeft: 0, paddingRight: 0, width: '75%'}}>
                                     {component.data.map((components, index) => {
                                         if (index + 1 === component.data.length) {
