@@ -59,6 +59,7 @@ public class AnalyticsDataServiceConfiguration {
 
     private int queueCleanupThreshold = Constants.DEFAULT_INDEXING_QUEUE_CLEANUP_THRESHOLD;
     private boolean lowercaseExpandedTerms = Constants.DEFAULT_LOWERCASE_EXPANDED_TERMS;
+    private int localIndexDataQueuePageSize;
 
     @XmlElement (name = "analytics-record-store", nillable = false)
     public AnalyticsRecordStoreConfiguration[] getAnalyticsRecordStoreConfigurations() {
@@ -206,4 +207,12 @@ public class AnalyticsDataServiceConfiguration {
         this.lowercaseExpandedTerms = lowercaseExpandedTerms;
     }
 
+    @XmlElement( name = "localIndexDataQueuePageSize")
+    public int getLocalIndexDataQueuePageSize() {
+        return localIndexDataQueuePageSize;
+    }
+
+    public void setLocalIndexDataQueuePageSize(int localIndexDataQueuePageSize) {
+        this.localIndexDataQueuePageSize = localIndexDataQueuePageSize;
+    }
 }

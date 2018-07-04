@@ -23,6 +23,7 @@ import com.leansoft.bigqueue.IBigQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dataservice.commons.exception.AnalyticsInterruptException;
+import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
 import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.datasource.commons.Record;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -213,6 +214,11 @@ public class LocalIndexDataStore {
             String path = Constants.DEFAULT_LOCAL_INDEX_STAGING_LOCATION;
             path = GenericUtils.resolveLocation(path);
             try {
+                int pageSize = AnalyticsServiceHolder.getAnalyticsDataServiceConfiguration().
+                        getLocalIndexDataQueuePageSize();
+                if (pageSize != 0) {
+                    return new BigQueueImpl(path, queueId, pageSize);
+                }
                 return new BigQueueImpl(path, queueId);
             } catch (IOException e) {
                 throw new AnalyticsException("Error in creating queue: " + e.getMessage(), e);
