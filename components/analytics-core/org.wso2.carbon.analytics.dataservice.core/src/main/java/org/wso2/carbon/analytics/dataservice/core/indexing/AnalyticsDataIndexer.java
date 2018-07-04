@@ -1382,18 +1382,33 @@ public class AnalyticsDataIndexer {
         }
     }
 
-    public Map<Integer, List<Record>> extractShardedRecords(List<Record> records) {
+    public Map<Integer, List<Record>> extractShardedRecords(List<Record> records) throws AnalyticsException {
         Map<Integer, List<Record>> result = new HashMap<>();
         int shardIndex;
-        List<Record> shardedList;
-        for (Record record : records) {
-            shardIndex = this.calculateShardId(record.getId());
-            shardedList = result.get(shardIndex);
-            if (shardedList == null) {
-                shardedList = new ArrayList<>();
-                result.put(shardIndex, shardedList);
+        Map<String, ColumnDefinition> indexedColumns;
+
+        if (!records.isEmpty()) {
+            int tenantId = records.get(0).getTenantId();
+            String tableName = records.get(0).getTableName();
+            indexedColumns = getAnalyticsDataService().getTableSchema(tenantId, tableName).getIndexedColumns();
+
+            List<Record> shardedList;
+            for (Record record : records) {
+                shardIndex = this.calculateShardId(record.getId());
+                shardedList = result.get(shardIndex);
+                if (shardedList == null) {
+                    shardedList = new ArrayList<>();
+                    result.put(shardIndex, shardedList);
+                }
+
+                //filter out the columns which need to be indexed and other columns are ignored.
+                Map<String, Object> values = record.getValues();
+                values.keySet().retainAll(indexedColumns.keySet());
+
+                //create a new record containing only the indexed columns
+                shardedList.add(new Record(record.getId(), record.getTenantId(), record.getTableName(), values,
+                        record.getTimestamp()));
             }
-            shardedList.add(record);
         }
         return result;
     }
