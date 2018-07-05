@@ -18,12 +18,13 @@
 
 package org.wso2.carbon.event.simulator.core.exception;
 
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+
 /**
  * customized exception class for validation whethere the number of attributes generated is equal to the number of
  * attributes in stream
  */
-public class InsufficientAttributesException extends Exception {
-
+public class InsufficientAttributesException extends SimulationValidationException {
 
     /**
      * Throws customizes validating the number of attributes generated
@@ -34,6 +35,10 @@ public class InsufficientAttributesException extends Exception {
         super(message);
     }
 
+    public InsufficientAttributesException(ResourceNotFoundException.ResourceType resourceType,
+                                           String resourceName, String message) {
+        super(message, resourceType, resourceName);
+    }
 
     /**
      * Throws customizes validating the number of attributes generated

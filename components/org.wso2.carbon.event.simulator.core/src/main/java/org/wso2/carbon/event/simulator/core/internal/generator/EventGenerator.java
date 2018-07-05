@@ -21,6 +21,7 @@ package org.wso2.carbon.event.simulator.core.internal.generator;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.carbon.event.simulator.core.exception.SimulationValidationException;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 
@@ -30,7 +31,7 @@ import org.wso2.siddhi.core.event.Event;
 public interface EventGenerator {
 
     void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, String simulationName)
-            throws InvalidConfigException, ResourceNotFoundException;
+            throws SimulationValidationException;
 
     void start();
 
@@ -49,7 +50,7 @@ public interface EventGenerator {
     String getSiddhiAppName();
 
     void validateSourceConfiguration(JSONObject sourceConfig, String simulationName)
-            throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException;
+            throws SimulationValidationException, ResourceNotFoundException;
 
     void setStartTimestamp(long startTimestamp);
 

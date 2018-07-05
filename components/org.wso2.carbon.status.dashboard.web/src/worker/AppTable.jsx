@@ -120,7 +120,7 @@ export default class AppTable extends React.Component {
             <TableRow>
                 <TableRowColumn style={{width: '400px'}}>
                     {isInactive ? (
-                        <div style={{height: 24, color: 'white'}}>
+                        <div style={{height: 24, color: 'white', display: 'flex', alignItems: 'center'}}>
                             <Circle color={isInactive ? 'red' : 'green'} style={{float: 'left', marginRight: 5}}/>
                             {row.appName}
                         </div>
@@ -129,7 +129,7 @@ export default class AppTable extends React.Component {
                               to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
                               + "/" + row.isStatEnabled}
                         >
-                            <div style={{height: 24, color: 'white'}}>
+                            <div style={{height: 24, color: 'white', display: 'flex', alignItems: 'center'}}>
                                 <Circle color={isInactive ? 'red' : 'green'} style={{float: 'left', marginRight: 5}}/>
                                 {row.appName}
                             </div>
@@ -142,7 +142,7 @@ export default class AppTable extends React.Component {
                     row.appMetricsHistory.latency.data.length !== 0 ?
                         (<TableRowColumn>
                             <div>
-                                <div style={{width: '50%', float: 'left', height: '100%', lineHeight: 4}}>
+                                <div style={{float: 'left', lineHeight: 4}}>
                                     {row.appMetricsHistory.latencyRecent}
                                 </div>
                                 <Link style={{textDecoration: 'none'}}
@@ -155,7 +155,7 @@ export default class AppTable extends React.Component {
                                               yDomain={[latencyLimit[0], latencyLimit[1]]}
                                               append={false}
                                               width={100}
-                                              height={50}
+                                              height={40}
                                         />
                                     </div>
                                 </Link>
@@ -168,7 +168,7 @@ export default class AppTable extends React.Component {
                 {row.isStatEnabled ?
                     row.appMetricsHistory.throughput.data.length !== 0 ?
                         (<TableRowColumn>
-                            <div style={{width: '50%', float: 'left', height: '100%', lineHeight: 4}}>
+                            <div style={{float: 'left', lineHeight: 4}}>
                                 {row.appMetricsHistory.throughputRecent}
                             </div>
                             <Link style={{textDecoration: 'none'}}
@@ -180,7 +180,7 @@ export default class AppTable extends React.Component {
                                           config={sparkLineConfig}
                                           yDomain={[throughputLimit[0], throughputLimit[1]]}
                                           width={100}
-                                          height={50}
+                                          height={40}
                                     />
                                 </div>
                             </Link>
@@ -192,7 +192,7 @@ export default class AppTable extends React.Component {
                 {row.isStatEnabled ?
                     row.appMetricsHistory.memory.data.length !== 0 ?
                         (<TableRowColumn>
-                            <div style={{width: '100px', height: '40px', float: 'left', lineHeight: 4}}>
+                            <div style={{height: '40px', float: 'left', lineHeight: 4}}>
                                 {row.appMetricsHistory.memoryRecent}
                             </div>
                             <Link style={{textDecoration: 'none'}}
@@ -205,7 +205,7 @@ export default class AppTable extends React.Component {
                                           config={sparkLineConfig}
                                           yDomain={[memoryLimit[0], memoryLimit[1]]}
                                           width={100}
-                                          height={50}
+                                          height={40}
                                     />
                                 </div>
                             </Link>
@@ -230,9 +230,9 @@ export default class AppTable extends React.Component {
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Age</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Latency(milliseconds)</h3>
+                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Latency (milliseconds)</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Throughput(events/second)</h3>
+                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Throughput (events/second)</h3>
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Memory</h3></TableHeaderColumn>
                         </TableRow>

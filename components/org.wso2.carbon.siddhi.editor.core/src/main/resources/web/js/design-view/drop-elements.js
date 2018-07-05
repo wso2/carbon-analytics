@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation'],
-    function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation) {
+define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
+        'jsonValidator'],
+    function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator) {
 
         /**
          * @class DesignView
@@ -64,14 +65,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
 
             var self = this;
-            if (!isCodeToDesignMode) {
-                self.formBuilder.DefineSource(i);
+            var name;
+            if (isCodeToDesignMode) {
+                name = sourceName;
+            } else {
+                name = self.formBuilder.DefineSource(i);
             }
-            var node = $('<div>' + sourceName + '</div>');
+            var node = $('<div>' + name + '</div>');
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sourceNameNode");
-
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Source Element will
@@ -130,10 +133,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         DropElements.prototype.dropSink = function (newAgent, i, top, left, isCodeToDesignMode, sinkName) {
 
             var self = this;
-            if (!isCodeToDesignMode) {
-                self.formBuilder.DefineSink(i);
+            var name;
+            if (isCodeToDesignMode) {
+                name = sinkName;
+            } else {
+                name = self.formBuilder.DefineSink(i);
             }
-            var node = $('<div>' + sinkName + '</div>');
+            var node = $('<div>' + name + '</div>');
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sinkNameNode");
@@ -596,6 +602,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(aggregationOptions, 'name', i);
                 var aggregation = new Aggregation(aggregationOptions);
                 self.configurationData.getSiddhiAppConfig().addAggregation(aggregation);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateAggregation(aggregation);
             }
 
             var node = $('<div>' + name + '</div>');
@@ -743,6 +752,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(queryOptions, 'id', i);
                 var query = new Query(queryOptions);
                 self.configurationData.getSiddhiAppConfig().addWindowFilterProjectionQuery(query);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateWindowFilterProjectionQuery(query, true);
             }
             var settingsIconId = "" + i + "-dropQuerySettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
@@ -819,6 +831,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(patternQueryOptions, 'id', i);
                 var patternQuery = new Query(patternQueryOptions);
                 self.configurationData.getSiddhiAppConfig().addPatternQuery(patternQuery);
+
+                // perform JSON validation
+                JSONValidator.prototype.validatePatternOrSequenceQuery(patternQuery, 'Pattern Query', true);
             }
 
             /*
@@ -902,6 +917,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(sequenceQueryOptions, 'id', i);
                 var sequenceQuery = new Query(sequenceQueryOptions);
                 self.configurationData.getSiddhiAppConfig().addSequenceQuery(sequenceQuery);
+
+                // perform JSON validation
+                JSONValidator.prototype
+                    .validatePatternOrSequenceQuery(sequenceQuery,'Sequence Query', true);
             }
 
             /*
@@ -984,6 +1003,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(queryOptions, 'id', i);
                 var query = new Query(queryOptions);
                 self.configurationData.getSiddhiAppConfig().addJoinQuery(query);
+
+                // perform JSON validation
+                JSONValidator.prototype.validateJoinQuery(query, true);
             }
             var settingsIconId = "" + i + "-dropJoinQuerySettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
@@ -1079,6 +1101,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var newPartition = new Partition(partitionOptions);
                 newPartition.setId(i);
                 self.configurationData.getSiddhiAppConfig().addPartition(newPartition);
+
+                // perform JSON validation
+                JSONValidator.prototype.validatePartition(newPartition, self.jsPlumbInstance, true);
             }
 
             // There will be always added a connection point by default
@@ -1144,15 +1169,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 * update the other elements data connected to current element. ex: when a stream is deleted from a
                 * query, from clause in the query will be updated as undefined.
                 * */
-                var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
-                var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
+                setTimeout(function () {
+                    var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
+                    var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
 
-                _.forEach(outConnections, function (connection) {
-                    self.jsPlumbInstance.deleteConnection(connection);
-                });
-                _.forEach(inConnections, function (connection) {
-                    self.jsPlumbInstance.deleteConnection(connection);
-                });
+                    _.forEach(outConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
+                    });
+                    _.forEach(inConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
+                    });
+                }, 100);
 
                 self.jsPlumbInstance.remove(newElement, true);
                 if (self.jsPlumbInstance.getGroupFor(newElement)) {

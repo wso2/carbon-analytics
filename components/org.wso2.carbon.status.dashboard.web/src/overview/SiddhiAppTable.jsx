@@ -37,7 +37,9 @@ const styles = {
     h3: {color: '#dedede', marginLeft: '2%', backgroundColor: '#222222'},
     h3Title: {color: '#dedede', margin: '60px 24px 0 24px', fontWeight: '400', fontSize: '1.17rem'},
     divider: {backgroundColor: '#9E9E9E', width: 'calc(100% - 48px)', margin: '3px 24px 0 24px'},
-    navBtn: {color: '#BDBDBD', padding: '0 24px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
     alignCenter: {display: 'flex', alignItems: 'center'},
 };
 
@@ -177,7 +179,7 @@ export default class SiddhiAppTable extends React.Component {
                             <Link style={{textDecoration: 'none'}}
                                   to={window.contextPath + '/worker/' + app.deployedNodeHost + '_'
                                   + app.deployedNodePort + '/siddhi-apps/' + app.appName + '/' + app.isStatEnabled}>
-                                <div style={{height: 24, color: 'white'}}>
+                                <div style={{height: 24, color: 'white', display: 'flex', alignItems: 'center'}}>
                                     <Circle color={isInactive ? 'red' : 'green'}
                                             style={{float: 'left', marginRight: 5}}/>
 
@@ -189,7 +191,7 @@ export default class SiddhiAppTable extends React.Component {
                                   to={window.contextPath + '/worker/' + app.deployedNodeHost + '_'
                                   + app.deployedNodePort + '/siddhi-apps/' + app.appName + '/' + app.isStatEnabled}>
 
-                                <div style={{height: 24, color: 'white'}}>
+                                <div style={{height: 24, color: 'white', display: 'flex', alignItems: 'center'}}>
                                     <Circle color={isInactive ? 'red' : 'green'}
                                             style={{float: 'left', marginRight: 5}}/>
                                     {app.appName}
@@ -288,23 +290,18 @@ export default class SiddhiAppTable extends React.Component {
         return (
             <div>
                 <Header/>
-                <div className="navigation-bar">
+                <div style={styles.navBar} className="navigation-bar">
                     <Button style={styles.navBtn}>
                         <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
                         Overview
                     </Button>
                 </div>
 
-                <Typography variant="display2" className={'node-title'} style={{
-                    marginTop: '20px',
-                    color: '#dedede',
-                    marginLeft: '24px',
-                    fontSize: '1.6rem'
-                }}>
+                <Typography variant="title" style={styles.titleStyle}>
                     App Overview
                 </Typography>
 
-                <div style={{marginTop: '-23px', marginRight: '24px', fontSize: '0.875rem'}}>
+                <div style={{marginTop: '-26px', marginRight: '24px', fontSize: '0.875rem'}}>
                     <Link style={{textDecoration: 'none', color: '#dedede', float: 'right', paddingLeft: 10}}
                           to={window.contextPath}>Node View</Link>
 
@@ -328,7 +325,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Single Node
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -361,7 +358,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -393,7 +390,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
                             <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
@@ -431,7 +428,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Single Node
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -471,7 +468,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -512,7 +509,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -553,7 +550,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Single Node
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -586,7 +583,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -626,7 +623,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Single Node
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -659,7 +656,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{ padding: '40px'}}>
+                    <div style={{ padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -700,7 +697,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}
@@ -732,7 +729,7 @@ export default class SiddhiAppTable extends React.Component {
                     <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
                         Deployment</Typography>
                     <Divider inset={true} style={styles.divider}/>
-                    <div style={{padding: '40px'}}>
+                    <div style={{padding: '40px 24px'}}>
 
                         <Table>
                             {SiddhiAppTable.renderTableHeader()}

@@ -28,6 +28,7 @@ import ParentAppTable from "./ParentAppTable";
 //Material UI
 import HomeButton from 'material-ui/svg-icons/action/home';
 import {Card, CardHeader, CardText, Dialog, Divider, FlatButton, Snackbar, RaisedButton} from 'material-ui';
+import {Button, Typography} from 'material-ui-next';
 
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
@@ -37,8 +38,12 @@ import {HttpStatus} from '../utils/Constants';
 import KafkaFlow from './KafkaFlow';
 
 const styles = {
-    root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
-    gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
+    button: {margin: 0, fontSize: 10, borderLeft: '1px solid #4c4c4c', borderRadius: 0}
 };
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -247,18 +252,24 @@ export default class AppView extends React.Component {
 
                 <div>
                     <Header/>
-                    <div className="navigation-bar">
-                        <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/></Link>
-                        <Link to={window.contextPath + "/" + this.props.match.params.id + "/" + "siddhi-apps"}>
-                            <FlatButton label={this.props.match.params.id + " >"}/></Link>
-                        <RaisedButton label={this.props.match.params.appName} disabled disabledLabelColor='white'
-                                      disabledBackgroundColor='#f17b31'/>
+                    <div style={styles.navBar} className="navigation-bar">
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath}>
+                            <Button style={styles.navBtn}>
+                                <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                                Overview >
+                            </Button>
+                        </Link>
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath + "/" +
+                            this.props.match.params.id + "/" + "siddhi-apps"}>
+                            <Button style={styles.navBtn}>
+                                {this.props.match.params.id} >
+                            </Button>
+                        </Link>
+                        <Typography style={styles.navBtnActive}>{this.props.match.params.appName}</Typography>
                     </div>
-                    <div className="worker-h1">
-                        <h2 style={{display: 'inline-block', float: 'left', marginLeft: 40}}> {this.state.workerID}
-                            : {this.state.appName} </h2>
-                    </div>
+                    <Typography variant="title" style={styles.titleStyle}>
+                        {this.state.workerID} : {this.state.appName}
+                    </Typography>
                 </div>
 
                 <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '50%', backgroundColor: "#222222"}}>

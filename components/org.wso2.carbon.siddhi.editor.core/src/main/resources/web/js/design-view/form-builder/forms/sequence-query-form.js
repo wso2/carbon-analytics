@@ -18,10 +18,11 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
-        'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils'],
+        'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils',
+        'jsonValidator'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
-              QueryWindowOrFunction, DesignViewUtils) {
+              QueryWindowOrFunction, DesignViewUtils, JSONValidator) {
 
         /**
          * @class SequenceQueryForm Creates a forms to collect data from a sequence query
@@ -521,6 +522,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 title: "Function",
                                 type: "object",
                                 required: true,
+                                options: {
+                                    disable_properties: false
+                                },
                                 properties: {
                                     functionName: {
                                         required: true,
@@ -529,7 +533,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                         minLength: 1
                                     },
                                     parameters: {
-                                        required: true,
                                         type: "array",
                                         format: "table",
                                         title: "Parameters",
@@ -1097,6 +1100,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setType(outputType);
                     }
+
+                    // perform JSON validation
+                    JSONValidator.prototype.validatePatternOrSequenceQuery(clickedElement, 'Sequence Query');
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');

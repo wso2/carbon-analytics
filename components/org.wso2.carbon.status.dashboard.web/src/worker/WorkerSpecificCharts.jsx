@@ -90,7 +90,7 @@ const memoryLineChartConfig = {
 };
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
-    gridList: {width: '95%', height: '50%', overflowY: 'auto', paddingLeft: 30}
+    gridList: {height: '50%', overflowY: 'auto', padding: '0 10px', margin: '-10px 0'}
 };
 
 /**

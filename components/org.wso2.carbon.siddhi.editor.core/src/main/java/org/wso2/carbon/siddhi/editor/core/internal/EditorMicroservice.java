@@ -860,8 +860,12 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getDesignView(String siddhiAppBase64) {
         try {
-            String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
+            FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
+            SiddhiManager siddhiManager = new SiddhiManager();
+            siddhiManager.setConfigManager(fileConfigManager);
             DesignGenerator designGenerator = new DesignGenerator();
+            designGenerator.setSiddhiManager(siddhiManager);
+            String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
             EventFlow eventFlow = designGenerator.getEventFlow(siddhiAppString);
             Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
             String eventFlowJson = gson.toJson(eventFlow);

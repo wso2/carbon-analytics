@@ -29,12 +29,14 @@ define(['require', 'elementUtils'],
             /*
              Data storing structure as follows
                 id*: '',
+                previousCommentSegment:'',
                 name*: '',
                 at*: ‘’
                 annotationList: [annotation1, annotation2, ...]
             */
             if (options !== undefined) {
                 this.id = options.id;
+                this.previousCommentSegment = options.previousCommentSegment;
                 this.name = options.name;
                 this.at = options.at;
             }

@@ -42,9 +42,24 @@ public class ConfigBuildingUtilities {
             throws DesignGenerationException {
         int[] startIndex = siddhiElement.getQueryContextStartIndex();
         int[] endIndex = siddhiElement.getQueryContextEndIndex();
+        return getStringWithQueryContextIndexes(startIndex, endIndex, siddhiAppString);
 
+    }
+
+    /**
+     * Gets the code segment starting from the given startIndex and ending at the given endIndex,
+     * from the given Siddhi app string
+     * @param startIndex                        Query context start index
+     * @param endIndex                          Query context end index
+     * @param siddhiAppString                   Complete Siddhi app string
+     * @return                                  Extracted code segment
+     * @throws DesignGenerationException        At least one of given startIndex and endIndex is null
+     */
+    public static String getStringWithQueryContextIndexes(int[] startIndex, int[] endIndex, String siddhiAppString)
+            throws DesignGenerationException {
         if (startIndex == null || endIndex == null) {
-            throw new DesignGenerationException("Unable to get the definition of the SiddhiElement");
+            throw new DesignGenerationException(
+                    "Failed to get the string since Start index and/or End index of the SiddhiElement are/is null");
         }
 
         int startLinePosition = ordinalIndexOf(startIndex[0], siddhiAppString);

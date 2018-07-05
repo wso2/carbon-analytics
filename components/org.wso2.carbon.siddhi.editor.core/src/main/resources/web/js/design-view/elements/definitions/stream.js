@@ -29,6 +29,7 @@ define(['require', 'elementUtils'],
             /*
              Data storing structure as follows
                 id: '',
+                previousCommentSegment:'',
                 name: '',
                 attributeList: [
                     {
@@ -40,6 +41,7 @@ define(['require', 'elementUtils'],
             */
             if (options !== undefined) {
                 this.id = options.id;
+                this.previousCommentSegment = options.previousCommentSegment;
                 this.name = options.name;
             }
             this.attributeList = [];

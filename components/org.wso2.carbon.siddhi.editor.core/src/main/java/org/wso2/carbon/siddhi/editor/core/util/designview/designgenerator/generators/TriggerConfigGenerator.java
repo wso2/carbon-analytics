@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * Generator to create config for a Siddhi Trigger
  */
-public class TriggerConfigGenerator {
+public class TriggerConfigGenerator extends CodeSegmentsPreserver {
     private static final String EVERY_SPLIT_KEYWORD = " every ";
 
     private String siddhiAppString;
@@ -54,14 +54,20 @@ public class TriggerConfigGenerator {
         } else if (triggerDefinition.getAt() != null) {
             at = triggerDefinition.getAt();
         }
+        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
 
-        return new TriggerConfig(
-                triggerDefinition.getId(),
-                triggerDefinition.getId(),
-                at,
-                new AnnotationConfigGenerator()
-                        .generateAnnotationConfigList(
-                                getTriggerStream(triggerDefinition.getId()).getAnnotations()));
+        TriggerConfig triggerConfig =
+                new TriggerConfig(
+                        triggerDefinition.getId(),
+                        triggerDefinition.getId(),
+                        at,
+                        annotationConfigGenerator
+                                .generateAnnotationConfigList(
+                                        getTriggerStream(triggerDefinition.getId()).getAnnotations()));
+        preserveCodeSegmentsOf(annotationConfigGenerator);
+        preserveAndBindCodeSegment(triggerDefinition, triggerConfig);
+
+        return triggerConfig;
     }
 
     /**

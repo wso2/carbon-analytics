@@ -80,15 +80,16 @@ export default class JVMOsPhysicalMemory extends React.Component {
         if (this.state.freePhysicalMemory.length === 0 && this.state.totalPhysicalMemory.length === 0
             && this.state.virtualMemory.length === 0) {
             return (
-                <div style={{paddingLeft: 10}}>
+                <div>
                     <Card>
                         <CardHeader
                             title="JVM Physical Memory (bytes)"
                         />
                         <Divider/>
                         <CardMedia>
-                            <div style={{backgroundColor: '#131313'}}>
-                                <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+                                color: '#9c9898'}}>
+                                No Data Available
                             </div>
                         </CardMedia>
                     </Card>
@@ -100,7 +101,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
         let data = DashboardUtils.getCombinedChartList(data1, this.state.virtualMemory);
         let y = DashboardUtils.getCombinedYDomain(this.state.virtualMemory, intY);
         return (
-            <div style={{paddingLeft: 10}}>
+            <div>
                 <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig} yDomain={y}
                            title="JVM Physical Memory (bytes)"/>
             </div>

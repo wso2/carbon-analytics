@@ -28,8 +28,9 @@ import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
 import Header from '../common/Header';
 //Material UI
 import HomeButton from 'material-ui/svg-icons/action/home';
-import {Card, Dialog, FlatButton, Popover, RaisedButton, Snackbar} from 'material-ui';
+import {Card, Dialog, FlatButton, Popover, Snackbar} from 'material-ui';
 import {List, ListItem} from 'material-ui/List';
+import {Button, Typography} from 'material-ui-next';
 import Delete from 'material-ui/svg-icons/action/delete';
 import Settings from 'material-ui/svg-icons/action/settings';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
@@ -40,7 +41,15 @@ const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 
-/**
+const styles = {
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
+};
+
+/**x
  * class which manages worker specific details.
  */
 export default class WorkerSpecific extends React.Component {
@@ -163,11 +172,11 @@ export default class WorkerSpecific extends React.Component {
     renderSettings() {
         if (this.state.hasManagerPermission) {
             return (
-                <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
+                <div style={{right: 0, marginRight: 12, position: 'absolute', top: '85px'}}>
                     <ListItem
                         style={{color: 'white'}}
                         primaryText="Settings"
-                        leftIcon={<Settings/>}
+                        leftIcon={<Settings style={{paddingLeft: '22px'}}/>}
                         onClick={(event) => {
                             this.setState({popOver: true, anchorEl: event.currentTarget})
                         }}
@@ -183,7 +192,7 @@ export default class WorkerSpecific extends React.Component {
                                 style={{color: 'white'}}
                                 key={1}
                                 primaryText="Delete Worker"
-                                leftIcon={<Delete/>}
+                                leftIcon={<Delete style={{paddingLeft: '22px'}}/>}
                                 onClick={() => {
                                     this.setState({open: true})
                                 }}
@@ -246,27 +255,26 @@ export default class WorkerSpecific extends React.Component {
                     </Dialog>
 
                     <Header/>
-                    <div className="navigation-bar">
-                        <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/></Link>
-                        <RaisedButton label={this.state.workerID} disabled disabledLabelColor='white'
-                                      disabledBackgroundColor='#f17b31'/>
+                    <div style={styles.navBar} className="navigation-bar">
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath}>
+                            <Button style={styles.navBtn}>
+                                <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                                Overview >
+                            </Button>
+                        </Link>
+                        <Typography style={styles.navBtnActive}>{this.state.workerID}</Typography>
                     </div>
-                    <div className="worker-h1">
-                        <h2 style={{
-                            display: 'inline-block',
-                            float: 'left',
-                            marginLeft: 20
-                        }}> {this.state.workerID} </h2>
-                    </div>
+                    <Typography variant="title" style={styles.titleStyle}> {this.state.workerID} </Typography>
                     {this.renderSettings()}
-                    <div><WorkerGeneralCard id={this.props.match.params.id}/></div>
-                    <div><WorkerSpecificCharts id={this.props.match.params.id}/></div>
+                    <div style={{margin: '10px 0'}}>
+                        <div><WorkerGeneralCard id={this.props.match.params.id}/></div>
+                        <div><WorkerSpecificCharts id={this.props.match.params.id}/></div>
+                    </div>
 
-                    <div style={{color: '#dedede', marginLeft: '1%', display: 'inline-block', width: '100%'}}>
+                    <div style={{color: '#dedede', marginLeft: '24px', display: 'inline-block'}}>
                         <h3> Siddhi Applications </h3>
                     </div>
-                    <div style={{padding: 20, paddingTop: 10, width: '98%', float: 'left', boxSizing: 'border-box'}}>
+                    <div style={{padding: 20, paddingTop: 10, float: 'left', boxSizing: 'border-box'}}>
                         <Card style={{height: 400}}>
                             <AppTable id={this.props.match.params.id}/>
                         </Card>

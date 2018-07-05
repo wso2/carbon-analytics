@@ -77,15 +77,16 @@ export default class JVMLoading extends React.Component {
         if (this.state.jvmClassLoadingLoadedTotal.length === 0 && this.state.jvmClassLoadingLoadedCurrent.length === 0
             && this.state.jvmClassLoadingUnloadedTotal.length === 0) {
             return (
-                <div style={{paddingLeft: 10}}>
+                <div>
                     <Card>
                         <CardHeader
                             title="Class Loading"
                         />
                         <Divider/>
                         <CardMedia>
-                            <div style={{backgroundColor: '#131313'}}>
-                                <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+                                color: '#9c9898'}}>
+                                No Data Available
                             </div>
                         </CardMedia>
                     </Card>
@@ -99,7 +100,7 @@ export default class JVMLoading extends React.Component {
             this.state.jvmClassLoadingLoadedCurrent);
         let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmClassLoadingUnloadedTotal, intY);
         return (
-            <div style={{paddingLeft: 10}}>
+            <div>
                 <ChartCard data={data} metadata={metadata} config={chartConfig} yDomain={y2}
                            title="Class Loading"/>
             </div>

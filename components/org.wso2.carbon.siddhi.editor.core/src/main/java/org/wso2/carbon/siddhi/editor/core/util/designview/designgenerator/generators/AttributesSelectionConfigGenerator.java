@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Generates to create AttributesSelectionConfig with given Siddhi elements
  */
-public class AttributesSelectionConfigGenerator {
+public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;
 
     public AttributesSelectionConfigGenerator(String siddhiAppString) {
@@ -53,9 +53,13 @@ public class AttributesSelectionConfigGenerator {
             } catch (DesignGenerationException e) {
                 // Selector object has been successfully compiled by the Siddhi Compiler, but no query indexes
                 // The OutputAttribute object was a result of 'select *'
+                AllSelectionConfig allSelectionConfig = new AllSelectionConfig();
+                preserveAndBindCodeSegment(selector, allSelectionConfig);
                 return new AllSelectionConfig();
             }
         }
+        UserDefinedSelectionConfig userDefinedSelectionConfig = new UserDefinedSelectionConfig(selectedAttributes);
+        preserveAndBindCodeSegment(selector, userDefinedSelectionConfig);
         return new UserDefinedSelectionConfig(selectedAttributes);
     }
 
@@ -67,9 +71,12 @@ public class AttributesSelectionConfigGenerator {
      */
     private SelectedAttribute generateSelectedAttribute(OutputAttribute outputAttribute)
             throws DesignGenerationException {
-        return new SelectedAttribute(
-                ConfigBuildingUtilities.getDefinition(outputAttribute.getExpression(), siddhiAppString),
-                outputAttribute.getRename());
+        SelectedAttribute selectedAttribute =
+                new SelectedAttribute(
+                        ConfigBuildingUtilities.getDefinition(outputAttribute.getExpression(), siddhiAppString),
+                        outputAttribute.getRename());
+        preserveAndBindCodeSegment(outputAttribute, selectedAttribute);
+        return selectedAttribute;
 
     }
 }

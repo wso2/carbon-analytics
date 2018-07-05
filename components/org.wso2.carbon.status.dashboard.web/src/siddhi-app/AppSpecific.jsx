@@ -30,6 +30,7 @@ import Header from '../common/Header';
 import {GridList, GridTile} from 'material-ui/GridList';
 import HomeButton from 'material-ui/svg-icons/action/home';
 import {Card, CardHeader, CardText, Dialog, Divider, FlatButton, RaisedButton, Snackbar, Toggle} from 'material-ui';
+import {Button, Typography} from 'material-ui-next';
 import DashboardUtils from '../utils/DashboardUtils';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
@@ -39,7 +40,13 @@ import AppEventFlow from "./AppEventFlow";
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
-    gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
+    gridList: {overflowY: 'auto', padding: 24},
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
+    button: {margin: 0, fontSize: 10, borderLeft: '1px solid #4c4c4c', borderRadius: 0}
 };
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
@@ -229,7 +236,7 @@ export default class WorkerSpecific extends React.Component {
     renderLatencyChart() {
         if (this.state.latency.length === 0) {
             return (
-                <GridTile title="Latency(milliseconds)" titlePosition="top" titleBackground='#303030'>
+                <GridTile title="Latency (milliseconds)" titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         color: 'rgba(255, 255, 255, 0.2)',
                         marginTop: 50,
@@ -266,7 +273,7 @@ export default class WorkerSpecific extends React.Component {
     renderThroughputChart() {
         if (this.state.throughputAll.length === 0) {
             return (
-                <GridTile title="Overall Throughput(events/second)" titlePosition="top" titleBackground='#303030'>
+                <GridTile title="Overall Throughput (events/second)" titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         color: 'rgba(255, 255, 255, 0.2)',
                         marginTop: 50,
@@ -304,7 +311,7 @@ export default class WorkerSpecific extends React.Component {
     renderMemoryChart() {
         if (this.state.totalMem.length === 0) {
             return (
-                <GridTile title="Memory Used(bytes)" titlePosition="top" titleBackground='#303030'>
+                <GridTile title="Memory Used (bytes)" titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
                         backgroundColor: '#131313',
@@ -348,7 +355,7 @@ export default class WorkerSpecific extends React.Component {
     renderToggle() {
         if (this.state.hasManagerPermission) {
             return (
-                <div style={{float: 'right', padding: 20, paddingRight: 20}}>
+                <div style={{position: 'absolute', right: 24, top: 100}}>
                     <Toggle labelPosition="left"
                             label="Metrics"
                             labelStyle={{color: 'white'}}
@@ -473,33 +480,39 @@ export default class WorkerSpecific extends React.Component {
 
                 <div>
                     <Header/>
-                    <div className="navigation-bar">
-                        <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/></Link>
-                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id}>
-                            <FlatButton label={this.state.workerID + " >"}/></Link>
-                        <RaisedButton label={this.props.match.params.appName} disabled disabledLabelColor='white'
-                                      disabledBackgroundColor='#f17b31'/>
+                    <div style={styles.navBar} className="navigation-bar">
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath}>
+                            <Button style={styles.navBtn}>
+                                <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                                Overview >
+                            </Button>
+                        </Link>
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
+                            this.props.match.params.id}>
+                            <Button style={styles.navBtn}>
+                                {this.state.workerID} >
+                            </Button>
+                        </Link>
+                        <Typography style={styles.navBtnActive}>{this.props.match.params.appName}</Typography>
                     </div>
-                    <div className="worker-h1">
-                        <h2 style={{display: 'inline-block', float: 'left', marginLeft: 40}}> {this.state.workerID}
-                            : {this.state.appName} </h2>
-                    </div>
+                    <Typography variant="title" style={styles.titleStyle}>
+                        {this.state.workerID} : {this.state.appName}
+                    </Typography>
 
-                    <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '60%', fontSize: '20px'}}>
+                    <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '45%', fontSize: '20px'}}>
                         {warningMessage}
                     </div>
                     {this.renderToggle()}
-                    <GridList cols={3} padding={35} cellHeight={250} style={styles.gridList}>
+                    <GridList cols={3} cellHeight={250} style={styles.gridList}>
                         {this.renderLatencyChart()}
                         {this.renderThroughputChart()}
                         {this.renderMemoryChart()}
                     </GridList>
                 </div>
 
-                <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '50%', backgroundColor: "#222222"}}>
+                <div style={{padding: 24, height: '50%', backgroundColor: "#222222"}}>
                     <Card style={{backgroundColor: "#282828", height: '50%'}}>
-                        <CardHeader title="Code View" subtitle={this.props.match.params.appName}
+                        <CardHeader title="Code View"
                                     titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
                         />
                         <Divider/>
@@ -511,41 +524,34 @@ export default class WorkerSpecific extends React.Component {
                     </Card>
                 </div>
 
-                <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '50%', backgroundColor: "#222222"}}>
+                <div style={{padding: 24, height: '50%', backgroundColor: "#222222"}}>
                     <Card style={{backgroundColor: "#282828", height: '50%'}}>
-                        <CardHeader title="Design View" subtitle={this.props.match.params.appName}
+                        <CardHeader title="Design View"
                                     titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
                         />
                         <Divider/>
 
-                        <CardText style={{padding: '80px'}}>
+                        <CardText style={{padding: '10px'}}>
                             <ul class="legend">
                                 <li class="legend-key ">
-                                    <span class="legend-colour source-image" >
+                                    <span class="legend-colour source-image">
 
                                     </span>
                                     <span class="legend-text">Source</span>
                                 </li>
                                 <li class="legend-key ">
-                                    <span class="legend-colour sink-image" >
+                                    <span class="legend-colour sink-image">
 
                                     </span>
                                     <span class="legend-text">Sink</span>
                                 </li>
                                 <li class="legend-key ">
-                                    <span class="legend-colour stream-image" >
-
+                                    <span class="legend-colour stream-image">
                                     </span>
                                     <span class="legend-text">Stream</span>
                                 </li>
                                 <li class="legend-key ">
-                                    <span class="legend-colour stream-image" >
-
-                                    </span>
-                                    <span class="legend-text">Stream</span>
-                                </li>
-                                <li class="legend-key ">
-                                    <span class="legend-colour table-image" ></span>
+                                    <span class="legend-colour table-image"></span>
                                     <span class="legend-text">Table</span>
                                 </li>
                                 <li class="legend-key ">
@@ -553,7 +559,7 @@ export default class WorkerSpecific extends React.Component {
                                     <span class="legend-text">Window</span>
                                 </li>
                                 <li class="legend-key ">
-                                    <span class="legend-colour trigger-image" ></span>
+                                    <span class="legend-colour trigger-image"></span>
                                     <span class="legend-text">Trigger</span>
                                 </li>
                                 <li class="legend-key ">
@@ -579,7 +585,7 @@ export default class WorkerSpecific extends React.Component {
                     </Card>
                 </div>
 
-                <div style={{width: '90%', marginLeft: 40}}>
+                <div style={{padding: 24}}>
                     <h3 style={{color: 'white'}}> Siddhi App Component Statistics</h3>
                     <ComponentTable id={this.props.match.params.id} appName={this.props.match.params.appName}
                                     statsEnabled={this.state.statsEnabled}/>

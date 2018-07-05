@@ -19,6 +19,56 @@
 define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewUtils'],
     function (require, log, $, _, FunctionDefinition, DesignViewUtils) {
 
+        var functionSchema = {
+            type: "object",
+            title: "Function",
+            properties: {
+                name: {
+                    type: "string",
+                    title: "Name",
+                    minLength: 1,
+                    required: true,
+                    propertyOrder: 1
+                },
+                scriptType: {
+                    propertyOrder: 2,
+                    required: true,
+                    type: "string",
+                    title: "Script Type",
+                    enum: [
+                        "Javascript",
+                        "R",
+                        "Scala"
+                    ],
+                    default: "Javascript"
+                },
+                returnType: {
+                    propertyOrder: 3,
+                    required: true,
+                    type: "string",
+                    title: "Return Type",
+                    enum: [
+                        "int",
+                        "long",
+                        "double",
+                        "float",
+                        "string",
+                        "bool",
+                        "object"
+                    ],
+                    default: "int"
+                },
+                body: {
+                    propertyOrder: 4,
+                    required: true,
+                    type: "string",
+                    title: "Script Body",
+                    format: "textarea",
+                    minLength: 1
+                }
+            }
+        };
+
         /**
          * @class FunctionForm Creates a forms to collect data from a function
          * @constructor
@@ -50,55 +100,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
 
             // generate the form to define a function
             var editor = new JSONEditor($(formContainer).find('#define-function')[0], {
-                schema: {
-                    type: "object",
-                    title: "Function",
-                    properties: {
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 1
-                        },
-                        scriptType: {
-                            propertyOrder: 2,
-                            required: true,
-                            type: "string",
-                            title: "Script Type",
-                            enum: [
-                                "Javascript",
-                                "R",
-                                "Scala"
-                            ],
-                            default: "Javascript"
-                        },
-                        returnType: {
-                            propertyOrder: 3,
-                            required: true,
-                            type: "string",
-                            title: "Return Type",
-                            enum: [
-                                "int",
-                                "long",
-                                "double",
-                                "float",
-                                "string",
-                                "bool",
-                                "object"
-                            ],
-                            default: "int"
-                        },
-                        body: {
-                            propertyOrder: 4,
-                            required: true,
-                            type: "string",
-                            title: "Script Body",
-                            format: "textarea",
-                            minLength: 1
-                        }
-                    }
-                },
+                schema: functionSchema,
                 show_errors: "always",
                 disable_properties: true,
                 display_required_only: true,
@@ -192,55 +194,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             };
 
             var editor = new JSONEditor($(formContainer).find('#define-function')[0], {
-                schema: {
-                    type: "object",
-                    title: "Function",
-                    properties: {
-                        name: {
-                            type: "string",
-                            title: "Name",
-                            minLength: 1,
-                            required: true,
-                            propertyOrder: 1
-                        },
-                        scriptType: {
-                            propertyOrder: 2,
-                            required: true,
-                            type: "string",
-                            title: "Script Type",
-                            enum: [
-                                "Javascript",
-                                "R",
-                                "Scala"
-                            ],
-                            default: "Javascript"
-                        },
-                        returnType: {
-                            propertyOrder: 3,
-                            required: true,
-                            type: "string",
-                            title: "Return Type",
-                            enum: [
-                                "int",
-                                "long",
-                                "double",
-                                "float",
-                                "string",
-                                "bool",
-                                "object"
-                            ],
-                            default: "int"
-                        },
-                        body: {
-                            propertyOrder: 4,
-                            required: true,
-                            type: "string",
-                            title: "Script Body",
-                            format: "textarea",
-                            minLength: 1
-                        }
-                    }
-                },
+                schema: functionSchema,
                 startval: fillWith,
                 show_errors: "always",
                 disable_properties: true,
