@@ -1505,8 +1505,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.390-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.1.46</siddhi.version>
-        <siddhi.bundle.version>4.1.46</siddhi.bundle.version>
+        <siddhi.version>4.1.55</siddhi.version>
+        <siddhi.bundle.version>4.1.55</siddhi.bundle.version>
 
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.0.64</carbon.analytics-common.version>
@@ -1711,15 +1711,15 @@
         <!--Siddhi Extension Versions-->
 
         <siddhi.io.tcp.version>2.0.17</siddhi.io.tcp.version>
-        <siddhi.io.email.version>1.0.15</siddhi.io.email.version>
+        <siddhi.io.email.version>1.0.17</siddhi.io.email.version>
         <siddhi.io.kafka.version>4.1.13</siddhi.io.kafka.version>
-        <siddhi.io.http.version>1.0.29</siddhi.io.http.version>
+        <siddhi.io.http.version>1.0.32</siddhi.io.http.version>
 
-        <siddhi.map.json.version>4.0.23</siddhi.map.json.version>
+        <siddhi.map.json.version>4.0.26</siddhi.map.json.version>
         <siddhi.map.binary.version>1.0.11</siddhi.map.binary.version>
         <siddhi.map.xml.version>4.0.14</siddhi.map.xml.version>
 
-        <siddhi.store.rdbms.version>4.0.21</siddhi.store.rdbms.version>
+        <siddhi.store.rdbms.version>4.0.23</siddhi.store.rdbms.version>
         <siddhi.store.solr.version>1.0.16</siddhi.store.solr.version>
 
         <zkclient.version>0.10</zkclient.version>
