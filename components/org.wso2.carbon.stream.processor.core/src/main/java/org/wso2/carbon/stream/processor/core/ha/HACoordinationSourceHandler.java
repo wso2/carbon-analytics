@@ -19,15 +19,19 @@
 package org.wso2.carbon.stream.processor.core.ha;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.event.queue.EventQueue;
+import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
+import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -40,13 +44,16 @@ public class HACoordinationSourceHandler extends SourceHandler {
     private long lastProcessedEventTimestamp = 0L;
     private Queue<Event> passiveNodeBufferedEvents;
     private String sourceHandlerElementId;
+    private EventQueue eventQueue;
+    private int count = 0;
 
     private final int queueCapacity;
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
-    public HACoordinationSourceHandler(int queueCapacity) {
+    public HACoordinationSourceHandler(int queueCapacity, EventQueue eventQueue) {
         this.queueCapacity = queueCapacity;
         passiveNodeBufferedEvents = new LinkedBlockingQueue<>(queueCapacity);
+        this.eventQueue = eventQueue;
     }
 
     @Override
@@ -65,6 +72,9 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void sendEvent(Event event, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
+            eventQueue.enqueue(new QueuedEvent(sourceHandlerElementId, event));
+            count++;
+            log.info("QUEUE COUNT     " + count);
             inputHandler.send(event);
         } else {
             synchronized (this) {
@@ -92,6 +102,11 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void sendEvent(Event[] events, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
+            for (Event event : events) {
+                eventQueue.enqueue(new QueuedEvent(sourceHandlerElementId, event));
+                count++;
+            }
+            log.info("COUNT     " + count);
             inputHandler.send(events);
         } else {
             if (collectEvents) {
@@ -157,8 +172,8 @@ public class HACoordinationSourceHandler extends SourceHandler {
      * Will indicate the passive node to start collecting events
      *
      * @param collectEvents should be true only when passive node requests the state of active node.
-     * Since state syncing takes time events should be collected to ensure that no events are lost during
-     * the state sync
+     *                      Since state syncing takes time events should be collected to ensure that no events are lost during
+     *                      the state sync
      */
     public void collectEvents(boolean collectEvents) {
         this.collectEvents = collectEvents;

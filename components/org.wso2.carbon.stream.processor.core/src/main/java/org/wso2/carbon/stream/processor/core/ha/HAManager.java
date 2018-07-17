@@ -18,12 +18,14 @@
 
 package org.wso2.carbon.stream.processor.core.ha;
 
-import org.apache.http.HttpResponse;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
+import org.wso2.carbon.stream.processor.core.event.queue.EventQueue;
+import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
+import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
@@ -74,6 +76,7 @@ public class HAManager {
     private HACoordinationRecordTableHandlerManager recordTableHandlerManager;
     private List<Timer> retrySiddhiAppSyncTimerList;
     private boolean isActiveNodeOutputSyncManagerStarted;
+    private EventQueue<QueuedEvent> eventQueue;
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -96,7 +99,8 @@ public class HAManager {
     }
 
     public void start() {
-        sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity);
+        eventQueue = EventQueueManager.initializeEventQueue(sourceQueueCapacity);
+        sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity, eventQueue);
         sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
         recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(sinkQueueCapacity);
 
@@ -135,6 +139,9 @@ public class HAManager {
                         TimeUnit.MILLISECONDS);
                 isActiveNodeOutputSyncManagerStarted = true;
             }
+            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeEventDispatcher(eventQueue, "localhost", 9892),
+                    0, 3000, TimeUnit.MILLISECONDS);
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
 
@@ -205,6 +212,9 @@ public class HAManager {
                     TimeUnit.MILLISECONDS);
             isActiveNodeOutputSyncManagerStarted = true;
         }
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeEventDispatcher(eventQueue, "localhost", 9892),
+                0, 1000, TimeUnit.MILLISECONDS);
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
         nodeInfo.setActiveNode(isActiveNode);
     }
