@@ -34,7 +34,7 @@ public class ActiveNodeEventDispatcher implements Runnable {
             log.error("Error in connecting to " + host + ":" + port + ". Will retry in the next iteration");
             return;
         }
-
+        log.info("!!!!!!!!!!  :::::::   " + eventQueue.getRemainingCapacity());
         QueuedEvent queuedEvent = eventQueue.dequeue();
         while (queuedEvent != null) {
             try {
@@ -45,6 +45,7 @@ public class ActiveNodeEventDispatcher implements Runnable {
             } catch (IOException e) {
                 log.error("Error in converting events to binary message.Will retry in the next iteration");
             }
+
             log.info("Sent - " + queuedEvent.getSourceHandlerElementId() + "  |   " +
                     queuedEvent.getEvent().toString());
             queuedEvent = eventQueue.dequeue();
