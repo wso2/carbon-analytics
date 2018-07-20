@@ -23,9 +23,11 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
+import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
+import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
@@ -135,27 +137,31 @@ public class HAManager {
             }
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
-            Map<String, Object> activeNodeHostAndPortMap = clusterCoordinator.getLeaderNode().getPropertiesMap();
 
-            //Not checking for null of Map since LeaderNode check is done. Leader node will have properties
-            activeNodeHost = (String) activeNodeHostAndPortMap.get("host");
-            activeNodePort = (String) activeNodeHostAndPortMap.get("port");
+            //start tcp server
+            TCPServer.getInstance().start(new TCPServerConfig());
 
-            if (liveSyncEnabled) {
-                log.info("Passive Node: Live Sync enabled. State sync from Active node scheduled after "
-                        + stateSyncGracePeriod / 1000 + " seconds");
-                syncAfterGracePeriodTimer = liveSyncAfterGracePeriod(stateSyncGracePeriod);
-            } else {
-                log.info("Passive Node: Live Sync disabled. State sync from Active node scheduled after "
-                        + stateSyncGracePeriod / 1000 + " seconds");
-                syncAfterGracePeriodTimer = persistenceStoreSyncAfterGracePeriod(stateSyncGracePeriod);
-            }
-
-            passiveNodeOutputSchedulerService = Executors.newSingleThreadScheduledExecutor();
-            passiveNodeOutputScheduledFuture = passiveNodeOutputSchedulerService.scheduleAtFixedRate(
-                    new PassiveNodeOutputSyncManager(clusterCoordinator, sinkHandlerManager, recordTableHandlerManager,
-                            activeNodeHost, activeNodePort, liveSyncEnabled, username, password), outputSyncInterval,
-                    outputSyncInterval, TimeUnit.MILLISECONDS);
+//            Map<String, Object> activeNodeHostAndPortMap = clusterCoordinator.getLeaderNode().getPropertiesMap();
+//
+//            //Not checking for null of Map since LeaderNode check is done. Leader node will have properties
+//            activeNodeHost = (String) activeNodeHostAndPortMap.get("host");
+//            activeNodePort = (String) activeNodeHostAndPortMap.get("port");
+//
+//            if (liveSyncEnabled) {
+//                log.info("Passive Node: Live Sync enabled. State sync from Active node scheduled after "
+//                        + stateSyncGracePeriod / 1000 + " seconds");
+//                syncAfterGracePeriodTimer = liveSyncAfterGracePeriod(stateSyncGracePeriod);
+//            } else {
+//                log.info("Passive Node: Live Sync disabled. State sync from Active node scheduled after "
+//                        + stateSyncGracePeriod / 1000 + " seconds");
+//                syncAfterGracePeriodTimer = persistenceStoreSyncAfterGracePeriod(stateSyncGracePeriod);
+//            }
+//
+//            passiveNodeOutputSchedulerService = Executors.newSingleThreadScheduledExecutor();
+//            passiveNodeOutputScheduledFuture = passiveNodeOutputSchedulerService.scheduleAtFixedRate(
+//                    new PassiveNodeOutputSyncManager(clusterCoordinator, sinkHandlerManager, recordTableHandlerManager,
+//                            activeNodeHost, activeNodePort, liveSyncEnabled, username, password), outputSyncInterval,
+//                    outputSyncInterval, TimeUnit.MILLISECONDS);
         }
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
@@ -227,27 +233,30 @@ public class HAManager {
 
                 boolean isPersisted = persistActiveNode(activeNodeHost, activeNodePort);
                 if (isPersisted) {
-                    ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap
-                            = StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntimeMap();
-
-                    siddhiAppRuntimeMap.forEach((siddhiAppName, siddhiAppRuntime) -> {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Passive Node: Restoring state of Siddhi Application " +
-                                    siddhiAppRuntime.getName() + " of passive node using live sync after" +
-                                    " grace period of " + gracePeriod + " milliseconds");
-                        }
-                        try {
-                            siddhiAppRuntime.restoreLastRevision();
-                            StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.currentTimeMillis());
-                            StreamProcessorDataHolder.getNodeInfo().setInSync(true);
-                        } catch (CannotRestoreSiddhiAppStateException e) {
-                            log.error("Error in restoring Siddhi Application: " + siddhiAppRuntime.getName(), e);
-                        }
-                    });
+                    syncState();
                 }
             }
         }, gracePeriod);
         return timer;
+    }
+
+    private void syncState(){
+        ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap
+                = StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntimeMap();
+
+        siddhiAppRuntimeMap.forEach((siddhiAppName, siddhiAppRuntime) -> {
+            if (log.isDebugEnabled()) {
+                log.debug("Restoring state of Siddhi Application " +
+                        siddhiAppRuntime.getName());
+            }
+            try {
+                siddhiAppRuntime.restoreLastRevision();
+                StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.currentTimeMillis());
+                StreamProcessorDataHolder.getNodeInfo().setInSync(true);
+            } catch (CannotRestoreSiddhiAppStateException e) {
+                log.error("Error in restoring Siddhi Application: " + siddhiAppRuntime.getName(), e);
+            }
+        });
     }
 
     /**
