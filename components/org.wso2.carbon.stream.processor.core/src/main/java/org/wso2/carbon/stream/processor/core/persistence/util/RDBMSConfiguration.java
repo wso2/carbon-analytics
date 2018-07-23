@@ -69,6 +69,9 @@ public class RDBMSConfiguration {
                     replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setCountQuery(queryManager.getQuery(PersistenceConstants.COUNT_NUMBER_REVISIONS).
                     replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setSelectAllLatestRevisionsForSiddhiAppsQuery(queryManager.
+                    getQuery(PersistenceConstants.SELECT_ALL_LAST_REVISION).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
 
         } catch (QueryMappingNotAvailableException | ConfigurationException | IOException e) {
             throw new DatasourceConfigurationException("Error reading queries for database: " + databaseType + " "

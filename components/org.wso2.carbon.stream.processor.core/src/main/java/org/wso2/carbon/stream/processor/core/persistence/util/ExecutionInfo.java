@@ -32,6 +32,7 @@ public class ExecutionInfo {
     private String preparedDeleteStatement;
     private String preparedDeleteOldRevisionsStatement;
     private String preparedCountStatement;
+    private String preparedSelectAllLatestRevisionsForSiddhiAppsStatement;
 
     private boolean tableExist = false;
 
@@ -113,5 +114,15 @@ public class ExecutionInfo {
 
     public void setTableExist(boolean tableExist) {
         this.tableExist = tableExist;
+    }
+
+    public void setPreparedSelectAllLatestRevisionsForSiddhiAppsStatement
+            (String preparedSelectAllLatestRevisionsForSiddhiAppsStatement) {
+        this.preparedSelectAllLatestRevisionsForSiddhiAppsStatement =
+                preparedSelectAllLatestRevisionsForSiddhiAppsStatement;
+    }
+
+    public String getPreparedSelectAllLatestRevisionsForSiddhiAppsStatement() {
+        return preparedSelectAllLatestRevisionsForSiddhiAppsStatement;
     }
 }

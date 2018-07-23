@@ -267,6 +267,8 @@ public class DBPersistenceStore implements PersistenceStore {
         executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
         executionInfo.setPreparedDeleteOldRevisionsStatement(databaseQueryEntries.getDeleteOldRevisionsQuery());
         executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
+        executionInfo.setPreparedSelectAllLatestRevisionsForSiddhiAppsStatement(databaseQueryEntries.
+                getSelectAllLatestRevisionsForSiddhiAppsQuery());
 
     }
 

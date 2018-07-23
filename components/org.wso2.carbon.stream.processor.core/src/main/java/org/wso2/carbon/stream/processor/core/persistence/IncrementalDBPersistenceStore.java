@@ -45,6 +45,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -291,6 +292,36 @@ public class IncrementalDBPersistenceStore implements IncrementalPersistenceStor
         return revisions;
     }
 
+    public Map<String,String> getAllLatestMapOfRevisionsForSiddhiAppsFromDB() {
+        Map<String,String> revisionsMap = new HashMap<>();
+        PreparedStatement stmt = null;
+        Connection con = null;
+        try {
+            try {
+                con = datasource.getConnection();
+            } catch (SQLException e) {
+                log.error("Cannot establish connection to datasource " + datasourceName +
+                        " . Could not load the map of latest revisions for Siddhi apps ", e);
+                return null;
+            }
+            con.setAutoCommit(false);
+            stmt = con.prepareStatement(executionInfo.getPreparedSelectAllLatestRevisionsForSiddhiAppsStatement());
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                con.commit();
+                while (resultSet.next()) {
+                    revisionsMap.put((String.valueOf(resultSet.getString("siddhiAppName"))),
+                            (String.valueOf(resultSet.getString("revision"))));
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Could not load the map of revisions, for Siddhi apps" +
+                    ", from the database with datasource " + datasourceName, e);
+        } finally {
+            DBPersistenceStoreUtils.cleanupConnections(stmt, con);
+        }
+        return revisionsMap;
+    }
+
     private void initializeDatabaseExecutionInfo() {
         executionInfo = new ExecutionInfo();
         RDBMSQueryConfigurationEntry databaseQueryEntries =
@@ -310,6 +341,8 @@ public class IncrementalDBPersistenceStore implements IncrementalPersistenceStor
         executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
         executionInfo.setPreparedDeleteOldRevisionsStatement(databaseQueryEntries.getDeleteOldRevisionsQuery());
         executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
+        executionInfo.setPreparedSelectAllLatestRevisionsForSiddhiAppsStatement(databaseQueryEntries.
+                getSelectAllLatestRevisionsForSiddhiAppsQuery());
     }
 
     private void cleanOldRevisions(IncrementalSnapshotInfo incrementalSnapshotInfo) {

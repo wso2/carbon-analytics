@@ -76,19 +76,20 @@ public class HACoordinationSourceHandler extends SourceHandler {
             count++;
             log.info("QUEUE COUNT     " + count);
             inputHandler.send(event);
-        } else {
-            synchronized (this) {
-                if (collectEvents) {
-                    boolean eventBuffered = passiveNodeBufferedEvents.offer(event);
-                    if (!eventBuffered) {
-                        passiveNodeBufferedEvents.remove();
-                        passiveNodeBufferedEvents.add(event);
-                    }
-                } else {
-                    inputHandler.send(event);
-                }
-            }
         }
+//        else {
+//            synchronized (this) {
+//                if (collectEvents) {
+//                    boolean eventBuffered = passiveNodeBufferedEvents.offer(event);
+//                    if (!eventBuffered) {
+//                        passiveNodeBufferedEvents.remove();
+//                        passiveNodeBufferedEvents.add(event);
+//                    }
+//                } else {
+//                    inputHandler.send(event);
+//                }
+//            }
+//        }
     }
 
     /**
@@ -108,23 +109,25 @@ public class HACoordinationSourceHandler extends SourceHandler {
             }
             log.info("COUNT     " + count);
             inputHandler.send(events);
-        } else {
-            if (collectEvents) {
-                synchronized (this) {
-                    int sizeAfterUpdate = passiveNodeBufferedEvents.size() + events.length;
-                    if (sizeAfterUpdate >= queueCapacity) {
-                        for (int i = queueCapacity; i < sizeAfterUpdate; i++) {
-                            passiveNodeBufferedEvents.remove();
-                        }
-                    }
-                    for (Event event : events) {
-                        passiveNodeBufferedEvents.add(event);
-                    }
-                }
-            } else {
-                inputHandler.send(events);
-            }
         }
+
+//        else {
+//            if (collectEvents) {
+//                synchronized (this) {
+//                    int sizeAfterUpdate = passiveNodeBufferedEvents.size() + events.length;
+//                    if (sizeAfterUpdate >= queueCapacity) {
+//                        for (int i = queueCapacity; i < sizeAfterUpdate; i++) {
+//                            passiveNodeBufferedEvents.remove();
+//                        }
+//                    }
+//                    for (Event event : events) {
+//                        passiveNodeBufferedEvents.add(event);
+//                    }
+//                }
+//            } else {
+//                inputHandler.send(events);
+//            }
+//        }
     }
 
     /**

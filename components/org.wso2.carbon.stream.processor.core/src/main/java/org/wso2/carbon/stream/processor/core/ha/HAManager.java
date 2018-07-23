@@ -30,6 +30,7 @@ import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConfig;
+import org.wso2.carbon.stream.processor.core.persistence.IncrementalDBPersistenceStore;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
@@ -78,6 +79,7 @@ public class HAManager {
     private boolean isActiveNodeOutputSyncManagerStarted;
     private EventQueue<QueuedEvent> eventQueue;
     private TCPServer tcpServerInstance = TCPServer.getInstance();
+    private EventQueueManager eventQueueManager;
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -97,7 +99,7 @@ public class HAManager {
         this.username = deploymentConfig.getLiveSync().getUsername();
         this.password = deploymentConfig.getLiveSync().getPassword();
         this.retrySiddhiAppSyncTimerList = new LinkedList<>();
-        EventQueue<QueuedEvent> eventQueue;
+        this.eventQueueManager = new EventQueueManager();
     }
 
     public void start() {
@@ -187,9 +189,16 @@ public class HAManager {
      * Cancels scheduled state sync of Passive Node from Active Node
      * Updates Coordination Properties with Advertised Host and Port
      */
-    void changeToActive() {
+    void changeToActive(){
         isActiveNode = true;
         syncState();
+        try {
+            eventQueueManager.trimAndSend();
+        } catch (InterruptedException e) {
+            e.printStackTrace();//todo
+        }
+        //openPorts
+
 
 
 
@@ -275,6 +284,10 @@ public class HAManager {
                 log.error("Error in restoring Siddhi Application: " + siddhiAppRuntime.getName(), e);
             }
         });
+    }
+
+    private void sendQueuedEventsToSourceHandler(){
+
     }
 
     /**
