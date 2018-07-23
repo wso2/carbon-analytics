@@ -28,6 +28,10 @@ public class EventQueue<E> {
         linkedBlockingQueue = new LinkedBlockingQueue<>(queueSize);
     }
 
+    public LinkedBlockingQueue<E> getQueue(){
+        return linkedBlockingQueue;
+    }
+
     public void enqueue(E object) {
         linkedBlockingQueue.offer(object);
     }
@@ -36,7 +40,13 @@ public class EventQueue<E> {
         return linkedBlockingQueue.poll();
     }
 
-    public boolean removeIf(Predicate filter) {
+    public boolean trim(Predicate filter) {
         return linkedBlockingQueue.removeIf(filter);
     }
+
+    public void clear(){
+        linkedBlockingQueue.clear();
+    }
+
+
 }

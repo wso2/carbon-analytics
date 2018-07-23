@@ -77,6 +77,7 @@ public class HAManager {
     private List<Timer> retrySiddhiAppSyncTimerList;
     private boolean isActiveNodeOutputSyncManagerStarted;
     private EventQueue<QueuedEvent> eventQueue;
+    private TCPServer tcpServerInstance = TCPServer.getInstance();
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -96,6 +97,7 @@ public class HAManager {
         this.username = deploymentConfig.getLiveSync().getUsername();
         this.password = deploymentConfig.getLiveSync().getPassword();
         this.retrySiddhiAppSyncTimerList = new LinkedList<>();
+        EventQueue<QueuedEvent> eventQueue;
     }
 
     public void start() {
@@ -144,9 +146,11 @@ public class HAManager {
                     0, 3000, TimeUnit.MILLISECONDS);
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
+            //initialize passive queue
+            this.eventQueue = EventQueueManager.initializeEventQueue(20000);
 
             //start tcp server
-            TCPServer.getInstance().start(new TCPServerConfig());
+            tcpServerInstance.start(new TCPServerConfig());
 
 //            Map<String, Object> activeNodeHostAndPortMap = clusterCoordinator.getLeaderNode().getPropertiesMap();
 //
@@ -185,38 +189,42 @@ public class HAManager {
      */
     void changeToActive() {
         isActiveNode = true;
-        activeNodePropertiesMap.put("host", localHost);
-        activeNodePropertiesMap.put("port", localPort);
-        clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
+        syncState();
 
-        if (passiveNodeOutputScheduledFuture != null) {
-            passiveNodeOutputScheduledFuture.cancel(false);
-        }
-        if (passiveNodeOutputSchedulerService != null) {
-            passiveNodeOutputSchedulerService.shutdown();
-        }
-        if (syncAfterGracePeriodTimer != null) {
-            syncAfterGracePeriodTimer.cancel();
-            syncAfterGracePeriodTimer.purge();
-        }
-        if (retrySiddhiAppSyncTimerList.size() > 0) {
-            for (Timer timer : retrySiddhiAppSyncTimerList) {
-                timer.cancel();
-                timer.purge();
-            }
-        }
-        if (!liveSyncEnabled && !isActiveNodeOutputSyncManagerStarted) {
-            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-            scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
-                            sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0, outputSyncInterval,
-                    TimeUnit.MILLISECONDS);
-            isActiveNodeOutputSyncManagerStarted = true;
-        }
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeEventDispatcher(eventQueue, "localhost", 9892),
-                0, 1000, TimeUnit.MILLISECONDS);
-        NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
-        nodeInfo.setActiveNode(isActiveNode);
+
+
+//        activeNodePropertiesMap.put("host", localHost);
+//        activeNodePropertiesMap.put("port", localPort);
+//        clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
+//
+//        if (passiveNodeOutputScheduledFuture != null) {
+//            passiveNodeOutputScheduledFuture.cancel(false);
+//        }
+//        if (passiveNodeOutputSchedulerService != null) {
+//            passiveNodeOutputSchedulerService.shutdown();
+//        }
+//        if (syncAfterGracePeriodTimer != null) {
+//            syncAfterGracePeriodTimer.cancel();
+//            syncAfterGracePeriodTimer.purge();
+//        }
+//        if (retrySiddhiAppSyncTimerList.size() > 0) {
+//            for (Timer timer : retrySiddhiAppSyncTimerList) {
+//                timer.cancel();
+//                timer.purge();
+//            }
+//        }
+//        if (!liveSyncEnabled && !isActiveNodeOutputSyncManagerStarted) {
+//            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+//            scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
+//                            sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0, outputSyncInterval,
+//                    TimeUnit.MILLISECONDS);
+//            isActiveNodeOutputSyncManagerStarted = true;
+//        }
+//        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+//        scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeEventDispatcher(eventQueue, "localhost", 9892),
+//                0, 1000, TimeUnit.MILLISECONDS);
+//        NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
+//        nodeInfo.setActiveNode(isActiveNode);
     }
 
     /**

@@ -21,20 +21,21 @@ package org.wso2.carbon.stream.processor.core.event.queue;
 import org.wso2.siddhi.core.event.Event;
 
 public class QueuedEvent {
-    private String streamId;
+    private String sourceHandlerElementId;
     private Event event;
+    private long timestamp;
 
-    public QueuedEvent(String streamId, Event event) {
-        this.streamId = streamId;
+    public QueuedEvent(String sourceHandlerElementId, Event event) {
+        this.sourceHandlerElementId = sourceHandlerElementId;
         this.event = event;
     }
 
-    public String getstreamId() {
-        return streamId;
+    public String getSourceHandlerElementId() {
+        return sourceHandlerElementId;
     }
 
-    public void setstreamId(String streamId) {
-        this.streamId = streamId;
+    public void setSourceHandlerElementId(String sourceHandlerElementId) {
+        this.sourceHandlerElementId = sourceHandlerElementId;
     }
 
     public Event getEvent() {
@@ -43,5 +44,15 @@ public class QueuedEvent {
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public long getTimestamp() {
+
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+
+        this.timestamp = timestamp;
     }
 }

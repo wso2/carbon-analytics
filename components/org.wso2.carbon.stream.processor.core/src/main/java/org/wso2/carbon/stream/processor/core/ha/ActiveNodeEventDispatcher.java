@@ -45,7 +45,8 @@ public class ActiveNodeEventDispatcher implements Runnable {
             } catch (IOException e) {
                 log.error("Error in converting events to binary message.Will retry in the next iteration");
             }
-            log.info("Sent - " + queuedEvent.getstreamId() + "  |   " + queuedEvent.getEvent().toString());
+            log.info("Sent - " + queuedEvent.getSourceHandlerElementId() + "  |   " +
+                    queuedEvent.getEvent().toString());
             queuedEvent = eventQueue.dequeue();
         }
     }

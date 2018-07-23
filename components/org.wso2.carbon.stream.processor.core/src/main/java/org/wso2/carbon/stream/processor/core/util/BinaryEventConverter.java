@@ -34,12 +34,12 @@ public class BinaryEventConverter {
 
     public static ByteBuffer convertToBinaryMessage(QueuedEvent queuedEvent) throws IOException {
         Event event = queuedEvent.getEvent();
-        int messageSize = 4 + BinaryMessageConverterUtil.getSize(queuedEvent.getstreamId());
+        int messageSize = 4 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
         messageSize += getEventSize(event);
 
         ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[messageSize]);
-        messageBuffer.putInt((queuedEvent.getstreamId()).length());
-        messageBuffer.put(((queuedEvent.getstreamId()).getBytes(Charset.defaultCharset())));
+        messageBuffer.putInt((queuedEvent.getSourceHandlerElementId()).length());
+        messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
 
         messageBuffer.putLong(event.getTimestamp());
         if (event.getData() != null && event.getData().length != 0) {

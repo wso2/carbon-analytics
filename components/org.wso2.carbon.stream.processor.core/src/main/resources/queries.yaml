@@ -25,6 +25,7 @@ queries:
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id IN (SELECT id FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id ASC LIMIT ?)
       DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+      SELECT_ALL_LAST_REVISIONS: SELECT revision,siddhiAppName FROM {{TABLE_NAME}} t1 WHERE id = (SELECT MAX(id) FROM {{TABLE_NAME}} t2 WHERE t1.siddhiAppName = t2.siddhiAppName)
 
    type: h2
    version: default
