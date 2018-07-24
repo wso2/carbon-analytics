@@ -10,6 +10,7 @@ queries:
       DELETE_ROW_FROM_TABLE:
       DELETE_OLD_REVISIONS:
       COUNT_NUMBER_REVISIONS:
+      SELECT_ALL_LAST_REVISIONS:
 
    type: default
    version: default
@@ -41,7 +42,7 @@ queries:
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ? IS NOT NULL ORDER BY id ASC LIMIT ?
       DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
-
+      SELECT_ALL_LAST_REVISIONS: select * from {{TABLENAME}}
    type: mysql
    version: default
 

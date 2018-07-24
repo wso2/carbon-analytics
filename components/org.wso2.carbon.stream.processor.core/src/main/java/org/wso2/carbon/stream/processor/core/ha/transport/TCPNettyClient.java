@@ -29,7 +29,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.ha.transport.handlers.MessageEncoder;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;

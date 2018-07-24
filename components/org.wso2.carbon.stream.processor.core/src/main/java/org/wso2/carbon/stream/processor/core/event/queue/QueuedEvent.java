@@ -47,7 +47,6 @@ public class QueuedEvent {
     }
 
     public long getTimestamp() {
-
         return timestamp;
     }
 

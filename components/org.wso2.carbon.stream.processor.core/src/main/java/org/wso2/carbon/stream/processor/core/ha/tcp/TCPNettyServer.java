@@ -28,6 +28,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.ha.transport.handlers.MessageDecoder;
 import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConfig;
 
 /**
@@ -58,7 +59,7 @@ public class TCPNettyServer {
                     @Override
                     protected void initChannel(Channel channel) throws Exception {
                         ChannelPipeline p = channel.pipeline();
-                        p.addLast(new PassiveTCPEventListener());
+                        p.addLast(new MessageDecoder());
                     }
                 })
                 .option(ChannelOption.TCP_NODELAY, true)

@@ -34,17 +34,18 @@ public class ActiveNodeEventDispatcher implements Runnable {
             log.error("Error in connecting to " + host + ":" + port + ". Will retry in the next iteration");
             return;
         }
-
+        log.info("!!!!!!!!!!  :::::::   " + eventQueue.getRemainingCapacity());
         QueuedEvent queuedEvent = eventQueue.dequeue();
         while (queuedEvent != null) {
             try {
                 ByteBuffer byteBuffer = BinaryEventConverter.convertToBinaryMessage(queuedEvent);
-                tcpNettyClient.send("aa", byteBuffer.array());
+                tcpNettyClient.send("eventMessage", byteBuffer.array());
             } catch (ConnectionUnavailableException e) {
                 log.error("Error in sending events to " + host + ":" + port + ".Will retry in the next iteration");
             } catch (IOException e) {
                 log.error("Error in converting events to binary message.Will retry in the next iteration");
             }
+
             log.info("Sent - " + queuedEvent.getSourceHandlerElementId() + "  |   " +
                     queuedEvent.getEvent().toString());
             queuedEvent = eventQueue.dequeue();

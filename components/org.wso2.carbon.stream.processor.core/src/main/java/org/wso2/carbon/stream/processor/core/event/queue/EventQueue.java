@@ -28,7 +28,7 @@ public class EventQueue<E> {
         linkedBlockingQueue = new LinkedBlockingQueue<>(queueSize);
     }
 
-    public LinkedBlockingQueue<E> getQueue(){
+    public LinkedBlockingQueue<E> getQueue() {
         return linkedBlockingQueue;
     }
 
@@ -44,9 +44,11 @@ public class EventQueue<E> {
         return linkedBlockingQueue.removeIf(filter);
     }
 
-    public void clear(){
+    public void clear() {
         linkedBlockingQueue.clear();
     }
 
-
+    public int getRemainingCapacity() {
+        return linkedBlockingQueue.remainingCapacity();
+    }
 }

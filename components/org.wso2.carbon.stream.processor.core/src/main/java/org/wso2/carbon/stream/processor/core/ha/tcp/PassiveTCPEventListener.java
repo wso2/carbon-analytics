@@ -25,19 +25,27 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 
+import java.nio.ByteBuffer;
+
 public class PassiveTCPEventListener extends ChannelInboundHandlerAdapter {
 
-    public PassiveTCPEventListener(){
+    public PassiveTCPEventListener() {
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf inBuffer = (ByteBuf) msg;
 
-        String received = inBuffer.toString(CharsetUtil.UTF_8);
-        System.out.println("Server received: " + received);
+        if (msg instanceof ByteBuffer) {
+            SiddhiEventConverter.toConvertToSiddhiEvents((ByteBuffer) msg);
+        } else {
+            SiddhiEventConverter.toConvertToSiddhiEvents(ByteBuffer.wrap((byte[]) msg));
+        }
 
-        ctx.write(Unpooled.copiedBuffer("Hello " + received, CharsetUtil.UTF_8));
+        //String received = inBuffer.toString(CharsetUtil.UTF_8);
+        System.out.println("Server received: ");
+
+        ctx.write(Unpooled.copiedBuffer("Hello ", CharsetUtil.UTF_8));
     }
 
     @Override
