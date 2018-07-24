@@ -31,7 +31,6 @@ import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConfig;
-import org.wso2.carbon.stream.processor.core.persistence.IncrementalDBPersistenceStore;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
@@ -148,7 +147,7 @@ public class HAManager {
             ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
             scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeEventDispatcher(eventQueue, "localhost", 9892),
                     0, 3000, TimeUnit.MILLISECONDS);
-            scheduledExecutorService.scheduleAtFixedRate(new EventQueueObserver(), 0, 3000, TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(new EventQueueObserver(), 0, 2000, TimeUnit.MILLISECONDS);
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue

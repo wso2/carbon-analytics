@@ -39,7 +39,7 @@ public class ActiveNodeEventDispatcher implements Runnable {
         while (queuedEvent != null) {
             try {
                 ByteBuffer byteBuffer = BinaryEventConverter.convertToBinaryMessage(queuedEvent);
-                tcpNettyClient.send("aa", byteBuffer.array());
+                tcpNettyClient.send("eventMessage", byteBuffer.array());
             } catch (ConnectionUnavailableException e) {
                 log.error("Error in sending events to " + host + ":" + port + ".Will retry in the next iteration");
             } catch (IOException e) {

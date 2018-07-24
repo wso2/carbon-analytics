@@ -17,7 +17,12 @@
  */
 package org.wso2.carbon.stream.processor.core.util;
 
+import io.netty.buffer.ByteBuf;
+import org.wso2.carbon.stream.processor.core.event.queue.EventDataMetaInfo;
+import org.wso2.siddhi.query.api.definition.Attribute;
+
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -48,6 +53,34 @@ public final class BinaryMessageConverterUtil {
         }
     }
 
+    public static EventDataMetaInfo getEventMetaInfo(Object data) {
+        int eventSize;
+        Attribute.Type attributeType;
+        if (data instanceof String) {
+            attributeType = Attribute.Type.STRING;
+            eventSize = 4 + ((String) data).length();
+        } else if (data instanceof Integer) {
+            attributeType = Attribute.Type.INT;
+            eventSize = 4;
+        } else if (data instanceof Long) {
+            attributeType = Attribute.Type.LONG;
+            eventSize = 8;
+        } else if (data instanceof Float) {
+            attributeType = Attribute.Type.FLOAT;
+            eventSize = 4;
+        } else if (data instanceof Double) {
+            attributeType = Attribute.Type.DOUBLE;
+            eventSize = 8;
+        } else if (data instanceof Boolean) {
+            attributeType = Attribute.Type.BOOL;
+            eventSize = 1;
+        } else {
+            attributeType = Attribute.Type.OBJECT;
+            eventSize = 1;
+        }
+        return new EventDataMetaInfo(eventSize, attributeType);
+    }
+
     public static void assignData(Object data, ByteBuffer eventDataBuffer) throws IOException {
         if (data instanceof String) {
             eventDataBuffer.putInt(((String) data).length());
@@ -65,5 +98,17 @@ public final class BinaryMessageConverterUtil {
         } else {
             eventDataBuffer.putInt(0);
         }
+    }
+
+    public static String getString(ByteBuf byteBuf, int size) throws UnsupportedEncodingException {
+        byte[] bytes = new byte[size];
+        byteBuf.readBytes(bytes);
+        return new String(bytes, Charset.defaultCharset());
+    }
+
+    public static String getString(ByteBuffer byteBuf, int size) throws UnsupportedEncodingException {
+        byte[] bytes = new byte[size];
+        byteBuf.get(bytes);
+        return new String(bytes, Charset.defaultCharset());
     }
 }
