@@ -21,10 +21,13 @@ package org.wso2.carbon.stream.processor.core.persistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
+import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
 
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -33,6 +36,7 @@ import java.util.concurrent.ConcurrentMap;
 public class PersistenceManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PersistenceManager.class);
+    TCPNettyClient tcpNettyClient = new TCPNettyClient();
 
     public PersistenceManager() {
     }
@@ -52,15 +56,32 @@ public class PersistenceManager implements Runnable {
     private void persist() {
         ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap = StreamProcessorDataHolder.
                 getSiddhiManager().getSiddhiAppRuntimeMap();
+        String[] siddhiRevisionArray = new String[siddhiAppRuntimeMap.size()];
+        int siddhiAppCount = 0;
         for (SiddhiAppRuntime siddhiAppRuntime : siddhiAppRuntimeMap.values()) {
             PersistenceReference persistenceReference = siddhiAppRuntime.persist();
+            siddhiRevisionArray[siddhiAppCount] = persistenceReference.getRevision();
+            siddhiAppCount++;
             if (log.isDebugEnabled()) {
                 log.debug("Revision " + persistenceReference.getRevision() +
                         " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
             }
         }
+        sendControlMessageToPassiveNode(siddhiRevisionArray);
         if (StreamProcessorDataHolder.getNodeInfo() != null) {
             StreamProcessorDataHolder.getNodeInfo().setLastPersistedTimestamp(System.currentTimeMillis());
+        }
+    }
+
+    private void sendControlMessageToPassiveNode(String[] siddhiRevisionArray) {
+        try {
+            if (!tcpNettyClient.isActive()) {
+                tcpNettyClient.connect("localhost", 9892);
+            }
+            String siddhiAppRevisions = Arrays.toString(siddhiRevisionArray);
+            tcpNettyClient.send("controlMessage", siddhiAppRevisions.getBytes());
+        } catch (ConnectionUnavailableException e) {
+            log.error("Error in connecting to 'localhost' and '9892' of the Passive node");
         }
     }
 }

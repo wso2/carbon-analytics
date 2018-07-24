@@ -18,13 +18,17 @@
 
 package org.wso2.carbon.stream.processor.core.util;
 
+import org.wso2.carbon.stream.processor.core.event.queue.EventDataMetaInfo;
+import org.wso2.carbon.stream.processor.core.event.queue.EventMetaInfo;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 
 /**
@@ -34,13 +38,18 @@ public class BinaryEventConverter {
 
     public static ByteBuffer convertToBinaryMessage(QueuedEvent queuedEvent) throws IOException {
         Event event = queuedEvent.getEvent();
-        int messageSize = 4 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
-        messageSize += getEventSize(event);
+        int messageSize = 8 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
+        EventMetaInfo eventMetaInfo = getEventMetaInfo(event);
+        String attributes = Arrays.toString(eventMetaInfo.getAttributeTypeOrder());
+        messageSize += eventMetaInfo.getEventSize() + attributes.length();
 
         ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[messageSize]);
         messageBuffer.putInt((queuedEvent.getSourceHandlerElementId()).length());
         messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
 
+
+        messageBuffer.putInt(attributes.length());
+        messageBuffer.put(((attributes).getBytes(Charset.defaultCharset())));
         messageBuffer.putLong(event.getTimestamp());
         if (event.getData() != null && event.getData().length != 0) {
             Object[] data = event.getData();
@@ -62,5 +71,21 @@ public class BinaryEventConverter {
             }
         }
         return eventSize;
+    }
+
+    private static EventMetaInfo getEventMetaInfo(Event event) {
+        int eventSize = 8;
+        Object[] data = event.getData();
+        Attribute.Type[] attributeTypeOrder = new Attribute.Type[data.length];
+        EventDataMetaInfo eventDataMetaInfo;
+        if (data != null) {
+            for (int i = 0; i < data.length; i++) {
+                Object aData = data[i];
+                eventDataMetaInfo = BinaryMessageConverterUtil.getEventMetaInfo(aData);
+                eventSize += eventDataMetaInfo.getEventSize();
+                attributeTypeOrder[i] = eventDataMetaInfo.getAttributeType();
+            }
+        }
+        return new EventMetaInfo(eventSize, attributeTypeOrder);
     }
 }
