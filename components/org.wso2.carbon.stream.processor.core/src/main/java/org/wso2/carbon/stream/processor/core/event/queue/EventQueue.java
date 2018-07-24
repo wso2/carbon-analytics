@@ -40,7 +40,7 @@ public class EventQueue<E> {
         return linkedBlockingQueue.poll();
     }
 
-    public boolean trim(Predicate filter) {
+    public boolean trim(Predicate<? super E> filter) {
         return linkedBlockingQueue.removeIf(filter);
     }
 

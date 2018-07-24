@@ -22,11 +22,10 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
+import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.event.queue.EventQueue;
 import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
-import org.wso2.carbon.stream.processor.core.event.queue.EventQueueObserver;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
-import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
@@ -80,7 +79,6 @@ public class HAManager {
     private EventQueue<QueuedEvent> eventQueue;
     private TCPServer tcpServerInstance = TCPServer.getInstance();
     private EventQueueManager eventQueueManager;
-
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -147,7 +145,6 @@ public class HAManager {
             ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
             scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeEventDispatcher(eventQueue, "localhost", 9892),
                     0, 3000, TimeUnit.MILLISECONDS);
-            scheduledExecutorService.scheduleAtFixedRate(new EventQueueObserver(), 0, 2000, TimeUnit.MILLISECONDS);
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
@@ -193,9 +190,10 @@ public class HAManager {
      */
     void changeToActive(){
         isActiveNode = true;
+        tcpServerInstance.stop();
         syncState();
         try {
-            eventQueueManager.trimAndSend();
+            eventQueueManager.trimAndSendToInputHandler();
         } catch (InterruptedException e) {
             e.printStackTrace();//todo
         }
@@ -286,10 +284,6 @@ public class HAManager {
                 log.error("Error in restoring Siddhi Application: " + siddhiAppRuntime.getName(), e);
             }
         });
-    }
-
-    private void sendQueuedEventsToSourceHandler(){
-
     }
 
     /**
