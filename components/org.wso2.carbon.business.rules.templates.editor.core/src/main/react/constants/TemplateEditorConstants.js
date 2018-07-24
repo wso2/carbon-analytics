@@ -63,6 +63,15 @@ const TemplateEditorConstants = {
     },
 
     // Schemas
+    TEMPLATE_GROUP_WRAPPER_SCHEMA: {
+        "id": "/templateGroupWrapperSchema",
+        "type": "object",
+        "properties": {
+            "templateGroup": {
+                "$ref": "/templateGroupSchema",
+            },
+        },
+    },
     TEMPLATE_GROUP_SCHEMA: {
         "id": "/templateGroupSchema",
         "type": "object",

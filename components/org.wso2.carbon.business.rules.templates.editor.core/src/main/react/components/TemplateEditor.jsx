@@ -176,8 +176,18 @@ class TemplateEditor extends React.Component {
 
     componentDidMount() {
         this.setState({
-            codeViewDefinition: JSON.stringify(this.state.templateGroup, null, 3)
+            codeViewDefinition: this.getWrappedTemplateGroupDefinition(this.state.templateGroup)
         });
+    }
+
+    /**
+     * Wraps the given templateGroupDefinition in a JSON object, with the key 'templateGroup',
+     * and returns the stringified JSON
+     * @param templateGroupDefinition
+     * @returns {string}
+     */
+    getWrappedTemplateGroupDefinition(templateGroupDefinition) {
+        return JSON.stringify({ templateGroup: templateGroupDefinition }, null, 3);
     }
 
     /**
@@ -189,7 +199,7 @@ class TemplateEditor extends React.Component {
         let state = this.state;
         state.isUnsaved = true;
         state.templateGroup[name] = value;
-        state.codeViewDefinition = JSON.stringify(state.templateGroup, null, 3);
+        state.codeViewDefinition = this.getWrappedTemplateGroupDefinition(state.templateGroup);
         this.setState(state);
     }
 
@@ -202,7 +212,7 @@ class TemplateEditor extends React.Component {
         state.templateGroup.ruleTemplates.push(
             JSON.parse(JSON.stringify(TemplateEditorConstants.TEMPLATE_GROUP_SKELETON.ruleTemplates[0])));
         state.scriptAdditionBins.push([]);
-        state.codeViewDefinition = JSON.stringify(state.templateGroup, null, 3);
+        state.codeViewDefinition = this.getWrappedTemplateGroupDefinition(state.templateGroup);
         this.setState(state);
     }
 
@@ -215,7 +225,7 @@ class TemplateEditor extends React.Component {
         const state = this.state;
         state.isUnsaved = true;
         state.templateGroup.ruleTemplates[index] = ruleTemplate;
-        state.codeViewDefinition = JSON.stringify(state.templateGroup, null, 3);
+        state.codeViewDefinition = this.getWrappedTemplateGroupDefinition(state.templateGroup);
         this.setState(state);
     }
 
@@ -241,7 +251,7 @@ class TemplateEditor extends React.Component {
         state.isUnsaved = true;
         state.templateGroup.ruleTemplates.splice(index, 1);
         state.scriptAdditionBins.splice(index, 1);
-        state.codeViewDefinition = JSON.stringify(state.templateGroup, null, 3);
+        state.codeViewDefinition = this.getWrappedTemplateGroupDefinition(state.templateGroup);
         this.setState(state);
     }
 
@@ -261,7 +271,7 @@ class TemplateEditor extends React.Component {
                 if (TemplateEditorUtilityFunctions.isSkeletonValid(validJSON)) {
                     // Switch off error, in case of a previous error
                     this.toggleCodeViewError();
-                    state.templateGroup = validJSON;
+                    state.templateGroup = validJSON.templateGroup;
                 }
             } catch (error) {
                 this.toggleCodeViewError(error);
@@ -389,10 +399,10 @@ class TemplateEditor extends React.Component {
             throw 'Invalid JSON for template group definition';
         }
         if (Object.hasOwnProperty.call(templateGroup, 'templateGroup')) {
-            if (TemplateEditorUtilityFunctions.isSkeletonValid(templateGroup.templateGroup)) {
+            if (TemplateEditorUtilityFunctions.isSkeletonValid(templateGroup)) {
                 this.setState({
                     templateGroup: templateGroup.templateGroup,
-                    codeViewDefinition: JSON.stringify(templateGroup.templateGroup, null, 3),
+                    codeViewDefinition: this.getWrappedTemplateGroupDefinition(templateGroup.templateGroup),
                     isUnsaved: false,
                 });
             }
