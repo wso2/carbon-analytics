@@ -22,6 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.SiddhiEventConverter;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 import org.wso2.siddhi.core.event.Event;
@@ -35,6 +36,11 @@ import java.util.List;
  */
 public class MessageDecoder extends ByteToMessageDecoder {
     static final Logger LOG = Logger.getLogger(MessageDecoder.class);
+    private EventQueueManager eventQueueManager;
+
+    public MessageDecoder(EventQueueManager eventQueueManager){
+        this.eventQueueManager = eventQueueManager;
+    }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
@@ -60,7 +66,9 @@ public class MessageDecoder extends ByteToMessageDecoder {
             in.readBytes(bytes);
 
             if (channelId.equals("eventMessage")) {
-                Event[] events = SiddhiEventConverter.toConvertToSiddhiEvents(ByteBuffer.wrap(bytes));
+                Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
+
+
                 LOG.info("Event Received : " + events.toString());
             } else if (channelId.equals("controlMessage")) {
                 LOG.info("Control Message Received : " + new String(bytes));

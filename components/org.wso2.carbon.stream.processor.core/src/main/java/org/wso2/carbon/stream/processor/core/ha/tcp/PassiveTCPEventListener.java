@@ -37,9 +37,9 @@ public class PassiveTCPEventListener extends ChannelInboundHandlerAdapter {
         ByteBuf inBuffer = (ByteBuf) msg;
 
         if (msg instanceof ByteBuffer) {
-            SiddhiEventConverter.toConvertToSiddhiEvents((ByteBuffer) msg);
+            //SiddhiEventConverter.toConvertAndEnqueue((ByteBuffer) msg);
         } else {
-            SiddhiEventConverter.toConvertToSiddhiEvents(ByteBuffer.wrap((byte[]) msg));
+           // SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap((byte[]) msg));
         }
 
         //String received = inBuffer.toString(CharsetUtil.UTF_8);

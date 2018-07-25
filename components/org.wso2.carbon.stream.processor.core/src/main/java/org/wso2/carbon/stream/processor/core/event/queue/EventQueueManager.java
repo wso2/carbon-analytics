@@ -74,4 +74,8 @@ public class EventQueueManager {
     public void trimQueue(long timestamp){
         eventQueue.trim((QueuedEvent queuedEvent) -> queuedEvent.getEvent().getTimestamp() > timestamp);
     }
+
+    public void addToQueue(QueuedEvent queuedEvent){
+        eventQueue.enqueue(queuedEvent);
+    }
 }

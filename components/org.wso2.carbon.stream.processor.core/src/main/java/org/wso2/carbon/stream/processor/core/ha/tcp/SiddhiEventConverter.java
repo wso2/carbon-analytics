@@ -19,6 +19,8 @@ package org.wso2.carbon.stream.processor.core.ha.tcp;
 
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
+import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 import org.wso2.siddhi.core.event.Event;
 
@@ -33,7 +35,7 @@ public class SiddhiEventConverter {
     static final Logger LOG = Logger.getLogger(SiddhiEventConverter.class);
     private static int count = 0;
 
-    public static Event[] toConvertToSiddhiEvents(ByteBuffer messageBuffer) {
+    public static Event[] toConvertAndEnqueue(ByteBuffer messageBuffer, EventQueueManager eventQueueManager) {
         try {
             String sourceHandlerElementId;
             int stringSize = messageBuffer.getInt();
@@ -56,6 +58,7 @@ public class SiddhiEventConverter {
             Event[] events = new Event[0];
             //for (int i = 0; i < numberOfEvents; i++) {
             events = new Event[]{getEvent(messageBuffer, attributeTypes)};
+                //eventQueueManager.addToQueue();
             //}
             count++;
             LOG.info("RECEIVED EVENT - " + sourceHandlerElementId + "       ||      " + events[0].toString() + "    |   COUNT " + count);
