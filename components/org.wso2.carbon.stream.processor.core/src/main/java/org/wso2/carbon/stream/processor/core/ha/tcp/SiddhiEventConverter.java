@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -37,31 +37,31 @@ public class SiddhiEventConverter {
 
     public static Event[] toConvertAndEnqueue(ByteBuffer messageBuffer, EventQueueManager eventQueueManager) {
         try {
-            String sourceHandlerElementId;
-            int stringSize = messageBuffer.getInt();
-            if (stringSize == 0) {
-                sourceHandlerElementId = null;
-            } else {
-                sourceHandlerElementId = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
-            }
+            int noOfEvents = messageBuffer.getInt();
+            LOG.info("No events in the received batch :     " + noOfEvents);
+            Event[] events = new Event[noOfEvents];
+            for (int i = 0; i < noOfEvents; i++) {
+                String sourceHandlerElementId;
+                int stringSize = messageBuffer.getInt();
+                if (stringSize == 0) {
+                    sourceHandlerElementId = null;
+                } else {
+                    sourceHandlerElementId = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
+                }
 
-            String attributes;
-            stringSize = messageBuffer.getInt();
-            if (stringSize == 0) {
-                attributes = null;
-            } else {
-                attributes = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
+                String attributes;
+                stringSize = messageBuffer.getInt();
+                if (stringSize == 0) {
+                    attributes = null;
+                } else {
+                    attributes = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
+                }
+                String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
+                events[i] = getEvent(messageBuffer, attributeTypes);
+                count++;
+                LOG.info("RECEIVED EVENT - " + sourceHandlerElementId + "       ||      " + events[0].toString() + " " +
+                        "   |   COUNT " + count);
             }
-            String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
-            //int numberOfEvents = messageBuffer.getInt();
-
-            Event[] events = new Event[0];
-            //for (int i = 0; i < numberOfEvents; i++) {
-            events = new Event[]{getEvent(messageBuffer, attributeTypes)};
-                //eventQueueManager.addToQueue();
-            //}
-            count++;
-            LOG.info("RECEIVED EVENT - " + sourceHandlerElementId + "       ||      " + events[0].toString() + "    |   COUNT " + count);
             return events;
         } catch (UnsupportedEncodingException e) {
             LOG.error(e.getMessage(), e);

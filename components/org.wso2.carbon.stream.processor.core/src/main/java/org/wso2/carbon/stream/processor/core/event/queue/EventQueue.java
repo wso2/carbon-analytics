@@ -18,10 +18,14 @@
 
 package org.wso2.carbon.stream.processor.core.event.queue;
 
+import org.apache.log4j.Logger;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Predicate;
 
 public class EventQueue<E> {
+    private static final Logger log = Logger.getLogger(EventQueue.class);
+
     private LinkedBlockingQueue<E> linkedBlockingQueue;
 
     public EventQueue(int queueSize) {
@@ -42,6 +46,17 @@ public class EventQueue<E> {
 
     public boolean trim(Predicate<? super E> filter) {
         return linkedBlockingQueue.removeIf(filter);
+    }
+
+    public boolean trimBasedOnTimestamp(Long timestamp) {
+        return linkedBlockingQueue.removeIf(new Predicate<E>() {
+            @Override
+            public boolean test(E e) {
+                QueuedEvent queuedEvent = (QueuedEvent) e;
+                log.info("TRIMMED :       " + queuedEvent.getEvent().toString());
+                return queuedEvent.getTimestamp() < timestamp;
+            }
+        });
     }
 
     public void clear() {
