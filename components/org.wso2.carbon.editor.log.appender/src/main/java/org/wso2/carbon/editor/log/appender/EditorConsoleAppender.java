@@ -39,13 +39,22 @@ import java.text.SimpleDateFormat;
 /**
  * This appender will be used to capture the logs and later send to clients, if requested via the
  * logging web service.
- * This maintains a circular buffer, of some fixed amount (say 100).
+ * This maintains a circular buffer, of some fixed amount {@value #BUFFER_SIZE}.
  */
 @Plugin(name = "EditorConsole", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE, printObject = true)
 public final class EditorConsoleAppender extends AbstractAppender {
 
+    /**
+     * Fixed size of the circular buffer {@value #BUFFER_SIZE}
+     */
     private static final int BUFFER_SIZE = 10;
+    /**
+     * Date Formatter to decode timestamp
+     */
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
+    /**
+     * CircularBuffer to hold the log events
+     */
     private CircularBuffer<ConsoleLogEvent> circularBuffer;
 
     /**
