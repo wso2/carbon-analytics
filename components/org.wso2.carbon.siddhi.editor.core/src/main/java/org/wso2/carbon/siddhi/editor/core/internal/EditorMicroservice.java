@@ -24,6 +24,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -52,8 +53,8 @@ import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
-import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.DeserializersRegisterer;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.CodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.DeserializersRegisterer;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
@@ -66,6 +67,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
+import org.wso2.siddhi.query.api.exception.SiddhiAppContextException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -202,7 +204,17 @@ public class EditorMicroservice implements Microservice {
             }
             jsonString = new Gson().toJson(response);
         } catch (Throwable t) {
-            jsonString = new Gson().toJson(t);
+            // If the exception is a SiddhiAppCreationException and its message is null, append the stacktrace as the
+            // message.
+            if (t instanceof SiddhiAppContextException &&
+                    ((SiddhiAppContextException) t).getMessageWithOutContext() == null) {
+                SiddhiAppContextException e = (SiddhiAppContextException) t;
+                SiddhiAppCreationException appCreationException = new SiddhiAppCreationException(
+                        ExceptionUtils.getStackTrace(t), t, e.getQueryContextStartIndex(), e.getQueryContextEndIndex());
+                jsonString = new Gson().toJson(appCreationException);
+            } else {
+                jsonString = new Gson().toJson(t);
+            }
         }
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
                 .build();

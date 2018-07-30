@@ -31,14 +31,26 @@ define(["./constants"], function (constants) {
      * @return {string} The word wrapped string
      */
     self.wordWrap = function (str, maxWidth) {
-        var brk = '\n';
-        var cut = false;
-        var regex = '.{1,' + maxWidth + '}(\s|$)' + (cut ? '|.{' + maxWidth + '}|.+$' : '|\S+?(\s|$)');
-        if (str) {
-            str = str.match(new RegExp(regex, 'g')).join(brk);
-            str = str.replace(new RegExp('\\\\n', 'g'), brk);
+        maxWidth = maxWidth || 120;
+        var brk = '<br />';
+        var lines = str.split('\n');
+        var result = '';
+        for(var i = 0; i < lines.length; i++) {
+            var words = lines[i].split(/\s/g);
+            var length = 0;
+            for(var j = 0; j < words.length; j++) {
+                if (length + words[j].length > maxWidth) {
+                    result += brk;
+                    length = 0;
+                }
+                result += words[j] + ' ';
+                length += words[j].length;
+            }
+            if (i < lines.length - 1) {
+                result += brk;
+            }
         }
-        return str;
+        return result;
     };
 
     /**
@@ -190,7 +202,7 @@ define(["./constants"], function (constants) {
         if (metaData.output) {
             description += "Output - " + metaData.output + "<br><br>";
         }
-        if (metaData.functionOperation &&
+        if (metaData.functionOperation && functionOperationSnippets &&
             functionOperationSnippets.inBuilt.windowProcessors) {
             var window =
                 functionOperationSnippets.inBuilt.windowProcessors[windowName];
