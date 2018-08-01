@@ -20,6 +20,7 @@ package org.wso2.carbon.stream.processor.core.ha;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
+import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
@@ -102,7 +103,7 @@ public class HAManager {
     }
 
     public void start() {
-        eventQueue = EventQueueManager.initializeEventQueue(sourceQueueCapacity);
+        //eventQueue = EventQueueManager.initializeEventQueue(sourceQueueCapacity);
         sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity, eventQueue);
         sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
         recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(sinkQueueCapacity);
@@ -189,15 +190,29 @@ public class HAManager {
      * Updates Coordination Properties with Advertised Host and Port
      */
     void changeToActive(){
-        isActiveNode = true;
-        tcpServerInstance.stop();
-        syncState();
-        try {
-            eventQueueManager.trimAndSendToInputHandler();
-        } catch (InterruptedException e) {
-            e.printStackTrace();//todo
+        if (!isActiveNode) {
+            isActiveNode = true;
+            tcpServerInstance.stop();
+            syncState();
+            try {
+                eventQueueManager.trimAndSendToInputHandler();
+            } catch (InterruptedException e) {
+                e.printStackTrace();//todo
+            }
+            //start the databridge servers
+            startSiddhiAppRuntimes();
+            List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
+            for (ServerEventListener listener : listeners) {
+                listener.start();
+            }
+
+
+            //start the siddhi app runtimes
         }
-        //openPorts
+
+
+
+
 
 
 
@@ -267,7 +282,7 @@ public class HAManager {
         return timer;
     }
 
-    private void syncState(){
+    private void syncState() {
         ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap
                 = StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntimeMap();
 
@@ -283,6 +298,19 @@ public class HAManager {
             } catch (CannotRestoreSiddhiAppStateException e) {
                 log.error("Error in restoring Siddhi Application: " + siddhiAppRuntime.getName(), e);
             }
+        });
+    }
+
+    private void startSiddhiAppRuntimes() {
+        ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap
+                = StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntimeMap();
+
+        siddhiAppRuntimeMap.forEach((siddhiAppName, siddhiAppRuntime) -> {
+            if (log.isDebugEnabled()) {
+                log.debug("Starting Siddhi Application " +
+                        siddhiAppRuntime.getName());
+            }
+            siddhiAppRuntime.start();
         });
     }
 

@@ -169,89 +169,102 @@ public class StreamProcessorService {
                                         backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
                             }
                         }
+                        siddhiAppData.setActive(true);
+                        siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+                        siddhiAppData.setInputHandlerMap(inputHandlerMap);
+                        siddhiAppData.setDeploymentTime(System.currentTimeMillis());
+                        siddhiAppMap.put(siddhiAppName, siddhiAppData);
+                        siddhiAppRuntime.start();
+                        log.info("Siddhi App " + siddhiAppName + " deployed successfully");
 
                     } else {
                         //Passive Node
-                        if (haManager.isLiveStateSyncEnabled()) {
-                            //Live State Sync Enabled of Passive Node
-                            log.info("Live State Sync is Enabled for Passive Node. Restoring Active Node current state "
-                                    +
-                                    "for " + siddhiAppName);
-                            boolean isPersisted = StreamProcessorDataHolder
-                                    .getHAManager().persistActiveNode(siddhiAppName);
 
-                            if (isPersisted) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Snapshot for " + siddhiAppName + " found from Active Node Live State " +
-                                            "Sync before deploying app");
-                                }
-                                try {
-                                    siddhiAppRuntime.restoreLastRevision();
-                                } catch (CannotRestoreSiddhiAppStateException e) {
-                                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
-                                }
+                        siddhiAppData.setActive(false);
+                        siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+                        siddhiAppData.setInputHandlerMap(inputHandlerMap);
+                        siddhiAppMap.put(siddhiAppName, siddhiAppData);
 
-                            } else {
-
-                                int gracePeriod =
-                                        StreamProcessorDataHolder.getDeploymentConfig().getRetryAppSyncPeriod();
-
-                                siddhiAppData.setActive(false);
-                                siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
-                                siddhiAppData.setInputHandlerMap(inputHandlerMap);
-                                siddhiAppData.setDeploymentTime(System.currentTimeMillis());
-                                siddhiAppMap.put(siddhiAppName, siddhiAppData);
-
-                                Timer timer = retrySiddhiAppLiveStateSync(gracePeriod, siddhiAppName, siddhiAppData,
-                                        siddhiAppRuntime);
-                                log.info("Snapshot for " + siddhiAppName + " not found. Make sure Active and Passive" +
-                                        " node have deployed the same Siddhi Applications");
-                                log.info("Scheduled active node state sync for " + siddhiAppName + " in " +
-                                        gracePeriod / 1000 + " seconds.");
-                                haManager.addRetrySiddhiAppSyncTimer(timer);
-
-                                return; // Siddhi application set to inactive state
-                            }
-                        } else {
-                            //Live State Sync Disabled of Passive Node
-                            if (StreamProcessorDataHolder.isPersistenceEnabled()) {
-                                log.info("Live State Sync is Disabled for Passive Node. Restoring Active nodes last " +
-                                        "persisted state for " + siddhiAppName);
-                                String revision = null;
-                                try {
-                                    revision = siddhiAppRuntime.restoreLastRevision();
-                                } catch (CannotRestoreSiddhiAppStateException e) {
-                                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
-                                }
-                                if (revision != null) {
-                                    log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
-                                } else {
-                                    int gracePeriod = StreamProcessorDataHolder.getDeploymentConfig().
-                                            getRetryAppSyncPeriod();
-
-                                    siddhiAppData.setActive(false);
-                                    siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
-                                    siddhiAppData.setInputHandlerMap(inputHandlerMap);
-                                    siddhiAppData.setDeploymentTime(System.currentTimeMillis());
-                                    siddhiAppMap.put(siddhiAppName, siddhiAppData);
-
-                                    Timer timer = retrySiddhiAppPersistenceStateSync(gracePeriod, siddhiAppName,
-                                            siddhiAppData, siddhiAppRuntime);
-                                    log.info(
-                                            "Snapshot for " + siddhiAppName + " not found. Make sure Active and Passive"
-                                                    +
-                                                    " node have deployed the same Siddhi Applications");
-                                    log.info("Scheduled active node persistence sync for " + siddhiAppName + " in " +
-                                            gracePeriod / 1000 + " seconds.");
-                                    haManager.addRetrySiddhiAppSyncTimer(timer);
-                                    return; //Defer the app deployment until state is synced from Active Node
-                                }
-                            } else {
-                                throw new HAModeException(
-                                        "Passive Node Periodic Persistence is Disabled and Live State " +
-                                                "Sync Disabled. Please enable Periodic Persistence.");
-                            }
-                        }
+//                        if (haManager.isLiveStateSyncEnabled()) {
+//                            //Live State Sync Enabled of Passive Node
+//                            log.info("Live State Sync is Enabled for Passive Node. Restoring Active Node current state "
+//                                    +
+//                                    "for " + siddhiAppName);
+//                            boolean isPersisted = StreamProcessorDataHolder
+//                                    .getHAManager().persistActiveNode(siddhiAppName);
+//
+//                            if (isPersisted) {
+//                                if (log.isDebugEnabled()) {
+//                                    log.debug("Snapshot for " + siddhiAppName + " found from Active Node Live State " +
+//                                            "Sync before deploying app");
+//                                }
+//                                try {
+//                                    siddhiAppRuntime.restoreLastRevision();
+//                                } catch (CannotRestoreSiddhiAppStateException e) {
+//                                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+//                                }
+//
+//                            } else {
+//
+//                                int gracePeriod =
+//                                        StreamProcessorDataHolder.getDeploymentConfig().getRetryAppSyncPeriod();
+//
+//                                siddhiAppData.setActive(false);
+//                                siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+//                                siddhiAppData.setInputHandlerMap(inputHandlerMap);
+//                                siddhiAppData.setDeploymentTime(System.currentTimeMillis());
+//                                siddhiAppMap.put(siddhiAppName, siddhiAppData);
+//
+//                                Timer timer = retrySiddhiAppLiveStateSync(gracePeriod, siddhiAppName, siddhiAppData,
+//                                        siddhiAppRuntime);
+//                                log.info("Snapshot for " + siddhiAppName + " not found. Make sure Active and Passive" +
+//                                        " node have deployed the same Siddhi Applications");
+//                                log.info("Scheduled active node state sync for " + siddhiAppName + " in " +
+//                                        gracePeriod / 1000 + " seconds.");
+//                                haManager.addRetrySiddhiAppSyncTimer(timer);
+//
+//                                return; // Siddhi application set to inactive state
+//                            }
+//                        } else {
+//                            //Live State Sync Disabled of Passive Node
+//                            if (StreamProcessorDataHolder.isPersistenceEnabled()) {
+//                                log.info("Live State Sync is Disabled for Passive Node. Restoring Active nodes last " +
+//                                        "persisted state for " + siddhiAppName);
+//                                String revision = null;
+//                                try {
+//                                    revision = siddhiAppRuntime.restoreLastRevision();
+//                                } catch (CannotRestoreSiddhiAppStateException e) {
+//                                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+//                                }
+//                                if (revision != null) {
+//                                    log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
+//                                } else {
+//                                    int gracePeriod = StreamProcessorDataHolder.getDeploymentConfig().
+//                                            getRetryAppSyncPeriod();
+//
+//                                    siddhiAppData.setActive(false);
+//                                    siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+//                                    siddhiAppData.setInputHandlerMap(inputHandlerMap);
+//                                    siddhiAppData.setDeploymentTime(System.currentTimeMillis());
+//                                    siddhiAppMap.put(siddhiAppName, siddhiAppData);
+//
+//                                    Timer timer = retrySiddhiAppPersistenceStateSync(gracePeriod, siddhiAppName,
+//                                            siddhiAppData, siddhiAppRuntime);
+//                                    log.info(
+//                                            "Snapshot for " + siddhiAppName + " not found. Make sure Active and Passive"
+//                                                    +
+//                                                    " node have deployed the same Siddhi Applications");
+//                                    log.info("Scheduled active node persistence sync for " + siddhiAppName + " in " +
+//                                            gracePeriod / 1000 + " seconds.");
+//                                    haManager.addRetrySiddhiAppSyncTimer(timer);
+//                                    return; //Defer the app deployment until state is synced from Active Node
+//                                }
+//                            } else {
+//                                throw new HAModeException(
+//                                        "Passive Node Periodic Persistence is Disabled and Live State " +
+//                                                "Sync Disabled. Please enable Periodic Persistence.");
+//                            }
+//                        }
                     }
                 } else {
                     if (StreamProcessorDataHolder.isPersistenceEnabled()) {
@@ -267,15 +280,9 @@ public class StreamProcessorService {
                             log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
                         }
                     }
+                    siddhiAppRuntime.start();
+                    log.info("Siddhi App " + siddhiAppName + " deployed successfully");
                 }
-
-                siddhiAppRuntime.start();
-                log.info("Siddhi App " + siddhiAppName + " deployed successfully");
-                siddhiAppData.setActive(true);
-                siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
-                siddhiAppData.setInputHandlerMap(inputHandlerMap);
-                siddhiAppData.setDeploymentTime(System.currentTimeMillis());
-                siddhiAppMap.put(siddhiAppName, siddhiAppData);
             }
         }
     }

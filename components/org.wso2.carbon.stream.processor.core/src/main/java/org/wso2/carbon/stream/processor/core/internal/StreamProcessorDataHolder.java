@@ -22,6 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
@@ -33,6 +34,9 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
 import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class which holds the OSGI Service references
@@ -57,6 +61,11 @@ public class StreamProcessorDataHolder {
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
     private ConfigProvider configProvider;
+
+    /**
+     * List used to hold all the registered subscribers.
+     */
+    private static List<ServerEventListener> serverListeners = new ArrayList<>();
 
     private StreamProcessorDataHolder() {
 
@@ -165,6 +174,18 @@ public class StreamProcessorDataHolder {
 
     public static void setDistributionService(DistributionService distributionService) {
         StreamProcessorDataHolder.distributionService = distributionService;
+    }
+
+    public static void setServerListener(ServerEventListener serverListener) {
+        serverListeners.add(serverListener);
+    }
+
+    public static void removeServerListener(ServerEventListener serverListener) {
+        serverListeners.remove(serverListener);
+    }
+
+    public static List<ServerEventListener> getServerListeners() {
+        return serverListeners;
     }
 
     /**
