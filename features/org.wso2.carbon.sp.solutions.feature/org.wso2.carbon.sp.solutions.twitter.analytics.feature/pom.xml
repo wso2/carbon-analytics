@@ -62,6 +62,11 @@
             <artifactId>wso2sp-solutions.twitter-analytics.wordcloud</artifactId>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -48,6 +48,11 @@
             <artifactId>org.wso2.sp.solutions.widgets.http.analytics.response.code.filter</artifactId>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

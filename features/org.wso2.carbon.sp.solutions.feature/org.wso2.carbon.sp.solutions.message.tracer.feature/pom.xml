@@ -32,6 +32,11 @@
             <artifactId>org.wso2.sp.open.tracer.client</artifactId>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
