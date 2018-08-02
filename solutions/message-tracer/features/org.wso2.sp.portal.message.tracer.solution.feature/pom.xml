@@ -19,7 +19,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>message-tracer</artifactId>
-        <groupId>org.wso2.sp</groupId>
+        <groupId>org.wso2.carbon.analytics</groupId>
         <version>4.3.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
@@ -32,22 +32,22 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.sp</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>wso2sp-solutions.message-tracer.open-tracing-list</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.sp</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>wso2sp-solutions.message-tracer.open-tracing-search</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.sp</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>wso2sp-solutions.message-tracer.open-tracing-vis-timeline</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.sp</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.sp.open.tracer.client</artifactId>
             <type>jar</type>
         </dependency>
@@ -69,7 +69,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.wso2.sp</groupId>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
                                     <artifactId>wso2sp-solutions.message-tracer.open-tracing-list</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
@@ -78,7 +78,7 @@
                                     <includes>OpenTracingList/**</includes>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.sp</groupId>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
                                     <artifactId>wso2sp-solutions.message-tracer.open-tracing-search</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
@@ -87,7 +87,7 @@
                                     <includes>OpenTracingSearch/**</includes>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.sp</groupId>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
                                     <artifactId>wso2sp-solutions.message-tracer.open-tracing-vis-timeline</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
@@ -107,7 +107,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.wso2.sp</groupId>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
                                     <artifactId>org.wso2.sp.open.tracer.client</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
@@ -131,7 +131,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <propertyFile>../etc/feature.properties</propertyFile>
+                            <propertyFile>../../../../features/solutions.feature/org.wso2.carbon.analytics.sp.solutions.message.tracer.feature/etc/feature.properties</propertyFile>
                             <adviceFileContents>
                                 <advice>
                                     <name>org.wso2.carbon.p2.category.type</name>
@@ -152,7 +152,7 @@
                 <directory>${project.build.directory}/target</directory>
             </resource>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>../../../../features/solutions.feature/org.wso2.carbon.analytics.sp.solutions.message.tracer.feature/src/main/resources</directory>
             </resource>
         </resources>
     </build>
