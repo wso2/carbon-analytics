@@ -31,6 +31,7 @@ public class DeploymentConfig {
     private int sinkQueueCapacity = 20000;
     private int sourceQueueCapacity = 20000;
     private int retryAppSyncPeriod = 60000;
+    private int passiveQueueCapacity = 20000;
 
     public String getType() {
         return type;
@@ -86,5 +87,15 @@ public class DeploymentConfig {
 
     public void setRetryAppSyncPeriod(int retryAppSyncPeriod) {
         this.retryAppSyncPeriod = retryAppSyncPeriod;
+    }
+
+    public int getPassiveQueueCapacity() {
+
+        return passiveQueueCapacity;
+    }
+
+    public void setPassiveQueueCapacity(int passiveQueueCapacity) {
+
+        this.passiveQueueCapacity = passiveQueueCapacity;
     }
 }
