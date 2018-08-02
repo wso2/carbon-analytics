@@ -438,9 +438,14 @@ public class ServiceComponent {
     )
     protected void registerServerListener(ServerEventListener serverEventListener) {
         StreamProcessorDataHolder.setServerListener(serverEventListener);
-        if(StreamProcessorDataHolder.getHAManager().isActiveNode()) {
+        if(StreamProcessorDataHolder.getHAManager() != null){
+            if(StreamProcessorDataHolder.getHAManager().isActiveNode()) {
+                serverEventListener.start();
+            }
+        }else {
             serverEventListener.start();
         }
+
     }
 
     protected void unregisterServerListener(ServerEventListener serverEventListener) {
