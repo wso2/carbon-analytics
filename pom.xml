@@ -49,7 +49,7 @@
         <module>components/org.wso2.carbon.permissions.rest.api</module>
         <module>components/org.wso2.carbon.data.provider</module>
         <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
-        <module>components/solutions</module>
+        <module>components/org.wso2.carbon.sp.solutions</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -70,7 +70,7 @@
         <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
         <module>features/org.wso2.carbon.data.provider.feature</module>
         <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
-        <module>features/solutions.feature</module>
+        <module>features/org.wso2.carbon.sp.solutions.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -1573,7 +1573,7 @@
             <!-- Solution Features -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.sp.solutions.http.analytics.feature</artifactId>
+                <artifactId>org.wso2.carbon.sp.solutions.http.analytics.feature</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1691,7 +1691,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.sp.solutions.message.tracer.feature</artifactId>
+                <artifactId>org.wso2.carbon.sp.solutions.message.tracer.feature</artifactId>
                 <type>zip</type>
                 <version>${project.version}</version>
             </dependency>
