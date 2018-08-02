@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -24,8 +24,12 @@ import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 import org.wso2.siddhi.core.event.Event;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 /**
  * This class is a implementation EventConverter to create the event from the Binary message.
@@ -37,36 +41,60 @@ public class SiddhiEventConverter {
 
     public static Event[] toConvertAndEnqueue(ByteBuffer messageBuffer, EventQueueManager eventQueueManager) {
         try {
-            String sourceHandlerElementId;
-            int stringSize = messageBuffer.getInt();
-            if (stringSize == 0) {
-                sourceHandlerElementId = null;
-            } else {
-                sourceHandlerElementId = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
-            }
+            messageBuffer = decompress(messageBuffer);
+           // int isCompressed = messageBuffer.getInt();
+            int noOfEvents = messageBuffer.getInt();
+            LOG.info("No events in the received batch :     " + noOfEvents);
+            Event[] events = new Event[noOfEvents];
+            for (int i = 0; i < noOfEvents; i++) {
+                String sourceHandlerElementId;
+                int stringSize = messageBuffer.getInt();
+                if (stringSize == 0) {
+                    sourceHandlerElementId = null;
+                } else {
+                    sourceHandlerElementId = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
+                }
 
-            String attributes;
-            stringSize = messageBuffer.getInt();
-            if (stringSize == 0) {
-                attributes = null;
-            } else {
-                attributes = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
+                String attributes;
+                stringSize = messageBuffer.getInt();
+                if (stringSize == 0) {
+                    attributes = null;
+                } else {
+                    attributes = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
+                }
+                String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
+                events[i] = getEvent(messageBuffer, attributeTypes);
+                count++;
+                LOG.info("RECEIVED EVENT - " + sourceHandlerElementId + "       ||      " + events[0].toString() + " " +
+                        "   |   COUNT " + count);
             }
-            String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
-            //int numberOfEvents = messageBuffer.getInt();
-
-            Event[] events = new Event[0];
-            //for (int i = 0; i < numberOfEvents; i++) {
-            events = new Event[]{getEvent(messageBuffer, attributeTypes)};
-                //eventQueueManager.addToQueue();
-            //}
-            count++;
-            LOG.info("RECEIVED EVENT - " + sourceHandlerElementId + "       ||      " + events[0].toString() + "    |   COUNT " + count);
             return events;
         } catch (UnsupportedEncodingException e) {
             LOG.error(e.getMessage(), e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (DataFormatException e) {
+            e.printStackTrace();
         }
         return null;
+    }
+
+
+    public static ByteBuffer decompress(ByteBuffer byteBuffer) throws IOException, DataFormatException {
+        //byte[] dataBytes = Base64.decode(data);
+        Inflater inflater = new Inflater();
+        inflater.setInput(byteBuffer.array());
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(byteBuffer.array().length);
+        byte[] buffer = new byte[byteBuffer.array().length];
+        //System.out.printf("REEEE            "+byteBuffer.array().length);
+        while (!inflater.finished()) {
+            int count = inflater.inflate(buffer);
+            outputStream.write(buffer, 0, count);
+        }
+
+        outputStream.close();
+        byte[] output = outputStream.toByteArray();
+        return ByteBuffer.wrap(output);
     }
 
     static Event getEvent(ByteBuffer byteBuffer, String[] attributeTypes) throws UnsupportedEncodingException {

@@ -27,6 +27,12 @@ import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.event.queue.EventQueue;
 import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
+<<<<<<< b004884c5c0bd7360fbd37f4d5aa1ea6683bcaf0
+=======
+import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClientManager;
+>>>>>>> redesign the active node HA implementation
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
@@ -34,6 +40,7 @@ import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
+import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 
 import java.net.URI;
@@ -80,6 +87,7 @@ public class HAManager {
     private EventQueue<QueuedEvent> eventQueue;
     private TCPServer tcpServerInstance = TCPServer.getInstance();
     private EventQueueManager eventQueueManager;
+ //   private static final TCPNettyClient tcpNettyClient = new TCPNettyClient();
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -104,7 +112,8 @@ public class HAManager {
 
     public void start() {
         //eventQueue = EventQueueManager.initializeEventQueue(sourceQueueCapacity);
-        sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity, eventQueue);
+ //       TCPNettyClientManager.initializeTCPClient("localhost", 9892);
+        sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity);
         sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
         recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(sinkQueueCapacity);
 
@@ -144,8 +153,9 @@ public class HAManager {
                 isActiveNodeOutputSyncManagerStarted = true;
             }
             ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-            scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeEventDispatcher(eventQueue, "localhost", 9892),
-                    0, 3000, TimeUnit.MILLISECONDS);
+//            scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeEventDispatcher(eventQueue, "localhost", 9892),
+//                    0, 3000, TimeUnit.MILLISECONDS);
+//            scheduledExecutorService.scheduleAtFixedRate(new EventQueueObserver(), 0, 2000, TimeUnit.MILLISECONDS);
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
@@ -372,6 +382,18 @@ public class HAManager {
             return false;
         }
     }
+
+//    private boolean connectToPassiveNode() {
+//        try {
+//            if (!tcpNettyClient.isActive()) {
+//                tcpNettyClient.connect("localhost", 9892);
+//            }
+//            return true;
+//        } catch (ConnectionUnavailableException e) {
+//            log.warn("Error in connecting to passive node with host'localhost' and port '9892'");
+//        }
+//        return false;
+//    }
 
     public boolean isActiveNode() {
         return isActiveNode;

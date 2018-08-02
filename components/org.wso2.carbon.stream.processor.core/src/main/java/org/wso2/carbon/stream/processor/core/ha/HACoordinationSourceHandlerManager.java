@@ -18,12 +18,8 @@
 
 package org.wso2.carbon.stream.processor.core.ha;
 
-import org.wso2.carbon.stream.processor.core.event.queue.EventQueue;
-import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
-
-import java.util.Queue;
 
 /**
  * Implementation of {@link SourceHandlerManager} used for 2 node minimum HA
@@ -34,15 +30,13 @@ public class HACoordinationSourceHandlerManager extends SourceHandlerManager {
      * Parameter that defines the size of the event queue that is stored in each {@link SourceHandler}
      */
     private int queueCapacity;
-    private EventQueue<QueuedEvent> eventQueue;
 
-    public HACoordinationSourceHandlerManager(int queueCapacity, EventQueue<QueuedEvent> eventQueue) {
+    public HACoordinationSourceHandlerManager(int queueCapacity) {
         this.queueCapacity = queueCapacity;
-        this.eventQueue = eventQueue;
     }
 
     @Override
     public SourceHandler generateSourceHandler() {
-        return new HACoordinationSourceHandler(queueCapacity, eventQueue);
+        return new HACoordinationSourceHandler(queueCapacity);
     }
 }

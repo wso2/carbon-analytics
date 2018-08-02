@@ -43,7 +43,7 @@ public class PassiveTCPEventListener extends ChannelInboundHandlerAdapter {
         }
 
         //String received = inBuffer.toString(CharsetUtil.UTF_8);
-        System.out.println("Server received: ");
+        //System.out.println("Server received: ");
 
         ctx.write(Unpooled.copiedBuffer("Hello ", CharsetUtil.UTF_8));
     }

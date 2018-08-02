@@ -21,7 +21,10 @@ package org.wso2.carbon.stream.processor.core.ha;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.event.queue.EventQueue;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClientManager;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
+import org.wso2.carbon.stream.processor.core.util.BinaryEventConverter;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
@@ -44,16 +47,17 @@ public class HACoordinationSourceHandler extends SourceHandler {
     private long lastProcessedEventTimestamp = 0L;
     private Queue<Event> passiveNodeBufferedEvents;
     private String sourceHandlerElementId;
-    private EventQueue eventQueue;
+    private TCPNettyClient tcpNettyClient;
     private int count = 0;
+    private ActiveNodeEventDispatcher activeNodeEventDispatcher;
 
     private final int queueCapacity;
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
-    public HACoordinationSourceHandler(int queueCapacity, EventQueue eventQueue) {
+    public HACoordinationSourceHandler(int queueCapacity) {
         this.queueCapacity = queueCapacity;
         passiveNodeBufferedEvents = new LinkedBlockingQueue<>(queueCapacity);
-        this.eventQueue = eventQueue;
+        activeNodeEventDispatcher = new ActiveNodeEventDispatcher();
     }
 
     @Override
@@ -72,7 +76,8 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void sendEvent(Event event, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
-            eventQueue.enqueue(new QueuedEvent(sourceHandlerElementId, event));
+            //eventQueue.enqueue(new QueuedEvent(sourceHandlerElementId, event));
+            activeNodeEventDispatcher.sendEventToPassiveNode(new QueuedEvent(sourceHandlerElementId, event));
             count++;
             log.info("QUEUE COUNT     " + count);
             inputHandler.send(event);
@@ -104,7 +109,8 @@ public class HACoordinationSourceHandler extends SourceHandler {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
             for (Event event : events) {
-                eventQueue.enqueue(new QueuedEvent(sourceHandlerElementId, event));
+                //eventQueue.enqueue(new QueuedEvent(sourceHandlerElementId, event));
+                activeNodeEventDispatcher.sendEventToPassiveNode(new QueuedEvent(sourceHandlerElementId, event));
                 count++;
             }
             log.info("COUNT     " + count);
@@ -210,4 +216,11 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public String getElementId() {
         return sourceHandlerElementId;
     }
+
+//    private boolean sendEventsToPassiveNode(QueuedEvent queuedEvent) {
+//        if (tcpNettyClient.isActive()) {
+//            tcpNettyClient.send("eventMessage", BinaryEventConverter.convertToBinaryMessage());
+//        }
+//        return true;
+//    }
 }

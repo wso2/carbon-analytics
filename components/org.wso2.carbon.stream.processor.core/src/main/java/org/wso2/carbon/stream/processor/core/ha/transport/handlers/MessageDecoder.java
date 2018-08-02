@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -64,7 +64,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
             int dataLength = in.readInt();
             byte[] bytes = new byte[dataLength];
             in.readBytes(bytes);
-
+            LOG.info("Message Received : " + new String(bytes));
             if (channelId.equals("eventMessage")) {
                 Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
 

@@ -76,7 +76,7 @@ public class PersistenceManager implements Runnable {
     private void sendControlMessageToPassiveNode(String[] siddhiRevisionArray) {
         try {
             if (!tcpNettyClient.isActive()) {
-                tcpNettyClient.connect("localhost", 9892);
+                tcpNettyClient.connect("localhost", 9893);
             }
             String siddhiAppRevisions = Arrays.toString(siddhiRevisionArray);
             tcpNettyClient.send("controlMessage", siddhiAppRevisions.getBytes());
