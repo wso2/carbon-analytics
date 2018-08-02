@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.wso2.carbon.analytics</groupId>
+        <artifactId>org.wso2.carbon.sp.solutions.message.tracer</artifactId>
+        <version>2.0.395-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>WSO2 Stream Processor - Message Tracer</name>
+    <description>WSO2 Stream Processor Message Tracer Solution</description>
+    <artifactId>message-tracer-widgets</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>OpenTracingList</module>
+        <module>OpenTracingSearch</module>
+        <module>OpenTracingVisTimeline</module>
+    </modules>
+
+
+</project>
