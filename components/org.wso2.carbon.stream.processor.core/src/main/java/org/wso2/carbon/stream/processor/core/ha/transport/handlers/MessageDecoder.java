@@ -64,7 +64,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
             int dataLength = in.readInt();
             byte[] bytes = new byte[dataLength];
             in.readBytes(bytes);
-
+            LOG.info("Message Received : " + new String(bytes));
             if (channelId.equals("eventMessage")) {
                 Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
 

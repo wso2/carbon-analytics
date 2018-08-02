@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClientManager;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
@@ -48,6 +49,12 @@ public class HAEventListener extends MemberEventListener {
 
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
+      //  System.out.println("#########################################");
+        ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
+            if (!nodeDetail.isCoordinator()) {
+       //     System.out.println("####################1111111111111#####################");
+       //     System.out.println(nodeDetail.getPropertiesMap().toString());
+        }
         // Do Nothing
     }
 

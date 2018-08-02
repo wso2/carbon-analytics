@@ -24,8 +24,12 @@ import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 import org.wso2.siddhi.core.event.Event;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 /**
  * This class is a implementation EventConverter to create the event from the Binary message.
@@ -37,6 +41,8 @@ public class SiddhiEventConverter {
 
     public static Event[] toConvertAndEnqueue(ByteBuffer messageBuffer, EventQueueManager eventQueueManager) {
         try {
+            messageBuffer = decompress(messageBuffer);
+           // int isCompressed = messageBuffer.getInt();
             int noOfEvents = messageBuffer.getInt();
             LOG.info("No events in the received batch :     " + noOfEvents);
             Event[] events = new Event[noOfEvents];
@@ -65,8 +71,30 @@ public class SiddhiEventConverter {
             return events;
         } catch (UnsupportedEncodingException e) {
             LOG.error(e.getMessage(), e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (DataFormatException e) {
+            e.printStackTrace();
         }
         return null;
+    }
+
+
+    public static ByteBuffer decompress(ByteBuffer byteBuffer) throws IOException, DataFormatException {
+        //byte[] dataBytes = Base64.decode(data);
+        Inflater inflater = new Inflater();
+        inflater.setInput(byteBuffer.array());
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(byteBuffer.array().length);
+        byte[] buffer = new byte[byteBuffer.array().length];
+        //System.out.printf("REEEE            "+byteBuffer.array().length);
+        while (!inflater.finished()) {
+            int count = inflater.inflate(buffer);
+            outputStream.write(buffer, 0, count);
+        }
+
+        outputStream.close();
+        byte[] output = outputStream.toByteArray();
+        return ByteBuffer.wrap(output);
     }
 
     static Event getEvent(ByteBuffer byteBuffer, String[] attributeTypes) throws UnsupportedEncodingException {

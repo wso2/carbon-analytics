@@ -73,7 +73,7 @@ public class EventQueueObserver implements Runnable {
                 }
             }
             if (!tcpNettyClient.isActive()) {
-                tcpNettyClient.connect("localhost", 9892);
+                tcpNettyClient.connect("localhost", 9893);
             }
             String siddhiAppRevisions = Arrays.toString(siddhiAppRevisionArray);
             tcpNettyClient.send("controlMessage", siddhiAppRevisions.getBytes());
