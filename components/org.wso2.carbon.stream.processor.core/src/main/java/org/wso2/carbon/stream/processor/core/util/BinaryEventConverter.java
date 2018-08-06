@@ -36,14 +36,39 @@ import java.util.Arrays;
  */
 public class BinaryEventConverter {
 
-    public static ByteBuffer convertToBinaryMessage(QueuedEvent queuedEvent) throws IOException {
+//    public static ByteBuffer convertToBinaryMessage(QueuedEvent queuedEvent) throws IOException {
+//        Event event = queuedEvent.getEvent();
+//        int messageSize = 8 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
+//        EventMetaInfo eventMetaInfo = getEventMetaInfo(event);
+//        String attributes = Arrays.toString(eventMetaInfo.getAttributeTypeOrder());
+//        messageSize += eventMetaInfo.getEventSize() + attributes.length();
+//
+//        ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[messageSize]);
+//        messageBuffer.putInt((queuedEvent.getSourceHandlerElementId()).length());
+//        messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
+//
+//
+//        messageBuffer.putInt(attributes.length());
+//        messageBuffer.put(((attributes).getBytes(Charset.defaultCharset())));
+//        messageBuffer.putLong(event.getTimestamp());
+//        if (event.getData() != null && event.getData().length != 0) {
+//            Object[] data = event.getData();
+//            for (int i = 0; i < data.length; i++) {
+//                Object aData = data[i];
+//                BinaryMessageConverterUtil.assignData(aData, messageBuffer);
+//            }
+//        }
+//        return messageBuffer;
+//    }
+
+    public static ByteBuffer convertToBinaryMessage(QueuedEvent queuedEvent, ByteBuffer messageBuffer)
+            throws IOException {
         Event event = queuedEvent.getEvent();
-        int messageSize = 8 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
+        //int messageSize = 8 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
         EventMetaInfo eventMetaInfo = getEventMetaInfo(event);
         String attributes = Arrays.toString(eventMetaInfo.getAttributeTypeOrder());
-        messageSize += eventMetaInfo.getEventSize() + attributes.length();
+        //messageSize += eventMetaInfo.getEventSize() + attributes.length();
 
-        ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[messageSize]);
         messageBuffer.putInt((queuedEvent.getSourceHandlerElementId()).length());
         messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
 

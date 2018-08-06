@@ -40,12 +40,16 @@ import java.util.UUID;
  */
 public class TCPNettyClient {
     private static final Logger log = Logger.getLogger(TCPNettyClient.class);
-
+    private static final TCPNettyClient tcpNettyClient = new TCPNettyClient();
     private EventLoopGroup group;
     private Bootstrap bootstrap;
     private Channel channel;
     private String sessionId;
     private String hostAndPort;
+
+    public static TCPNettyClient getInstance() {
+        return tcpNettyClient;
+    }
 
     public TCPNettyClient(boolean keepAlive, boolean noDelay) {
         this(0, keepAlive, noDelay);

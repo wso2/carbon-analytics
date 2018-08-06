@@ -22,8 +22,8 @@ public final class TCPServerConstants {
 
     public static final String DEFAULT_CHARSET = "UTF-8";
     public static final int DEFAULT_RECEIVER_THREADS = 10;
-    public static final int DEFAULT_WORKER_THREADS = 1;
-    public static final int DEFAULT_PORT = 9892;
+    public static final int DEFAULT_WORKER_THREADS = 10;
+    public static final int DEFAULT_PORT = 9893;
     public static final String DEFAULT_HOST = "0.0.0.0";
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
     public static final boolean DEFAULT_KEEP_ALIVE = true;
