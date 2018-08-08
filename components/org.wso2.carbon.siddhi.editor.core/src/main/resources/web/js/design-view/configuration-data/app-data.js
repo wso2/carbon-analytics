@@ -29,6 +29,8 @@ define(['require', 'elementUtils', 'lodash'],
             // initiates the collections
             if (options !== undefined) {
                 this.siddhiAppName = options.siddhiAppName;
+                this.siddhiAppDescription = options.siddhiAppDescription;
+
                 // Following lists hold references for comments in the code view. These lists are passed to the backend
                 // when generating the code from design. Front end does not use them.
                 this.elementCodeSegments = options.elementCodeSegments;
@@ -198,6 +200,10 @@ define(['require', 'elementUtils', 'lodash'],
             return this.siddhiAppName;
         };
 
+         AppData.prototype.getSiddhiAppDescription = function () {
+                    return this.siddhiAppDescription;
+         };
+
         AppData.prototype.getStream = function (streamId) {
             var returnedElement = ElementUtils.prototype.getElement(this.streamList, streamId);
             if (!returnedElement) {
@@ -335,6 +341,10 @@ define(['require', 'elementUtils', 'lodash'],
         AppData.prototype.setSiddhiAppName = function (siddhiAppName) {
             this.siddhiAppName = siddhiAppName;
         };
+
+        AppData.prototype.setSiddhiAppDescription = function (siddhiAppDescription) {
+                    this.siddhiAppDescription = siddhiAppDescription;
+         };
 
         AppData.prototype.setAppAnnotationList = function (appAnnotationList) {
             this.appAnnotationList = appAnnotationList;

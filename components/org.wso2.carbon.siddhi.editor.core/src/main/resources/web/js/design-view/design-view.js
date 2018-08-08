@@ -164,7 +164,8 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 var defaultResponse = {
                     "siddhiAppConfig": {
                         "siddhiAppName": match[1],
-                        "appAnnotationList": ['@App:description("' + match[2] + '")'],
+                        "siddhiAppDescription": match[2],
+                        "appAnnotationList": [],
                         "streamList": [],
                         "tableList": [],
                         "windowList": [],

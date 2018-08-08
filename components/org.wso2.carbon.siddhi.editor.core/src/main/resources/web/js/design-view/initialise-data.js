@@ -55,6 +55,9 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
             // set the app name
             self.appData.setSiddhiAppName(configurationJSON.siddhiAppConfig.siddhiAppName);
+            // set the app desc
+            self.appData.setSiddhiAppDescription(configurationJSON.siddhiAppConfig.siddhiAppDescription);
+
             // add app annotations
             self.appData.setAppAnnotationList(configurationJSON.siddhiAppConfig.appAnnotationList);
             // add definitions to the data storing structure
