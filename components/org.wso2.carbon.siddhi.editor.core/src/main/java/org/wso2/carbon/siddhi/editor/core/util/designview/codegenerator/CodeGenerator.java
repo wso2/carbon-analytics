@@ -119,8 +119,6 @@ public class CodeGenerator {
         return appNameStringBuilder.toString();
     }
 
-    //mine
-
     /**
      * Generate's the Siddhi code representation of a Siddhi app's app description
      *
@@ -141,9 +139,6 @@ public class CodeGenerator {
 
         return appDescriptionStringBuilder.toString();
     }
-
-
-
 
     /**
      * Generate's the Siddhi code representation of a Siddhi app's stream definitions

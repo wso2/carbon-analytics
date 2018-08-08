@@ -98,15 +98,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.dropElements.formBuilder.DefineFormForAppAnnotations(this);
             });
 
-            // add a text field to display the siddhi app name
+            // add text fields to display the siddhi app name and description
             var siddhiAppNameNodeId = self.currentTabId + '-siddhiAppNameId';
             var siddhiAppName = self.configurationData.getSiddhiAppConfig().getSiddhiAppName();
             var siddhiAppNameNode = $("<div id='" + siddhiAppNameNodeId + "' " +
                 "class='siddhi-app-name-node'>" + siddhiAppName + "</div>");
             var siddhiAppDescription = self.configurationData.getSiddhiAppConfig().getSiddhiAppDescription();
             var siddhiAppDescriptionNode = $("<div id='siddhi-app-desc-node'>"+siddhiAppDescription +"</div>");
-
-
             self.canvas.append(siddhiAppNameNode,siddhiAppDescriptionNode);
 
             /**

@@ -44,7 +44,7 @@ import java.util.Set;
 public class SiddhiAppConfig {
     private int finalElementCount = 0;
 
-    private String siddhiAppDescription ="";
+    private String siddhiAppDescription = "";
     private String siddhiAppName = "";
     private List<String> appAnnotationList = new ArrayList<>();
     private List<SourceSinkConfig> sourceList = new ArrayList<>();
@@ -70,7 +70,8 @@ public class SiddhiAppConfig {
 
     /**
      * Returns Id for the next element id, after incrementing the final element count
-     * @return      Id for the element
+     *
+     * @return Id for the element
      */
     private String generateNextElementId() {
         return String.valueOf(++finalElementCount);
@@ -78,9 +79,10 @@ public class SiddhiAppConfig {
 
     /**
      * Returns PartitionConnector id, with the given partition id and connector id
-     * @param partitionId       Id of the PartitionConfig
-     * @param connectorId       Id of the PartitionConnector, within the Partition
-     * @return                  PartitionConnector id
+     *
+     * @param partitionId Id of the PartitionConfig
+     * @param connectorId Id of the PartitionConnector, within the Partition
+     * @return PartitionConnector id
      */
     private String generatePartitionConnectorId(String partitionId, String connectorId) {
         return partitionId + "_pc" + connectorId;
@@ -88,9 +90,10 @@ public class SiddhiAppConfig {
 
     /**
      * Adds a given generic type Siddhi ElementConfig, to the given list of the same generic type
-     * @param elementList       List to which, the given element config should be added
-     * @param elementConfig     Siddhi ElementConfig object
-     * @param <T>               Generic type of the Siddhi ElementConfig object, and each membe of the list
+     *
+     * @param elementList   List to which, the given element config should be added
+     * @param elementConfig Siddhi ElementConfig object
+     * @param <T>           Generic type of the Siddhi ElementConfig object, and each membe of the list
      */
     private <T> void addElement(List<T> elementList, T elementConfig) {
         ((SiddhiElementConfig) elementConfig).setId(generateNextElementId());
@@ -101,7 +104,8 @@ public class SiddhiAppConfig {
     /**
      * Adds the given list of ElementCodeSegment objects representing code segments of Siddhi elements,
      * to the existing list
-     * @param elementCodeSegments       List of ElementCodeSegment objects
+     *
+     * @param elementCodeSegments List of ElementCodeSegment objects
      */
     public void addElementCodeSegments(Set<ElementCodeSegment> elementCodeSegments) {
         this.elementCodeSegments.addAll(elementCodeSegments);
@@ -109,7 +113,8 @@ public class SiddhiAppConfig {
 
     /**
      * Adds the code segment of the given SiddhiElementConfig object, to the existing list of code segments
-     * @param siddhiElementConfig       SiddhiElementConfig object
+     *
+     * @param siddhiElementConfig SiddhiElementConfig object
      */
     private void addElementCodeSegment(SiddhiElementConfig siddhiElementConfig) {
         ElementCodeSegment elementCodeSegment =
@@ -123,8 +128,9 @@ public class SiddhiAppConfig {
 
     /**
      * Adds a given QueryConfig object to its specific query list, denoted by the given QueryInputType
-     * @param queryListType     Key with which, the specific query list is denoted
-     * @param queryConfig       QueryConfig object
+     *
+     * @param queryListType Key with which, the specific query list is denoted
+     * @param queryConfig   QueryConfig object
      */
     public void addQuery(QueryListType queryListType, QueryConfig queryConfig) {
         queryConfig.setId(generateNextElementId());
@@ -134,7 +140,8 @@ public class SiddhiAppConfig {
 
     /**
      * Adds a given PartitionConfig object to the partitionList
-     * @param partitionConfig       PartitionConfig object
+     *
+     * @param partitionConfig PartitionConfig object
      */
     public void addPartition(PartitionConfig partitionConfig) {
         partitionConfig.setId(generateNextElementId());

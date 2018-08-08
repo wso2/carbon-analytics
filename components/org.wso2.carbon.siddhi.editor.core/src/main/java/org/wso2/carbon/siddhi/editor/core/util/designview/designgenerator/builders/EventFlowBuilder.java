@@ -81,7 +81,8 @@ public class EventFlowBuilder {
 
     /**
      * Creates an EventFlow object with loaded elements
-     * @return      EventFlow object
+     *
+     * @return EventFlow object
      */
     public EventFlow create() {
         return new EventFlow(siddhiAppConfig, edges);
@@ -89,7 +90,8 @@ public class EventFlowBuilder {
 
     /**
      * Loads App level Annotations from the Siddhi app
-     * @return      A reference to this object
+     *
+     * @return A reference to this object
      */
     public EventFlowBuilder loadAppAnnotations() {
         String siddhiAppName = "";
@@ -100,14 +102,10 @@ public class EventFlowBuilder {
             if (annotation.getName().equalsIgnoreCase("NAME")) {
                 siddhiAppName = annotation.getElements().get(0).getValue();
                 annotationConfigGenerator.preserveCodeSegment(annotation);
-            }
-
-            else if (annotation.getName().equalsIgnoreCase("DESCRIPTION")){
+            } else if (annotation.getName().equalsIgnoreCase("DESCRIPTION")) {
                 siddhiAppDescription = annotation.getElements().get(0).getValue();
                 annotationConfigGenerator.preserveCodeSegment(annotation);
-            }
-
-            else {
+            } else {
                 appAnnotations.add(
                         "@App:" + annotationConfigGenerator.generateAnnotationConfig(annotation).split("@")[1]);
             }
@@ -121,8 +119,9 @@ public class EventFlowBuilder {
 
     /**
      * Loads Triggers from the SiddhiApp
-     * @return                                  A reference to this object
-     * @throws DesignGenerationException        Error while loading elements
+     *
+     * @return A reference to this object
+     * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadTriggers() throws DesignGenerationException {
         TriggerConfigGenerator triggerConfigGenerator =
@@ -136,9 +135,10 @@ public class EventFlowBuilder {
 
     /**
      * Returns the availability of a Trigger with the given name, in the given Siddhi app
-     * @param streamName    Name of the Stream
-     * @param siddhiApp     Siddhi app in which, availability of Trigger is searched
-     * @return              Availability of Trigger with the given name, in given Siddhi app
+     *
+     * @param streamName Name of the Stream
+     * @param siddhiApp  Siddhi app in which, availability of Trigger is searched
+     * @return Availability of Trigger with the given name, in given Siddhi app
      */
     private boolean isTriggerDefined(String streamName, SiddhiApp siddhiApp) {
         return (siddhiApp.getTriggerDefinitionMap().size() != 0 &&
@@ -147,7 +147,8 @@ public class EventFlowBuilder {
 
     /**
      * Loads Streams from the SiddhiAppRuntime
-     * @return      A reference to this object
+     *
+     * @return A reference to this object
      */
     public EventFlowBuilder loadStreams() {
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
@@ -165,7 +166,8 @@ public class EventFlowBuilder {
 
     /**
      * Loads Sources from the SiddhiAppRuntime
-     * @return      A reference to this object
+     *
+     * @return A reference to this object
      */
     public EventFlowBuilder loadSources() throws DesignGenerationException {
         SourceSinkConfigsGenerator sourceConfigsGenerator = new SourceSinkConfigsGenerator();
@@ -180,7 +182,8 @@ public class EventFlowBuilder {
 
     /**
      * Loads Sinks from the SiddhiAppRuntime
-     * @return      A reference to this object
+     *
+     * @return A reference to this object
      */
     public EventFlowBuilder loadSinks() throws DesignGenerationException {
         SourceSinkConfigsGenerator sinkConfigsGenerator = new SourceSinkConfigsGenerator();
@@ -195,8 +198,9 @@ public class EventFlowBuilder {
 
     /**
      * Loads Tables from the Siddhi App
-     * @return                                  A reference to this object
-     * @throws DesignGenerationException        Error while loading elements
+     *
+     * @return A reference to this object
+     * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadTables() throws DesignGenerationException {
         TableConfigGenerator tableConfigGenerator = new TableConfigGenerator();
@@ -209,8 +213,9 @@ public class EventFlowBuilder {
 
     /**
      * Loads Defined Windows from the SiddhiAppRuntime
-     * @return                                  A reference to this object
-     * @throws DesignGenerationException        Error while loading elements
+     *
+     * @return A reference to this object
+     * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadWindows() throws DesignGenerationException {
         WindowConfigGenerator windowConfigGenerator = new WindowConfigGenerator(siddhiAppString);
@@ -223,8 +228,9 @@ public class EventFlowBuilder {
 
     /**
      * Loads Aggregations from the SiddhiApp
-     * @return                                  A reference to this object
-     * @throws DesignGenerationException        Error while loading elements
+     *
+     * @return A reference to this object
+     * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadAggregations() throws DesignGenerationException {
         AggregationConfigGenerator aggregationConfigGenerator = new AggregationConfigGenerator(siddhiAppString);
@@ -237,7 +243,8 @@ public class EventFlowBuilder {
 
     /**
      * Loads Functions from the siddhi app
-     * @return      A reference to this object
+     *
+     * @return A reference to this object
      */
     public EventFlowBuilder loadFunctions() {
         FunctionConfigGenerator functionConfigGenerator = new FunctionConfigGenerator();
@@ -250,8 +257,9 @@ public class EventFlowBuilder {
 
     /**
      * Loads Execution Elements from the Siddhi App
-     * @return                                  A reference to this object
-     * @throws DesignGenerationException        Error while loading elements
+     *
+     * @return A reference to this object
+     * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadExecutionElements() throws DesignGenerationException {
         Map<String, Map<String, AbstractDefinition>> partitionedInnerStreamDefinitions =
@@ -283,8 +291,9 @@ public class EventFlowBuilder {
 
     /**
      * Loads generated Edges that represent connections between SiddhiElementConfigs, into SiddhiAppConfig object
-     * @return                                  A reference to this object
-     * @throws DesignGenerationException        Error while loading edges
+     *
+     * @return A reference to this object
+     * @throws DesignGenerationException Error while loading edges
      */
     public EventFlowBuilder loadEdges() throws DesignGenerationException {
         EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
@@ -294,8 +303,9 @@ public class EventFlowBuilder {
 
     /**
      * Loads Comments, that were preserved by each Siddhi Element Config generator
-     * @return                                  A reference to this object
-     * @throws DesignGenerationException        Error while generating Comment Code Segments
+     *
+     * @return A reference to this object
+     * @throws DesignGenerationException Error while generating Comment Code Segments
      */
     public EventFlowBuilder loadComments() throws DesignGenerationException {
         OuterScopeCommentsPreserver outerScopeCommentsPreserver =
