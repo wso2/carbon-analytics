@@ -103,7 +103,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var siddhiAppName = self.configurationData.getSiddhiAppConfig().getSiddhiAppName();
             var siddhiAppNameNode = $("<div id='" + siddhiAppNameNodeId + "' " +
                 "class='siddhi-app-name-node'>" + siddhiAppName + "</div>");
-            self.canvas.append(siddhiAppNameNode);
+            var siddhiAppDescription = self.configurationData.getSiddhiAppConfig().getSiddhiAppDescription();
+            var siddhiAppDescriptionNode = $("<div id='siddhi-app-desc-node'>"+siddhiAppDescription +"</div>");
+
+
+            self.canvas.append(siddhiAppNameNode,siddhiAppDescriptionNode);
 
             /**
              * @description jsPlumb function opened

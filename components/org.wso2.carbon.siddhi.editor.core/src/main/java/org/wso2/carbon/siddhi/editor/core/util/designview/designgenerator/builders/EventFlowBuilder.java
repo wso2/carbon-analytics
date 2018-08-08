@@ -93,18 +93,27 @@ public class EventFlowBuilder {
      */
     public EventFlowBuilder loadAppAnnotations() {
         String siddhiAppName = "";
+        String siddhiAppDescription = "";
         List<String> appAnnotations = new ArrayList<>();
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         for (Annotation annotation : siddhiApp.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase("NAME")) {
                 siddhiAppName = annotation.getElements().get(0).getValue();
                 annotationConfigGenerator.preserveCodeSegment(annotation);
-            } else {
+            }
+
+            else if (annotation.getName().equalsIgnoreCase("DESCRIPTION")){
+                siddhiAppDescription = annotation.getElements().get(0).getValue();
+                annotationConfigGenerator.preserveCodeSegment(annotation);
+            }
+
+            else {
                 appAnnotations.add(
                         "@App:" + annotationConfigGenerator.generateAnnotationConfig(annotation).split("@")[1]);
             }
         }
         siddhiAppConfig.setSiddhiAppName(siddhiAppName);
+        siddhiAppConfig.setSiddhiAppDescription(siddhiAppDescription);
         siddhiAppConfig.setAppAnnotationList(appAnnotations);
         siddhiAppConfig.addElementCodeSegments(annotationConfigGenerator.getPreservedCodeSegments());
         return this;

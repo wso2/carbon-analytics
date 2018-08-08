@@ -57,6 +57,8 @@ public class SiddhiCodeBuilderConstants {
     public static final String ALL_EVENTS = "all events";
     // Annotation Strings
     public static final String APP_NAME_ANNOTATION = "@App:name('";
+    public static final String APP_DESCRIPTION_ANNOTATION = "@App:description('";
+
     public static final String SOURCE_ANNOTATION = "@source(type='";
     public static final String SINK_ANNOTATION = "@sink(type='";
     public static final String STORE_ANNOTATION = "@store(type='";
@@ -64,6 +66,8 @@ public class SiddhiCodeBuilderConstants {
     public static final String ATTRIBUTES_ANNOTATION = "@attributes(";
     public static final String PAYLOAD_ANNOTATION = "@payload(";
     public static final String DEFAULT_APP_NAME_ANNOTATION = APP_NAME_ANNOTATION + "SiddhiApp" +
+            SINGLE_QUOTE + CLOSE_BRACKET;
+    public static final String DEFAULT_APP_DESCRIPTION_ANNOTATION = APP_DESCRIPTION_ANNOTATION + "Description of the plan" +
             SINGLE_QUOTE + CLOSE_BRACKET;
     // Join Strings
     public static final String JOIN = "join";

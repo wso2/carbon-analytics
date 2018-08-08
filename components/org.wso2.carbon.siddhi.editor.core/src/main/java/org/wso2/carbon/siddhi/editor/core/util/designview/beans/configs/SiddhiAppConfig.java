@@ -44,6 +44,7 @@ import java.util.Set;
 public class SiddhiAppConfig {
     private int finalElementCount = 0;
 
+    private String siddhiAppDescription ="";
     private String siddhiAppName = "";
     private List<String> appAnnotationList = new ArrayList<>();
     private List<SourceSinkConfig> sourceList = new ArrayList<>();
@@ -203,6 +204,10 @@ public class SiddhiAppConfig {
     public void setAppAnnotationList(List<String> appAnnotationList) {
         this.appAnnotationList = appAnnotationList;
     }
+
+    public void setSiddhiAppDescription(String siddhiAppDescription) { this.siddhiAppDescription = siddhiAppDescription; }
+
+    public String getSiddhiAppDescription() { return siddhiAppDescription; }
 
     public void setSiddhiAppName(String siddhiAppName) {
         this.siddhiAppName = siddhiAppName;

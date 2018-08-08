@@ -51,7 +51,6 @@ define(['require', 'elementUtils'],
         ConfigurationData.prototype.getEdge = function (edgeId) {
             return ElementUtils.prototype.getElement(this.edgeList, edgeId);
         };
-
         ConfigurationData.prototype.getEdgeList = function () {
             return this.edgeList;
         };

@@ -52,15 +52,17 @@ define(['require', 'log', 'jquery', 'lodash'],
 
             var siddhiAppConfig = self.configurationData.getSiddhiAppConfig();
             var siddhiAppName = siddhiAppConfig.getSiddhiAppName();
+            var siddhiAppDescription = siddhiAppConfig.getSiddhiAppDescription();
             var savedAppAnnotations = siddhiAppConfig.getAppAnnotationList();
             var annotations = [];
             _.forEach(savedAppAnnotations, function (savedAnnotation) {
-                annotations.push({annotation: savedAnnotation});
+                annotations.push({annotation:savedAnnotation});
             });
 
             var fillWith = {
                 siddhiApp: {
-                    name: siddhiAppName
+                    name: siddhiAppName,
+                    description: siddhiAppDescription
                 },
                 annotations: annotations
             };
@@ -84,6 +86,13 @@ define(['require', 'log', 'jquery', 'lodash'],
                                     title: "Name",
                                     type: "string",
                                     minLength: 1
+                                },
+                                description: {
+                                    required: true,
+                                    title: "Description",
+                                    type: "string",
+                                    minLength: 1
+
                                 }
                             }
                         },
@@ -130,6 +139,7 @@ define(['require', 'log', 'jquery', 'lodash'],
                 var config = editor.getValue();
 
                 siddhiAppConfig.setSiddhiAppName(config.siddhiApp.name);
+                siddhiAppConfig.setSiddhiAppDescription(config.siddhiApp.description);
                 siddhiAppConfig.clearAppAnnotationList();
                 _.forEach(config.annotations, function (annotation) {
                     siddhiAppConfig.addAppAnnotation(annotation.annotation);
@@ -138,6 +148,10 @@ define(['require', 'log', 'jquery', 'lodash'],
                 // update the siddhi app name displayed on the canvas
                 var siddhiAppNameNode = $('#' + self.currentTabId + '-siddhiAppNameId');
                 siddhiAppNameNode.html(config.siddhiApp.name);
+
+                //update the siddhi app desc displayed on the canvas
+                var siddhiAppDescriptionNode = $('#siddhi-app-desc-node');
+                siddhiAppDescriptionNode.html(config.siddhiApp.description);
 
                 // design view container and toggle view button are enabled
                 self.designViewContainer.removeClass('disableContainer');

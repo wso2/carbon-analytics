@@ -85,6 +85,8 @@ public class CodeGenerator {
                 siddhiApp.getTriggerList(), siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
 
         return generateAppName(siddhiApp.getSiddhiAppName()) +
+                //mine
+                generateAppDescription(siddhiApp.getSiddhiAppDescription()) +
                 SubElementCodeGenerator.generateAnnotations(siddhiApp.getAppAnnotationList()) +
                 generateStreams(streamsToBeGenerated, siddhiApp.getSourceList(), siddhiApp.getSinkList()) +
                 generateTables(siddhiApp.getTableList()) +
@@ -116,6 +118,32 @@ public class CodeGenerator {
 
         return appNameStringBuilder.toString();
     }
+
+    //mine
+
+    /**
+     * Generate's the Siddhi code representation of a Siddhi app's app description
+     *
+     * @param appDescription The Siddhi app's app description
+     * @return The Siddhi code representation of a Siddhi app description annotation
+     */
+    private String generateAppDescription(String appDescription) {
+        StringBuilder appDescriptionStringBuilder = new StringBuilder();
+
+        if (appDescription != null && !appDescription.isEmpty()) {
+            appDescriptionStringBuilder.append(SiddhiCodeBuilderConstants.APP_DESCRIPTION_ANNOTATION)
+                    .append(appDescription)
+                    .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
+                    .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
+        } else {
+            appDescriptionStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_APP_DESCRIPTION_ANNOTATION);
+        }
+
+        return appDescriptionStringBuilder.toString();
+    }
+
+
+
 
     /**
      * Generate's the Siddhi code representation of a Siddhi app's stream definitions
