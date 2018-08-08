@@ -85,7 +85,6 @@ public class CodeGenerator {
                 siddhiApp.getTriggerList(), siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
 
         return generateAppName(siddhiApp.getSiddhiAppName()) +
-                //mine
                 generateAppDescription(siddhiApp.getSiddhiAppDescription()) +
                 SubElementCodeGenerator.generateAnnotations(siddhiApp.getAppAnnotationList()) +
                 generateStreams(streamsToBeGenerated, siddhiApp.getSourceList(), siddhiApp.getSinkList()) +
