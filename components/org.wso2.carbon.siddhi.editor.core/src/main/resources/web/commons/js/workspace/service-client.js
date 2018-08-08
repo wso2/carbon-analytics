@@ -123,10 +123,10 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
         };
 
         ServiceClient.prototype.readFile = function (filePath) {
-           var fileData = this.readFileContent(filePath),
-               pathArray = _.split(filePath, this.application.getPathSeperator()),
-               fileName = _.last(pathArray),
-               folderPath = _.join(_.take(pathArray, pathArray.length -1), this.application.getPathSeperator());
+            var fileData = this.readFileContent(filePath),
+                pathArray = _.split(filePath, this.application.getPathSeperator()),
+                fileName = _.last(pathArray),
+                folderPath = _.join(_.take(pathArray, pathArray.length -1), this.application.getPathSeperator());
 
             return new File({
                 name: fileName,
@@ -156,13 +156,32 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
             return data;
         };
 
+        ServiceClient.prototype.readPathSeparator = function () {
+            var data = {};
+            $.ajax({
+                type: "GET",
+                context: this,
+                url: _.get(this.application, 'config.services.workspace.endpoint') + "/config",
+                datatype : "application/json",
+                async: false,
+                success: function (response) {
+                    data = response;
+                },
+                error: function(xhr, textStatus, errorThrown){
+                    data = getErrorFromResponse(xhr, textStatus, errorThrown);
+                    log.error(data.message);
+                }
+            });
+            return data.fileSeparator;
+        };
+
         ServiceClient.prototype.create = function (path, type) {
             var data = {};
             $.ajax({
                 type: "GET",
                 context: this,
                 url: _.get(this.application, 'config.services.workspace.endpoint') + "/create?" + "path=" + btoa(path)
-                    + "&type=" + btoa(type),
+                + "&type=" + btoa(type),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
@@ -182,7 +201,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 type: "GET",
                 context: this,
                 url: _.get(this.application, 'config.services.workspace.endpoint') + "/delete?" + "path=" + btoa(path)
-                    + "&type=" + btoa(type),
+                + "&type=" + btoa(type),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
@@ -203,8 +222,8 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 type: "POST",
                 context: this,
                 url: _.get(this.application, 'config.services.workspace.endpoint') + "/write",
-                data: "location=" + btoa(file.getPath()) + "&configName=" + btoa("workspace" +
-                        self.application.getPathSeperator() + file.getName()) + "&config=" + (btoa(content)),
+                data: "location=" + btoa(file.getPath()) + "&configName=" +
+                btoa(file.getName()) + "&config=" + (btoa(content)),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {

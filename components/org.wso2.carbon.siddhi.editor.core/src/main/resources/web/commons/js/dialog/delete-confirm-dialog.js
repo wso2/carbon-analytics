@@ -171,7 +171,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                                                     "There are running simulations.");
                                                                 deleteWizardError.show();
                                                                 simulationsExists = true;
-                                                            } 
+                                                            }
                                                         },
                                                         function (data) {
                                                             var message = {
@@ -185,7 +185,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                                     );
                                                 }
                                             }
-                                        }   
+                                        }
                                         if (!simulationsExists) {
                                             deleteSiddhiAppAndCloseSingleSimulations(callback, this.application);
                                         }
@@ -278,8 +278,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         var data = {};
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                        var payload = "configName=" + btoa("workspace" + self.app
-                                    .getPathSeperator() + options.configName);
+                        var payload = "configName=" + btoa(options.configName);
 
                         $.ajax({
                             type: "POST",
@@ -300,11 +299,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
 
                     function deleteSiddhiApp(options, callback) {
                         var activeTab = app.tabController.activeTab;
-                        var relativePath = "workspace" + self.app.getPathSeperator() + options.oldAppName;
+                        var relativePath = options.oldAppName;
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         $.ajax({
-                            url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName +
-                            "&relativePath=" + encodeURI(relativePath),
+                            url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName ,
                             type: "DELETE",
                             contentType: "text/plain; charset=utf-8",
                             async: false,
