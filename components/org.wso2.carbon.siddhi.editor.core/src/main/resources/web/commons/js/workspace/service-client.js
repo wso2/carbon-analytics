@@ -156,6 +156,25 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
             return data;
         };
 
+        ServiceClient.prototype.readPathSeparator = function () {
+            var data = {};
+            $.ajax({
+                type: "GET",
+                context: this,
+                url: _.get(this.application, 'config.services.workspace.endpoint') + "/config",
+                datatype : "application/json",
+                async: false,
+                success: function (response) {
+                    data = response;
+                },
+                error: function(xhr, textStatus, errorThrown){
+                    data = getErrorFromResponse(xhr, textStatus, errorThrown);
+                    log.error(data.message);
+                }
+            });
+            return data.fileSeparator;
+        };
+
         ServiceClient.prototype.create = function (path, type) {
             var data = {};
             $.ajax({
@@ -203,8 +222,8 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 type: "POST",
                 context: this,
                 url: _.get(this.application, 'config.services.workspace.endpoint') + "/write",
-                data: "location=" + btoa(file.getPath()) + "&configName=" + btoa("workspace" +
-                        self.application.getPathSeperator() + file.getName()) + "&config=" + (btoa(content)),
+                data: "location=" + btoa(file.getPath()) + "&configName=" +
+                    btoa(file.getName()) + "&config=" + (btoa(content)),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
