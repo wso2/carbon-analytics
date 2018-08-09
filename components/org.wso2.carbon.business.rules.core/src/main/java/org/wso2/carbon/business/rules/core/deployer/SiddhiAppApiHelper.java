@@ -25,6 +25,7 @@ import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppDeployerServiceSt
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
 
 import feign.Response;
+import feign.RetryableException;
 
 /**
  * Consists of methods for additional features for the exposed Siddhi App Api
@@ -94,6 +95,9 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             }
         } catch (SiddhiAppDeployerServiceStubException e) {
             throw new SiddhiAppsApiHelperException("URI generated for node url '" + hostAndPort + "' is invalid.", e);
+        } catch (RetryableException e) {
+            throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
+                    "retrieving status of the siddhi app " + siddhiAppName + ".", e);
         } finally {
             closeResponse(response);
         }
