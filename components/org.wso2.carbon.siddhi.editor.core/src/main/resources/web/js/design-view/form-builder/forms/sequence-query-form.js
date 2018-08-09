@@ -373,7 +373,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 title: "For",
                                 type: "string",
                                 enum: ['current events', 'expired events', 'all events'],
-                                default: 'all events'
+                                default: 'current events'
                             }
                         }
                     };
