@@ -1402,11 +1402,12 @@ public class TemplateManagerService implements BusinessRulesService {
                 List templateList = (List) templates;
                 if (!templateList.contains(ruleTemplateUUID.toString())) {
                     return new ArrayList<String>(nodes.keySet());
-                }
-                for (Object uuid : templateList) {
-                    if (ruleTemplateUUID.equals(uuid.toString())) {
-                        nodeList.add(node);
-                        break;
+                } else {
+                    for (Object uuid : templateList) {
+                        if (ruleTemplateUUID.equals(uuid.toString())) {
+                            nodeList.add(node);
+                            break;
+                        }
                     }
                 }
             }
