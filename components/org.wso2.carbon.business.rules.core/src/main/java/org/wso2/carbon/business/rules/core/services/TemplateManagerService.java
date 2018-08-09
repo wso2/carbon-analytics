@@ -46,6 +46,7 @@ import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -1398,7 +1399,11 @@ public class TemplateManagerService implements BusinessRulesService {
             String node = object.toString();
             Object templates = nodes.get(node);
             if (templates instanceof List) {
-                for (Object uuid : (List) templates) {
+                List templateList = (List) templates;
+                if (!templateList.contains(ruleTemplateUUID.toString())) {
+                    return new ArrayList<String>(nodes.keySet());
+                }
+                for (Object uuid : templateList) {
                     if (ruleTemplateUUID.equals(uuid.toString())) {
                         nodeList.add(node);
                         break;
