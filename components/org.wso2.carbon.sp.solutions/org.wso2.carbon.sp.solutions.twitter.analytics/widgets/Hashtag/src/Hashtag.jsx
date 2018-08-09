@@ -51,7 +51,9 @@ class Hashtag extends Widget {
 
     render() {
         if (this.state.hashTag.length === 0) {
-            var url = 'https://github.com/wso2/product-sp/blob/master/modules/solutions/twitter-analytics/README.md';
+            var url =
+                'https://github.com/wso2/carbon-analytics/blob/master/features/org.wso2.carbon.sp.solutions.feature/' +
+                'org.wso2.carbon.sp.solutions.twitter.analytics.feature/README.md';
             return (
                 <p style={{ textAlign: 'center' }}>
                     For the processing of "Twitter Analytics" please deploy the Siddhi app as per&nbsp;
