@@ -56,7 +56,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         WindowFilterProjectionQueryForm.prototype.generatePropertiesForm = function (element, formConsole,
                                                                                      formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Query Configuration</h3></div>' +
+            var propertyDiv = $('<div id="property-header"><h3>Query Configuration </h3></div>' +
                 '<div class="define-windowFilterProjection-query"></div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
@@ -672,7 +672,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                                 title: "For",
                                 type: "string",
                                 enum: ['current events', 'expired events', 'all events'],
-                                default: 'all events'
+                                default: 'current events'
                             }
                         }
                     };

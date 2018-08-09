@@ -91,8 +91,7 @@ public class QueryOutputCodeGenerator {
         if (insertOutput.getEventType() != null && !insertOutput.getEventType().isEmpty()) {
             switch (insertOutput.getEventType().toUpperCase()) {
                 case CodeGeneratorConstants.CURRENT_EVENTS:
-                    insertOutputStringBuilder.append(SiddhiCodeBuilderConstants.CURRENT_EVENTS)
-                            .append(SiddhiCodeBuilderConstants.SPACE);
+                    insertOutputStringBuilder.append(SiddhiCodeBuilderConstants.SPACE);
                     break;
                 case CodeGeneratorConstants.EXPIRED_EVENTS:
                     insertOutputStringBuilder.append(SiddhiCodeBuilderConstants.EXPIRED_EVENTS)
