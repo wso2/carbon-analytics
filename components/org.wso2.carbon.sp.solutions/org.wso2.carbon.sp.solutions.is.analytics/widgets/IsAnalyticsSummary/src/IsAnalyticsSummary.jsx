@@ -223,15 +223,13 @@ class IsAnalyticsSummary extends Widget {
             );
         }
         return (
-            <MuiThemeProvider theme={this.props.muiTheme}>
-                <div style={{
-                    paddingLeft: padding, paddingRight: padding, height, width
-                }}>
+            <div style={{paddingLeft: padding, paddingRight: padding, height, width}}>
+                <MuiThemeProvider theme={this.props.muiTheme}>
                     <div style={{height: this.state.height * 0.05}}>
                         <h2>{this.state.widgetTexts.heading}</h2>
                     </div>
                     <div style={{height: height * 0.10, width: width * 0.9}}>
-                        <p style={{wordWrap:"break-word"}}>{this.state.widgetTexts.bodyText}</p>
+                        <p>{this.state.widgetTexts.bodyText}</p>
                     </div>
                     <div style={{height: height * 0.25, width: width * 0.9}}>
                         <VizG
@@ -262,15 +260,15 @@ class IsAnalyticsSummary extends Widget {
                             </div>
                         </div>
                     }
-                    <div style={{height: height * 0.5, width: width * 0.9}}>
-                        <a href={this.state.widgetTexts.seeMoreLink}>
-                            <Button color="primary" variant="contained" component="span">
-                                See More >>
-                            </Button>
-                        </a>
-                    </div>
+                </MuiThemeProvider>
+                <div style={{height: height * 0.5, width: width * 0.9}}>
+                    <a href={this.state.widgetTexts.seeMoreLink}>
+                        <Button color="primary" variant="contained" component="span">
+                            See More >>
+                        </Button>
+                    </a>
                 </div>
-            </MuiThemeProvider>
+            </div>
         );
     }
 }
