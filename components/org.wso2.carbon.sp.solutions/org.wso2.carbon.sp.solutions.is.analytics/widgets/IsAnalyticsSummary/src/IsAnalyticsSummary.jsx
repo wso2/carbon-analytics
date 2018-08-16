@@ -43,7 +43,6 @@ const widgetTexts = {
 
 const colorGreen = '#6ED460';
 const colorRed = '#EC5D40';
-const padding = 10;
 
 const successStyle = {
     color: colorGreen,
@@ -211,6 +210,7 @@ class IsAnalyticsSummary extends Widget {
     render() {
         const height = this.state.height;
         const width = this.state.width;
+        const padding = this.state.width * 0.05;
 
         if (this.state.isProviderConfigFault) {
             return (
@@ -225,15 +225,15 @@ class IsAnalyticsSummary extends Widget {
         return (
             <MuiThemeProvider theme={this.props.theme}>
                 <div style={{
-                    padding: padding, height, width, wordWrap: 'break-word'
+                    paddingLeft: padding, paddingRight: padding, height, width
                 }}>
                     <div style={{height: this.state.height * 0.05}}>
                         <h2>{this.state.widgetTexts.heading}</h2>
                     </div>
-                    <div style={{height: height * 0.10, width}}>
-                        <p>{this.state.widgetTexts.bodyText}</p>
+                    <div style={{height: height * 0.10, width: width * 0.9}}>
+                        <p style={{wordWrap:"break-word"}}>{this.state.widgetTexts.bodyText}</p>
                     </div>
-                    <div style={{height: height * 0.2}}>
+                    <div style={{height: height * 0.25, width: width * 0.9}}>
                         <VizG
                             config={numChartConfig}
                             metadata={this.state.numChartMetadata}
@@ -243,8 +243,8 @@ class IsAnalyticsSummary extends Widget {
                     </div>
                     {
                         this.state.totalAttempts > 0
-                        && <div style={{height: height * 0.45}}>
-                            <div style={{height: height * 0.1}}>
+                        && <div style={{height: height * 0.25, width: width * 0.9}}>
+                            <div style={{height: height * 0.05, width: width * 0.9}}>
                                 <h6 style={successStyle}>
                                     Success:{this.state.successPercentage}
                                 </h6>
@@ -252,7 +252,7 @@ class IsAnalyticsSummary extends Widget {
                                     Failure:{this.state.failurePercentage}
                                 </h6>
                             </div>
-                            <div style={{height: height * 0.35}}>
+                            <div style={{height: height * 0.2, width: width * 0.9}}>
                                 <VizG
                                     config={this.state.pieChartConfig}
                                     metadata={this.state.pieChartMetadata}
@@ -262,7 +262,7 @@ class IsAnalyticsSummary extends Widget {
                             </div>
                         </div>
                     }
-                    <div style={{height: height * 0.1}}>
+                    <div style={{height: height * 0.5, width: width * 0.9}}>
                         <a href={this.state.widgetTexts.seeMoreLink}>
                             <Button color="primary" variant="contained" component="span">
                                 See More >>
