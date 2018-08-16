@@ -214,7 +214,7 @@ class IsAnalyticsSummary extends Widget {
 
         if (this.state.isProviderConfigFault) {
             return (
-                <MuiThemeProvider theme={this.props.theme}>
+                <MuiThemeProvider theme={this.props.muiTheme}>
                     <div style={{padding: padding, height, width}}>
                         <h3>{this.state.widgetTexts.heading}</h3>
                         <h5>[ERROR]: Cannot connect to the data provider</h5>
@@ -223,7 +223,7 @@ class IsAnalyticsSummary extends Widget {
             );
         }
         return (
-            <MuiThemeProvider theme={this.props.theme}>
+            <MuiThemeProvider theme={this.props.muiTheme}>
                 <div style={{
                     paddingLeft: padding, paddingRight: padding, height, width
                 }}>
