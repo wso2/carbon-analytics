@@ -59,6 +59,7 @@ public class SiddhiCodeBuilderConstants {
     public static final String APP_NAME_ANNOTATION = "@App:name('";
     public static final String APP_DESCRIPTION_ANNOTATION = "@App:description('";
 
+    public static final String QUERY_NAME_ANNOTATION = "@info(name='";
     public static final String SOURCE_ANNOTATION = "@source(type='";
     public static final String SINK_ANNOTATION = "@sink(type='";
     public static final String STORE_ANNOTATION = "@store(type='";

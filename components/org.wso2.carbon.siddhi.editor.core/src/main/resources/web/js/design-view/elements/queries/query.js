@@ -48,6 +48,7 @@ define(['require', 'elementUtils'],
                 annotationList: [annotation1, annotation2, ...]
             */
             if (options !== undefined) {
+                this.queryName = options.queryName;
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;
                 this.queryInput = options.queryInput;
@@ -60,6 +61,14 @@ define(['require', 'elementUtils'],
             }
             this.orderBy = [];
             this.annotationList = [];
+        };
+
+        Query.prototype.addQueryName = function (queryName) {
+            this.queryName =  queryName ;
+        };
+
+        Query.prototype.getQueryName = function () {
+            return this.queryName;
         };
 
         Query.prototype.addAnnotation = function (annotation) {

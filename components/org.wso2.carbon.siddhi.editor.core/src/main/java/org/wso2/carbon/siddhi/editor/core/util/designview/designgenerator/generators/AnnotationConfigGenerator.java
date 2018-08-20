@@ -61,7 +61,8 @@ public class AnnotationConfigGenerator extends CodeSegmentsPreserver {
     public List<String> generateAnnotationConfigList(List<Annotation> annotations) {
         List<String> annotationList = new ArrayList<>();
         for (Annotation annotation : annotations) {
-            annotationList.add(generateAnnotationConfig(annotation));
+            if (!annotation.getName().equalsIgnoreCase("info"))
+                annotationList.add(generateAnnotationConfig(annotation));
         }
         return annotationList;
     }
