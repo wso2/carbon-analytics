@@ -432,7 +432,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     schema: {
                            required: true,
                            title: "Name",
-                           type: "string"
+                           type: "string",
+                           default: "query"
                     },
                     startval: queryName,
                     show_errors: "always"
@@ -981,6 +982,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var selectConfig = editorSelect.getValue();
                     var outputConfig = editorOutput.getValue();
 
+                    var isQueryNameUsed
+                        = self.formUtils.isQueryDefinitionNameUsed(queryNameConfig, clickedElement.getId());
+                    if (isQueryNameUsed) {
+                           DesignViewUtils.prototype.errorAlert("Query name \"" + queryNameConfig + "\" is already"
+                                                                                                +" defined.");
+                        return;
+                    }
+
                     clickedElement.clearAnnotationList();
                     _.forEach(annotationConfig.annotations, function (annotation) {
                         clickedElement.addAnnotation(annotation.annotation);
@@ -1083,6 +1092,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         clickedElement.setOutputRateLimit(outputConfig.outputRateLimit.outputRateLimit);
                     } else {
                         clickedElement.setOutputRateLimit(undefined);
+                    }
+
+
+                    // update name of the query related to the element if the name is changed
+                    if (queryName !== queryNameConfig) {
+                        // update selected query
+                        clickedElement.addQueryName(queryNameConfig);
+                        if (queryNameConfig == "")
+                            queryNameConfig = "Pattern Query";
+                        var textNode = $('#' + clickedElement.getId()).find('.patternQueryNameNode');
+                        textNode.html(queryNameConfig);
                     }
 
                     var queryOutput = clickedElement.getQueryOutput();

@@ -99,7 +99,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
             if (annotation.getName().equalsIgnoreCase("info"))
                 return annotation.getElement("name");
         }
-        return "";
+        return "query";
     }
 
     /**

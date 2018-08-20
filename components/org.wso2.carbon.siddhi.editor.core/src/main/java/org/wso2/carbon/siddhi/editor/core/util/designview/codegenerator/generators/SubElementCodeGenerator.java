@@ -67,6 +67,9 @@ public class SubElementCodeGenerator {
                     .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
                     .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
         }
+        else
+            queryNameStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_QUERY_NAME_ANNOTATION);
+
         return queryNameStringBuilder.toString();
     }
 

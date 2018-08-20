@@ -111,6 +111,35 @@ define(['require', 'lodash'],
         };
 
         /**
+         * @function check whether given query name is used in the query list
+         * @param elementName given name to the definition element
+         * @param skipElementID this element name will be ignored when checking the unique name. This is used when
+         *          saving the same name after editing a particular element
+         * @return {boolean}
+         */
+        FormUtils.prototype.isQueryDefinitionNameUsed = function (elementName, skipElementID) {
+            var self = this;
+            var isNameUsed = false;
+            var joinQueryList = self.configurationData.getSiddhiAppConfig().getJoinQueryList();
+            var sequenceQueryList = self.configurationData.getSiddhiAppConfig().getSequenceQueryList();
+            var patternQueryList = self.configurationData.getSiddhiAppConfig().getPatternQueryList();
+            var WindowFilterProjectionQueryList = self.configurationData.getSiddhiAppConfig()
+                                                            .getWindowFilterProjectionQueryList();
+            var listNames = [joinQueryList, sequenceQueryList, patternQueryList, WindowFilterProjectionQueryList];
+           _.forEach(listNames, function (list) {
+               _.forEach(list, function (element) {
+                   if (element.getQueryName() === elementName) {
+                       if (!(skipElementID !== undefined && skipElementID === element.getId())) {
+                           isNameUsed = true;
+                       }
+                   }
+               });
+           });
+
+          return isNameUsed;
+        };
+
+        /**
          * @function This method removes undefined, null, empty arrays, empty object property fields from a JSON object
          * @param objectElement object which is needed to be cleaned
          * @return cleaned element
