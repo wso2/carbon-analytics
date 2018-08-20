@@ -22,17 +22,21 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.wso2.carbon.data.provider.ProviderConfig;
 
+import java.util.List;
+
 public class SiddhiDataProviderConfig implements ProviderConfig {
 
     private String siddhiApp;
     private JsonElement queryData;
     private int publishingInterval;
+    private String timeColumns;
 
 
     public SiddhiDataProviderConfig() {
         this.queryData = new JsonObject();
         this.siddhiApp = "";
         this.publishingInterval = 5;
+        this.timeColumns = "";
     }
 
     public JsonElement getQueryData() {
@@ -64,5 +68,9 @@ public class SiddhiDataProviderConfig implements ProviderConfig {
     @Override
     public boolean isPurgingEnable() {
         return false;
+    }
+
+    public String getTimeColumns() {
+        return timeColumns;
     }
 }

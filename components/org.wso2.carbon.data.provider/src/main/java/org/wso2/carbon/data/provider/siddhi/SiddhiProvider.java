@@ -40,6 +40,7 @@ import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -60,12 +61,15 @@ public class SiddhiProvider extends AbstractDataProvider {
     private SiddhiAppRuntime siddhiAppRuntime;
     private String[] linearTypes = new String[]{"INT", "LONG", "FLOAT", "DOUBLE"};
     private String[] ordinalTypes = new String[]{"STRING", "BOOL"};
+    private List<String> timeColumns;
 
     @Override
     public DataProvider init(String topic, String sessionId, JsonElement jsonElement) throws DataProviderException {
         this.siddhiDataProviderConfig = new Gson().fromJson(jsonElement, SiddhiDataProviderConfig.class);
         siddhiDataProviderConfig.setQueryData(((JsonObject) jsonElement).get(STORE_QUERY));
         siddhiDataProviderConfig.setSiddhiAppContext(((JsonObject) jsonElement).get(SIDDHI_APP).getAsString());
+        this.timeColumns = Arrays.asList(this.siddhiDataProviderConfig.getTimeColumns().toUpperCase(Locale.ENGLISH)
+                .split(","));
         super.init(topic, sessionId, siddhiDataProviderConfig);
         SiddhiAppRuntime siddhiAppRuntime = getSiddhiAppRuntime();
         siddhiAppRuntime.start();
@@ -172,6 +176,9 @@ public class SiddhiProvider extends AbstractDataProvider {
      */
     private DataSetMetadata.Types getMetadataTypes(String dataType) {
         if (Arrays.asList(linearTypes).contains(dataType.toUpperCase(Locale.ENGLISH))) {
+            if (this.timeColumns.contains(dataType.toUpperCase(Locale.ENGLISH))) {
+                return DataSetMetadata.Types.TIME;
+            }
             return DataSetMetadata.Types.LINEAR;
         } else if (Arrays.asList(ordinalTypes).contains(dataType.toUpperCase(Locale
                 .ENGLISH))) {
