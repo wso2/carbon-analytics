@@ -35,6 +35,7 @@
 
     <modules>
         <module>SearchBox</module>
+        <module>MessageTable</module>
     </modules>
 
 </project>
