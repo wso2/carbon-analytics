@@ -1,0 +1,29 @@
+{
+  "name": "SearchBox",
+  "id": "SearchBox",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "publisher"
+      ],
+      "publisherWidgetOutputs":[
+        "selectedComponent"
+      ]
+    },
+    "providerConfig": {
+      "configs": {
+        "type": "SiddhiStoreDataProvider",
+        "config": {
+          "siddhiApp": "@App:name('EIStatComponentNamesApp') @App:description('Aggregations for ESBStat and MediatorStat') define stream PreProcessedESBStatStream (componentId string, componentName string, componentType string, duration long, faultCount int, startTime long, entryPoint string, metaTenantId int); @store(type = 'rdbms', datasource = 'EI_ANALYTICS') @info(name = 'ESBStat') define aggregation ESBStatAgg from PreProcessedESBStatStream select componentId, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, entryPoint, metaTenantId, startTime as eventTimestamp group by metaTenantId, componentId, componentName, componentType, entryPoint aggregate by startTime every sec...years; define stream PreProcessedMediatorStatStream (metaTenantId int, entryPoint string, entryPointHashcode string, componentId string, hashCode string, componentName string, componentType string, duration long, faultCount int, startTime long);@store(type = 'rdbms', datasource = 'EI_ANALYTICS') @info(name = 'MediatorStat') define aggregation MediatorStatAgg from PreProcessedMediatorStatStream  select metaTenantId, entryPoint, entryPointHashcode, componentId, hashCode, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, startTime group by metaTenantId, componentId, componentName, componentType, entryPoint, entryPointHashcode, hashCode aggregate by startTime every sec...years;",
+           "queryData": {
+            "query": "",
+            "queryESB": "from ESBStatAgg_MINUTES  on componentType=='{{paramComponentType}}'  select componentName group by componentName;",
+            "queryMediator": "from MediatorStatAgg_MINUTES on componentType=='{{paramComponentType}}'  select componentName group by componentName;"
+          },
+          "publishingInterval": 60
+        }
+      }
+    }
+  }
+}
