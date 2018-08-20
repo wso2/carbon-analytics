@@ -111,6 +111,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         joinType = "full outer";
                     }
                 }
+                var queryName = clickedElement.getQueryName();
                 var on = clickedElement.getQueryInput().getOn();
                 var within = clickedElement.getQueryInput().getWithin();
                 var per = clickedElement.getQueryInput().getPer();
@@ -573,6 +574,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
+                    '<div class="row"><div id="form-query-name"></div>'+
                     '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
                     '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
@@ -613,6 +615,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     no_additional_properties: true,
                     disable_array_delete_all_rows: true,
                     disable_array_delete_last_row: true
+                });
+
+                var editorQueryName = new JSONEditor($(formContainer).find('#form-query-name')[0], {
+                    schema: {
+                           required: true,
+                           title: "Name",
+                           type: "string"
+                    },
+                    startval: queryName,
+                    show_errors: "always"
                 });
 
                 var editorInput = new JSONEditor($(formContainer).find('#form-query-input')[0], {
@@ -1104,9 +1116,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     var annotationConfig = editorAnnotation.getValue();
+                    var queryNameConfig = editorQueryName.getValue();
                     var inputConfig = editorInput.getValue();
                     var selectConfig = editorSelect.getValue();
                     var outputConfig = editorOutput.getValue();
+
+                    clickedElement.addQueryName(queryNameConfig);
 
                     // checks stream handlers related validations
                     function validateSourceStreamHandlers(joinConfiguration, joinSourceSide) {

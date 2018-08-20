@@ -46,6 +46,7 @@ public class QueryCodeGenerator {
         StringBuilder queryStringBuilder = new StringBuilder();
         queryStringBuilder.append(SubElementCodeGenerator.generateComment(query.getPreviousCommentSegment()))
                 .append(SubElementCodeGenerator.generateAnnotations(query.getAnnotationList()))
+                .append(SubElementCodeGenerator.generateQueryName(query.getQueryName()))
                 .append(QueryInputCodeGenerator.generateQueryInput(query.getQueryInput()))
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(QuerySelectCodeGenerator.generateQuerySelect(query.getSelect()));
