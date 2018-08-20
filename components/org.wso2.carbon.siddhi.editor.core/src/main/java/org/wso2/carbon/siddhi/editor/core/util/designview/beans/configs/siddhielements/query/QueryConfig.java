@@ -30,6 +30,8 @@ import java.util.Map;
  * Represents a Siddhi Query
  */
 public class QueryConfig extends SiddhiElementConfig {
+
+    private String queryName;
     private QueryInputConfig queryInput;
     private AttributesSelectionConfig select;
     private List<String> groupBy;
@@ -41,6 +43,10 @@ public class QueryConfig extends SiddhiElementConfig {
     private List<String> annotationList;
     private String partitionId;
     private Map<String, String> connectorsAndStreams;
+
+    public String getQueryName() { return queryName; }
+
+    public void setQueryName(String queryName) { this.queryName = queryName; }
 
     public QueryInputConfig getQueryInput() {
         return queryInput;

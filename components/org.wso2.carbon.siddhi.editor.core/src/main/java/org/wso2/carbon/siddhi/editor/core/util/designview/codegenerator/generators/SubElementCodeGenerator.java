@@ -54,6 +54,23 @@ public class SubElementCodeGenerator {
     }
 
     /**
+     * Generate's the Siddhi code representation of the query's name
+     *
+     * @param queryName The Siddhi query's name
+     * @return The Siddhi code representation of a Siddhi query name annotation
+     */
+    public static String generateQueryName(String queryName) {
+        StringBuilder queryNameStringBuilder = new StringBuilder();
+        if (queryName != null && !queryName.isEmpty()) {
+            queryNameStringBuilder.append(SiddhiCodeBuilderConstants.QUERY_NAME_ANNOTATION)
+                    .append(queryName)
+                    .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
+                    .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
+        }
+        return queryNameStringBuilder.toString();
+    }
+
+    /**
      * Generate's the Siddhi code representation of a AttributeConfig list
      *
      * @param attributes The AttributeConfig list

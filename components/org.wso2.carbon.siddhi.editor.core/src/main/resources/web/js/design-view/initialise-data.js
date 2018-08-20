@@ -261,6 +261,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             _.forEach(windowFilterProjectionQueryList, function (windowFilterProjectionQuery) {
                 var queryObject = new Query(windowFilterProjectionQuery);
                 addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
+                queryObject.addQueryName(windowFilterProjectionQuery.queryName);
 
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
                 if (!windowFilterProjectionQuery.queryInput) {

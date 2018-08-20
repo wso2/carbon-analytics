@@ -26,6 +26,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.patternsequence.PatternSequenceConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AttributesSelectionConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.AnnotationConfigGenerator;
@@ -35,6 +36,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.genera
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.SiddhiApp;
+import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
 import org.wso2.siddhi.query.api.execution.query.output.ratelimit.OutputRate;
@@ -82,10 +84,23 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
         queryConfig.setOutputRateLimit(generateOutputRateLimit(query.getOutputRate()));
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         queryConfig.setAnnotationList(annotationConfigGenerator.generateAnnotationConfigList(query.getAnnotations()));
-
+        queryConfig.setQueryName(generateQueryName(query.getAnnotations()));
         preserveCodeSegmentsOf(annotationConfigGenerator);
         preserveAndBindCodeSegment(query, queryConfig);
         return queryConfig;
+    }
+
+    /**
+     * Extracts the query name from the annotation list
+     * @param annotations           Query annotation list
+     * @return query name           name of the query
+     */
+    private String generateQueryName(List<Annotation> annotations) {
+        for (Annotation annotation : annotations) {
+            if (annotation.getName().equalsIgnoreCase("info"))
+                return annotation.getElement("name");
+        }
+        return "";
     }
 
     /**
