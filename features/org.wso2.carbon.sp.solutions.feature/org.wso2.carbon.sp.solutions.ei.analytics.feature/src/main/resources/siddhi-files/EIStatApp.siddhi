@@ -1,0 +1,86 @@
+@App:name('EIStatApp')
+@App:description('SiddhiApp for EI Analytics')
+
+-- Streams
+
+-- temporary stream to store MediatorStat data
+define stream PreProcessedMediatorStatStream (metaTenantId int, entryPoint string, entryPointHashcode string, componentId string, hashCode string, componentName string, componentType string, duration long, faultCount int, startTime long);
+
+-- maps Flow Entry into FlowEntryEventStream
+@source(type = 'wso2event', wso2.stream.id = 'org.wso2.esb.analytics.stream.FlowEntry:1.0.0', 
+	@map(type = 'wso2event'))
+define stream FlowEntryEventStream (meta_compressed bool, meta_tenantId int, messageId string, flowData string);
+
+-- temporary stream to store ESBStat data
+define stream PreProcessedESBStatStream (componentId string, componentName string, componentType string, duration long, faultCount int, startTime long, entryPoint string, metaTenantId int);
+
+-- maps Config entry into ConfigEntryEventStream
+@source(type = 'wso2event', wso2.stream.id = 'org.wso2.esb.analytics.stream.ConfigEntry:1.0.0', 
+	@map(type = 'wso2event'))
+define stream ConfigEntryEventStream (meta_tenantId int, hashcode string, entryName string, configData string);
+
+-- defines the DecompressedEventStream, which stores decompressed FlowEntryEventStream data
+define stream DecompressedEventStream (metaTenantId int, messageFlowId string, host string, hashCode string, componentName string, componentType string, componentIndex int, componentId string, startTime long, endTime long, duration long, beforePayload string, afterPayload string, contextPropertyMap string, transportPropertyMap string, children string, entryPoint string, entryPointHashcode string, faultCount int, eventTimestamp long);
+
+-- Tables
+
+-- table that stores ESBEventStream data
+@store(type = 'rdbms', datasource = 'EI_ANALYTICS', field.length="contextPropertyMap:5000,beforePayload:5000,afterPayload:5000,transportPropertyMap:5000" )
+@Index('metaTenantId','messageFlowId','host','hashCode','componentName','componentType','componentIndex','componentId','startTime','endTime','entryPoint','entryPointHashcode','faultCount')
+define table ESBEventTable (metaTenantId int, messageFlowId string, host string, hashCode string, componentName string, componentType string, componentIndex int, componentId string, startTime long, endTime long, duration long, beforePayload string, afterPayload string, contextPropertyMap string, transportPropertyMap string, children string, entryPoint string, entryPointHashcode string, faultCount int, eventTimestamp long);
+
+-- table that stores ConfigEntryEventStream data
+@store(type = 'rdbms', datasource = 'EI_ANALYTICS', field.length="configData:6000")
+@PrimaryKey('hashcode')
+@Index('metaTenantId','entryName')
+define table ConfigEntryTable (metaTenantId int, hashcode string, entryName string, configData string, eventTimestamp long);
+
+-- Aggregations
+
+-- aggregates PreProcessedMediatorStatStream data every minute to month
+@store(type = 'rdbms', datasource = 'EI_ANALYTICS')
+@info(name = 'MediatorStat')
+define aggregation MediatorStatAgg 
+from PreProcessedMediatorStatStream 
+ select metaTenantId, entryPoint, entryPointHashcode, componentId, hashCode, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, startTime 
+	group by metaTenantId, componentId, componentName, componentType, entryPoint, entryPointHashcode, hashCode 
+	aggregate by startTime every sec...years;
+
+-- aggregates PreProcessedESBStatStream data every minute to month
+@store(type = 'rdbms', datasource = 'EI_ANALYTICS')
+@info(name = 'ESBStat')
+define aggregation ESBStatAgg 
+from PreProcessedESBStatStream 
+ select componentId, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, entryPoint, metaTenantId, startTime as eventTimestamp 
+	group by metaTenantId, componentId, componentName, componentType, entryPoint 
+	aggregate by startTime every sec...years;
+
+-- Queries
+
+-- decompress compressed-FlowEntryEventStream and store data in DecompressedEventStream
+from FlowEntryEventStream#esbAnalytics:decompress(meta_compressed, meta_tenantId, messageId, flowData) 
+select metaTenantId, messageFlowId, host, hashCode, componentName, str:lower(componentType) as componentType, componentIndex, componentId, startTime, endTime, duration, beforePayload, afterPayload, contextPropertyMap, transportPropertyMap, children, entryPoint, entryPointHashcode, faultCount, _timestamp as eventTimestamp 
+insert current events into DecompressedEventStream;
+
+-- store ConfigEntryEventStream data into ConfigEntryTable
+from ConfigEntryEventStream 
+select meta_tenantId as metaTenantId, hashcode, entryName, configData, eventTimestamp() as eventTimestamp 
+insert current events into ConfigEntryTable;
+
+-- if DecompressedEventStream has beforePayload or transportPropertyMap or contextPropertyMap, add them to into ESBEventTable 
+from DecompressedEventStream[not(beforePayload is null) or not(transportPropertyMap is null) or not(contextPropertyMap is null)] 
+select metaTenantId, messageFlowId, host, hashCode, componentName, componentType, componentIndex, componentId, startTime, endTime, duration, beforePayload, afterPayload, contextPropertyMap, transportPropertyMap, children, entryPoint, entryPointHashcode, faultCount, eventTimestamp 
+insert current events into ESBEventTable;
+
+-- if DecompressedEventStream's componentType is ProxyService or API or InboundEndPoint, add it into PreProcessedESBStatStream 
+from DecompressedEventStream[componentType == "proxy service" or componentType == "api" or componentType == "inbound endpoint"] 
+select componentId, componentName, componentType, duration, ifThenElse(faultCount > 0, 1, 0) as faultCount, startTime, entryPoint, metaTenantId 
+insert current events into PreProcessedESBStatStream;
+
+-- insert DecompressedEventStream data into PreProcessedMediatorStatStream
+from DecompressedEventStream 
+select metaTenantId, entryPoint, entryPointHashcode, componentId, hashCode, componentName, componentType, duration, ifThenElse(faultCount > 0, 1, 0) as faultCount, startTime 
+insert current events into PreProcessedMediatorStatStream;
+
+
+
