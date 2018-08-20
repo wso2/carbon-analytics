@@ -1,0 +1,29 @@
+@App:name("APIM_THROTTLED_OUT_SUMMARY")
+@App:description("Defines aggregations for api throttled out stream")
+
+@source(type = 'wso2event', wso2.stream.id = 'org.wso2.apimgt.statistics.throttle:3.0.0', 
+	@map(type = 'wso2event'))
+define stream ThrottledOutStream(
+    meta_clientType string,
+    username string,
+    userTenantDomain string,
+    apiName string,
+    apiVersion string,
+    apiContext string,
+    apiCreator string,
+    apiCreatorTenantDomain string,
+    applicationId string,
+    applicationName string,
+    subscriber string,	
+    throttledOutReason string,
+    gatewayType string,
+    throttledOutTimestamp long
+);
+
+@store(type='rdbms', datasource='APIM_ANALYTICS_DB') 
+define aggregation ApiThrottledOutAgg
+from ThrottledOutStream
+select apiName,apiVersion,apiContext,apiCreator,apiCreatorTenantDomain,username,userTenantDomain,applicationId,applicationName,subscriber,count() as throttledOutCount,throttledOutReason,gatewayType
+group by apiContext,applicationId,throttledOutReason
+aggregate by throttledOutTimestamp every seconds...year;
+

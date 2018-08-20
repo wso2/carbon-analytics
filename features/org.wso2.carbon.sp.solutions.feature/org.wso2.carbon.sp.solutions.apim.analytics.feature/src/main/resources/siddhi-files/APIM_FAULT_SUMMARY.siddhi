@@ -1,0 +1,32 @@
+@App:name("APIM_FAULT_SUMMARY")
+@App:description("Defines aggregations for fault stream")
+
+@source(type = 'wso2event', wso2.stream.id = 'org.wso2.apimgt.statistics.fault:3.0.0', 
+	@map(type = 'wso2event'))
+define stream FaultStream(
+    meta_clientType string,
+    applicationConsumerKey string,
+    apiName string,
+    apiVersion string,
+    apiContext string,
+    apiResourcePath string,
+    apiMethod string,
+    apiCreator string,
+    username string,
+    userTenantDomain string,
+    apiCreatorTenantDomain string,
+    hostname string,
+    applicationId string,
+    applicationName string,
+    protocol string,
+    errorCode string,
+    errorMessage string,
+    requestTimestamp long
+);
+
+@store(type='rdbms', datasource='APIM_ANALYTICS_DB')
+define aggregation ApiFaultyInvocationAgg
+from FaultStream 
+select apiName,apiVersion,apiCreator,apiCreatorTenantDomain,apiContext,applicationConsumerKey,hostname,applicationId,applicationName,requestTimestamp,count() as totalFaultCount
+group by apiContext,applicationId,hostname
+aggregate by requestTimestamp every seconds...year;

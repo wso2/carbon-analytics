@@ -1578,6 +1578,14 @@
                 <type>zip</type>
             </dependency>
 
+            <!--  APIM analytics Solution Features -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.sp.solutions.apim.analytics.feature</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+
             <!-- Twitter Analytics solution dependencies -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>

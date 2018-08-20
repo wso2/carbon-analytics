@@ -1,0 +1,154 @@
+@App:name("APIM_UNUSUAL_IP_ACCESS_ALERT")
+@App:description("Alerts if an access from a strange ip is detected")
+
+@source(type='inMemory' , topic='APIM_REQUEST')
+define stream Request (meta_clientType string, applicationConsumerKey string, applicationName string, applicationId string, applicationOwner string, apiContext string,apiName string, apiVersion string, apiResourcePath string, apiResourceTemplate string, apiMethod string, apiCreator string, apiCreatorTenantDomain string, apiTier string, apiHostname string, username string, userTenantDomain string, userIp string, userAgent string, requestTimestamp long, throttledOut bool, responseTime long, serviceTime long, backendTime long, responseCacheHit bool, responseSize long, protocol string, responseCode int, destination string, securityLatency long, throttlingLatency long, requestMediationLatency long, responseMediationLatency long, backendLatency long, otherLatency long, gatewayType string, label string);
+
+--Table Definitions
+@store(type = 'rdbms', datasource = 'APIM_ANALYTICS_DB')
+define table ApimAllAlert (type string, tenantDomain string, message string, severity int, alertTimestamp long);
+
+@store(type = 'rdbms', datasource = 'APIM_ANALYTICS_DB')
+define table ApimIPAccessAbnormalityAlert (type string, message string, severity int, ip string, applicationName string, applicationOwner string, username string,tenantDomain string, requestTimestamp long, alertTimestamp long);
+
+@PrimaryKey('applicationConsumerKey','ip')
+@store(type = 'rdbms', datasource = 'APIM_ANALYTICS_DB')
+define table ApimIPAccessSummary (username string, applicationConsumerKey string, ip string, lastAccessedDate long) ;
+
+@PrimaryKey('applicationConsumerKey','username')
+@store(type = 'rdbms', datasource = 'APIM_ANALYTICS_DB')
+define table ApimIPAccessAlertCount (username string, applicationConsumerKey string, requestCount long) ;
+
+@PrimaryKey('userId', 'isSubscriber', 'isPublisher', 'isAdmin')
+@store(type = 'rdbms', datasource = 'APIM_ANALYTICS_DB')
+define table ApimAlertStakeholderInfo(userId string, alertTypes	string, emails	string, isSubscriber bool, isPublisher	bool, isAdmin	bool);
+
+@sink(type="inMemory", topic="APIM_EMAIL_NOTIFICATION", @map(type='passThrough'))
+define stream EmailAlertStream (type string, message string, alertTimestamp	string, emails	string);
+
+@info(name = 'Query generates TempStream')
+from Request[applicationConsumerKey == ApimIPAccessSummary.applicationConsumerKey in ApimIPAccessSummary]#window.length(1) as api left outer join ApimIPAccessSummary as ais
+on api.applicationConsumerKey == ais.applicationConsumerKey and api.userIp==ais.ip
+select api.applicationConsumerKey as applicationConsumerKey, api.userTenantDomain as userTenantDomain, api.applicationName as applicationName ,  api.applicationOwner as applicationOwner,  api.username as username, api.userIp as requestHostName, ais.ip as ip, api.requestTimestamp, ais.lastAccessedDate as lastAccessedDate, count() as count 
+insert into TempStream;
+
+@info(name = 'Query generates NewConsumerKeyStream')
+from Request[not (applicationConsumerKey == ApimIPAccessSummary.applicationConsumerKey in ApimIPAccessSummary)]
+select username, applicationConsumerKey, userIp as ip, requestTimestamp as lastAccessedDate, count() as count
+insert into NewConsumerKeyStream;
+
+--updates the IPAccessSummary table if is a new consumerKey
+@info(name = 'Query inserts data to DB Table : ApimIPAccessSummary')
+from NewConsumerKeyStream
+select username, applicationConsumerKey, ip, lastAccessedDate
+update or insert into ApimIPAccessSummary
+on ApimIPAccessSummary.applicationConsumerKey==applicationConsumerKey and ApimIPAccessSummary.ip==ip;
+
+-- Adding the alert count
+@info(name = 'Query inserts data to DB Table : ApimIPAccessAlertCount')
+from NewConsumerKeyStream
+select username, applicationConsumerKey, count as requestCount
+update or insert into ApimIPAccessAlertCount
+on ApimIPAccessAlertCount.username == username and ApimIPAccessAlertCount.applicationConsumerKey==applicationConsumerKey;
+
+/*
+    all fields will have value if the username and applicationConsumerKey already exists
+    exUsername and exConsumerKey will be null if it is a new user and newUserStream is derived based on that
+*/
+@info(name='Query generates ExistingUserStream') 
+from TempStream as ts left outer join ApimIPAccessAlertCount as iaac
+on ts.username==iaac.username and ts.applicationConsumerKey == iaac.applicationConsumerKey 
+select ts.applicationConsumerKey as applicationConsumerKey, ts.userTenantDomain, ts.applicationName , ts.applicationOwner , ts.username as username, ts.requestHostName as requestHostName, ts.ip as ip, ts.requestTimestamp, ts.lastAccessedDate as lastAccessedDate, (ts.count + iaac.requestCount) as requestCount,iaac.username as exUsername, iaac.applicationConsumerKey as exConsumerKey
+insert into ExistingUserStream;
+
+--checks whether the username is new
+@info(name='query generates new user stream') 
+from ExistingUserStream[exUsername  is null]
+select ts.applicationConsumerKey as applicationConsumerKey, ts.userTenantDomain, ts.applicationName , ts.applicationOwner , ts.username as username, ts.requestHostName as requestHostName, ts.ip as ip, ts.requestTimestamp, ts.lastAccessedDate as lastAccessedDate, count() as requestCount
+insert into NewUserStream;
+
+@info(name='query inserts data to DB table : ApimIPAccessAlertCount') 
+from NewUserStream
+select username, applicationConsumerKey, requestCount
+update or insert into ApimIPAccessAlertCount 
+set ApimIPAccessAlertCount.requestCount = requestCount
+on ApimIPAccessAlertCount.username == username and ApimIPAccessAlertCount.applicationConsumerKey==applicationConsumerKey;
+
+@info(name='query inserts data to DB table : ApimIPAccessSummary')
+from NewUserStream
+select username, applicationConsumerKey, requestHostName as ip, requestTimestamp as lastAccessedDate
+update or insert into ApimIPAccessSummary
+on ApimIPAccessSummary.applicationConsumerKey==applicationConsumerKey and ApimIPAccessSummary.ip==ip;
+
+/*
+    if the username  and applicatioConsumerkey already exists it increments the request count for the username.
+    exUsername will not be null if it is an existing user
+*/
+@info(name = 'query update or insert data to ApimIPAccessAlertCount')
+from ExistingUserStream[not (exUsername  is null)]
+select username, applicationConsumerKey, requestCount
+update or insert into ApimIPAccessAlertCount
+set ApimIPAccessAlertCount.requestCount=requestCount
+on ApimIPAccessAlertCount.username == username and ApimIPAccessAlertCount.applicationConsumerKey==applicationConsumerKey;
+
+/*
+    if a requestCount from particular user has reached the threshold limit 
+    and if a new ip is detected from the particular username and applicationConsumerKey
+    Note: ip will be null if its a new ip from the user
+*/ 
+@info(name = 'query generates NewIPDetectedStream')
+from ExistingUserStream[ip is null and requestCount > 100]
+select *
+insert into NewIPDetectedStream;
+
+@info(name = 'query generates AlertIPAccessAbnormalityStream')
+from NewIPDetectedStream
+select "UnusualIPAccess" as type, "A request from a new IP detected." as message, 2 as severity, requestHostName as ip, applicationName, applicationOwner, username, userTenantDomain as tenantDomain, requestTimestamp,(time:timestampInMilliseconds()) as alertTimestamp
+insert into AlertIpAccessAbnormalityStream;
+
+@info(name = 'query inserts data to ApimIPAccessSummaryTable')
+from NewIPDetectedStream
+select username, applicationConsumerKey, requestHostName as ip, requestTimestamp as lastAccessedDate
+update or insert into ApimIPAccessSummary
+on ApimIPAccessSummary.applicationConsumerKey==applicationConsumerKey and ApimIPAccessSummary.ip==ip;
+
+-- Check if the request for the IP is received after the threshold time gap
+@info(name = 'query generates CheckAbnormalTimeBetweenAccessStream ')
+from ExistingUserStream[(not (ip is null)) and requestCount > 100]
+select requestHostName, applicationConsumerKey, applicationName, applicationOwner, (requestTimestamp - lastAccessedDate) as timeBetweenAccess, requestTimestamp, username, userTenantDomain as tenantDomain, lastAccessedDate
+insert into CheckAbnormalTimeBetweenAccessStream;
+
+@info(name = 'query genererates AbnormalTimeBetweenAccessStream')
+from CheckAbnormalTimeBetweenAccessStream[timeBetweenAccess > 1 month]
+select *
+insert into AbnormalTimeBetweenAccessStream;
+
+@info(name = 'query generates AlertIpAccessAbnormalityStream')
+from AbnormalTimeBetweenAccessStream
+select "UnusualIPAccess" as type, "A request from an old IP detected." as message, 2 as severity, requestHostName as ip, applicationName, applicationOwner, username,tenantDomain , requestTimestamp,(time:timestampInMilliseconds()) as alertTimestamp
+insert into AlertIpAccessAbnormalityStream;
+
+-- Send all the alerts to the Global Alert Stream
+@info(name = 'query inserts data to DB table ApimAllAlert')
+from AlertIpAccessAbnormalityStream
+select type, tenantDomain, str:concat("A request from a ", ifThenElse(str:contains(message, 'old'), 'old','new'), " IP (", ip, ") detected by user:" , username,  " using application:", applicationName, " owned by ", applicationOwner, ".") as message, severity, (time:timestampInMilliseconds()) as alertTimestamp
+insert into ApimAllAlert;
+
+@info(name='query inserts data to DB table ApimIPAccessAbnormalityAlert') 
+from AlertIpAccessAbnormalityStream
+select *
+insert into ApimIPAccessAbnormalityAlert;
+
+-- Update the request time for the lastAccessDate
+@info(name = 'query updates ApimIPAccessSummary Table')
+from CheckAbnormalTimeBetweenAccessStream[timeBetweenAccess > 1 day]
+select username, applicationConsumerKey, requestHostName as ip, requestTimestamp as lastAccessedDate
+update or insert into ApimIPAccessSummary
+set ApimIPAccesSummary.lastAccessedDate=lastAccessedDate on
+ApimIPAccessSummary.applicationConsumerKey == applicationConsumerKey and ApimIPAccessSummary.ip == ip;
+
+from AlertIpAccessAbnormalityStream#window.length(1) join ApimAlertStakeholderInfo as ASI
+on ((AlertIpAccessAbnormalityStream.applicationOwner == ASI.userId and true == ASI.isSubscriber ) or true == ASI.isAdmin )
+select 'UnusualIPAccess' as type , str:concat("A request from a ", ifThenElse(str:contains(message, 'old'), 'old','new'), " IP (", ip, ") detected by user:" , AlertIpAccessAbnormalityStream.username,  " using application:", applicationName, " owned by ", applicationOwner, ".") as message, time:dateFormat(AlertIpAccessAbnormalityStream.alertTimestamp,'yyyy-MM-dd HH:mm:ss') as alertTimestamp, ASI.emails
+having  str:contains(ASI.alertTypes, 'UnusualIPAccess')
+insert into EmailAlertStream;
