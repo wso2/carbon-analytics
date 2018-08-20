@@ -30,7 +30,6 @@ import java.util.Map;
  * Represents a Siddhi Query
  */
 public class QueryConfig extends SiddhiElementConfig {
-
     private String queryName;
     private QueryInputConfig queryInput;
     private AttributesSelectionConfig select;
