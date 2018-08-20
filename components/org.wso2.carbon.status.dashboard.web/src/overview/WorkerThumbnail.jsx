@@ -272,7 +272,8 @@ export default class WorkerThumbnail extends React.Component {
                 loadAvg = <h4 style={{margin: 0}}>N/A in Windows</h4>;
                 loadTrendImg = <div/>;
             } else {
-                loadAvg = <h1 style={{margin: 0}}>{this.props.worker.serverDetails.workerMetrics.loadAverage}</h1>;
+                loadAvg = <h1 style={{margin: 0}}>
+                    {parseFloat(this.props.worker.serverDetails.workerMetrics.loadAverage.toFixed(2))} </h1>;
                 {
                     loadTrendImg = loadTrend === constants.up ? <span style={{color: 'red'}}>˄</span> :
                         <span style={{color: 'green'}}>˅</span>
