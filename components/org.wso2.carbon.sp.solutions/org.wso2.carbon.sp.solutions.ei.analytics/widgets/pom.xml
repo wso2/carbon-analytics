@@ -36,6 +36,7 @@
     <modules>
         <module>SearchBox</module>
         <module>MessageTable</module>
+        <module>TPS</module>
     </modules>
 
 </project>
