@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
@@ -422,5 +423,36 @@ public class ServiceComponent {
     protected void unsetPermissionManager(PermissionManager permissionManager) {
         StreamProcessorDataHolder.setPermissionProvider(null);
     }
+
+    /**
+     * Get the ServerEventListener service.
+     * This is the bind method that gets called for ServerEventListener service
+     * registration that satisfy the policy.
+     *
+     * @param serverEventListener the server listeners that is registered as a service.
+     */
+    @Reference(
+            name = "org.wso2.carbon.databridge.commons.ServerEventListener",
+            service = ServerEventListener.class,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterServerListener"
+    )
+    protected void registerServerListener(ServerEventListener serverEventListener) {
+        StreamProcessorDataHolder.setServerListener(serverEventListener);
+        if(StreamProcessorDataHolder.getHAManager() != null){
+            if(StreamProcessorDataHolder.getHAManager().isActiveNode()) {
+                serverEventListener.start();
+            }
+        }else {
+            serverEventListener.start();
+        }
+    }
+
+    protected void unregisterServerListener(ServerEventListener serverEventListener) {
+        StreamProcessorDataHolder.removeServerListener(serverEventListener);
+    }
+
+
 
 }
