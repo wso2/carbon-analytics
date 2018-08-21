@@ -123,8 +123,8 @@ class HorizontalBarChart extends Widget {
                 let query = dataProviderConf.configs.config.queryData.query;
                 const graphType = this.state.graphType;
                 const aggregator = (
-                    graphType === 'API' || graphType === 'Proxy Service' || graphType === 'Inbound Endpoint'
-                ) ? 'ESBStat' : 'MediatorStat';
+                    graphType === 'api' || graphType === 'proxy service' || graphType === 'inbound endpoint'
+                ) ? 'ESBStatAgg' : 'MediatorStatAgg';
                 /* Insert required parameters to the query string. */
                 dataProviderConf.configs.config.queryData.query = query
                     .replace('{{aggregator}}', aggregator)
@@ -165,10 +165,10 @@ class HorizontalBarChart extends Widget {
             /* Filter well known components. */
             let excludeEndpoints;
             switch (this.state.graphType) {
-                case 'Endpoint':
+                case 'endpoint':
                     excludeEndpoints = ['AnonymousEndpoint'];
                     break;
-                case 'Sequence':
+                case 'sequence':
                     excludeEndpoints = ['PROXY_INSEQ', 'PROXY_OUTSEQ', 'PROXY_FAULTSEQ', 'API_OUTSEQ', 'API_INSEQ',
                         'API_FAULTSEQ', 'AnonymousSequence', 'fault'];
                     break;
@@ -272,7 +272,7 @@ class HorizontalBarChart extends Widget {
     render() {
         return (
             <div id={DIV_ID_GRAPH}>
-                {this.state.isLoading ? HorizontalBarChart.renderEmptyRecordsMessage() : this.renderGraph()}
+                {this.state.isLoading ? this.renderEmptyRecordsMessage() : this.renderGraph()}
             </div>
         );
     }

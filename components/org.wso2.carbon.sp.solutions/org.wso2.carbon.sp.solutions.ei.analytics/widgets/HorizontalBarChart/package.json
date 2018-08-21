@@ -19,6 +19,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "webpack -p",
+    "build-dev": "webpack -d --config webpack.config.js --watch --progress",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "clean": "rimraf dist"
