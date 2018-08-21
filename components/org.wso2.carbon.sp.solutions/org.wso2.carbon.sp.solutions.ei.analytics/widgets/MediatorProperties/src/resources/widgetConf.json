@@ -12,11 +12,11 @@
       "configs" : {
         "type": "SiddhiStoreDataProvider",
         "config": {
-          "siddhiApp": "@App:name('EIStatApp-ESB') @store(type = 'rdbms', datasource = 'EI_ANALYTICS') define table esbEventStream (meta_tenantId int, messageFlowId string, host string, hashCode string, componentName string, componentType string, componentIndex int, componentId string, startTime long, endTime long, duration long, beforePayload string, afterPayload string, contextPropertyMap string, transportPropertyMap string, children string, entryPoint string, entryPointHashcode string, faultCount int, _timestamp long);",
-          "queryData": {
+          "siddhiApp": "@App:name('ESBEventTable') @store(type = 'rdbms', datasource = 'EI_ANALYTICS', field.length='contextPropertyMap:5000,beforePayload:5000,afterPayload:5000,transportPropertyMap:5000' ) @Index('metaTenantId','messageFlowId','host','hashCode','componentName','componentType','componentIndex','componentId','startTime','endTime','entryPoint','entryPointHashcode','faultCount') define table ESBEventTable (metaTenantId int, messageFlowId string, host string, hashCode string, componentName string, componentType string, componentIndex int, componentId string, startTime long, endTime long, duration long, beforePayload string, afterPayload string, contextPropertyMap string, transportPropertyMap string, children string, entryPoint string, entryPointHashcode string, faultCount int, eventTimestamp long);",
+           "queryData": {
             "query": "",
-            "GET_MESSAGE_FLOW_DATA_QUERY": "from esbEventStream on messageFlowId=='{{messageFlowId}}' AND componentId=='{{componentId}}' AND meta_tenantId=={{meta_tenantId}} select children, beforePayload, afterPayload, transportPropertyMap, contextPropertyMap limit 1",
-            "GET_CHILD_MESSAGE_FLOW_DATA_QUERY": "from esbEventStream on messageFlowId=='{{messageFlowId}}' AND componentIndex=='{{componentIndex}}' AND meta_tenantId=={{meta_tenantId}} select transportPropertyMap, contextPropertyMap limit 1"
+            "GET_MESSAGE_FLOW_DATA_QUERY": "from ESBEventTable on messageFlowId=='{{messageFlowId}}' AND componentId=='{{componentId}}' AND metaTenantId=={{meta_tenantId}} select children, beforePayload, afterPayload, transportPropertyMap, contextPropertyMap limit 1",
+            "GET_CHILD_MESSAGE_FLOW_DATA_QUERY": "from ESBEventTable on messageFlowId=='{{messageFlowId}}' AND componentIndex=='{{componentIndex}}' AND metaTenantId=={{meta_tenantId}} select transportPropertyMap, contextPropertyMap limit 1"
           },
           "publishingInterval": 60
         }

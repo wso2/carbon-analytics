@@ -1,0 +1,180 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+body {
+    min-height: 100%;
+    cursor: -webkit-grab; 
+    cursor: grab;
+}
+
+body.grabbing {
+    min-height: 100%;
+    cursor: -webkit-grabbing;
+    cursor: grabbing; 
+}
+
+.page-content-wrapper {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
+    background-size:50px 50px;
+}
+a, a:visited, a:focus, a:active {
+    text-decoration: none;
+    color: #fff;
+}
+.cluster rect {
+    stroke: #fff;
+    stroke-width: 1.5pxs;
+    stroke-dasharray: 5;
+    stroke-dashoffset: 20;
+    opacity: 0.5;
+    fill: #232C35;
+    transform: translate(3px,-7px);
+}
+
+.cluster > g.label > g {
+/*            transform: translate(-33px,-112px);*/
+}
+
+.node .label foreignobject h2 {
+    font-size: 16px;
+    margin: 0 0 5px;
+}
+
+.node .label foreignobject h3 {
+    margin: 0;
+    font-size: 12px;
+    text-align: left;
+}
+
+.node .label foreignobject h3 span {
+    font-weight: normal;
+    margin-left: 3px;
+    color: #e4e4e4;
+}
+
+text {
+    font-weight: 300;
+    font-size: 14px;
+    fill: #fff;
+}
+
+.node rect {
+    fill: transparent;
+    stroke: #fff;
+    stroke-width: 2px;
+}
+
+.edgePath path {
+    stroke: #5FDBCC;
+    stroke-width: 2px;
+    fill: transparent;
+}
+
+.edgePath .arrowhead {
+    fill: #232C35;
+}
+
+#btnViewToggle {
+    position: absolute;
+    right: 40px;
+    top: 40px;
+}
+
+.btn.btn-lg > .icon {
+    vertical-align: text-bottom;
+    margin-bottom: 2px;
+    margin-right: 5px;
+}
+
+a:hover {
+    color: #5fdbcc !important;
+    cursor:pointer;
+}
+
+label{
+    cursor:pointer;
+}
+
+.selected {
+    color: #5fdbcc !important;
+}
+
+.failed-node {
+    color: #e26861;
+}
+
+.failed-node:hover {
+    color: #5fdbcc !important;
+    cursor:pointer;
+}
+
+.node rect .failed-node  {
+    fill: transparent;
+    stroke: #e26861;
+    stroke-width: 2px;
+}
+
+.btn-zoom {
+    width: 30px;
+    height:30px;
+    background: #636C7C;
+    color: #fff;
+    border-color: #353C48;
+}
+
+.zoom-panel {
+    right: 0px;
+    padding: 3px;
+    position: absolute;
+}
+
+.nodeLabel > svg {
+    height: 45px;
+}
+
+.nodeLabel > svg path {
+    fill: #fff;
+}
+
+.nodeLabelWrap > svg {
+    height: 45px;
+}
+
+.nodeLabelWrap > svg path {
+    fill: #fff;
+}
+
+.endpoint-icon {
+    font-size:40px;
+}
+
+.mediator-icon {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+    filter: invert(1);
+}

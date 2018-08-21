@@ -1,0 +1,32 @@
+
+{
+  "name": "MessageFlow",
+  "id": "MessageFlow",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "subscriber",
+        "publisher"
+      ]
+    },
+    "providerConfig": {
+      "configs" : {
+        "type": "SiddhiStoreDataProvider",
+        "config": {
+          "siddhiApp": "@App:name('EIStatApp-ESB') define stream PreProcessedMediatorStatStream (metaTenantId int, entryPoint string, entryPointHashcode string, componentId string, hashCode string, componentName string, componentType string, duration long, faultCount int, startTime long); @store(type = 'rdbms', datasource = 'EI_ANALYTICS') @info(name = 'MediatorStat') define aggregation MediatorStatAgg from PreProcessedMediatorStatStream  select metaTenantId, entryPoint, entryPointHashcode, componentId, hashCode, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, startTime group by metaTenantId, componentId, componentName, componentType, entryPoint, entryPointHashcode, hashCode aggregate by startTime every sec...years; @store(type = 'rdbms', datasource = 'EI_ANALYTICS', field.length='contextPropertyMap:5000,beforePayload:5000,afterPayload:5000,transportPropertyMap:5000' ) @Index('metaTenantId','messageFlowId','host','hashCode','componentName','componentType','componentIndex','componentId','startTime','endTime','entryPoint','entryPointHashcode','faultCount') define table ESBEventTable (metaTenantId int, messageFlowId string, host string, hashCode string, componentName string, componentType string, componentIndex int, componentId string, startTime long, endTime long, duration long, beforePayload string, afterPayload string, contextPropertyMap string, transportPropertyMap string, children string, entryPoint string, entryPointHashcode string, faultCount int, eventTimestamp long); @store(type = 'rdbms', datasource = 'EI_ANALYTICS', field.length='configData:6000') @PrimaryKey('hashcode') @Index('metaTenantId','entryName') define table ConfigEntryTable (metaTenantId int, hashcode string, entryName string, configData string, eventTimestamp long);",
+           "queryData": {
+            "query": "",
+            "GET_CONFIG_ENTRY_DATA": "from ConfigEntryTable on entryName == {{entryName}} AND  metaTenantId == {{meta_tenantId}} select metaTenantId as meta_tenantId, hashcode, entryName, configData, eventTimestamp as _timestamp having time:timestampInMilliseconds({{timeFrom}},'yyyy-MM-dd HH:mm:ss') < _timestamp AND _timestamp < time:timestampInMilliseconds({{timeTo}},'yyyy-MM-dd HH:mm:ss') order by _timestamp desc limit 1",
+            "MESSAGE_FLOW_QUERY_GET_COMPONENTS": "from ESBEventTable on messageFlowId=={{messageFlowId}} AND metaTenantId=={{meta_tenantId}} select *",
+            "MESSAGE_FLOW_QUERY_GET_FLOW_SCHEMA": "from ConfigEntryTable on hashcode=={{hashcode}} AND metaTenantId=={{meta_tenantId}} select configData limit 1",
+            "MESSAGE_FLOW_QUERY_GET_COMPONENT_SCHEMA": "from ConfigEntryTable on {{sequences}} AND metaTenantId=={{meta_tenantId}} select configData, hashcode",
+            "SEQUENCE_MESSAGE_FLOW_QUERY_GET_AGGREGATE_DATA": "from MediatorStatAgg on {{componentIDs}} AND metaTenantId == {{tenantId}} within {{timeFrom}}, {{timeTo}} per {{timeUnit}} select componentId, entryPoint, componentType, sum(totalDuration) as totalDuration, max(maxDuration) as maxDuration, sum(noOfInvocation) as invocations, sum(faultCount) as faults group by componentId",
+            "ENTRY_POINT_MESSAGE_FLOW_GET_AGGREGATE_DATA": "from MediatorStatAgg on entryPointHashcode == {{hashcode}} AND metaTenantId == {{tenantId}} within {{timeFrom}}, {{timeTo}} per {{timeUnit}} select metaTenantId as  meta_tenantId, entryPoint as entryPoint, entryPointHashcode, componentId, hashCode, componentName, componentType as componentType, sum(totalDuration) as totalDuration, minDuration, max(maxDuration) as maxDuration, sum(noOfInvocation) as invocations, sum(faultCount) as faults, startTime group by componentId"
+          },
+          "publishingInterval": 60
+        }
+      }
+    }
+  }
+}
