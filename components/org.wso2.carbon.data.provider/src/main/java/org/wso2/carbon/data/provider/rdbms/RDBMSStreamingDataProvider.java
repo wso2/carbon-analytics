@@ -88,7 +88,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                         }
                         data.add(rowData);
                     }
-                    if (!data.isEmpty()) {
+                    if (!data.isEmpty() || lastRecordValue == 0) {
                         publishToEndPoint(data, sessionId, topic);
                     }
                 } catch (SQLException e) {

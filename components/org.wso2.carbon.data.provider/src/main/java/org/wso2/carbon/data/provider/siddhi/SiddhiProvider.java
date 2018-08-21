@@ -122,8 +122,10 @@ public class SiddhiProvider extends AbstractDataProvider {
         Event[] events = siddhiAppRuntime.query(siddhiDataProviderConfig.getQueryData().getAsJsonObject().get
                 (QUERY).getAsString());
         ArrayList<Object[]> data = new ArrayList<>();
-        for (Event event : events) {
-            data.add(event.getData());
+        if (events != null) {
+            for (Event event : events) {
+                data.add(event.getData());
+            }
         }
         publishToEndPoint(data, sessionId, topic);
     }
