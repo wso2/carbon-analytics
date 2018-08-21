@@ -81,7 +81,9 @@ class MessageTable extends Widget {
             metadata: this.metadata,
             width: this.props.glContainer.width,
             height: this.props.glContainer.height,
-            btnGroupHeight: 100
+            btnGroupHeight: 100,
+            selectedComponent: null,
+            timeFromParameter: null,
         };
         this.isDataLoaded = false;
         this.handleResize = this.handleResize.bind(this);
@@ -125,12 +127,17 @@ class MessageTable extends Widget {
                 data: []
             }, this.handleGraphUpdate);
         }
+        if ('selectedComponent' in message) {
+            this.setState({
+                selectedComponent: message.selectedComponent
+            }, this.handleGraphUpdate);
+        }
     }
 
     handleGraphUpdate() {
-        super.getWidgetConfiguration(this.props.widgetID)
+        if (this.state.selectedComponent != null && this.state.timeFromParameter != null) {
+            super.getWidgetConfiguration(this.props.widgetID)
             .then((message) => {
-
 
                 super.getWidgetChannelManager().unsubscribeWidget(this.props.id);
 
@@ -143,9 +150,7 @@ class MessageTable extends Widget {
                 let componentIdentifier = "componentName";
                 let urlParams = new URLSearchParams(window.location.search);
 
-                if (urlParams.has('id')) {
-                    componentName = this.getUrlParameter('id');
-                }
+                componentName = this.state.selectedComponent;
 
                 if (pageName == "api") {
                     componentType = "api";
@@ -184,8 +189,9 @@ class MessageTable extends Widget {
 
             })
             .catch((error) => {
-
+                console.error("Unable to load widget configurations");
             });
+        }
     }
 
     static getProviderConf(widgetConfiguration) {
