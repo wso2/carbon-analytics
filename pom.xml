@@ -1695,11 +1695,24 @@
                 <type>zip</type>
                 <version>${project.version}</version>
             </dependency>
+
+            <!-->siddhi-execution-esbanalytics extension-->
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo-shaded</artifactId>
+                <version>${kryo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.spark.core</artifactId>
+                <version>${carbon.analytics.spark.core.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
         <carbon.analytics.version>2.0.400-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.spark.core.version>1.2.3</carbon.analytics.spark.core.version>
         <siddhi.version>4.2.0</siddhi.version>
         <siddhi.bundle.version>4.2.0</siddhi.bundle.version>
 

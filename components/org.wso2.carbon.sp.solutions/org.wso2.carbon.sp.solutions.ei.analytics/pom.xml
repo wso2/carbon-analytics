@@ -12,6 +12,7 @@
 
     <modules>
         <module>widgets</module>
+        <module>components/siddhi-extensions/siddhi-execution-esbanalytics</module>
     </modules>
 
 </project>

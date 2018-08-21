@@ -1,0 +1,22 @@
+# Field names and types of the Decompressed event
+
+messageFlowId : string
+componentType : string
+componentName : string
+componentIndex : integer
+componentId : string
+startTime : long
+endTime : long
+duration : long
+beforePayload : string
+afterPayload : string
+contextPropertyMap : string
+transportPropertyMap : string
+children : string
+entryPoint : string
+entryPointHashcode : string
+faultCount : integer
+hashCode : string
+host : string
+metaTenantId : integer
+_timestamp : long
