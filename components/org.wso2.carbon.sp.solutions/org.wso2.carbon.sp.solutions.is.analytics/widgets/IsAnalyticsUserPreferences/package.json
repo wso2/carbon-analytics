@@ -1,15 +1,15 @@
 {
-  "name": "IsAnalyticsSummary",
+  "name": "IsAnalyticsUserPreferences",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^1.4.0",
+    "@material-ui/core": "^1.5.1",
     "@wso2-dashboards/widget": "^1.2.2",
     "css-loader": "^0.28.11",
-    "eslint-config-airbnb": "^17.1.0",
-    "react": "^16.4.1",
-    "react-router-dom": "^4.3.1",
-    "react-vizgrammar": "^0.7.14",
+    "material-ui": "^0.20.2",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-native": "^0.56.0",
     "rimraf": "^2.6.2",
     "style-loader": "^0.21.0"
   },

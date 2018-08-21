@@ -1,0 +1,32 @@
+{
+  "name": "IS Analytics User Preferences",
+  "id": "IsAnalyticsUserPreferences",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "publisher",
+        "subscriber"
+      ],
+      "publisherWidgetOutputs":[
+        "header",
+        "body"
+      ]
+    },
+    "options": [
+      {
+        "id": "widgetType",
+        "title": "Widget Type",
+        "type": {
+          "name": "ENUM",
+          "possibleValues": [
+            "Overall",
+            "Local",
+            "Federated"
+          ]
+        },
+        "defaultValue": "Overall"
+      }
+    ]
+  }
+}

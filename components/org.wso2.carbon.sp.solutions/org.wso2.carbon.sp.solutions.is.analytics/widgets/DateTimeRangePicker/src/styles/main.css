@@ -1,0 +1,15 @@
+.perUnderline:before {
+     background-color: rgba(255, 255, 255, 0) !important;
+}
+
+.viewer-light .MuiInput-underline-56:before{
+     background-color: #000;
+}
+
+.viewer-light .MuiSelect-icon-51 {
+     color: #000;
+}
+
+.MuiInput-root-52 {
+     color: inherit !important;
+}

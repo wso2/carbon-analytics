@@ -27,21 +27,19 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <name>WSO2 Stream Processor - WSO2 Identity Server Analytics</name>
-    <description>WSO2 Stream Processor WSO2 Identity Server Analytics Solution</description>
+    <name>WSO2 Stream Processor - WSO2 Identity Server Analytics - Widgets</name>
     <artifactId>is-analytics-widgets</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>IsAnalyticsSummary</module>
-        <!--
+        <module>DateTimeRangePicker</module>
+        <module>IsAnalyticsAreaChart</module>
         <module>IsAnalyticsAttemptsOverTime</module>
-        <module>IsAnalyticsCompactSummery</module>
+        <module>IsAnalyticsCompactSummary</module>
+        <module>IsAnalyticsSummary</module>
         <module>IsAnalyticsHorizontalBarChart</module>
         <module>IsAnalyticsMessages</module>
-        <module>IsAnalyticsSummery</module>
         <module>IsAnalyticsUserPreferences</module>
-         -->
     </modules>
 
 </project>

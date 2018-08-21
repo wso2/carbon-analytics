@@ -1,0 +1,38 @@
+{
+    "id": "DateRangePicker",
+    "name": "Date Time Range",
+    "thumbnailURL": "",
+    "configs": {
+        "pubsub": {
+            "types": [
+                "publisher"
+            ],
+            "publisherWidgetOutputs":[
+                "granularity",
+                "from",
+                "to"
+            ]
+        },
+        "options": [
+            {
+                "id": "defaultValue",
+                "title": "Default Range",
+                "type": {
+                    "name": "ENUM",
+                    "possibleValues": [
+                        "1 Min",
+                        "15 Min",
+                        "1 Hour",
+                        "1 Day",
+                        "7 Days",
+                        "1 Month",
+                        "3 Months",
+                        "6 Months",
+                        "1 Year"
+                    ]
+                },
+                "defaultValue": "3 Months"
+            }
+        ]
+    }
+}

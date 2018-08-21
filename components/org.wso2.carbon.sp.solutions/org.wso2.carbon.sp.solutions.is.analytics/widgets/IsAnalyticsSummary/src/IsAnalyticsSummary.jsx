@@ -19,7 +19,7 @@
 
 import Widget from '@wso2-dashboards/widget';
 import VizG from 'react-vizgrammar';
-import {MuiThemeProvider} from '@material-ui/core/styles';
+import {MuiThemeProvider, createMuiTheme} from '@material-ui/core/styles';
 import _ from 'lodash';
 import Button from '@material-ui/core/Button';
 
@@ -44,12 +44,26 @@ const widgetTexts = {
 const colorGreen = '#6ED460';
 const colorRed = '#EC5D40';
 
+let darkTheme = createMuiTheme({
+    palette: {
+        type: 'dark',
+    }
+});
+
+let lightTheme = createMuiTheme({
+    palette: {
+        type: 'light',
+    }
+});
+
 const successStyle = {
     color: colorGreen,
+    margin: "0px auto",
 };
 
 const failureStyle = {
     color: colorRed,
+    margin: "0px auto",
 };
 
 const pieChartMetadata = {
@@ -211,10 +225,15 @@ class IsAnalyticsSummary extends Widget {
         const height = this.state.height;
         const width = this.state.width;
         const padding = this.state.width * 0.05;
+        let theme = darkTheme;
+
+        if (this.props.muiTheme.appBar.color === "#eeeeee") {
+            theme = lightTheme;
+        }
 
         if (this.state.isProviderConfigFault) {
             return (
-                <MuiThemeProvider theme={this.props.muiTheme}>
+                <MuiThemeProvider theme={theme}>
                     <div style={{padding: padding, height, width}}>
                         <h3>{this.state.widgetTexts.heading}</h3>
                         <h5>[ERROR]: Cannot connect to the data provider</h5>
@@ -223,8 +242,9 @@ class IsAnalyticsSummary extends Widget {
             );
         }
         return (
-            <div style={{paddingLeft: padding, paddingRight: padding, height, width}}>
-                <MuiThemeProvider theme={this.props.muiTheme}>
+            <MuiThemeProvider theme={theme}>
+                <div style={{paddingLeft: padding, paddingRight: padding, height, width}}>
+
                     <div style={{height: this.state.height * 0.05}}>
                         <h2>{this.state.widgetTexts.heading}</h2>
                     </div>
@@ -239,36 +259,39 @@ class IsAnalyticsSummary extends Widget {
                             theme={this.props.muiTheme.name}
                         />
                     </div>
-                    {
-                        this.state.totalAttempts > 0
-                        && <div style={{height: height * 0.25, width: width * 0.9}}>
-                            <div style={{height: height * 0.05, width: width * 0.9}}>
-                                <h6 style={successStyle}>
-                                    Success:{this.state.successPercentage}
-                                </h6>
-                                <h6 style={failureStyle}>
-                                    Failure:{this.state.failurePercentage}
-                                </h6>
+                    <div style={{height: height * 0.25, width: width * 0.9}}>
+                        {
+                            this.state.totalAttempts > 0
+                            &&
+                            <div>
+                                <div style={{height: height * 0.05, width: width * 0.9, 'text-align': 'center'}}>
+                                    <h5 style={successStyle}>
+                                        Success:{this.state.successPercentage}
+                                    </h5>
+                                    <h5 style={failureStyle}>
+                                        Failure:{this.state.failurePercentage}
+                                    </h5>
+                                </div>
+                                <div style={{height: height * 0.2, width: width * 0.9}}>
+                                    <VizG
+                                        config={this.state.pieChartConfig}
+                                        metadata={this.state.pieChartMetadata}
+                                        data={this.state.pieChartData}
+                                        theme={this.props.muiTheme.name}
+                                    />
+                                </div>
                             </div>
-                            <div style={{height: height * 0.2, width: width * 0.9}}>
-                                <VizG
-                                    config={this.state.pieChartConfig}
-                                    metadata={this.state.pieChartMetadata}
-                                    data={this.state.pieChartData}
-                                    theme={this.props.muiTheme.name}
-                                />
-                            </div>
-                        </div>
-                    }
-                </MuiThemeProvider>
-                <div style={{height: height * 0.5, width: width * 0.9}}>
-                    <a href={this.state.widgetTexts.seeMoreLink}>
-                        <Button color="primary" variant="contained" component="span">
-                            See More >>
-                        </Button>
-                    </a>
+                        }
+                    </div>
+                    <div style={{height: height * 0.1, width: width * 0.9}}>
+                        <a href={this.state.widgetTexts.seeMoreLink}>
+                            <Button color="primary" variant="contained" component="span">
+                                See More >>
+                            </Button>
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </MuiThemeProvider>
         );
     }
 }

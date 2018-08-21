@@ -1,15 +1,15 @@
 {
-  "name": "IsAnalyticsSummary",
+  "name": "IsAnalyticsMessages",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^1.4.0",
+    "@material-ui/core": "^1.3.0",
     "@wso2-dashboards/widget": "^1.2.2",
     "css-loader": "^0.28.11",
-    "eslint-config-airbnb": "^17.1.0",
+    "moment": "^2.22.2",
     "react": "^16.4.1",
-    "react-router-dom": "^4.3.1",
-    "react-vizgrammar": "^0.7.14",
+    "react-custom-scrollbars": "^4.2.1",
+    "react-vizgrammar": "^0.7.22",
     "rimraf": "^2.6.2",
     "style-loader": "^0.21.0"
   },
