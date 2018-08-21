@@ -70,6 +70,9 @@ public class SiddhiCodeBuilderConstants {
             SINGLE_QUOTE + CLOSE_BRACKET;
     public static final String DEFAULT_APP_DESCRIPTION_ANNOTATION = APP_DESCRIPTION_ANNOTATION +
             "Description of the plan" + SINGLE_QUOTE + CLOSE_BRACKET;
+    public static final String DEFAULT_QUERY_NAME_ANNOTATION = QUERY_NAME_ANNOTATION + "query" +
+            SINGLE_QUOTE + CLOSE_BRACKET;
+
     // Join Strings
     public static final String JOIN = "join";
     public static final String LEFT_OUTER_JOIN = "left outer join";

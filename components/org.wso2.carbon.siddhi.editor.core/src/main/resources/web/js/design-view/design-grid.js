@@ -1471,7 +1471,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.forEach(self.configurationData.getSiddhiAppConfig().getPatternQueryList(), function (patternQuery) {
 
                 var patternQueryId = patternQuery.getId();
-                var patternQueryName = "Pattern Query";
+                var patternQueryName = patternQuery.getQueryName();
                 var array = patternQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
@@ -1482,7 +1482,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.forEach(self.configurationData.getSiddhiAppConfig().getSequenceQueryList(), function (sequenceQuery) {
 
                 var sequenceQueryId = sequenceQuery.getId();
-                var sequenceQueryName = "Sequence Query";
+                var sequenceQueryName = sequenceQuery.getQueryName();
                 var array = sequenceQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
@@ -1493,7 +1493,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.forEach(self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQueryList(),
                 function (windowFilterProjectionQuery) {
                     var queryId = windowFilterProjectionQuery.getId();
-                    var queryName = "Query";
+                    var queryName = windowFilterProjectionQuery.getQueryName();
                     var querySubType = windowFilterProjectionQuery.getQueryInput().getType();
 
                     var queryType;
@@ -1517,7 +1517,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.forEach(self.configurationData.getSiddhiAppConfig().getJoinQueryList(), function (joinQuery) {
 
                 var joinQueryId = joinQuery.getId();
-                var joinQueryName = "Join Query";
+                var joinQueryName = joinQuery.getQueryName();
                 var array = joinQueryId.split("_");
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
@@ -1552,7 +1552,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 _.forEach(partition.getPatternQueryList(), function (patternQuery) {
 
                     var patternQueryId = patternQuery.getId();
-                    var patternQueryName = "Pattern Query";
+                    var patternQueryName = patternQuery.getQueryName();
                     var array = patternQueryId.split("_");
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
@@ -1566,7 +1566,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 _.forEach(partition.getSequenceQueryList(), function (sequenceQuery) {
 
                     var sequenceQueryId = sequenceQuery.getId();
-                    var sequenceQueryName = "Sequence Query";
+                    var sequenceQueryName = sequenceQuery.getQueryName();
                     var array = sequenceQueryId.split("_");
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
@@ -1580,7 +1580,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 _.forEach(partition.getWindowFilterProjectionQueryList(),
                     function (windowFilterProjectionQuery) {
                         var queryId = windowFilterProjectionQuery.getId();
-                        var queryName = "Query";
+                        var queryName = windowFilterProjectionQuery.getQueryName();
                         var querySubType = windowFilterProjectionQuery.getQueryInput().getType();
 
                         var queryType;
@@ -1610,7 +1610,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 _.forEach(partition.getJoinQueryList(), function (joinQuery) {
 
                     var joinQueryId = joinQuery.getId();
-                    var joinQueryName = "Join Query";
+                    var joinQueryName = joinQuery.getQueryName();
                     var array = joinQueryId.split("_");
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
