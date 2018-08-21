@@ -255,8 +255,8 @@ class StatsChart extends Widget {
                 super.getWidgetChannelManager()
                     .subscribeWidget(this.props.id, this.handleStats().bind(this), dataProviderConf.configs.providerConfig);
             })
-            .catch((error) => {
-                // todo: Handle Rest API call failure
+            .catch(() => {
+                console.error("Unable to load widget configurations");
             });
     }
 
