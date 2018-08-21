@@ -1090,8 +1090,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (queryName !== queryNameConfig) {
                         // update selected query
                         clickedElement.addQueryName(queryNameConfig);
-                        if (queryNameConfig == "")
+                        if (queryNameConfig == "") {
                             queryNameConfig = "Sequence Query";
+                        }
                         var textNode = $('#' + clickedElement.getId()).find('.sequenceQueryNameNode');
                         textNode.html(queryNameConfig);
                     }

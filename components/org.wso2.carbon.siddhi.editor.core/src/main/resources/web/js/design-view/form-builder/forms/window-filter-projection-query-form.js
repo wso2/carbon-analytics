@@ -1283,8 +1283,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (queryName !== queryNameConfig) {
                         // update selected query
                         clickedElement.addQueryName(queryNameConfig);
-                        if (queryNameConfig == "")
-                            queryNameConfig = "Query";
+                        if (queryNameConfig == "") {
+                             queryNameConfig = "Query";
+                        }
                         var textNode = $('#' + clickedElement.getId()).find('.queryNameNode');
                         textNode.html(queryNameConfig);
                     }

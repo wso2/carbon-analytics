@@ -1099,8 +1099,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     if (queryName !== queryNameConfig) {
                         // update selected query
                         clickedElement.addQueryName(queryNameConfig);
-                        if (queryNameConfig == "")
+                        if (queryNameConfig == "") {
                             queryNameConfig = "Pattern Query";
+                        }
                         var textNode = $('#' + clickedElement.getId()).find('.patternQueryNameNode');
                         textNode.html(queryNameConfig);
                     }
