@@ -1,0 +1,24 @@
+{
+  "name": "TPS",
+  "id": "TPS",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "subscriber"
+      ]
+    },
+    "providerConfig": {
+      "configs": {
+        "type": "SiddhiStoreDataProvider",
+        "config": {
+          "siddhiApp": "@App:name('ESBStatAggregation') define stream PreProcessedESBStatStream (componentId string, componentName string, componentType string, duration long, faultCount int, startTime long, entryPoint string, metaTenantId int); @store(type = 'rdbms', datasource = 'EI_ANALYTICS') @info(name = 'ESBStatAggregation') define aggregation ESBStatAgg from PreProcessedESBStatStream select componentId, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, entryPoint, metaTenantId, startTime as eventTimestamp group by metaTenantId, componentId, componentName, componentType, entryPoint aggregate by startTime every sec...years;",
+          "queryData": {
+            "query": "from ESBStatAgg on metaTenantId=={{tenantId}} within {{timeFrom}}, {{timeTo}} per {{timeunit}} select AGG_TIMESTAMP, noOfInvocation group by AGG_TIMESTAMP"
+          },
+          "publishingInterval": 60
+        }
+      }
+    }
+  }
+}

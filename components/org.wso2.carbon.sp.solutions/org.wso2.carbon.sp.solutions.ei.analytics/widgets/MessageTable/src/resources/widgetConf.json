@@ -1,0 +1,27 @@
+{
+  "name": "MessageTable",
+  "id": "MessageTable",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "subscriber"
+      ]
+    },
+    "providerConfig": {
+      "configs": {
+        "type": "RDBMSBatchDataProvider",
+        "config": {
+          "datasourceName": "EI_ANALYTICS",
+          "queryData": {
+            "query": "select messageFlowId,host,startTime,if(faultCount>0,'Failed','Success') as faultCount from ESBEventTable where startTime>={{timeFrom}} and startTime<{{timeTo}} and metaTenantId={{metaTenantId}} and componentType='{{componentType}}' and {{componentIdentifier}}='{{componentName}}'"
+          },
+          "tableName": "ESBEventTable",
+          "incrementalColumn": "startTime",
+          "publishingInterval": 60,
+          "publishingLimit": 100
+        }
+      }
+    }
+  }
+}
