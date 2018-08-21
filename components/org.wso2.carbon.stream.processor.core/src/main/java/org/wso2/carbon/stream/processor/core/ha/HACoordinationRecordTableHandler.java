@@ -213,6 +213,10 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
         }
     }
 
+    public void setPassive() {
+        this.isActiveNode = false;
+    }
+
     /**
      * Update the event queue according to the last processed event timestamp of the active node in given record table.
      *

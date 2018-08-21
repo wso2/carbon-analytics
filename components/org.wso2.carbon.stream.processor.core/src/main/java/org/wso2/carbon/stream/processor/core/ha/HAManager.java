@@ -52,6 +52,7 @@ public class HAManager {
     private ClusterCoordinator clusterCoordinator;
     private ScheduledExecutorService passiveNodeOutputSchedulerService;
     private ScheduledFuture passiveNodeOutputScheduledFuture;
+    private ScheduledExecutorService activeNodeScheduledExecutorService;
     private boolean liveSyncEnabled;
     private int outputSyncInterval;
     private String localHost;
@@ -127,10 +128,10 @@ public class HAManager {
             clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
             isActiveNode = true;
             if (!liveSyncEnabled) {
-                ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-                scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
-                                sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0, outputSyncInterval,
-                        TimeUnit.MILLISECONDS);
+                activeNodeScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+                activeNodeScheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
+                                sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0,
+                        outputSyncInterval, TimeUnit.MILLISECONDS);
                 isActiveNodeOutputSyncManagerStarted = true;
             }
         } else {
@@ -193,15 +194,46 @@ public class HAManager {
             }
         }
         if (!liveSyncEnabled && !isActiveNodeOutputSyncManagerStarted) {
-            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-            scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
-                            sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0, outputSyncInterval,
-                    TimeUnit.MILLISECONDS);
+            activeNodeScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            activeNodeScheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
+                            sinkHandlerManager, recordTableHandlerManager, clusterCoordinator),
+                    0, outputSyncInterval, TimeUnit.MILLISECONDS);
             isActiveNodeOutputSyncManagerStarted = true;
         }
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
         nodeInfo.setActiveNode(isActiveNode);
     }
+
+    /**
+     * Starts Publisher Syncing of Passive Node
+     * Starts scheduled state sync of Passive Node from Active Node
+     * Updates Coordination Properties with Advertised Host and Port
+     */
+    void changeToPassive() {
+        isActiveNode = false;
+        Map<String, Object> activeNodeHostAndPortMap = clusterCoordinator.getLeaderNode().getPropertiesMap();
+        if (activeNodeHostAndPortMap != null) {
+            activeNodeHost = (String) activeNodeHostAndPortMap.get("host");
+            activeNodePort = (String) activeNodeHostAndPortMap.get("port");
+        }
+        if (activeNodeScheduledExecutorService != null) {
+            activeNodeScheduledExecutorService.shutdown();
+            isActiveNodeOutputSyncManagerStarted = false;
+        }
+        if (liveSyncEnabled) {
+            syncAfterGracePeriodTimer = liveSyncAfterGracePeriod(stateSyncGracePeriod);
+        } else {
+            syncAfterGracePeriodTimer = persistenceStoreSyncAfterGracePeriod(stateSyncGracePeriod);
+        }
+        passiveNodeOutputSchedulerService = Executors.newSingleThreadScheduledExecutor();
+        passiveNodeOutputScheduledFuture = passiveNodeOutputSchedulerService.scheduleAtFixedRate(
+                new PassiveNodeOutputSyncManager(clusterCoordinator, sinkHandlerManager, recordTableHandlerManager,
+                        activeNodeHost, activeNodePort, liveSyncEnabled, username, password), outputSyncInterval,
+                outputSyncInterval, TimeUnit.MILLISECONDS);
+        NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
+        nodeInfo.setActiveNode(isActiveNode);
+    }
+
 
     /**
      * Implements a timer task to run after specified time interval to sync with active node

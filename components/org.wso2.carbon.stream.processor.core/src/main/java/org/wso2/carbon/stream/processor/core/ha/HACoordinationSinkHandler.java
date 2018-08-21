@@ -159,6 +159,17 @@ public class HACoordinationSinkHandler extends SinkHandler {
     }
 
     /**
+     * Method to change the sink handler to Passive state so that publishing of events is blocked.
+     * The events will be buffered.
+     * Will only be called when this node is the Active Node.
+     */
+    public void setAsPassive() {
+        //When active node becomes passive, events will be queued.
+        this.isQueueFlushing = false;
+        this.isActiveNode = false;
+    }
+
+    /**
      * Get the timestamp of the last event published from the given sink.
      * Will only be called when this node is the Active node and publishing events.
      *
