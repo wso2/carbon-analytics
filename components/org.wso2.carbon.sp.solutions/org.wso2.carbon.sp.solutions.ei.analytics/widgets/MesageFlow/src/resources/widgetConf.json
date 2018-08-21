@@ -1,0 +1,32 @@
+
+{
+  "name": "MessageFlow",
+  "id": "MessageFlow",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "subscriber",
+        "publisher"
+      ]
+    },
+    "providerConfig": {
+      "configs" : {
+        "type": "SiddhiStoreDataProvider",
+        "config": {
+          "siddhiApp": "@App:name('EIStatApp-ESB') @store(type = 'rdbms', datasource = 'EI_ANALYTICS') define stream MediatorStatStreamTemp (meta_tenantId int, entryPoint string, entryPointHashcode string, componentId string, hashCode string, componentName string, componentType string, duration long, faultCount int, startTime long); @store(type = 'rdbms', datasource = 'EI_ANALYTICS') define aggregation MediatorStat from MediatorStatStreamTemp select meta_tenantId, entryPoint, entryPointHashcode, componentId, hashCode, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, startTime group by meta_tenantId, componentId, componentName, componentType, entryPoint, entryPointHashcode, hashCode aggregate by startTime every sec ... years; @store(type = 'rdbms', datasource = 'EI_ANALYTICS') define table esbEventStream (meta_tenantId int, messageFlowId string, host string, hashCode string, componentName string, componentType string, componentIndex int, componentId string, startTime long, endTime long, duration long, beforePayload string, afterPayload string, contextPropertyMap string, transportPropertyMap string, children string, entryPoint string, entryPointHashcode string, faultCount int, _timestamp long); @store(type = 'rdbms', datasource = 'EI_ANALYTICS') define table configEntry (meta_tenantId int, hashcode string, entryName string, configData string, _timestamp long)",
+          "queryData": {
+            "query": "",
+            "GET_CONFIG_ENTRY_DATA": "from configEntry on entryName == {{entryName}} AND  meta_tenantId == {{meta_tenantId}} select meta_tenantId, hashcode, entryName, configData, _timestamp having time:timestampInMilliseconds({{timeFrom}},'yyyy-MM-dd HH:mm:ss') < _timestamp AND _timestamp < time:timestampInMilliseconds({{timeTo}},'yyyy-MM-dd HH:mm:ss') order by _timestamp desc limit 1",
+            "MESSAGE_FLOW_QUERY_GET_COMPONENTS": "from esbEventStream on messageFlowId=={{messageFlowId}} AND meta_tenantId=={{meta_tenantId}} select *",
+            "MESSAGE_FLOW_QUERY_GET_FLOW_SCHEMA": "from configEntry on hashcode=={{hashcode}} AND meta_tenantId=={{meta_tenantId}} select configData limit 1",
+            "MESSAGE_FLOW_QUERY_GET_COMPONENT_SCHEMA": "from configEntry on {{sequences}} AND meta_tenantId=={{meta_tenantId}} select configData, hashcode",
+            "SEQUENCE_MESSAGE_FLOW_QUERY_GET_AGGREGATE_DATA": "from MediatorStat on {{componentIDs}} AND meta_tenantId == {{tenantId}} within {{timeFrom}}, {{timeTo}} per {{timeUnit}} select componentId, entryPoint, componentType, sum(totalDuration) as totalDuration, max(maxDuration) as maxDuration, sum(noOfInvocation) as invocations, sum(faultCount) as faults group by componentId",
+            "ENTRY_POINT_MESSAGE_FLOW_GET_AGGREGATE_DATA": "from MediatorStat on entryPointHashcode == {{hashcode}} AND meta_tenantId == {{tenantId}} within {{timeFrom}}, {{timeTo}} per {{timeUnit}} select meta_tenantId, entryPoint as entryPoint, entryPointHashcode, componentId, hashCode, componentName, componentType as componentType, sum(totalDuration) as totalDuration, minDuration, max(maxDuration) as maxDuration, sum(noOfInvocation) as invocations, sum(faultCount) as faults, startTime group by componentId"
+          },
+          "publishingInterval": 60
+        }
+      }
+    }
+  }
+}

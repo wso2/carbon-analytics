@@ -1,0 +1,41 @@
+{
+    "name": "message-flow-widget",
+    "version": "1.0.0",
+    "private": true,
+    "dependencies": {
+        "@material-ui/core": "^1.3.1",
+        "css-loader": "^0.28.11",
+        "d3": "^5.5.0",
+        "dagre-d3": "^0.6.1",
+        "jquery": "^3.3.1",
+        "moment": "^2.22.2",
+        "nanoscroller": "^0.8.7",
+        "react": "16.3.2",
+        "react-custom-scrollbars": "^4.2.1",
+        "react-dom": "16.3.2",
+        "rimraf": "^2.6.2",
+        "style-loader": "^0.21.0",
+        "url-loader": "^1.0.1"
+    },
+    "scripts": {
+        "build": "webpack -p",
+        "build-dev": "webpack -d --config webpack.config.js --watch --progress",
+        "start": "react-scripts start",
+        "test": "react-scripts test --env=jsdom",
+        "eject": "react-scripts eject",
+        "clean": "rimraf dist"
+    },
+    "devDependencies": {
+        "webpack": "^3.5.6",
+        "ajv": "^5.2.2",
+        "babel-core": "^6.25.0",
+        "babel-loader": "^7.1.1",
+        "babel-preset-es2015": "^6.24.1",
+        "babel-preset-react": "^6.24.1",
+        "babel-register": "^6.26.0",
+        "copy-webpack-plugin": "^4.2.0",
+        "node-sass": "^4.5.3",
+        "sass-loader": "^6.0.6",
+        "@wso2-dashboards/widget": "1.2.2"
+    }
+}
