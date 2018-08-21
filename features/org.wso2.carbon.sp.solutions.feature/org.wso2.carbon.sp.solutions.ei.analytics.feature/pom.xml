@@ -29,6 +29,30 @@
             <type>zip</type>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>wso2sp-solutions.ei-analytics.statschart</artifactId>
+            <version>2.0.399-SNAPSHOT</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>wso2sp-solutions.ei-analytics.horizontalbarchart</artifactId>
+            <version>2.0.399-SNAPSHOT</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>wso2sp-solutions.ei-analytics.messageflow</artifactId>
+            <version>2.0.399-SNAPSHOT</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>wso2sp-solutions.ei-analytics.mediatorproperties</artifactId>
+            <version>2.0.399-SNAPSHOT</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <scope>test</scope>
@@ -76,6 +100,42 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
                                     <includes>TPS/**</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
+                                    <artifactId>wso2sp-solutions.ei-analytics.messageflow</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
+                                    <includes>MessageFlow/**</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
+                                    <artifactId>wso2sp-solutions.ei-analytics.horizontalbarchart</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
+                                    <includes>HorizontalBarChart/**</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
+                                    <artifactId>wso2sp-solutions.ei-analytics.statschart</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
+                                    <includes>StatsChart/**</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
+                                    <artifactId>wso2sp-solutions.ei-analytics.mediatorproperties</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
+                                    <includes>MediatorProperties/**</includes>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

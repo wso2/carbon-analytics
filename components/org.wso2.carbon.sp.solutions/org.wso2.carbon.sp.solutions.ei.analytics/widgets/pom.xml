@@ -40,7 +40,7 @@
         <module>HorizontalBarChart</module>
         <module>StatsChart</module>
         <module>MediatorProperties</module>
-        <module>MesageFlow</module>
+        <module>MessageFlow</module>
     </modules>
 
 </project>
