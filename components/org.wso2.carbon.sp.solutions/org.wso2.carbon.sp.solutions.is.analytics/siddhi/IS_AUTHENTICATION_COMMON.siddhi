@@ -1,0 +1,146 @@
+@App:name("IS_AUTHENTICATION_COMMON")
+@App:description("Handle Event from IS and save data in a table for Overall Authentication")
+
+-- Read data from IS
+@source(type = "wso2event", wso2.stream.id = "org.wso2.is.analytics.stream.OverallAuthentication:1.0.0", @map(type = 'wso2event'))
+define stream SourceStreamFromIdentityServerWso2EventStream (
+    meta_tenantId int,
+    contextId string,
+    eventId string,
+    eventType string,
+    authenticationSuccess bool,
+    username string,
+    localUsername string,
+    userStoreDomain string,
+    tenantDomain string,
+    remoteIp string,
+    region string,
+    inboundAuthType string,
+    serviceProvider string,
+    rememberMeEnabled bool,
+    forceAuthEnabled bool,
+    passiveAuthEnabled bool,
+    rolesCommaSeparated string,
+    authenticationStep string,
+    identityProvider string,
+    authStepSuccess bool,
+    stepAuthenticator string,
+    isFirstLogin bool,
+    identityProviderType string,
+    _timestamp long
+);
+
+@sink(type='inMemory', topic='IsAnalytics.Authentication.Common.OutputSinkFromProcessedAuthenticationDataStream', @map(type='passThrough'))
+define stream ProcessedAuthenticationDataStream (
+    meta_tenantId int,
+    eventId string,
+    username string,
+    localUsername string, 
+    userStoreDomain string,
+    tenantDomain string,
+    rolesCommaSeparated string,
+    remoteIp string,
+    region string,
+    inboundAuthType string,
+    serviceProvider string,
+    rememberMeEnabled bool,
+    forceAuthEnabled bool,
+    passiveAuthEnabled bool,
+    stepAuthenticator string,
+    authenticationStep string,
+    authStepSuccess bool,
+    identityProvider string,
+    identityProviderType string,
+    isFirstLogin bool,
+    successValue int,
+    failureValue int,
+    stepSuccessValue int,
+    firstLoginValue int,
+    timestamp long
+);
+
+@sink(type='inMemory', topic='IsAnalytics.Authentication.Common.OutputSinkFromOverallAuthenticationProcessedStream', @map(type='passThrough'))
+define stream OverallAuthenticationProcessedStream (
+    meta_tenantId int,
+    contextId string,
+    eventId string,
+    eventType string,
+    username string,
+    localUsername string,
+    userStoreDomain string,
+    tenantDomain string,
+    remoteIp string,
+    region string,
+    inboundAuthType string,
+    serviceProvider string,
+    rememberMeEnabled bool,
+    forceAuthEnabled bool,
+    passiveAuthEnabled bool,
+    rolesCommaSeparated string,
+    authenticationStep string,
+    identityProvider string,
+    authenticationSuccess bool,
+    authStepSuccess bool,
+    stepAuthenticator string,
+    isFirstLogin bool,
+    identityProviderType string,
+    timestamp long
+);
+
+from SourceStreamFromIdentityServerWso2EventStream
+select 
+    meta_tenantId, 
+    contextId, 
+    eventId, 
+    eventType,
+    username, 
+    localUsername, 
+    userStoreDomain, 
+    tenantDomain, 
+    remoteIp, 
+    ifThenElse(geo:findCountryFromIP(remoteIp)=="", "N/A", geo:findCountryFromIP(remoteIp)) as region, 
+    inboundAuthType, 
+    serviceProvider, 
+    rememberMeEnabled, 
+    forceAuthEnabled, 
+    passiveAuthEnabled, 
+    rolesCommaSeparated, 
+    authenticationStep, 
+    identityProvider,
+    authenticationSuccess,
+    authStepSuccess, 
+    stepAuthenticator, 
+    isFirstLogin, 
+    identityProviderType, 
+    _timestamp as timestamp
+insert into OverallAuthenticationProcessedStream;
+
+from OverallAuthenticationProcessedStream
+select 
+    meta_tenantId,
+    eventId,
+    username,
+    localUsername, 
+    userStoreDomain,
+    tenantDomain,
+    rolesCommaSeparated,
+    remoteIp,
+    region,
+    inboundAuthType,
+    serviceProvider,
+    rememberMeEnabled,
+    forceAuthEnabled,
+    passiveAuthEnabled,
+    stepAuthenticator,
+    authenticationStep,
+    authStepSuccess,
+    identityProvider,
+    identityProviderType,
+    isFirstLogin,
+    ifThenElse(authenticationSuccess == true, 1, 0) as successValue, 
+    ifThenElse((authStepSuccess == false and eventType == 'step'), 1, 0) as failureValue, 
+    ifThenElse((authStepSuccess == true and eventType == 'step'), 1, 0) as stepSuccessValue, 
+    ifThenElse(authenticationSuccess == true AND isFirstLogin == true, 1, 0) as firstLoginValue,
+    timestamp
+insert into ProcessedAuthenticationDataStream;
+

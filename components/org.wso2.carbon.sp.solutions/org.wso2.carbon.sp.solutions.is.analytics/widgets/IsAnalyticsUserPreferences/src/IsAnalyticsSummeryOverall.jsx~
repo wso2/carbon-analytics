@@ -1,0 +1,190 @@
+import React, {Component} from "react";
+import Widget from "@wso2-dashboards/widget";
+import VizG from 'react-vizgrammar';
+import {Scrollbars} from 'react-custom-scrollbars';
+import {MuiThemeProvider, darkBaseTheme, getMuiTheme} from 'material-ui/styles';
+
+let heading = "Overall Login Attempts";
+let bodyText = "Analyze overall login attempts made via WSO2 Identity Server.\n" +
+    "This includes information about overall flows of authentication took place through Identity Server.\n" +
+    "A collection of authentication steps is considered as an overall attempt";
+let values = "TOTAL LOGIN ATTEMPTS\n" +
+    "         {{value}}         \n" +
+    "        Success: {{successCount}}\n" +
+    "        Failure: {{failureCount}}\n";
+let totalAttempts = 0;
+let successCount = 0;
+let failureCount = 0;
+
+let metadata = {
+    names: ['attemptType', 'attemptCount'],
+    types: ['ordinal', 'linear']
+}
+
+let chartConfig = {
+    "charts": [
+    {
+        "type": "arc",
+        "x": "attemptCount",
+        "color": "attemptType",
+        "mode": "donut"
+    }
+],
+    "legendOrientation": "top"
+}
+
+class IsAnalyticsSummeryOverall extends Widget {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            width: this.props.glContainer.width,
+            height: this.props.glContainer.height,
+
+            chartConfig: chartConfig,
+            data: [],
+            metadata: metadata,
+            faultyProviderConf: false,
+            totalAttempts: totalAttempts,
+            successCount: successCount,
+            failureCount: failureCount,
+            values: values
+        };
+
+        this._handleDataReceived = this._handleDataReceived.bind(this);
+        this.assembleQuery = this.assembleQuery.bind(this);
+        this.setReceivedMsg = this.setReceivedMsg.bind(this);
+        this.setValues = this.setValues.bind(this);
+
+        this.props.glContainer.on('resize', () =>
+            this.setState({
+                width: this.props.glContainer.width,
+                height: this.props.glContainer.height,
+            })
+        );
+    }
+
+    componentDidMount() {
+        super.subscribe(this.setReceivedMsg);
+        super.getWidgetConfiguration(this.props.widgetID)
+            .then((message) => {
+                this.setState({
+                    dataProviderConf: message.data.configs.providerConfig
+                });
+            })
+            .catch((error) => {
+                this.setState({
+                    faultyProviderConf: true
+                });
+            });
+    }
+
+    componentWillUnmount() {
+        super.getWidgetChannelManager().unsubscribeWidget(this.props.id);
+    }
+
+    _handleDataReceived(message) {
+        this.setState({
+            metadata: metadata,
+            data: [
+                [
+                    "Failure Attempts",
+                    message.data[0][0]
+                ],
+                [
+                    "Successful Attempts",
+                    message.data[0][1]
+                ]
+            ],
+            totalAttempts: message.data[0][0] + message.data[0][1],
+            failureCount: message.data[0][0],
+            successCount: message.data[0][1]
+        });
+        window.dispatchEvent(new Event('resize'));
+    }
+
+    setReceivedMsg(receivedMsg) {
+        console.log(receivedMsg);
+        this.setState({
+            per: receivedMsg.granularity,
+            fromDate: receivedMsg.from,
+            toDate: receivedMsg.to,
+            data: [],
+            totalAttempts: 0,
+            failureCount: 0,
+            successCount: 0
+        }, this.assembleQuery);
+    }
+
+    setValues() {
+        this.state.values = values
+            .replace("{{value}}", this.state.totalAttempts)
+            .replace("{{failureCount}}", this.state.failureCount)
+            .replace("{{successCount}}", this.state.successCount)
+    }
+
+    assembleQuery() {
+        super.getWidgetChannelManager().unsubscribeWidget(this.props.id);
+        let dataProviderConfigs = _.cloneDeep(this.state.dataProviderConf);
+        let query = dataProviderConfigs.configs.config.queryData.query;
+        console.log("Query: ", query);
+
+        let updatedQuery = query
+            .replace("{{per}}", this.state.per)
+            .replace("{{from}}", this.state.fromDate)
+            .replace("{{to}}", this.state.toDate);
+        dataProviderConfigs.configs.config.queryData.query = updatedQuery;
+
+        super.getWidgetChannelManager().subscribeWidget(this.props.id, this._handleDataReceived, dataProviderConfigs);
+        console.log("Updated Query: ", updatedQuery, "\n", "Details: ", this.state.per , " ", this.state.fromDate, " ", this.state.toDate);
+    }
+
+    render() {
+        if (this.state.faultyProviderConf) {
+            return (
+                <div style={{padding: 24}}>
+                    <h3>{heading}</h3>
+                    <h5>Data Provider Connection Error - Please check the provider configs</h5>
+                </div>
+            );
+        }
+
+
+        else {
+            this.setValues();
+            return (
+                <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                    <Scrollbars style={{height: this.state.height}}>
+                        <div style={{padding: 24}}>
+                            <h2>{heading}</h2>
+                            <h4>
+                                {bodyText.split("\n").map((i, key) => {
+                                    return <div key={key}>{i}</div>;
+                                })}
+                            </h4>
+                            <h5>
+                                {this.state.values.split("\n").map((i, key) => {
+                                    return <div key={key}>{i}</div>;
+                                })}
+                            </h5>
+                            <VizG config={chartConfig}
+                                  metadata={this.state.metadata}
+                                  data={this.state.data}
+                                  width={this.state.width}
+                                  height={this.state.height * 0.75}
+                                  theme={this.props.muiTheme.name}
+                            />
+                        </div>
+                        <div>
+                            <a href="Overall">
+                                <h5>See More >></h5>
+                            </a>
+                        </div>
+                    </Scrollbars>
+                </MuiThemeProvider>
+            )
+        }
+    }
+}
+
+global.dashboard.registerWidget('IsAnalyticsSummeryOverall', IsAnalyticsSummeryOverall);

@@ -1,0 +1,109 @@
+@App:name("IS_AUTHENTICATION_OVERALL")
+@App:description("Handle Event from IS and save data in a table for Overall Authentication")
+
+-- Read data from OverallAuthenticationProcessedStream (Sinked from IsAnalytics_Auth_Common)
+@source(type='inMemory', topic='IsAnalytics.Authentication.Common.OutputSinkFromOverallAuthenticationProcessedStream', @map(type='passThrough'))
+define stream OverallAuthenticationProcessedStream (
+    meta_tenantId int,
+    contextId string,
+    eventId string,
+    eventType string,
+    username string,
+    localUsername string,
+    userStoreDomain string,
+    tenantDomain string,
+    remoteIp string,
+    region string,
+    inboundAuthType string,
+    serviceProvider string,
+    rememberMeEnabled bool,
+    forceAuthEnabled bool,
+    passiveAuthEnabled bool,
+    rolesCommaSeparated string,
+    authenticationStep string,
+    identityProvider string,
+    authenticationSuccess bool,
+    authStepSuccess bool,
+    stepAuthenticator string,
+    isFirstLogin bool,
+    identityProviderType string,
+    timestamp long
+);
+
+-- TABLE DEFINITIONS
+
+-- Overall Authentication Table
+@store(type='rdbms', datasource='IS_ANALYTICS_DB')
+@primaryKey('meta_tenantId', 'contextId', 'eventId', 'eventType')
+@index('meta_tenantId', 'username', 'identityProviderType', 'identityProvider', 'userStoreDomain', 'serviceProvider', 'region', 'timestamp')
+@purge(enable='true', interval='60 min', @retentionPeriod(sec='1 day', min='72 hours', hours='90 days', days='1 year', months='2 years', years='3 years'))
+define table OverallAuthenticationTable (
+    meta_tenantId int,
+    contextId string,
+    eventId string,
+    eventType string,
+    username string,
+    localUsername string,
+    userStoreDomain string,
+    tenantDomain string,
+    remoteIp string,
+    region string,
+    inboundAuthType string,
+    serviceProvider string,
+    rememberMeEnabled bool,
+    forceAuthEnabled bool,
+    passiveAuthEnabled bool,
+    rolesCommaSeparated string,
+    authenticationStep string,
+    identityProvider string,
+    authenticationSuccess bool,
+    authStepSuccess bool,
+    stepAuthenticator string,
+    isFirstLogin bool,
+    identityProviderType string,
+    utcTime string,
+    timestamp long
+);
+
+-- QUERIES
+
+-- Update OverallAuthenticationTable
+from OverallAuthenticationProcessedStream
+select 
+    meta_tenantId,
+    contextId,
+    eventId,
+    eventType,
+    username,
+    localUsername,
+    userStoreDomain,
+    tenantDomain,
+    remoteIp,
+    region,
+    inboundAuthType,
+    serviceProvider,
+    rememberMeEnabled,
+    forceAuthEnabled,
+    passiveAuthEnabled,
+    rolesCommaSeparated,
+    authenticationStep,
+    identityProvider,
+    authenticationSuccess,
+    authStepSuccess,
+    stepAuthenticator,
+    isFirstLogin,
+    identityProviderType,
+    time:dateFormat(timestamp, "MMMM dd, yyyy hh:mm:ss a zzz") as utcTime,
+    timestamp
+group by 
+    meta_tenantId,
+    contextId,
+    eventId,
+    eventType,
+    region
+update or insert into OverallAuthenticationTable
+on 
+    OverallAuthenticationTable.meta_tenantId==meta_tenantId 
+    and OverallAuthenticationTable.contextId==contextId 
+    and OverallAuthenticationTable.eventType==eventType 
+    and OverallAuthenticationTable.eventId==eventId

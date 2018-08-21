@@ -1,0 +1,41 @@
+{
+  "name": "IS Analytics Compact Summary",
+  "id": "IsAnalyticsCompactSummary",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "subscriber"
+      ]
+    },
+    "options": [
+      {
+        "id": "widgetType",
+        "title": "Widget Type",
+        "type": {
+          "name": "ENUM",
+          "possibleValues": [
+            "Overall",
+            "Local",
+            "Federated"
+          ]
+        },
+        "defaultValue": "Overall"
+      }
+    ],
+    "providerConfig": {
+      "configs": {
+        "type": "SiddhiStoreDataProvider",
+        "config": {
+          "siddhiApp":"@App:name(\"IsAnalytics_Authentication_Aggregations\") @App:description(\"Handle Event from IS and save data in a table for Overall Authentication\") @source(type='inMemory', topic='IsAnalytics.Authentication.Common.OutputSinkFromProcessedAuthenticationDataStream', @map(type='passThrough')) define stream ProcessedAuthenticationDataStream ( meta_tenantId int, eventId string, username string, localUsername string, userStoreDomain string, tenantDomain string, remoteIp string, region string, inboundAuthType string, serviceProvider string, rememberMeEnabled bool, forceAuthEnabled bool, passiveAuthEnabled bool, rolesCommaSeparated string, authenticationStep string, identityProvider string, authStepSuccess bool, stepAuthenticator string, isFirstLogin bool, successValue int, failureValue int, stepSuccessValue int, firstLoginValue int, identityProviderType string, timestamp long ); define stream PerUserRolesDuplicateEventStream ( meta_tenantId int, eventId string, username string, localUsername string, userStoreDomain string, tenantDomain string, remoteIp string, region string, inboundAuthType string, serviceProvider string, rememberMeEnabled bool, forceAuthEnabled bool, passiveAuthEnabled bool, rolesCommaSeparated string, authenticationStep string, identityProvider string, authStepSuccess bool, stepAuthenticator string, isFirstLogin bool, successValue int, failureValue int, stepSuccessValue int, firstLoginValue int, identityProviderType string, timestamp long, token string ); @store(type='rdbms', datasource='IS_ANALYTICS_DB') define aggregation RoleAggregation from PerUserRolesDuplicateEventStream select meta_tenantId, username, serviceProvider, identityProvider, token as role, remoteIp, region, userStoreDomain, isFirstLogin, sum(successValue) as authSuccessCount, sum(failureValue) as authFailureCount, sum(stepSuccessValue) as authStepSuccessCount, identityProviderType, timestamp group by meta_tenantId, username, serviceProvider, token aggregate by timestamp every second ... year; @store(type='rdbms', datasource='IS_ANALYTICS_DB') define aggregation AuthenticationStatAggregation from ProcessedAuthenticationDataStream select meta_tenantId, username, localUsername, rolesCommaSeparated, serviceProvider, identityProvider, remoteIp, region, userStoreDomain, isFirstLogin, sum(successValue) as authSuccessCount, sum(failureValue) as authFailureCount, sum(stepSuccessValue) as authStepSuccessCount, sum(firstLoginValue) as authFirstSuccessCount, identityProviderType, timestamp group by meta_tenantId, username, localUsername, remoteIp, rolesCommaSeparated aggregate by timestamp every second ... year; from ProcessedAuthenticationDataStream#str:tokenize(rolesCommaSeparated, ',') insert into PerUserRolesDuplicateEventStream;",
+          "queryData": {
+            "query": "from AuthenticationStatAggregation {{filterCondition}} within {{from}}L, {{to}}L per \"{{per}}s\" select sum(authFailureCount) as authFailureCount, sum(authStepSuccessCount) as authSuccessCount, identityProviderType ",
+            "queryLocal": "from AuthenticationStatAggregation on identityProviderType==\'LOCAL\' {{filterCondition}} within {{from}}L, {{to}}L per \"{{per}}s\" select sum(authFailureCount) as authFailureCount, sum(authSuccessCount) as authSuccessCount, identityProviderType ",
+            "queryFederated": "from AuthenticationStatAggregation on identityProviderType==\'FEDERATED\' {{filterCondition}} within {{from}}L, {{to}}L per \"{{per}}s\" select sum(authFailureCount) as authFailureCount, sum(authStepSuccessCount) as authSuccessCount, identityProviderType "
+          },
+          "publishingInterval": 60
+        }
+      }
+    }
+  }
+}
