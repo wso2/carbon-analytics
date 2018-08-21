@@ -1,0 +1,43 @@
+{
+  "name": "TOP COMPONENTS BY REQUEST COUNT",
+  "id": "HorizontalBarChart",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "subscriber"
+      ]
+    },
+    "providerConfig": {
+      "configs" : {
+        "type": "SiddhiStoreDataProvider",
+        "config": {
+          "siddhiApp": "@App:name(\"Aggregations\") define stream ESBStatStreamTemp (componentId string, componentName string, componentType string, duration long, faultCount int, startTime long, entryPoint string, meta_tenantId int); define stream MediatorStatStreamTemp (meta_tenantId int, entryPoint string, entryPointHashcode string, componentId string, hashCode string, componentName string, componentType string, duration long, faultCount int, startTime long);@store(type = 'rdbms', datasource = 'EI_ANALYTICS')@info(name = 'ESBStat')define aggregation ESBStat from ESBStatStreamTemp select componentId, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, entryPoint, meta_tenantId, startTime as _timestamp group by meta_tenantId, componentId, componentName, componentType, entryPoint aggregate by startTime every seconds...years;@store(type = 'rdbms', datasource = 'EI_ANALYTICS')@info(name = 'MediatorStat') define aggregation MediatorStat from MediatorStatStreamTemp select meta_tenantId, entryPoint, entryPointHashcode, componentId, hashCode, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, startTime group by meta_tenantId, componentId, componentName, componentType, entryPoint, entryPointHashcode, hashCode aggregate by startTime every sec ... years;",
+          "queryData": {
+            "query": "from {{aggregator}} on componentType==\"{{componentType}}\" AND meta_tenantId=={{tenantId}} within \"{{timeFrom}}\", \"{{timeTo}}\" per 'minutes' select sum(noOfInvocation) as totalInvocations, componentName group by componentName order by totalInvocations desc limit 5"
+          },
+          "publishingInterval": 60
+        }
+      }
+    },
+    "options": [
+      {
+        "id": "Component Type Selection",
+        "title": "Component Type",
+        "type": {
+          "name": "ENUM",
+          "possibleValues": [
+            "API",
+            "Endpoint",
+            "Sequence",
+            "Mediator",
+            "API Resource",
+            "Proxy Service",
+            "Inbound EndPoint"
+          ]
+        },
+        "defaultValue": "API"
+      }
+    ]
+  }
+}
