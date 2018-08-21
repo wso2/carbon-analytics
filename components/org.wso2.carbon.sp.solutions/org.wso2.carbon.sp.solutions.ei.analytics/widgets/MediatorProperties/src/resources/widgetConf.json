@@ -1,0 +1,26 @@
+{
+  "name": "MEDIATOR PROPERTIES",
+  "id": "MediatorProperties",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "subscriber"
+      ]
+    },
+    "providerConfig": {
+      "configs" : {
+        "type": "SiddhiStoreDataProvider",
+        "config": {
+          "siddhiApp": "@App:name('EIStatApp-ESB') @store(type = 'rdbms', datasource = 'EI_ANALYTICS') define table esbEventStream (meta_tenantId int, messageFlowId string, host string, hashCode string, componentName string, componentType string, componentIndex int, componentId string, startTime long, endTime long, duration long, beforePayload string, afterPayload string, contextPropertyMap string, transportPropertyMap string, children string, entryPoint string, entryPointHashcode string, faultCount int, _timestamp long);",
+          "queryData": {
+            "query": "",
+            "GET_MESSAGE_FLOW_DATA_QUERY": "from esbEventStream on messageFlowId=='{{messageFlowId}}' AND componentId=='{{componentId}}' AND meta_tenantId=={{meta_tenantId}} select children, beforePayload, afterPayload, transportPropertyMap, contextPropertyMap limit 1",
+            "GET_CHILD_MESSAGE_FLOW_DATA_QUERY": "from esbEventStream on messageFlowId=='{{messageFlowId}}' AND componentIndex=='{{componentIndex}}' AND meta_tenantId=={{meta_tenantId}} select transportPropertyMap, contextPropertyMap limit 1"
+          },
+          "publishingInterval": 60
+        }
+      }
+    }
+  }
+}

@@ -39,6 +39,7 @@
         <module>TPS</module>
         <module>HorizontalBarChart</module>
         <module>StatsChart</module>
+        <module>MediatorProperties</module>
     </modules>
 
 </project>
