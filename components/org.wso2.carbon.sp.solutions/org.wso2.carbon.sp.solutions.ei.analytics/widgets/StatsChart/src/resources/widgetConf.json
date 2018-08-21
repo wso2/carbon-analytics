@@ -1,0 +1,26 @@
+{
+  "name": "StatsChart",
+  "id": "StatsChart",
+  "thumbnailURL": "",
+  "configs": {
+    "pubsub": {
+      "types": [
+        "subscriber"
+      ]
+    },
+    "providerConfig": {
+      "configs" : {
+        "type": "SiddhiStoreDataProvider",
+        "config": {
+          "siddhiApp": "@App:name(\"Aggregations\") define stream ESBStatStreamTemp (componentId string, componentName string, componentType string, duration long, faultCount int, startTime long, entryPoint string, meta_tenantId int); define stream MediatorStatStreamTemp (meta_tenantId int, entryPoint string, entryPointHashcode string, componentId string, hashCode string, componentName string, componentType string, duration long, faultCount int, startTime long);@store(type = 'rdbms', datasource = 'EI_ANALYTICS')@info(name = 'ESBStat')define aggregation ESBStat from ESBStatStreamTemp select componentId, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, entryPoint, meta_tenantId, startTime as _timestamp group by meta_tenantId, componentId, componentName, componentType, entryPoint aggregate by startTime every seconds...years;@store(type = 'rdbms', datasource = 'EI_ANALYTICS')@info(name = 'MediatorStat') define aggregation MediatorStat from MediatorStatStreamTemp select meta_tenantId, entryPoint, entryPointHashcode, componentId, hashCode, componentName, componentType, sum(duration) as totalDuration, min(duration) as minDuration, max(duration) as maxDuration, count() as noOfInvocation, sum(faultCount) as faultCount, startTime group by meta_tenantId, componentId, componentName, componentType, entryPoint, entryPointHashcode, hashCode aggregate by startTime every sec ... years;",
+          "queryData": {
+            "query": "",
+            "nullEntryPointStatPerQuery": "from {{aggregator}} on {{componentIdentifier}}=={{componentName}} AND meta_tenantId=={{tenantId}} within {{timeFrom}}, {{timeTo}} per {{timeUnit}} select sum(noOfInvocation) as noOfInvocationSum, sum(faultCount) as faultCountSum, AGG_TIMESTAMP as _timestamp",
+            "notNullEntryPointStatPerQuery":"from {{aggregator}} on {{componentIdentifier}}=={{componentName}} AND meta_tenantId=={{tenantId}} AND entryPoint=={{entryPoint}} within {{timeFrom}}, {{timeTo}} per {{timeUnit}} select sum(noOfInvocation) as noOfInvocationSum, sum(faultCount) as faultCountSum"
+          },
+          "publishingInterval": 60
+        }
+      }
+    }
+  }
+}
