@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.wso2.carbon.analytics</groupId>
+        <artifactId>org.wso2.carbon.sp.solutions.apim.analytics</artifactId>
+        <version>2.0.399-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.sp.extension.siddhi.io.mgwfile</artifactId>
+    <packaging>bundle</packaging>
+    <name>WSO2 SP - Apim Analytics Micro Gateway File</name>
+    <description>Apim Analytics Micro Gateway Component</description>
+    <url>http://wso2.org</url>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-query-compiler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-query-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.log4j.wso2</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.databridge.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.map.json</groupId>
+            <artifactId>siddhi-map-json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.map.wso2event</groupId>
+            <artifactId>siddhi-map-wso2event</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <properties>
+        <import.package>
+            *;resolution:=optional
+        </import.package>
+        <export.package>
+            org.wso2.extension.siddhi.io.mgwfile.*
+        </export.package>
+        <Include-Resource>
+            META-INF=target/classes/META-INF
+        </Include-Resource>
+    </properties>
+
+</project>
