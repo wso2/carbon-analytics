@@ -48,6 +48,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
     }
 
     private static final String SOURCE_1 = "source-1";
+    private static final String ELEMENT_1 = "element-1";
 
     @Test
     public void testPassiveNodeEventQueue() throws InterruptedException {
@@ -58,7 +59,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         InputHandler inputHandler = mock(InputHandler.class);
         doNothing().when(inputHandler).send(any(Event.class));
 
-        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
 
         Event event = new Event();
         Event eventTwo = new Event();
@@ -96,7 +97,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         doNothing().when(inputHandler).send(any(Event.class));
         when(haCoordinationSourceHandler.getInputHandler()).thenReturn(inputHandler);
 
-        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
 
         Event event = new Event();
         Event eventTwo = new Event();
@@ -143,7 +144,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         doNothing().when(inputHandler).send(any(Event.class));
         haCoordinationSourceHandler.setInputHandler(inputHandler);
 
-        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
 
         Event event = new Event();
         Event eventTwo = new Event();
@@ -181,7 +182,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         doNothing().when(inputHandler).send(any(Event.class));
         haCoordinationSourceHandler.setInputHandler(inputHandler);
 
-        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
 
         Event event = new Event();
         Event eventTwo = new Event();
@@ -219,7 +220,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         doNothing().when(inputHandler).send(any(Event.class));
         haCoordinationSourceHandler.setInputHandler(inputHandler);
 
-        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
 
         Event event = new Event();
         Event eventTwo = new Event();
@@ -248,7 +249,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         InputHandler inputHandler = mock(InputHandler.class);
         doNothing().when(inputHandler).send(any(Event.class));
 
-        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
 
         Event event = new Event();
         Event eventTwo = new Event();
