@@ -61,7 +61,7 @@ queries:
 
   -
    mappings:
-      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL IDENTITY(1,1) PRIMARY KEY, siddhiAppName VARCHAR(100), revision VARCHAR(300), snapshot VARBINARY(8000))
+      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL IDENTITY(1,1) PRIMARY KEY, siddhiAppName VARCHAR(100), revision VARCHAR(300), snapshot VARBINARY(max))
       INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (siddhiAppName, revision, snapshot) VALUES (?, ?, ?)
       IS_TABLE_EXISTS: SELECT TOP 1 1 FROM {{TABLE_NAME}}
       SELECT_SNAPSHOT: SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ?

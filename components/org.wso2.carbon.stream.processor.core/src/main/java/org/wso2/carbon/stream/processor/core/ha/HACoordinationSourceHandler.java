@@ -153,6 +153,11 @@ public class HACoordinationSourceHandler extends SourceHandler {
         isActiveNode = true;
     }
 
+    public void setAsPassive() {
+        passiveNodeBufferedEvents.clear();
+        isActiveNode = false;
+    }
+
     /**
      * Will indicate the passive node to start collecting events
      *

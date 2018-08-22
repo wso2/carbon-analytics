@@ -59,37 +59,53 @@ public class HAEventListener extends MemberEventListener {
     @Override
     public void coordinatorChanged(NodeDetail nodeDetail) {
         ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
-        if (clusterCoordinator != null && clusterCoordinator.isLeaderNode()) {
-            log.info("HA Deployment: This Node is now the Active Node");
-            StreamProcessorDataHolder.getHAManager().changeToActive();
+        if (clusterCoordinator != null) {
             SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
             Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
-            for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
-                ((HACoordinationSinkHandler) sinkHandler).setAsActive();
-            }
             SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
             Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
                     getRegsiteredSourceHandlers();
-            for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                ((HACoordinationSourceHandler) sourceHandler).setAsActive();
-            }
             RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.
                     getRecordTableHandlerManager();
             Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
                     getRegisteredRecordTableHandlers();
-            for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
-                try {
-                    ((HACoordinationRecordTableHandler) recordTableHandler).setAsActive();
-                } catch (ConnectionUnavailableException e) {
-                    backoffRetryCounter.reset();
-                    log.error("HA Deployment: Error in connecting to table " + ((HACoordinationRecordTableHandler)
-                            recordTableHandler).getTableId() + " while changing from passive" +
-                            " state to active, will retry in " + backoffRetryCounter.getTimeInterval(), e);
-                    ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-                    backoffRetryCounter.increment();
-                    scheduledExecutorService.schedule(new RetryRecordTableConnection(backoffRetryCounter,
-                                    recordTableHandler, scheduledExecutorService),
-                            backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
+
+            if (clusterCoordinator.isLeaderNode()) {
+                log.info("HA Deployment: This Node is now the Active Node");
+                StreamProcessorDataHolder.getHAManager().changeToActive();
+                for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
+                    ((HACoordinationSinkHandler) sinkHandler).setAsActive();
+                }
+                for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                    ((HACoordinationSourceHandler) sourceHandler).setAsActive();
+                }
+                for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
+                    try {
+                        ((HACoordinationRecordTableHandler) recordTableHandler).setAsActive();
+                    } catch (ConnectionUnavailableException e) {
+                        backoffRetryCounter.reset();
+                        log.error("HA Deployment: Error in connecting to table " + ((HACoordinationRecordTableHandler)
+                                recordTableHandler).getTableId() + " while changing from passive" +
+                                " state to active, will retry in " + backoffRetryCounter.getTimeInterval(), e);
+                        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+                        backoffRetryCounter.increment();
+                        scheduledExecutorService.schedule(new RetryRecordTableConnection(backoffRetryCounter,
+                                        recordTableHandler, scheduledExecutorService),
+                                backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
+                    }
+                }
+            } else {
+                log.info("HA Deployment: This Node is now the Passive Node");
+                StreamProcessorDataHolder.getHAManager().changeToPassive();
+                for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
+                    HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
+                    handler.setAsPassive();
+                }
+                for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                    ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
+                }
+                for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
+                    ((HACoordinationRecordTableHandler) recordTableHandler).setPassive();
                 }
             }
         }
