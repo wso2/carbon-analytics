@@ -81,25 +81,10 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
 
         queryConfig.setQueryOutput(generateOutput(query.getOutputStream()));
         queryConfig.setOutputRateLimit(generateOutputRateLimit(query.getOutputRate()));
-        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
-        queryConfig.setAnnotationList(annotationConfigGenerator.generateAnnotationConfigList(query.getAnnotations()));
+        queryConfig.setAnnotationList(generateAnnotationList(query.getAnnotations()));
         queryConfig.setQueryName(generateQueryName(query.getAnnotations()));
-        preserveCodeSegmentsOf(annotationConfigGenerator);
         preserveAndBindCodeSegment(query, queryConfig);
         return queryConfig;
-    }
-
-    /**
-     * Extracts the query name from the annotation list
-     * @param annotations           Query annotation list
-     * @return query name           name of the query
-     */
-    private String generateQueryName(List<Annotation> annotations) {
-        for (Annotation annotation : annotations) {
-            if (annotation.getName().equalsIgnoreCase("info"))
-                return annotation.getElement("name");
-        }
-        return "query";
     }
 
     /**
@@ -201,6 +186,39 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
             return Long.parseLong(ConfigBuildingUtilities.getDefinition(limit, siddhiAppString));
         }
         return 0;
+    }
+
+    /**
+     * Generates a string list of Siddhi Annotations, from the given list of Siddhi Annotations.
+     * Ignores the 'info' annotation
+     * @param queryAnnotations      List of Siddhi Annotations of a query
+     * @return                      List of strings, each representing a Siddhi Query Annotation
+     */
+    private List<String> generateAnnotationList(List<Annotation> queryAnnotations) {
+        List<String> annotationList = new ArrayList<>();
+        AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
+        for (Annotation queryAnnotation : queryAnnotations) {
+            if (!queryAnnotation.getName().equalsIgnoreCase("info")) {
+                annotationList.add(annotationConfigGenerator.generateAnnotationConfig(queryAnnotation));
+            }
+        }
+        preserveCodeSegmentsOf(annotationConfigGenerator);
+        return annotationList;
+    }
+
+    /**
+     * Extracts the query name from the annotation list
+     * @param annotations           Query annotation list
+     * @return query name           name of the query
+     */
+    private String generateQueryName(List<Annotation> annotations) {
+        for (Annotation annotation : annotations) {
+            if (annotation.getName().equalsIgnoreCase("info")) {
+                preserveCodeSegment(annotation);
+                return annotation.getElement("name");
+            }
+        }
+        return "query";
     }
 
     /**
