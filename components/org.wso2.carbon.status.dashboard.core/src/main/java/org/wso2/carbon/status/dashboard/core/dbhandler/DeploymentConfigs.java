@@ -152,11 +152,19 @@ public class DeploymentConfigs {
         workerAccessCredentials.setPassword(password);
     }
 
-    public String getPdfHeader() { return pdfHeader; }
+    public String getPdfHeader() {
+        return pdfHeader;
+    }
 
-    public void setPdfHeader(String pdfHeader) { this.pdfHeader = pdfHeader; }
+    public void setPdfHeader(String pdfHeader) {
+        this.pdfHeader = pdfHeader;
+    }
 
-    public String getPdfFooter() { return pdfFooter; }
+    public String getPdfFooter() {
+        return pdfFooter;
+    }
 
-    public void setPdfFooter(String pdfFooter) { this.pdfFooter = pdfFooter; }
+    public void setPdfFooter(String pdfFooter) {
+        this.pdfFooter = pdfFooter;
+    }
 }
