@@ -1,0 +1,27 @@
+{
+    "name": "TopLongestSession",
+    "id": "TopLongestSession",
+    "thumbnailURL": "",
+    "configs": {
+      "pubsub": {
+        "types": [
+          "subscriber"
+        ]
+      },
+      "providerConfig": {
+        "configs": {
+          "type": "RDBMSBatchDataProvider",
+          "config": {
+            "datasourceName": "IS_ANALYTICS_DB",
+            "queryData": {
+              "query": "select sessionId, usernameWithTenantDomainAndUserstoreDomain as username, duration FROM SessionInformationTable where (startTimestamp >= 0 and startTimestamp<='finish') and ((endTimestamp>='begin' and endTimestamp<=now) or isActive=1) "
+            }, 
+            "incrementalColumn": "username,duration",
+            "publishingInterval": 60
+  
+          }
+        }
+      }
+    }
+  }
+  
