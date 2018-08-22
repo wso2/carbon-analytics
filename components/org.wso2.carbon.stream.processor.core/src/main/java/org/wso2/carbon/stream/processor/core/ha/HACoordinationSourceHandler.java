@@ -50,7 +50,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     @Override
-    public void init(String sourceElementId, StreamDefinition streamDefinition) {
+    public void init(String sourceElementId, String elementId, StreamDefinition streamDefinition) {
         this.sourceHandlerElementId = sourceElementId;
     }
 
