@@ -214,6 +214,7 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
     }
 
     public void setPassive() {
+        eventQueue.clear();
         this.isActiveNode = false;
     }
 

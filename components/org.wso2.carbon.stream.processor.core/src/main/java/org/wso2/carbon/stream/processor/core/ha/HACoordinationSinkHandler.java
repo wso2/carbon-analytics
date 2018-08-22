@@ -165,6 +165,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
      */
     public void setAsPassive() {
         //When active node becomes passive, events will be queued.
+        passiveNodeProcessedEvents.clear();
         this.isQueueFlushing = false;
         this.isActiveNode = false;
     }
