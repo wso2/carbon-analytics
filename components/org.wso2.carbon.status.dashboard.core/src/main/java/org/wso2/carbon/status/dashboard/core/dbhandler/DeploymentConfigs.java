@@ -41,6 +41,12 @@ public class DeploymentConfigs {
     @Element(description = "polling interval to get real-time statistics of worker in seconds")
     private Integer pollingInterval;
 
+    @Element(description = "pdf header image")
+    private String pdfHeader;
+
+    @Element(description = "pdf header image")
+    private String pdfFooter;
+
     @Element(description = "Metrics Datasource")
     private String metricsDatasourceName;
 
@@ -146,4 +152,11 @@ public class DeploymentConfigs {
         workerAccessCredentials.setPassword(password);
     }
 
+    public String getPdfHeader() { return pdfHeader; }
+
+    public void setPdfHeader(String pdfHeader) { this.pdfHeader = pdfHeader; }
+
+    public String getPdfFooter() { return pdfFooter; }
+
+    public void setPdfFooter(String pdfFooter) { this.pdfFooter = pdfFooter; }
 }
