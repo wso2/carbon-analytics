@@ -53,6 +53,7 @@ import java.util.List;
  * Generator to create QueryConfig from Siddhi elements
  */
 public class QueryConfigGenerator extends CodeSegmentsPreserver {
+    private static final String DEFAULT_QUERY_NAME = "query";
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
 
@@ -207,7 +208,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Extracts the query name from the annotation list
+     * Extracts the query name from the annotation list, or returns the default query name
      * @param annotations           Query annotation list
      * @return query name           name of the query
      */
@@ -218,7 +219,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
                 return annotation.getElement("name");
             }
         }
-        return "query";
+        return DEFAULT_QUERY_NAME;
     }
 
     /**
