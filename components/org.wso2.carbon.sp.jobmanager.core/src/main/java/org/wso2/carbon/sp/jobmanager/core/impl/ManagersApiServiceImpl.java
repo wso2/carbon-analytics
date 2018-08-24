@@ -112,8 +112,10 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     .getAppsWaitingForDeploy();
 
             if (deployedSiddhiAppHolder.isEmpty() && waitingToDeploy.isEmpty()) {
-                logger.info("There is no siddhi apps");
-                return Response.ok().entity("There is no siddhi app  in the manager node").build();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("No Siddhi application is available in the manager node.");
+                }
+                return Response.noContent().entity("No Siddhi application is available in the manager node").build();
             } else {
                 List<SiddhiAppDetails> appList = new ArrayList<>();
                 for (Map.Entry<String, List<SiddhiAppHolder>> en : waitingToDeploy.entrySet()) {
