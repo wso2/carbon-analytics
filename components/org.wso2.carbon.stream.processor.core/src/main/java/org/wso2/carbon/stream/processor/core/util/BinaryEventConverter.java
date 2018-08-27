@@ -71,7 +71,8 @@ public class BinaryEventConverter {
 
         messageBuffer.putInt((queuedEvent.getSourceHandlerElementId()).length());
         messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
-
+        messageBuffer.putInt((queuedEvent.getSiddhiAppName()).length());
+        messageBuffer.put(((queuedEvent.getSiddhiAppName()).getBytes(Charset.defaultCharset())));
 
         messageBuffer.putInt(attributes.length());
         messageBuffer.put(((attributes).getBytes(Charset.defaultCharset())));

@@ -23,16 +23,10 @@ import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
-import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.event.queue.EventQueue;
 import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
-<<<<<<< b004884c5c0bd7360fbd37f4d5aa1ea6683bcaf0
-=======
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClientManager;
->>>>>>> redesign the active node HA implementation
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
@@ -40,7 +34,6 @@ import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
-import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 
 import java.net.URI;
@@ -62,8 +55,6 @@ import java.util.concurrent.TimeUnit;
 public class HAManager {
 
     private ClusterCoordinator clusterCoordinator;
-    private ScheduledExecutorService passiveNodeOutputSchedulerService;
-    private ScheduledFuture passiveNodeOutputScheduledFuture;
     private boolean liveSyncEnabled;
     private int outputSyncInterval;
     private String localHost;
@@ -201,30 +192,26 @@ public class HAManager {
      */
     void changeToActive(){
         if (!isActiveNode) {
-            isActiveNode = true;
             tcpServerInstance.stop();
             syncState();
+            //change the system clock to work with event time
+            enableEventTimeClock(true);
             try {
                 eventQueueManager.trimAndSendToInputHandler();
             } catch (InterruptedException e) {
                 e.printStackTrace();//todo
             }
-            //start the databridge servers
+            isActiveNode = true;
+
+            //change the system clock to work with current time
+            enableEventTimeClock(false);
             startSiddhiAppRuntimes();
+            //start the databridge servers
             List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
             for (ServerEventListener listener : listeners) {
                 listener.start();
             }
-
-
-            //start the siddhi app runtimes
         }
-
-
-
-
-
-
 
 
 //        activeNodePropertiesMap.put("host", localHost);
@@ -261,36 +248,36 @@ public class HAManager {
 //        nodeInfo.setActiveNode(isActiveNode);
     }
 
-    /**
-     * Implements a timer task to run after specified time interval to sync with active node
-     *
-     * @param gracePeriod time given for passive node to connect to all sources before re-syncing with active node
-     * @return reference to the timer. Can be used to cancel task if needed
-     */
-    private Timer liveSyncAfterGracePeriod(int gracePeriod) {
-
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                log.info("Passive Node: Borrowing state from active node after " + gracePeriod / 1000 + " seconds");
-                Map<String, SourceHandler> sourceHandlerMap = sourceHandlerManager.getRegsiteredSourceHandlers();
-                for (SourceHandler sourceHandler : sourceHandlerMap.values()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Setting source handler with ID " + sourceHandler.getElementId() +
-                                " to collect events in buffer");
-                    }
-                    ((HACoordinationSourceHandler) sourceHandler).collectEvents(true);
-                }
-
-                boolean isPersisted = persistActiveNode(activeNodeHost, activeNodePort);
-                if (isPersisted) {
-                    syncState();
-                }
-            }
-        }, gracePeriod);
-        return timer;
-    }
+//    /**
+//     * Implements a timer task to run after specified time interval to sync with active node
+//     *
+//     * @param gracePeriod time given for passive node to connect to all sources before re-syncing with active node
+//     * @return reference to the timer. Can be used to cancel task if needed
+//     */
+//    private Timer liveSyncAfterGracePeriod(int gracePeriod) {
+//
+//        Timer timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                log.info("Passive Node: Borrowing state from active node after " + gracePeriod / 1000 + " seconds");
+//                Map<String, SourceHandler> sourceHandlerMap = sourceHandlerManager.getRegsiteredSourceHandlers();
+//                for (SourceHandler sourceHandler : sourceHandlerMap.values()) {
+//                    if (log.isDebugEnabled()) {
+//                        log.debug("Setting source handler with ID " + sourceHandler.getElementId() +
+//                                " to collect events in buffer");
+//                    }
+//                    ((HACoordinationSourceHandler) sourceHandler).collectEvents(true);
+//                }
+//
+//                boolean isPersisted = persistActiveNode(activeNodeHost, activeNodePort);
+//                if (isPersisted) {
+//                    syncState();
+//                }
+//            }
+//        }, gracePeriod);
+//        return timer;
+//    }
 
     private void syncState() {
         ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap
@@ -308,6 +295,19 @@ public class HAManager {
             } catch (CannotRestoreSiddhiAppStateException e) {
                 log.error("Error in restoring Siddhi Application: " + siddhiAppRuntime.getName(), e);
             }
+        });
+    }
+
+    private void enableEventTimeClock(boolean enablePlayBack) {
+        ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap
+                = StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntimeMap();
+
+        siddhiAppRuntimeMap.forEach((siddhiAppName, siddhiAppRuntime) -> {
+            if (log.isDebugEnabled()) {
+                log.debug("Changing system clock for Siddhi Application " +
+                        siddhiAppRuntime.getName());
+            }
+            siddhiAppRuntime.enablePlayBack(enablePlayBack, null, null);
         });
     }
 

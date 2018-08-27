@@ -71,8 +71,21 @@ public class EventQueueManager {
         eventQueue.getQueue().clear();
     }
 
-    public void trimQueue(long timestamp){
-        eventQueue.trim((QueuedEvent queuedEvent) -> queuedEvent.getEvent().getTimestamp() > timestamp);
+    public void trimQueue(String[] persistedAppDetails){
+        for(String appDetail : persistedAppDetails){
+            String[] details = appDetail.split("__");
+            String appName = details[1];
+            long timestamp = Long.valueOf(details[0]);
+            eventQueue.trim((QueuedEvent queuedEvent) -> queuedEvent.getSiddhiAppName().equals(appName) &&
+                    queuedEvent.getEvent().getTimestamp() > timestamp);
+//            Iterator<QueuedEvent> itr = eventQueue.getQueue().iterator();
+//            while (itr.hasNext()) {
+//                QueuedEvent queuedEvent = itr.next();
+//                if(queuedEvent.getSiddhiAppName().equals(appName) && timestamp >= queuedEvent.getTimestamp()){
+//                    eventQueue.getQueue().remove(queuedEvent);
+//                }
+//            }
+        }
     }
 
     public void addToQueue(QueuedEvent queuedEvent){

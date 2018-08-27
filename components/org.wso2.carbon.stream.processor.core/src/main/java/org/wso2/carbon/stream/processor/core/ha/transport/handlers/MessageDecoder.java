@@ -26,10 +26,14 @@ import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.SiddhiEventConverter;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.util.timestamp.TimestampGenerator;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Byte to message decoder.
@@ -37,9 +41,11 @@ import java.util.List;
 public class MessageDecoder extends ByteToMessageDecoder {
     static final Logger LOG = Logger.getLogger(MessageDecoder.class);
     private EventQueueManager eventQueueManager;
+    private BlockingQueue<ByteBuffer> byteBufferQueue;
 
-    public MessageDecoder(EventQueueManager eventQueueManager){
+    public MessageDecoder(EventQueueManager eventQueueManager,BlockingQueue<ByteBuffer> byteBufferQueue){
         this.eventQueueManager = eventQueueManager;
+        this.byteBufferQueue = byteBufferQueue;
     }
 
     @Override
@@ -65,12 +71,16 @@ public class MessageDecoder extends ByteToMessageDecoder {
             byte[] bytes = new byte[dataLength];
             in.readBytes(bytes);
             LOG.info("Message Received : " + new String(bytes));
+
             if (channelId.equals("eventMessage")) {
-                Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
-
-
-                LOG.info("Event Received : " + events.toString());
+                ByteBuffer messageBuffer = ByteBuffer.wrap(bytes);
+                byteBufferQueue.offer(messageBuffer);
+                //Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
+               // LOG.info("Event Received : " + events.toString());
             } else if (channelId.equals("controlMessage")) {
+                String message = new String(bytes);
+                String[] persistedApps = message.split(",");
+                eventQueueManager.trimQueue(persistedApps);
                 LOG.info("Control Message Received : " + new String(bytes));
             }
         } catch (UnsupportedEncodingException e) {
@@ -78,7 +88,6 @@ public class MessageDecoder extends ByteToMessageDecoder {
         } finally {
             in.markReaderIndex();
         }
-
     }
 
 }

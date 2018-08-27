@@ -83,7 +83,6 @@ public class ActiveNodeEventDispatcher {
         }
     }
 
-
     public void sendEventsToPassiveNode(QueuedEvent[] queuedEvents) {
         try {
             if (!tcpNettyClient.isActive()) {

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class EventQueueObserver implements Runnable {
+public class  EventQueueObserver implements Runnable {
 
     private static final Logger log = Logger.getLogger(EventQueueObserver.class);
     private TCPNettyClient tcpNettyClient = new TCPNettyClient();

@@ -43,31 +43,29 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class HACoordinationSourceHandler extends SourceHandler {
 
     private boolean isActiveNode;
-    private boolean collectEvents;
+    //private boolean collectEvents;
     private long lastProcessedEventTimestamp = 0L;
-    private Queue<Event> passiveNodeBufferedEvents;
+    //private Queue<Event> passiveNodeBufferedEvents;
     private String sourceHandlerElementId;
+    private String siddhiAppName;
     private TCPNettyClient tcpNettyClient;
-    private int count = 0;
     private ActiveNodeEventDispatcher activeNodeEventDispatcher;
 
-    private final int queueCapacity;
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
     public HACoordinationSourceHandler(int queueCapacity) {
-        this.queueCapacity = queueCapacity;
-        passiveNodeBufferedEvents = new LinkedBlockingQueue<>(queueCapacity);
+        //this.queueCapacity = queueCapacity;
         activeNodeEventDispatcher = new ActiveNodeEventDispatcher();
     }
 
     @Override
-    public void init(String sourceElementId, StreamDefinition streamDefinition) {
+    public void init(String siddhiAppName, String sourceElementId, StreamDefinition streamDefinition) {
         this.sourceHandlerElementId = sourceElementId;
+        this.siddhiAppName = siddhiAppName;
     }
 
     /**
      * Method that would process events if this is the Active Node.
-     * If Passive Node, events will be buffered during the state syncing state.
      *
      * @param event        the event being sent to processing.
      * @param inputHandler callback that would send events for processing.
@@ -77,24 +75,10 @@ public class HACoordinationSourceHandler extends SourceHandler {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
             //eventQueue.enqueue(new QueuedEvent(sourceHandlerElementId, event));
-            activeNodeEventDispatcher.sendEventToPassiveNode(new QueuedEvent(sourceHandlerElementId, event));
-            count++;
-            log.info("QUEUE COUNT     " + count);
+            activeNodeEventDispatcher.sendEventToPassiveNode(new QueuedEvent(
+                    siddhiAppName, sourceHandlerElementId, event));
             inputHandler.send(event);
         }
-//        else {
-//            synchronized (this) {
-//                if (collectEvents) {
-//                    boolean eventBuffered = passiveNodeBufferedEvents.offer(event);
-//                    if (!eventBuffered) {
-//                        passiveNodeBufferedEvents.remove();
-//                        passiveNodeBufferedEvents.add(event);
-//                    }
-//                } else {
-//                    inputHandler.send(event);
-//                }
-//            }
-//        }
     }
 
     /**
@@ -109,66 +93,46 @@ public class HACoordinationSourceHandler extends SourceHandler {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
             for (Event event : events) {
-                //eventQueue.enqueue(new QueuedEvent(sourceHandlerElementId, event));
-                activeNodeEventDispatcher.sendEventToPassiveNode(new QueuedEvent(sourceHandlerElementId, event));
-                count++;
+                activeNodeEventDispatcher.sendEventToPassiveNode
+                        (new QueuedEvent(siddhiAppName ,sourceHandlerElementId, event));
             }
-            log.info("COUNT     " + count);
             inputHandler.send(events);
         }
+    }
 
-//        else {
-//            if (collectEvents) {
-//                synchronized (this) {
-//                    int sizeAfterUpdate = passiveNodeBufferedEvents.size() + events.length;
-//                    if (sizeAfterUpdate >= queueCapacity) {
-//                        for (int i = queueCapacity; i < sizeAfterUpdate; i++) {
-//                            passiveNodeBufferedEvents.remove();
-//                        }
-//                    }
-//                    for (Event event : events) {
-//                        passiveNodeBufferedEvents.add(event);
-//                    }
-//                }
-//            } else {
-//                inputHandler.send(events);
+//    /**
+//     * This method will trim the passive nodes buffer and send the remaining events for processing
+//     *
+//     * @param activeLastProcessedEventTimestamp the point to which the passive nodes buffer should be trimmed
+//     */
+//    public void processBufferedEvents(long activeLastProcessedEventTimestamp) {
+//
+//        while (passiveNodeBufferedEvents.peek() != null &&
+//                passiveNodeBufferedEvents.peek().getTimestamp() <= activeLastProcessedEventTimestamp) {
+//            passiveNodeBufferedEvents.remove();
+//        }
+//        while (passiveNodeBufferedEvents.peek() != null) {
+//            try {
+//                getInputHandler().send(passiveNodeBufferedEvents.poll());
+//            } catch (InterruptedException e) {
+//                log.error("Error esending Passive Node Events after State Sync. ", e);
 //            }
 //        }
-    }
-
-    /**
-     * This method will trim the passive nodes buffer and and send the remaining events for processing
-     *
-     * @param activeLastProcessedEventTimestamp the point to which the passive nodes buffer should be trimmed
-     */
-    public void processBufferedEvents(long activeLastProcessedEventTimestamp) {
-
-        while (passiveNodeBufferedEvents.peek() != null &&
-                passiveNodeBufferedEvents.peek().getTimestamp() <= activeLastProcessedEventTimestamp) {
-            passiveNodeBufferedEvents.remove();
-        }
-        while (passiveNodeBufferedEvents.peek() != null) {
-            try {
-                getInputHandler().send(passiveNodeBufferedEvents.poll());
-            } catch (InterruptedException e) {
-                log.error("Error esending Passive Node Events after State Sync. ", e);
-            }
-        }
-        collectEvents(false);
-        if (log.isDebugEnabled()) {
-            log.debug("Setting Source Handler with ID " + sourceHandlerElementId + " to stop collecting events" +
-                    " in buffer");
-        }
-
-        //Recheck if queue is not empty due to other thread updating the queue and send events
-        while (passiveNodeBufferedEvents.peek() != null) {
-            try {
-                getInputHandler().send(passiveNodeBufferedEvents.poll());
-            } catch (InterruptedException e) {
-                log.error("Error Resending Passive Node Events after State Sync. ", e);
-            }
-        }
-    }
+//        collectEvents(false);
+//        if (log.isDebugEnabled()) {
+//            log.debug("Setting Source Handler with ID " + sourceHandlerElementId + " to stop collecting events" +
+//                    " in buffer");
+//        }
+//
+//        //Recheck if queue is not empty due to other thread updating the queue and send events
+//        while (passiveNodeBufferedEvents.peek() != null) {
+//            try {
+//                getInputHandler().send(passiveNodeBufferedEvents.poll());
+//            } catch (InterruptedException e) {
+//                log.error("Error Resending Passive Node Events after State Sync. ", e);
+//            }
+//        }
+//    }
 
     /**
      * Method to change the source handler to Active state so that timestamp of event being processed is saved.
@@ -177,20 +141,20 @@ public class HACoordinationSourceHandler extends SourceHandler {
         isActiveNode = true;
     }
 
-    /**
-     * Will indicate the passive node to start collecting events
-     *
-     * @param collectEvents should be true only when passive node requests the state of active node.
-     *                      Since state syncing takes time events should be collected to ensure that no events are lost during
-     *                      the state sync
-     */
-    public void collectEvents(boolean collectEvents) {
-        this.collectEvents = collectEvents;
-    }
+//    /**
+//     * Will indicate the passive node to start collecting events
+//     *
+//     * @param collectEvents should be true only when passive node requests the state of active node.
+//     *                      Since state syncing takes time events should be collected to ensure that no events are lost during
+//     *                      the state sync
+//     */
+//    public void collectEvents(boolean collectEvents) {
+//        this.collectEvents = collectEvents;
+//    }
 
-    public Queue<Event> getPassiveNodeBufferedEvents() {
-        return passiveNodeBufferedEvents;
-    }
+//    public Queue<Event> getPassiveNodeBufferedEvents() {
+//        return passiveNodeBufferedEvents;
+//    }
 
     @Override
     public Map<String, Object> currentState() {
@@ -205,11 +169,11 @@ public class HACoordinationSourceHandler extends SourceHandler {
 
     @Override
     public void restoreState(Map<String, Object> map) {
-        if (map != null) {
-            if (map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP) != null) {
-                processBufferedEvents((Long) map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP));
-            }
-        }
+//        if (map != null) {
+//            if (map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP) != null) {
+//                processBufferedEvents((Long) map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP));
+//            }
+//        }
     }
 
     @Override

@@ -29,8 +29,20 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
+import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.ha.transport.handlers.MessageDecoder;
 import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConfig;
+import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
+import org.wso2.siddhi.core.event.Event;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TCP Netty Server.
@@ -45,6 +57,10 @@ public class TCPNettyServer {
     private TCPServerConfig serverConfig;
     private static final Logger log = Logger.getLogger(TCPNettyServer.class);
     private EventQueueManager eventQueueManager = new EventQueueManager();
+    private BlockingQueue<ByteBuffer> eventByteBufferQueue = new LinkedBlockingQueue<ByteBuffer>(20000);
+    private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    private long count = 0;
+    private EventBufferExtractor eventBufferExtractor = new EventBufferExtractor();
 
     public void start(TCPServerConfig serverConf) {
         serverConfig = serverConf;
@@ -61,7 +77,7 @@ public class TCPNettyServer {
                     @Override
                     protected void initChannel(Channel channel) throws Exception {
                         ChannelPipeline p = channel.pipeline();
-                        p.addLast(new MessageDecoder(eventQueueManager));
+                        p.addLast(new MessageDecoder(eventQueueManager,eventByteBufferQueue));
                     }
                 })
                 .option(ChannelOption.TCP_NODELAY, true)
@@ -74,6 +90,9 @@ public class TCPNettyServer {
         } catch (InterruptedException e) {
             log.error("Error when booting up tcp server on '" + hostAndPort + "' " + e.getMessage(), e);
         }
+
+        scheduledExecutorService.scheduleAtFixedRate(eventBufferExtractor,0, 10 ,
+                TimeUnit.MILLISECONDS);
     }
 
     public void shutdownGracefully() {
@@ -91,4 +110,57 @@ public class TCPNettyServer {
 
     }
 
+    /**
+     * This {@link Runnable} class is executed by the {@link ScheduledExecutorService}
+     */
+    private class EventBufferExtractor implements Runnable {
+
+        @Override
+        public void run() {
+            if (eventByteBufferQueue.peek() != null) {
+                ByteBuffer eventContent = eventByteBufferQueue.poll();
+                try {
+                    int noOfEvents = eventContent.getInt();
+                    QueuedEvent queuedEvent;
+                    log.info("No events in the received batch :     " + noOfEvents);
+                    Event[] events = new Event[noOfEvents];
+                    for (int i = 0; i < noOfEvents; i++) {
+                        String sourceHandlerElementId;
+                        String siddhiAppName;
+                        int stringSize = eventContent.getInt();
+                        if (stringSize == 0) {
+                            sourceHandlerElementId = null;
+                        } else {
+                            sourceHandlerElementId = BinaryMessageConverterUtil.getString(eventContent, stringSize);
+                        }
+
+                        int appSize = eventContent.getInt();
+                        if (appSize == 0) {
+                            siddhiAppName = null;
+                        } else {
+                            siddhiAppName = BinaryMessageConverterUtil.getString(eventContent, appSize);
+                        }
+
+                        String attributes;
+                        stringSize = eventContent.getInt();
+                        if (stringSize == 0) {
+                            attributes = null;
+                        } else {
+                            attributes = BinaryMessageConverterUtil.getString(eventContent, stringSize);
+                        }
+                        String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
+                        events[i] = SiddhiEventConverter.getEvent(eventContent, attributeTypes);
+                        queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, events[i]);
+                        eventQueueManager.addToQueue(queuedEvent);
+                        count++;
+                        log.info("RECEIVED EVENT - " + sourceHandlerElementId + "       ||      " +
+                                events[0].toString() + " " + "   |   COUNT " + count);
+                    }
+                } catch (UnsupportedEncodingException e) {
+
+                }
+
+            }
+        }
+    }
 }
