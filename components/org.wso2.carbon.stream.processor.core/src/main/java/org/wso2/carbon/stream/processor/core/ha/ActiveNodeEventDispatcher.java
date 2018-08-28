@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.stream.processor.core.ha;
 
-import io.netty.handler.codec.base64.Base64;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnection;
 import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
 import org.wso2.carbon.stream.processor.core.util.BinaryEventConverter;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
@@ -29,9 +29,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 import java.util.zip.Deflater;
 
-public class ActiveNodeEventDispatcher {
+public class ActiveNodeEventDispatcher implements Callable {
     private static final Logger log = Logger.getLogger(ActiveNodeEventDispatcher.class);
     private TCPNettyClient tcpNettyClient;
     private String host;
@@ -39,12 +40,22 @@ public class ActiveNodeEventDispatcher {
     //private EventQueue<QueuedEvent> eventQueue;
     private ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[1024 * 1024 * 10]);
     private byte[] data;
+    private QueuedEvent queuedEvent;
 
-    public ActiveNodeEventDispatcher() {
+    ActiveNodeEventDispatcher() {
+
+    }
+
+    public void setQueuedEvent(QueuedEvent queuedEvent) {
+        this.queuedEvent = queuedEvent;
+    }
+
+    public ActiveNodeEventDispatcher(QueuedEvent queuedEvent) {
 //        this.eventQueue = eventQueue;
 //        this.host = host;
 //        this.port = port;
-        tcpNettyClient = TCPNettyClient.getInstance();
+        this.queuedEvent = queuedEvent;
+        //tcpNettyClient = ((TCPConnection) Thread.currentThread()).getTcpNettyClient();
     }
 
     public void sendEventToPassiveNode(QueuedEvent queuedEvent) {
@@ -69,14 +80,14 @@ public class ActiveNodeEventDispatcher {
         } catch (IOException e) {
             log.error("Error in converting events to binary message.Will retry in the next iteration");
         }
-        log.info("Sent - " + queuedEvent.getSourceHandlerElementId() + " |   " + queuedEvent.getEvent().toString());
+        // log.info("Sent - " + queuedEvent.getSourceHandlerElementId() + " |   " + queuedEvent.getEvent().toString());
         // queuedEvent = eventQueue.dequeue();
         //}
         messageBuffer.putInt(0, numOfEvents);
         if (numOfEvents > 0) {
             try {
                 data = Arrays.copyOfRange(messageBuffer.array(), 0, messageBuffer.position());
-                tcpNettyClient.send("eventMessage", compress(data));
+                tcpNettyClient.send("eventMessage", data);
             } catch (ConnectionUnavailableException e) {
                 log.error("Error in sending events to " + host + ":" + port + ".Will retry in the next iteration");
             }
@@ -120,7 +131,7 @@ public class ActiveNodeEventDispatcher {
         if (numOfEvents > 0) {
             try {
                 data = Arrays.copyOfRange(messageBuffer.array(), 0, messageBuffer.position());
-                tcpNettyClient.send("eventMessage", compress(data));
+                tcpNettyClient.send("eventMessage", data);
             } catch (ConnectionUnavailableException e) {
                 log.error("Error in sending events to " + host + ":" + port + ".Will retry in the next iteration");
             }
@@ -156,5 +167,14 @@ public class ActiveNodeEventDispatcher {
 //        }
         return output;
         //return new String(output, 0, count, "UTF-8");
+    }
+
+    @Override
+    public Object call() throws Exception {
+        if (tcpNettyClient == null) {
+            tcpNettyClient = ((TCPConnection) Thread.currentThread()).getTcpNettyClient();
+        }
+        sendEventToPassiveNode(queuedEvent);
+        return null;
     }
 }

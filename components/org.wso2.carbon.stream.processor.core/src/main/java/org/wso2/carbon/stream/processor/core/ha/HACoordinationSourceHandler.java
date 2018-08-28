@@ -18,24 +18,18 @@
 
 package org.wso2.carbon.stream.processor.core.ha;
 
+import com.google.common.util.concurrent.ListeningExecutorService;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.event.queue.EventQueue;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClientManager;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
-import org.wso2.carbon.stream.processor.core.util.BinaryEventConverter;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
-import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of {@link SourceHandler} used for 2 node minimum HA
@@ -43,18 +37,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class HACoordinationSourceHandler extends SourceHandler {
 
     private boolean isActiveNode;
-    //private boolean collectEvents;
     private long lastProcessedEventTimestamp = 0L;
-    //private Queue<Event> passiveNodeBufferedEvents;
     private String sourceHandlerElementId;
     private String siddhiAppName;
-    private TCPNettyClient tcpNettyClient;
     private ActiveNodeEventDispatcher activeNodeEventDispatcher;
+    private ListeningExecutorService listeningExecutorService;
+    private QueuedEvent queuedEvent = new QueuedEvent();
+    private AtomicInteger sequenceID;
 
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
-    public HACoordinationSourceHandler(int queueCapacity) {
-        //this.queueCapacity = queueCapacity;
+    public HACoordinationSourceHandler(ListeningExecutorService listeningExecutorService, AtomicInteger sequenceID) {
+        this.listeningExecutorService = listeningExecutorService;
+        this.sequenceID = sequenceID;
         activeNodeEventDispatcher = new ActiveNodeEventDispatcher();
     }
 
@@ -74,9 +69,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void sendEvent(Event event, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
-            //eventQueue.enqueue(new QueuedEvent(sourceHandlerElementId, event));
-            activeNodeEventDispatcher.sendEventToPassiveNode(new QueuedEvent(
-                    siddhiAppName, sourceHandlerElementId, event));
+            sendEventsToPassiveNode(event);
             inputHandler.send(event);
         }
     }
@@ -93,8 +86,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
             for (Event event : events) {
-                activeNodeEventDispatcher.sendEventToPassiveNode
-                        (new QueuedEvent(siddhiAppName ,sourceHandlerElementId, event));
+                sendEventsToPassiveNode(event);
             }
             inputHandler.send(events);
         }
@@ -181,10 +173,12 @@ public class HACoordinationSourceHandler extends SourceHandler {
         return sourceHandlerElementId;
     }
 
-//    private boolean sendEventsToPassiveNode(QueuedEvent queuedEvent) {
-//        if (tcpNettyClient.isActive()) {
-//            tcpNettyClient.send("eventMessage", BinaryEventConverter.convertToBinaryMessage());
-//        }
-//        return true;
-//    }
+    private void sendEventsToPassiveNode(Event event) {
+        queuedEvent.setSequenceID(sequenceID.incrementAndGet());
+        queuedEvent.setEvent(event);
+        queuedEvent.setSiddhiAppName(siddhiAppName);
+        queuedEvent.setSourceHandlerElementId(sourceHandlerElementId);
+        activeNodeEventDispatcher.setQueuedEvent(queuedEvent);
+        listeningExecutorService.submit(activeNodeEventDispatcher);
+    }
 }

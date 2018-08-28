@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.stream.processor.core.ha;
 
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
@@ -25,6 +27,7 @@ import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.event.queue.EventTreeMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnectionFactory;
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
@@ -78,7 +81,7 @@ public class HAManager {
     private int passiveQueueCapacity;
     private DeploymentConfig deploymentConfig;
     private BlockingQueue<ByteBuffer> eventByteBufferQueue = new LinkedBlockingQueue<ByteBuffer>(20000);
-
+    private ListeningExecutorService listeningExecutorService;
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -104,9 +107,9 @@ public class HAManager {
     }
 
     public void start() {
-        //eventQueue = EventTreeMapManager.initializeEventTreeMap(sourceQueueCapacity);
- //       TCPNettyClientManager.initializeTCPClient("localhost", 9892);
-        sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity);
+        listeningExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10, new
+                TCPConnectionFactory()));
+        sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity, listeningExecutorService);
         sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
         recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(sinkQueueCapacity);
 
@@ -170,7 +173,7 @@ public class HAManager {
      * Sync state
      * start siddhi app runtimes
      */
-    void changeToActive(){
+    void changeToActive() {
         if (!isActiveNode) {
             tcpServerInstance.stop();
             syncState();

@@ -22,14 +22,27 @@ import org.wso2.siddhi.core.event.Event;
 
 public class QueuedEvent {
     private String sourceHandlerElementId;
+    private int sequenceID;
     private Event event;
     private long timestamp;
     private String siddhiAppName;
 
-    public QueuedEvent(String siddhiAppName, String sourceHandlerElementId, Event event) {
+    public QueuedEvent() {
+    }
+
+    public QueuedEvent(String siddhiAppName, String sourceHandlerElementId, int sequenceID, Event event) {
         this.sourceHandlerElementId = sourceHandlerElementId;
         this.siddhiAppName = siddhiAppName;
+        this.sequenceID = sequenceID;
         this.event = event;
+    }
+
+    public int getSequenceID() {
+        return sequenceID;
+    }
+
+    public void setSequenceID(int sequenceID) {
+        this.sequenceID = sequenceID;
     }
 
     public String getSourceHandlerElementId() {
