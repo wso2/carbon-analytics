@@ -158,7 +158,7 @@ public class HAManager {
             EventTreeMapManager.initializeEventTreeMap();
 
             //start tcp server
-            tcpServerInstance.start(deploymentConfig.getTcpServerConfig(), eventByteBufferQueue);
+            tcpServerInstance.start(deploymentConfig.getTcpServer(), eventByteBufferQueue);
         }
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
