@@ -18,13 +18,16 @@
 
 package org.wso2.carbon.stream.processor.core.ha.tcp;
 
-import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConfig;
+import org.wso2.carbon.stream.processor.core.internal.beans.TCPServerConfig;
+
+import java.nio.ByteBuffer;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Singleton tcp server.
  */
 public class TCPServer {
-    private static TCPServer ourInstance = new TCPServer();
+    private static TCPServer instance = new TCPServer();
     private TCPNettyServer tcpNettyServer = new TCPNettyServer();
     private boolean started = false;
 
@@ -32,17 +35,17 @@ public class TCPServer {
     }
 
     public static TCPServer getInstance() {
-        return ourInstance;
+        return instance;
     }
 
-    public synchronized void start(TCPServerConfig serverConfig) {
+    public void start(TCPServerConfig serverConfig, BlockingQueue<ByteBuffer> eventByteBufferQueue) {
         if (!started) {
-            tcpNettyServer.start(serverConfig);
+            tcpNettyServer.start(serverConfig, eventByteBufferQueue);
             started = true;
         }
     }
 
-    public synchronized void stop() {
+    public void stop() {
         if (started) {
             try {
                 tcpNettyServer.shutdownGracefully();
@@ -50,6 +53,10 @@ public class TCPServer {
                 started = false;
             }
         }
+    }
+
+    public void shutdownOtherResources() {
+        tcpNettyServer.shutdownScheduler();
     }
 
 }

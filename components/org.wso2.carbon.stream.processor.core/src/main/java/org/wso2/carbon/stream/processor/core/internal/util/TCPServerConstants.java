@@ -21,7 +21,7 @@ package org.wso2.carbon.stream.processor.core.internal.util;
 public final class TCPServerConstants {
 
     public static final String DEFAULT_CHARSET = "UTF-8";
-    public static final int DEFAULT_RECEIVER_THREADS = 10;
+    public static final int DEFAULT_BOSS_THREADS = 10;
     public static final int DEFAULT_WORKER_THREADS = 10;
     public static final int DEFAULT_PORT = 9893;
     public static final String DEFAULT_HOST = "0.0.0.0";

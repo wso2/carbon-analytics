@@ -22,29 +22,24 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
-import org.wso2.carbon.stream.processor.core.ha.tcp.SiddhiEventConverter;
+import org.wso2.carbon.stream.processor.core.event.queue.EventTreeMapManager;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.util.timestamp.TimestampGenerator;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Byte to message decoder.
  */
 public class MessageDecoder extends ByteToMessageDecoder {
-    static final Logger LOG = Logger.getLogger(MessageDecoder.class);
-    private EventQueueManager eventQueueManager;
+    static final Logger log = Logger.getLogger(MessageDecoder.class);
+    private EventTreeMapManager eventTreeMapManager;
     private BlockingQueue<ByteBuffer> byteBufferQueue;
 
-    public MessageDecoder(EventQueueManager eventQueueManager,BlockingQueue<ByteBuffer> byteBufferQueue){
-        this.eventQueueManager = eventQueueManager;
+    public MessageDecoder(EventTreeMapManager eventTreeMapManager, BlockingQueue<ByteBuffer> byteBufferQueue){
+        this.eventTreeMapManager = eventTreeMapManager;
         this.byteBufferQueue = byteBufferQueue;
     }
 
@@ -70,21 +65,21 @@ public class MessageDecoder extends ByteToMessageDecoder {
             int dataLength = in.readInt();
             byte[] bytes = new byte[dataLength];
             in.readBytes(bytes);
-            LOG.info("Message Received : " + new String(bytes));
+            log.info("Message Received : " + new String(bytes));
 
             if (channelId.equals("eventMessage")) {
                 ByteBuffer messageBuffer = ByteBuffer.wrap(bytes);
                 byteBufferQueue.offer(messageBuffer);
-                //Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
-               // LOG.info("Event Received : " + events.toString());
+                //Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventTreeMapManager);
+               // log.info("Event Received : " + events.toString());
             } else if (channelId.equals("controlMessage")) {
                 String message = new String(bytes);
                 String[] persistedApps = message.split(",");
-                eventQueueManager.trimQueue(persistedApps);
-                LOG.info("Control Message Received : " + new String(bytes));
+                eventTreeMapManager.trimQueue(persistedApps);
+                log.info("Control Message Received : " + new String(bytes));
             }
         } catch (UnsupportedEncodingException e) {
-            LOG.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } finally {
             in.markReaderIndex();
         }

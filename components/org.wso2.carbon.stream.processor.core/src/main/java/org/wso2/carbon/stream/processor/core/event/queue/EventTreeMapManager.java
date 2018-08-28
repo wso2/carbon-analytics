@@ -23,23 +23,19 @@ import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.stream.input.source.Source;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
-public class EventQueueManager {
-    private static EventQueue<QueuedEvent> eventQueue;
+public class EventTreeMapManager {
+    private static TreeMap<Integer,QueuedEvent> eventTreeMap;
 
-    public EventQueueManager() {
+    public EventTreeMapManager() {
     }
 
-    public static EventQueue<QueuedEvent> initializeEventQueue(int queueSize) {
-        eventQueue = new EventQueue<>(queueSize);
-        return eventQueue;
-    }
-
-    public static EventQueue getEventQueue() {
-        return eventQueue;
+    public static TreeMap<Integer,QueuedEvent> initializeEventTreeMap() {
+        eventTreeMap = new TreeMap<Integer,QueuedEvent>();
+        return eventTreeMap;
     }
 
     public void trimAndSendToInputHandler() throws InterruptedException {
@@ -55,20 +51,20 @@ public class EventQueueManager {
                 Collection<List<Source>> sourceCollection = entry.getValue().getSiddhiAppRuntime().getSources();
                 for (List<Source> sources : sourceCollection) {
                     for (Source source : sources) {
-                        Iterator<QueuedEvent> itr = eventQueue.getQueue().iterator();
-                        while (itr.hasNext()) {
-                            QueuedEvent queuedEvent = itr.next();
+                        for(Map.Entry<Integer,QueuedEvent> treeMapValue : eventTreeMap.entrySet()) {
+                            int key = treeMapValue.getKey();
+                            QueuedEvent queuedEvent = treeMapValue.getValue();
                             if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
                                     getHandler().getElementId()) && persistedTimestamp < queuedEvent.getEvent().getTimestamp()){
                                 source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
-                                eventQueue.getQueue().remove(queuedEvent);
+                                eventTreeMap.remove(key);
                             }
                         }
                     }
                 }
             }
         }
-        eventQueue.getQueue().clear();
+        eventTreeMap.clear();
     }
 
     public void trimQueue(String[] persistedAppDetails){
@@ -76,19 +72,18 @@ public class EventQueueManager {
             String[] details = appDetail.split("__");
             String appName = details[1];
             long timestamp = Long.valueOf(details[0]);
-            eventQueue.trim((QueuedEvent queuedEvent) -> queuedEvent.getSiddhiAppName().equals(appName) &&
-                    queuedEvent.getEvent().getTimestamp() > timestamp);
-//            Iterator<QueuedEvent> itr = eventQueue.getQueue().iterator();
-//            while (itr.hasNext()) {
-//                QueuedEvent queuedEvent = itr.next();
-//                if(queuedEvent.getSiddhiAppName().equals(appName) && timestamp >= queuedEvent.getTimestamp()){
-//                    eventQueue.getQueue().remove(queuedEvent);
-//                }
-//            }
+            for(Map.Entry<Integer,QueuedEvent> treeMapValue : eventTreeMap.entrySet()) {
+                int key = treeMapValue.getKey();
+                QueuedEvent queuedEvent = treeMapValue.getValue();
+                if(queuedEvent.getSiddhiAppName().equals(appName) &&
+                        queuedEvent.getEvent().getTimestamp() > timestamp){
+                    eventTreeMap.remove(key);
+                }
+            }
         }
     }
 
-    public void addToQueue(QueuedEvent queuedEvent){
-        eventQueue.enqueue(queuedEvent);
+    public void addToTreeMap(int sequenceNum, QueuedEvent queuedEvent){
+        eventTreeMap.put(sequenceNum, queuedEvent);
     }
 }

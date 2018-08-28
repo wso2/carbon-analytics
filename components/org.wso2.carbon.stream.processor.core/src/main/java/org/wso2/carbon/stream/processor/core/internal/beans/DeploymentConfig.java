@@ -26,6 +26,7 @@ public class DeploymentConfig {
 
     private String type;
     private LiveSyncConfig liveSync;
+    private TCPServerConfig tcpServerConfig;
     private int outputSyncInterval = 60000;
     private int stateSyncGracePeriod = 120000;
     private int sinkQueueCapacity = 20000;
@@ -97,5 +98,15 @@ public class DeploymentConfig {
     public void setPassiveQueueCapacity(int passiveQueueCapacity) {
 
         this.passiveQueueCapacity = passiveQueueCapacity;
+    }
+
+    public TCPServerConfig getTcpServerConfig() {
+
+        return tcpServerConfig;
+    }
+
+    public void setTcpServerConfig(TCPServerConfig tcpServerConfig) {
+
+        this.tcpServerConfig = tcpServerConfig;
     }
 }

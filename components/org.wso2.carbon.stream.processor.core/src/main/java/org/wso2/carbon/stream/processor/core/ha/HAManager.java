@@ -23,30 +23,28 @@ import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
-import org.wso2.carbon.stream.processor.core.event.queue.EventQueue;
-import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
-import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
+import org.wso2.carbon.stream.processor.core.event.queue.EventTreeMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
-import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
-import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -75,10 +73,12 @@ public class HAManager {
     private HACoordinationRecordTableHandlerManager recordTableHandlerManager;
     private List<Timer> retrySiddhiAppSyncTimerList;
     private boolean isActiveNodeOutputSyncManagerStarted;
-    private EventQueue<QueuedEvent> eventQueue;
     private TCPServer tcpServerInstance = TCPServer.getInstance();
-    private EventQueueManager eventQueueManager;
- //   private static final TCPNettyClient tcpNettyClient = new TCPNettyClient();
+    private EventTreeMapManager eventTreeMapManager;
+    private int passiveQueueCapacity;
+    private DeploymentConfig deploymentConfig;
+    private BlockingQueue<ByteBuffer> eventByteBufferQueue = new LinkedBlockingQueue<ByteBuffer>(20000);
+
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -98,11 +98,13 @@ public class HAManager {
         this.username = deploymentConfig.getLiveSync().getUsername();
         this.password = deploymentConfig.getLiveSync().getPassword();
         this.retrySiddhiAppSyncTimerList = new LinkedList<>();
-        this.eventQueueManager = new EventQueueManager();
+        this.eventTreeMapManager = new EventTreeMapManager();
+        this.passiveQueueCapacity = deploymentConfig.getPassiveQueueCapacity();
+        this.deploymentConfig = deploymentConfig;
     }
 
     public void start() {
-        //eventQueue = EventQueueManager.initializeEventQueue(sourceQueueCapacity);
+        //eventQueue = EventTreeMapManager.initializeEventTreeMap(sourceQueueCapacity);
  //       TCPNettyClientManager.initializeTCPClient("localhost", 9892);
         sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity);
         sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
@@ -150,32 +152,10 @@ public class HAManager {
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
-            this.eventQueue = EventQueueManager.initializeEventQueue(20000);
+            EventTreeMapManager.initializeEventTreeMap();
 
             //start tcp server
-            tcpServerInstance.start(new TCPServerConfig());
-
-//            Map<String, Object> activeNodeHostAndPortMap = clusterCoordinator.getLeaderNode().getPropertiesMap();
-//
-//            //Not checking for null of Map since LeaderNode check is done. Leader node will have properties
-//            activeNodeHost = (String) activeNodeHostAndPortMap.get("host");
-//            activeNodePort = (String) activeNodeHostAndPortMap.get("port");
-//
-//            if (liveSyncEnabled) {
-//                log.info("Passive Node: Live Sync enabled. State sync from Active node scheduled after "
-//                        + stateSyncGracePeriod / 1000 + " seconds");
-//                syncAfterGracePeriodTimer = liveSyncAfterGracePeriod(stateSyncGracePeriod);
-//            } else {
-//                log.info("Passive Node: Live Sync disabled. State sync from Active node scheduled after "
-//                        + stateSyncGracePeriod / 1000 + " seconds");
-//                syncAfterGracePeriodTimer = persistenceStoreSyncAfterGracePeriod(stateSyncGracePeriod);
-//            }
-//
-//            passiveNodeOutputSchedulerService = Executors.newSingleThreadScheduledExecutor();
-//            passiveNodeOutputScheduledFuture = passiveNodeOutputSchedulerService.scheduleAtFixedRate(
-//                    new PassiveNodeOutputSyncManager(clusterCoordinator, sinkHandlerManager, recordTableHandlerManager,
-//                            activeNodeHost, activeNodePort, liveSyncEnabled, username, password), outputSyncInterval,
-//                    outputSyncInterval, TimeUnit.MILLISECONDS);
+            tcpServerInstance.start(deploymentConfig.getTcpServerConfig(), eventByteBufferQueue);
         }
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
@@ -186,18 +166,28 @@ public class HAManager {
     }
 
     /**
-     * Stops Publisher Syncing of Passive Node
-     * Cancels scheduled state sync of Passive Node from Active Node
-     * Updates Coordination Properties with Advertised Host and Port
+     * Stops TCP server
+     * Sync state
+     * start siddhi app runtimes
      */
     void changeToActive(){
         if (!isActiveNode) {
             tcpServerInstance.stop();
             syncState();
+
+            //Give time for byte buffer queue to be empty
+            while (eventByteBufferQueue.peek() != null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    log.warn("Error in checking byte buffer queue empty");
+                }
+            }
+            tcpServerInstance.shutdownOtherResources();
             //change the system clock to work with event time
             enableEventTimeClock(true);
             try {
-                eventQueueManager.trimAndSendToInputHandler();
+                eventTreeMapManager.trimAndSendToInputHandler();
             } catch (InterruptedException e) {
                 e.printStackTrace();//todo
             }

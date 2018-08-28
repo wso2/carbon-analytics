@@ -19,8 +19,6 @@ package org.wso2.carbon.stream.processor.core.ha.tcp;
 
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.event.queue.EventQueueManager;
-import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 import org.wso2.siddhi.core.event.Event;
 
@@ -39,7 +37,7 @@ public class SiddhiEventConverter {
     static final Logger LOG = Logger.getLogger(SiddhiEventConverter.class);
     private static int count = 0;
 
-//    public static Event[] toConvertAndEnqueue(ByteBuffer messageBuffer, EventQueueManager eventQueueManager) {
+//    public static Event[] toConvertAndEnqueue(ByteBuffer messageBuffer, EventTreeMapManager eventQueueManager) {
 //        try {
 //            messageBuffer = decompress(messageBuffer);
 //           // int isCompressed = messageBuffer.getInt();
