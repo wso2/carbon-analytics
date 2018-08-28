@@ -1515,11 +1515,11 @@
 
     <properties>
         <carbon.analytics.version>2.0.406-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.2.7</siddhi.version>
-        <siddhi.bundle.version>4.2.7</siddhi.bundle.version>
+        <siddhi.version>4.2.9</siddhi.version>
+        <siddhi.bundle.version>4.2.9</siddhi.bundle.version>
 
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.0.66</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.0.67</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.1.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
@@ -1626,7 +1626,7 @@
         <carbon.utils.version>2.0.7</carbon.utils.version>
         <carbon.config.version>2.1.5</carbon.config.version>
         <carbon.config.version.range>[2.1.5, 3.0.0)</carbon.config.version.range>
-        <carbon.securevault.version>5.0.10</carbon.securevault.version>
+        <carbon.securevault.version>5.0.11</carbon.securevault.version>
 
         <!-- Clustering Dependencies -->
         <carbon.coordination.version>2.0.18</carbon.coordination.version>
@@ -1679,9 +1679,10 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.6.2</msf4j.version>
+        <msf4j.version>2.6.3</msf4j.version>
         <msf4j.import.version.range>[2.6.2, 3.0.0)</msf4j.import.version.range>
-        <com.fasterxml.jackson.core.version>2.8.9</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.core.version>2.9.6</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>
         <io.swagger.version>1.5.16</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
         <pax.logging.api.version>1.10.0</pax.logging.api.version>
