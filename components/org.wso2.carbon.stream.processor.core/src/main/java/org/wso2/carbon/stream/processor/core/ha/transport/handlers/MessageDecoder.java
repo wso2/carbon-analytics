@@ -27,6 +27,7 @@ import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -37,6 +38,9 @@ public class MessageDecoder extends ByteToMessageDecoder {
     static final Logger log = Logger.getLogger(MessageDecoder.class);
     private EventTreeMapManager eventTreeMapManager;
     private BlockingQueue<ByteBuffer> byteBufferQueue;
+    private static long startTime;
+    private static long endTime;
+    static int count = 0;
 
     public MessageDecoder(EventTreeMapManager eventTreeMapManager, BlockingQueue<ByteBuffer> byteBufferQueue){
         this.eventTreeMapManager = eventTreeMapManager;
@@ -47,6 +51,10 @@ public class MessageDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (in.readableBytes() < 5) {
             return;
+        }
+        if (startTime == 0L) {
+            log.info("TIME START LLLLLLLLLLLLOOOOOOOOOOOOGGGGGGGGGg ");
+            startTime = new Date().getTime();
         }
         try {
             int protocol = in.readByte();
@@ -65,13 +73,21 @@ public class MessageDecoder extends ByteToMessageDecoder {
             int dataLength = in.readInt();
             byte[] bytes = new byte[dataLength];
             in.readBytes(bytes);
-            log.info("Message Received : " + new String(bytes));
+            //LOG.info("Message Received : " + new String(bytes));
 
             if (channelId.equals("eventMessage")) {
                 ByteBuffer messageBuffer = ByteBuffer.wrap(bytes);
                 byteBufferQueue.offer(messageBuffer);
-                //Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventTreeMapManager);
-               // log.info("Event Received : " + events.toString());
+                count++;
+                if (count % 10000 == 0) {
+                    log.info("COUNT " + count);
+                    endTime = new Date().getTime();
+                    //LOG.info("TIME START    " + time + "    TIMES   " + timeE);
+                    log.info("Server TPS:   " + (((10000 * 1000) / (endTime - startTime))));
+                    startTime = new Date().getTime();
+                }
+                //Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
+                // LOG.info("Event Received : " + events.toString());
             } else if (channelId.equals("controlMessage")) {
                 String message = new String(bytes);
                 String[] persistedApps = message.split(",");

@@ -77,7 +77,7 @@ public class TCPNettyServer {
                     @Override
                     protected void initChannel(Channel channel) throws Exception {
                         ChannelPipeline p = channel.pipeline();
-                        p.addLast(new MessageDecoder(eventTreeMapManager,eventByteBufferQueue));
+                        p.addLast(new MessageDecoder(eventTreeMapManager, eventByteBufferQueue));
                     }
                 })
                 .option(ChannelOption.TCP_NODELAY, true)
@@ -92,7 +92,7 @@ public class TCPNettyServer {
         }
 
         eventBufferExtractorScheduleFuture = scheduledExecutorService.
-                scheduleAtFixedRate(eventBufferExtractor,0, 5 , TimeUnit.MILLISECONDS);
+                scheduleAtFixedRate(eventBufferExtractor, 0, 5, TimeUnit.MILLISECONDS);
     }
 
     public void shutdownGracefully() {
@@ -126,20 +126,12 @@ public class TCPNettyServer {
                 try {
                     int noOfEvents = eventContent.getInt();
                     QueuedEvent queuedEvent;
-                    log.info("No events in the received batch :     " + noOfEvents);
+                    // log.info("No events in the received batch :     " + noOfEvents);
                     Event[] events = new Event[noOfEvents];
                     for (int i = 0; i < noOfEvents; i++) {
                         String sourceHandlerElementId;
                         String siddhiAppName;
-                        String sequenceNum;
-
-                        int sequenceSize = eventContent.getInt();
-                        if (sequenceSize == 0) {
-                            sequenceNum = null;
-                        } else {
-                            sequenceNum = BinaryMessageConverterUtil.getString(eventContent, sequenceSize);
-                        }
-
+                        int sequenceID = eventContent.getInt();
                         int stringSize = eventContent.getInt();
                         if (stringSize == 0) {
                             sourceHandlerElementId = null;
@@ -163,8 +155,10 @@ public class TCPNettyServer {
                         }
                         String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
                         events[i] = SiddhiEventConverter.getEvent(eventContent, attributeTypes);
-                        queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, events[i]);
-                        eventTreeMapManager.addToTreeMap(Integer.parseInt(sequenceNum), queuedEvent);
+                        queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i]);
+                        eventTreeMapManager.addToTreeMap(sequenceID, queuedEvent);
+//                        log.info("RECEIVED EVENT - " + sourceHandlerElementId + "       ||      " +
+//                                events[0].toString() + " " + "   |   COUNT " + count);
                     }
                 } catch (UnsupportedEncodingException e) {
 
