@@ -143,6 +143,8 @@
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",
+            com.fasterxml.jackson.core.*;version="${com.fasterxml.jackson.core.version}",
+            com.fasterxml.jackson.databind.*;version="${com.fasterxml.jackson.core.version}",
             *;resolution:=optional
         </import.package>
         <carbon.component>
