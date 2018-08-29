@@ -34,6 +34,7 @@ public class DeploymentConfig {
     private int retryAppSyncPeriod = 60000;
     private int passiveQueueCapacity = 20000;
     private int eventByteBufferQueueCapacity = 20000;
+    private TCPClientPoolConfig tcpClientPool;
 
     public String getType() {
         return type;
@@ -117,7 +118,14 @@ public class DeploymentConfig {
     }
 
     public void setEventByteBufferQueueCapacity(int eventByteBufferQueueCapacity) {
-
         this.eventByteBufferQueueCapacity = eventByteBufferQueueCapacity;
+    }
+
+    public TCPClientPoolConfig getTcpClientPool() {
+        return tcpClientPool;
+    }
+
+    public void setTcpClientPool(TCPClientPoolConfig tcpClientPool) {
+        this.tcpClientPool = tcpClientPool;
     }
 }

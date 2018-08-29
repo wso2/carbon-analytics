@@ -69,7 +69,7 @@ public class BinaryEventConverter {
         String attributes = Arrays.toString(eventMetaInfo.getAttributeTypeOrder());
         //messageSize += eventMetaInfo.getEventSize() + attributes.length();
 
-        messageBuffer.putInt(queuedEvent.getSequenceID());
+        messageBuffer.putLong(queuedEvent.getSequenceID());
         messageBuffer.putInt((queuedEvent.getSourceHandlerElementId()).length());
         messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
         messageBuffer.putInt((queuedEvent.getSiddhiAppName()).length());
